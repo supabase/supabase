@@ -32,21 +32,21 @@ describe('validateWebAuthnOrigins', () => {
       })
     })
 
-    it('counts Android app origins toward the 5-origin limit', () => {
+    it('counts Android app origins toward the 10-origin limit', () => {
       const origins = [
-        ...Array.from({ length: 4 }, (_, i) => `https://app${i}.example.com`),
+        ...Array.from({ length: 9 }, (_, i) => `https://app${i}.example.com`),
         ANDROID_ORIGIN,
       ].join(',')
       expect(validateWebAuthnOrigins(origins, 'example.com')).toEqual({ valid: true })
     })
 
-    it('rejects when origins exceed 5 counting an Android app origin', () => {
+    it('rejects when origins exceed 10 counting an Android app origin', () => {
       const origins = [
-        ...Array.from({ length: 5 }, (_, i) => `https://app${i}.example.com`),
+        ...Array.from({ length: 10 }, (_, i) => `https://app${i}.example.com`),
         ANDROID_ORIGIN,
       ].join(',')
       const result = validateWebAuthnOrigins(origins, 'example.com')
-      expect(result).toEqual({ valid: false, message: 'A maximum of 5 origins is allowed' })
+      expect(result).toEqual({ valid: false, message: 'A maximum of 10 origins is allowed' })
     })
 
     it.each([

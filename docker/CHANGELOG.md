@@ -22,6 +22,77 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ---
 
+## [0.8.5](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.5) - 2026-11-23
+
+⚠️ **Note:** This update includes **important changes**. Please check the details below:
+- Includes **security fixes** for Auth, Storage, Supavisor, PgBouncer, nginx and Kong - updating is **strongly recommended**
+- Realtime database migrations in this release are one-way: rolling back to the previous Realtime version breaks Postgres Changes. **Back up your database** before updating. See the **Realtime** section below
+- HTML and SVG files opened directly in the browser from Storage, the Data API or Edge Functions can no longer run scripts. See the **API gateway** section below
+- With the logs override, Vector needs a new environment variable or logs stop arriving. `update.sh` applies it. See the **Analytics (Logflare)** section below
+
+### Documentation
+- Added a guide for [configuring the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server) - PR [#53544](https://github.com/supabase/supabase/pull/53544)
+- Fixed the nginx template variable name in the [HTTPS proxy guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) - PR [#53740](https://github.com/supabase/supabase/pull/53740) (via [@sudhi76](https://github.com/sudhi76))
+
+### API gateway
+- ⚠️ Changed: the gateway adds a `Content-Security-Policy` to responses on `/storage/v1/`, `/rest/v1/` and `/functions/v1/`, so HTML or SVG opened directly in the browser can't run scripts or load other resources. `<img>`, `fetch` and downloads are unaffected (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53466](https://github.com/supabase/supabase/pull/53466)
+- Changed: Studio routes (`/`, `/mcp`, `/api/mcp`) no longer allow cross-origin requests (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53546](https://github.com/supabase/supabase/pull/53546)
+- Fixed the OAuth 2.1 server endpoints requiring an API key at the gateway (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53542](https://github.com/supabase/supabase/pull/53542)
+- Fixed Envoy cutting off responses after 30 seconds, such as long downloads; requests now time out after 5 idle minutes (requires `volumes/api/envoy/lds.template.yaml` update) - PR [#51620](https://github.com/supabase/supabase/pull/51620) (via [@mandar1045](https://github.com/mandar1045))
+- Fixed the nginx override rejecting request bodies over 1 MB outside Storage (requires `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#53039](https://github.com/supabase/supabase/pull/53039) (via [@24tiy](https://github.com/24tiy))
+- Fixed dashboard basic auth breaking after `caddy reload` with the Caddy override (requires `docker-compose.caddy.yml` and `volumes/proxy/caddy/Caddyfile` update) - PR [#52717](https://github.com/supabase/supabase/pull/52717) (via [@24tiy](https://github.com/24tiy))
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.9` (requires `docker-compose.nginx.yml` update)
+  - ⚠️ Fixed **security** issues in HTTP/2 and TLS 1.3 handling, reachable with the bundled configuration (CVE-2026-123007, CVE-2026-123633, CVE-2026-118899) - [nginx advisories](https://nginx.org/en/security_advisories.html)
+- Updated Kong to `3.9.5` (requires `docker-compose.kong.yml` update) - [Changelog](https://github.com/Kong/kong/blob/release/3.9.x/CHANGELOG.md#395)
+  - ⚠️ Fixed **security** issues in HTTP/2 handling (CVE-2026-123007, CVE-2026-123633)
+
+### Studio
+- Updated to `2026.11.23-sha-4a73166`
+
+### Auth
+- Updated to `v2.198.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.198.0)
+  - ⚠️ Fixed a **security** issue: a crafted request could crash Auth (Go 1.27.4, GO-2026-6859) - [auth#2922](https://github.com/supabase/auth/pull/2922)
+  - Fixed a **security** issue in the OAuth 2.1 server; only affects setups that enabled it
+  - Changed: a magic link, email OTP or recovery for an unconfirmed account now clears a password set before confirmation - [auth#2887](https://github.com/supabase/auth/pull/2887)
+
+### Realtime
+- Updated to `v2.174.6` - [Release](https://github.com/supabase/realtime/releases/tag/v2.174.6)
+  - ⚠️ Changed: adds one-way database migrations. Rolling back to `v2.148.3` makes Postgres Changes subscriptions fail with error 42P10 until you recreate the old index: `CREATE UNIQUE INDEX IF NOT EXISTS subscription_subscription_id_entity_filters_action_filter_selec ON realtime.subscription USING btree (subscription_id, entity, filters, action_filter, COALESCE(selected_columns, '{}'::text[]));`
+  - Added broadcast persistence: clients can store private-channel broadcasts for replay if an RLS policy on `realtime.messages` allows it - [realtime#2235](https://github.com/supabase/realtime/pull/2235)
+  - Fixed Postgres Changes filters on array columns stopping all changes, and large `in` filters - [realtime#2362](https://github.com/supabase/realtime/pull/2362), [realtime#2097](https://github.com/supabase/realtime/pull/2097)
+- ⚠️ Changed: Realtime generates its Erlang cookie at startup, binds its internal RPC port to loopback and disables cluster discovery. Multi-node setups must set `RELEASE_COOKIE` (requires `docker-compose.yml`, `.env`, and `volumes/realtime/docker-entrypoint.sh` update) - PR [#53175](https://github.com/supabase/supabase/pull/53175)
+
+### Storage
+- Updated to `v1.98.6` - [Release](https://github.com/supabase/storage/releases/tag/v1.98.6)
+  - ⚠️ Fixed S3 protocol requests for unsupported operations, such as `PutObjectTagging`, overwriting or deleting objects - [storage#1722](https://github.com/supabase/storage/pull/1722)
+  - ⚠️ Fixed **security** issues in dependencies: a denial of service in multipart upload parsing (`@fastify/multipart`, GHSA-5849-5m6q-9632) - [storage#1704](https://github.com/supabase/storage/pull/1704)
+  - Fixed TUS uploads ignoring a bucket size limit of 0, and Storage not recovering after a database connection drop - [storage#1668](https://github.com/supabase/storage/pull/1668), [storage#1730](https://github.com/supabase/storage/pull/1730)
+- Updated RustFS to `1.0.6` (requires `docker-compose.rustfs.yml` update)
+
+### imgproxy
+- Updated to `v4.0.24`, now from `ghcr.io/imgproxy/imgproxy` (requires `docker-compose.yml` update) - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v4.0.24)
+
+### Postgres Meta
+- Updated to `v0.100.1`, rebuilt on Node.js 22.23.5 with its security fixes - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.100.1)
+
+### Edge Runtime
+- Updated to `v1.79.2` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.79.2)
+  - Changed: functions using built-in ONNX inference (`Supabase.ai.Session`) now log a deprecation warning - [edge-runtime#769](https://github.com/supabase/edge-runtime/pull/769)
+
+### Supavisor
+- Updated to `2.10.1` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.10.1)
+  - Fixed **security** issues in dependencies and the Erlang/OTP runtime (27.3.4.19); the image is now based on Debian 13
+  - Fixed transaction-mode clients hanging with 4 or more pipelined queries - [supavisor#1207](https://github.com/supabase/supavisor/pull/1207)
+- Updated PgBouncer to `v1.26.1-p0` (requires `docker-compose.pgbouncer.yml` update)
+  - ⚠️ Fixed **security** issues reachable through the published pooler port, including unauthenticated crashes (CVE-2026-19888, CVE-2026-6668, CVE-2026-107349, CVE-2026-107350) - [PgBouncer news](https://github.com/pgbouncer/pgbouncer/blob/master/NEWS.md)
+  - Changed: `search_path` passed at connect time is now ignored, not rejected, so it can't leak between clients (`IGNORE_STARTUP_PARAMETERS`). Use `SET LOCAL search_path` or schema-qualified names - [pgbouncer#1635](https://github.com/pgbouncer/pgbouncer/issues/1635)
+
+### Analytics (Logflare)
+- Updated Vector to `0.62.0-alpine` (requires `docker-compose.logs.yml` update) - [Release](https://github.com/vectordotdev/vector/releases/tag/v0.62.0)
+  - ⚠️ Changed: Vector 0.57+ expands `${VAR}` in its config only with `VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION: "true"`, now set in `docker-compose.logs.yml`. Without it, logs stop arriving - [vector#25699](https://github.com/vectordotdev/vector/pull/25699)
+
+---
+
 ## [0.8.4](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.4) - 2026-11-05
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below:
