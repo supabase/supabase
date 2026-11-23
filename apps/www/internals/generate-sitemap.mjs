@@ -231,11 +231,14 @@ async function generate() {
     </urlset>
     `
 
-  const { code: formatted } = await format('sitemap.html', sitemap, {
+  const { code: formatted, errors } = await format('sitemap.html', sitemap, {
     tabWidth: 2,
     printWidth: 100,
     endOfLine: 'lf',
   })
+  if (errors.length > 0) {
+    throw new Error(`Failed to format www sitemap: ${errors.map((e) => e.message).join('; ')}`)
+  }
 
   /**
    * generate sitemap router
