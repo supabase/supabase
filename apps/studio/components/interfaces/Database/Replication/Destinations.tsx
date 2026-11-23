@@ -97,7 +97,6 @@ const compareStatusNames = (
 }
 
 export const Destinations = () => {
-  const clusterId = useReplicationClusterId()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
