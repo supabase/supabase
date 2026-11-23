@@ -264,39 +264,45 @@ Calling [`SignInWithSSO`](/docs/reference/csharp/auth-signinwithsso) starts the 
 
 ### Use a dedicated scope for a connection
 
-By default, every SAML connection in a project shares one `EntityID`, one Metadata URL, and one ACS URL. Some identity providers, including Microsoft Entra, don't let you register the same `EntityID` in more than one application. With shared URLs, you can connect only one such application to your project.
+By default, every SAML connection in a project shares one `EntityID`, one Metadata URL, and one ACS URL. Some identity providers, including Microsoft Entra, require an `EntityID` to be unique, and Entra enforces this within a tenant. With shared URLs, you can connect only one such application in each tenant to your project.
 
 A connection with a dedicated scope has its own `EntityID`, Metadata URL, and ACS URL. Each URL includes the connection's provider ID, so you can register a separate identity provider application for every connection.
 
-| Name                        | Shared (default)                                          | Dedicated scope                                                         |
-| --------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `EntityID` and Metadata URL | `https://<project>.supabase.co/auth/v1/sso/saml/metadata` | `https://<project>.supabase.co/auth/v1/sso/<provider-id>/saml/metadata` |
-| ACS URL                     | `https://<project>.supabase.co/auth/v1/sso/saml/acs`      | `https://<project>.supabase.co/auth/v1/sso/<provider-id>/saml/acs`      |
+| Name                        | Shared (default)                                                 | Dedicated scope                                                                   |
+| --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `EntityID` and Metadata URL | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/saml/metadata` | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/YOUR_PROVIDER_ID/saml/metadata` |
+| ACS URL                     | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/saml/acs`      | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/YOUR_PROVIDER_ID/saml/acs`      |
 
 All connections still use the same signing certificate. A connection with a dedicated scope accepts assertions only at its own ACS URL, and a connection without one accepts assertions only at the shared ACS URL.
 
-To create a connection with a dedicated scope, add the `--dedicated-scope` flag to [`supabase sso add`](/docs/reference/cli/supabase-sso-add):
+To create a connection with a dedicated scope, add the `--dedicated-scope` flag to [`supabase sso add`](/docs/reference/cli/supabase-sso-add). Replace `YOUR_PROJECT_REF` with your project reference:
 
 ```bash
-supabase sso add --type saml --remote=<your-project> \
+supabase sso add --type saml --remote=YOUR_PROJECT_REF \
   --metadata-url 'https://company.com/idp/saml/metadata' \
   --domains company.com \
   --dedicated-scope
 ```
 
-You can set a dedicated scope only when you add a connection. [`supabase sso update`](/docs/reference/cli/supabase-sso-update) doesn't accept the flag. To change the scope of an existing connection, remove the connection and add it again.
+You can set a dedicated scope only when you add a connection. [`supabase sso update`](/docs/reference/cli/supabase-sso-update) doesn't accept the flag.
 
-`supabase sso show`, `add`, `update`, and `remove` print the connection's own `EntityID` and ACS URL when it has a dedicated scope. `supabase sso info` always prints the shared values. The `saml.dedicated_scope` field appears in the output of `supabase sso show` and `supabase sso list`.
+<Admonition type="caution" title="Changing the scope signs users out">
+
+To change the scope of an existing connection, you have to remove it and add it again. Removing a connection signs out its users, and the new connection gets a new `sso_provider_id`. Before users sign in again, update every stored `sso_provider_id` value and every Row Level Security policy that references the old ID.
+
+</Admonition>
+
+`supabase sso show`, `add`, `update`, and `remove` print the connection's own `SP ENTITY ID` and `SP ACS URL` when it has a dedicated scope. `supabase sso info` always prints the shared values. The default `supabase sso list` table has no dedicated-scope column. To read the `saml.dedicated_scope` field, run `supabase sso show YOUR_PROVIDER_ID --remote=YOUR_PROJECT_REF -o json`.
 
 #### Set up an identity provider application
 
-Some identity providers need the `EntityID` and ACS URL when you create the application, but the provider ID in the dedicated URLs doesn't exist until you add the connection. To work around this, create the application with the shared values first, and then switch it to the dedicated values.
+Some identity providers need the `EntityID` and ACS URL when you create the application, but the provider ID in the dedicated URLs doesn't exist until you add the connection. To work around this, create the application with temporary values first, and then switch it to the dedicated values.
 
-1. In the identity provider, create the application with the shared `EntityID`, Metadata URL, and ACS URL from `supabase sso info --remote=<your-project>`.
+1. In the identity provider, create the application. Use the shared `EntityID` and ACS URL from `supabase sso info --remote=YOUR_PROJECT_REF`. If the identity provider rejects the `EntityID` because another application already uses it, as Entra does within a tenant, enter any unique temporary identifier instead.
 2. Copy the identity provider's Metadata URL for the new application.
-3. Add the connection with `supabase sso add` and the `--dedicated-scope` flag, using the Metadata URL from the previous step.
-4. Run `supabase sso show <provider-id> --remote=<your-project>` and copy the connection's `EntityID`, Metadata URL, and ACS URL.
-5. In the identity provider, edit the application to use the dedicated `EntityID`, Metadata URL, and ACS URL.
+3. Add the connection with `supabase sso add` and the `--dedicated-scope` flag, using the Metadata URL from the previous step. The output includes the provider ID.
+4. Run `supabase sso show YOUR_PROVIDER_ID --remote=YOUR_PROJECT_REF`. Copy only the `SP ENTITY ID` and `SP ACS URL` values. `SP ENTITY ID` is also the Supabase Metadata URL for the connection. Don't copy the identity provider's `SAML 2.0 EntityID` or `SAML 2.0 METADATA` values.
+5. In the identity provider, edit the application to use the `SP ENTITY ID` and `SP ACS URL` values.
 
 Repeat these steps for each application. Test sign-in only after step 5, because the connection rejects assertions sent to the shared ACS URL.
 
