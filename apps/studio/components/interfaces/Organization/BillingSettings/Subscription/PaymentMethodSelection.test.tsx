@@ -52,6 +52,7 @@ vi.mock('@stripe/react-stripe-js', () => ({
   AddressElement: ({ onChange }: { onChange: (event: unknown) => void }) => (
     <button
       type="button"
+      tabIndex={0}
       data-testid="address-element"
       onClick={() =>
         onChange({

@@ -254,7 +254,6 @@ export const PaymentBillingAddress = ({
           </p>
           {taxId && (
             <p className="mt-1 text-base text-foreground-light">
-              <span className="text-foreground-lighter">Tax ID</span>{' '}
               <span translate="no">{formatTaxId(taxId, address.country)}</span>
             </p>
           )}

@@ -299,33 +299,6 @@ export const SubscriptionPlanUpdateView = ({
               <PlanChangeNotes exampleProjectRef={exampleProjectRef} />
             )}
 
-            {isDowngrade && (
-              <div>
-                <h2 className="mb-1 text-sm text-foreground">Features you'll lose</h2>
-                <p className="mb-4 text-xs text-foreground-light">
-                  Please review carefully before downgrading.
-                </p>
-                <ul className="space-y-2">
-                  {featuresToLose.map((feature) => (
-                    <li
-                      key={typeof feature === 'string' ? feature : feature[0]}
-                      className="flex items-start gap-3"
-                    >
-                      <InfoIcon
-                        size={14}
-                        strokeWidth={3}
-                        className="mt-1 shrink-0 text-warning-600"
-                        aria-hidden="true"
-                      />
-                      <p className="text-sm text-foreground-light">
-                        {typeof feature === 'string' ? feature : feature[0]}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             {billingViaPartner && (
               <p className="text-sm text-foreground-light">
                 This organization is billed through our partner{' '}
@@ -358,6 +331,33 @@ export const SubscriptionPlanUpdateView = ({
                   onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
                   onClose={onClose}
                 />
+              </div>
+            )}
+
+            {isDowngrade && (
+              <div>
+                <h2 className="mb-1 text-sm text-foreground">Features you'll lose</h2>
+                <p className="mb-4 text-xs text-foreground-light">
+                  Please review carefully before downgrading.
+                </p>
+                <ul className="space-y-2">
+                  {featuresToLose.map((feature) => (
+                    <li
+                      key={typeof feature === 'string' ? feature : feature[0]}
+                      className="flex items-start gap-3"
+                    >
+                      <InfoIcon
+                        size={14}
+                        strokeWidth={3}
+                        className="mt-1 shrink-0 text-warning-600"
+                        aria-hidden="true"
+                      />
+                      <p className="text-sm text-foreground-light">
+                        {typeof feature === 'string' ? feature : feature[0]}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
