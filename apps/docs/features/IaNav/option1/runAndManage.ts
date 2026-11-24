@@ -337,22 +337,16 @@ export const runAndManage: NavMenuConstant = {
     {
       name: 'Logs and monitoring',
       items: [
+        { name: 'Overview', url: '/guides/observability' },
         {
-          name: 'Logs',
+          name: 'Read project data',
           items: [
-            { name: 'Logs in Studio', url: '/guides/observability/logs' },
             { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
+            { name: 'Logs in Studio', url: '/guides/observability/logs' },
+            { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
             { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
-            { name: 'Configure logging', url: '/guides/observability/configure-logging' },
-            { name: 'Log drains', url: '/guides/observability/log-drains' },
-            {
-              name: 'Postgres connection logging',
-              url: '/guides/platform/postgres-connection-logging',
-            },
-            {
-              name: 'Log slow and failing queries',
-              url: '/guides/observability/log-slow-queries',
-            },
+            { name: 'Advisors', url: '/guides/observability/advisors' },
+            { name: 'Reports', url: '/guides/observability/reports' },
           ],
         },
         {
@@ -369,13 +363,9 @@ export const runAndManage: NavMenuConstant = {
             { name: 'Vendor-agnostic setup', url: '/guides/observability/metrics/vendor-agnostic' },
           ],
         },
-        { name: 'Reports', url: '/guides/observability/reports' },
         {
-          name: 'Advisors and health checks',
-          items: [
-            { name: 'Advisors', url: '/guides/observability/advisors' },
-            { name: 'Detection checks', url: '/guides/observability/detecting' },
-          ],
+          name: 'Detect and diagnose',
+          items: [{ name: 'Detection checks', url: '/guides/observability/detecting' }],
         },
         {
           name: 'Agent prompts',
@@ -391,8 +381,18 @@ export const runAndManage: NavMenuConstant = {
           ],
         },
         {
-          name: 'Tracing and error monitoring',
+          name: 'Configure and export',
           items: [
+            { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+            {
+              name: 'Log slow and failing queries',
+              url: '/guides/observability/log-slow-queries',
+            },
+            { name: 'Log drains', url: '/guides/observability/log-drains' },
+            {
+              name: 'Postgres connection logging',
+              url: '/guides/platform/postgres-connection-logging',
+            },
             { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
             { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
           ],
