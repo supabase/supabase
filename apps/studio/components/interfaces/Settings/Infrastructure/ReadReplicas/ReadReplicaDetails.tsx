@@ -15,11 +15,12 @@ import {
 } from 'ui-patterns/Chart'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
@@ -129,8 +130,8 @@ export const ReadReplicaDetails = () => {
           </ChartContent>
         </ChartCard>
       </Chart>
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth>
+      <PageContainer>
+        <PageSection>
           <Card>
             <CardHeader>
               <CardTitle>Replica Information</CardTitle>
@@ -177,8 +178,8 @@ export const ReadReplicaDetails = () => {
               </>
             )}
           </Card>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection>
+      </PageContainer>
     </>
   )
 }
