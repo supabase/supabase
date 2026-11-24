@@ -187,6 +187,16 @@ describe('CloseOnNavigation', () => {
     expect(screen.getByText('initiated')).toBeInTheDocument()
     expect(screen.getByText('menu-mounted')).toBeInTheDocument()
   })
+
+  it('keeps an open menu open on a hash-only change', async () => {
+    const user = userEvent.setup()
+    const { navigate } = renderMenu('/careers#positions')
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }))
+    await navigate('/careers')
+
+    expect(screen.getByText('open')).toBeInTheDocument()
+  })
 })
 
 describe('useCrossCompatRouter', () => {

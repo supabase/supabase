@@ -75,15 +75,16 @@ function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
 
-  const { asPath } = useFramework()
-  const previousAsPathRef = useRef(asPath)
+  // Hash-only changes (e.g. Back from `/careers#positions`) aren't navigations, so ignore the fragment.
+  const path = useFramework().asPath?.split('#')[0]
+  const previousPathRef = useRef(path)
 
   useEffect(() => {
-    if (previousAsPathRef.current === asPath) return
-    previousAsPathRef.current = asPath
+    if (previousPathRef.current === path) return
+    previousPathRef.current = path
     setIsOpen(false)
     resetCommandMenu()
-  }, [asPath, resetCommandMenu, setIsOpen])
+  }, [path, resetCommandMenu, setIsOpen])
 
   return children
 }

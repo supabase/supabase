@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { FrameworkProvider } from 'common'
 import { useEffect, useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -24,10 +25,12 @@ function MobileSheetNavWithState({
   shouldCloseOnRouteChange = true,
   shouldCloseOnQueryChange = true,
   shouldCloseOnViewportResize = true,
+  children = <div>Nav content</div>,
 }: {
   shouldCloseOnRouteChange?: boolean
   shouldCloseOnQueryChange?: boolean
   shouldCloseOnViewportResize?: boolean
+  children?: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
   useEffect(() => {
@@ -43,7 +46,7 @@ function MobileSheetNavWithState({
         shouldCloseOnQueryChange={shouldCloseOnQueryChange}
         shouldCloseOnViewportResize={shouldCloseOnViewportResize}
       >
-        <div>Nav content</div>
+        {children}
       </MobileSheetNav>
     </>
   )
@@ -166,6 +169,58 @@ describe('MobileSheetNav', () => {
       mockRouter.asPath = '/project/default/issues/function_search_path_mutable'
       rerender(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
       await waitFor(() => expect(screen.queryByText('Nav content')).not.toBeInTheDocument())
+    })
+  })
+
+  describe('link taps', () => {
+    // Router links prevent the default navigation, so the asPath has not changed yet on tap.
+    const RouterLink = ({ href, ...props }: React.ComponentProps<'a'> & { href: string }) => (
+      <a href={href} onClick={(event) => event.preventDefault()} {...props} />
+    )
+
+    it('closes the sheet as soon as an internal link is tapped', async () => {
+      const user = userEvent.setup()
+      renderWithFramework(
+        <MobileSheetNavWithState>
+          <RouterLink href="/other-page">Other page</RouterLink>
+        </MobileSheetNavWithState>
+      )
+
+      await user.click(await screen.findByRole('link', { name: 'Other page' }))
+
+      expect(screen.getByTestId('sheet-open')).toHaveTextContent('false')
+    })
+
+    it('keeps the sheet open for new tabs, external links, and opted-out query links', async () => {
+      const user = userEvent.setup()
+      renderWithFramework(
+        <MobileSheetNavWithState shouldCloseOnQueryChange={false}>
+          <RouterLink href="/other-page" target="_blank">
+            New tab
+          </RouterLink>
+          <RouterLink href="https://example.com/docs">External</RouterLink>
+          <RouterLink href={`${window.location.pathname}?q=function`}>Filter</RouterLink>
+        </MobileSheetNavWithState>
+      )
+
+      await user.click(await screen.findByRole('link', { name: 'New tab' }))
+      await user.click(screen.getByRole('link', { name: 'External' }))
+      await user.click(screen.getByRole('link', { name: 'Filter' }))
+
+      expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
+    })
+
+    it('keeps the sheet open on link taps when shouldCloseOnRouteChange is false', async () => {
+      const user = userEvent.setup()
+      renderWithFramework(
+        <MobileSheetNavWithState shouldCloseOnRouteChange={false}>
+          <RouterLink href="/other-page">Other page</RouterLink>
+        </MobileSheetNavWithState>
+      )
+
+      await user.click(await screen.findByRole('link', { name: 'Other page' }))
+
+      expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
     })
   })
 
