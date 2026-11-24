@@ -195,10 +195,21 @@ export const SubscriptionPlanUpdateView = ({
     setPaymentIntentSecret('')
 
     if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
-      await confirmPendingSubscriptionChange({
-        slug: selectedOrganization?.slug,
-        payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-      })
+      await confirmPendingSubscriptionChange(
+        {
+          slug: selectedOrganization?.slug,
+          payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
+        },
+        {
+          // A 202 means the payment went through and the plan is still syncing. The mutation skips
+          // its onSuccess for that response, so the completion is tracked here.
+          onSuccess: (data) => {
+            if (data && 'message' in data) {
+              track('studio_pricing_plan_change_completed', planChangeProperties)
+            }
+          },
+        }
+      )
     } else {
       setSubmittedState(undefined)
       setPaymentConfirmationLoading(false)

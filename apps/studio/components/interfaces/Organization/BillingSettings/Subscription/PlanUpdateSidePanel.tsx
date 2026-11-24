@@ -3,6 +3,7 @@ import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
@@ -156,8 +157,12 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
+  const [, setSource] = useQueryState('source')
+
   const onClose = () => {
     setPanel(null)
+    // A reopen from the billing page would otherwise report the previous entry point as its origin.
+    setSource(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({

@@ -2107,7 +2107,7 @@ export interface StudioPricingPlanChangeProperties {
    */
   origin?: string
   /**
-   * Number of paused projects in the org when the event fired.
+   * Paused projects listed on the plan change bill. Counts the first page of org projects only.
    */
   pausedProjectCount: number
 }
