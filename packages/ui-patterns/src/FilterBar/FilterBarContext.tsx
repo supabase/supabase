@@ -25,7 +25,7 @@ import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
   findConditionByPath,
   isAsyncOptionsFunction,
-  removeFromGroup,
+  removeConditionAndEmptiedGroups,
   resolvePropertyChange,
   updateNestedLogicalOperator,
   updateNestedOperator,
@@ -359,7 +359,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleRemoveCondition = useCallback(
     (path: number[]) => {
-      const updatedFilters = removeFromGroup(filters, path)
+      const updatedFilters = removeConditionAndEmptiedGroups(filters, path)
       commitFilters(updatedFilters)
       setActiveInput(null)
     },

@@ -465,7 +465,11 @@ describe('UnifiedLogs', () => {
       }
     )
 
-    await user.click(await screen.findByTestId('filter-remove-status', {}, { timeout: 5_000 }))
+    const removeStatus = await screen.findByTestId('filter-remove-status', {}, { timeout: 5_000 })
+    expect(screen.getByPlaceholderText('+ Add filter')).toBeInTheDocument()
+    await user.click(removeStatus)
+    // The emptied group leaves the bar too, instead of lingering as an empty "( )".
+    expect(screen.queryByPlaceholderText('+ Add filter')).not.toBeInTheDocument()
     await waitFor(
       () =>
         expect(

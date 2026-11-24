@@ -15,6 +15,7 @@ import {
   isCustomOptionObject,
   isFilterOptionObject,
   isSyncOptionsFunction,
+  removeConditionAndEmptiedGroups,
   removeFromGroup,
   resolvePropertyChange,
   updateNestedLogicalOperator,
@@ -165,6 +166,47 @@ describe('FilterBar Utils', () => {
       const result = removeFromGroup(sampleFilterGroup, [1, 0])
       const nestedGroup = result.conditions[1] as FilterGroup
       expect(nestedGroup.conditions).toHaveLength(0)
+    })
+  })
+
+  describe('removeConditionAndEmptiedGroups', () => {
+    const single = { propertyName: 'status', value: 'active', operator: '=' }
+    const level = { propertyName: 'level', value: 'error', operator: '=' }
+
+    it('removes a nested group when its last condition is removed', () => {
+      const result = removeConditionAndEmptiedGroups(
+        {
+          logicalOperator: 'AND',
+          conditions: [level, { logicalOperator: 'OR', conditions: [single] }],
+        },
+        [1, 0]
+      )
+      expect(result.conditions).toEqual([level])
+    })
+
+    it('keeps a nested group that still has conditions', () => {
+      const other = { propertyName: 'status', value: 'pending', operator: '=' }
+      const result = removeConditionAndEmptiedGroups(
+        {
+          logicalOperator: 'AND',
+          conditions: [{ logicalOperator: 'OR', conditions: [single, other] }],
+        },
+        [0, 0]
+      )
+      expect(result.conditions).toEqual([{ logicalOperator: 'OR', conditions: [other] }])
+    })
+
+    it('leaves other empty groups alone and keeps an emptied root', () => {
+      const emptyGroup: FilterGroup = { logicalOperator: 'OR', conditions: [] }
+      expect(
+        removeConditionAndEmptiedGroups(
+          { logicalOperator: 'AND', conditions: [level, emptyGroup] },
+          [0]
+        ).conditions
+      ).toEqual([emptyGroup])
+      expect(
+        removeConditionAndEmptiedGroups({ logicalOperator: 'AND', conditions: [level] }, [0])
+      ).toEqual({ logicalOperator: 'AND', conditions: [] })
     })
   })
 
