@@ -399,6 +399,7 @@ export const OAuthAppsAuthorizeScreen = ({
       ? preflightError
       : null
   const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
+  const cannotSubmit = cannotGrantRequestedAccess || hasNoSelection
 
   const handleApprove = () => {
     if (hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure)
@@ -531,7 +532,7 @@ export const OAuthAppsAuthorizeScreen = ({
             block
             variant={primaryActionVariant}
             loading={isSubmitting || isPendingPreflight}
-            disabled={cannotGrantRequestedAccess}
+            disabled={cannotSubmit}
             aria-label={primaryActionLabel}
             onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
           >
