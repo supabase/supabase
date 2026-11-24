@@ -39,7 +39,7 @@ import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-ut
 import assert from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import prettier from 'prettier'
+import { format } from 'oxfmt'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 import { z, type SafeParseError } from 'zod'
@@ -263,8 +263,24 @@ async function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, 
     if (meta.convertToJs) {
       const { code } = amaro.transformSync(content, { mode: 'strip-only' })
 
-      const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
-      processedContent = await prettier.format(code, { ...prettierConfig, parser: 'typescript' })
+      const { code: formattedCode, errors } = await format(
+        lang === 'tsx' ? 'sample.tsx' : 'sample.ts',
+        code,
+        {
+          trailingComma: 'es5',
+          tabWidth: 2,
+          semi: false,
+          singleQuote: true,
+          printWidth: 100,
+          endOfLine: 'lf',
+        }
+      )
+      if (errors.length > 0) {
+        throw new Error(
+          `Failed to format converted code sample: ${errors.map((e) => e.message).join('; ')}`
+        )
+      }
+      processedContent = formattedCode
 
       // Convert TypeScript/TSX language to JavaScript/JSX when converting types
       assert(

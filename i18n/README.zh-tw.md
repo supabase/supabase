@@ -79,7 +79,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <th>客户端</th>
     <th colspan="5">特徵-客户端(捆绑在Supabase客户端中)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
@@ -100,9 +100,9 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ 官方⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -121,9 +121,9 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚社群 💚</th>
-  
+
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -205,7 +205,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

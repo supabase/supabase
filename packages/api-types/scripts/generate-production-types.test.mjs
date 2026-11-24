@@ -36,7 +36,6 @@ test('generateTypes fetches specifications and generates types straight into the
     fetchImpl: async (url) => ({ ok: true, text: async () => validSpecification }),
     runImpl: async (command, args) => {
       runCalls.push([command, args])
-      if (args.includes('--find-config-path')) return { stdout: '/repo/.prettierrc\n' }
       return { stdout: '' }
     },
   })
@@ -50,11 +49,11 @@ test('generateTypes fetches specifications and generates types straight into the
   const redocly = await readFile(join(temporaryDirectory, 'redocly.yaml'), 'utf8')
   assert.match(redocly, new RegExp(`output: ${generatedTypesDirectory}/api-v1.d.ts`))
 
-  assert.equal(runCalls.length, 3)
+  assert.equal(runCalls.length, 2)
   assert.deepEqual(runCalls[0][0], 'pnpm')
   assert.ok(runCalls[0][1].includes('openapi-typescript'))
-  assert.ok(runCalls[1][1].includes('--find-config-path'))
-  assert.ok(runCalls[2][1].includes('--write'))
-  assert.ok(runCalls[2][1].includes(join(generatedTypesDirectory, 'api-v1.d.ts')))
-  assert.ok(runCalls[2][1].includes(join(generatedTypesDirectory, 'fga-requirements.ts')))
+  assert.ok(runCalls[1][1].includes('oxfmt'))
+  assert.ok(runCalls[1][1].includes('--config'))
+  assert.ok(runCalls[1][1].includes(join(generatedTypesDirectory, 'api-v1.d.ts')))
+  assert.ok(runCalls[1][1].includes(join(generatedTypesDirectory, 'fga-requirements.ts')))
 })
