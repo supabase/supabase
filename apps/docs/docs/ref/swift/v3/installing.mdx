@@ -20,7 +20,9 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/docs
     - `Realtime`
     - `Storage`
 
-    If you use Xcode, follow [Apple's dependencies guide](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app) to add supabase-swift to your project. Use `https://github.com/supabase/supabase-swift.git` for the URL and `3.0.0-alpha.2` for the version. Xcode does not pick a prerelease unless the version rule names one.
+    In `Package.swift`, replace `YOUR_TARGET_NAME` with the name of your target.
+
+    If you use Xcode, follow [Apple's dependencies guide](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app) to add supabase-swift to your project. Use `https://github.com/supabase/supabase-swift.git` for the URL and `3.0.0-alpha.2` for the version. Xcode picks a prerelease version only when the version rule names one.
 
   </RefSubLayout.Details>
 
@@ -47,7 +49,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/docs
             ],
             targets: [
                 .target(
-                    name: "YourTargetName",
+                    name: "YOUR_TARGET_NAME",
                     dependencies: [
                         .product(
                             name: "Supabase", // Auth, Functions, PostgREST, Realtime, or Storage
@@ -72,27 +74,29 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/docs
 
     supabase-swift uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
 
-    In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+    In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions that your app queries or calls. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
 
     Alternatively, grant the permissions with SQL. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+    In the SQL, replace `YOUR_TABLE` and `YOUR_FUNCTION` with the names of your table and function.
 
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
 
     ```sql
-    -- Before granting access to client roles, make sure RLS is enabled
-    -- and create the policies required for each role's allowed operations.
-    alter table public.your_table enable row level security;
-    -- create policy ... on public.your_table ...;
+    -- Before granting access to client roles, make sure Row Level Security (RLS)
+    -- is enabled and create the policies required for each role's allowed operations.
+    alter table public.YOUR_TABLE enable row level security;
+    -- create policy ... on public.YOUR_TABLE ...;
 
     -- Grant least-privilege access to tables after RLS and policies are in place
-    grant select on public.your_table to anon;
-    grant select, insert, update, delete on public.your_table to authenticated;
-    grant all on public.your_table to service_role;
+    grant select on public.YOUR_TABLE to anon;
+    grant select, insert, update, delete on public.YOUR_TABLE to authenticated;
+    grant all on public.YOUR_TABLE to service_role;
 
     -- Grant execute on functions after verifying any table access they rely on
-    grant execute on function public.your_function to authenticated, service_role;
+    grant execute on function public.YOUR_FUNCTION to authenticated, service_role;
     ```
 
   </RefSubLayout.Examples>

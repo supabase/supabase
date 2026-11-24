@@ -1,17 +1,21 @@
 ---
 id: upgrade-guide
 title: Upgrade to supabase-swift v3
-description: 'Learn how to upgrade to supabase-swift v3.'
+description: 'Upgrade a Swift app from supabase-swift v2 to v3. Create the client with a configuration, log with swift-log, catch errors by module, and apply the renames.'
 ---
 
-v3 changes many public names and types, so expect compile errors when you upgrade. Most errors are a rename. This page covers the changes that affect every app. For the full list, including the changes that still compile but behave differently, read the [v3 migration guide](https://github.com/supabase/supabase-swift/blob/main/V3_MIGRATION.md) and the [module guides](https://github.com/supabase/supabase-swift/tree/main/docs/migrations/v3) for Auth, PostgREST, Storage, Functions, and Realtime.
+Upgrade your app from supabase-swift v2 to v3 and fix the compile errors that the upgrade causes. v3 renames many public types and methods, so most errors come from a rename. This page covers the changes that affect every app.
+
+For the full list, including the changes that still compile but behave differently, see the supabase-swift repository on GitHub. It has the [v3 migration guide](https://github.com/supabase/supabase-swift/blob/main/V3_MIGRATION.md) and the [module guides](https://github.com/supabase/supabase-swift/tree/main/docs/migrations/v3) for Auth, PostgREST, Storage, Functions, and Realtime.
 
 ## Upgrade the client library
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Install Xcode 26.0 or later (Swift 6.2 or later). Then update the package requirement. v3 also needs swift-crypto 4.0.0 or later. If your app pins swift-crypto below 4.0.0, raise the pin.
+    1. Install Xcode 26.0 or later. v3 needs Swift 6.2 or later, which Xcode 26.0 includes.
+    2. Update the supabase-swift package requirement to `3.0.0-alpha.2`.
+    3. If your app pins swift-crypto below 4.0.0, raise the pin to 4.0.0 or later. v3 needs swift-crypto 4.0.0 or later.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -28,9 +32,9 @@ v3 changes many public names and types, so expect compile errors when you upgrad
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    `SupabaseClientOptions` is now `SupabaseClient.Configuration`, and the initializer label is `configuration:`. The nested types drop their `Options` suffix, and `db` is now `database`.
+    v3 renames `SupabaseClientOptions` to `SupabaseClient.Configuration`, and the initializer label is `configuration:`. The nested types drop their `Options` suffix, and `db` is renamed to `database`.
 
-    Every client initializer now throws when the URL has no scheme or no host. Add `try`.
+    In v3, every client initializer throws when the URL has no scheme or no host. Add `try`.
 
     Headers are `HTTPFields`. Write each key as an `HTTPField.Name`.
 
@@ -84,9 +88,9 @@ v3 changes many public names and types, so expect compile errors when you upgrad
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Every `logger:` parameter now takes a `Logging.Logger` from [swift-log](https://github.com/apple/swift-log). `SupabaseLogger` and `OSLogSupabaseLogger` are removed. Add swift-log to your package and `import Logging` where you build the logger.
+    In v3, every `logger:` parameter takes a `Logging.Logger` from the [swift-log](https://github.com/apple/swift-log) package on GitHub. v3 removes `SupabaseLogger` and `OSLogSupabaseLogger`. Add swift-log to your package and `import Logging` where you build the logger.
 
-    Debug builds now log warnings and errors to stderr when you pass no logger. Release builds stay silent.
+    When you pass no logger, debug builds log warnings and errors to stderr. Release builds stay silent.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -113,9 +117,9 @@ v3 changes many public names and types, so expect compile errors when you upgrad
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Every client sends requests through one `ClientTransport` behind an ordered list of `ClientMiddleware`. Both go in one `HTTPClientConfiguration`, passed as `http:`. `URLSessionTransport(session:)` wraps the `URLSession` that you used in v2.
+    v3 replaces the `fetch` closures and the `URLSession` options with a transport and middleware. Every client sends requests through one `ClientTransport` behind an ordered list of `ClientMiddleware`. Both go in one `HTTPClientConfiguration`, passed as `http:`. `URLSessionTransport(session:)` wraps the `URLSession` that you used in v2.
 
-    The SDK now sets the request timeout itself: 60 seconds, or 150 seconds for Functions. To change it, set `HTTPClientConfiguration(timeout:)`.
+    In v3, the SDK sets the request timeout itself: 60 seconds, or 150 seconds for Functions. To change it, set `HTTPClientConfiguration(timeout:)`.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -157,16 +161,16 @@ v3 changes many public names and types, so expect compile errors when you upgrad
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
-## Handle errors by module
+## Catch errors by module
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    `HTTPError` is removed. Each module throws its own error (`AuthError`, `PostgrestError`, `StorageError`, `FunctionsError`, or `RealtimeError`). Each one conforms to `SupabaseError` and has a `kind`, a `code`, the `response`, and an `underlyingError`.
+    v3 removes `HTTPError`. Each module throws its own error type: `AuthError`, `PostgrestError`, `StorageError`, `FunctionsError`, or `RealtimeError`. Each one conforms to `SupabaseError` and has a `kind`, a `code`, the `response`, and an `underlyingError`.
 
-    A `URLError` or `DecodingError` from the SDK no longer reaches you as itself. It arrives as the module error, with the original in `underlyingError`. A cancelled task now throws `CancellationError` in every module.
+    The SDK wraps a `URLError` or `DecodingError` in the module error and keeps the original in `underlyingError`. In v3, a canceled task throws `CancellationError` in every module.
 
-    Errors that your own transport or middleware throws are not wrapped. Keep the handlers for those errors.
+    Errors that your own transport or middleware throws reach you unchanged. Keep the handlers for those errors.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -188,18 +192,23 @@ v3 changes many public names and types, so expect compile errors when you upgrad
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
-## Other renames
+## Other renames and removals
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    - `AnyJSON` is now `JSONValue`. Numbers are one case, `.number(JSONNumber)`, which keeps every digit.
-    - `supabase.database` is removed. Use `supabase.from(_:)`, `supabase.rpc(_:)`, and `supabase.schema(_:)`.
-    - `supabase.realtimeV2` is now `supabase.realtime`, and `supabase.channel(_:)` is `async`.
-    - `supabase.handle(_:)` is now `supabase.handleRedirect(_:)`.
+    v3 also renames the following methods, types, and arguments:
+
+    - `AnyJSON` is renamed to `JSONValue`. Numbers are one case, `.number(JSONNumber)`, which keeps every digit.
+    - `supabase.realtimeV2` is renamed to `supabase.realtime`, and `supabase.channel(_:)` is `async`.
+    - `supabase.handle(_:)` is renamed to `supabase.handleRedirect(_:)`.
     - Methods that only read a value drop their `get` prefix. For example, `getPublicURL` is `publicURL`.
     - Arguments that name an identifier are `id:`, and acronyms keep their capitals, as in `factorID`.
-    - Every API that was deprecated in v2.55.4 is removed.
+
+    v3 removes the following:
+
+    - `supabase.database`. Use `supabase.from(_:)`, `supabase.rpc(_:)`, and `supabase.schema(_:)`.
+    - Every type, method, and property that was deprecated in v2.55.4.
 
   </RefSubLayout.Details>
 </RefSubLayout.EducationRow>
