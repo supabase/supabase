@@ -1,5 +1,6 @@
 import { parseChangedFilesList } from './paths.ts'
-import { truncatedPagesWarning, type ScopeResult } from './run-suite.ts'
+import type { ScopeResult } from './run-suite.ts'
+import { formatAnnotation, formatJobSummary, formatLog } from './truncation.ts'
 
 export type ResolveScopeCliConfig = {
   label: string
@@ -49,14 +50,16 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
   }
 
   if (result.truncated?.length) {
-    const warning = truncatedPagesWarning(config.label, result.truncated)
-    console.error(`::warning title=Pages not tested::${warning}`)
+    const truncation = {
+      label: config.label,
+      limit: result.limit ?? result.pages.length,
+      truncated: result.truncated,
+    }
+    console.error(formatLog(truncation))
+    console.error(`::warning title=Pages not tested::${formatAnnotation(truncation)}`)
     if (process.env.GITHUB_STEP_SUMMARY) {
       const { appendFileSync } = await import('node:fs')
-      appendFileSync(
-        process.env.GITHUB_STEP_SUMMARY,
-        `### Some pages were not tested\n\n${warning}\n`
-      )
+      appendFileSync(process.env.GITHUB_STEP_SUMMARY, formatJobSummary(truncation))
     }
   }
 }

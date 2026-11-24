@@ -20,17 +20,9 @@ import {
   GUIDE_ARTICLE_SELECTOR,
   type LinkCheckResult,
 } from '../utils/docs-links.js'
-import { MAX_A11Y_PAGES, splitAtLimit } from '../utils/scope-limits.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 const LINK_CHECK_CONCURRENCY = 4
-
-// The a11y scan is the slow test, so it covers the first MAX_A11Y_PAGES pages. Link checks
-// cover every page. `pnpm e2e:docs:all` sets E2E_RUN_ALL to lift the limit.
-const { kept: a11yPagePaths, dropped: a11ySkippedPaths } =
-  process.env.E2E_RUN_ALL === '1'
-    ? { kept: pagePaths, dropped: [] as string[] }
-    : splitAtLimit(pagePaths, MAX_A11Y_PAGES)
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })
@@ -105,18 +97,7 @@ test.describe('Docs owned pages', () => {
     })
   }
 
-  if (a11ySkippedPaths.length > 0) {
-    test('accessibility scan covers every resolved page', ({}, testInfo) => {
-      annotate(
-        testInfo,
-        `The accessibility scan covers only the first ${MAX_A11Y_PAGES} of ${pagePaths.length} pages, ` +
-          `so ${a11ySkippedPaths.length} were not scanned: ${a11ySkippedPaths.join(', ')}. ` +
-          'Link checks still ran on all of them.'
-      )
-    })
-  }
-
-  for (const pagePath of a11yPagePaths) {
+  for (const pagePath of pagePaths) {
     test(`${pagePath} has no blocking accessibility violations @a11y`, async ({
       page,
     }, testInfo) => {

@@ -2,7 +2,6 @@ import { readdir, readFile } from 'node:fs/promises'
 import { basename, join, relative } from 'node:path'
 
 import { normalizeRepoPath } from '../../shared/paths.ts'
-import { MAX_LINK_PAGES, splitAtLimit } from './scope-limits.ts'
 
 export const FEDERATED_SECTIONS = [
   'graphql',
@@ -11,6 +10,8 @@ export const FEDERATED_SECTIONS = [
   'deployment/terraform',
   'deployment/ci',
 ] as const
+
+export const MAX_SCOPED_PAGES = 20
 
 const GUIDES_PREFIX = 'apps/docs/content/guides/'
 const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
@@ -79,6 +80,7 @@ export type ResolveDocsScopeResult = {
   skip: boolean
   // In scope but dropped by the page limit, so no test covers them.
   truncated: string[]
+  limit: number
 }
 
 function isFederatedGuideSlug(slug: string): boolean {
@@ -238,7 +240,7 @@ export async function resolveDocsScope(
 ): Promise<ResolveDocsScopeResult> {
   await assertFederatedSectionsInSync(options.repoRoot)
 
-  const maxPages = options.maxPages ?? MAX_LINK_PAGES
+  const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
   const pages = new Set<string>()
   const requiredPages = new Set<string>()
   const changedPartials: string[] = []
@@ -273,16 +275,18 @@ export async function resolveDocsScope(
 
   const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
   const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
-  const { kept: selectedPages, dropped: truncated } = splitAtLimit(
-    [...pages].filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page)).sort(),
-    remainingSlots
-  )
+  const candidatePages = [...pages]
+    .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
+    .sort()
+  const selectedPages = candidatePages.slice(0, remainingSlots)
+  const truncated = candidatePages.slice(remainingSlots)
   const sorted = [...selectedRequiredPages, ...selectedPages].sort()
 
   return {
     pages: sorted,
     skip: sorted.length === 0,
     truncated,
+    limit: maxPages,
   }
 }
 

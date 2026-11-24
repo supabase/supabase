@@ -70,7 +70,7 @@ test('reports no truncated pages when everything fits', async () => {
   assert.deepEqual(result.truncated, [])
 })
 
-test('covers the 62-page change that exceeded the old 20-page limit', async () => {
+test('caps a default run at 20 pages and reports the rest', async () => {
   const changedFiles = Array.from(
     { length: 62 },
     (_, i) => `apps/docs/content/guides/ai-tools/page-${String(i).padStart(2, '0')}.mdx`
@@ -78,6 +78,6 @@ test('covers the 62-page change that exceeded the old 20-page limit', async () =
 
   const result = await resolveDocsScope({ changedFiles, repoRoot })
 
-  assert.equal(result.pages.length, 62)
-  assert.deepEqual(result.truncated, [])
+  assert.equal(result.pages.length, 20)
+  assert.equal(result.truncated.length, 42)
 })

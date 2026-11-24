@@ -1,20 +1,14 @@
 import { spawn } from 'node:child_process'
 
 import { collectChangedFiles, repoRootFrom } from './git.ts'
+import { formatLocalWarning } from './truncation.ts'
 
 export type ScopeResult = {
   pages: string[]
   skip: boolean
   // In scope but dropped by a page limit, so no test covers them.
   truncated?: string[]
-}
-
-export function truncatedPagesWarning(label: string, truncated: string[]): string {
-  return (
-    `${truncated.length} in-scope ${label} page(s) are over the page limit and were not tested: ` +
-    `${truncated.join(', ')}. Run them with the page_paths input of the Docs E2E workflow, ` +
-    `or locally with pnpm e2e:docs:all.`
-  )
+  limit?: number
 }
 
 export type SuiteConfig = {
@@ -71,7 +65,13 @@ async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
     console.error(`  ${page}`)
   }
   if (result.truncated?.length) {
-    console.error(`Warning: ${truncatedPagesWarning(config.label, result.truncated)}`)
+    console.error(
+      formatLocalWarning({
+        label: config.label,
+        limit: result.limit ?? result.pages.length,
+        truncated: result.truncated,
+      })
+    )
   }
   return result.pages
 }
@@ -109,11 +109,7 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
 
   const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalArgs], {
     cwd: config.root,
-    env: {
-      ...process.env,
-      [config.pagePathsEnv]: pages.join(','),
-      ...(runAll ? { E2E_RUN_ALL: '1' } : {}),
-    },
+    env: { ...process.env, [config.pagePathsEnv]: pages.join(',') },
     stdio: 'inherit',
     shell: process.platform === 'win32',
   })
