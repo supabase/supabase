@@ -33,7 +33,7 @@ The [Security and Performance Advisors](/docs/guides/observability/advisors) rea
 
 Run them locally with `supabase db advisors`. Add `--fail-on warn` to make the command exit with an error when it finds a warning, so it can fail a CI job.
 
-The Advisors don't sign in as two users or send two requests at once. They can't tell whether a policy matches what you meant. With both RLS bugs from the next section in place, `supabase db advisors` reports no warnings for the `documents` table. Behavior tests cover that gap:
+The Advisors don't sign in as two users or send two requests at once. They can't tell whether a policy matches what you meant. With the RLS bugs from the next section in place, `supabase db advisors` reports no warnings for the `documents` table. Behavior tests cover that gap:
 
 | Problem                                 | Caught by the Advisors | Caught by                               |
 | :-------------------------------------- | :--------------------- | :-------------------------------------- |
@@ -54,7 +54,7 @@ The example is a team app. Users belong to teams, and every document belongs to 
    supabase migration new team_documents
    ```
 
-2. In the new migration file, add the following SQL. The policies contain two bugs that are common in generated code. Both look reasonable when you read them:
+2. In the new migration file, add the following SQL. The policies contain three bugs that are common in generated code. All of them look reasonable when you read them:
 
    ```sql
    create table public.teams (
@@ -116,6 +116,8 @@ The example is a team app. Users belong to teams, and every document belongs to 
    to authenticated
    with check (owner_id = (select auth.uid()));
 
+   -- Bug 3: without a with check, the new row only has to pass the using check,
+   -- so an author can move their document into a team they don't belong to
    create policy "Authors can edit their documents"
    on public.documents for update
    to authenticated
@@ -146,7 +148,7 @@ The example is a team app. Users belong to teams, and every document belongs to 
    ```sql
    begin;
    create extension if not exists pgtap with schema extensions;
-   select plan(7);
+   select plan(8);
 
    -- Two users, each in their own team, each with one document
    insert into auth.users (id, email) values
@@ -190,6 +192,14 @@ The example is a team app. Users belong to teams, and every document belongs to 
      'B cannot delete a Team A document'
    );
 
+   -- No where or returning: either one also applies the select policy to the new row
+   select throws_ok(
+     $$update public.documents set team_id = 101$$,
+     '42501',
+     null,
+     'B cannot move a document into Team A'
+   );
+
    -- Act as user A, and check that nothing B tried got through
    set local request.jwt.claims = '{"sub": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "role": "authenticated"}';
 
@@ -221,6 +231,7 @@ A few details make this test useful:
 
 - `set local role` and `set local request.jwt.claims` make the statements that follow run as that user, the way the Data API runs a signed-in request. `auth.uid()` reads the `sub` claim.
 - RLS doesn't raise an error when it hides a row from an `update` or `delete`. The statement succeeds and changes nothing. The test adds `returning id` and checks that no rows come back.
+- B may edit their own document, so the move test changes B's own row. A row that fails a `with check` raises error `42501`. The move test leaves out `where` and `returning`, because either one makes Postgres also check the new row against the `select` policy. After the fix below, that check alone would block the move, and the test would pass even with a broken `update` policy.
 - The test also checks what each user should see. A policy that blocks everything passes every "B cannot" check, so the positive checks guard against that.
 - The file runs in one transaction and rolls back, so the test data never persists.
 
@@ -232,7 +243,7 @@ A few details make this test useful:
    supabase test db
    ```
 
-   Both bugs show up as failures:
+   All three bugs show up as failures:
 
    ```text
    # Failed test 1: "B sees only Team B documents"
@@ -242,11 +253,14 @@ A few details make this test useful:
    # Failed test 2: "B cannot add a document to Team A"
    #       caught: no exception
    #       wanted: 42501
-   # Failed test 5: "A sees only Team A documents, unchanged"
+   # Failed test 5: "B cannot move a document into Team A"
+   #       caught: no exception
+   #       wanted: 42501
+   # Failed test 6: "A sees only Team A documents, unchanged"
    #     Results differ beginning at row 2:
    #         have: ("Team B plan")
    #         want: NULL
-   # Looks like you failed 3 tests of 7
+   # Looks like you failed 4 tests of 8
    ```
 
 2. Create a migration for the fix:
@@ -255,11 +269,12 @@ A few details make this test useful:
    supabase migration new fix_document_policies
    ```
 
-3. Add the following SQL. Both policies now check membership in the document's own team:
+3. Add the following SQL. All three policies now check membership in the document's own team. For `update`, the `with check` runs on the new row, so a document can't move into a team the author doesn't belong to:
 
    ```sql
    drop policy "Members can read team documents" on public.documents;
    drop policy "Members can add documents" on public.documents;
+   drop policy "Authors can edit their documents" on public.documents;
 
    create policy "Members can read team documents"
    on public.documents for select
@@ -275,6 +290,19 @@ A few details make this test useful:
    create policy "Members can add documents"
    on public.documents for insert
    to authenticated
+   with check (
+     owner_id = (select auth.uid())
+     and exists (
+       select 1 from public.team_members m
+       where m.team_id = documents.team_id
+         and m.user_id = (select auth.uid())
+     )
+   );
+
+   create policy "Authors can edit their documents"
+   on public.documents for update
+   to authenticated
+   using (owner_id = (select auth.uid()))
    with check (
      owner_id = (select auth.uid())
      and exists (
@@ -666,7 +694,7 @@ pgTAP runs a test file in one session. To test a race, the file opens two more s
 begin;
 create extension if not exists pgtap with schema extensions;
 create extension if not exists dblink with schema extensions;
-select plan(3);
+select plan(4);
 
 -- Open two extra sessions. Their writes commit, so the file cleans up at the end.
 do $$
@@ -709,22 +737,34 @@ select ok(
 
 -- Session 2 asks for the same seat while session 1 is still open
 do $$
+declare
+  lock_seen boolean := false;
 begin
   perform extensions.dblink_send_query('s2', 'select public.book_seat(9001)');
 
-  -- Wait until session 2 is blocked on a lock held by session 1
-  for i in 1..50 loop
+  -- Wait up to 10 seconds until session 2 is blocked on a lock held by session 1
+  for i in 1..100 loop
     perform pg_stat_clear_snapshot();
-    exit when exists (
+    lock_seen := exists (
       select 1 from pg_stat_activity
       where query = 'select public.book_seat(9001)'
         and wait_event_type = 'Lock'
     );
+    exit when lock_seen;
     perform pg_sleep(0.1);
   end loop;
 
+  -- Record the result for the assertion below, then let session 2 continue
+  perform set_config('race_test.lock_seen', lock_seen::text, true);
   perform extensions.dblink_exec('s1', 'commit');
 end $$;
+
+-- If session 2 never waited, it read the seat after session 1 committed and the
+-- race didn't happen. The other assertions would then pass without testing it.
+select ok(
+  current_setting('race_test.lock_seen')::boolean,
+  'session 2 waited for session 1''s lock'
+);
 
 -- fail_on_error => false: an error in session 2 counts as "no seat", not a crash
 select ok(
@@ -764,18 +804,19 @@ rollback;
 How the test stays reliable:
 
 - It waits until session 2 is blocked on a lock before session 1 commits. The original function and both fixes all reach that lock, so the result doesn't depend on timing. `pg_stat_clear_snapshot()` makes each loop read fresh activity data.
+- If session 2 isn't blocked within 10 seconds, for example on a slow CI runner, the lock assertion fails. The test can't pass without reproducing the race.
 - `dblink` only lets a non-superuser connect with a password. Local connections to `127.0.0.1` don't ask for one, so the test connects to the server address the test session itself used.
 - The sessions commit their rows, so the file removes them at the end, and removes leftovers from a failed run at the start.
 
 Against the original function, the test fails:
 
 ```text
-# Failed test 2: "session 2 does not get a seat"
-# Failed test 3: "the event has exactly one booking"
+# Failed test 3: "session 2 does not get a seat"
+# Failed test 4: "the event has exactly one booking"
 #     Results differ beginning at row 1:
 #         have: (2)
 #         want: (1)
-# Looks like you failed 2 tests of 3
+# Looks like you failed 2 tests of 4
 ```
 
 With either fix, it passes.
@@ -901,7 +942,7 @@ With [Branching](/docs/guides/deployment/branching), each pull request gets a pr
 
 ## Checklist before launch
 
-- For every table with user data, a test signs in as user B and tries to `select`, `insert`, `update`, and `delete` user A's rows. The same test checks that user A still sees their own rows.
+- For every table with user data, a test signs in as user B and tries to `select`, `insert`, `update`, and `delete` user A's rows, and to move B's own rows into A's team. The same test checks that user A still sees their own rows.
 - Signed-out visitors (`anon`) see only what you meant to make public.
 - Columns that users must not change, such as plans, roles, or balances, aren't granted for `update`.
 - Every "only N" rule uses a conditional `update` or a row lock, with a `check` constraint as a backstop, and has a two-session test.
