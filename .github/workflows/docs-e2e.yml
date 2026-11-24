@@ -91,7 +91,16 @@ jobs:
       - name: Run docs E2E harness unit tests
         if: github.event_name == 'pull_request' && steps.changes.outputs.harness == 'true'
         working-directory: e2e/docs
-        run: node --test --experimental-strip-types 'utils/*.test.ts'
+        # `node --test` passes when its pattern matches no files, so fail here if a
+        # rename or move leaves nothing to run.
+        run: |
+          shopt -s nullglob
+          test_files=(utils/*.test.ts)
+          if [ "${#test_files[@]}" -eq 0 ]; then
+            echo "::error::No harness unit tests match e2e/docs/utils/*.test.ts."
+            exit 1
+          fi
+          node --test --experimental-strip-types "${test_files[@]}"
 
       # Map changed owned content (guides, partials) to page
       # URLs. Harness-only PRs resolve to skip=true and exit before Playwright.
