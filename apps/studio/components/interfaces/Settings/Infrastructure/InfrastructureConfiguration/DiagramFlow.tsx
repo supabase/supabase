@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import {
   Background,
   ColorMode,
@@ -11,9 +13,6 @@ import {
 } from '@xyflow/react'
 import { useTheme } from 'next-themes'
 import { useEffect, useEffectEvent, useState } from 'react'
-
-import '@xyflow/react/dist/style.css'
-
 import { cn } from 'ui'
 
 import { getDagreGraphLayout } from './InstanceConfiguration.utils'

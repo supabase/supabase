@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import prettier from 'prettier'
+import { format } from 'oxfmt'
 import { readSvg, toPascalCase } from '../utils/helpers.mjs'
 
 export default ({
@@ -66,15 +66,28 @@ export const Index: Record<string, any> = [`
     // const { deprecated = false } = iconMetaData[iconName]
     const deprecated = false
 
-    const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated, svgAttributes })
-    const output = pretty
-      ? await prettier.format(elementTemplate, {
+    const elementTemplate = template({
+      componentName,
+      iconName,
+      children,
+      getSvg,
+      deprecated,
+      svgAttributes,
+    })
+    let output = elementTemplate
+    if (pretty) {
+      const { code, errors } = await format(`${iconName}${iconFileExtension}`, elementTemplate, {
         singleQuote: true,
         trailingComma: 'all',
         printWidth: 100,
-        parser: 'babel',
       })
-      : elementTemplate
+      if (errors.length > 0) {
+        throw new Error(
+          `Failed to format icon ${iconName}: ${errors.map((e) => e.message).join('; ')}`
+        )
+      }
+      output = code
+    }
 
     const rawSvg = JSON.stringify(readSvg(`${iconName}.svg`, iconsDir))
 
