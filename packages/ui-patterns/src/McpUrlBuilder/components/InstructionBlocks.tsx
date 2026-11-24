@@ -14,10 +14,14 @@ import { normalizeAssetUrl, type ImportedAssetModule } from '../utils/mcpIconAss
  * Local image assets referenced by `image` nodes, keyed by the node's `url`
  * (used as an asset id, not a real URL). Kept here so the React-free
  * instructions module stays importable by the Node markdown build, which can't
- * resolve static png imports.
+ * resolve static png imports. `width`/`height` are the intrinsic size, so the image's space is
+ * reserved before it loads.
  */
-const INSTRUCTION_ASSETS: Record<string, ImportedAssetModule> = {
-  'antigravity-auth': antigravityAuthenticateScreenshot,
+const INSTRUCTION_ASSETS: Record<
+  string,
+  { src: ImportedAssetModule; width: number; height: number }
+> = {
+  'antigravity-auth': { src: antigravityAuthenticateScreenshot, width: 1316, height: 258 },
 }
 
 /**
@@ -86,11 +90,13 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
       if (!asset) return null
       return (
         <img
-          src={normalizeAssetUrl(asset)}
+          src={normalizeAssetUrl(asset.src)}
+          width={asset.width}
+          height={asset.height}
           alt={node.alt ?? ''}
           loading="lazy"
           decoding="async"
-          className="rounded border border-muted w-full"
+          className="rounded border border-muted w-full h-auto"
         />
       )
     },
