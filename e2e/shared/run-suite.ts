@@ -43,18 +43,24 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
 
 type ResolvedPages = { pages: string[]; a11yPages?: string[] }
 
-async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
-  const explicit = process.env[config.pagePathsEnv]?.trim()
-  if (explicit) {
-    // CI passes both lists from the scope step, so keep the scan list when it is set.
-    const explicitA11y = config.a11yPagePathsEnv
-      ? process.env[config.a11yPagePathsEnv]?.trim()
-      : undefined
-    return {
-      pages: parsePagePaths(explicit),
-      ...(explicitA11y ? { a11yPages: parsePagePaths(explicitA11y) } : {}),
-    }
+// Reads page lists passed in the environment. CI passes both lists from the scope
+// step, so the scan list is kept when it is set.
+export function readExplicitPages(
+  config: Pick<SuiteConfig, 'pagePathsEnv' | 'a11yPagePathsEnv'>,
+  env: NodeJS.ProcessEnv
+): ResolvedPages | null {
+  const explicit = env[config.pagePathsEnv]?.trim()
+  if (!explicit) return null
+  const explicitA11y = config.a11yPagePathsEnv ? env[config.a11yPagePathsEnv]?.trim() : undefined
+  return {
+    pages: parsePagePaths(explicit),
+    ...(explicitA11y ? { a11yPages: parsePagePaths(explicitA11y) } : {}),
   }
+}
+
+async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
+  const explicit = readExplicitPages(config, process.env)
+  if (explicit) return explicit
 
   const baseRef = process.env[config.baseRefEnv]?.trim() || 'origin/master'
   const repoRoot = repoRootFrom(config.root)
