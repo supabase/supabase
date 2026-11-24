@@ -147,15 +147,25 @@ Branching reads one config file from your `supabase` directory: `config.json` or
 - **Both `config.json` and `config.jsonc` exist**: Branch setup fails. Delete the file you don't use.
 - **Changes to `config.toml` have no effect**: A `config.json` or `config.jsonc` file in the same directory takes precedence, so `config.toml` is ignored. Delete the file you don't use. `supabase config validate` names the file it reads and flags an ignored `config.toml`.
 
-To go back to `config.toml` after converting, restore it from the commit before the conversion and delete the JSON file:
+To go back to `config.toml` after converting, run `supabase config convert --to toml` with CLI 3.3.0 or later. It converts the JSON file to `config.toml`, keeps your edits, and moves the JSON file to a `.bak` backup that you delete before committing. See [Convert back to TOML](/docs/guides/local-development/cli/config-formats#convert-back-to-toml).
+
+With a CLI earlier than 3.3.0, restore `config.toml` from the commit before the conversion. If a `config.toml` exists, the checkout replaces it, so first copy any edits from it that you want to keep:
 
 ```bash
 git log --diff-filter=D -n 1 --format=%h -- supabase/config.toml
 git checkout <commit>^ -- supabase/config.toml
-git rm supabase/config.jsonc
 ```
 
-Replace `<commit>` with the hash the first command prints. Edits you made to the JSON file after converting aren't carried over, so copy them into `config.toml`. Commit and push the change to update your branches.
+Replace `<commit>` with the hash the first command prints. Edits you made to the JSON file after converting aren't carried over, so copy them, and any edits you saved from the old `config.toml`, into `config.toml`. Once you've checked they're there, stage `config.toml` and delete the JSON file. `-f` deletes it even if it has uncommitted edits:
+
+```bash
+git add supabase/config.toml
+git rm -f supabase/config.jsonc
+```
+
+If your project uses `config.json`, run `git rm -f supabase/config.json` instead.
+
+Either way, commit and push the change to update your branches.
 
 ### Secrets not available
 
