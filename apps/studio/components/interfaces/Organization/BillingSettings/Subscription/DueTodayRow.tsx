@@ -1,7 +1,8 @@
 import { InfoIcon } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { formatRoundedCurrency, type DueTodayBreakdown } from './PlanChangeSummary.utils'
+import { type DueTodayBreakdown } from './PlanChangeSummary.utils'
+import { formatCurrency } from '@/lib/helpers'
 
 const TooltipLine = ({
   label,
@@ -20,7 +21,7 @@ const TooltipLine = ({
       className={cn('tabular-nums', isCredit ? 'text-brand' : 'text-foreground')}
       translate="no"
     >
-      {isCredit ? `−${formatRoundedCurrency(amount)}` : formatRoundedCurrency(amount)}
+      {isCredit ? `−${formatCurrency(amount)}` : formatCurrency(amount)}
     </span>
   </div>
 )
@@ -50,13 +51,13 @@ export const DueTodayRow = ({ breakdown, planName, currentPlanName }: DueTodayRo
         <div className="flex items-baseline gap-2">
           {isReduced && (
             <span className="text-sm text-foreground-lighter line-through" translate="no">
-              {formatRoundedCurrency(planAmount)}
+              {formatCurrency(planAmount)}
             </span>
           )}
           <Tooltip>
             <TooltipTrigger className="flex items-center gap-1.5" translate="no">
               <span className="text-2xl text-foreground tabular-nums underline decoration-dotted underline-offset-4">
-                {formatRoundedCurrency(dueToday)}
+                {formatCurrency(dueToday)}
               </span>
               <InfoIcon size={14} className="text-foreground-lighter" aria-hidden="true" />
             </TooltipTrigger>

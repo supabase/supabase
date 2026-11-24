@@ -14,7 +14,6 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 import { PlanChangeBill } from './PlanChangeBill'
 import { PlanChangeNotes } from './PlanChangeNotes'
 import {
-  formatRoundedCurrency,
   getDueTodayBreakdown,
   getPausedProjects,
   getPlanChangeSummary,
@@ -37,6 +36,7 @@ import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subsc
 import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -255,7 +255,10 @@ export const SubscriptionPlanUpdateView = ({
   )
 
   const dueToday = useMemo(
-    () => getDueTodayBreakdown(subscriptionPreview, { planAmount: summary.planAmount }),
+    () =>
+      getDueTodayBreakdown(subscriptionPreview, {
+        planAmount: summary.planAmount,
+      }),
     [subscriptionPreview, summary.planAmount]
   )
 
@@ -288,7 +291,7 @@ export const SubscriptionPlanUpdateView = ({
   const hasPaymentDueToday = subscriptionPreviewInitialized && !isDowngrade && dueToday.dueToday > 0
   const confirmLabel = isDowngrade
     ? `Downgrade to ${newPlanName}`
-    : `Upgrade to ${newPlanName}${hasPaymentDueToday ? ` · pay ${formatRoundedCurrency(dueToday.dueToday)} today` : ''}`
+    : `Upgrade to ${newPlanName}${hasPaymentDueToday ? ` · pay ${formatCurrency(dueToday.dueToday)} today` : ''}`
 
   return (
     <FullScreenPanel
@@ -337,7 +340,10 @@ export const SubscriptionPlanUpdateView = ({
                   isCondensed={isCondensed}
                   currentPlan={
                     isCondensed && currentPlanName
-                      ? { name: currentPlanName, price: currentPlanMeta?.price ?? 0 }
+                      ? {
+                          name: currentPlanName,
+                          price: currentPlanMeta?.price ?? 0,
+                        }
                       : undefined
                   }
                 />
