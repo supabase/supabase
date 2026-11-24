@@ -12,14 +12,12 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
-  "engines": {
-    "node": ">= 16"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "minimist": "^1.2.7",
+    "oxfmt": "catalog:",
     "svgson": "^5.2.1"
   }
 }

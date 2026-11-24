@@ -14,7 +14,7 @@ date: '2024-03-26'
 toc_depth: 3
 ---
 
-[Amazon Bedrock](https://aws.amazon.com/bedrock) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
+[Amazon Bedrock](https://aws.amazon.com/bedrock/) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
 
 [Amazon Titan](https://aws.amazon.com/bedrock/titan/) is a family of foundation models (FMs) for text and image generation, summarization, classification, open-ended Q&A, information extraction, and text or image search.
 
@@ -45,7 +45,7 @@ When creating your project, make sure to note down your database password as you
 You can find the database connection string in your Supabase Dashboard [project connect page](https://supabase.com/dashboard/project/_?showConnect=true). Select "Use connection pooling" with `Mode: Session` for a direct connection to your Postgres database. It will look something like this:
 
 ```txt
-postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
 ## Install the dependencies
@@ -74,10 +74,10 @@ from matplotlib import pyplot as plt
 from matplotlib import image as mpimg
 from typing import Optional
 
-DB_CONNECTION = "postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
+DB_CONNECTION = "postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
 ```
 
-Next, get the [credentials to your AWS account](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html) and instantiate the `boto3` client:
+Next, get the [credentials to your AWS account](https://docs.aws.amazon.com/boto3/latest/guide/credentials.html) and instantiate the `boto3` client:
 
 ```python
 bedrock_client = boto3.client(

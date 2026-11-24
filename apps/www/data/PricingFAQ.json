@@ -33,7 +33,7 @@
   },
   {
     "question": "Can I self-host Supabase for free?",
-    "answer": "Yes, you can use the [Docker setup](https://supabase.com/docs/guides/hosting/docker) or the [Supabase CLI](https://github.com/supabase/cli). [Supabase Studio](https://supabase.com/blog/supabase-studio) is also available in the Docker setup."
+    "answer": "Yes, you can use the [Docker setup](https://supabase.com/docs/guides/self-hosting/docker) or the [Supabase CLI](https://github.com/supabase/cli). [Supabase Studio](https://supabase.com/blog/supabase-studio) is also available in the Docker setup."
   },
   {
     "question": "Can I pause a free project?",

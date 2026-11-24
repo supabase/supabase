@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import type { PGSchema } from '@supabase/pg-meta'
 import {
   Background,
@@ -11,6 +13,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -23,10 +26,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import '@xyflow/react/dist/style.css'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,10 +42,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useTableActions } from '../../TableGridEditor/useTableActions'
 import { DefaultEdge } from './DefaultEdge'
 import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
@@ -89,6 +90,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { editTable } = useTableActions()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
@@ -372,14 +374,10 @@ export const SchemaGraph = () => {
         snap.onEditColumn(column)
       },
       onEditTable: (tableId) => {
-        const table = tables.find((table) => table.id === tableId)
-        if (!table || table.columns == null) return
-
-        setSelectedTable(table)
-        snap.onEditTable()
+        void editTable(tableId)
       },
     }),
-    [tables, snap, isDownloading, selectedEdge]
+    [tables, snap, editTable, isDownloading, selectedEdge]
   )
 
   return (
@@ -432,9 +430,8 @@ export const SchemaGraph = () => {
             </div>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
-                <div className="flex items-center gap-0">
+                <SplitButtonGroup className="items-center gap-0">
                   <ButtonTooltip
-                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                     icon={copied ? <CheckIcon data-testid="copy-sql-ready" /> : <CopyIcon />}
                     onClick={copyAsSQL}
                     tooltip={{
@@ -459,7 +456,7 @@ export const SchemaGraph = () => {
                       <Button
                         size="tiny"
                         aria-label="Export options"
-                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                        className="shrink-0 px-1 py-1.25"
                         icon={<ChevronDownIcon size={12} />}
                       />
                     </DropdownMenuTrigger>
@@ -501,7 +498,7 @@ export const SchemaGraph = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
+                </SplitButtonGroup>
                 <AlertDialog open={autoLayoutDialogOpen} onOpenChange={setAutoLayoutDialogOpen}>
                   <Shortcut
                     id={SHORTCUT_IDS.SCHEMA_VISUALIZER_AUTO_LAYOUT}

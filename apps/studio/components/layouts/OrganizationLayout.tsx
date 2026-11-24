@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
+import { ORG_SETTINGS_ROUTES } from './OrganizationLayout/OrganizationLayout.utils'
 import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -20,9 +21,6 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 interface OrganizationLayoutProps {
   title: string
 }
-
-// [Joshen] Just for page title generation for org settings pages
-const settingsPages = ['general', 'security', 'sso', 'apps', 'audit', 'documents']
 
 type MarketplaceBannerRedirectSource = 'vercel' | 'aws'
 
@@ -98,7 +96,7 @@ const OrganizationLayoutContent = ({
   )
 
   // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
-  const isSettingsSurface = settingsPages.some((x) => router.pathname.endsWith(x))
+  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => router.pathname.endsWith(x))
   const pageTitle = buildStudioPageTitle({
     section: title,
     surface: isSettingsSurface ? 'Organization Settings' : undefined,

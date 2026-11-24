@@ -1,7 +1,6 @@
 // [Joshen] Allowlist of API endpoints supported in hosted (platform) mode.
-// Every other /api/* route must 404 in platform mode. Shared by the Next
-// middleware (proxy.ts) and the TanStack request middleware (start.ts) so
-// the list can't drift between the two frameworks while both run in parallel.
+// Every other /api/* route must 404 in platform mode (enforced by the request
+// middleware in start.ts).
 export const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/generate-v4',
   '/ai/sql/policy',

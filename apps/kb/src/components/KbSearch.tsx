@@ -1,5 +1,6 @@
 import { useDocsSearchV2 } from 'common/hooks/useDocsSearchV2'
 import { useMountEffect } from 'common/hooks/useMountEffect'
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import type { KbSearchClosedEvent, KbSearchOpenedEvent } from 'common/telemetry-constants'
 import {
   getVisibleResults,
@@ -91,7 +92,7 @@ const KbSearchPanel = ({ onClose }: Pick<KbSearchDialogProps, 'onClose'>) => {
     sendKbTelemetryEvent({
       action: 'kb_search_submitted',
       properties: {
-        queryLength: searchState.query.length,
+        ...describeSearchQuery(searchState.query),
         resultCount,
         hasResults: resultCount > 0,
       },

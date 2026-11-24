@@ -82,7 +82,6 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-v4-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
@@ -122,8 +121,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
-  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-    `free-micro-upgrade-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-at-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
@@ -146,6 +145,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
   IA_NAV_FLAG: 'docs-ia-mvp-v1',
+  DOCS_PAGE_ACTION: 'docs.ui.page-action',
 
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
@@ -177,6 +177,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
+  LOCAL_STORAGE_KEYS.DOCS_PAGE_ACTION,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
@@ -190,10 +191,17 @@ export function clearLocalStorage() {
     const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
     // Per-profile, and holds the new org's type and size until the follow-up saves them
     const isOnboardingSurveyFollowUp = key.startsWith(ONBOARDING_SURVEY_FOLLOW_UP_PREFIX)
+    // Consent belongs to the browser, so an opt-out has to survive sign-out
+    const isConsentRecord =
+      key.startsWith('uc_') ||
+      key === 'ucData' ||
+      key === 'ucString' ||
+      key.startsWith('__ph_opt_in_out_')
     if (
       !LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) &&
       !isRecoveryReminder &&
-      !isOnboardingSurveyFollowUp
+      !isOnboardingSurveyFollowUp &&
+      !isConsentRecord
     ) {
       safeLocalStorage.removeItem(key)
     }

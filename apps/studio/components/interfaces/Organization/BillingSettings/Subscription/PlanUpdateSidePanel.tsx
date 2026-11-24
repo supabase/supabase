@@ -1,14 +1,17 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
+import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
+import { SubscriptionPlanUpdateView } from './SubscriptionPlanUpdateView'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -24,7 +27,6 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
 
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
@@ -116,9 +118,13 @@ export const PlanUpdateSidePanel = () => {
   const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
   const debouncedAddress = useDebounce(billingAddress, 1000)
   const debouncedTaxId = useDebounce(billingTaxId, 1000)
+  // Until the debounce settles the preview prices an older address than the one on screen,
+  // and submitting would charge an amount the customer never reviewed.
+  const isBillingPreviewPending =
+    !isEqual(billingAddress, debouncedAddress) || !isEqual(billingTaxId, debouncedTaxId)
 
   const handleAddressChange = useCallback(
-    (address: CustomerAddress) => setLatestAddress(address),
+    (address: CustomerAddress | null) => setLatestAddress(address ?? undefined),
     []
   )
 
@@ -133,9 +139,10 @@ export const PlanUpdateSidePanel = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
-  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+  const { panel, setPanel } = useOrgSettingsPanel()
+  const visible = panel === 'subscriptionPlan'
+  // Panel was already open when the page loaded (deep link), so skip the entry animation delay
+  const [isOpenedViaUrl] = useState(visible)
 
   const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
@@ -150,11 +157,7 @@ export const PlanUpdateSidePanel = () => {
   const hasOrioleProjects = !!data?.has_oriole_project
 
   const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
+    setPanel(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -206,6 +209,12 @@ export const PlanUpdateSidePanel = () => {
     }
   }, [visible, isSuccessSubscription, subscription?.plan.id])
 
+  // tier_free goes through the cancellation flow instead of the plan update view
+  const isConfirmingPlanChange = selectedTier !== undefined && selectedTier !== 'tier_free'
+
+  // Rolls out the redesigned full screen plan change flow. Off falls back to the dialog.
+  const isPlanUpdateRedesignEnabled = useFlag('billingPlanUpdateRedesign')
+
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
@@ -249,11 +258,26 @@ export const PlanUpdateSidePanel = () => {
       isPartnerBilledOrganization={isPartnerBilledOrganization}
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
-      entryDelay={contentDelay}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
   )
+
+  // Both plan change surfaces take the same props, so the flag only picks the renderer.
+  const planChangeProps = {
+    selectedTier,
+    onClose: () => setSelectedTier(undefined),
+    onSuccess: onClose,
+    planMeta,
+    subscriptionPreviewQueryResult: subscriptionPreviewData,
+    projects: orgProjects,
+    currentPlanMeta,
+    onAddressChange: handleAddressChange,
+    onTaxIdChange: handleTaxIdChange,
+    isBillingPreviewPending,
+    useAsDefaultBillingAddress,
+    onUseAsDefaultBillingAddressChange: handleUseAsDefaultBillingAddressChange,
+  }
 
   return (
     <>
@@ -275,19 +299,12 @@ export const PlanUpdateSidePanel = () => {
         onDowngrade={() => setSelectedTier(undefined)}
       />
 
-      <SubscriptionPlanUpdateDialog
-        selectedTier={selectedTier}
-        onClose={() => setSelectedTier(undefined)}
-        onSuccess={onClose}
-        planMeta={planMeta}
-        subscriptionPreviewQueryResult={subscriptionPreviewData}
-        projects={orgProjects}
-        currentPlanMeta={currentPlanMeta}
-        onAddressChange={handleAddressChange}
-        onTaxIdChange={handleTaxIdChange}
-        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
-        onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
-      />
+      {isConfirmingPlanChange &&
+        (isPlanUpdateRedesignEnabled ? (
+          <SubscriptionPlanUpdateView {...planChangeProps} />
+        ) : (
+          <SubscriptionPlanUpdateDialog {...planChangeProps} />
+        ))}
 
       <UpgradeSurveyModal
         visible={showUpgradeSurvey}

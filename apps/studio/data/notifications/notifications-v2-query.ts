@@ -1,4 +1,5 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import { useIsLoggedIn } from 'common'
 
 import { notificationKeys } from './keys'
 import type { components } from '@/data/api'
@@ -76,11 +77,13 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
     number | undefined
   > = {}
 ) => {
+  const isLoggedIn = useIsLoggedIn()
+
   return useInfiniteQuery({
     queryKey: notificationKeys.listV2({ status, filters, limit }),
     queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    enabled: enabled,
+    enabled: (enabled ?? true) && isLoggedIn,
     initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length

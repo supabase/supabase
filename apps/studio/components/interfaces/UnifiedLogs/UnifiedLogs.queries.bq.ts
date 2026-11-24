@@ -110,7 +110,7 @@ const buildConditions = (
           (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(wrapIlikePattern(v))})`
         )
         conditions.push(safeSql`(${joinSqlFragments(branches, join)})`)
-      } else if (key === 'host' || key === 'pathname') {
+      } else if (key === 'host') {
         const branches = values.map((v) => safeSql`${col} ${likeOp} ${lit('%' + v + '%')}`)
         conditions.push(safeSql`(${joinSqlFragments(branches, joinAndOr)})`)
       } else {

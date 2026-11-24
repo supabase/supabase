@@ -1,7 +1,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 // Lazy admin client for self-hosted API routes under
-// `pages/api/platform/{auth,storage}/**`. SUPABASE_URL and
+// `routes/api/platform/{auth,storage}/**`. SUPABASE_URL and
 // SUPABASE_SERVICE_KEY are only set on self-hosted deployments — the
 // platform build doesn't need these env vars. But on the TanStack Start
 // server, every API route's module gets evaluated when the single function
