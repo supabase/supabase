@@ -399,7 +399,8 @@ export const OAuthAppsAuthorizeScreen = ({
       ? preflightError
       : null
   const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
-  const cannotSubmit = hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure
+  const cannotSubmit =
+    hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure
 
   const handleApprove = () => {
     if (hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure)
