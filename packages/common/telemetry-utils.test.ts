@@ -22,6 +22,18 @@ describe('keywords url param redaction', () => {
       `${USERS_PAGE}?sortBy=id&keywords=redacted#row`,
     ],
     [`${USERS_PAGE}?mykeywords=abc`, `${USERS_PAGE}?mykeywords=abc`],
+    [
+      'https://supabase.com/dashboard/project/abc/database/schemas?schema=billing_private',
+      'https://supabase.com/dashboard/project/abc/database/schemas?schema=redacted',
+    ],
+    [
+      'https://supabase.com/dashboard/project/abc/editor/1?schema=acme&view=definition',
+      'https://supabase.com/dashboard/project/abc/editor/1?schema=redacted&view=definition',
+    ],
+    [
+      'https://supabase.com/dashboard/project/abc/database/tables?schemas=a&myschema=b',
+      'https://supabase.com/dashboard/project/abc/database/tables?schemas=a&myschema=b',
+    ],
     ['https://example.com/', 'https://example.com/'],
   ])('redactUrlKeywords(%j)', (url, expected) => {
     expect(redactUrlKeywords(url)).toBe(expected)
