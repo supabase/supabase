@@ -150,7 +150,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const showUpgradeBanner = isEligibleForFreeMicroUpgrade({
       planId: selectedOrganization?.plan?.id,
-      computeSize: selectedProject?.infra_compute_size ?? 'nano',
+      computeSize: selectedProject?.infra_compute_size,
     })
 
     const isExplorerEnabled = useFlag('explorer')
