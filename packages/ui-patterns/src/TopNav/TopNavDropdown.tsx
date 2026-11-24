@@ -1,5 +1,6 @@
 'use client'
 
+import { useIsUserLoading, useUser, type User } from 'common/auth'
 import { DASHBOARD_ACCOUNT_URL, DASHBOARD_PROJECTS_URL } from 'common/constants/dashboard-urls'
 import { Database, LogOut, Menu, Settings, UserIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -35,27 +36,40 @@ export interface TopNavSignOutItemProps {
   onSelect: () => void
 }
 
-export const TopNavDropdown = ({ children, className }: TopNavDropdownProps) => (
-  <DropdownMenu modal={false}>
-    <DropdownMenuTrigger asChild>
-      <button
-        type="button"
-        className={cn(
-          buttonVariants({ variant: 'default' }),
-          'size-7.5 min-w-7.5 space-x-0 border-default bg-transparent px-0 text-foreground-light',
-          'hover:border-strong hover:bg-overlay-hover/50! data-open:border-stronger data-open:bg-overlay-hover/30',
-          className
-        )}
-      >
-        <Menu aria-hidden className="size-4.5" strokeWidth={1} />
-        <span className="sr-only">Open menu</span>
-      </button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent side="bottom" align="end" className="w-52">
-      {children}
-    </DropdownMenuContent>
-  </DropdownMenu>
-)
+interface TriggerIconProps {
+  user: User | null
+}
+
+export const TopNavDropdown = ({ children, className }: TopNavDropdownProps) => {
+  const user = useUser()
+  const isUserLoading = useIsUserLoading()
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            buttonVariants({ variant: 'default' }),
+            'size-7.5 min-w-7.5 space-x-0 border-default bg-transparent px-0 text-foreground-light',
+            'hover:border-strong hover:bg-overlay-hover/50! data-open:border-stronger data-open:bg-overlay-hover/30',
+            user ? 'overflow-hidden rounded-full' : null,
+            isUserLoading
+              ? 'in-data-signed-in:overflow-hidden in-data-signed-in:rounded-full'
+              : null,
+            className
+          )}
+        >
+          {isUserLoading ? <LoadingTriggerIcon /> : <TriggerIcon user={user} />}
+          <span className="sr-only">Open menu</span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export const TopNavThemeGroup = ({ value, onValueChange }: TopNavThemeGroupProps) => (
   <DropdownMenuGroup>
@@ -97,3 +111,35 @@ export const TopNavSignOutItem = ({ onSelect }: TopNavSignOutItemProps) => (
     Sign out
   </DropdownMenuItem>
 )
+
+// auth loads after hydration, so the first-paint hint in common/gotrue picks the icon until then
+const LoadingTriggerIcon = () => (
+  <>
+    <Menu aria-hidden className="size-4.5 in-data-signed-in:hidden" strokeWidth={1} />
+    <UserIcon aria-hidden className="hidden size-4 in-data-signed-in:block" strokeWidth={1.5} />
+    <span
+      aria-hidden
+      className="absolute inset-0 hidden bg-(image:--signed-in-avatar) bg-cover bg-center in-data-signed-in:block"
+    />
+  </>
+)
+
+const TriggerIcon = ({ user }: TriggerIconProps) => {
+  const avatarUrl: unknown = user?.user_metadata?.avatar_url
+
+  if (!user) return <Menu aria-hidden className="size-4.5" strokeWidth={1} />
+  if (typeof avatarUrl !== 'string' || avatarUrl === '') {
+    return <UserIcon aria-hidden className="size-4" strokeWidth={1.5} />
+  }
+  // a failed background paints nothing, so the person icon stays visible. a failed img draws a broken icon
+  return (
+    <>
+      <UserIcon aria-hidden className="size-4" strokeWidth={1.5} />
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${JSON.stringify(avatarUrl)})` }}
+      />
+    </>
+  )
+}
