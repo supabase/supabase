@@ -1,8 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
-import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isEqual } from 'lodash'
-import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
@@ -95,8 +94,25 @@ const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
   return `stripe projects ${action} supabase/${currentTier}`
 }
 
+/**
+ * Sends the panel opened event once per open. On a page load that lands on the panel, the
+ * organization resolves after the panel is visible, so the event waits for its plan.
+ */
+const useTrackPanelOpened = (isOpen: boolean, currentPlan: string | undefined) => {
+  const track = useTrack()
+  const [source] = useQueryState('source')
+
+  const onOpened = useEffectEvent(() => {
+    track('studio_pricing_side_panel_opened', { currentPlan, origin: source ?? undefined })
+  })
+
+  const isReady = isOpen && currentPlan !== undefined
+  useEffect(() => {
+    if (isReady) onOpened()
+  }, [isReady])
+}
+
 export const PlanUpdateSidePanel = () => {
-  const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
@@ -104,7 +120,6 @@ export const PlanUpdateSidePanel = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-  const track = useTrack()
 
   const originalPlanRef = useRef<string>(undefined)
 
@@ -156,8 +171,12 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
+  const [source, setSource] = useQueryState('source')
+
   const onClose = () => {
     setPanel(null)
+    // A reopen from the billing page would otherwise report the previous entry point as its origin.
+    setSource(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -177,11 +196,7 @@ export const PlanUpdateSidePanel = () => {
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
 
-  const onPanelOpened = useEffectEvent(
-    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
-      track('studio_pricing_side_panel_opened', properties)
-    }
-  )
+  useTrackPanelOpened(visible, selectedOrganization?.plan.name)
 
   useEffect(() => {
     if (visible) {
@@ -189,18 +204,7 @@ export const PlanUpdateSidePanel = () => {
       setLatestAddress(undefined)
       setLatestTaxId(undefined)
       setUseAsDefaultBillingAddress(true)
-      const source = Array.isArray(router.query.source)
-        ? router.query.source[0]
-        : router.query.source
-      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
-        currentPlan: subscription?.plan?.name,
-      }
-      if (source) {
-        properties.origin = source
-      }
-      onPanelOpened(properties)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   useEffect(() => {
@@ -259,6 +263,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
+      isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
       onSelectTier={setSelectedTier}
     />
   )
@@ -301,7 +306,7 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} />
+          <SubscriptionPlanUpdateView {...planChangeProps} origin={source ?? undefined} />
         ) : (
           <SubscriptionPlanUpdateDialog {...planChangeProps} />
         ))}
