@@ -323,6 +323,9 @@ export const SchemaGraph = () => {
 
   const isFirstLoad = useRef(true)
   const fitViewOnNextLayout = useRef(false)
+  // Schema of the nodes currently on the canvas. Switching to a schema whose tables are cached
+  // keeps the graph mounted, so the view must be fitted again or the new nodes can sit off-screen.
+  const layoutSchemaRef = useRef<string | null>(null)
   const pendingFocusTableIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
@@ -331,7 +334,9 @@ export const SchemaGraph = () => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
         // Prevent resetting a view after first load to avoid layout changes after editing a column
-        if (isFirstLoad.current || fitViewOnNextLayout.current) {
+        const isNewSchema = layoutSchemaRef.current !== selectedSchema
+        layoutSchemaRef.current = selectedSchema
+        if (isFirstLoad.current || fitViewOnNextLayout.current || isNewSchema) {
           isFirstLoad.current = false
           fitViewOnNextLayout.current = false
           setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
