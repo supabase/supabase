@@ -65,10 +65,10 @@ DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
 # create vector store client
 vx = vecs.create_client(DB_CONNECTION)
 
-docs = vx.get_or_create_collection(name="docs", dimension=1536)
+docs = vx.get_or_create_collection(name="docs", dimension=3)
 
-docs.upsert(vectors=[
-  ('79409372-7556-4ccc-ab8f-5786a6cfa4f7', [100, 200, 300], { url: '/hello-world' })
+docs.upsert(records=[
+  ('79409372-7556-4ccc-ab8f-5786a6cfa4f7', [100, 200, 300], {'url': '/hello-world'})
 ])
 
 ```

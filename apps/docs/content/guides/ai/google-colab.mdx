@@ -62,7 +62,7 @@ Create a new code block below the install block (`ctrl+m b`). Add the following 
 collection = vx.get_or_create_collection(name="colab_collection", dimension=3)
 
 collection.upsert(
-    vectors=[
+    records=[
         (
          "vec0",           # the vector's identifier
          [0.1, 0.2, 0.3],  # the vector. list or np.array
