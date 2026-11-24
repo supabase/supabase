@@ -3,6 +3,7 @@
 // legacy layout for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
+import { VideoPreview } from '~/components/VideoPreview'
 import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
@@ -32,7 +33,13 @@ const GuidesSidebar = ({
       <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit min-h-0">
         {video && (
           <div className="relative pl-5">
-            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
+            <ExpandableVideo
+              imgUrl={tocVideoPreview}
+              videoId={video}
+              videoTitle={videoTitle}
+              trigger={<VideoPreview imgUrl={tocVideoPreview} />}
+              triggerContainerClassName="rounded-lg focus-ring"
+            />
           </div>
         )}
         {showFeedback && (
