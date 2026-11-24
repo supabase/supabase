@@ -4,7 +4,6 @@ import {
   getAllProjectsRowLabel,
   getAuthorizationChangeDescriptions,
   getAuthorizationChanges,
-  getConsentApprovalLine,
   getResultingGrantDescription,
   hasAuthorizationChanges,
 } from './Authorization.utils'
@@ -32,16 +31,6 @@ describe('getResultingGrantDescription', () => {
     expect(getResultingGrantDescription(true, true)).toEqual(
       'One grant per member, projects chosen when connecting'
     )
-  })
-})
-
-describe('getConsentApprovalLine', () => {
-  test('describes the owner approving once for an organization-bound grant', () => {
-    expect(getConsentApprovalLine(false)).toEqual('An org owner approves once, for everyone')
-  })
-
-  test('describes approving for yourself for a member-bound grant', () => {
-    expect(getConsentApprovalLine(true)).toEqual("You're approving for yourself only")
   })
 })
 

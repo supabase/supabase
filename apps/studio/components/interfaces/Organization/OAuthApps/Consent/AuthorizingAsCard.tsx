@@ -3,6 +3,10 @@ import { LogOutIcon } from 'lucide-react'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { OAuthAppsAuthorizeRequestData } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 
+/** Shown only for member-bound grants. Exported so previews of this screen stay in step with it. */
+export const MEMBER_BOUND_GRANT_NOTICE =
+  'This grant acts as you, it can never do more than your role in this organization allows.'
+
 export interface AuthorizingAsCardProps {
   email: string
   request: OAuthAppsAuthorizeRequestData
@@ -39,9 +43,7 @@ export const AuthorizingAsCard = ({ email, request, onSignOut }: AuthorizingAsCa
         )}
       </div>
       {request.grant_kind === 'member_bound' && (
-        <p className="text-xs text-foreground-lighter">
-          This grant acts as you, it can never do more than your role in this organization allows.
-        </p>
+        <p className="text-xs text-foreground-lighter">{MEMBER_BOUND_GRANT_NOTICE}</p>
       )}
     </section>
   )

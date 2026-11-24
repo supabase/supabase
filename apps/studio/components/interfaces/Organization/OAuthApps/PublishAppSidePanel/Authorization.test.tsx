@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, test } from 'vitest'
 
+import { MEMBER_BOUND_GRANT_NOTICE } from '../Consent/AuthorizingAsCard'
 import { AuthorizationSection } from './Authorization'
 import { AuthorizationValues, DEFAULT_AUTHORIZATION_VALUES } from './Authorization.utils'
 import {
@@ -13,6 +14,7 @@ import {
 import { customRender } from '@/tests/lib/custom-render'
 
 const OWNER_OPTION = /An owner, once for the whole organization/
+const MEMBER_OPTION = /Each member, for themselves/
 const ALL_PROJECTS_OPTION = /^All projects(?! in)/
 const LET_THEM_CHOOSE_OPTION = /Let them choose/
 
@@ -82,6 +84,17 @@ describe('AuthorizationSection', () => {
     expect(
       await screen.findByText(/Today: One grant for the organization, every project in it/)
     ).toBeVisible()
+  })
+
+  test('the preview only explains the grant acts as you for member-bound grants', async () => {
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
+
+    await screen.findByText('Authorize Acme Deploy')
+    expect(screen.queryByText(MEMBER_BOUND_GRANT_NOTICE)).toBeNull()
+
+    fireEvent.click(await screen.findByRole('radio', { name: MEMBER_OPTION }))
+
+    expect(await screen.findByText(MEMBER_BOUND_GRANT_NOTICE)).toBeInTheDocument()
   })
 
   test('the preview mock is hidden from assistive technology', async () => {

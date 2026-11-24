@@ -3,11 +3,11 @@ import { useId } from 'react'
 import { Control, useWatch } from 'react-hook-form'
 import { Badge, Card, cn, FormField, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
+import { MEMBER_BOUND_GRANT_NOTICE } from '../Consent/AuthorizingAsCard'
 import { ScopeGroupCard } from '../Consent/ScopeGroupCard'
 import {
   AuthorizationValues,
   getAllProjectsRowLabel,
-  getConsentApprovalLine,
   getResultingGrantDescription,
 } from './Authorization.utils'
 import { FormSchemaWithOAuthAppScopedGrants } from './PublishAppSidePanel.utils'
@@ -175,14 +175,15 @@ const AuthorizationPreview = ({
       <p className="text-sm text-foreground">Preview: what someone connecting will see</p>
 
       <div className="overflow-hidden rounded-lg border">
-        <div className="relative h-72 overflow-hidden bg-studio">
+        <div className="relative h-80 overflow-hidden bg-studio">
+          {/*
+            The crop stays fixed across both states so that turning on project scoping only adds
+            the Projects section below Organization, the way the real screen does, rather than
+            shifting everything above it.
+          */}
           <div
             aria-hidden
-            className={cn(
-              'pointer-events-none absolute inset-x-0 flex justify-center px-6 opacity-60 select-none',
-              // The project picker sits further down the card, so crop more of the header to reach it
-              isProjectScopingEnabled ? '-top-40' : '-top-16'
-            )}
+            className="pointer-events-none absolute inset-x-0 -top-16 flex justify-center px-6 opacity-60 select-none"
           >
             <Card className={cn('w-full', INTERSTITIAL_WIDTH_CLASS)}>
               <div className="flex flex-col items-center gap-1 px-6 pt-6 pb-5 text-center">
@@ -210,9 +211,9 @@ const AuthorizationPreview = ({
                       </div>
                     )}
                   </div>
-                  <p className="text-xs text-foreground-lighter">
-                    {getConsentApprovalLine(isMemberBoundGrant)}
-                  </p>
+                  {isMemberBoundGrant && (
+                    <p className="text-xs text-foreground-lighter">{MEMBER_BOUND_GRANT_NOTICE}</p>
+                  )}
                 </section>
 
                 <div className="flex flex-col gap-2">

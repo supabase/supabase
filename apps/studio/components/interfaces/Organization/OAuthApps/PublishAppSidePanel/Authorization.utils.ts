@@ -29,12 +29,6 @@ export function getResultingGrantDescription(
   return 'One grant for the organization, every project in it'
 }
 
-export function getConsentApprovalLine(isMemberBoundGrant: boolean): string {
-  return isMemberBoundGrant
-    ? "You're approving for yourself only"
-    : 'An org owner approves once, for everyone'
-}
-
 export function getAllProjectsRowLabel(
   isMemberBoundGrant: boolean,
   organizationName?: string
