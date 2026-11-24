@@ -174,6 +174,31 @@ test.describe('SQL Editor', () => {
     }
   })
 
+  test('keeps inline editor results when opened in the SQL editor', async ({ ref }) => {
+    await page.goto(toUrl(`/project/${ref}`))
+    await page.locator('#editor-trigger').click()
+    await page.locator('.view-lines').click()
+    await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.keyboard.type(`select 'kept on expand';`)
+    await page.getByTestId('sql-run-button').click()
+    await expect(page.getByRole('gridcell', { name: 'kept on expand' })).toBeVisible()
+
+    const expandButton = page.getByRole('button', { name: 'Open in SQL editor' })
+    await expandButton.click()
+    await expect(expandButton, 'Inline editor should close after expanding').not.toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'kept on expand' }),
+      'Inline editor results should carry over without running the query again'
+    ).toBeVisible()
+
+    // clear SQL snippet
+    if (!isCLI()) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    } else {
+      await page.reload()
+    }
+  })
+
   test('should block execution for alter database connection limit 0', async ({ ref }) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
