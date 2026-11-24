@@ -443,8 +443,20 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.100.1
     restart: unless-stopped
-    # Reaps orphaned processes, such as the image's healthcheck killed at its timeout.
+    # Reaps orphaned processes, such as a healthcheck killed at its timeout.
     init: true
+    # Defined here because Podman ignores the healthcheck embedded in the image.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:8080/health').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
