@@ -52,6 +52,9 @@ export const onboardingSurveySchema = z.object({
 // How long after creating an org its creator can be asked the survey again
 export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000
 
+// Vercel Marketplace orgs created from this date on have their owners asked the survey
+export const VERCEL_MARKETPLACE_SURVEY_START = '2026-11-25T00:00:00Z'
+
 export type OnboardingSurveyOption = {
   value: string
   label: string

@@ -1,13 +1,16 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCallback, useEffect, useState } from 'react'
 
+import { VERCEL_MARKETPLACE_SURVEY_START } from './OnboardingSurvey.constants'
 import {
   getFollowUpRemainingMs,
   parseFollowUpState,
   type OnboardingSurveyFollowUpStatus,
 } from './OnboardingSurveyFollowUp.utils'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 
 const UNKNOWN_STORAGE_KEY = 'supabase-onboarding-survey-follow-up-unknown'
@@ -17,6 +20,10 @@ const UNKNOWN_STORAGE_KEY = 'supabase-onboarding-survey-follow-up-unknown'
  * again: they left it blank on the new-org form in this browser, haven't
  * answered or skipped since, and the org is less than five minutes old.
  * `hasExpired` turns true once those five minutes pass with no answer or skip.
+ *
+ * Vercel Marketplace orgs never pass through the new-org form, so their owners
+ * are asked here instead: once per browser, with no time limit, for orgs
+ * created since VERCEL_MARKETPLACE_SURVEY_START.
  */
 export function useOnboardingSurveyFollowUp() {
   const { profile } = useProfile()
@@ -29,8 +36,25 @@ export function useOnboardingSurveyFollowUp() {
       ? LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, orgSlug)
       : UNKNOWN_STORAGE_KEY
 
-  const [storedState, setStoredState] = useLocalStorageQuery<unknown>(storageKey, null)
+  const [storedState, setStoredState, { isSuccess: isStoredStateLoaded }] =
+    useLocalStorageQuery<unknown>(storageKey, null)
   const followUpState = parseFollowUpState(storedState)
+
+  // Until storage has been read, "no state" is only the default and can't count as never asked
+  const isUnaskedVercelOwner =
+    isStoredStateLoaded &&
+    followUpState === null &&
+    !!profileId &&
+    organization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE &&
+    organization.is_owner
+  const { data: vercelOrgCreatedAt } = useOrganizationQuery(
+    { slug: orgSlug },
+    { enabled: isUnaskedVercelOwner, select: (org) => org.created_at }
+  )
+  const isNewVercelOrg =
+    !!vercelOrgCreatedAt &&
+    Date.parse(vercelOrgCreatedAt) >= Date.parse(VERCEL_MARKETPLACE_SURVEY_START)
+  const isVercelOwnerToAsk = isUnaskedVercelOwner && isNewVercelOrg
   const pendingOrgCreatedAt =
     followUpState?.status === 'pending' ? followUpState.orgCreatedAt : undefined
 
@@ -41,7 +65,7 @@ export function useOnboardingSurveyFollowUp() {
     !!pendingOrgCreatedAt &&
     (expiredOrgCreatedAt === pendingOrgCreatedAt ||
       getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now()) <= 0)
-  const isEligible = !!pendingOrgCreatedAt && !hasExpired
+  const isEligible = (!!pendingOrgCreatedAt && !hasExpired) || isVercelOwnerToAsk
 
   useEffect(() => {
     if (!pendingOrgCreatedAt) return
@@ -56,10 +80,12 @@ export function useOnboardingSurveyFollowUp() {
     (status: Exclude<OnboardingSurveyFollowUpStatus, 'pending'>) => {
       setStoredState((previous: unknown) => {
         const previousState = parseFollowUpState(previous)
-        return previousState ? { ...previousState, status } : previous
+        if (previousState) return { ...previousState, status }
+        // A Vercel Marketplace org has no marker yet: this answer or skip is its first record
+        return isVercelOwnerToAsk ? { status, orgCreatedAt: vercelOrgCreatedAt } : previous
       })
     },
-    [setStoredState]
+    [isVercelOwnerToAsk, setStoredState, vercelOrgCreatedAt]
   )
 
   // Undoes a dismissal whose save failed, keeping the original org details and
