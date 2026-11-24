@@ -6,6 +6,7 @@ import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   useImpersonatedAAL,
   useImpersonatedExternalAuth,
@@ -16,6 +17,7 @@ import {
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export function NewTab() {
+  const track = useTrack()
   const editor = useEditorType()
   const { selectedSchema } = useQuerySchemaState()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -36,7 +38,13 @@ export function NewTab() {
           description: 'Design and create a new database table',
           bgColor: 'bg-blue-500',
           isBeta: false,
-          onClick: () => snap.onAddTable(),
+          onClick: () => {
+            track('table_editor_new_item_clicked', {
+              itemType: 'table',
+              trigger: 'new_tab_card',
+            })
+            snap.onAddTable()
+          },
         },
       ]
 

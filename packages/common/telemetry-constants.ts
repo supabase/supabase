@@ -3344,6 +3344,226 @@ export interface RlsGeneratedPoliciesCreatedEvent {
 }
 
 /**
+ * User selected a different schema in the Table Editor sidebar.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor
+ */
+export interface TableEditorSchemaUpdatedEvent {
+  action: 'table_editor_schema_updated'
+  properties: {
+    /**
+     * Whether the selected schema is a Supabase or Postgres system schema
+     */
+    isSystemSchema: boolean
+    /**
+     * Whether the selected schema is the public schema
+     */
+    isPublic: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to create a new schema or table from the Table Editor sidebar or new-tab page.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor or /project/[ref]/editor/new
+ */
+export interface TableEditorNewItemClickedEvent {
+  action: 'table_editor_new_item_clicked'
+  properties:
+    | {
+        /**
+         * The type of database item being created
+         */
+        itemType: 'schema'
+      }
+    | {
+        /**
+         * The type of database item being created
+         */
+        itemType: 'table'
+        /**
+         * Where the user triggered creating a new table
+         */
+        trigger: 'sidebar' | 'new_tab_card'
+      }
+  groups: TelemetryGroups
+}
+
+/**
+ * User searched the entity list in the Table Editor sidebar (debounced, once per search).
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor
+ */
+export interface TableEditorTableSearchSubmittedEvent {
+  action: 'table_editor_table_search_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * User changed the entity-type filter in the Table Editor sidebar.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor
+ */
+export interface TableEditorEntityFilterUpdatedEvent {
+  action: 'table_editor_entity_filter_updated'
+  properties: {
+    /**
+     * Number of entity types enabled after the filter update
+     */
+    visibleTypeCount: number
+  }
+  groups: TelemetryGroups
+}
+
+export type TableEditorEntityAction =
+  | 'copy_name'
+  | 'copy_schema'
+  | 'copy_definition'
+  | 'edit'
+  | 'duplicate'
+  | 'export_csv'
+  | 'export_sql'
+  | 'export_cli'
+  | 'view_partitions'
+  | 'delete'
+
+export type TableEditorEntityType =
+  | 'table'
+  | 'view'
+  | 'materialized_view'
+  | 'foreign_table'
+  | 'partitioned_table'
+
+/**
+ * User selected an action from a table/entity dropdown or context menu in the Table Editor sidebar.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor
+ */
+export interface TableEditorEntityActionClickedEvent {
+  action: 'table_editor_entity_action_clicked'
+  properties: {
+    /**
+     * The menu action selected by the user
+     */
+    action: TableEditorEntityAction
+    /**
+     * The Postgres entity type of the targeted item
+     */
+    entityType: TableEditorEntityType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully created a column from the column side panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor or /project/[ref]/database/tables
+ */
+export interface TableColumnCreatedEvent {
+  action: 'table_column_created'
+  properties: {
+    /**
+     * Whether the column has at least one foreign key relation
+     */
+    hasForeignKey: boolean
+    /**
+     * Whether the column is defined as an array type
+     */
+    isArray: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully updated a column from the column side panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor or /project/[ref]/database/tables
+ */
+export interface TableColumnUpdatedEvent {
+  action: 'table_column_updated'
+  properties: {
+    /**
+     * Whether the column has at least one active foreign key relation after the update
+     */
+    hasForeignKey: boolean
+    /**
+     * Whether the column is defined as an array type after the update
+     */
+    isArray: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully saved changes to an existing table from the table side panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor or /project/[ref]/database/tables
+ */
+export interface TableUpdatedEvent {
+  action: 'table_updated'
+  properties: {
+    /**
+     * Whether the total number of columns on the table changed
+     */
+    columnCountChanged: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing row in the Table Editor via the side panel or inline cell editing.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor/[id]
+ */
+export interface TableEditorRowUpdatedEvent {
+  action: 'table_editor_row_updated'
+  properties: {
+    /**
+     * How the row edit was performed
+     */
+    editMethod: 'side_panel' | 'inline'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the expanded JSON or text cell editor side panel in the Table Editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/editor/[id]
+ */
+export interface TableEditorCellEditorOpenedEvent {
+  action: 'table_editor_cell_editor_opened'
+  properties: {
+    /**
+     * Which expanded cell editor was opened
+     */
+    editorType: 'json' | 'text'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened API docs panel.
  *
  * @group Events
@@ -5137,6 +5357,16 @@ export type TelemetryEvent =
   | RlsGeneratePoliciesClickedEvent
   | RlsGeneratedPolicyRemovedEvent
   | RlsGeneratedPoliciesCreatedEvent
+  | TableEditorSchemaUpdatedEvent
+  | TableEditorNewItemClickedEvent
+  | TableEditorTableSearchSubmittedEvent
+  | TableEditorEntityFilterUpdatedEvent
+  | TableEditorEntityActionClickedEvent
+  | TableColumnCreatedEvent
+  | TableColumnUpdatedEvent
+  | TableUpdatedEvent
+  | TableEditorRowUpdatedEvent
+  | TableEditorCellEditorOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent

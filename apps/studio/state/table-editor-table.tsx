@@ -15,6 +15,7 @@ import { getInitialGridColumns } from '@/components/grid/utils/column'
 import { getGridColumns } from '@/components/grid/utils/gridColumns'
 import { Entity } from '@/data/table-editor/table-editor-types'
 import { isSensitiveComment } from '@/lib/sensitive-column-comment'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
 
@@ -258,6 +259,7 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
+  const track = useTrack()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -266,6 +268,7 @@ export const TableEditorTableStateContextProvider = ({
       table,
       onAddColumn: tableEditorSnap.onAddColumn,
       onExpandJSONEditor: (column: string, row: SupaRow) => {
+        track('table_editor_cell_editor_opened', { editorType: 'json' })
         tableEditorSnap.onExpandJSONEditor({
           column,
           row,
@@ -273,6 +276,7 @@ export const TableEditorTableStateContextProvider = ({
         })
       },
       onExpandTextEditor: (column: string, row: SupaRow) => {
+        track('table_editor_cell_editor_opened', { editorType: 'text' })
         tableEditorSnap.onExpandTextEditor(column, row)
       },
     })

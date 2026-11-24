@@ -302,6 +302,7 @@ export const SidePanelEditor = ({
               enumArrayColumns,
               onSuccess: () => toast.success('Successfully updated row'),
             })
+            track('table_editor_row_updated', { editMethod: 'side_panel' })
           } catch (error: any) {
             saveRowError = error
           }
@@ -414,6 +415,7 @@ export const SidePanelEditor = ({
         selectedTable,
         primaryKey,
         foreignKeyRelations,
+        track,
       })
     } else {
       if (!selectedColumnToEdit) {
@@ -428,6 +430,7 @@ export const SidePanelEditor = ({
         primaryKey,
         foreignKeyRelations,
         existingForeignKeyRelations,
+        track,
       })
     }
 

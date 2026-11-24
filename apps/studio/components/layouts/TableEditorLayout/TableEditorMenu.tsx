@@ -42,20 +42,25 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 type Sort = 'alphabetical' | 'grouped-alphabetical'
 
+export const TABLE_SEARCH_TRACK_DEBOUNCE_MS = 500
+
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
+  const track = useTrack()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [searchText, setSearchText] = useState<string>('')
+  const searchTrackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
   const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
@@ -138,6 +143,63 @@ export const TableEditorMenu = () => {
   })
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+
+  const cancelPendingSearchTrack = useCallback(() => {
+    if (searchTrackTimerRef.current !== null) {
+      clearTimeout(searchTrackTimerRef.current)
+      searchTrackTimerRef.current = null
+    }
+  }, [])
+
+  useEffect(() => cancelPendingSearchTrack, [cancelPendingSearchTrack])
+
+  const handleSelectSchema = (name: string) => {
+    cancelPendingSearchTrack()
+    setSearchText('')
+    setPartitionParentId(undefined)
+    setSelectedSchema(name)
+    setIsSchemaDropdownOpen(false)
+    if (name !== selectedSchema) {
+      track('table_editor_schema_updated', {
+        isSystemSchema: INTERNAL_SCHEMAS.includes(name) || name.startsWith('pg_'),
+        isPublic: name === 'public',
+      })
+    }
+  }
+
+  const handleSelectCreateSchema = () => {
+    track('table_editor_new_item_clicked', { itemType: 'schema' })
+    snap.onAddSchema()
+    setIsSchemaDropdownOpen(false)
+  }
+
+  const handleAddTable = () => {
+    track('table_editor_new_item_clicked', { itemType: 'table', trigger: 'sidebar' })
+    snap.onAddTable()
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchText(value)
+    cancelPendingSearchTrack()
+    if (value.trim().length > 0) {
+      searchTrackTimerRef.current = setTimeout(() => {
+        searchTrackTimerRef.current = null
+        track('table_editor_table_search_submitted')
+      }, TABLE_SEARCH_TRACK_DEBOUNCE_MS)
+    }
+  }
+
+  const handleVisibleTypesChange = (nextVisibleTypes: string[]) => {
+    const isUnchanged =
+      nextVisibleTypes.length === visibleTypes.length &&
+      nextVisibleTypes.every((type) => visibleTypes.includes(type))
+    if (isUnchanged) return
+
+    setVisibleTypes(nextVisibleTypes)
+    track('table_editor_entity_filter_updated', {
+      visibleTypeCount: nextVisibleTypes.length,
+    })
+  }
 
   const onSelectExportCLI = useCallback(
     async (id: number) => {
@@ -238,16 +300,8 @@ export const TableEditorMenu = () => {
             <SchemaSelector
               className="mx-4"
               selectedSchemaName={selectedSchema}
-              onSelectSchema={(name: string) => {
-                setSearchText('')
-                setPartitionParentId(undefined)
-                setSelectedSchema(name)
-                setIsSchemaDropdownOpen(false)
-              }}
-              onSelectCreateSchema={() => {
-                snap.onAddSchema()
-                setIsSchemaDropdownOpen(false)
-              }}
+              onSelectSchema={handleSelectSchema}
+              onSelectCreateSchema={handleSelectCreateSchema}
               open={isSchemaDropdownOpen}
               onOpenChange={setIsSchemaDropdownOpen}
             />
@@ -263,7 +317,7 @@ export const TableEditorMenu = () => {
                 size="tiny"
                 icon={<PlusIcon size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 className="justify-start"
-                onClick={() => snap.onAddTable()}
+                onClick={handleAddTable}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -307,7 +361,7 @@ export const TableEditorMenu = () => {
                       value={searchText}
                       placeholder="Search tables..."
                       aria-labelledby="Search tables"
-                      onChange={(e) => setSearchText(e.target.value)}
+                      onChange={(e) => handleSearchChange(e.target.value)}
                     >
                       <InnerSideBarFilterSortDropdown
                         value={sort}
@@ -355,9 +409,11 @@ export const TableEditorMenu = () => {
                                     checked={visibleTypes.includes(value)}
                                     onCheckedChange={() => {
                                       if (visibleTypes.includes(value)) {
-                                        setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                                        handleVisibleTypesChange(
+                                          visibleTypes.filter((y) => y !== value)
+                                        )
                                       } else {
-                                        setVisibleTypes(visibleTypes.concat([value]))
+                                        handleVisibleTypesChange(visibleTypes.concat([value]))
                                       }
                                     }}
                                   />
@@ -367,7 +423,7 @@ export const TableEditorMenu = () => {
                                 </div>
                                 <Button
                                   size="tiny"
-                                  onClick={() => setVisibleTypes([value])}
+                                  onClick={() => handleVisibleTypesChange([value])}
                                   className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                                 >
                                   Select only
@@ -382,7 +438,7 @@ export const TableEditorMenu = () => {
 
                   {visibleTypes.length === 0 && (
                     <TableMenuFilterEmptyState
-                      onResetFilters={() => setVisibleTypes(Object.values(ENTITY_TYPE))}
+                      onResetFilters={() => handleVisibleTypesChange(Object.values(ENTITY_TYPE))}
                     />
                   )}
 

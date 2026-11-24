@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { getEntityActions, type EntityAction, type EntityActionGroup } from './EntityActions.utils'
+import {
+  ENTITY_ACTION_TO_TELEMETRY,
+  ENTITY_TYPE_TO_TELEMETRY,
+  getEntityActions,
+  type EntityAction,
+  type EntityActionGroup,
+} from './EntityActions.utils'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 const flatten = (groups: EntityActionGroup[]): EntityAction[] =>
@@ -98,5 +104,25 @@ describe('getEntityActions', () => {
 
   it('only offers copying the name for other entity types', () => {
     expect(idsOf(getActions({ type: ENTITY_TYPE.FOREIGN_TABLE }))).toEqual(['copy-name'])
+  })
+
+  it('maps every non-navigation leaf action to a telemetry action and skips view-policies/export', () => {
+    const allActionIds = new Set(
+      Object.values(ENTITY_TYPE).flatMap((type) => idsOf(getActions({ type })))
+    )
+
+    for (const id of allActionIds) {
+      if (id === 'view-policies' || id === 'export') {
+        expect(ENTITY_ACTION_TO_TELEMETRY[id]).toBeUndefined()
+      } else {
+        expect(ENTITY_ACTION_TO_TELEMETRY[id]).toBeDefined()
+      }
+    }
+  })
+
+  it('maps every ENTITY_TYPE to a telemetry entityType', () => {
+    for (const type of Object.values(ENTITY_TYPE)) {
+      expect(ENTITY_TYPE_TO_TELEMETRY[type]).toBeDefined()
+    }
   })
 })

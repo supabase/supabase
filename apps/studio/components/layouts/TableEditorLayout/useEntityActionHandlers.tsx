@@ -1,7 +1,11 @@
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
-import type { EntityActionId } from './EntityActions.utils'
+import {
+  ENTITY_ACTION_TO_TELEMETRY,
+  ENTITY_TYPE_TO_TELEMETRY,
+  type EntityActionId,
+} from './EntityActions.utils'
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 import { useTableActions } from '@/components/interfaces/TableGridEditor/useTableActions'
 import { getTableDefinition } from '@/data/database/table-definition-query'
@@ -10,6 +14,7 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { useTrack } from '@/lib/telemetry/track'
 
 type UseEntityActionHandlersParams = {
   entity: Entity
@@ -26,6 +31,7 @@ export const useEntityActionHandlers = ({
   onExportCLI,
   onViewPartitions,
 }: UseEntityActionHandlersParams) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const { editTable, duplicateTable, deleteTable, deleteView, deleteMaterializedView } =
     useTableActions()
@@ -74,6 +80,14 @@ export const useEntityActionHandlers = ({
   }
 
   const onSelectAction = (actionId: EntityActionId) => {
+    const telemetryAction = ENTITY_ACTION_TO_TELEMETRY[actionId]
+    if (telemetryAction) {
+      track('table_editor_entity_action_clicked', {
+        action: telemetryAction,
+        entityType: ENTITY_TYPE_TO_TELEMETRY[entity.type],
+      })
+    }
+
     switch (actionId) {
       case 'copy-name':
         copyToClipboard(entity.name)

@@ -1,3 +1,5 @@
+import type { TableEditorEntityAction, TableEditorEntityType } from 'common/telemetry-constants'
+
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
 
@@ -14,6 +16,28 @@ export type EntityActionId =
   | 'export-cli'
   | 'view-partitions'
   | 'delete'
+
+export const ENTITY_TYPE_TO_TELEMETRY: Record<ENTITY_TYPE, TableEditorEntityType> = {
+  [ENTITY_TYPE.TABLE]: 'table',
+  [ENTITY_TYPE.VIEW]: 'view',
+  [ENTITY_TYPE.MATERIALIZED_VIEW]: 'materialized_view',
+  [ENTITY_TYPE.FOREIGN_TABLE]: 'foreign_table',
+  [ENTITY_TYPE.PARTITIONED_TABLE]: 'partitioned_table',
+}
+
+export const ENTITY_ACTION_TO_TELEMETRY: Partial<Record<EntityActionId, TableEditorEntityAction>> =
+  {
+    'copy-name': 'copy_name',
+    'copy-schema': 'copy_schema',
+    'copy-definition': 'copy_definition',
+    'edit-table': 'edit',
+    'duplicate-table': 'duplicate',
+    'export-csv': 'export_csv',
+    'export-sql': 'export_sql',
+    'export-cli': 'export_cli',
+    'view-partitions': 'view_partitions',
+    delete: 'delete',
+  }
 
 export type EntityAction = {
   id: EntityActionId
