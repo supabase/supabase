@@ -31,7 +31,7 @@ As our latest foray into NFTs we’re announcing <a href="https://buymeth.com/" 
 
 Each NFT stores a blurhash representation of a full image, but also a link to the full encrypted version of the image stored on IPFS. The full image is always encrypted with the key of the _current_ owner.
 
-When a sale is initiated i.e. the seller accepts a buyers offer, Metamask re-encrypts the image with the public key of the buyer, and uploads it to IPFS, the url in the NFT is updated and the buyer assigned as the new owner. After the sale, a 1 week challenge period is initiated where the proceeds of the sale are kept in an escrow contract. The buyer can then decrypt the contents of the image, and can run an automated verification function to verify that the image received (when hashed) does indeed produce the publically available blurhash (or thumbnail). If it does not, then the buyer can submit a claim to the sales contract, along with a proof of the invalid file, and claim back the proceeds.
+When a sale is initiated i.e. the seller accepts a buyers offer, Metamask re-encrypts the image with the public key of the buyer, and uploads it to IPFS, the url in the NFT is updated and the buyer assigned as the new owner. After the sale, a 1 week challenge period is initiated where the proceeds of the sale are kept in an escrow contract. The buyer can then decrypt the contents of the image, and can run an automated verification function to verify that the image received (when hashed) does indeed produce the publicly available blurhash (or thumbnail). If it does not, then the buyer can submit a claim to the sales contract, along with a proof of the invalid file, and claim back the proceeds.
 
 ![Most popular NFTs](/images/blog/nft/nft-2.png)
 

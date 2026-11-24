@@ -69,7 +69,7 @@ const nextConfig = {
     '/guides/**/*': ['./content/guides/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
-  serverExternalPackages: ['libpg-query', 'twoslash'],
+  serverExternalPackages: ['libpg-query', 'oxfmt', 'twoslash'],
   async headers() {
     return [
       {

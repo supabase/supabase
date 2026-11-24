@@ -9,9 +9,9 @@ import type { UseCustomQueryOptions } from '@/types'
 // [Joshen] Is it possible to import this from the code gen?
 // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
 export enum ReplicaInitializationStatus {
-  'InProgress' = 'in_progress',
-  'Completed' = 'completed',
-  'Failed' = 'failed',
+  InProgress = 'in_progress',
+  Completed = 'completed',
+  Failed = 'failed',
 }
 
 export type DatabaseStatus = components['schemas']['DatabaseStatusResponse_Output']
