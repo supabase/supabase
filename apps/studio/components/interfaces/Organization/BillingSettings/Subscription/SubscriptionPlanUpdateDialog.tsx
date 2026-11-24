@@ -22,6 +22,7 @@ import {
   getPlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -71,8 +72,11 @@ interface Props {
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
   projects: OrgProject[]
-  onAddressChange?: (address: CustomerAddress) => void
+  /** Receives null when there is no address to estimate against, which clears the preview address. */
+  onAddressChange?: (address: CustomerAddress | null) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  /** The billing address was edited and the plan preview has not caught up with it yet. */
+  isBillingPreviewPending?: boolean
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
@@ -87,6 +91,7 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
   onAddressChange,
   onTaxIdChange,
+  isBillingPreviewPending = false,
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
@@ -106,6 +111,9 @@ export const SubscriptionPlanUpdateDialog = ({
     isPending: subscriptionPreviewIsLoading,
     isFetching: subscriptionPreviewIsFetching,
     isSuccess: subscriptionPreviewInitialized,
+    isError: subscriptionPreviewIsError,
+    error: subscriptionPreviewError,
+    refetch: refetchSubscriptionPreview,
   } = subscriptionPreviewQueryResult
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -186,6 +194,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const onUpdateSubscription = async () => {
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
+    if (!subscriptionPreviewInitialized) return console.error('Plan preview is required')
 
     setPaymentConfirmationLoading(true)
 
@@ -394,6 +403,14 @@ export const SubscriptionPlanUpdateDialog = ({
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
+              {subscriptionPreviewIsError && (
+                <AlertError error={subscriptionPreviewError} subject="Failed to estimate your bill">
+                  <Button variant="default" onClick={() => refetchSubscriptionPreview()}>
+                    Try again
+                  </Button>
+                </AlertError>
+              )}
+
               {subscriptionPreviewInitialized && (
                 <>
                   <div
@@ -520,7 +537,12 @@ export const SubscriptionPlanUpdateDialog = ({
               <div className="flex space-x-2">
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
-                  disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
+                  disabled={
+                    !subscriptionPreviewInitialized ||
+                    subscriptionPreviewIsLoading ||
+                    subscriptionPreviewIsFetching ||
+                    isBillingPreviewPending
+                  }
                   variant="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
