@@ -1,6 +1,4 @@
-import { useRef } from 'react'
 import { cn } from 'ui'
-import { GlyphLines } from 'ui-patterns/GlyphLines'
 
 import { CELL_HEIGHT, CELL_WIDTH } from '../lib/ascii/field'
 
@@ -18,7 +16,6 @@ const GRID_HEIGHT = 320
 const GRID_REACH = 2400
 
 export const HeroGrid = ({ axis, text, isMirrored, className }: HeroGridProps) => {
-  const linesRef = useRef<SVGSVGElement>(null)
   const lines =
     axis === 'columns'
       ? // the grid hero's cells. 12 columns go past the page middle. there is no middle column, because it would cut the shape
@@ -38,17 +35,16 @@ export const HeroGrid = ({ axis, text, isMirrored, className }: HeroGridProps) =
 
   return (
     <div aria-hidden className={cn(isMirrored && '-scale-x-100', className)}>
-      <GlyphLines
-        linesRef={linesRef}
-        text={text}
+      <canvas
+        data-hero-grid={text}
+        aria-hidden
         className={cn(
-          'absolute inset-0 size-full font-mono caret-background text-border-stronger',
+          'pointer-events-none absolute inset-0 size-full font-mono caret-background text-border-stronger',
           '[--glyph-lines-pulse:var(--color-brand)] dark:[--glyph-lines-pulse:var(--color-glyph-strong)]',
           isMirrored && '-scale-x-100'
         )}
       />
       <svg
-        ref={linesRef}
         // the classes size it. until the css loads, a zero size keeps it from flashing
         width={0}
         height={0}

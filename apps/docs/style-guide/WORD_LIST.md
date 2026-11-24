@@ -865,6 +865,9 @@ self-hosting requirements or a migration VM, and in general CPU discussion.
 Write _versus_ in prose, not _vs._ Use `vs` only when it is part of a literal name
 or when space is constrained.
 
+A heading that compares two named things uses `vs`, with no period, such as
+`## JSON vs JSONB`. Don't write it as `How <X> differs from <Y>`.
+
 ## W
 
 ### web

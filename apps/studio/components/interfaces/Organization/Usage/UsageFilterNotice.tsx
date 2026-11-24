@@ -1,7 +1,6 @@
 import { InfoIcon } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
 export interface UsageFilterNoticeProps {
   branchName?: string
@@ -15,7 +14,7 @@ export const UsageFilterNotice = ({
   onViewOrganizationUsage,
 }: UsageFilterNoticeProps) => {
   return (
-    <ScaffoldContainer className="mt-5">
+    <PageContainer className="mt-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground-light">
         <p>
           {branchName && <span>{`${branchName} branch only.`}</span>}
@@ -45,6 +44,6 @@ export const UsageFilterNotice = ({
           </Tooltip>
         </div>
       </div>
-    </ScaffoldContainer>
+    </PageContainer>
   )
 }

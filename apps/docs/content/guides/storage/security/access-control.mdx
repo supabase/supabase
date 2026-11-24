@@ -14,6 +14,23 @@ You can use RLS to create [Security Access Policies](https://www.postgresql.org/
 
 By default Storage does not allow any uploads to buckets without RLS policies. You selectively allow certain operations by creating RLS policies on the `storage.objects` table.
 
+Policies on `storage.objects` control every file operation: upload, download, list, move, copy, update, delete, and creating signed URLs. This works the same way in private and public buckets. File operations don't need any policy on `storage.buckets`.
+
+Storage skips the policy check in two cases: a download through the public URL of a [public bucket](/docs/guides/storage/buckets/fundamentals#access-model), and a download or upload through a signed URL, because Storage checked the policies when it created the URL.
+
+To let users read their own files in a private bucket, add a `SELECT` policy on `storage.objects`, such as the "Individual user Access" policy in [Policy examples](#policy-examples).
+
+You need policies on `storage.buckets` only when clients call bucket methods. Each bucket operation needs these permissions:
+
+| Bucket operation  | Permissions on `storage.buckets` | Permissions on `storage.objects` |
+| ----------------- | -------------------------------- | -------------------------------- |
+| Create a bucket   | `INSERT`                         | None                             |
+| Retrieve a bucket | `SELECT`                         | None                             |
+| List all buckets  | `SELECT`                         | None                             |
+| Update a bucket   | `SELECT` and `UPDATE`            | None                             |
+| Delete a bucket   | `SELECT` and `DELETE`            | None                             |
+| Empty a bucket    | `SELECT`                         | `SELECT` and `DELETE`            |
+
 You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can use these [helper functions](/docs/guides/storage/schema/helper-functions) .
 
 If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
