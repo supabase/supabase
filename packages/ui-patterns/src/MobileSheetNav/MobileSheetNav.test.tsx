@@ -1,19 +1,29 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { FrameworkProvider } from 'common'
 import { useEffect, useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MobileSheetNav } from './MobileSheetNav'
 
-const mockRouter = vi.hoisted(() => ({ asPath: '/initial' }))
+const mockRouter = { asPath: '/initial' }
 const mockWindowSize = vi.hoisted(() => ({ width: 400 }))
-
-vi.mock('next/router', () => ({
-  useRouter: () => mockRouter,
-}))
 
 vi.mock('react-use', () => ({
   useWindowSize: () => mockWindowSize,
 }))
+
+function renderWithFramework(ui: React.ReactElement) {
+  const utils = render(
+    <FrameworkProvider value={{ asPath: mockRouter.asPath }}>{ui}</FrameworkProvider>
+  )
+  return {
+    ...utils,
+    rerender: (nextUi: React.ReactElement) =>
+      utils.rerender(
+        <FrameworkProvider value={{ asPath: mockRouter.asPath }}>{nextUi}</FrameworkProvider>
+      ),
+  }
+}
 
 function MobileSheetNavWithState({
   shouldCloseOnRouteChange = true,
@@ -58,7 +68,9 @@ describe('MobileSheetNav', () => {
   describe('shouldCloseOnRouteChange', () => {
     it('calls onOpenChange(false) when route changes and shouldCloseOnRouteChange is true (default)', () => {
       const onOpenChange = vi.fn()
-      const { rerender } = render(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />
+      )
 
       onOpenChange.mockClear()
       mockRouter.asPath = '/other-page'
@@ -70,7 +82,7 @@ describe('MobileSheetNav', () => {
     })
 
     it('effectively closes the sheet on route change when shouldCloseOnRouteChange is true', async () => {
-      const { rerender } = render(<MobileSheetNavWithState />)
+      const { rerender } = renderWithFramework(<MobileSheetNavWithState />)
 
       await waitFor(() => {
         expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
@@ -87,7 +99,9 @@ describe('MobileSheetNav', () => {
     })
 
     it('effectively does NOT close the sheet on route change when shouldCloseOnRouteChange is false', async () => {
-      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnRouteChange={false} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNavWithState shouldCloseOnRouteChange={false} />
+      )
 
       await waitFor(() => {
         expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
@@ -103,7 +117,7 @@ describe('MobileSheetNav', () => {
 
     it('does not call onOpenChange when route changes if shouldCloseOnRouteChange is false', () => {
       const onOpenChange = vi.fn()
-      const { rerender } = render(
+      const { rerender } = renderWithFramework(
         <MobileSheetNav
           {...defaultProps}
           onOpenChange={onOpenChange}
@@ -130,7 +144,9 @@ describe('MobileSheetNav', () => {
   describe('query changes', () => {
     it('closes the sheet for query navigation by default', () => {
       const onOpenChange = vi.fn()
-      const { rerender } = render(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />
+      )
       onOpenChange.mockClear()
       mockRouter.asPath = '/initial?type=wrappers'
       rerender(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
@@ -139,7 +155,9 @@ describe('MobileSheetNav', () => {
 
     it('keeps filters open when opted out, and closes on path navigation', async () => {
       mockRouter.asPath = '/project/default/issues'
-      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNavWithState shouldCloseOnQueryChange={false} />
+      )
       expect(await screen.findByText('Nav content')).toBeInTheDocument()
 
       mockRouter.asPath = '/project/default/issues?q=function'
@@ -159,7 +177,9 @@ describe('MobileSheetNav', () => {
   describe('shouldCloseOnViewportResize', () => {
     it('calls onOpenChange(false) when width changes and shouldCloseOnViewportResize is true (default)', () => {
       const onOpenChange = vi.fn()
-      const { rerender } = render(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />
+      )
 
       onOpenChange.mockClear()
       mockWindowSize.width = 800
@@ -171,7 +191,7 @@ describe('MobileSheetNav', () => {
     })
 
     it('effectively closes the sheet on viewport resize when shouldCloseOnViewportResize is true', async () => {
-      const { rerender } = render(<MobileSheetNavWithState />)
+      const { rerender } = renderWithFramework(<MobileSheetNavWithState />)
 
       await waitFor(() => {
         expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
@@ -188,7 +208,9 @@ describe('MobileSheetNav', () => {
     })
 
     it('effectively does NOT close the sheet on viewport resize when shouldCloseOnViewportResize is false', async () => {
-      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnViewportResize={false} />)
+      const { rerender } = renderWithFramework(
+        <MobileSheetNavWithState shouldCloseOnViewportResize={false} />
+      )
 
       await waitFor(() => {
         expect(screen.getByTestId('sheet-open')).toHaveTextContent('true')
@@ -204,7 +226,7 @@ describe('MobileSheetNav', () => {
 
     it('does not call onOpenChange when width changes if shouldCloseOnViewportResize is false', () => {
       const onOpenChange = vi.fn()
-      const { rerender } = render(
+      const { rerender } = renderWithFramework(
         <MobileSheetNav
           {...defaultProps}
           onOpenChange={onOpenChange}

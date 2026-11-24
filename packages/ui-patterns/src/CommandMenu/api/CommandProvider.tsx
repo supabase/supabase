@@ -1,8 +1,7 @@
 'use client'
 
-import { useConstant } from 'common'
-import { useRouter as useLegacyRouter } from 'next/compat/router'
-import { useCallback, useEffect, useMemo, type PropsWithChildren } from 'react'
+import { useConstant, useFramework } from 'common'
+import { useCallback, useEffect, useMemo, useRef, type PropsWithChildren } from 'react'
 
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
@@ -75,8 +74,9 @@ function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
 
-  const legacyRouter = useLegacyRouter()
-  const isUsingLegacyRouting = !!legacyRouter
+  const { asPath, pathname } = useFramework()
+  const currentPath = asPath ?? pathname
+  const previousPathRef = useRef(currentPath)
 
   const completeNavigation = useCallback(() => {
     setIsOpen(false)
@@ -91,11 +91,10 @@ function CloseOnNavigation({ children }: PropsWithChildren) {
   )
 
   useEffect(() => {
-    if (!isUsingLegacyRouting) return
-
-    legacyRouter.events.on('routeChangeComplete', completeNavigation)
-    return () => legacyRouter.events.off('routeChangeComplete', completeNavigation)
-  }, [completeNavigation, isUsingLegacyRouting, legacyRouter])
+    if (previousPathRef.current === currentPath) return
+    previousPathRef.current = currentPath
+    completeNavigation()
+  }, [completeNavigation, currentPath])
 
   return (
     <CrossCompatRouterContext.Provider value={ctx}>{children}</CrossCompatRouterContext.Provider>

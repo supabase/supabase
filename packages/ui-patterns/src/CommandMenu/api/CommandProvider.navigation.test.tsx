@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { FrameworkProvider } from 'common'
+import { describe, expect, it } from 'vitest'
 
 import { CommandProvider } from './CommandProvider'
 import {
@@ -8,33 +9,6 @@ import {
   useCommandMenuOpen,
   useSetCommandMenuOpen,
 } from './hooks/viewHooks'
-
-type RouteHandler = (url: string, options?: { shallow?: boolean }) => void
-
-const legacyRouter = vi.hoisted(() => {
-  const handlers = new Map<string, Set<RouteHandler>>()
-
-  return {
-    events: {
-      on: (type: string, handler: RouteHandler) => {
-        handlers.set(type, (handlers.get(type) ?? new Set()).add(handler))
-      },
-      off: (type: string, handler: RouteHandler) => {
-        handlers.get(type)?.delete(handler)
-      },
-    },
-    emit(type: string, url: string, options?: { shallow?: boolean }) {
-      handlers.get(type)?.forEach((handler) => handler(url, options))
-    },
-    reset() {
-      handlers.clear()
-    },
-  }
-})
-
-vi.mock('next/compat/router', () => ({
-  useRouter: () => legacyRouter,
-}))
 
 const MenuProbe = () => {
   const isInitiated = useCommandMenuInitiated()
@@ -53,51 +27,48 @@ const MenuProbe = () => {
   )
 }
 
-const renderMenu = () =>
-  render(
-    <CommandProvider openKey="">
-      <MenuProbe />
-    </CommandProvider>
+const renderMenu = (initialPath = '/project/ref') => {
+  const utils = render(
+    <FrameworkProvider value={{ asPath: initialPath, pathname: initialPath }}>
+      <CommandProvider openKey="">
+        <MenuProbe />
+      </CommandProvider>
+    </FrameworkProvider>
   )
 
-const completeRoute = async (url: string, options?: { shallow?: boolean }) => {
-  await act(async () => {
-    legacyRouter.emit('routeChangeComplete', url, options)
-  })
+  const navigate = async (url: string) => {
+    await act(async () => {
+      utils.rerender(
+        <FrameworkProvider value={{ asPath: url, pathname: url.split(/[?#]/)[0] }}>
+          <CommandProvider openKey="">
+            <MenuProbe />
+          </CommandProvider>
+        </FrameworkProvider>
+      )
+    })
+  }
+
+  return { ...utils, navigate }
 }
 
 describe('CloseOnNavigation', () => {
-  beforeEach(() => {
-    legacyRouter.reset()
-  })
-
   it('does not initiate a never-opened menu on a real navigation', async () => {
-    renderMenu()
+    const { navigate } = renderMenu()
 
     expect(screen.getByText('idle')).toBeInTheDocument()
     expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
 
-    await completeRoute('/project/ref/sql', { shallow: false })
-
-    expect(screen.getByText('idle')).toBeInTheDocument()
-    expect(screen.getByText('closed')).toBeInTheDocument()
-    expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
-  })
-
-  it('does not initiate a never-opened menu on a shallow completion', async () => {
-    renderMenu()
-
-    await completeRoute('/project/ref/editor?schema=auth', { shallow: true })
+    await navigate('/project/ref/sql')
 
     expect(screen.getByText('idle')).toBeInTheDocument()
     expect(screen.getByText('closed')).toBeInTheDocument()
     expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
   })
 
-  it('does not initiate a never-opened menu when the completion omits shallow', async () => {
-    renderMenu()
+  it('does not initiate a never-opened menu on a shallow query navigation', async () => {
+    const { navigate } = renderMenu('/project/ref/editor')
 
-    await completeRoute('/project/ref/sql')
+    await navigate('/project/ref/editor?schema=auth')
 
     expect(screen.getByText('idle')).toBeInTheDocument()
     expect(screen.getByText('closed')).toBeInTheDocument()
@@ -117,22 +88,22 @@ describe('CloseOnNavigation', () => {
 
   it('closes an open menu on a real navigation without unmounting it', async () => {
     const user = userEvent.setup()
-    renderMenu()
+    const { navigate } = renderMenu()
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
-    await completeRoute('/project/ref/sql', { shallow: false })
+    await navigate('/project/ref/sql')
 
     expect(screen.getByText('closed')).toBeInTheDocument()
     expect(screen.getByText('initiated')).toBeInTheDocument()
     expect(screen.getByText('menu-mounted')).toBeInTheDocument()
   })
 
-  it('closes an open menu on a shallow completion', async () => {
+  it('closes an open menu on a shallow query navigation', async () => {
     const user = userEvent.setup()
-    renderMenu()
+    const { navigate } = renderMenu('/project/ref/editor')
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
-    await completeRoute('/new/org', { shallow: true })
+    await navigate('/project/ref/editor?schema=auth')
 
     expect(screen.getByText('closed')).toBeInTheDocument()
     expect(screen.getByText('initiated')).toBeInTheDocument()

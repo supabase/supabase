@@ -11,10 +11,6 @@ import { useCurrentPage, useRegisterPage, useSetPage } from './hooks/pagesHooks'
 import { useQuery } from './hooks/queryHooks'
 import { useResetCommandMenu } from './hooks/viewHooks'
 
-vi.mock('next/compat/router', () => ({
-  useRouter: () => null,
-}))
-
 const SUBPAGE = 'Search things'
 
 const ControlledInput = () => {

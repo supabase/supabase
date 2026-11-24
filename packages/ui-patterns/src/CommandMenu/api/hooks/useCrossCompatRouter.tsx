@@ -1,7 +1,6 @@
 'use client'
 
-import { useRouter as useLegacyRouter } from 'next/compat/router'
-import { useRouter as useNextRouter } from 'next/navigation'
+import { useFramework } from 'common'
 import { createContext, useContext, useMemo, useRef, useTransition } from 'react'
 
 type Handler = (...evts: any[]) => void
@@ -26,7 +25,7 @@ function useHasChanged<T>(value: T, { onlyTo }: { onlyTo?: T } = {}) {
   let result = true
 
   if (prev.current === value) result = false
-  if (onlyTo && value !== onlyTo) result = false
+  if (onlyTo !== undefined && value !== onlyTo) result = false
 
   prev.current = value
 
@@ -35,30 +34,31 @@ function useHasChanged<T>(value: T, { onlyTo }: { onlyTo?: T } = {}) {
 
 export function useCrossCompatRouter() {
   const { onPendingEnd } = useCrossCompatRouterContext()
-
-  const legacyRouter = useLegacyRouter()
-  const newRouter = useNextRouter()
-  const isUsingLegacyRouting = !!legacyRouter
+  const { push: frameworkPush } = useFramework()
 
   const [isPending, startTransition] = useTransition()
   const hasPendingEnded = useHasChanged(isPending, { onlyTo: false })
-  if (!isUsingLegacyRouting && hasPendingEnded) {
+  if (hasPendingEnded) {
     onPendingEnd.forEach((fn) => fn())
   }
 
   const api = useMemo(
     () => ({
       push: (path: string) => {
-        if (isUsingLegacyRouting) {
-          legacyRouter.push(path)
-        } else {
-          startTransition(() => {
-            newRouter.push(path)
-          })
-        }
+        startTransition(async () => {
+          if (frameworkPush) {
+            try {
+              await frameworkPush(path)
+            } catch (error) {
+              console.error('Failed to navigate:', error)
+            }
+          } else if (typeof window !== 'undefined') {
+            window.location.assign(path)
+          }
+        })
       },
     }),
-    [isUsingLegacyRouting, legacyRouter, newRouter]
+    [frameworkPush]
   )
 
   return api

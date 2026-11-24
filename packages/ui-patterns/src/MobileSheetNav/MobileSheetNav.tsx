@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/router'
+import { useFramework } from 'common'
 import { ComponentProps, useEffect, useRef } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
@@ -25,10 +25,10 @@ const MobileSheetNav: React.FC<{
   shouldCloseOnViewportResize = true,
   onPointerDownOutside,
 }) => {
-  const router = useRouter()
+  const { asPath, pathname } = useFramework()
   const { width } = useWindowSize()
 
-  const fullPath = router?.asPath ?? ''
+  const fullPath = asPath ?? pathname ?? ''
   const previousPath = useRef(fullPath)
   useEffect(() => {
     const hasPathnameChanged = previousPath.current.split(/[?#]/)[0] !== fullPath.split(/[?#]/)[0]
