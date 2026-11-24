@@ -1,6 +1,7 @@
 'use client'
 
-import { Menu } from 'lucide-react'
+import { DASHBOARD_ACCOUNT_URL, DASHBOARD_PROJECTS_URL } from 'common/constants/dashboard-urls'
+import { Database, LogOut, Menu, Settings, UserIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import {
   buttonVariants,
@@ -8,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -23,6 +25,14 @@ export interface TopNavDropdownProps {
 export interface TopNavThemeGroupProps {
   value: string | undefined
   onValueChange: (value: string) => void
+}
+
+export interface TopNavAccountItemsProps {
+  email: string | undefined
+}
+
+export interface TopNavSignOutItemProps {
+  onSelect: () => void
 }
 
 export const TopNavDropdown = ({ children, className }: TopNavDropdownProps) => (
@@ -58,4 +68,32 @@ export const TopNavThemeGroup = ({ value, onValueChange }: TopNavThemeGroupProps
       ))}
     </DropdownMenuRadioGroup>
   </DropdownMenuGroup>
+)
+
+export const TopNavAccountItems = ({ email }: TopNavAccountItemsProps) => (
+  <>
+    <DropdownMenuLabel className="flex items-center gap-2 font-normal">
+      <UserIcon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+      <span className="truncate">{email || "You're signed in"}</span>
+    </DropdownMenuLabel>
+    <DropdownMenuItem asChild className="gap-2">
+      <a href={DASHBOARD_ACCOUNT_URL}>
+        <Settings aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+        Account Preferences
+      </a>
+    </DropdownMenuItem>
+    <DropdownMenuItem asChild className="gap-2">
+      <a href={DASHBOARD_PROJECTS_URL}>
+        <Database aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+        All Projects
+      </a>
+    </DropdownMenuItem>
+  </>
+)
+
+export const TopNavSignOutItem = ({ onSelect }: TopNavSignOutItemProps) => (
+  <DropdownMenuItem className="gap-2" onSelect={onSelect}>
+    <LogOut aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+    Sign out
+  </DropdownMenuItem>
 )

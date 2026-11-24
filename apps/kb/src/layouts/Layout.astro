@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
+import { STORAGE_KEY } from 'common/gotrue'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
@@ -56,6 +57,12 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 				applyTheme()
 				systemDark.addEventListener('change', applyTheme)
 			})()
+		</script>
+		<script is:inline define:vars={{ sessionKey: STORAGE_KEY }}>
+			// auth loads after hydration, so a stored dashboard session picks the header link before first paint
+			try {
+				if (localStorage.getItem(sessionKey)) document.documentElement.setAttribute('data-signed-in', '')
+			} catch (_) {}
 		</script>
 		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
 		<link rel="manifest" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${faviconRoute}/manifest.json`} />
