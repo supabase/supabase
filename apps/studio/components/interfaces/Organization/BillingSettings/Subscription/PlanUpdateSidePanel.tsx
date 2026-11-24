@@ -171,8 +171,12 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
+  const [source, setSource] = useQueryState('source')
+
   const onClose = () => {
     setPanel(null)
+    // A reopen from the billing page would otherwise report the previous entry point as its origin.
+    setSource(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -259,6 +263,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
+      isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
       onSelectTier={setSelectedTier}
     />
   )
@@ -301,7 +306,7 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} />
+          <SubscriptionPlanUpdateView {...planChangeProps} origin={source ?? undefined} />
         ) : (
           <SubscriptionPlanUpdateDialog {...planChangeProps} />
         ))}
