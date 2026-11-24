@@ -403,6 +403,8 @@ export const duplicateTable = async (
     })
   }
 
+  let failedIdentitySequenceUpdate: PromiseRejectedResult | undefined
+
   // Duplicate rows if needed
   if (isDuplicateRows) {
     const columns = duplicateTable.columns ?? []
@@ -441,7 +443,12 @@ export const duplicateTable = async (
         grant: unguarded.migrating,
       })
     })
-    await Promise.all(identitySequenceUpdates)
+    // Settle every update before failing so the requested RLS setting below is
+    // still applied to the table that was already created.
+    const identitySequenceResults = await Promise.allSettled(identitySequenceUpdates)
+    failedIdentitySequenceUpdate = identitySequenceResults.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    )
   }
 
   const tables = await queryClient.fetchQuery({
@@ -461,6 +468,10 @@ export const duplicateTable = async (
       schema: duplicatedTable?.schema!,
       payload: { rls_enabled: isRLSEnabled },
     })
+  }
+
+  if (failedIdentitySequenceUpdate) {
+    throw failedIdentitySequenceUpdate.reason
   }
 
   return duplicatedTable
