@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { formatAnnotation, formatJobSummary, formatLocalWarning } from '../../shared/truncation.ts'
+import { formatAnnotation, formatJobSummary, formatLocalWarning } from '../../shared/scan-limit.ts'
 
 const pages = Array.from({ length: 80 }, (_, i) => `/docs/guides/ai/page-${i}`)
-const truncation = { label: 'docs', check: 'accessibility scan', limit: 20, truncated: pages }
+const warning = { label: 'docs', check: 'accessibility scan', limit: 20, pages }
 
 test('annotation shows only the count for many skipped pages', () => {
-  const annotation = formatAnnotation(truncation)
+  const annotation = formatAnnotation(warning)
 
   assert.ok(!annotation.includes('\n'))
   assert.ok(annotation.startsWith('80 in-scope docs page(s) did not get the accessibility scan'))
@@ -17,19 +17,19 @@ test('annotation shows only the count for many skipped pages', () => {
 })
 
 test('annotation names the pages when only a few are skipped', () => {
-  const annotation = formatAnnotation({ ...truncation, truncated: pages.slice(0, 5) })
+  const annotation = formatAnnotation({ ...warning, pages: pages.slice(0, 5) })
 
   for (const page of pages.slice(0, 5)) assert.ok(annotation.includes(page))
 })
 
 test('annotation drops the names once more than five are skipped', () => {
-  const annotation = formatAnnotation({ ...truncation, truncated: pages.slice(0, 6) })
+  const annotation = formatAnnotation({ ...warning, pages: pages.slice(0, 6) })
 
   assert.ok(!annotation.includes('/docs/guides/'))
 })
 
 test('job summary lists every page and a ready-to-paste page_paths value', () => {
-  const summary = formatJobSummary(truncation)
+  const summary = formatJobSummary(warning)
 
   for (const page of pages) assert.ok(summary.includes(`- ${page}\n`))
   assert.ok(summary.includes(`\`\`\`\n${pages.join(',')}\n\`\`\``))
@@ -39,18 +39,18 @@ test('job summary lists every page and a ready-to-paste page_paths value', () =>
 })
 
 test('local warning shows only the count for many skipped pages', () => {
-  const warning = formatLocalWarning(truncation, 'DOCS_E2E_PAGE_PATHS')
+  const message = formatLocalWarning(warning, 'DOCS_E2E_PAGE_PATHS')
 
   assert.ok(
-    warning.includes('80 in-scope docs page(s) are over the 20-page accessibility scan limit')
+    message.includes('80 in-scope docs page(s) are over the 20-page accessibility scan limit')
   )
-  assert.ok(!warning.includes('/docs/guides/'))
+  assert.ok(!message.includes('/docs/guides/'))
 })
 
 test('local warning names the env var and the all-pages command', () => {
-  const warning = formatLocalWarning(truncation, 'DOCS_E2E_PAGE_PATHS')
+  const message = formatLocalWarning(warning, 'DOCS_E2E_PAGE_PATHS')
 
-  assert.ok(warning.includes("won't get it"))
-  assert.ok(warning.includes('set DOCS_E2E_PAGE_PATHS to them'))
-  assert.ok(warning.includes('`pnpm e2e:docs:all`'))
+  assert.ok(message.includes("won't get it"))
+  assert.ok(message.includes('set DOCS_E2E_PAGE_PATHS to them'))
+  assert.ok(message.includes('`pnpm e2e:docs:all`'))
 })

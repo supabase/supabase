@@ -2,16 +2,16 @@ import { spawn } from 'node:child_process'
 
 import { collectChangedFiles, repoRootFrom } from './git.ts'
 import { parsePagePaths } from './paths.ts'
-import { formatLocalWarning, formatLog } from './truncation.ts'
+import { formatLocalWarning, formatLog, type UnscannedPages } from './scan-limit.ts'
 
 export type ScopeResult = {
+  // Every in-scope page. The link check runs on all of them.
   pages: string[]
   // Pages that also get the accessibility scan. Defaults to `pages` when unset.
   a11yPages?: string[]
   skip: boolean
-  // In scope but over the accessibility scan limit, so they get no scan.
-  truncated?: string[]
-  limit?: number
+  // In-scope pages over the accessibility scan limit, so they get no scan.
+  unscanned?: UnscannedPages
 }
 
 export type SuiteConfig = {
@@ -80,15 +80,10 @@ async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | nu
   for (const page of result.pages) {
     console.error(`  ${page}`)
   }
-  if (result.truncated?.length) {
-    const truncation = {
-      label: config.label,
-      check: 'accessibility scan',
-      limit: result.limit ?? result.pages.length,
-      truncated: result.truncated,
-    }
-    console.error(formatLog(truncation))
-    console.error(formatLocalWarning(truncation, config.pagePathsEnv))
+  if (result.unscanned?.pages.length) {
+    const warning = { label: config.label, ...result.unscanned }
+    console.error(formatLog(warning))
+    console.error(formatLocalWarning(warning, config.pagePathsEnv))
   }
   return { pages: result.pages, a11yPages: result.a11yPages }
 }

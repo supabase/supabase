@@ -1,6 +1,6 @@
 import { parseChangedFilesList } from './paths.ts'
 import type { ScopeResult } from './run-suite.ts'
-import { formatAnnotation, formatJobSummary, formatLog } from './truncation.ts'
+import { formatAnnotation, formatJobSummary, formatLog } from './scan-limit.ts'
 
 export type ResolveScopeCliConfig = {
   label: string
@@ -50,20 +50,15 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
     console.error(`No in-scope ${config.label} pages — skipping Playwright suite.`)
   }
 
-  if (result.truncated?.length) {
-    const truncation = {
-      label: config.label,
-      check: 'accessibility scan',
-      limit: result.limit ?? result.pages.length,
-      truncated: result.truncated,
-    }
-    console.error(formatLog(truncation))
+  if (result.unscanned?.pages.length) {
+    const warning = { label: config.label, ...result.unscanned }
+    console.error(formatLog(warning))
     console.error(
-      `::warning title=Pages without accessibility scan::${formatAnnotation(truncation)}`
+      `::warning title=Pages without the ${warning.check}::${formatAnnotation(warning)}`
     )
     if (process.env.GITHUB_STEP_SUMMARY) {
       const { appendFileSync } = await import('node:fs')
-      appendFileSync(process.env.GITHUB_STEP_SUMMARY, formatJobSummary(truncation))
+      appendFileSync(process.env.GITHUB_STEP_SUMMARY, formatJobSummary(warning))
     }
   }
 }

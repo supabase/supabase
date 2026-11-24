@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { basename, join, relative } from 'node:path'
 
 import { normalizeRepoPath } from '../../shared/paths.ts'
+import type { ScopeResult } from '../../shared/run-suite.ts'
 
 export const FEDERATED_SECTIONS = [
   'graphql',
@@ -76,16 +77,7 @@ export type ResolveDocsScopeOptions = {
   maxA11yPages?: number
 }
 
-export type ResolveDocsScopeResult = {
-  // Every in-scope page. The link check runs on all of them.
-  pages: string[]
-  // The pages that also get the accessibility scan, up to the limit.
-  a11yPages: string[]
-  skip: boolean
-  // In scope but over the accessibility scan limit, so they get no scan.
-  truncated: string[]
-  limit: number
-}
+export type ResolveDocsScopeResult = Required<ScopeResult>
 
 function isFederatedGuideSlug(slug: string): boolean {
   return FEDERATED_SECTIONS.some((section) => slug === section || slug.startsWith(`${section}/`))
@@ -290,8 +282,11 @@ export async function resolveDocsScope(
     pages: [...orderedPages].sort(),
     a11yPages: orderedPages.slice(0, maxA11yPages).sort(),
     skip: orderedPages.length === 0,
-    truncated: orderedPages.slice(maxA11yPages),
-    limit: maxA11yPages,
+    unscanned: {
+      check: 'accessibility scan',
+      limit: maxA11yPages,
+      pages: orderedPages.slice(maxA11yPages),
+    },
   }
 }
 

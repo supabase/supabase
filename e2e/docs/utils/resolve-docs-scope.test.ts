@@ -63,17 +63,17 @@ test('checks links on every page and limits only the accessibility scan', async 
     '/docs/guides/ai-tools/c',
   ])
   assert.deepEqual(result.a11yPages, ['/docs/guides/ai-tools/a', '/docs/guides/ai-tools/b'])
-  assert.deepEqual(result.truncated, ['/docs/guides/ai-tools/c'])
+  assert.deepEqual(result.unscanned.pages, ['/docs/guides/ai-tools/c'])
 })
 
-test('reports nothing truncated when every page gets the accessibility scan', async () => {
+test('reports no unscanned pages when every page gets the accessibility scan', async () => {
   const result = await resolveDocsScope({
     changedFiles: ['apps/docs/content/guides/ai-tools/mcp.mdx'],
     repoRoot,
   })
 
   assert.deepEqual(result.a11yPages, result.pages)
-  assert.deepEqual(result.truncated, [])
+  assert.deepEqual(result.unscanned.pages, [])
 })
 
 test('keeps every page in a large change and caps the accessibility scan at 20', async () => {
@@ -86,9 +86,10 @@ test('keeps every page in a large change and caps the accessibility scan at 20',
 
   assert.equal(result.pages.length, 82)
   assert.equal(result.a11yPages.length, 20)
-  assert.equal(result.truncated.length, 62)
+  assert.equal(result.unscanned.pages.length, 62)
+  assert.equal(result.unscanned.limit, 20)
   assert.deepEqual(
-    [...result.a11yPages, ...result.truncated].sort(),
+    [...result.a11yPages, ...result.unscanned.pages].sort(),
     result.pages,
     'every page is either scanned or reported'
   )
@@ -102,7 +103,7 @@ test('gives required pages the accessibility scan before other pages', async () 
   })
 
   assert.deepEqual(result.a11yPages, [...GUIDE_LIST_COMPONENT_PAGES].sort())
-  assert.deepEqual(result.truncated, ['/docs/guides/ai-tools/mcp'])
+  assert.deepEqual(result.unscanned.pages, ['/docs/guides/ai-tools/mcp'])
   assert.equal(result.pages.length, 4)
 })
 
@@ -117,7 +118,7 @@ test('always scans at least one page', async () => {
   })
 
   assert.equal(result.a11yPages.length, 1)
-  assert.equal(result.truncated.length, 1)
+  assert.equal(result.unscanned.pages.length, 1)
 })
 
 test('reports required pages dropped by a tiny accessibility limit', async () => {
@@ -129,7 +130,7 @@ test('reports required pages dropped by a tiny accessibility limit', async () =>
 
   assert.equal(result.a11yPages.length, 2)
   assert.deepEqual(
-    [...result.a11yPages, ...result.truncated].sort(),
+    [...result.a11yPages, ...result.unscanned.pages].sort(),
     [...GUIDE_LIST_COMPONENT_PAGES, '/docs/guides/ai-tools/mcp'].sort()
   )
 })
