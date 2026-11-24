@@ -3855,7 +3855,7 @@ functions:
             .contains("main_exports", value: ["oil"])
           ```
 
-  - id: containedBy
+  - id: contained-by
     title: containedBy()
     description: |
       Match only rows where every element in `column` appears in `value`.
@@ -3885,7 +3885,7 @@ functions:
             .overlaps("main_exports", value: ["exports", "tourism"])
           ```
 
-  - id: rangeLt
+  - id: range-lt
     title: rangeLt()
     description: |
       Match only rows where every element in `column` is less than any element in `value`.
@@ -3900,7 +3900,7 @@ functions:
             .rangeLt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
           ```
 
-  - id: rangeGt
+  - id: range-gt
     title: rangeGt()
     description: |
       Match only rows where every element in `column` is greater than any element in `value`.
@@ -3915,7 +3915,7 @@ functions:
             .rangeGt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
           ```
 
-  - id: rangeGte
+  - id: range-gte
     title: rangeGte()
     description: |
       Match only rows where every element in `column` is either contained in `value` or greater than any element in `value`.
@@ -3930,7 +3930,7 @@ functions:
             .rangeGte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
           ```
 
-  - id: rangeLte
+  - id: range-lte
     title: rangeLte()
     description: |
       Match only rows where every element in `column` is either contained in `value` or less than any element in `value`.
@@ -3945,7 +3945,7 @@ functions:
             .rangeLte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
           ```
 
-  - id: rangeAdjacent
+  - id: range-adjacent
     title: rangeAdjacent()
     description: |
       Match only rows where `column` is adjacent to the `value` range.
@@ -3960,7 +3960,7 @@ functions:
             .rangeAdjacent("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
           ```
 
-  - id: textSearch
+  - id: text-search
     title: textSearch()
     description: |
       Match only rows where `column` matches the query string in `query`.
