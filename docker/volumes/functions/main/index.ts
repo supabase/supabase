@@ -310,21 +310,44 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
 }
 
 Deno.serve({ onError }, async (req: Request) => {
-  if (req.method !== 'OPTIONS' && VERIFY_JWT) {
-    const token = getAuthToken(req)
-    if (typeof token !== 'string') {
-      return getAuthErrorResponse(token)
-    }
-    const authFailure = await isValidHybridJWT(token)
-    if (authFailure) {
-      return getAuthErrorResponse(authFailure)
-    }
-  }
-
+  const start = performance.now()
+  const requestId = crypto.randomUUID()
   const url = new URL(req.url)
   const { pathname } = url
   const path_parts = pathname.split('/')
   const service_name = path_parts[1]
+
+  const logResponse = (response: Response, executionId?: string): Response => {
+    try {
+      emitLog({
+        stream: 'request',
+        timestamp: new Date().toISOString(),
+        msg: `${req.method} ${pathname} ${response.status}`,
+        metadata: {
+          function_id: service_name,
+          request_id: requestId,
+          execution_id: executionId,
+          request: { method: req.method, pathname },
+          response: { status_code: response.status },
+          execution_time_ms: Math.round(performance.now() - start),
+        },
+      })
+    } catch (error) {
+      logInternal('main', 'error', 'main worker failed to emit request log', error)
+    }
+    return response
+  }
+
+  if (req.method !== 'OPTIONS' && VERIFY_JWT) {
+    const token = getAuthToken(req)
+    if (typeof token !== 'string') {
+      return logResponse(getAuthErrorResponse(token))
+    }
+    const authFailure = await isValidHybridJWT(token)
+    if (authFailure) {
+      return logResponse(getAuthErrorResponse(authFailure))
+    }
+  }
 
   if (!service_name || service_name === 'main') {
     return getFunctionErrorResponse({
@@ -375,8 +398,6 @@ Deno.serve({ onError }, async (req: Request) => {
   const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
-  const start = performance.now()
-  const requestId = crypto.randomUUID()
   let executionId: string | undefined
 
   const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
@@ -438,22 +459,5 @@ Deno.serve({ onError }, async (req: Request) => {
     response.headers.set('Access-Control-Expose-Headers', exposed.join(', '))
   }
 
-  try {
-    emitLog({
-      stream: 'request',
-      timestamp: new Date().toISOString(),
-      msg: `${req.method} ${pathname} ${response.status}`,
-      metadata: {
-        function_id: service_name,
-        request_id: requestId,
-        execution_id: executionId,
-        request: { method: req.method, pathname },
-        response: { status_code: response.status },
-        execution_time_ms: Math.round(performance.now() - start),
-      },
-    })
-  } catch (error) {
-    logInternal('main', 'error', 'main worker failed to emit request log', error)
-  }
-  return response
+  return logResponse(response, executionId)
 })
