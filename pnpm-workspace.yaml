@@ -5,7 +5,6 @@ packages:
   - e2e/*
 
 blockExoticSubdeps: true
-engineStrict: false # revert after node 26 upgrade completed
 updateNotifier: false
 # Doesn't work because of Typescript issues with peer dependencies, see https://github.com/pnpm/pnpm/issues/9739
 enableGlobalVirtualStore: false
