@@ -14,8 +14,8 @@ export function WwwAppFrameworkProvider({ children }: { children: ReactNode }) {
     () => ({
       Link: NextLink,
       Image: NextImage,
-      pathname,
-      asPath: pathname,
+      pathname: pathname ?? undefined,
+      asPath: pathname ?? undefined,
       push: (path) => router.push(path),
     }),
     [pathname, router]
