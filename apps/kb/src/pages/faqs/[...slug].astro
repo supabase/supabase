@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
-import { faqPageSchema, serializeJsonLd } from '../../lib/json-ld'
+import { breadcrumbListSchema, canonicalUrl, faqPageSchema, KB_BASE_URL } from '../../lib/json-ld'
 
 export async function getStaticPaths() {
 	const faqs = await getCollection('faqs')
@@ -20,12 +20,16 @@ const { Content } = await render(faq)
 // faq.filePath is relative to the kb app root, e.g. "src/content/faqs/auth/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${faq.filePath}`
 
-const faqPageJsonLd = serializeJsonLd(
-	faqPageSchema({ question: title, answerMarkdown: faq.body ?? '', dateModified: lastEdited })
-)
+const url = canonicalUrl(Astro.url.pathname)
+const jsonLd = [
+	faqPageSchema({ question: title, answerMarkdown: faq.body ?? '', dateModified: lastEdited }),
+	breadcrumbListSchema([
+		{ name: 'Knowledge Base', url: KB_BASE_URL },
+		{ name: title, url },
+	]),
+]
 ---
 
-<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} lastEdited={lastEdited}>
-	<script type="application/ld+json" set:html={faqPageJsonLd} />
+<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} lastEdited={lastEdited} jsonLd={jsonLd}>
 	<Content components={{ Admonition }} />
 </ArticleLayout>
