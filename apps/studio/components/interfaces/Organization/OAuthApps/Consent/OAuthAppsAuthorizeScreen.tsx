@@ -270,10 +270,6 @@ export const OAuthAppsAuthorizeScreen = ({
     return <ApiAuthorizationInvalidScreen missingParameters={['auth_id']} />
   }
 
-  if (isPendingRequest) {
-    return <ApiAuthorizationLoadingScreen />
-  }
-
   if (isErrorRequest) {
     return (
       <InterstitialLayout
@@ -350,6 +346,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   if (
     isPendingRequest ||
+    isPendingPreflight ||
     isPendingIdentity ||
     isPendingMemberOrg ||
     (isPendingInitialProjects && initialRefs.length > 0)
