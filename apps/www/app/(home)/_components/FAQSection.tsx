@@ -1,8 +1,6 @@
 import { FaqList } from '~/components/FaqList'
 import homeFaq from '~/data/HomeFAQ.json'
 
-// Server component: rendered on the server and passed to HomeContent as a slot
-// so the FAQ markup and FAQPage JSON-LD ship in the initial HTML.
 export function FAQSection() {
   return (
     <div className="mx-auto max-w-5xl">
