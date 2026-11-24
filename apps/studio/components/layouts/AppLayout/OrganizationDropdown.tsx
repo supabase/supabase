@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { BoxesIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -14,6 +14,7 @@ import {
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import PartnerIcon from '@/components/ui/PartnerIcon'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -41,17 +42,19 @@ export const OrganizationDropdown = ({
   } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+  const isBillingEnabled = useIsFeatureEnabled('billing:all')
+  const isPlanChangeDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
 
-  // The Free plan badge links into the upgrade funnel. Partner-managed orgs are excluded: they
-  // change plans at the partner, and PlanUpdateSidePanel disables every paid tier for them.
+  const isFreePlan = selectedOrganization?.plan.id === 'free'
+  // Partners the mapper doesn't know fall through to MANAGED_BY.SUPABASE, hence both checks.
+  const isBilledBySupabase =
+    selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
+    !isPartnerBillingOrganization(selectedOrganization.billing_partner)
   const showPlanBadgeUpgrade =
-    !!slug &&
-    selectedOrganization?.plan.id === 'free' &&
-    selectedOrganization.managed_by === MANAGED_BY.SUPABASE &&
-    !selectedOrganization.billing_partner
+    isFreePlan && isBilledBySupabase && isBillingEnabled && !isPlanChangeDisabled
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -98,8 +101,6 @@ export const OrganizationDropdown = ({
             {orgName ?? 'Select an organization'}
           </span>
           {!!selectedOrganization && <PartnerIcon organization={selectedOrganization} />}
-          {/* When upgradable, the badge is rendered as a clickable sibling (via `trailingContent`)
-              instead, to avoid nesting an `<a>` inside the org link. */}
           {!!selectedOrganization && !showPlanBadgeUpgrade && (
             <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
           )}
@@ -111,7 +112,7 @@ export const OrganizationDropdown = ({
             href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
             className="ml-2 shrink-0"
             aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
-            onClick={() => track('plan_badge_upgrade_clicked')}
+            onClick={() => track('upgrade_cta_clicked', { placement: 'org_plan_badge' })}
           >
             <Badge
               variant="default"

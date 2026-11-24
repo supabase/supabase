@@ -4390,7 +4390,8 @@ export interface AccessTokenDoneButtonClickedEvent {
 
 /**
  * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
- * `placement` identifying which one (the user dropdown or the org project-list usage card).
+ * `placement` identifying which one (the user dropdown, the org project-list usage card, or the
+ * Free plan badge next to the organization name in the header).
  *
  * @group Events
  * @source studio
@@ -4398,21 +4399,8 @@ export interface AccessTokenDoneButtonClickedEvent {
 export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
-    placement: 'user_dropdown' | 'org_projects_list'
+    placement: 'user_dropdown' | 'org_projects_list' | 'org_plan_badge'
   }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * User clicked the Free plan badge next to the organization name (in the org dropdown) to
- * start the upgrade flow.
- *
- * @group Events
- * @page Any authenticated dashboard route — the org dropdown is in the global header
- * @source studio
- */
-export interface PlanBadgeUpgradeClickedEvent {
-  action: 'plan_badge_upgrade_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -5100,7 +5088,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PlanBadgeUpgradeClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
