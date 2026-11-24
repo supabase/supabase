@@ -1,5 +1,5 @@
 import { parseChangedFilesList } from './paths.ts'
-import type { ScopeResult } from './run-suite.ts'
+import { truncatedPagesWarning, type ScopeResult } from './run-suite.ts'
 
 export type ResolveScopeCliConfig = {
   label: string
@@ -46,5 +46,17 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
     }
   } else {
     console.error(`No in-scope ${config.label} pages — skipping Playwright suite.`)
+  }
+
+  if (result.truncated?.length) {
+    const warning = truncatedPagesWarning(config.label, result.truncated)
+    console.error(`::warning title=Pages not tested::${warning}`)
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const { appendFileSync } = await import('node:fs')
+      appendFileSync(
+        process.env.GITHUB_STEP_SUMMARY,
+        `### Some pages were not tested\n\n${warning}\n`
+      )
+    }
   }
 }

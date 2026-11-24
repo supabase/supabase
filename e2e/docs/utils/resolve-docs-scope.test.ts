@@ -49,3 +49,35 @@ test('excludes a guide that the navigation disables from the full run', async ()
   assert.ok(pages.includes('/docs/guides/ai-tools/mcp'))
   assert.ok(!pages.includes('/docs/guides/ai-tools/agent-feedback'))
 })
+
+test('reports pages over the page limit instead of dropping them silently', async () => {
+  const changedFiles = ['a', 'b', 'c'].map(
+    (slug) => `apps/docs/content/guides/ai-tools/${slug}.mdx`
+  )
+
+  const result = await resolveDocsScope({ changedFiles, repoRoot, maxPages: 2 })
+
+  assert.deepEqual(result.pages, ['/docs/guides/ai-tools/a', '/docs/guides/ai-tools/b'])
+  assert.deepEqual(result.truncated, ['/docs/guides/ai-tools/c'])
+})
+
+test('reports no truncated pages when everything fits', async () => {
+  const result = await resolveDocsScope({
+    changedFiles: ['apps/docs/content/guides/ai-tools/mcp.mdx'],
+    repoRoot,
+  })
+
+  assert.deepEqual(result.truncated, [])
+})
+
+test('covers the 62-page change that exceeded the old 20-page limit', async () => {
+  const changedFiles = Array.from(
+    { length: 62 },
+    (_, i) => `apps/docs/content/guides/ai-tools/page-${String(i).padStart(2, '0')}.mdx`
+  )
+
+  const result = await resolveDocsScope({ changedFiles, repoRoot })
+
+  assert.equal(result.pages.length, 62)
+  assert.deepEqual(result.truncated, [])
+})

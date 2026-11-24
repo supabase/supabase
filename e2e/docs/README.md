@@ -118,7 +118,7 @@ To test every guide instead of a changed-files scope
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 ```
 
-This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
+This ignores `DOCS_E2E_PAGE_PATHS` and the page limits described in
 [Limits](#limits), and tests every page listed by
 `pnpm -C e2e/docs resolve-docs-scope` across the whole `guides`
 tree — several hundred pages as of this writing. `--all`
@@ -155,10 +155,19 @@ pages linking into reference docs or server-side auth guides.
 
 ### Limits
 
-Resolved scope is capped at 20 pages so a widely shared partial cannot explode
-runtime. If a change resolves to more pages than that, only the first 20 in
-sorted order are tested and the rest are silently dropped from that run. To
-test beyond the cap, use `pnpm e2e:docs:all` instead of raising it. See
+Two limits keep runtime bounded so a widely shared partial cannot explode it.
+Both live in `utils/scope-limits.ts`:
+
+- **Link checks** cover up to 100 pages.
+- **Accessibility scans** cover the first 20 pages in sorted order, because
+  each scan renders and settles the page.
+
+When a change resolves to more pages than a limit, the run doesn't fail, but it
+says so instead of dropping pages silently. The scope step prints a warning and
+adds a job summary that lists the pages over the link limit. The accessibility
+test file adds a warning that lists the pages it didn't scan. To test the
+remaining pages, pass them to the `page_paths` input of the workflow, or run
+`pnpm e2e:docs:all` locally. See
 [Run every in-scope page](#run-every-in-scope-page).
 
 To inspect the resolved list without running Playwright, replicate the same
