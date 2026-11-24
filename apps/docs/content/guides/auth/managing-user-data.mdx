@@ -253,6 +253,14 @@ var metadata = user?.UserMetadata;
 </$Show>
 </Tabs>
 
+<Admonition type="danger">
+
+Users can change their own user metadata, so don't use it for authorization. Any signed-in user can add, overwrite, or remove fields in their `user_metadata` by updating their own user with new metadata, such as with `updateUser()` and `data` in JavaScript. Supabase Auth doesn't check the new values. Don't store roles, tenant IDs, or other values your app trusts in user metadata, and don't rely on it, or the `user_metadata` claim in the JWT, in RLS policies.
+
+Store values that users must not change in `app_metadata`, which is saved in the `raw_app_meta_data` column. Users can't change it themselves. Set it from a trusted server with your project's [secret key](/docs/guides/getting-started/api-keys), for example with [`auth.admin.updateUserById()`](/docs/reference/javascript/auth-admin-updateuserbyid). For more on both fields, see [the user object](/docs/guides/auth/users#the-user-object) and [`auth.jwt()`](/docs/guides/database/postgres/row-level-security#authjwt) in the Row Level Security guide.
+
+</Admonition>
+
 ## Deleting users
 
 You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired.
