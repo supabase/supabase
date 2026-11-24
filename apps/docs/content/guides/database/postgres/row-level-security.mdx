@@ -567,7 +567,7 @@ on team_members
 using btree (user_id);
 ```
 
-A policy with a fixed condition, one that doesn't depend on who is asking, also lets Postgres use a [partial index](/docs/guides/database/postgres/indexes#partial-indexes). Postgres adds a policy's `using` expression to every query that the policy applies to, so the planner treats it like a `where` clause. The planner uses a partial index only when the query's conditions imply the index's predicate, and the policy supplies that condition. For a public leaderboard that hides users who opted out:
+A policy with a fixed condition, one that doesn't depend on who is asking, also lets Postgres use a [partial index](/docs/guides/database/postgres/indexes#partial-indexes). Postgres adds a policy's `using` expression to every query that the policy applies to, so the planner treats it like a `where` clause. The planner uses a partial index only when the query's conditions imply the index's predicate, and the policy supplies the predicate. For a public leaderboard that hides users who opted out:
 
 ```sql
 create table scores (
@@ -578,6 +578,8 @@ create table scores (
 );
 
 alter table scores enable row level security;
+revoke all on table scores from anon, authenticated;
+grant select on table scores to anon;
 
 create policy "scores_select_public" on scores
 for select
@@ -589,7 +591,7 @@ on scores (score desc)
 where not opted_out;
 ```
 
-A query such as `select name, score from scores order by score desc limit 10` from `anon` can use `scores_public_idx`, even though the client doesn't filter on `opted_out`. The two expressions don't have to match as text: an equivalent form such as `opted_out = false` in the policy also matches. If neither the policy nor the query contains the condition, as with `using (true)`, Postgres can't use the partial index.
+From `anon`, a query such as `select name, score from scores order by score desc limit 10` can use `scores_public_idx`. The client doesn't filter on `opted_out`. Postgres matches a few equivalent forms, such as `opted_out = false` in the policy. It doesn't match others, such as `opted_out is false`, so write the policy condition and the index predicate the same way. If neither the policy nor the query contains the condition, as with `using (true)`, Postgres can't use the partial index.
 
 The policy alone decides which rows a role can see. The index changes only how fast Postgres finds them, never which rows or how many a query returns.
 
