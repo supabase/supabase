@@ -1,13 +1,5 @@
-import { ChevronDownIcon } from 'lucide-react'
 import { ReactNode } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  buttonVariants,
-  cn,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 export const OAuthGrantAccordion = ({
   children,
@@ -40,21 +32,12 @@ export const OAuthGrantAccordionItem = ({
 }: OAuthGrantAccordionItemProps) => {
   return (
     <AccordionItem value={value} className="border-b-0">
-      <AccordionTrigger hideIcon className="group hover:no-underline gap-x-4 py-3.5">
+      <AccordionTrigger className="cursor-pointer hover:no-underline gap-x-4 py-3.5">
         <span className="shrink-0 text-foreground-lighter">{icon}</span>
         <div className="min-w-0 flex-1 flex flex-col gap-y-1">
           <p className="truncate text-sm text-foreground">{title}</p>
           <p className="text-xs text-foreground-lighter">{description}</p>
         </div>
-        <span
-          aria-hidden
-          className={cn(
-            buttonVariants({ variant: 'text', size: 'small' }),
-            'size-7 shrink-0 p-0 transition-none hover:bg-accent group-focus-visible:bg-accent'
-          )}
-        >
-          <ChevronDownIcon className="size-4 text-foreground-lighter transition-colors duration-150 motion-reduce:transition-none [span:hover>&]:text-foreground group-focus-visible:text-foreground group-data-[state=open]:rotate-180" />
-        </span>
       </AccordionTrigger>
       <AccordionContent>
         <div className="flex flex-col gap-y-2 pl-8">
