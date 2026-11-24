@@ -41,8 +41,6 @@ export function PlanCard({
   onSelectTier,
   onTrackCtaClick,
 }: PlanCardProps) {
-  const isProPlan = plan.id === 'tier_pro'
-
   const ctaButton = isCurrentPlan ? (
     <Button block size="large" disabled>
       Current plan
@@ -50,17 +48,12 @@ export function PlanCard({
   ) : !canUpdateSubscription &&
     !isDowngradeOption &&
     (plan.name === 'Pro' || plan.name === 'Team') ? (
-    <RequestUpgradeToBillingOwners
-      block
-      size="large"
-      variant={isProPlan ? 'primary' : 'default'}
-      plan={plan.name}
-    />
+    <RequestUpgradeToBillingOwners block size="large" variant="primary" plan={plan.name} />
   ) : (
     <ButtonTooltip
       block
       size="large"
-      variant={isProPlan && !isDowngradeOption ? 'primary' : 'default'}
+      variant={isDowngradeOption ? 'default' : 'primary'}
       disabled={
         (!canUpdateSubscription && isDowngradeOption) ||
         currentSubscriptionPlanId === 'enterprise' ||
