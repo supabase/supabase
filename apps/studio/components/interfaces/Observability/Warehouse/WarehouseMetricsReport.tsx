@@ -9,7 +9,10 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WarehouseCapacitySection } from './WarehouseCapacitySection'
+import { WarehouseCatalogSection } from './WarehouseCatalogSection'
+import { WarehouseInlinedDataSection } from './WarehouseInlinedDataSection'
 import { WarehouseLatencySection } from './WarehouseLatencySection'
+import { WarehouseMaintenanceSection } from './WarehouseMaintenanceSection'
 import { WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
 import {
@@ -20,6 +23,8 @@ import {
   hasAnyValues,
   type ReportView,
 } from './WarehouseMetricsReport.utils'
+import { WarehouseReplicationSection } from './WarehouseReplicationSection'
+import { WarehouseTableHealthSection } from './WarehouseTableHealthSection'
 import { WarehouseWorkersSection } from './WarehouseWorkersSection'
 import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -224,6 +229,11 @@ const WarehouseMetricsReportContent = () => {
               <WarehouseLatencySection range={range} />
               <WarehouseCapacitySection range={range} />
               <WarehouseWorkersSection range={range} />
+              <WarehouseReplicationSection range={range} />
+              <WarehouseMaintenanceSection range={range} />
+              <WarehouseInlinedDataSection range={range} />
+              <WarehouseTableHealthSection range={range} />
+              <WarehouseCatalogSection range={range} />
             </div>
           )}
         </div>
@@ -286,8 +296,8 @@ const WarehouseMetricsBody = ({
           title={isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'}
           description={
             isDisabled
-              ? 'Set up Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.'
-              : 'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.'
+              ? 'Set up Warehouse again to query a replicated copy of your data and monitor queries, replication, and storage here.'
+              : 'Run analytical queries on a replicated copy of your data, then monitor queries, replication, and storage here.'
           }
         >
           <Button asChild variant="default">

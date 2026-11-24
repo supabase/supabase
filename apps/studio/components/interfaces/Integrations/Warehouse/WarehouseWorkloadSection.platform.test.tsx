@@ -11,6 +11,7 @@ import type {
 } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 const metric = (
   name: WarehouseMetric['metric'],
@@ -50,14 +51,11 @@ beforeEach(() =>
 )
 
 test('shows both query trends and links to the report', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () =>
-      HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [metric('query_rate'), metric('query_duration_p95')],
-      }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [metric('query_rate'), metric('query_duration_p95')],
+    })
+  )
   renderSection()
   expect(screen.getByRole('status', { name: 'Workload status' })).toHaveTextContent(
     'Loading workload metrics'
@@ -75,14 +73,11 @@ test('shows both query trends and links to the report', async () => {
 })
 
 test('names the no-data window and refreshes the measurements', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () =>
-      HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [metric('query_rate', 'no_data'), metric('query_duration_p95', 'no_data')],
-      }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [metric('query_rate', 'no_data'), metric('query_duration_p95', 'no_data')],
+    })
+  )
   renderSection()
   expect(await screen.findAllByText('No data in the last 60 minutes')).toHaveLength(2)
   let finishRefresh = () => {}
@@ -90,15 +85,11 @@ test('names the no-data window and refreshes the measurements', async () => {
     finishRefresh = resolve
   })
 
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: async () => {
-      await refreshedMetrics
-      return HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [metric('query_rate'), metric('query_duration_p95')],
-      })
-    },
+  addWarehouseMetricsMock(async () => {
+    await refreshedMetrics
+    return HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [metric('query_rate'), metric('query_duration_p95')],
+    })
   })
   await userEvent.click(screen.getByRole('button', { name: 'Refresh report' }))
   expect(screen.getByRole('status', { name: 'Workload status' })).toHaveTextContent(
@@ -113,14 +104,11 @@ test('names the no-data window and refreshes the measurements', async () => {
 })
 
 test('keeps unavailable metrics distinct from an empty period', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () =>
-      HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [metric('query_rate', 'disabled'), metric('query_duration_p95', 'disabled')],
-      }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [metric('query_rate', 'disabled'), metric('query_duration_p95', 'disabled')],
+    })
+  )
   renderSection()
   expect(await screen.findByRole('alert')).toHaveTextContent('Warehouse metrics are unavailable')
   expect(screen.getByText('Replication status is shown above.')).toBeInTheDocument()
@@ -131,11 +119,9 @@ test('keeps unavailable metrics distinct from an empty period', async () => {
 })
 
 test('announces the error shown after workload metrics fail', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<APIErrorBody>({ message: 'Metrics failed' }, { status: 400 }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<APIErrorBody>({ message: 'Metrics failed' }, { status: 400 })
+  )
 
   renderSection()
 

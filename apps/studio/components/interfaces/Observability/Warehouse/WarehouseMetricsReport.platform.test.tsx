@@ -12,6 +12,7 @@ import { projectKeys } from '@/data/projects/keys'
 import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 type Setup = components['schemas']['WarehouseSetupStatusResponse_Output']
 const setup: Setup = {
@@ -60,11 +61,7 @@ const response = (value: number | null): WarehouseMetricsResponse => ({
   ],
 })
 const mockMetrics = (value: number | null) =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<WarehouseMetricsResponse>(response(value)),
-  })
+  addWarehouseMetricsMock(() => HttpResponse.json<WarehouseMetricsResponse>(response(value)))
 const renderReport = (enabled = true) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
@@ -122,24 +119,18 @@ test.each(['not_started', 'disabled'] as const)(
   }
 )
 test('shows a request failure rather than a no-data state', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+  )
   renderReport()
   expect(await screen.findByText('Failed to retrieve Warehouse metrics')).toBeInTheDocument()
 })
 
 test('requests the period selected in the date picker', async () => {
   const requests: URL[] = []
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      requests.push(new URL(request.url))
-      return HttpResponse.json<WarehouseMetricsResponse>(response(null))
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    requests.push(new URL(request.url))
+    return HttpResponse.json<WarehouseMetricsResponse>(response(null))
   })
   renderReport()
   await screen.findByText('No data in the selected period')
@@ -158,15 +149,11 @@ test('requests the period selected in the date picker', async () => {
 
 test('refreshes report measurements without changing the selected period', async () => {
   let requests = 0
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
-        return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
-      requests += 1
-      return HttpResponse.json<WarehouseMetricsResponse>(response(requests > 2 ? 4 : null))
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
+      return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
+    requests += 1
+    return HttpResponse.json<WarehouseMetricsResponse>(response(requests > 2 ? 4 : null))
   })
   renderReport()
   await screen.findByText('No data in the selected period')
@@ -185,7 +172,7 @@ test('refreshes report measurements without changing the selected period', async
 
 test('shows the retention upgrade prompt instead of requesting seven days on a free plan', async () => {
   const metricsRequest = vi.fn(() => HttpResponse.json<WarehouseMetricsResponse>(response(null)))
-  addAPIMock({ method: 'get', path: '/platform/warehouse/:ref/metrics', response: metricsRequest })
+  addWarehouseMetricsMock(metricsRequest)
   renderReport()
   await screen.findByText('No data in the selected period')
   await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
@@ -203,7 +190,7 @@ test('does not request Warehouse data without access', async () => {
     path: '/platform/warehouse/:ref/setup-status',
     response: setupRequest,
   })
-  addAPIMock({ method: 'get', path: '/platform/warehouse/:ref/metrics', response: metricsRequest })
+  addWarehouseMetricsMock(metricsRequest)
   renderReport(false)
   expect(await screen.findByText('Warehouse metrics are unavailable')).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
@@ -268,21 +255,17 @@ test('shows query outcomes without treating missing measurements as zero', async
     { ...metric, metric: 'query_timeout_rate', availability: 'no_data' },
     { ...metric, metric: 'query_canceled_rate', availability: 'unavailable' }
   )
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
-        return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
-      expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toEqual([
-        'query_rate',
-        'query_in_flight',
-        'query_error_rate',
-        'query_timeout_rate',
-        'query_canceled_rate',
-      ])
-      return HttpResponse.json<WarehouseMetricsResponse>(data)
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
+      return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
+    expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toEqual([
+      'query_rate',
+      'query_in_flight',
+      'query_error_rate',
+      'query_timeout_rate',
+      'query_canceled_rate',
+    ])
+    return HttpResponse.json<WarehouseMetricsResponse>(data)
   })
   mockSetup('not_started')
   renderReport()

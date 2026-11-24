@@ -11,6 +11,7 @@ import type {
 } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 beforeEach(() =>
   addAPIMock({
@@ -59,19 +60,15 @@ const renderSection = (
   )
 
 test('shows latency charts and their timing boundaries', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toHaveLength(7)
-      return HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [
-          metric('query_duration_p95'),
-          metric('assignment_wait_p95'),
-          metric('duckdb_duration_mean'),
-        ],
-      })
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toHaveLength(7)
+    return HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [
+        metric('query_duration_p95'),
+        metric('assignment_wait_p95'),
+        metric('duckdb_duration_mean'),
+      ],
+    })
   })
   renderSection()
   expect(await screen.findByRole('region', { name: 'Query duration' })).toBeInTheDocument()
@@ -82,11 +79,9 @@ test('shows latency charts and their timing boundaries', async () => {
   expect(screen.getByText(/including result streaming and client backpressure/)).toBeInTheDocument()
 })
 test('offers recovery when latency fails', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+  )
   renderSection()
   expect(await screen.findByText('Failed to retrieve latency metrics')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
@@ -115,14 +110,11 @@ test('aligns percentiles preserving gaps and zeroes, and converts seconds to mil
 
 test('keeps latency charts available when refreshing fails', async () => {
   let shouldFail = false
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () =>
-      shouldFail
-        ? HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
-        : HttpResponse.json<WarehouseMetricsResponse>({ metrics: [metric('query_duration_p95')] }),
-  })
+  addWarehouseMetricsMock(() =>
+    shouldFail
+      ? HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+      : HttpResponse.json<WarehouseMetricsResponse>({ metrics: [metric('query_duration_p95')] })
+  )
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   renderSection(queryClient)
   expect(await screen.findByRole('region', { name: 'Query duration' })).toBeInTheDocument()

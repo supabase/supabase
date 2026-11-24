@@ -14,6 +14,7 @@ import type { TablesData } from '@/data/tables/tables-query'
 import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
@@ -55,11 +56,7 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
 }))
 
 beforeEach(() =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
-  })
+  addWarehouseMetricsMock(() => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }))
 )
 
 mockAnimationsApi()

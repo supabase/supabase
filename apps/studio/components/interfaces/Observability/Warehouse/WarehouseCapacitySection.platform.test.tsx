@@ -12,6 +12,7 @@ import type {
 } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 beforeEach(() =>
   addAPIMock({
@@ -71,15 +72,11 @@ test('shows capacity limits and labelled rejection reasons without dropping zero
       points: [{ timestamp: 160, value: 1 }],
     },
   ]
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toHaveLength(5)
-      return HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [metric('worker_admission_occupied'), metric('worker_admission_limit'), rejection],
-      })
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toHaveLength(5)
+    return HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [metric('worker_admission_occupied'), metric('worker_admission_limit'), rejection],
+    })
   })
   renderSection()
   expect(screen.getByRole('status')).toHaveTextContent('Loading capacity metrics')
@@ -97,11 +94,9 @@ test('shows capacity limits and labelled rejection reasons without dropping zero
 })
 
 test('keeps capacity errors recoverable', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+  )
   renderSection()
   expect(await screen.findByText('Failed to retrieve capacity metrics')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()

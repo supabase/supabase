@@ -10,6 +10,7 @@ import type {
 } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 beforeEach(() =>
   addAPIMock({
@@ -58,37 +59,33 @@ const renderSection = () =>
   )
 
 test('shows worker starts and requests with their API labels', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: ({ request }) => {
-      const attributes = new URL(request.url).searchParams.get('attributes')?.split(',')
-      expect(attributes).toEqual([
-        'activation_rate',
-        'activation_duration_mean',
-        'activation_duration_p95',
-        'rpc_rate',
-        'rpc_duration_mean',
-        'rpc_duration_p95',
-      ])
-      const starts = metric('activation_rate')
-      starts.series.push({ ...starts.series[0], labels: { kind: 'cold', result: 'success' } })
-      const requests = metric('rpc_rate')
-      requests.series.push({
-        ...requests.series[0],
-        labels: { method: 'metadata', status: 'error' },
-      })
-      return HttpResponse.json<WarehouseMetricsResponse>({
-        metrics: [
-          starts,
-          metric('activation_duration_mean'),
-          metric('activation_duration_p95'),
-          requests,
-          metric('rpc_duration_mean'),
-          metric('rpc_duration_p95'),
-        ],
-      })
-    },
+  addWarehouseMetricsMock(({ request }) => {
+    const attributes = new URL(request.url).searchParams.get('attributes')?.split(',')
+    expect(attributes).toEqual([
+      'activation_rate',
+      'activation_duration_mean',
+      'activation_duration_p95',
+      'rpc_rate',
+      'rpc_duration_mean',
+      'rpc_duration_p95',
+    ])
+    const starts = metric('activation_rate')
+    starts.series.push({ ...starts.series[0], labels: { kind: 'cold', result: 'success' } })
+    const requests = metric('rpc_rate')
+    requests.series.push({
+      ...requests.series[0],
+      labels: { method: 'metadata', status: 'error' },
+    })
+    return HttpResponse.json<WarehouseMetricsResponse>({
+      metrics: [
+        starts,
+        metric('activation_duration_mean'),
+        metric('activation_duration_p95'),
+        requests,
+        metric('rpc_duration_mean'),
+        metric('rpc_duration_p95'),
+      ],
+    })
   })
   renderSection()
   expect(screen.getByRole('status')).toHaveTextContent('Loading worker metrics')
@@ -105,11 +102,9 @@ test('shows worker starts and requests with their API labels', async () => {
 })
 
 test('keeps worker failures recoverable', async () => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 }),
-  })
+  addWarehouseMetricsMock(() =>
+    HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+  )
   renderSection()
   expect(await screen.findByText('Failed to retrieve worker metrics')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()

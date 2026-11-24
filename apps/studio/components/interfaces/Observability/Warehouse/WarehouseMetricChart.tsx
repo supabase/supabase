@@ -4,7 +4,9 @@ import { ChartLine } from 'ui-patterns/Chart'
 import {
   expandWarehouseChartSeries,
   getWarehouseChartPoints,
+  getWarehouseSeriesPeak,
   getWarehouseSeriesRank,
+  type WarehouseSeriesLabelOptions,
   type WarehouseChartSeries,
 } from './WarehouseMetricChart.utils'
 import { getEmptyMessage } from './WarehouseMetricsReport.utils'
@@ -19,6 +21,9 @@ export const WarehouseMetricChart = ({
   scale = 1,
   emptyMessage,
   series: inputSeries = [{ metric, label: title }],
+  formatValue,
+  formatLabels,
+  hideSharedLabels,
 }: {
   metric?: WarehouseMetric
   title: string
@@ -27,10 +32,15 @@ export const WarehouseMetricChart = ({
   scale?: number
   emptyMessage?: string
   series?: WarehouseChartSeries[]
-}) => {
-  const allSeries = expandWarehouseChartSeries(inputSeries)
+  formatValue?: (value: number) => string
+} & WarehouseSeriesLabelOptions) => {
+  const allSeries = expandWarehouseChartSeries(inputSeries, { formatLabels, hideSharedLabels })
   const selectedSeries = [...allSeries]
-    .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
+    .sort(
+      (a, b) =>
+        getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a) ||
+        getWarehouseSeriesPeak(b) - getWarehouseSeriesPeak(a)
+    )
     .slice(0, 12)
   const series = allSeries.filter((item) => selectedSeries.includes(item))
 
@@ -87,6 +97,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
+                YAxisProps={formatValue ? { tickFormatter: formatValue } : undefined}
                 tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
               />
             </>
