@@ -10,6 +10,8 @@ import {
   ReferenceSidebar,
   type ReferenceLink,
 } from '~/features/docs/Reference.sidebar'
+import { PROD_URL } from '~/lib/constants'
+import { serializeJsonLd, techArticleSchema } from '~/lib/json-ld'
 import { notFound, redirect } from 'next/navigation'
 import { cn } from 'ui'
 
@@ -46,8 +48,18 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
     ? (((await getRefFrontmatter(`api/${section.id}`)).links as ReferenceLink[] | undefined) ?? [])
     : []
 
+  const title = section.title ?? operationSlug
+  const techArticleJsonLd = serializeJsonLd(
+    techArticleSchema({
+      url: `${PROD_URL}/reference/api/${operationSlug}`,
+      headline: `Management API: ${title}`,
+      description: `Management API reference for the Supabase API: ${title}`,
+    })
+  )
+
   return (
     <ReferencePageShell menuId={MenuId.RefApi} navigation={navigationProps}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: techArticleJsonLd }} />
       {isIntroduction ? (
         <TocAnchorsProvider>
           <div className="grid grid-cols-12 relative gap-4">

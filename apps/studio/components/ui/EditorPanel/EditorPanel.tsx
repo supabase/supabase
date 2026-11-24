@@ -70,6 +70,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
+import { sqlEditorSessionState } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
@@ -316,6 +317,10 @@ export const EditorPanel = () => {
     })
 
     sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
+    if (results !== undefined && !error) {
+      const { appendAutoLimit } = applyAutoLimit(acceptUntrustedSql(currentValue), 100)
+      sqlEditorSessionState.addResult(snippet.id, [...results], appendAutoLimit ? 100 : undefined)
+    }
     requestSave(snippet.id)
 
     router.push(`/project/${ref}/sql/${snippet.id}`)
