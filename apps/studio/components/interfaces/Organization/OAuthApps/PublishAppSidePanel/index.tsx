@@ -207,22 +207,31 @@ export const PublishAppSidePanel = ({
 
     setIsSavingApp(true)
 
+    let uploadedIconUrl = iconUrl
+    if (iconFile !== undefined) {
+      try {
+        uploadedIconUrl = await uploadAttachment(
+          'oauth-app-icons',
+          `${slug}/${uuidv4()}.png`,
+          iconFile
+        )
+      } catch {
+        uploadedIconUrl = undefined
+      }
+    }
+
+    if (iconFile !== undefined && uploadedIconUrl === undefined) {
+      toast.error('Failed to upload OAuth application icon')
+      setIsSavingApp(false)
+      return
+    }
+
     try {
       const { name, website, redirect_uris } = values
       let member_bound_grant, project_scoping
       if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
         member_bound_grant = values.member_bound_grant
         project_scoping = values.project_scoping
-      }
-      const uploadedIconUrl =
-        iconFile !== undefined
-          ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
-          : iconUrl
-
-      if (iconFile !== undefined && uploadedIconUrl === undefined) {
-        toast.error('Failed to upload OAuth application icon')
-        setIsSavingApp(false)
-        return
       }
 
       if (selectedApp === undefined) {
