@@ -38,7 +38,7 @@ By default it will use the asset name to save the file on disk. You can optional
 
 #### Programmatic downloads with query parameters
 
-When using the SDK's `download()` method, you can pass additional query parameters to customize the download behavior:
+In JavaScript, pass the `download` option to `getPublicUrl()` or `createSignedUrl()` to get a URL that saves the file under a custom name. The JavaScript `download()` method returns the file contents and doesn't take a filename. In Dart and Swift, pass the query parameters to `download()`:
 
 <Tabs
   scrollable
