@@ -16,7 +16,6 @@ services:
     container_name: supabase-studio
     image: supabase/studio:2026.11.23-sha-4a73166
     restart: unless-stopped
-    # Reaps orphaned processes, such as a healthcheck killed at its timeout.
     init: true
     healthcheck:
       test:
@@ -443,7 +442,6 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.100.1
     restart: unless-stopped
-    # Reaps orphaned processes, such as a healthcheck killed at its timeout.
     init: true
     # Defined here because Podman ignores the healthcheck embedded in the image.
     healthcheck:
