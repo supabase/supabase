@@ -48,9 +48,9 @@ const CtaSection = ({
           <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight">{title}</h2>
           {subtitle && <p className="text-foreground-light text-lg">{subtitle}</p>}
           {notice && (
-            <div className="border-l-4 border-strong pl-4 text-left max-w-3xl">
+            <div className="border rounded-lg bg-surface-100 px-6 py-5 text-center max-w-2xl">
               <p className="text-foreground font-medium">{notice.title}</p>
-              <p className="text-foreground-light mt-1">{notice.body}</p>
+              <p className="text-foreground-light text-base mt-2">{notice.body}</p>
             </div>
           )}
           {(primaryCta || secondaryCta) && (
