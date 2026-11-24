@@ -10,9 +10,17 @@ export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
   variants?: Variants
+  isPlanUpdateRedesignEnabled: boolean
+  origin?: string
 }
 
-export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({
+  plan,
+  isCurrentPlan,
+  variants,
+  isPlanUpdateRedesignEnabled,
+  origin,
+}: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const features = plan.features
@@ -53,6 +61,8 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCard
             track('studio_pricing_plan_cta_clicked', {
               selectedPlan: 'Enterprise',
               currentPlan,
+              planUpdateRedesignEnabled: isPlanUpdateRedesignEnabled,
+              origin,
             })
           }
         >
@@ -88,6 +98,8 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCard
             track('studio_pricing_plan_cta_clicked', {
               selectedPlan: 'Enterprise',
               currentPlan,
+              planUpdateRedesignEnabled: isPlanUpdateRedesignEnabled,
+              origin,
             })
           }
         >

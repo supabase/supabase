@@ -23,6 +23,7 @@ export interface PlanCardsProps {
   /** Seconds to wait before the cards stagger in. */
   entryDelay: number
   showAwsMarketplacePurchase?: boolean
+  isPlanUpdateRedesignEnabled: boolean
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
 }
 
@@ -37,6 +38,7 @@ export function PlanCards({
   selectedOrganization,
   entryDelay,
   showAwsMarketplacePurchase = false,
+  isPlanUpdateRedesignEnabled,
   onSelectTier,
 }: PlanCardsProps) {
   const router = useRouter()
@@ -65,6 +67,8 @@ export function PlanCards({
               plan={plan}
               isCurrentPlan={isCurrentPlan}
               variants={entryAnimation.card}
+              isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
+              origin={source}
             />
           )
         }
@@ -89,6 +93,8 @@ export function PlanCards({
               track('studio_pricing_plan_cta_clicked', {
                 selectedPlan: plan.name,
                 currentPlan: currentSubscriptionPlanName,
+                planUpdateRedesignEnabled: isPlanUpdateRedesignEnabled,
+                origin: source,
               })
             }
           />

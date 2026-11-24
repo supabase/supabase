@@ -183,15 +183,14 @@ export const PlanUpdateSidePanel = () => {
     }
   )
 
+  const source = Array.isArray(router.query.source) ? router.query.source[0] : router.query.source
+
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
       setLatestAddress(undefined)
       setLatestTaxId(undefined)
       setUseAsDefaultBillingAddress(true)
-      const source = Array.isArray(router.query.source)
-        ? router.query.source[0]
-        : router.query.source
       const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
         currentPlan: subscription?.plan?.name,
       }
@@ -260,6 +259,7 @@ export const PlanUpdateSidePanel = () => {
       selectedOrganization={selectedOrganization}
       entryDelay={contentDelay}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
+      isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
       onSelectTier={setSelectedTier}
     />
   )
