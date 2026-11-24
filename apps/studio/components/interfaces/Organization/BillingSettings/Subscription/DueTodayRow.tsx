@@ -74,6 +74,7 @@ export const DueTodayRow = ({ breakdown, planName, currentPlanName }: DueTodayRo
               )}
               <div className={cn('pt-1', hasCreditsApplied && 'border-t')}>
                 <TooltipLine label={`${planName} Plan`} amount={planAmount} />
+                {tax && <TooltipLine label={`Tax (${tax.ratePercentage}%)`} amount={tax.amount} />}
                 {creditBalance > 0 && (
                   <TooltipLine label="Credit balance" amount={creditBalance} isCredit />
                 )}
@@ -84,7 +85,6 @@ export const DueTodayRow = ({ breakdown, planName, currentPlanName }: DueTodayRo
                     isCredit
                   />
                 )}
-                {tax && <TooltipLine label={`Tax (${tax.ratePercentage}%)`} amount={tax.amount} />}
                 <TooltipLine label="Due today" amount={dueToday} className="border-t" />
               </div>
               <p className="mt-2 text-foreground-lighter">
