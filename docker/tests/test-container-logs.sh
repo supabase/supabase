@@ -134,8 +134,9 @@ check_logs realtime \
 check_logs storage \
     'Started Successfully'
 
+# Next.js builds print "Ready in <n>s"; TanStack Start builds print "Listening on: <url>"
 check_logs studio \
-    'ready in.*s$'
+    'ready in.*s$|Listening on:'
 
 check_logs meta \
     'Server listening at http'

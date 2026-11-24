@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
 import { OAuthAppsAuthorizeApproveData } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
@@ -221,6 +221,61 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
+  test('blocks organization-wide authorization when preflight reports insufficient permissions', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsAuthorizeRequestData>(
+          createMockRequest({ project_scoping_mode: false })
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({ slug: 'northwind-traders', name: 'Northwind Traders' }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsPreflightValidationData>(
+          createMockPreflight({
+            validation_failure: {
+              scope_target: 'all_projects',
+              role: { name: 'read-only' },
+              failed_scopes: ['database:write'],
+            },
+          })
+        ),
+    })
+    const approve = vi.fn(() => HttpResponse.json<OAuthAppsAuthorizeApproveData>({ url: '' }))
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: approve,
+    })
+
+    renderScreen()
+
+    expect(
+      await screen.findByText('You don’t have permission to authorize this application')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Permissions requested' })).not.toBeInTheDocument()
+    const authorize = screen.getByRole('button', { name: 'Authorize Vercel' })
+    expect(authorize).toBeDisabled()
+    fireEvent.click(authorize)
+    expect(approve).not.toHaveBeenCalled()
+  })
+
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
@@ -311,8 +366,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
-    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
+    expect(screen.getByRole('heading', { name: 'Read only' }).parentElement).toHaveTextContent(
+      'Secrets, Projects, Edge Functions, Storage'
+    )
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -377,7 +437,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/test@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared, exactly once, without the member-bound copy', async () => {
+  test('keeps organization-bound consent focused on the requested access', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -422,17 +482,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
+    await screen.findByText('Permissions requested')
     expect(
-      screen.getAllByText(
-        'Have them authorize Vercel from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
-      )
-    ).toHaveLength(1)
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/This authorization will appear in Authorized apps/)
-    ).toBeInTheDocument()
+      screen.queryByText('Some requested permissions exceed your role')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
@@ -464,9 +518,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     expect(
-      await screen.findByText(/No admin approval is needed if your role permits this access/)
+      await screen.findByText(/The app can only use the permissions listed below/)
     ).toBeInTheDocument()
-    expect(screen.getByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
   })
@@ -666,7 +720,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    expect(screen.getByRole('radio', { name: 'Selected projects only' })).toBeChecked()
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox', { name: 'Projects' })).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -721,7 +776,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeChecked()
+      expect(screen.getByRole('radio', { name: 'All current and future projects' })).toBeChecked()
     })
     await enabledAuthorizeButton()
   })
@@ -913,15 +968,16 @@ describe('OAuthAppsAuthorizeScreen', () => {
     const findSpanWithText = (text: string) =>
       screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
     await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
+    expect(screen.getByRole('button', { name: 'Environment' })).toBeInTheDocument()
+    await findSpanWithText('Analytics (Upgraded from Read only)')
+    await findSpanWithText('Secrets (Demoted from Read and write)')
     await findSpanWithText('Edge Functions (New)')
     await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
+    await findSpanWithText('Rest (Read only)')
 
     expect(screen.queryByText('Database')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    await screen.findByText('Database management')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {
