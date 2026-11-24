@@ -13,6 +13,7 @@ import type { VaultSecret } from '@/types'
 
 const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
+  key_id: null,
   name: 'test',
   description: 'new text',
   secret: 'NASR0SoksURJ0OorMJ9FzraTzcqSWk5u1PQa2r4c3w9rUVc=',

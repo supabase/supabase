@@ -6,7 +6,8 @@ import { COOLDOWN_DURATION } from './disk-attributes-update-mutation'
 import { configKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskAttributesVariables = {
   projectRef?: string
@@ -30,7 +31,7 @@ export async function getDiskAttributes(
 }
 
 export type DiskAttributesData = Awaited<ReturnType<typeof getDiskAttributes>>
-export type DiskAttributesError = ResponseError
+export type DiskAttributesError = StudioError
 
 export const useDiskAttributesQuery = <TData = DiskAttributesData>(
   { projectRef }: DiskAttributesVariables,

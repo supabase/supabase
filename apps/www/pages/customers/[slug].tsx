@@ -15,11 +15,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { AiTools } from '@/components/AiTools'
 import SectionContainer from '@/components/Layouts/SectionContainer'
-import { MarkdownActions } from '@/components/MarkdownActions'
-
-// table of contents extractor
-const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_customers')
@@ -60,7 +57,6 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }
@@ -210,9 +206,10 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
-                        <MarkdownActions
+                        <AiTools
                           pagePath={`/customers/${slug}`}
                           pageType="customers"
+                          titleClassName="sr-only"
                           className="not-prose"
                         />
 
@@ -221,7 +218,7 @@ function CaseStudyPage(props: any) {
                           <div>
                             <Button asChild iconRight={<ChevronRight />}>
                               <Link
-                                href="https://supabase.com/contact/enterprise"
+                                href="https://forms.supabase.com/enterprise"
                                 className="no-underline"
                               >
                                 Contact sales

@@ -1,7 +1,7 @@
 import { useBreakpoint, useReducedMotion } from 'common'
 import { navData as DevelopersData } from 'data/Solutions'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useMedia } from 'react-use'

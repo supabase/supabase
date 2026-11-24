@@ -13,7 +13,7 @@ date: '2021-07-27'
 toc_depth: 2
 ---
 
-At Supabase, one of our core values is [Kaizen](https://en.wikipedia.org/wiki/Kaizen) - continuous improvement. And that's exactly what we've been doing with Storage since it [launched](/blog/2021/03/30/supabase-storage) three months ago. Today, we are launching the Sequel to Storage Alpha (I bet you didn't see that coming): Storage Beta!
+At Supabase, one of our core values is [Kaizen](https://en.wikipedia.org/wiki/Kaizen) - continuous improvement. And that's exactly what we've been doing with Storage since it [launched](/blog/supabase-storage) three months ago. Today, we are launching the Sequel to Storage Alpha (I bet you didn't see that coming): Storage Beta!
 
 ## Streaming Media
 
@@ -46,7 +46,7 @@ Public buckets still require [Auth Policies](/docs/guides/storage/security/acces
 
 ## Directory uploads
 
-You can now upload an entire directory to Supabase Storage and the directory structure is fully preserved after the upload. We used the [File and Directory entries API](https://developer.mozilla.org/en-US/docs/Web/API/File_and_Directory_Entries_API) for implementing this. This is a non-standard API, but we didn't find any compatibility issues in the browsers we support. So, now you can upload the [Storage GitHub repo](https://github.com/supabase/storage-api/) to storage 🤓
+You can now upload an entire directory to [Supabase Storage](/docs/guides/storage) and the directory structure is fully preserved after the upload. We used the [File and Directory entries API](https://developer.mozilla.org/en-US/docs/Web/API/File_and_Directory_Entries_API) for implementing this. This is a non-standard API, but we didn't find any compatibility issues in the browsers we support. So, now you can upload the [Storage GitHub repo](https://github.com/supabase/storage-api/) to storage 🤓
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source
@@ -57,7 +57,7 @@ You can now upload an entire directory to Supabase Storage and the directory str
 
 ## A New Policy Editor
 
-Postgres [Row Level Security](https://www.postgresql.org/docs/13/ddl-rowsecurity.html) (RLS) is at the core of Supabase Storage and Auth. RLS lets you define complex policies, tightly integrated with Supabase Auth users, using the language you're already comfortable with - SQL.
+Postgres [Row Level Security](https://www.postgresql.org/docs/13/ddl-rowsecurity.html) (RLS) is at the core of Supabase Storage and Auth. RLS lets you define complex policies, tightly integrated with [Supabase Auth](/auth) users, using the language you're already comfortable with - SQL.
 
 However, getting started with RLS can be daunting. To make it more approachable for beginners, we've included a set of pre-defined templates on our Dashboard, covering common use-cases.
 
@@ -67,7 +67,7 @@ Once you've selected a template, you choose which operations to allow and the Da
 
 ![Policy editor permissions](/images/blog/launch-week-sql-day-2/policy-editor-2.png)
 
-After writing the policy definition (which can be any valid SQL expression), you get an opportunity to review the final policy before saving. We made sure that there is no magic going on behind the scenes: you can always see the underlying SQL definition of the policies. As you become more comfortable with Row Level Security, you can define these policies directly using our SQL editor.
+After writing the policy definition (which can be any valid SQL expression), you get an opportunity to review the final policy before saving. We made sure that there is no magic going on behind the scenes: you can always see the underlying SQL definition of the policies. As you become more comfortable with [Row Level Security](/docs/guides/database/postgres/row-level-security), you can define these policies directly using our SQL editor.
 
 ## Using Storage in Local development
 
@@ -127,7 +127,7 @@ Here is a demo testing rendering the heaviest object known to mankind - the `nod
 ## API changes
 
 Supabase Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.com/ankitjena) for
-[this Pull Request](https://github.com/supabase/storage-api/pull/32).
+[this Pull Request](https://github.com/supabase/storage/pull/32).
 
 ![Storage now supports upserts](/images/blog/2021-june/supabase-storage-upsert.png)
 
@@ -135,7 +135,7 @@ We also have automated API docs generated [here](https://supabase.github.io/stor
 
 ### Storage in the wild
 
-We have a few production applications using Supabase Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using Supabase Storage to store short video clips uploaded to his [Spot app](/blog/spot-flutter-with-postgres) built with Flutter
+We have a few production applications using Supabase Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using Supabase Storage to store short video clips uploaded to his [Spot app](/customers) built with Flutter
 
 <Quote img="tyler-spot.jpg" caption="Tyler Shukert, creator of Spot">
   <p>

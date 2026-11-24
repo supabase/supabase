@@ -7,7 +7,7 @@ breadcrumb: 'AI Quickstarts'
 
 This guide will walk you through a basic ["Hello World"](https://github.com/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb) example using Colab and Supabase Vecs. You'll learn how to:
 
-1. Launch a Postgres database that uses pgvector to store embeddings
+1. Launch a Postgres database that uses [pgvector](/docs/guides/database/extensions/pgvector) to store embeddings
 1. Launch a notebook that connects to your database
 1. Create a vector collection
 1. Add data to the collection
@@ -51,7 +51,7 @@ SQLAlchemy requires the connection string to start with `postgresql://` (instead
 
 <Admonition type='note'>
 
-You must use the Session pooler connection string with Google Colab since Colab does not support IPv6.
+You must use the Session pooler connection string with Google Colab since [Colab does not support IPv6](/kb/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP).
 
 </Admonition>
 

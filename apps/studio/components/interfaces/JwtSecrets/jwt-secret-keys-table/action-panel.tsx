@@ -37,7 +37,7 @@ export const ActionPanel = forwardRef<HTMLDivElement, ActionPanelProps>(
             <CardTitle className="text-sm">{title}</CardTitle>
             <CardDescription className="max-w-xl">{description}</CardDescription>
           </div>
-          <div className="flex lg:justify-end flex-">
+          <div className="flex lg:justify-end ">
             {shortcutId ? (
               <Shortcut
                 id={shortcutId}

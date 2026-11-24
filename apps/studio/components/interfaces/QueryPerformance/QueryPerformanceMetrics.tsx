@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import { parseAsJson, useQueryStates } from 'nuqs'
 import React, { useMemo } from 'react'
 import { cn, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -76,7 +76,7 @@ export const QueryPerformanceMetrics = () => {
                             e.stopPropagation()
                           }}
                         >
-                          <Info size={12} />
+                          <InfoIcon size={12} />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="top" align="start" className="max-w-xs text-xs">
@@ -97,7 +97,7 @@ export const QueryPerformanceMetrics = () => {
                             e.stopPropagation()
                           }}
                         >
-                          <Info size={12} />
+                          <InfoIcon size={12} />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="top" align="start" className="max-w-xs text-xs">

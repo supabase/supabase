@@ -65,7 +65,6 @@ describe('ReadReplicasSection', () => {
   })
 
   test('renders the read replicas section with add CTA and empty state', async () => {
-    mockUseIsFeatureEnabled.mockReturnValue({ infrastructureReadReplicas: true })
     addReplicaListMocks()
 
     customRender(<ReadReplicasSection onRecommendCompute={vi.fn()} />)

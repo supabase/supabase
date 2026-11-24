@@ -3,7 +3,7 @@ import type { AiPromptId } from './ai-prompts.data'
 export const monitoringAgents = {
   health: {
     id: 'health',
-    name: 'Health monitor',
+    name: 'Health',
     promptId: 'monitoring-agent-health' as AiPromptId,
     schedule: {
       cadence: 'once per hour',
@@ -15,7 +15,7 @@ export const monitoringAgents = {
   },
   security: {
     id: 'security',
-    name: 'Security monitor',
+    name: 'Security',
     promptId: 'monitoring-agent-security' as AiPromptId,
     schedule: {
       cadence: 'once per day',
@@ -26,7 +26,7 @@ export const monitoringAgents = {
   },
   performance: {
     id: 'performance',
-    name: 'Performance monitor',
+    name: 'Performance',
     promptId: 'monitoring-agent-performance' as AiPromptId,
     schedule: {
       cadence: 'once per hour',
@@ -37,7 +37,7 @@ export const monitoringAgents = {
   },
   usage: {
     id: 'usage',
-    name: 'Resource monitor',
+    name: 'Resources',
     promptId: 'monitoring-agent-usage' as AiPromptId,
     schedule: {
       cadence: 'once each morning',

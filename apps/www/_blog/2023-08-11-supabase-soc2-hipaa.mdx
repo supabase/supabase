@@ -16,7 +16,7 @@ imgThumb: launch-week-8/day-5/thumb-day5-compliance.jpg
 
 While we weren’t [planning](https://news.ycombinator.com/item?id=35526018) to do anything official for this announcement, [the customer is always right](https://news.ycombinator.com/item?id=35555756).
 
-Supabase is now officially SOC2 Type 2 and HIPAA compliant.
+Supabase is now officially [SOC2](https://supabase.com/features/soc-2-compliance) Type 2 and HIPAA compliant.
 
 That’s all you need to know. The rest of this blog post will give you some background and what to expect if you’re planning to go through the same process.
 
@@ -60,13 +60,13 @@ We used the same auditor to streamline the process. Many of the controls require
 
 We also had to sign a Business Associate Agreement (BAA) with all of our vendors who would have access to PHI, such as AWS, and ensure that we follow their terms listed in the agreements. For example, when using AWS to store PHI, we could only use their [HIPAA Eligible Services](https://aws.amazon.com/compliance/hipaa-eligible-services-reference/). There were similar requirements from the other vendors we use and to ensure that we were complying with all their requirements.
 
-Similarly when you sign a BAA with us, you have some responsibilities you agree to when using Supabase to store PHI. These are documented in our [shared responsibility doc](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
+Similarly when you sign a BAA with us, you have some responsibilities you agree to when using Supabase to store PHI. These are documented in our [shared responsibility doc](/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data).
 
 We made a significant change to our incident management process for HIPAA. The [HIPAA Breach Notification](https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html) rules have strict requirements for handling breaches. For instance, business associates are required to notify the covered entity within 60 days of a breach. This also required us to appoint a HIPAA Security officer who would be responsible for reviewing any breach for PHI disclosure and communicating it’s impact to the Covered Entity.
 
 ![Data Breach Declaration](/images/blog/launch-week-8/day-5/data-breach-2.png)
 
-The not-so-fun but important stuff included updating a bunch of our policies to cover HIPAA requirements such as enforcing automatic log-offs as part of our workstation security policy. Shopping for a good Technology Errors and Omissions Insurance plan was another boring but important thing we had to finalize in the off-chance that we get hacked despite all our measures. [HIPAA fines](https://www.strongdm.com/blog/hipaa-violation-penalties) are no joke, you could rake up to 1.9 million dollars per violation per calendar year depending the severity of the breach!
+The not-so-fun but important stuff included updating a bunch of our policies to cover HIPAA requirements such as enforcing automatic log-offs as part of our workstation security policy. Shopping for a good Technology Errors and Omissions Insurance plan was another boring but important thing we had to finalize in the off-chance that we get hacked despite all our measures. [HIPAA fines](https://delinea.com/blog/hipaa-violation-penalties) are no joke, you could rake up to 1.9 million dollars per violation per calendar year depending the severity of the breach!
 
 ## Build Healthcare Apps on Supabase
 
@@ -79,4 +79,4 @@ If you want to start developing healthcare apps on Supabase, reach out to our te
 - [Launch Week 8](https://supabase.com/launch-week)
 - [Coding the stars - an interactive constellation with Three.js and React Three Fiber](https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber)
 - [Why we'll stay remote](https://supabase.com/blog/why-supabase-remote)
-- [Postgres Language Server](https://github.com/supabase/postgres_lsp)
+- [Postgres Language Server](https://github.com/supabase-community/postgres-language-server)

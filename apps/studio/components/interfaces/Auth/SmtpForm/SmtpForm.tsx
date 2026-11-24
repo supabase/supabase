@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -12,11 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  FormInputGroupInput,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -36,7 +31,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
@@ -62,15 +57,6 @@ const smtpEnabledSchema = z.object({
       .min(1, 'Must be a valid port number more than 0')
       .max(65535, 'Must be a valid port number no more than 65535')
   ),
-  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(
-    z.coerce
-      .number({
-        required_error: 'Rate limit is required',
-        invalid_type_error: 'Rate limit is required',
-      })
-      .min(1, 'Must be more than 0')
-      .max(32767, 'Must not be more than 32,767 an hour')
-  ),
   SMTP_USER: z.string().trim().min(1, 'SMTP Username is required'),
   SMTP_PASS: z.string().trim().optional(),
 })
@@ -81,7 +67,6 @@ const smtpDisabledSchema = z.object({
   SMTP_SENDER_NAME: z.string().optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: preprocessEmptyNumberInput(z.coerce.number().optional()),
-  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(z.coerce.number().optional()),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
 })
@@ -106,13 +91,12 @@ export const SmtpForm = () => {
   const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)
   const [pendingValues, setPendingValues] = useState<SmtpFormValues | null>(null)
 
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const blockEditingOnReset =
@@ -138,7 +122,6 @@ export const SmtpForm = () => {
       SMTP_SENDER_NAME: '',
       SMTP_HOST: '',
       SMTP_PORT: undefined,
-      SMTP_MAX_FREQUENCY: undefined,
       SMTP_USER: '',
       SMTP_PASS: '',
       ENABLE_SMTP: false,
@@ -418,31 +401,6 @@ export const SmtpForm = () => {
                                   placeholder="587"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="SMTP_MAX_FREQUENCY"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Minimum interval per user"
-                              description="The minimum time in seconds between emails before another email can be sent to the same user."
-                            >
-                              <FormControl>
-                                <InputGroup>
-                                  <FormInputGroupInput
-                                    type="number"
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    disabled={!canUpdateConfig}
-                                  />
-                                  <InputGroupAddon align="inline-end">
-                                    <InputGroupText>seconds</InputGroupText>
-                                  </InputGroupAddon>
-                                </InputGroup>
                               </FormControl>
                             </FormItemLayout>
                           )}

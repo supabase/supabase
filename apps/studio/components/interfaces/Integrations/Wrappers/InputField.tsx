@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import { cn, FormControl, FormField, Input, InputVariants, Textarea } from 'ui'
@@ -12,15 +12,17 @@ interface InputFieldProps<TFieldValues extends FieldValues = FieldValues> {
   control: Control<TFieldValues>
   loading?: boolean
   placeholder?: string
+  layout?: 'vertical' | 'horizontal'
 }
 
-const InputField = <
+export const InputField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   control,
   option,
   loading = false,
+  layout = 'horizontal',
   placeholder,
 }: InputFieldProps<TFieldValues>) => {
   return (
@@ -30,14 +32,14 @@ const InputField = <
       defaultValue={(option.defaultValue ?? '') as any}
       render={({ field }) => (
         <FormItemLayout
-          layout="vertical"
+          layout={layout}
           label={
             <div className="flex items-center space-x-2">
               <p>{option.label}</p>
               {option.urlHelper !== undefined && (
                 <Link href={option.urlHelper} target="_blank" rel="noreferrer">
                   <span className="sr-only">Documentation</span>
-                  <HelpCircle
+                  <HelpCircleIcon
                     strokeWidth={2}
                     size={14}
                     className="text-foreground-light hover:text-foreground cursor-pointer transition"
@@ -67,5 +69,3 @@ const InputField = <
     />
   )
 }
-
-export default InputField

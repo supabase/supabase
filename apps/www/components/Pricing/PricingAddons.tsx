@@ -1,13 +1,13 @@
 'use client'
 
 import { ArrowUpRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FC } from 'react'
 import { Button, cn } from 'ui'
 
 import CostControlAnimation from './CostControlAnimation'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const addons = [
   {
@@ -65,7 +65,6 @@ const PricingAddons: FC = () => {
 }
 
 const AddonCard = ({ addon }: any) => {
-  const { resolvedTheme } = useTheme()
   const basePath = '' // basePath is empty string in next.config.mjs
 
   const isHighlightCard = addon.id === 'addon-cost-control'
@@ -97,9 +96,15 @@ const AddonCard = ({ addon }: any) => {
         </div>
         <div className="flex items-center gap-4 mt-4">
           <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4 h-4" />}>
-            <Link href={addon.ctaLink} target={addon.ctaTarget}>
-              {addon.ctaText}
-            </Link>
+            {isCrossZoneHref(addon.ctaLink) ? (
+              <a href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </a>
+            ) : (
+              <Link href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </Link>
+            )}
           </Button>
         </div>
       </div>
@@ -115,12 +120,19 @@ const AddonCard = ({ addon }: any) => {
         )}
       >
         <Image
-          src={`${basePath}/images/pricing/${addon.heroImg}${
-            resolvedTheme?.includes('dark') ? '' : '-light'
-          }.svg`}
+          src={`${basePath}/images/pricing/${addon.heroImg}-light.svg`}
           alt={`${addon.name} illustration`}
           fill
-          className={cn('object-contain', addon.id === 'addon-pitr' && 'object-bottom')}
+          className={cn('object-contain dark:hidden', addon.id === 'addon-pitr' && 'object-bottom')}
+        />
+        <Image
+          src={`${basePath}/images/pricing/${addon.heroImg}.svg`}
+          alt={`${addon.name} illustration`}
+          fill
+          className={cn(
+            'hidden object-contain dark:block',
+            addon.id === 'addon-pitr' && 'object-bottom'
+          )}
         />
       </div>
       <div className="p-4 lg:pl-0 lg:-ml-2 xl:ml-0 gap-4 col-span-2">
@@ -130,12 +142,18 @@ const AddonCard = ({ addon }: any) => {
           </p>
           <div className="flex items-center gap-2">
             <Image
-              src={`${basePath}/images/pricing/${addon.icon}${
-                resolvedTheme?.includes('dark') ? '' : '-light'
-              }.svg`}
+              src={`${basePath}/images/pricing/${addon.icon}-light.svg`}
               width={14}
               height={14}
               alt="Compute"
+              className="dark:hidden"
+            />
+            <Image
+              src={`${basePath}/images/pricing/${addon.icon}.svg`}
+              width={14}
+              height={14}
+              alt="Compute"
+              className="hidden dark:block"
             />
             <h3 className="text-sm text-foreground">{addon.name}</h3>
           </div>
@@ -152,6 +170,10 @@ const AddonCard = ({ addon }: any) => {
     <div className={containerClasses}>
       <HighlightCard />
     </div>
+  ) : isCrossZoneHref(addon.ctaLink) ? (
+    <a href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
+      <SmallCard />
+    </a>
   ) : (
     <Link href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
       <SmallCard />

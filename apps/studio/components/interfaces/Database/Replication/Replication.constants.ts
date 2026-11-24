@@ -6,5 +6,3 @@ export enum PipelineStatusName {
   STOPPING = 'stopping',
   UNKNOWN = 'unknown',
 }
-
-export const PIPELINES_FEEDBACK_URL = 'https://github.com/orgs/supabase/discussions/39416'

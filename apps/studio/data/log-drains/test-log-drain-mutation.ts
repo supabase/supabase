@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LogDrainTestVariables = {
   projectRef: string
@@ -25,10 +26,10 @@ export const useTestLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LogDrainTestData, ResponseError, LogDrainTestVariables>,
+  UseCustomMutationOptions<LogDrainTestData, StudioError, LogDrainTestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<LogDrainTestData, ResponseError, LogDrainTestVariables>({
+  return useMutation<LogDrainTestData, StudioError, LogDrainTestVariables>({
     mutationFn: (vars) => testLogDrain(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

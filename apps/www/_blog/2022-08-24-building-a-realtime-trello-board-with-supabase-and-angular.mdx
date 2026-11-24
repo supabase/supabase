@@ -144,7 +144,7 @@ $$;
 
 Besides the creation of tables we also changed the replica identity, which helps to alter retrieve records when a row is deleted.
 
-Finally we defined a very important **function** that we will use to make the table secure using [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security).
+Finally we defined a very important **function** that we will use to make the table secure using [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
 This function will retrieve all boards of a user from the `user_boards` table and will be used in our policies now.
 
@@ -258,7 +258,7 @@ At this point our Supabase project is configured correctly and we can move into 
 
 ## Creating the Angular Project
 
-We are not bound to any framework, but in this article we are using [Angular](https://supabase.com/docs/guides/with-angular) to build a robust web application.
+We are not bound to any framework, but in this article we are using [Angular](https://supabase.com/docs/guides/getting-started/tutorials/with-angular) to build a robust web application.
 
 Get started by using the [Angular CLI](https://angular.io/cli) to generate a new project and then add some components and services that we will need.
 
@@ -1280,7 +1280,7 @@ We can do this right inside the table editor of Supabase, so go to your tables, 
 
 ![Supabase Realtime](/images/blog/simon-grimm-angular-realtime/supabase-realtime.png)
 
-Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next Supabase JS update, the general idea can still be applied:
+Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next [Supabase JS](/docs/reference/javascript/introduction) update, the general idea can still be applied:
 
 We create a new `Subject` and return it as an `Observable`, and then listen to changes of our tables by using `on()`.
 
@@ -1390,5 +1390,5 @@ Until next time and happy coding with Supabase!
 
 ## Resources
 
-- [Quickstart: Angular](https://supabase.com/docs/guides/with-angular)
+- [Quickstart: Angular](https://supabase.com/docs/guides/getting-started/tutorials/with-angular)
 - [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)

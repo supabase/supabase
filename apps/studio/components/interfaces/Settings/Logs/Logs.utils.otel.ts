@@ -4,6 +4,7 @@ import { LogsTableName, type SqlFilterEntry } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, Metadata, QueryType } from './Logs.types'
 import { buildWhereClauses, resolveLogTimestamp } from './Logs.utils'
 import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
+import { PIPELINE_ID_OTEL_SQL } from '@/data/logs/pipeline-logs'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -99,11 +100,9 @@ const SUPAVISOR_FILTERS: Record<string, SqlFilterEntry> = {
   ...COMMON_FILTERS,
   database: (value: string) => safeSql`${attr('project')} LIKE ${lit(value + '%')}`,
 }
-const ETL_FILTERS: Record<string, SqlFilterEntry> = {
+const PIPELINES_FILTERS: Record<string, SqlFilterEntry> = {
   ...COMMON_FILTERS,
-  // pipeline_id arrives as a number, but log_attributes values are strings, so
-  // compare as a string. A numeric literal here is a ClickHouse type error.
-  pipeline_id: (value: string | number) => safeSql`${attr('pipeline_id')} = ${lit(String(value))}`,
+  pipeline_id: (value: string | number) => safeSql`${PIPELINE_ID_OTEL_SQL} = ${lit(String(value))}`,
 }
 
 const col = (key: string, alias: SafeLogSqlFragment): SafeLogSqlFragment =>
@@ -210,7 +209,7 @@ const OTEL_SOURCES: Record<LogsTableName, OtelSourceDescriptor> = {
     filterTemplates: { ...COMMON_FILTERS, database: databaseFilter },
   },
   [LogsTableName.SUPAVISOR]: { source: 'supavisor_logs', filterTemplates: SUPAVISOR_FILTERS },
-  [LogsTableName.ETL]: { source: 'etl_replication_logs', filterTemplates: ETL_FILTERS },
+  [LogsTableName.PIPELINES]: { source: 'etl_replication_logs', filterTemplates: PIPELINES_FILTERS },
   [LogsTableName.AUTH_AUDIT]: { source: 'auth_audit_logs' },
   [LogsTableName.REALTIME]: { source: 'realtime_logs' },
   [LogsTableName.STORAGE]: { source: 'storage_logs' },

@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { CreditCardIcon, MoreHorizontalIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -18,6 +18,22 @@ import type { OrganizationPaymentMethod } from '@/data/organizations/organizatio
 import type { PlanId } from '@/data/subscriptions/types'
 import { BASE_PATH } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+
+const BRANDS_WITH_ICON = new Set(['amex', 'discover', 'jcb', 'mastercard', 'visa'])
+
+export const CardBrandIcon = ({ brand }: { brand: string | null | undefined }) => {
+  if (!brand || !BRANDS_WITH_ICON.has(brand)) {
+    return (
+      <CreditCardIcon
+        aria-label="Credit card"
+        strokeWidth={1.5}
+        className="h-6 w-8 text-foreground-lighter"
+      />
+    )
+  }
+
+  return <img alt={brand} src={`${BASE_PATH}/img/payment-methods/${brand}.png`} width="32" />
+}
 
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod
@@ -95,13 +111,7 @@ const CreditCard = ({
       <div className="flex items-center justify-between gap-8">
         <div className="flex items-center gap-8">
           <div className="relative shrink-0">
-            <img
-              alt="Credit card brand"
-              src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                .replace(' ', '-')
-                .toLowerCase()}.png`}
-              width="32"
-            />
+            <CardBrandIcon brand={paymentMethod.card.brand} />
             {isSpt && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -127,8 +137,7 @@ const CreditCard = ({
             {isSpt && spt && (
               <div className="mt-2.5 flex items-center gap-2 border-t pt-2.5 text-xs text-foreground-light">
                 <p className="m-0">
-                  Managed via Stripe Projects · Token ending in{' '}
-                  <code className="text-code-inline">{spt.last4}</code>
+                  Managed via Stripe Projects · Token ending in <code>{spt.last4}</code>
                   {tokenExpiry && <span> · Expires {tokenExpiry}</span>}
                 </p>
               </div>
@@ -157,7 +166,7 @@ const CreditCard = ({
                 <Button
                   variant="outline"
                   className="hover:border-muted px-1"
-                  icon={<MoreHorizontal />}
+                  icon={<MoreHorizontalIcon />}
                   aria-label="More options"
                 />
               </DropdownMenuTrigger>

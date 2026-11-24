@@ -6,9 +6,10 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
+import { describeSearchQuery } from 'common/search-query-telemetry'
+import { Book, ChevronRight, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup, CommandItem, CommandList, StatusIcon } from 'ui'
+import { Button, cn, CommandGroup, CommandItem, CommandList, GithubIcon, StatusIcon } from 'ui'
 
 import {
   Breadcrumb,
@@ -88,7 +89,7 @@ const DocsSearchPage = () => {
         properties: {
           command_name: name,
           command_type: 'route',
-          search_query: query || undefined,
+          search_query: describeSearchQuery(query).query,
           result_path: path,
           app: telemetryContext.app,
         },
@@ -347,7 +348,7 @@ export function getPageIcon(page: Page) {
     case PageType.Troubleshooting:
       return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <GithubIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

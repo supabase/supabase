@@ -1,8 +1,6 @@
 {
   "$schema": "./enabled-features.schema.json",
 
-  "account:show_security_settings": true,
-
   "ai:opt_in_level_disabled": true,
   "ai:opt_in_level_schema": true,
   "ai:opt_in_level_schema_and_log": true,
@@ -103,7 +101,6 @@
 
   "project_creation:show_advanced_config": true,
   "project_creation:show_high_availability": true,
-  "project_creation:show_best_available_region": true,
 
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -25,7 +25,7 @@ export const ResizingState = () => {
         <div className="space-y-6 py-6">
           <div className="flex px-8 space-x-8">
             <div className="mt-1">
-              <Loader2 className="animate-spin text-foreground-light" size={18} />
+              <Loader2Icon className="animate-spin text-foreground-light" size={18} />
             </div>
             <div className="flex flex-col gap-1">
               <p>Resizing project</p>

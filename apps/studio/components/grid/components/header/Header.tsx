@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useBreakpoint, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Trash } from 'lucide-react'
+import { ChevronDownIcon, TrashIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -24,7 +24,11 @@ import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import type { SupaRow } from '@/components/grid/types'
 import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  formatTableRowsToJSON,
+  formatTableRowsToSQL,
+  wrapGridJsonText,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import {
   useExportAllRowsAsCsv,
   useExportAllRowsAsJson,
@@ -244,6 +248,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
         projectRef: project.ref,
         connectionString: project.connectionString ?? null,
         roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+        jsonAsText: type === 'sql',
       })
       if (hydrated.status !== 'ok') {
         throw new Error('Failed to fetch full values for truncated cells')
@@ -255,9 +260,10 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
           columns: snap.table!.columns.map((column) => column.name),
         })
       } else if (type === 'sql') {
-        return formatTableRowsToSQL(snap.table, rows)
+        // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
+        return formatTableRowsToSQL(snap.table, wrapGridJsonText(snap.table, rows))
       } else {
-        return JSON.stringify(rows)
+        return formatTableRowsToJSON(snap.table, rows)
       }
     })()
 
@@ -351,7 +357,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
           {!snap.allRowsSelected ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="tiny" iconRight={<ChevronDown />} loading={isCopying}>
+                <Button size="tiny" iconRight={<ChevronDownIcon />} loading={isCopying}>
                   Copy
                 </Button>
               </DropdownMenuTrigger>
@@ -378,7 +384,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="tiny" iconRight={<ChevronDown />} loading={isExporting}>
+              <Button size="tiny" iconRight={<ChevronDownIcon />} loading={isExporting}>
                 Export
               </Button>
             </DropdownMenuTrigger>
@@ -430,7 +436,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
             <ButtonTooltip
               variant="danger"
               size="tiny"
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={onRowsDelete}
               disabled={snap.allRowsSelected && isImpersonatingRole}
               tooltip={{

@@ -7,7 +7,7 @@ import {
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { BASE_PATH } from '~/lib/constants'
+import { PROD_URL } from '~/lib/constants'
 import { toHtml } from 'hast-util-to-html'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
@@ -33,10 +33,11 @@ export async function GET(request: Request) {
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
-      const url = new URL(request.url)
-      url.pathname = [BASE_PATH, 'reference', lib, isVersion ? version : null, section.slug]
-        .filter(Boolean)
-        .join('/')
+      const url = new URL(
+        [PROD_URL, 'reference', lib, isVersion ? version : null, section.slug]
+          .filter(Boolean)
+          .join('/')
+      )
 
       return {
         ...section,

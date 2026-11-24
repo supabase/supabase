@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Home, Plus } from 'lucide-react'
+import { CheckIcon, HomeIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Command,
@@ -8,7 +8,10 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  cn,
   DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -18,12 +21,12 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from './Reports.constants'
-import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -31,27 +34,29 @@ import type { Dashboards } from '@/types'
 
 interface MetricOptionsProps {
   config?: Dashboards.Content
-  handleChartSelection: ({
-    metric,
-    isAddingChart,
-  }: {
-    metric: Metric
-    isAddingChart: boolean
-  }) => void
+  onAddCharts: (metrics: Metric[]) => void
 }
 
-export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
+export const MetricOptions = ({ config, onAddCharts }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
+  const [selectedMetrics, setSelectedMetrics] = useState<Metric[]>([])
+
+  const toggleMetric = (metric: Metric) => {
+    setSelectedMetrics((current) =>
+      current.some((selected) => selected.key === metric.key)
+        ? current.filter((selected) => selected.key !== metric.key)
+        : [...current, metric]
+    )
+  }
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
   ])
 
-  const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
+  const { isBurstable: supportsBurstableIO } = useProjectDiskLimits()
 
   const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
     if (key === 'api_auth') return authEnabled
@@ -79,7 +84,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
         return (
           <DropdownMenuSub key={cat.key}>
             <DropdownMenuSubTrigger className="space-x-2">
-              {cat.icon ? cat.icon() : <Home size={14} />}
+              {cat.icon ? cat.icon() : <HomeIcon size={14} />}
               <p>{cat.label}</p>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -94,8 +99,13 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                     <DropdownMenuCheckboxItem
                       key={metric.key}
                       className="cursor-pointer"
-                      checked={config?.layout?.some((x: any) => x.attribute === metric.key)}
-                      onCheckedChange={(e) => handleChartSelection({ metric, isAddingChart: e })}
+                      checked={
+                        config?.layout?.some((chart) => chart.attribute === metric.key) ||
+                        selectedMetrics.some((selected) => selected.key === metric.key)
+                      }
+                      disabled={config?.layout?.some((chart) => chart.attribute === metric.key)}
+                      onSelect={(event) => event.preventDefault()}
+                      onCheckedChange={() => toggleMetric(metric)}
                     >
                       <div className="flex flex-col space-y-0">
                         <span>{metric.label}</span>
@@ -119,7 +129,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
             strokeWidth={1.5}
             className="fill-foreground-light w-5 h-4 shrink-0 grow-0 -ml-0.5"
           />
-          <p>SQL Snippets</p>
+          <p>SQL snippets</p>
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
           <DropdownMenuSubContent className="p-0">
@@ -129,6 +139,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                 placeholder="Search snippets..."
                 value={search}
                 onValueChange={setSearch}
+                onKeyDown={onSearchInputEscape(search, setSearch)}
               />
               <CommandList>
                 {isLoading ? (
@@ -147,21 +158,35 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                       key={snippet.id}
                       value={snippet.id}
                       className="cursor-pointer"
-                      onSelect={() => {
-                        if (!config?.layout.find((x) => x.id === snippet.id)) {
-                          handleChartSelection({
-                            metric: {
-                              id: snippet.id,
-                              key: `snippet_${snippet.id}`,
-                              label: snippet.name,
-                            },
-                            isAddingChart: true,
-                          })
-                          track('custom_report_add_sql_block_clicked')
-                        }
-                      }}
+                      disabled={config?.layout?.some(
+                        (chart) =>
+                          chart.id === snippet.id || chart.attribute === `snippet_${snippet.id}`
+                      )}
+                      onSelect={() =>
+                        toggleMetric({
+                          id: snippet.id,
+                          key: `snippet_${snippet.id}`,
+                          label: snippet.name,
+                        })
+                      }
                     >
-                      {snippet.name}
+                      <CheckIcon
+                        size={14}
+                        aria-hidden="true"
+                        className={cn(
+                          'mr-2 shrink-0',
+                          !config?.layout?.some(
+                            (chart) =>
+                              chart.id === snippet.id || chart.attribute === `snippet_${snippet.id}`
+                          ) &&
+                            !selectedMetrics.some((metric) => metric.id === snippet.id) &&
+                            'invisible'
+                        )}
+                      />
+                      <span className="truncate">{snippet.name}</span>
+                      {selectedMetrics.some((metric) => metric.id === snippet.id) && (
+                        <span className="sr-only">Selected</span>
+                      )}
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -178,7 +203,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                   }}
                 >
                   <div className="w-full flex items-center gap-2">
-                    <Plus size={14} strokeWidth={1.5} />
+                    <PlusIcon size={14} strokeWidth={1.5} />
                     <p>Create snippet</p>
                   </div>
                 </CommandItem>
@@ -187,6 +212,18 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
       </DropdownMenuSub>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        disabled={selectedMetrics.length === 0}
+        onSelect={() => {
+          onAddCharts(selectedMetrics)
+          selectedMetrics
+            .filter((metric) => metric.key.startsWith('snippet_'))
+            .forEach(() => track('custom_report_add_sql_block_clicked'))
+        }}
+      >
+        <span>{`Add ${selectedMetrics.length} ${selectedMetrics.length === 1 ? 'block' : 'blocks'}`}</span>
+      </DropdownMenuItem>
     </>
   )
 }

@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion'
 import { debounce } from 'lib/helpers'
 import { LayoutGrid, Search, Table2 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
 import Head from 'next/head'

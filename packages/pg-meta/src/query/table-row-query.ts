@@ -241,18 +241,18 @@ export const getTableRowsSql = ({
     const isJson = (JSON_SET as Set<string>).has(format)
     // format comes from pg_attribute (e.g. 'text', 'json') — ident() ensures safe quoting
     const arrayTypeCast = isJson ? safeSql`::${keyword(format)}[]` : safeSql`::text[]`
-    const lastElement: SafeSqlFragment = isJson
-      ? safeSql`array['{"truncated": true}'::json]`
-      : safeSql`array['...']`
+    const marker: SafeSqlFragment = isJson
+      ? safeSql`'{"truncated": true}'::json`
+      : safeSql`'...'::text`
+    const lastElement: SafeSqlFragment = safeSql`array[${marker}]`
     const col = ident(columnName)
     if (index >= 0) {
       // We cast to text[] but limit the array size if the total size of the array is too large (same logic than for text fields)
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
       // NOTE: this is not optimal, as the first element in the array could still be very large (more than 10Kb) and in such case
       // the trimming might fail.
-      // Also handle multi-dimentionals array truncation, but won't happen the extra `...` element to it as we can't determine what's
-      // the right number of items to generate within the array. Studio side, we'll consider any multi-dimentional array as possibly
-      // truncated.
+      // Multi-dimensional arrays are sliced the same way, but the marker has to be a whole extra entry of the first
+      // dimension (so that the array stays rectangular). It's filled with the marker, using the lengths of the other dimensions.
       selectExpressions[index] = safeSql`
         case 
           when octet_length(${col}::text) > ${literal(maxCharacters)} 
@@ -262,7 +262,13 @@ export const getTableRowsSql = ({
               then
                 (select array_cat(${col}[1:${literal(maxArraySize)}]${arrayTypeCast}, ${lastElement}${arrayTypeCast}))${arrayTypeCast}
               else
-                ${col}[1:${literal(maxArraySize)}]${arrayTypeCast}
+                array_cat(
+                  ${col}[1:${literal(maxArraySize)}]${arrayTypeCast},
+                  array_fill(
+                    ${marker},
+                    array(select array_length(${col}, d) from generate_series(2, array_ndims(${col})) as d order by d)
+                  )${arrayTypeCast}
+                )${arrayTypeCast}
             end
           else ${col}${arrayTypeCast}
         end

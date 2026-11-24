@@ -22,7 +22,7 @@ imgThumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpeg
 
 Today we’re open-sourcing [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) for self-hosting Deno Edge Functions.
 
-Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the Supabase CLI to serve functions then you’re already one of our Beta testers (thanks!).
+Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) to serve functions then you’re already one of our Beta testers (thanks!).
 
 <div className="video-container">
   <iframe
@@ -55,7 +55,7 @@ Self-hosting is not the only benefit of Edge Runtime. It will improve the local 
 
 ### Serve all functions
 
-Supabase CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
+[Supabase CLI](/docs/guides/local-development/cli/getting-started) can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
 
 When you run `supabase functions serve`, the CLI uses Edge Runtime to serve all functions. It supports JWT verification, import maps, and passing custom environment variables. It hot-reloads local changes, giving you a seamless development experience.
 
@@ -73,7 +73,7 @@ We have put together a demo on how to self-host edge functions on [Fly.io](http:
 
 To try it yourself:
 
-1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://fly.io/docs/hands-on/install-flyctl/)
+1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://docs.fly.io/flyctl/install)
 2. Clone the [demo repository](https://github.com/supabase/self-hosted-edge-functions-demo) to your machine
 3. Copy your Edge Function into the `./functions` directory in the demo repo.
 4. Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))
@@ -151,7 +151,7 @@ serve(async (req: Request) => {
 
 ## What’s Next?
 
-Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for Edge Functions. In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
+Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for [Edge Functions](/docs/guides/functions). In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
 
 ### API Gateway to other Supabase services
 
@@ -207,7 +207,7 @@ try {
 
 Another exciting thing about shipping a custom JavaScript runtime is that we can control the available global objects in the runtime. In previous examples, you may noticed we used `EdgeRuntime` without importing a specific module to our function, this was possible because we exposed it as a global object in the runtime.
 
-We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to Supabase Storage.
+We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to [Supabase Storage](/docs/guides/storage).
 
 ## We 💚 Contributions
 

@@ -1,7 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
+import {
+  CopyIcon,
+  Edit2Icon,
+  EditIcon,
+  FileTextIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -26,12 +33,12 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import {
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
   type SavedDatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -61,11 +68,24 @@ export const FunctionList = ({
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { data: functions = [] } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const { data: functions = [] } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema,
+      grant: readGrant.grant,
+    })
+  )
 
   const _functions = useMemo(
     () =>
@@ -73,10 +93,7 @@ export const FunctionList = ({
     [functions, filterString, returnTypeFilter, schema, securityFilter]
   )
 
-  const { can: canUpdateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
-  )
+  const canUpdateFunctions = writeGrant.status === 'granted'
 
   if (_functions.length === 0 && filterString.length === 0) {
     return (
@@ -161,7 +178,7 @@ export const FunctionList = ({
                             <Button
                               aria-label={`${x.name} actions`}
                               className="px-1"
-                              icon={<MoreVertical />}
+                              icon={<MoreVerticalIcon />}
                             />
                           </DropdownMenuTrigger>
                         </TooltipTrigger>
@@ -178,14 +195,14 @@ export const FunctionList = ({
                                 )
                               }
                             >
-                              <FileText size={14} />
+                              <FileTextIcon size={14} />
                               <p>Client API docs</p>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                           </>
                         )}
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
-                          <Edit2 size={14} />
+                          <Edit2Icon size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -218,19 +235,19 @@ export const FunctionList = ({
                             })
                           }}
                         >
-                          <Edit size={14} />
+                          <EditIcon size={14} />
                           <p>Edit function with Assistant</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => duplicateFunction(x)}
                         >
-                          <Copy size={14} />
+                          <CopyIcon size={14} />
                           <p>Duplicate function</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
-                          <Trash size={14} className="text-destructive" />
+                          <TrashIcon size={14} className="text-destructive" />
                           <p>Delete function</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -238,7 +255,7 @@ export const FunctionList = ({
                   ) : (
                     <ButtonTooltip
                       disabled
-                      icon={<MoreVertical />}
+                      icon={<MoreVerticalIcon />}
                       className="px-1"
                       tooltip={{
                         content: {

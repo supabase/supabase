@@ -97,7 +97,7 @@ As laid out in a [previous blog post](https://supabase.com/blog/postgres-languag
 
 This is why we decided not to create a custom parser. Instead, we leverage the existing [libpg_query](https://github.com/pganalyze/libpg_query) library to parse SQL code reliably. The pganalyze team has published a great blog post on [why this approach is preferred](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby).
 
-However, `libpg_query` is designed to parse *executable* SQL — not to provide language intelligence. This limitation posed several challenges, requiring us to find pragmatic solutions along the way. The biggest challenge of this project has been (and continues to be) resisting the urge to chase perfection, avoiding unnecessary complexity, and prioritizing practical solutions instead.
+However, `libpg_query` is designed to parse _executable_ SQL — not to provide language intelligence. This limitation posed several challenges, requiring us to find pragmatic solutions along the way. The biggest challenge of this project has been (and continues to be) resisting the urge to chase perfection, avoiding unnecessary complexity, and prioritizing practical solutions instead.
 
 Let’s explore some of these solutions by walking through the document lifecycle.
 
@@ -218,7 +218,7 @@ When the client asks for diagnostics, we load all statements alongside their ran
 
 Again, the type checker is very simple: Since we maintain a database connection, we can just ask Postgres to do the heavy lifting by `PREPARE`-ing the statement. If the statement contains a type issue, such as a missing column, the error is returned as diagnostics to the user.
 
-Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres_lsp/issues/131).
+Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres-language-server/issues/131).
 
 In the end, providing diagnostics happens without noticeable delay for the user (we promise the GIF was not edited 🤞):
 
@@ -327,7 +327,7 @@ However, our vision for this project is larger: We want to create a home for all
 - behind a HTTP API
 - (hopefully soon) from Wasm right in your browser.
 
-This approach is *heavily* inspired by (and borrows a lot from) [Biome](https://github.com/biomejs/biome). Without their sophisticated and well-structured codebase, we wouldn’t have been able to implement an entire toolchain infrastructure this quickly over the past months. Cheers to Open Source!
+This approach is _heavily_ inspired by (and borrows a lot from) [Biome](https://github.com/biomejs/biome). Without their sophisticated and well-structured codebase, we wouldn’t have been able to implement an entire toolchain infrastructure this quickly over the past months. Cheers to Open Source!
 
 ## What’s Next
 
@@ -343,6 +343,6 @@ Once we're happy with the results, we'll try to make the Postgres LSP accessible
 
 If you want, you can already help us by installing the Language Server and reporting any issues we might have overlooked, or you could suggest features that we should implement later on (we're currently planning PL/pgSQL support, a Wasm build for [pglite](https://github.com/electric-sql/pglite), and parsing SQL function bodies).
 
-We also added a few [issues](https://github.com/supabase-community/postgres_lsp/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen) to our [repository](https://github.com/supabase-community/postgres_lsp) for anybody who wants to contribute by writing code. Any kind of help is highly appreciated!
+We also added a few [issues](https://github.com/supabase-community/postgres_lsp/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen) to our [repository](https://github.com/supabase-community/postgres-language-server) for anybody who wants to contribute by writing code. Any kind of help is highly appreciated!
 
 Happy coding! 🧀

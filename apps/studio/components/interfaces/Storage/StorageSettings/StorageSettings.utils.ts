@@ -1,4 +1,7 @@
-import { StorageSizeUnits } from './StorageSettings.constants'
+import {
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
+  StorageSizeUnits,
+} from './StorageSettings.constants'
 
 const k = 1024
 
@@ -95,3 +98,20 @@ export const decodeBucketLimitErrorMessage = (message?: string): BucketLimitErro
     })
     .filter((entry) => entry !== undefined)
 }
+
+export const isFileSizeReducedBySpendCap = ({
+  planId,
+  isUsageBillingEnabled,
+  entitledMaxBytes,
+  isEntitlementUnlimited,
+}: {
+  planId?: string
+  isUsageBillingEnabled?: boolean
+  entitledMaxBytes?: number
+  isEntitlementUnlimited: boolean
+}) =>
+  planId === 'pro' &&
+  isUsageBillingEnabled === false &&
+  !isEntitlementUnlimited &&
+  entitledMaxBytes !== undefined &&
+  entitledMaxBytes < STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED

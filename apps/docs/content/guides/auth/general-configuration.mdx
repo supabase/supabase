@@ -1,7 +1,7 @@
 ---
 id: 'auth-general-configuration'
 title: 'General configuration'
-subtitle: 'General configuration options for Supabase Auth'
+description: 'General configuration options for Supabase Auth'
 ---
 
 This section covers the [general configuration options](/dashboard/project/_/auth) for Supabase Auth. If you are looking for another type of configuration, you may be interested in one of the following sections:
@@ -29,6 +29,6 @@ Supabase Auth provides these [general configuration options](/dashboard/project/
   - This option can be found in the email provider under the provider-specific configuration.
     {/* - If you previously relied on this config to autoconfirm a user's email address, you can switch to use **Allow unverified email sign in** instead. This new option allows the user to sign in with an unverified email which you can keep track of through the user object. It provides more versatility if you require your users to verify their email address in the future since you can structure your RLS policies to check the user's `email_verified` field. */}
 
-- **Allow anonymous sign-ins**: Allow anonymous users to be created.
+- **Allow [anonymous sign-ins](/docs/guides/auth/auth-anonymous)**: Allow anonymous users to be created.
 
 - **Allow manual linking**: Allow users to link their accounts manually.

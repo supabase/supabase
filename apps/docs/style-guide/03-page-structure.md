@@ -12,6 +12,8 @@ Apply this document when you add a page or move content around on an existing on
 | If you're deciding                                     | Read                                                          |
 | ------------------------------------------------------ | ------------------------------------------------------------- |
 | Which document type to write, and how big it should be | [Document types](#document-types)                             |
+| Which template a page follows                          | [Choose a template](#choose-a-template)                       |
+| What to put in a guide's frontmatter                   | [Write good frontmatter](#write-good-frontmatter)             |
 | Which reader question a chunk answers                  | [Information types](#information-types)                       |
 | How to order sections on the page                      | [Grouping sections](#grouping-sections)                       |
 | How many items belong in one group                     | [Chunking](#chunking)                                         |
@@ -21,22 +23,30 @@ Apply this document when you add a page or move content around on an existing on
 
 ## Document types
 
-Supabase docs contain five types of document. Decide which one you need before you start
+Supabase docs contain four types of document. Decide which one you need before you start
 writing.
 
-| Type            | Purpose                     | Contains                            | Doesn't contain                  | Example                                                                            |
-| --------------- | --------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
-| Explainer       | Learn a topic               | What it is, why, and when to use it | Instructions                     | [Auth architecture](/docs/guides/auth/architecture)                                |
-| Tutorial        | Finish a multi-feature goal | Procedures plus the reasoning       | —                                | [Build a Next.js app](/docs/guides/getting-started/tutorials/with-nextjs)          |
-| Guide           | Finish one task             | Procedures in sequence              | Background; link to an explainer | [Passwordless logins](/docs/guides/auth/auth-email-passwordless)                   |
-| Reference       | Look something up           | Parameters, return types, samples   | Context and use cases            | [JavaScript client](/docs/reference/javascript/introduction)                       |
-| Troubleshooting | Resolve one error           | The symptom, the cause, the fix     | Feature overviews                | [Too many channels](/docs/guides/troubleshooting/realtime-too-many-channels-error) |
+| Type      | Purpose                     | Contains                            | Doesn't contain                  | Example                                                                   |
+| --------- | --------------------------- | ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------- |
+| Explainer | Learn a topic               | What it is, why, and when to use it | Procedures past two steps        | [Auth architecture](/docs/guides/auth/architecture)                       |
+| Tutorial  | Finish a multi-feature goal | Procedures plus the reasoning       | —                                | [Build a Next.js app](/docs/guides/getting-started/tutorials/with-nextjs) |
+| Guide     | Finish one task             | Procedures in sequence              | Background; link to an explainer | [Passwordless logins](/docs/guides/auth/auth-email-passwordless)          |
+| Reference | Look something up           | Parameters, return types, samples   | Context and use cases            | [JavaScript client](/docs/reference/javascript/introduction)              |
 
 Reference content is generated from spec files rather than hand-authored. See
 [CONTRIBUTING.md](../CONTRIBUTING.md) for the reference pipeline.
 
-Troubleshooting entries live in `content/troubleshooting/` and use TOML frontmatter.
-Some sync from GitHub discussions, so check whether an entry exists before writing one.
+### Choose a template
+
+Pick the one template that matches the page, and follow only that one. Each template
+answers a reader question and names its Information Type.
+
+| Page purpose              | Reader question                   | Information type | Template                                         |
+| ------------------------- | --------------------------------- | ---------------- | ------------------------------------------------ |
+| Learn a topic (explainer) | What is it, and when do I use it? | Concept          | [`explainer.md`](./templates/explainer.md)       |
+| Finish one task (guide)   | How do I do one task?             | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
+
+If no row fits the page, say so and ask the requester. Don't invent a structure.
 
 ### Open a guide with a value statement
 
@@ -79,6 +89,47 @@ those items are about. A procedure can have six steps and still cover two tasks.
 
 - **Recommended**: A passwordless email login guide with `Send a one-time password` and `Verify the code`.
 - **Not recommended**: An `Authentication` page that also covers passwords, OAuth, and session storage.
+
+## Write good frontmatter
+
+Every guide sets `title` and `description` in its frontmatter.
+
+### Title
+
+Keep the title to 35 characters or fewer, in sentence case.
+
+- **Task pages:** start with an imperative, such as `Create a table`.
+- **Explainers:** use a noun phrase, such as `Auth architecture`.
+
+Name the product when the noun alone could belong to several products, such as `Storage
+schema` or `Auth identities`. Search results, browser tabs, and AI answers show the title
+without the navigation around it. Leave the product out when the noun is already
+specific, such as `Keyword search`.
+
+Name the concept, not the page's place in the docs.
+
+**Not recommended:** Avoid gerunds, such as `Creating a table`, and questions, such as
+`What is a bucket?`. Avoid placeholder words such as `Fundamentals`, `Introduction`,
+`Overview`, and `Basics`. A URL that already uses one of these words keeps it, because
+renaming a URL breaks links.
+
+### (Optional) Sidebar label
+
+`sidebar_label` sets a shorter name for the page in the sidebar. The navigation section
+already names the product, so the label can drop it, such as `CDN` for `Storage CDN`. The
+label still names the same concept as the title.
+
+### (Optional) Subtitle
+
+Subtitles are decorative to add more depth to a title. If it matches the first sentence of the page,
+leave it out.
+
+- **Recommended**: A page called `Vault` has the subtitle `Manage secrets in Postgres`.
+
+### Description
+
+The description is the page's 150–160 character meta description. Say what the page helps
+the reader do with relevant keywords.
 
 ## Information types
 

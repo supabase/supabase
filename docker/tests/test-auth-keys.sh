@@ -10,7 +10,13 @@
 #   - Running self-hosted Supabase instance
 #   - .env file with all keys configured
 #   - jq (for JSON parsing)
-#   - node >= 16 (for HS256 token minting test only)
+#   - openssl (for minting the HS256 test token)
+#   - docker access to supabase-db (for the effective role checks, skipped without it)
+#
+# The legacy HS256 groups are kept on purpose: they cover Auth's and PostgREST's
+# backward-compatible path. The sb_ key groups cover a different path: the
+# gateway translates the key into a pre-signed ES256 JWT, which each service
+# verifies against JWKS by its kid.
 #
 
 set -e
@@ -22,7 +28,7 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-for cmd in jq node; do
+for cmd in jq openssl; do
     if ! command -v $cmd >/dev/null 2>&1; then
         echo "Error: $cmd not found."
         exit 1
@@ -35,6 +41,11 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
+
+# Prefer the running container's value: .env can be quoted or edited without
+# recreating the functions service. Fall back to .env without Docker access.
+FUNCTIONS_VERIFY_JWT=$(docker exec supabase-edge-functions printenv VERIFY_JWT 2>/dev/null \
+    || grep '^FUNCTIONS_VERIFY_JWT=' .env | cut -d= -f2-)
 
 pass=0
 fail=0
@@ -59,15 +70,16 @@ http_status() {
     curl -s -o /dev/null -w "%{http_code}" "$@" "$url"
 }
 
-# Like http_status, but appends " sdk" when the response carries the
-# @supabase/server error header, i.e. the gateway passed the request through
-# and the function itself rejected it.
+# Like http_status, but identifies whether a 401 came from the main service
+# (sb-error-code) or the function SDK (x-supabase-server-error).
 fn_status() {
     url="$1"
     shift
     out=$(curl -s -o /dev/null -D - -w '\n%{http_code}' "$@" "$url")
     code=$(printf '%s\n' "$out" | tail -n 1)
-    if printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
+    if printf '%s\n' "$out" | grep -qi '^sb-error-code: UNAUTHORIZED_'; then
+        echo "$code runtime"
+    elif printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
         echo "$code sdk"
     else
         echo "$code"
@@ -196,14 +208,20 @@ echo "--- Edge Functions (/functions/v1/) ---"
 
 # hello uses withSupabase({ auth: ["publishable", "secret"] }), which requires
 # an sb_ key in the apikey header. "401 sdk" means the gateway passed the
-# request through and the function rejected it; a bare "401" is the gateway.
-check "No auth -> passed to function, rejected by SDK" "401 sdk" \
+# request through and the function rejected it. With JWT verification enabled,
+# the main service rejects requests without a bearer JWT before calling hello.
+if [ "$FUNCTIONS_VERIFY_JWT" = "true" ]; then
+    unauthenticated_fn_status="401 runtime"
+else
+    unauthenticated_fn_status="401 sdk"
+fi
+check "No auth -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
 
 # Non-sb_ values (legacy JWT, typo, third-party JWT) are not validated at the gateway.
-check "Legacy ANON_KEY -> passed to function, rejected by SDK" "401 sdk" \
+check "Legacy ANON_KEY as apikey -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
-check "Non-sb_ invalid apikey -> passed to function, rejected by SDK" "401 sdk" \
+check "Non-sb_ invalid apikey -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
@@ -224,7 +242,7 @@ if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         check "Conflicting sb_ keys -> 401 at gateway (Envoy)" "401" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
     else
-        check "Invalid sb_ apikey -> passed to function, rejected by SDK (Kong)" "401 sdk" \
+        check "Invalid sb_ apikey -> rejected by Functions (Kong)" "$unauthenticated_fn_status" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
     fi
 fi
@@ -275,10 +293,99 @@ jwks_has_oct=$(echo "$jwks_content" | jq -r '[.keys[] | .kty] | if any(. == "oct
 check "JWKS contains EC public key" "true" "$jwks_has_ec"
 check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 
-#echo ""
-#echo "--- OAuth metadata endpoint ---"
-#check "well-known oauth (no auth)" "200" \
-#    "$(http_status "$BASE_URL/.well-known/oauth-authorization-server")"
+echo ""
+echo "--- Opaque keys -> Auth admin API ---"
+# The path most server-side code takes: only the apikey header, no
+# Authorization. The gateway must send a service_role JWT that Auth verifies.
+if [ -n "$SUPABASE_SECRET_KEY" ]; then
+    admin_email="test-keys-admin-$$@example.com"
+    admin_create=$(curl -s -w '\n%{http_code}' "$BASE_URL/auth/v1/admin/users" \
+        -X POST \
+        -H "apikey: $SUPABASE_SECRET_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"$admin_email\",\"password\":\"test-password-123456\",\"email_confirm\":true}")
+    check "SECRET_KEY, no Authorization -> create user" "200" \
+        "$(printf '%s\n' "$admin_create" | tail -n 1)"
+    admin_user_id=$(printf '%s\n' "$admin_create" | sed '$d' | jq -r '.id // empty' 2>/dev/null)
+
+    check "SECRET_KEY, no Authorization -> list users" "200" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_SECRET_KEY")"
+    check "SECRET_KEY + Authorization: Bearer SECRET_KEY -> list users" "200" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_SECRET_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SECRET_KEY")"
+    # The publishable key maps to anon, which has no admin access.
+    check "PUBLISHABLE_KEY -> admin API rejected" "403" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
+
+    if [ -n "$admin_user_id" ]; then
+        check "SECRET_KEY, no Authorization -> delete user" "200" \
+            "$(http_status "$BASE_URL/auth/v1/admin/users/$admin_user_id" \
+                -X DELETE \
+                -H "apikey: $SUPABASE_SECRET_KEY")"
+    fi
+else
+    echo "  SKIP: Opaque keys not configured"
+fi
+
+echo ""
+echo "--- OAuth and OIDC discovery ---"
+check "OIDC discovery (no auth)" "200" \
+    "$(http_status "$BASE_URL/auth/v1/.well-known/openid-configuration")"
+
+# Auth returns 404 feature_disabled while its OAuth server is off (the default),
+# so either the metadata or that error shows the request reached Auth.
+oauth_metadata_reached() {
+    if curl -s "$BASE_URL$1" | grep -qE '"issuer"|"feature_disabled"'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+check "OAuth metadata at RFC 8414 path (no auth)" "true" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server/auth/v1)"
+check "OAuth metadata under /auth/v1 (no auth)" "true" \
+    "$(oauth_metadata_reached /auth/v1/.well-known/oauth-authorization-server)"
+check "OAuth metadata at bare root path not routed to Auth" "false" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server)"
+
+echo ""
+echo "--- OAuth server endpoints ---"
+# Third-party OAuth clients never have the project's API key, so these must
+# reach Auth without one. Auth answers with its own JSON error (error_code;
+# feature_disabled while the OAuth server is off, the default), while a
+# gateway 401 has no error_code.
+auth_reached() {
+    if curl -s -X "$1" "$BASE_URL$2" | grep -q '"error_code"'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+check "OAuth authorize (no auth)" "true" "$(auth_reached GET /auth/v1/oauth/authorize)"
+check "OAuth token (no auth)" "true" "$(auth_reached POST /auth/v1/oauth/token)"
+check "OAuth userinfo (no auth)" "true" "$(auth_reached GET /auth/v1/oauth/userinfo)"
+check "OAuth client registration (no auth)" "true" \
+    "$(auth_reached POST /auth/v1/oauth/clients/register)"
+# The consent endpoints are called by the project's own app, with its API key.
+# Require the gateway's own 401 (no error_code), so a failed request or an
+# unrelated error can't pass this check.
+gateway_rejected() {
+    response=$(curl -s -w '\n%{http_code}' -X "$1" "$BASE_URL$2") || {
+        echo "request failed"
+        return
+    }
+    status=$(printf '%s\n' "$response" | tail -n 1)
+    if [ "$status" = "401" ] && ! printf '%s\n' "$response" | grep -q '"error_code"'; then
+        echo "true"
+    else
+        echo "false (HTTP $status)"
+    fi
+}
+check "OAuth consent endpoints still need an API key" "true" \
+    "$(gateway_rejected GET /auth/v1/oauth/authorizations/test)"
 
 echo ""
 echo "--- Realtime WebSocket upgrade ---"
@@ -398,6 +505,61 @@ else
     check "Sign in test user" "true" "false"
 fi
 
+# ---------------------------------------------
+# Effective role in PostgREST
+# ---------------------------------------------
+
+echo ""
+echo "--- Effective role in PostgREST ---"
+# Status codes don't show which role a request ran as. A temporary function
+# returns current_user, the role PostgREST switched to for the request.
+role_fn="test_keys_role_$$"
+if docker exec supabase-db psql -U postgres -v ON_ERROR_STOP=1 -q -c \
+    "create function public.$role_fn() returns text language sql as 'select current_user::text';
+     notify pgrst, 'reload schema';" >/dev/null 2>&1; then
+    # role_via [curl args]: the role the function reports, or the HTTP status
+    role_via() {
+        out=$(curl -s -w '\n%{http_code}' -X POST "$BASE_URL/rest/v1/rpc/$role_fn" \
+            -H "Content-Type: application/json" -H "Content-Profile: public" -d '{}' "$@")
+        code=$(printf '%s\n' "$out" | tail -n 1)
+        if [ "$code" = "200" ]; then
+            printf '%s\n' "$out" | sed '$d' | jq -r '.'
+        else
+            echo "HTTP $code"
+        fi
+    }
+    # Wait for PostgREST to load the new function
+    i=0
+    while [ "$(role_via -H "apikey: $ANON_KEY")" != "anon" ] && [ "$i" -lt 20 ]; do
+        sleep 0.5
+        i=$((i + 1))
+    done
+
+    # Legacy keys are JWTs that clients send in both headers, as supabase-js
+    # does. With apikey alone, the role depends on the gateway: Envoy turns
+    # the apikey into a Bearer token, Kong doesn't, so PostgREST sees anon.
+    check "Legacy ANON_KEY (apikey + Bearer) runs as anon" "anon" \
+        "$(role_via -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")"
+    check "Legacy SERVICE_ROLE_KEY (apikey + Bearer) runs as service_role" "service_role" \
+        "$(role_via -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")"
+    # sb_ keys aren't JWTs: the gateway translates them, with no Authorization needed.
+    if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+        check "PUBLISHABLE_KEY runs as anon" "anon" \
+            "$(role_via -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
+        check "SECRET_KEY runs as service_role" "service_role" \
+            "$(role_via -H "apikey: $SUPABASE_SECRET_KEY")"
+        if [ -n "$access_token" ]; then
+            check "PUBLISHABLE_KEY + user JWT runs as authenticated" "authenticated" \
+                "$(role_via -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Authorization: Bearer $access_token")"
+        fi
+    fi
+
+    docker exec supabase-db psql -U postgres -q -c \
+        "drop function if exists public.$role_fn(); notify pgrst, 'reload schema';" >/dev/null 2>&1 || true
+else
+    echo "  SKIP: Effective role checks (no docker access to supabase-db)"
+fi
+
 # Clean up test user
 if [ -n "$test_user_id" ]; then
     curl -s -o /dev/null "$BASE_URL/auth/v1/admin/users/$test_user_id" \
@@ -413,32 +575,27 @@ fi
 echo ""
 echo "--- HS256 backward compatibility ---"
 
-# Mint a legacy HS256 JWT with role=anon (simulating a pre-migration token)
-hs256_token=$(JWT_SECRET="$JWT_SECRET" node -e "
-const crypto = require('crypto');
-const header = Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url');
-const payload = Buffer.from(JSON.stringify({
-    role:'anon',iss:'supabase',
-    iat:Math.floor(Date.now()/1000),
-    exp:Math.floor(Date.now()/1000)+3600
-})).toString('base64url');
-const sig = crypto.createHmac('sha256',process.env.JWT_SECRET)
-    .update(header+'.'+payload).digest('base64url');
-console.log(header+'.'+payload+'.'+sig);
-" 2>/dev/null)
+# Mint a legacy HS256 JWT with role=anon (simulating a pre-migration token),
+# signed the same way as in utils/generate-keys.sh
+base64_url_encode() {
+    openssl enc -base64 -A | tr '+/' '-_' | tr -d '='
+}
+hs256_iat=$(date +%s)
+hs256_header=$(printf %s '{"alg":"HS256","typ":"JWT"}' | base64_url_encode)
+hs256_payload=$(printf '{"role":"anon","iss":"supabase","iat":%s,"exp":%s}' \
+    "$hs256_iat" "$((hs256_iat + 3600))" | base64_url_encode)
+hs256_signature=$(printf %s "$hs256_header.$hs256_payload" \
+    | openssl dgst -binary -sha256 -hmac "$JWT_SECRET" | base64_url_encode)
+hs256_token="$hs256_header.$hs256_payload.$hs256_signature"
 
-if [ -n "$hs256_token" ]; then
-    check "HS256 token with PostgREST (backward compat)" "403" \
-        "$(http_status "$BASE_URL/rest/v1/" \
-            -H "apikey: $ANON_KEY" \
-            -H "Authorization: Bearer $hs256_token")"
-    check "HS256 token with PostgREST + service role key" "200" \
-        "$(http_status "$BASE_URL/rest/v1/" \
-            -H "apikey: $SERVICE_ROLE_KEY" \
-            -H "Authorization: Bearer $hs256_token")"
-else
-    echo "  SKIP: Could not mint HS256 token (node required)"
-fi
+check "HS256 token with PostgREST (backward compat)" "403" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $ANON_KEY" \
+        -H "Authorization: Bearer $hs256_token")"
+check "HS256 token with PostgREST + service role key" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $hs256_token")"
 
 # ---------------------------------------------
 # 4. JWT_KEYS format validation

@@ -448,7 +448,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
 
     #### Renaming is and in filter
 
-    Because `is` and `in` are [reserved keywords](https://dart.dev/languages/keywords) in Dart, v1 used `is_` and `in_` as query filter names.
+    Because `is` and `in` are [reserved keywords](https://dart.dev/language/keywords) in Dart, v1 used `is_` and `in_` as query filter names.
     Users found the underscore confusing, so the query filters are now renamed to `isFilter` and `inFilter`.
 
   </RefSubLayout.Details>
@@ -571,7 +571,7 @@ We have brought numerous updates behind the scenes to make the SDK work more int
 
     The `PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code.
 
-    In v2, the `code` property contains the [PostgREST error code](https://postgrest.org/en/stable/references/errors.html), which is more useful for debugging.
+    In v2, the `code` property contains the [PostgREST error code](https://docs.postgrest.org/en/stable/references/errors.html), which is more useful for debugging.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>

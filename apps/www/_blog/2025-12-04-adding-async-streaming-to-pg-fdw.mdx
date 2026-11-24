@@ -15,7 +15,7 @@ date: '2025-12-04'
 toc_depth: 2
 ---
 
-Postgres can query external databases through Foreign Data Wrappers (FDWs). But FDWs have long shared one limitation: they tend to fetch all results, or fixed-size batches, using a **synchronous** approach.
+Postgres can query external databases through [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) (FDWs). But FDWs have long shared one limitation: they tend to fetch all results, or fixed-size batches, using a **synchronous** approach.
 
 With [Supabase Wrappers](https://github.com/supabase/wrappers), we’ve been exploring how to bring Postgres FDWs into the modern era with Rust. The latest release introduces something new to the Postgres world: **asynchronous streaming between databases**.
 

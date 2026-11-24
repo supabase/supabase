@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
@@ -149,7 +149,7 @@ export const QueryInsightsChart = ({
             <div className="w-full h-[180px] px-0">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">
-                  <Loader2 size={20} className="animate-spin text-foreground-lighter" />
+                  <Loader2Icon size={20} className="animate-spin text-foreground-lighter" />
                 </div>
               ) : data.length === 0 ? (
                 <div className="flex items-center justify-center h-full">

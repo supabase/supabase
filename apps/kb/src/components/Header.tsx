@@ -1,20 +1,149 @@
-import { Logo } from './Logo'
-import { Nav } from './Nav'
-import { ThemeToggle } from './ThemeToggle'
+import { AuthProvider } from 'common/auth'
+import { DASHBOARD_PROJECTS_URL, DASHBOARD_SIGN_UP_URL } from 'common/constants/dashboard-urls'
+import { SearchTrigger } from 'docs-search/components'
+import { useCallback, useRef, useState } from 'react'
+import { buttonVariants, cn } from 'ui'
+import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
+import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
+import {
+  TopNavMenu,
+  TopNavMenuGroup,
+  TopNavMenuGroupLink,
+  TopNavMenuItem,
+  TopNavMenuPanel,
+} from 'ui-patterns/TopNav/TopNavMenu'
+import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
-// Bare-bones port of apps/docs' TopNavBar — logo, nav, and theme toggle, each
-// split into their own component (Logo.tsx, Nav.tsx, ThemeToggle.tsx). No
-// search, no user menu, no dashboard link — kb doesn't have any of that yet.
-function Header() {
+import { getNavMenus } from '../lib/nav'
+import type { Topic } from '../lib/topics'
+import { HeaderMenu, useThemeChoice } from './HeaderMenu'
+import { openKbSearch } from './KbSearch'
+import { Logo } from './Logo'
+import { MobileMenu } from './MobileMenu'
+
+const MOBILE_MENU_ID = 'mobile-menu'
+
+export interface HeaderProps {
+  topics: Topic[]
+  currentPath: string
+}
+
+interface AccountLinkProps {
+  className?: string
+}
+
+export const Header = ({ topics, currentPath }: HeaderProps) => {
+  const menus = getNavMenus(topics)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { choice, onChoiceChange } = useThemeChoice()
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
+  const shownTitle = isMenuOpen ? null : scrolledTitle
+
+  const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen)
+
+  // the article title is static html, so the island finds it once the header mounts
+  const observePageTitle = useCallback((nav: HTMLElement | null) => {
+    const title = document.querySelector<HTMLElement>('[data-page-title]')
+    if (!nav || !title) return
+    // the title counts as hidden once it is under the header and the toc bar
+    const coveredHeight = Math.max(
+      nav.getBoundingClientRect().bottom,
+      document.querySelector('[data-toc-menu]')?.getBoundingClientRect().bottom ?? 0
+    )
+    const observer = new IntersectionObserver(
+      ([entry]) =>
+        setScrolledTitle(entry.isIntersecting ? null : (title.dataset.pageTitle ?? null)),
+      { rootMargin: `-${coveredHeight}px 0px 0px 0px` }
+    )
+    observer.observe(title)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <header className="relative z-50 backdrop-blur-sm backdrop-filter bg-default/75 border-b border-default w-full px-5 lg:pl-10 items-center flex h-(--header-height) gap-3">
-      <div className="flex basis-full h-full items-center justify-center gap-2">
-        <Logo />
-        <Nav />
-      </div>
-      <ThemeToggle />
-    </header>
+    <AuthProvider>
+      <nav
+        ref={observePageTitle}
+        className="relative h-(--header-height) border-default max-lg:border-b bg-background/90 backdrop-blur-xs dark:bg-background/95"
+      >
+        <div className="section-container flex h-full items-center justify-between gap-3">
+          <div className="flex h-full min-w-0 items-center">
+            <div className="min-w-0 lg:w-[calc(var(--nav-inset)-0.625rem-1px)]">
+              <Logo className="max-lg:hidden" />
+              <div className="flex h-11 min-w-0 items-center text-sm font-medium text-foreground lg:hidden">
+                <HeadingReel id={shownTitle ?? 'logo'} index={shownTitle ? 1 : 0}>
+                  {shownTitle ? <a href={import.meta.env.BASE_URL}>{shownTitle}</a> : <Logo />}
+                </HeadingReel>
+              </div>
+            </div>
+            <TopNavMenu className="hidden lg:flex">
+              {menus.map((menu) => (
+                <TopNavMenuItem key={menu.label} label={menu.label}>
+                  <TopNavMenuPanel>
+                    {menu.groups.map((group) => (
+                      <TopNavMenuGroup key={group.label} label={group.label}>
+                        {group.links.map((link) => (
+                          <TopNavMenuGroupLink key={link.href} href={link.href}>
+                            {link.label}
+                          </TopNavMenuGroupLink>
+                        ))}
+                      </TopNavMenuGroup>
+                    ))}
+                  </TopNavMenuPanel>
+                </TopNavMenuItem>
+              ))}
+            </TopNavMenu>
+          </div>
+          <div className="flex items-center gap-2">
+            {isMenuOpen ? (
+              <MobileNavThemeButton
+                value={choice}
+                onValueChange={onChoiceChange}
+                className="lg:hidden"
+              />
+            ) : (
+              <SearchTrigger onClick={openKbSearch} placeholder="Search" />
+            )}
+            <AccountLink className="hidden lg:inline-flex" />
+            <HeaderMenu className="hidden lg:inline-flex" />
+            <TopNavMenuToggle
+              ref={menuButtonRef}
+              isOpen={isMenuOpen}
+              aria-controls={MOBILE_MENU_ID}
+              onClick={handleMenuToggle}
+              className="lg:hidden"
+            />
+          </div>
+        </div>
+      </nav>
+      <MobileMenu
+        id={MOBILE_MENU_ID}
+        open={isMenuOpen}
+        menus={menus}
+        currentPath={currentPath}
+        toggleRef={menuButtonRef}
+        className="lg:hidden"
+      />
+    </AuthProvider>
   )
 }
 
-export { Header }
+const AccountLink = ({ className }: AccountLinkProps) => {
+  const linkClassName = cn(buttonVariants({ variant: 'primary' }), 'h-7.5', className)
+
+  return (
+    <SignedInSwitch
+      signedIn={
+        <a href={DASHBOARD_PROJECTS_URL} className={linkClassName}>
+          Dashboard
+        </a>
+      }
+      signedOut={
+        <a href={DASHBOARD_SIGN_UP_URL} className={linkClassName}>
+          Sign up
+        </a>
+      }
+    />
+  )
+}

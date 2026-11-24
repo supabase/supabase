@@ -467,7 +467,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Rivet',
-      url: 'https://rivet.gg/',
+      url: 'https://rivet.dev/',
     },
     {
       company: 'Trieve',
@@ -479,7 +479,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Gauge',
-      url: 'https://withgauge.com/',
+      url: 'https://www.withgauge.com/',
     },
     {
       company: 'Stardex',
@@ -495,7 +495,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Vespper',
-      url: 'https://vespper.com/',
+      url: 'https://www.vespper.com/',
     },
     {
       company: 'Curo',
@@ -503,7 +503,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Kombo',
-      url: 'https://kombo.dev/',
+      url: 'https://www.kombo.dev/',
     },
     {
       company: 'Candle',
@@ -511,7 +511,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Trainloop',
-      url: 'http://trainloop.ai/',
+      url: 'https://www.trainloop.ai/',
     },
     {
       company: 'Replit',
@@ -531,7 +531,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Arva AI',
-      url: 'https://www.arva.ai/',
+      url: 'https://arva.ai/',
     },
     {
       company: 'Posthog',
@@ -551,7 +551,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Leaping AI',
-      url: 'https://www.leapingai.com/',
+      url: 'https://leapingai.com/',
     },
     {
       company: 'WarpBuild',
@@ -559,7 +559,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Domu',
-      url: 'https://www.domu.ai/',
+      url: 'https://domu.ai/',
     },
     {
       company: 'Bilanc',
@@ -575,7 +575,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Cubic',
-      url: 'https://cubic.dev/',
+      url: 'https://www.cubic.dev/',
     },
     {
       company: 'CTGT',
@@ -595,7 +595,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Weave',
-      url: 'http://getweave.com/',
+      url: 'https://www.getweave.com/',
     },
     {
       company: 'Palmier',
@@ -603,7 +603,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Rainmaker',
-      url: 'http://www.rainmaker.nyc/',
+      url: 'https://www.rainmaker.nyc/',
     },
     {
       company: 'Wasmer',
@@ -619,7 +619,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Hitpay',
-      url: 'https://www.hitpayapp.com/',
+      url: 'https://hitpayapp.com/',
     },
     {
       company: 'Tempo',
@@ -627,7 +627,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'SalesPatriot',
-      url: 'https://www.salespatriot.com/',
+      url: 'https://salespatriot.com/',
     },
     {
       company: 'Surge',
@@ -655,7 +655,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'OpenNote',
-      url: 'https://opennote.com/',
+      url: 'https://www.opennote.com/',
     },
     {
       company: 'Coverage Cat',
@@ -663,7 +663,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Flair Labs',
-      url: 'https://www.flairlabs.ai/',
+      url: 'https://flairlabs.ai/',
     },
     {
       company: 'Percival',
@@ -679,7 +679,7 @@ const stateOfStartupsData = {
     },
     {
       company: 'Nautilus',
-      url: 'https://nautilus.co/',
+      url: 'https://www.nautilus.co/',
     },
   ],
 }

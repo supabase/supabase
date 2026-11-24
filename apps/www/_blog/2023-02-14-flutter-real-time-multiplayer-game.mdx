@@ -385,7 +385,9 @@ There is a lot going here, so let’s break it down. Within the `onLoad` method,
 
 Within `onPanUpdate`, we handle the user dragging on the screen. Note that we are calling the `onGameStateUpdate` callback to pass the player’s position so that we can share it to the opponent’s client later when we handle network connections. On the other hand, we have the `updateOpponent` method, which is used to update the opponent’s state with the information coming in from the network. We will also add logic to call it from the Flutter widgets later.
 
-Upon starting the game, `_shootBullets()` is called, which shoots out bullets both from the player and the opponent. `_shootBullets()` is a recursive function that calls itself every 500 milliseconds. If the bullet hits the player, it is caught inside the `udpate()` method, which is called on every frame. There we calculate the new player’s health points.
+Upon starting the game, `_shootBullets()` is called, which shoots out bullets both from the player
+and the opponent. `_shootBullets()` is a recursive function that calls itself every 500
+milliseconds. If the bullet hits the player, it is caught inside the `update()` method, which is called on every frame. There we calculate the new player’s health points.
 
 ### Creating the Player Component
 
@@ -840,6 +842,6 @@ We learned how to create an interactive shooting game. We took advantage of Flut
 
 - [Complete code of this article](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-multiplayer-shooting-game)
 - [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [Generate Flame template using Very Good CLI](https://verygood.ventures/blog/generate-a-game-with-our-new-template)
+- [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authorization-with-rls)
+- [Generate Flame template using Very Good CLI](https://verygood.ventures/blog/generate-a-game-with-our-new-template/)
 - [Supabase Flutter SDK docs](https://supabase.com/docs/reference/dart/introduction)

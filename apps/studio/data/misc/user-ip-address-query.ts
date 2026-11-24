@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { miscKeys } from './keys'
 import { fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getUserIPAddress() {
   try {
@@ -15,7 +16,7 @@ export async function getUserIPAddress() {
 }
 
 export type UserIPAddressData = Awaited<ReturnType<typeof getUserIPAddress>>
-export type UserIPAddressError = ResponseError
+export type UserIPAddressError = StudioError
 
 export const useUserIPAddressQuery = <TData = UserIPAddressData>({
   enabled = true,

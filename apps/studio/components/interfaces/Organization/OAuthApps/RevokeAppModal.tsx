@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -59,7 +59,7 @@ export const RevokeAppModal = ({
               />
               <div className="space-y-5">
                 <div className="flex gap-2 text-sm">
-                  <Lock size={14} className="shrink-0" />
+                  <LockIcon size={14} className="shrink-0" />
                   <div>
                     <strong>Before you remove this app, consider:</strong>
                     <ul className="space-y-2 mt-2">

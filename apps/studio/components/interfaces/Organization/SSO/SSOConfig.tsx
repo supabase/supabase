@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
@@ -14,7 +16,6 @@ import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
 import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
@@ -174,7 +175,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
-        idjag_issuer_url: values.idjagIssuerUrl || undefined,
+        idjag_issuer_url: values.idjagIssuerUrl || null,
       },
     }
 
@@ -233,8 +234,8 @@ export const SSOConfig = () => {
   }, [enableSpInitiated])
 
   return (
-    <ScaffoldContainer size="small" className="px-6 xl:px-10">
-      <ScaffoldSection isFullWidth>
+    <PageContainer size="small">
+      <PageSection>
         {isLoadingEntitlement || (hasAccessToSso && isLoadingSSOConfig) ? (
           <Card>
             <CardContent>
@@ -371,7 +372,7 @@ export const SSOConfig = () => {
                       {!!ssoConfig && (
                         <Button
                           variant="danger"
-                          icon={<Trash />}
+                          icon={<TrashIcon />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
                         >
@@ -421,14 +422,15 @@ export const SSOConfig = () => {
                       <span className="text-foreground font-semibold">{ssoConfig.domains[0]}</span>
                     </>
                   )}
-                  .
+                  <span>.</span>
                 </p>
 
                 {ssoMemberCount > 0 && (
                   <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3">
                     <p className="text-sm text-foreground">
                       <span className="font-semibold">
-                        {ssoMemberCount} organization member{ssoMemberCount !== 1 ? 's' : ''}
+                        {ssoMemberCount} organization member
+                        {ssoMemberCount !== 1 ? <span>s</span> : ''}
                       </span>{' '}
                       who authenticate via SSO will be{' '}
                       <span className="font-semibold">permanently removed</span> from this
@@ -454,7 +456,7 @@ export const SSOConfig = () => {
             </TextConfirmModal>
           </>
         ) : null}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

@@ -443,6 +443,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-patch-postgres-config",
+        "title": "Patch postgres config",
+        "slug": "v1-patch-postgres-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-read-only-query",
         "title": "Read only query",
         "slug": "v1-read-only-query",
@@ -909,6 +915,12 @@
         "title": "List organization roles",
         "slug": "v2-list-organization-roles",
         "type": "operation"
+      },
+      {
+        "id": "v2-remove-organization-members",
+        "title": "Remove organization members",
+        "slug": "v2-remove-organization-members",
+        "type": "operation"
       }
     ]
   },
@@ -1067,6 +1079,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-download-project-backup",
+        "title": "Download project backup",
+        "slug": "v2-download-project-backup",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-all-projects-for-organization",
         "title": "Get all projects for organization",
         "slug": "v1-get-all-projects-for-organization",
@@ -1208,6 +1226,12 @@
         "id": "v1-restore-a-project",
         "title": "Restore a project",
         "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-review-network-restrictions",
+        "title": "Review network restrictions",
+        "slug": "v1-review-network-restrictions",
         "type": "operation"
       },
       {

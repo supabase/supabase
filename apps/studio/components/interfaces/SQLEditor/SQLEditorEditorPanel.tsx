@@ -1,5 +1,5 @@
 import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useCallback } from 'react'
 import { cn } from 'ui'
@@ -176,7 +176,7 @@ function LoadingSpinner() {
   return (
     <div className="overflow-y-auto h-full">
       <div className="flex h-full w-full items-center justify-center">
-        <Loader2 className="animate-spin text-primary" />
+        <Loader2Icon className="animate-spin text-primary" />
       </div>
     </div>
   )

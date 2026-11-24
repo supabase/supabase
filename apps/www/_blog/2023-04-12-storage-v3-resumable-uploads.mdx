@@ -14,7 +14,7 @@ imgSocial: launch-week-7/day-3-storage-resumable-uploads/storage-v3-og.jpg
 imgThumb: launch-week-7/day-3-storage-resumable-uploads/storage-v3-thumb.jpg
 ---
 
-Supabase Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads, Quality Filters, Next.js support, and WebP support.
+[Supabase Storage](/storage) is receiving a major upgrade, implementing many of the most requested features from our users: [Resumable Uploads](https://supabase.com/docs/guides/storage/uploads/resumable-uploads), Quality Filters, Next.js support, and WebP support.
 
 The key feature: **Resumable Uploads**! With Resumable Uploads, you can continue uploading a file from where you left off, even if you lose internet connectivity or accidentally close your browser tab while uploading.
 
@@ -82,7 +82,7 @@ const MyImage = (props) => {
 
 Authenticated users can now generate presigned URLs.
 
-These URLs can then be shared with other users who can then upload to storage without further authorization. For example, you can generate a presigned URL on your server (ahem, Edge Function).
+These URLs can then be shared with other users who can then upload to storage without further authorization. For example, you can generate a presigned URL on your server (ahem, [Edge Function](/docs/guides/functions)).
 
 Shoutout to community members [@abbit](https://github.com/abbit) and [@MagnusHJensen](https://github.com/MagnusHJensen) who [implemented](https://github.com/supabase/storage-api/pull/282) this feature on the Storage server and [@Rawnly](https://github.com/Rawnly) for the [client library bindings](https://github.com/supabase/storage-js/pull/152) 🎉.
 
@@ -122,7 +122,7 @@ First, why do we need Resumable Uploads, when the HTTP protocol has a standard m
 
 ### TUS - Resumable Protocol
 
-We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with Supabase Storage.
+We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with [Supabase Storage](/docs/guides/storage).
 
 TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at Supabase, we love [Uppy.js](https://uppy.io/docs/tus/), a multi-file uploader for TUS.
 
@@ -179,7 +179,7 @@ And there you have it, with a few lines of code, you can support parallel, resum
 
 There were a few technical challenges we faced while implementing TUS in Supabase Storage.
 
-Storage is powered by our [Storage-API service](https://github.com/supabase/storage-api), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the Supabase ecosystem, making it easy to protect files with Postgres RLS policies.
+Storage is powered by our [Storage-API service](https://github.com/supabase/storage), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the Supabase ecosystem, making it easy to protect files with Postgres RLS policies.
 
 To implement the TUS protocol, we use [tus-node-server](https://github.com/tus/tus-node-server), which was recently ported to Typescript. It was only missing a few features we needed:
 

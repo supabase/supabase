@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -22,8 +21,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 const schema = z.object({
@@ -32,21 +30,14 @@ const schema = z.object({
 
 export const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
 
   const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const endpoint = settings?.app_config?.endpoint
-  const { can: canConfigureCustomDomain } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canConfigureCustomDomain } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_WRITE
   )
 
   const form = useForm<z.infer<typeof schema>>({
@@ -112,11 +103,11 @@ export const CustomDomainsConfigureHostname = () => {
             <h4 className="text-sm mb-1">Configure a CNAME record</h4>
             <p className="text-sm text-foreground-light">
               Set up a CNAME record for{' '}
-              {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
-              resolving to{' '}
+              {domain ? <code>{domain}</code> : <span>your custom domain</span>}{' '}
+              <span>resolving to</span>{' '}
               {endpoint ? (
                 <span className="inline-flex items-center gap-x-1">
-                  <code className="text-code-inline">{endpoint}</code>
+                  <code>{endpoint}</code>
                   <CopyButton
                     iconOnly
                     variant="text"
@@ -125,20 +116,24 @@ export const CustomDomainsConfigureHostname = () => {
                   />
                 </span>
               ) : (
-                "your project's API URL"
+                <span>your project's API URL</span>
               )}{' '}
-              with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-              disable the proxy option.
+              <span>
+                with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                disable the proxy option.
+              </span>
               <br />
               {trimmedDomain.includes('.') ? (
                 <>
                   Some DNS providers expect only the subdomain label{' '}
-                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
-                  others accept the full hostname{' '}
-                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                  <code>{trimmedDomain.split('.')[0]}</code>, while others accept the full hostname{' '}
+                  <code className="whitespace-nowrap">{trimmedDomain}</code>.
                 </>
               ) : (
-                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+                <span>
+                  Some DNS providers expect only the subdomain label, while others accept the full
+                  hostname.
+                </span>
               )}
             </p>
           </CardContent>

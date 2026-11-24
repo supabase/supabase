@@ -1,5 +1,6 @@
 'use client'
 
+import { useReducedMotion } from 'common'
 import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
 import { ReactNode, useId, useState } from 'react'
@@ -117,6 +118,7 @@ export const ChartLine = ({
   strokeWidth = 1.5,
   referenceLines,
 }: ChartLineProps) => {
+  const prefersReducedMotion = useReducedMotion()
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
   const { resolvedTheme } = useTheme()
@@ -203,10 +205,14 @@ export const ChartLine = ({
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
       <ChartContainer
-        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        className={cn(
+          'w-full! [&_.recharts-surface:focus-visible]:focus-inset',
+          hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full'
+        )}
         config={chartConfig}
       >
         <RechartAreaChart
+          accessibilityLayer
           data={data}
           syncId={syncId}
           margin={margin}
@@ -329,6 +335,7 @@ export const ChartLine = ({
             <Area
               key={key}
               type="step"
+              isAnimationActive={prefersReducedMotion ? false : undefined}
               dataKey={key}
               fill={`url(#${gradientPrefix}-${index})`}
               fillOpacity={0.1}

@@ -6,11 +6,6 @@
       "type": "string"
     },
 
-    "account:show_security_settings": {
-      "type": "boolean",
-      "description": "Show the account security settings page"
-    },
-
     "ai:opt_in_level_disabled": {
       "type": "boolean",
       "description": "Enable the AI opt in level 'disabled'"
@@ -358,10 +353,6 @@
       "type": "boolean",
       "description": "Show the high availability toggle in the project creation flow"
     },
-    "project_creation:show_best_available_region": {
-      "type": "boolean",
-      "description": "Show the best available region option in the project creation region selector"
-    },
 
     "project_homepage:show_instance_size": {
       "type": "boolean",
@@ -465,7 +456,6 @@
     }
   },
   "required": [
-    "account:show_security_settings",
     "ai:opt_in_level_disabled",
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",

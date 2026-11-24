@@ -1,5 +1,6 @@
 import {
   getDismissalKey,
+  isRelevantToSignedOutUser,
   isRelevantToUser,
   type StatusItem,
   type UserRegionContext,
@@ -47,14 +48,18 @@ function earliestBy<T>(items: ReadonlyArray<T>, getTimeMs: (item: T) => number):
  */
 export function selectBanner(args: {
   items: Array<StatusItem>
-  user: UserRegionContext
+  /** Pass null for signed-out surfaces, which have no project/region context to match against. */
+  user: UserRegionContext | null
   dismissedKeys: ReadonlySet<string>
   nowMs: number
 }): BannerSelection | null {
   const { items, user, dismissedKeys, nowMs } = args
 
   const eligible = items.filter(
-    (item) => item.showBanner && !item.isProjectCreationOnly && isRelevantToUser(item, user)
+    (item) =>
+      item.showBanner &&
+      !item.isProjectCreationOnly &&
+      (user === null ? isRelevantToSignedOutUser(item) : isRelevantToUser(item, user))
   )
 
   const withinWindow = eligible.filter(
@@ -114,7 +119,7 @@ export function getBannerCopy(selection: BannerSelection): { title: string; desc
         selection.items.length > 1
           ? 'We are investigating multiple technical issues'
           : 'We are investigating a technical issue'
-      return { title, description: 'Follow the status page for updates' }
+      return { title, description: '' }
     }
     case 'maintenance': {
       const { scheduledEndAt } = selection.item

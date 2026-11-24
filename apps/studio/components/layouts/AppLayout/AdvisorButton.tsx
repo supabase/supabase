@@ -1,22 +1,38 @@
-import { Lightbulb } from 'lucide-react'
+import { useFlag } from 'common'
+import { Inbox, Issues } from 'icons'
+import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
+function getButtonIcon({
+  isIssuesInboxEnabled,
+  hasIssues,
+}: {
+  isIssuesInboxEnabled: boolean
+  hasIssues: boolean
+}) {
+  if (!isIssuesInboxEnabled) return LightbulbIcon
+  return hasIssues ? Issues : Inbox
+}
+
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
+  const { issues } = useProjectIssues({ projectRef, enabled: isIssuesInboxEnabled })
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
@@ -43,6 +59,9 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 
+  const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
+  const Icon = getButtonIcon({ isIssuesInboxEnabled, hasIssues: issues.length > 0 })
+
   return (
     <div className="relative">
       <ButtonTooltip
@@ -51,8 +70,6 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
-          // Critical fill/border only when idle — selected matches the other
-          // header circles (foreground fill, no destructive outline).
           hasCriticalIssues &&
             !isOpen &&
             'bg-destructive-200 border-destructive-500 hover:border-destructive',
@@ -61,11 +78,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         onClick={handleClick}
         tooltip={{
           content: {
-            text: 'Advisor Center',
+            text: label,
           },
         }}
       >
-        <Lightbulb
+        <Icon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -73,13 +90,12 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
-        <span className="sr-only">Advisor Center</span>
+        <span className="sr-only">{label}</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span
           className={cn(
             'absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full',
-            // Slightly lighter on the inverted selected fill in light mode only.
             isOpen ? 'bg-destructive-500 dark:bg-destructive' : 'bg-destructive'
           )}
         />

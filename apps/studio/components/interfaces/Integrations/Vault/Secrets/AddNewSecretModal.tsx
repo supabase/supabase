@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -156,7 +156,7 @@ export const AddNewSecretModal = () => {
                               aria-label={
                                 isSecretVisible ? 'Hide secret value' : 'Show secret value'
                               }
-                              icon={isSecretVisible ? <EyeOff /> : <Eye />}
+                              icon={isSecretVisible ? <EyeOffIcon /> : <EyeIcon />}
                               onClick={() => setIsSecretVisible((prev) => !prev)}
                             />
                           </TooltipTrigger>

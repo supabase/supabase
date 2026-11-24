@@ -557,6 +557,51 @@ test.describe('Storage', () => {
     await deleteItem(page, fileName)
   })
 
+  test('Deleting a file preserves the current filter', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_delete_file_filter`
+    const fileName = 'test-file.txt'
+
+    // Create a bucket via API, navigate to it, and upload a file
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'test-file.txt'),
+      'test-file.txt'
+    )
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'test-file-2.txt'),
+      'test-file-2.txt'
+    )
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'another-file.txt'),
+      'another-file.txt'
+    )
+    await page.getByPlaceholder('Search in root directory...').fill('test')
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(1)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+
+    // Delete the file
+    await deleteItem(page, fileName)
+
+    // Check the filter is still applied
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+  })
+
   test('can delete a folder', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_folder`
     const folderName = 'test_folder'

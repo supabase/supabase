@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -16,18 +16,21 @@ mockAnimationsApi()
 
 // Feature flags are not API calls — mock at the module level so tests can
 // control per-destination-type visibility without hitting PostHog.
+const mockCreationPreview = vi.fn()
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: mockCreationPreview() }),
+}))
+
 const mockBigQueryEnabled = vi.fn()
-const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
 const mockClickHouseEnabled = vi.fn()
 
-vi.mock('../useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
-  useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
-  useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
-  useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
-  useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
+vi.mock('../useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => mockBigQueryEnabled(),
+  useIsPipelinesDuckLakeEnabled: () => mockDucklakeEnabled(),
+  useIsPipelinesSnowflakeEnabled: () => mockSnowflakeEnabled(),
+  useIsPipelinesClickHouseEnabled: () => mockClickHouseEnabled(),
 }))
 
 // Background queries from useDestinationInformation (sources + pipelines fire
@@ -52,16 +55,27 @@ const addBackgroundMocks = () => {
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
     window.localStorage.clear()
-  })
-
-  test('shows placeholder when no type is selected', async () => {
+    mockCreationPreview.mockReturnValue(false)
     mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
+  })
 
+  test('uses radio cards only when creation preview is enabled', async () => {
+    mockCreationPreview.mockReturnValue(true)
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
+    customRender(<DestinationTypeSelection />)
+    expect(await screen.findByRole('radiogroup', { name: 'Destination type' })).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /DuckLake/ }))
+    expect(await screen.findByRole('radio', { name: /DuckLake/ })).toBeChecked()
+  })
+
+  test('shows placeholder when no type is selected', async () => {
     customRender(<DestinationTypeSelection />)
 
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
@@ -69,93 +83,80 @@ describe('DestinationTypeSelection', () => {
 
   test('groups destinations by release stage', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(true)
     mockDucklakeEnabled.mockReturnValue(true)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
+    mockSnowflakeEnabled.mockReturnValue(true)
+    mockClickHouseEnabled.mockReturnValue(true)
 
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Public Alpha')).toBeInTheDocument()
-    expect(screen.getByText('Early Access')).toBeInTheDocument()
-    expect(screen.getByText('Deprecated')).toBeInTheDocument()
-    expect(screen.getByText('BigQuery')).toBeInTheDocument()
-    expect(screen.getByText('DuckLake')).toBeInTheDocument()
-    expect(screen.getByText('Analytics Bucket')).toBeInTheDocument()
-    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
+    const publicAlphaGroup = await screen.findByRole('group', { name: 'Public Alpha' })
+    expect(screen.queryByText('Early Access')).not.toBeInTheDocument()
+    expect(screen.queryByText('Deprecated')).not.toBeInTheDocument()
+    for (const destination of ['BigQuery', 'ClickHouse', 'DuckLake', 'Snowflake']) {
+      expect(within(publicAlphaGroup).getByText(destination)).toBeInTheDocument()
+    }
+    expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
   })
 
   test('hides destinations behind disabled feature flags', async () => {
-    mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
-
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(screen.queryByText('Read Replica')).not.toBeInTheDocument()
-    expect(screen.queryByText('BigQuery')).not.toBeInTheDocument()
-    expect(screen.queryByText('DuckLake')).not.toBeInTheDocument()
-    expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
-    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('option')).toHaveLength(0)
   })
 
-  test('shows the public alpha warning for a Pipelines destination', async () => {
-    mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
+  test.each(['BigQuery', 'ClickHouse', 'DuckLake', 'Snowflake'])(
+    'shows the public alpha warning for %s',
+    async (destination) => {
+      mockBigQueryEnabled.mockReturnValue(true)
+      mockDucklakeEnabled.mockReturnValue(true)
+      mockSnowflakeEnabled.mockReturnValue(true)
+      mockClickHouseEnabled.mockReturnValue(true)
 
-    customRender(<DestinationTypeSelection />)
+      customRender(<DestinationTypeSelection />)
 
-    fireEvent.click(await screen.findByRole('combobox'))
-    fireEvent.click(await screen.findByText('BigQuery'))
+      fireEvent.click(await screen.findByRole('combobox'))
+      fireEvent.click(await screen.findByText(destination))
 
-    expect(
-      await screen.findByText(
-        'Destination type cannot be changed after creation. BigQuery support is in public alpha.'
-      )
-    ).toBeInTheDocument()
-  })
+      expect(
+        await screen.findByText(
+          `Destination type cannot be changed after creation. ${destination} support is in public alpha.`
+        )
+      ).toBeInTheDocument()
+    }
+  )
 
-  test('disables the selector in edit mode so the destination type cannot be changed', async () => {
-    mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
-    // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
-    addAPIMock({
-      method: 'get',
-      path: '/platform/replication/:ref/destinations/:destination_id',
-      response: () =>
-        HttpResponse.json<ReplicationDestinationResponse>({
-          tenant_id: 't',
-          id: 1,
-          name: 'My BigQuery Destination',
-          config: {
-            big_query: {
-              project_id: 'gcp-proj',
-              dataset_id: 'analytics',
-              connection_pool_size: 5,
+  test.each([false, true])(
+    'keeps the edit selector locked (creation preview: %s)',
+    async (isEnabled) => {
+      mockCreationPreview.mockReturnValue(isEnabled)
+      mockBigQueryEnabled.mockReturnValue(true)
+      // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/destinations/:destination_id',
+        response: () =>
+          HttpResponse.json<ReplicationDestinationResponse>({
+            tenant_id: 't',
+            id: 1,
+            name: 'My BigQuery Destination',
+            config: {
+              big_query: {
+                project_id: 'gcp-proj',
+                dataset_id: 'analytics',
+                connection_pool_size: 5,
+              },
             },
-          },
-        }),
-    })
+          }),
+      })
 
-    // ?edit=1 locks the type to the existing destination
-    customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
+      // ?edit=1 locks the type to the existing destination
+      customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
 
-    expect(await screen.findByRole('combobox')).toBeDisabled()
-  })
+      expect(await screen.findByRole('combobox')).toBeDisabled()
+    }
+  )
 })

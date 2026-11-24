@@ -1,9 +1,8 @@
-import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, InfoIcon, KeyIcon, TimerIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
-  Button,
   Checkbox,
   cn,
   DialogDescription,
@@ -22,6 +21,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 export function RotateKeyDialog({
   projectRef,
@@ -37,6 +37,10 @@ export function RotateKeyDialog({
   const [isStandbyUnderstood, setStandbyUnderstood] = useState(false)
   const [isPreviouslyUsedUnderstood, setPreviouslyUsedUnderstood] = useState(false)
   const [isEdgeFunctionsVerifyJWTUnderstood, setEdgeFunctionsVerifyJWTUnderstood] = useState(false)
+
+  const updateGrant = useGrant('PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}', {
+    projectRef,
+  })
 
   const { data: edgeFunctions, isPending: isLoadingEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef,
@@ -72,11 +76,11 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer size={14} />
+            <TimerIcon size={14} />
             Standby key
           </Badge>
           <div>
-            <ArrowRight className="size-4 text-foreground-light" />
+            <ArrowRightIcon className="size-4 text-foreground-light" />
           </div>
           <div>
             <Badge
@@ -85,7 +89,7 @@ export function RotateKeyDialog({
                 'px-4 py-1 gap-2 flex flex-row items-center uppercase'
               )}
             >
-              <Key size={14} />
+              <KeyIcon size={14} />
               Current key
             </Badge>
           </div>
@@ -103,11 +107,11 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Key size={14} />
+            <KeyIcon size={14} />
             Current key
           </Badge>
           <div>
-            <ArrowRight className="h-4 w-4 text-foreground-light" />
+            <ArrowRightIcon className="h-4 w-4 text-foreground-light" />
           </div>
           <Badge
             className={cn(
@@ -115,7 +119,7 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer size={14} />
+            <TimerIcon size={14} />
             Previous key
           </Badge>
           <div />
@@ -152,7 +156,7 @@ export function RotateKeyDialog({
                 All of my application's components have picked up the standby key.
               </p>
               <ButtonTooltip
-                icon={<Info />}
+                icon={<InfoIcon />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
                   content: {
@@ -187,7 +191,7 @@ export function RotateKeyDialog({
                 To invalidate non-expired JWTs I need to explicitly revoke the currently used key.
               </p>
               <ButtonTooltip
-                icon={<Info />}
+                icon={<InfoIcon />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
                   content: {
@@ -231,7 +235,7 @@ export function RotateKeyDialog({
                         target="_blank"
                         title={name}
                       >
-                        <ExternalLink className="size-3 inline-block" /> <code>{name}</code>
+                        <ExternalLinkIcon className="size-3 inline-block" /> <code>{name}</code>
                       </a>
                     ))
                     .reduce<React.ReactNode[]>(
@@ -241,7 +245,7 @@ export function RotateKeyDialog({
                 </p>
                 <ButtonTooltip
                   variant="default"
-                  icon={<Info />}
+                  icon={<InfoIcon />}
                   className="px-1.5 py-2 mt-0.5"
                   tooltip={{
                     content: {
@@ -274,19 +278,37 @@ export function RotateKeyDialog({
         )}
       </DialogSection>
       <DialogFooter>
-        <Button
+        <ButtonTooltip
           variant="primary"
-          onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
+          onClick={() => {
+            if (!updateGrant.grant) {
+              toast.error(getWriteGrantToastMessage(updateGrant.status, 'rotate', 'signing keys'))
+              return
+            }
+            mutate({
+              projectRef,
+              grant: updateGrant.grant,
+              keyId: standbyKey.id,
+              status: 'in_use',
+            })
+          }}
           disabled={
+            !updateGrant.grant ||
             isLoadingEdgeFunctions ||
             !isPreviouslyUsedUnderstood ||
             !isStandbyUnderstood ||
             (!!verifyJWTEdgeFunctions.length && !isEdgeFunctionsVerifyJWTUnderstood)
           }
           loading={isPendingMutation}
+          tooltip={{
+            content: {
+              side: 'top',
+              text: getWriteGrantTooltip(updateGrant.status, 'rotate', 'signing keys'),
+            },
+          }}
         >
           Rotate signing key
-        </Button>
+        </ButtonTooltip>
       </DialogFooter>
     </>
   )

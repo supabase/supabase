@@ -154,7 +154,7 @@ export default () => {
             },
             {
               label: '20+ Third-party Logins',
-              link: '/docs/guides/auth/social-login#set-up-a-social-provider-with-supabase-auth',
+              link: '/docs/guides/auth/social-sign-in#set-up-a-social-provider-with-supabase-auth',
             },
             {
               label: 'Custom Access Policies via RLS',

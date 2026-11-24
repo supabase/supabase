@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 // Audit log timestamps are returned in microseconds, not milliseconds.
 // Divide by this constant before passing to dayjs/Date to get a valid date.
@@ -33,7 +34,7 @@ async function getOrganizationAuditLogs(
 }
 
 type OrganizationAuditLogsData = Awaited<ReturnType<typeof getOrganizationAuditLogs>>
-type OrganizationAuditLogsError = ResponseError
+type OrganizationAuditLogsError = StudioError
 
 export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>(
   vars: OrganizationAuditLogsVariables,

@@ -170,7 +170,7 @@ export const ProjectAccessSection = () => {
                             <TableCell colSpan={2}>
                               <p className="text-sm text-foreground-lighter">
                                 +{hiddenMembersCount} more project member
-                                {hiddenMembersCount === 1 ? '' : 's'}
+                                {hiddenMembersCount === 1 ? '' : <span>s</span>}
                               </p>
                             </TableCell>
                           </TableRow>

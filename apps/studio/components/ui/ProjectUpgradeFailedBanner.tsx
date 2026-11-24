@@ -2,7 +2,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -70,7 +70,7 @@ export const ProjectUpgradeFailedBanner = () => {
               </SupportLink>
             </Button>
             <ButtonTooltip
-              icon={<X />}
+              icon={<XIcon />}
               variant="text"
               className="w-6"
               tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}

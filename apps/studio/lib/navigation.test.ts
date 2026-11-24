@@ -1,230 +1,82 @@
+// @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createNavigationHandler } from './navigation'
 
+type NavigationEvent = Parameters<ReturnType<typeof createNavigationHandler>>[0]
+type Outcome = 'push' | 'new-tab' | 'none'
+
 describe('createNavigationHandler', () => {
-  let mockRouter: any
-  let mockWindowOpen: any
+  const URL = '/project/123/settings'
+  const router = { push: vi.fn() }
+  const windowOpen = vi.fn()
 
   beforeEach(() => {
-    // Mock router with push method
-    mockRouter = {
-      push: vi.fn(),
+    router.push.mockReset()
+    windowOpen.mockReset()
+    global.window.open = windowOpen
+  })
+
+  const run = (event: Record<string, unknown>) => {
+    const preventDefault = vi.fn()
+    const handler = createNavigationHandler(
+      URL,
+      router as unknown as Parameters<typeof createNavigationHandler>[1]
+    )
+    handler({
+      metaKey: false,
+      ctrlKey: false,
+      preventDefault,
+      ...event,
+    } as unknown as NavigationEvent)
+    return { preventDefault }
+  }
+
+  const expectOutcome = (outcome: Outcome) => {
+    if (outcome === 'push') {
+      expect(router.push).toHaveBeenCalledWith(URL)
+    } else {
+      expect(router.push).not.toHaveBeenCalled()
     }
+    if (outcome === 'new-tab') {
+      expect(windowOpen).toHaveBeenCalledWith(URL, '_blank')
+    } else {
+      expect(windowOpen).not.toHaveBeenCalled()
+    }
+  }
 
-    // Mock window.open
-    mockWindowOpen = vi.fn()
-    global.window.open = mockWindowOpen
+  it.each<[string, Record<string, unknown>, Outcome]>([
+    ['Enter', { key: 'Enter' }, 'push'],
+    ['Space', { key: ' ' }, 'push'],
+    ['Cmd + Enter', { key: 'Enter', metaKey: true }, 'new-tab'],
+    ['Ctrl + Enter', { key: 'Enter', ctrlKey: true }, 'new-tab'],
+    ['Cmd + Space', { key: ' ', metaKey: true }, 'new-tab'],
+  ])('handles %s by preventing default and navigating', (_, event, outcome) => {
+    const { preventDefault } = run(event)
+
+    expect(preventDefault).toHaveBeenCalled()
+    expectOutcome(outcome)
   })
 
-  describe('keyboard navigation', () => {
-    it('should call router.push when Enter key is pressed without modifiers', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: 'Enter',
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
+  it('ignores other keys', () => {
+    const { preventDefault } = run({ key: 'a' })
 
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockRouter.push).toHaveBeenCalledWith('/test-url')
-      expect(mockWindowOpen).not.toHaveBeenCalled()
-    })
-
-    it('should call router.push when Space key is pressed without modifiers', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: ' ',
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockRouter.push).toHaveBeenCalledWith('/test-url')
-      expect(mockWindowOpen).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab when Enter key is pressed with metaKey', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: 'Enter',
-        metaKey: true,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab when Enter key is pressed with ctrlKey', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: 'Enter',
-        metaKey: false,
-        ctrlKey: true,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab when Space key is pressed with metaKey', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: ' ',
-        metaKey: true,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should do nothing when other keys are pressed', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        key: 'a',
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.KeyboardEvent
-
-      handler(event)
-
-      expect(event.preventDefault).not.toHaveBeenCalled()
-      expect(mockRouter.push).not.toHaveBeenCalled()
-      expect(mockWindowOpen).not.toHaveBeenCalled()
-    })
+    expect(preventDefault).not.toHaveBeenCalled()
+    expectOutcome('none')
   })
 
-  describe('mouse navigation', () => {
-    it('should call router.push on regular left click', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        button: 0,
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
+  it.each<[string, Record<string, unknown>, Outcome]>([
+    ['a regular left click', { button: 0 }, 'push'],
+    ['a middle click', { button: 1 }, 'new-tab'],
+    ['Cmd + left click', { button: 0, metaKey: true }, 'new-tab'],
+    ['Ctrl + left click', { button: 0, ctrlKey: true }, 'new-tab'],
+    // Right click opens the context menu, so it must not navigate.
+    ['a right click', { button: 2 }, 'none'],
+  ])('handles %s', (_, event, outcome) => {
+    const { preventDefault } = run(event)
 
-      handler(event)
-
-      expect(mockRouter.push).toHaveBeenCalledWith('/test-url')
-      expect(mockWindowOpen).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab on middle mouse button click', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        button: 1, // Middle button
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab on Cmd + left click', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        button: 0,
-        metaKey: true,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should open new tab on Ctrl + left click', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        button: 0,
-        metaKey: false,
-        ctrlKey: true,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(mockWindowOpen).toHaveBeenCalledWith('/test-url', '_blank')
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
-    it('should handle right click without navigation', () => {
-      const handler = createNavigationHandler('/test-url', mockRouter)
-      const event = {
-        button: 2, // Right button
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      // Right click opens the context menu, so it must not navigate.
-      expect(mockRouter.push).not.toHaveBeenCalled()
-      expect(mockWindowOpen).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('URL handling', () => {
-    it('should handle URLs with BASE_PATH correctly', () => {
-      const handler = createNavigationHandler('/project/123/settings', mockRouter)
-      const event = {
-        button: 1, // Middle button to open in new tab
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      // Should prepend BASE_PATH when opening new tab
-      expect(mockWindowOpen).toHaveBeenCalledWith('/project/123/settings', '_blank')
-    })
-
-    it('should pass URL directly to router.push without BASE_PATH', () => {
-      const handler = createNavigationHandler('/project/123/settings', mockRouter)
-      const event = {
-        button: 0,
-        metaKey: false,
-        ctrlKey: false,
-        preventDefault: vi.fn(),
-      } as unknown as React.MouseEvent
-
-      handler(event)
-
-      // router.push should receive URL without BASE_PATH
-      expect(mockRouter.push).toHaveBeenCalledWith('/project/123/settings')
-    })
+    expectOutcome(outcome)
+    // New-tab clicks must not also trigger the browser's default navigation
+    if (outcome === 'new-tab') expect(preventDefault).toHaveBeenCalled()
   })
 })

@@ -1,13 +1,13 @@
 import {
-  ArrowUp,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  MessageSquare,
-  NotebookText,
-  Play,
-  Plus,
-  SquareCode,
+  ArrowUpIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  HomeIcon,
+  MessageSquareIcon,
+  NotebookTextIcon,
+  PlayIcon,
+  PlusIcon,
+  SquareCodeIcon,
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -52,28 +52,28 @@ const SidebarHome = ({ section }: { section: Section }) => (
   <>
     <div className="space-y-px">
       <SidebarRow
-        icon={SquareCode}
+        icon={SquareCodeIcon}
         isActive={section === 'query'}
-        trailing={<Icon icon={Plus} />}
+        trailing={<Icon icon={PlusIcon} />}
         lineClassName="w-9"
       />
       <SidebarRow
-        icon={NotebookText}
+        icon={NotebookTextIcon}
         trailing={
           <>
             <Count />
-            <Icon icon={ChevronRight} />
+            <Icon icon={ChevronRightIcon} />
           </>
         }
         lineClassName="w-12"
       />
       <SidebarRow
-        icon={MessageSquare}
+        icon={MessageSquareIcon}
         isActive={section === 'chat'}
         trailing={
           <>
             <Count />
-            <Icon icon={ChevronRight} />
+            <Icon icon={ChevronRightIcon} />
           </>
         }
         lineClassName="w-8"
@@ -81,10 +81,10 @@ const SidebarHome = ({ section }: { section: Section }) => (
     </div>
     <div className="space-y-px">
       <Line className="mx-1.5 mb-2 w-14 bg-foreground-muted/50" />
-      <SidebarRow icon={NotebookText} lineClassName="w-14" />
-      <SidebarRow icon={MessageSquare} isActive={section === 'chat'} lineClassName="w-12" />
-      <SidebarRow icon={NotebookText} lineClassName="w-10" />
-      <SidebarRow icon={MessageSquare} lineClassName="w-14" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-14" />
+      <SidebarRow icon={MessageSquareIcon} isActive={section === 'chat'} lineClassName="w-12" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-10" />
+      <SidebarRow icon={MessageSquareIcon} lineClassName="w-14" />
     </div>
   </>
 )
@@ -95,11 +95,11 @@ const SidebarNotebooks = () => (
       <Line className="w-12" />
     </div>
     <div className="space-y-px">
-      <SidebarRow icon={NotebookText} isActive lineClassName="w-14" />
-      <SidebarRow icon={NotebookText} lineClassName="w-10" />
-      <SidebarRow icon={NotebookText} lineClassName="w-16" />
-      <SidebarRow icon={NotebookText} lineClassName="w-12" />
-      <SidebarRow icon={NotebookText} lineClassName="w-9" />
+      <SidebarRow icon={NotebookTextIcon} isActive lineClassName="w-14" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-10" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-16" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-12" />
+      <SidebarRow icon={NotebookTextIcon} lineClassName="w-9" />
     </div>
   </>
 )
@@ -107,10 +107,10 @@ const SidebarNotebooks = () => (
 const Sidebar = ({ section }: { section: Section }) => (
   <div className="flex w-[24%] shrink-0 flex-col border-r">
     <div className="flex h-7 shrink-0 items-center gap-1 border-b px-2.5 text-foreground-muted">
-      {section === 'notebook' && <Icon icon={ChevronLeft} />}
+      {section === 'notebook' && <Icon icon={ChevronLeftIcon} />}
       <Line className={cn('bg-foreground-muted', section === 'notebook' ? 'w-12' : 'w-10')} />
       <div className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-sm border">
-        <Icon icon={Plus} className="size-2" />
+        <Icon icon={PlusIcon} className="size-2" />
       </div>
     </div>
     <div className="flex flex-col gap-3 p-1.5">
@@ -120,9 +120,9 @@ const Sidebar = ({ section }: { section: Section }) => (
 )
 
 const TAB_ICONS: Record<Exclude<Section, 'home'>, LucideIcon> = {
-  query: SquareCode,
-  notebook: NotebookText,
-  chat: MessageSquare,
+  query: SquareCodeIcon,
+  notebook: NotebookTextIcon,
+  chat: MessageSquareIcon,
 }
 
 const Tab = ({ icon, isActive = false }: { icon: LucideIcon; isActive?: boolean }) => (
@@ -145,12 +145,12 @@ const TabBar = ({ section }: { section: Section }) => (
         section === 'home' ? 'bg-surface-200 text-foreground' : 'text-foreground-muted'
       )}
     >
-      <Icon icon={Home} />
+      <Icon icon={HomeIcon} />
     </div>
     {section !== 'home' && <Tab icon={TAB_ICONS[section]} isActive />}
-    <Tab icon={section === 'notebook' ? SquareCode : NotebookText} />
+    <Tab icon={section === 'notebook' ? SquareCodeIcon : NotebookTextIcon} />
     <div className="flex items-center px-2 text-foreground-muted">
-      <Icon icon={Plus} />
+      <Icon icon={PlusIcon} />
     </div>
   </div>
 )
@@ -217,7 +217,7 @@ const BarChart = ({ className }: { className?: string }) => (
 
 const RunButton = () => (
   <div className="flex h-4 items-center gap-1 rounded-sm border bg-surface-300 px-1.5 text-foreground-muted">
-    <Icon icon={Play} className="size-2 fill-current" />
+    <Icon icon={PlayIcon} className="size-2 fill-current" />
     <div className="h-0.5 w-4 rounded-[2px] bg-foreground-muted" />
   </div>
 )
@@ -229,12 +229,12 @@ const HomeContent = () => (
       <Line className="w-1/2" />
       <div className="flex justify-end">
         <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground-muted text-background">
-          <Icon icon={ArrowUp} className="size-2" />
+          <Icon icon={ArrowUpIcon} className="size-2" />
         </div>
       </div>
     </div>
     <div className="grid w-full grid-cols-2 gap-2">
-      {[SquareCode, NotebookText].map((icon, index) => (
+      {[SquareCodeIcon, NotebookTextIcon].map((icon, index) => (
         <div key={index} className="flex items-center gap-1.5 rounded-md border bg-surface-200 p-2">
           <div className="flex h-4 w-4 items-center justify-center rounded-sm border bg-surface-300 text-foreground-muted">
             <Icon icon={icon} className="size-2" />
@@ -286,7 +286,7 @@ const NotebookContent = () => (
       <BarChart className="h-16" />
       <div className="flex items-center gap-1.5 text-foreground-muted">
         <div className="h-px flex-1 bg-border" />
-        <Icon icon={Plus} />
+        <Icon icon={PlusIcon} />
         <div className="h-px flex-1 bg-border" />
       </div>
       <MarkdownCell lines={['w-3/4']} />
@@ -316,7 +316,7 @@ const ChatContent = () => (
         Ask a follow up question...
       </span>
       <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground-muted text-background">
-        <Icon icon={ArrowUp} className="size-2" />
+        <Icon icon={ArrowUpIcon} className="size-2" />
       </div>
     </div>
   </div>

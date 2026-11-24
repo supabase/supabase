@@ -1,27 +1,34 @@
 ---
-title: 'Creating Analytics Buckets'
+title: 'Create an analytics bucket'
 subtitle: 'Set up your first analytics bucket using the SDK or dashboard.'
+description: 'Create an analytics bucket in your Supabase project with the SDK or the Dashboard, then store Apache Iceberg tables in it and query them with Iceberg clients.'
 ---
+
+Create an analytics bucket to store large analytical datasets as Apache Iceberg tables.
 
 <Admonition type="caution">
 
-This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed at this stage. Request access through this [form](https://forms.supabase.com/analytics-buckets).
+This feature is in **private alpha**. API stability and backward compatibility are not guaranteed at this stage. Request access through the [Analytics Buckets request form](https://forms.supabase.com/analytics-buckets).
 
 </Admonition>
+
+## Overview
 
 Analytics buckets use [Apache Iceberg](https://iceberg.apache.org/), an open-table format for efficient management of large analytical datasets. You can interact with analytics buckets using tools such as [PyIceberg](https://py.iceberg.apache.org/), [Apache Spark](https://spark.apache.org/), or any client supporting the [Iceberg REST Catalog API](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/apache/iceberg/main/open-api/rest-catalog-open-api.yaml).
 
 <Admonition type="note" title="About replication">
 
-Analytics Buckets are still available, but replication into Analytics Buckets via Supabase Pipelines is no longer supported. If you want to use Analytics Buckets, bring your own ingestion pipeline.
+<$Partial path="pipelines-replication-unsupported.mdx" />
 
 </Admonition>
 
-## Creating an Analytics bucket
+## Procedure
 
 You can create an analytics bucket using either the Supabase SDK or the Supabase Dashboard.
 
 ### Using the Supabase SDK
+
+To create the bucket in code, run the following in the language you use:
 
 <Tabs
   scrollable
@@ -66,6 +73,8 @@ print('Analytics bucket created:', response)
 
 ### Using the Supabase Dashboard
 
+To create the bucket in the Dashboard:
+
 1. Navigate to the **Storage** section in the Supabase Dashboard.
 2. Click **Create Bucket**.
 3. Enter a name for your bucket (e.g., `my-analytics-bucket`).
@@ -73,7 +82,7 @@ print('Analytics bucket created:', response)
 5. Click **Create**.
 
 <Image
-  alt="Create Analytics Bucket in Dashboard"
+  alt="The Create storage bucket dialog with the name my-analytics-bucket entered and the Analytics bucket type selected."
   width="644"
   height="402"
   src="/docs/img/storage/iceberg-bucket.png"
@@ -81,7 +90,14 @@ print('Analytics bucket created:', response)
 
 ## Next steps
 
-Once you've created your analytics bucket, you can:
+After you create your analytics bucket, you can:
 
 - [Connect with Iceberg clients](/docs/guides/storage/analytics/connecting-to-analytics-bucket) like PyIceberg or Apache Spark
 - [Query data with Postgres](/docs/guides/storage/analytics/query-with-postgres) using the Iceberg Foreign Data Wrapper
+
+## Related resources
+
+To read more about Analytics Buckets, see these pages:
+
+- [Analytics Buckets](/docs/guides/storage/analytics/introduction): learn what they store and how they work.
+- [Limits](/docs/guides/storage/analytics/limits): check the quotas that apply to your buckets.

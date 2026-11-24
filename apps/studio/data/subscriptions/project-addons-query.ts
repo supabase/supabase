@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
@@ -33,7 +34,7 @@ export async function getProjectAddons(
 }
 
 export type ProjectAddonsData = Awaited<ReturnType<typeof getProjectAddons>>
-export type ProjectAddonsError = ResponseError
+export type ProjectAddonsError = StudioError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,

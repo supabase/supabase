@@ -28,6 +28,6 @@ export const useDatabaseReport = () => {
     },
     largeObjectsSql: largeObjects.resolvedSql,
     isPending,
-    refresh: () => largeObjects.runQuery,
+    refresh: () => largeObjects.runQuery(),
   }
 }

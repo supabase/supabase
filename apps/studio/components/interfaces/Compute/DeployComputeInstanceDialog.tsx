@@ -172,7 +172,7 @@ export const DeployComputeInstanceDialog = ({
                 render={({ field }) => (
                   <FormItemLayout
                     label="Access"
-                    description="Public instances accept requests with a publishable key"
+                    description="Public instances serve HTTP without an API key check. Private instances run as background workers with no inbound access."
                   >
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>

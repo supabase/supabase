@@ -12,6 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
+import { PRERENDERED_ROUTES } from './lib/prerendered-routes'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -38,7 +39,6 @@ const nextShims: Record<string, string> = {
   'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
-  'next/server': path.join(compatRoot, 'server.ts'),
 }
 
 // Combined compat + migration guard:
@@ -46,8 +46,7 @@ const nextShims: Record<string, string> = {
 //   shim (acts like resolve.alias).
 // - Otherwise, if app source imports from `next` or `next/*`, fail the
 //   build so we catch unshimmed usage at build time during the migration.
-// - node_modules imports (e.g. @sentry/nextjs reaching into next) pass
-//   through untouched.
+// - node_modules imports pass through untouched.
 function nextCompat(): Plugin {
   return {
     name: 'studio-next-compat',
@@ -83,14 +82,11 @@ const RAW_TEXT_SPECIFIERS: Record<string, string> = {
 const RAW_TEXT_PREFIX = '\0studio-raw-text:'
 const RAW_TEXT_SUFFIX = '.js'
 
-// Mirror the raw-loader rules from next.config.ts: serve `*.md` files (used
-// by `static-data/integrations/*/overview.md` via
+// Serve `*.md` files (used by `static-data/integrations/*/overview.md` via
 // `static-data/integrations/overviews.ts`) and the Deno typings in
 // `public/deno/*.d.ts` as JS modules whose default export is the file's
-// text. Vite has `?raw` for this, but the query suffix would have to live
-// in shared app source where it breaks the webpack/turbopack raw-loader
-// rule, so the import specifiers stay query-free and this plugin does the
-// conversion for the Vite pipeline.
+// text. The import specifiers stay query-free (no `?raw`) and this plugin
+// does the conversion.
 //
 // The `.d.ts` files can't go through a plain `transform` like the `.md`
 // files do: the dep scanner's native scan pipeline skips JS transform/load
@@ -132,12 +128,11 @@ function rawTextLoader(): Plugin {
 // editorWorkerService / graphql workers on the main thread ("Could not
 // create web worker(s)..." console warning). graphiql also ships
 // `setup-workers/vite`, which imports the same three workers via Vite's
-// `?worker` suffix; importing that unconditionally would break the Next
-// build, so the swap happens here instead of in app source.
+// `?worker` suffix, but those imports don't belong in the server graph, so
+// the swap happens here (client builds only) instead of in app source.
 //
 // SSR resolution is left untouched: neither variant's `getWorker` ever runs
-// during SSR, and the webpack flavor is a plain global assignment while the
-// vite flavor's `?worker` imports don't belong in the server graph.
+// during SSR, and the webpack flavor is a plain global assignment.
 function graphiqlViteWorkers(): Plugin {
   return {
     name: 'studio-graphiql-vite-workers',
@@ -235,8 +230,7 @@ function umdAmdShortCircuit(): Plugin {
 // a function"). Deep imports (`lodash/isEqual`) fail harder: their plain-CJS
 // `require` throws "require is not defined". lodash-es is the same version as
 // real ESM, so both import styles just work. Client bundles are untouched —
-// resolution is gated on `options.ssr`, and the Next build doesn't read this
-// config.
+// resolution is gated on `options.ssr`.
 function ssrLodashEs(): Plugin {
   return {
     name: 'studio-ssr-lodash-es',
@@ -385,6 +379,54 @@ function workersFollowClientAssetsDir(): Plugin {
   }
 }
 
+export function serverSourceMaps(): Plugin {
+  let ssrOutDir: string | undefined
+
+  return {
+    name: 'studio-server-source-maps',
+    apply: 'build',
+    enforce: 'pre',
+    applyToEnvironment: (environment) => environment.name === 'nitro',
+    configResolved(config) {
+      const outDir = config.environments.ssr?.build.outDir
+      if (outDir) ssrOutDir = path.resolve(config.root, outDir) + path.sep
+    },
+    async load(id) {
+      if (!ssrOutDir || !id.startsWith(ssrOutDir) || !/\.m?js$/.test(id)) return
+
+      // Vite does not load existing maps when Nitro rebundles the SSR service.
+      // Returning the adjacent map preserves the original application locations.
+      let map: string
+      try {
+        map = await fs.promises.readFile(`${id}.map`, 'utf8')
+      } catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return
+        throw error
+      }
+      return { code: await fs.promises.readFile(id, 'utf8'), map }
+    },
+  }
+}
+
+export function sentryForFinalOutputs(
+  options: Parameters<typeof sentryTanstackStart>[0]
+): Plugin[] {
+  return sentryTanstackStart(options).map((plugin) => {
+    if (plugin.name !== 'sentry-vite-plugin') return plugin
+    const applyToEnvironment = plugin.applyToEnvironment
+    return {
+      ...plugin,
+      applyToEnvironment(environment) {
+        // Nitro rebundles SSR code, so intermediate debug IDs must not compete with final IDs.
+        if (environment.name === 'ssr' && environment.getTopLevelConfig().command === 'build') {
+          return false
+        }
+        return applyToEnvironment?.(environment) ?? true
+      },
+    }
+  })
+}
+
 export default defineConfig(({ command, mode }) => {
   // Match Next's "always production-NODE_ENV during build" behaviour.
   // `pnpm run e2e:setup:selfhosted` invokes the build with a shell
@@ -454,8 +496,7 @@ export default defineConfig(({ command, mode }) => {
     'VERCEL_BRANCH_URL',
     // Sentry release (sentry.tanstack.ts): the SDK silently drops session
     // envelopes when the client has no release, so Release Health would send
-    // nothing. The commit SHA is also what withSentryConfig resolves the Next
-    // build's release to, keeping release names aligned across both builds.
+    // nothing.
     'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
@@ -473,20 +514,19 @@ export default defineConfig(({ command, mode }) => {
     ) ?? 'undefined'
 
   // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
-  // It's deliberately unprefixed, and the other two consumers both read it at
-  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
-  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
-  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // It's deliberately unprefixed, and `vercel.ts` reads it at BUILD time
+  // while emitting `vercel.json`, so flipping maintenance has always meant a
   // rebuild/redeploy, never just a server restart. Inline it here on the same
   // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
-  // mirrors those rules for the TanStack runtime — can read it on the client
+  // mirrors those rules for the Node server — can read it on the client
   // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
   // var. Falls back to `''` (not left undefined) so the browser bundle never
   // ends up with a bare `process.env` reference.
   publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
 
-  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
-  // these at runtime in the browser. When a var is unset it gets no define
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) and the
+  // error sample rates (lib/errors/error-routing.ts) read these at runtime in
+  // the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built
   // bundle — and an undeclared `process` throws in the browser. Inline
   // `undefined` as the fallback, mirroring how Next inlines unset
@@ -495,6 +535,9 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_SENTRY_DSN',
     'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_USER_FAULT',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
@@ -504,9 +547,12 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Self-hosted sign-in redirects straight to the default project, so there's nothing to prerender.
+  const prerenderedRoutes = env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? PRERENDERED_ROUTES : []
+  const shouldUploadSourceMaps =
+    process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
-  // Self-hosted responses get next.config.ts's security headers via Nitro
-  // route rules. On Vercel they come from vercel.ts: a `/**` header route in
+  // Self-hosted responses get the security headers via Nitro route rules. On Vercel they come from vercel.ts: a `/**` header route in
   // the Build Output config would stop matching before Nitro's asset and
   // skew-cookie rules.
   const securityHeaders = Object.fromEntries(
@@ -547,23 +593,6 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       tsconfigPaths: true,
-      alias: [
-        // `@sentry/nextjs`'s client entry drags in Next runtime internals
-        // (`next/dist/shared/lib/constants`), whose module scope evaluates
-        // `process?.features?.typescript` — optional chaining doesn't guard
-        // an undeclared `process` in the browser, so every built chunk
-        // containing it (e.g. table-editor) crashes at load with
-        // "ReferenceError: process is not defined". Dev is unaffected
-        // because the dev pipeline shims `process`. Point the bare import
-        // at a shim that re-exports `@sentry/react` (same 10.x version —
-        // it's what `@sentry/nextjs` wraps on the client) plus explicit
-        // stand-ins for the Next-only APIs. Next build (`build:next`)
-        // doesn't read this config and keeps the real package.
-        {
-          find: /^@sentry\/nextjs$/,
-          replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
-        },
-      ],
     },
     ...(basePath && { base: basePath }),
     optimizeDeps: {
@@ -673,17 +702,19 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
             }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
+            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
+              return 'ui-avatar'
+            }
             return undefined
           },
         },
       },
     },
     css: {
-      // Disable PostCSS auto-discovery. Studio's postcss.config.cjs is kept
-      // for the Next build (`build:next`) and uses `@tailwindcss/postcss`,
-      // but under Vite we let `@tailwindcss/vite` (added below) handle
-      // Tailwind v4 directives directly. Running both plugins on the same
-      // CSS would double-process Tailwind output.
+      // Disable PostCSS auto-discovery: `@tailwindcss/vite` (added below)
+      // handles Tailwind v4 directives directly, and a discovered PostCSS
+      // Tailwind plugin would double-process the output.
       postcss: { plugins: [] },
     },
     ssr: {
@@ -711,10 +742,8 @@ export default defineConfig(({ command, mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      // `@sentry/nextjs` deliberately has no entry here: the resolve.alias
-      // above rewrites it to the `@sentry/react`-backed shim before SSR
-      // resolution ever sees the id, and `@sentry/react` ships real ESM
-      // ("import" condition → build/esm), so plain externalization works.
+      // `@sentry/react` ships real ESM ("import" condition → build/esm), so
+      // plain externalization works and it needs no entry here.
       // `tslib` is inlined for the BUILD only: Nitro's dev runner has no CJS
       // interop for the `tslib.js` that its ESM wrapper default-imports, and
       // every SSR request would 500. Left external in dev, Node loads it.
@@ -735,12 +764,16 @@ export default defineConfig(({ command, mode }) => {
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
       workersFollowClientAssetsDir(),
+      serverSourceMaps(),
       devtools(),
       tailwindcss(),
       // Nitro builds and hosts the server for every target: the Vercel
       // function (`.vercel/output`, preset auto-detected from `VERCEL`) and
       // the self-hosted node server (`.output`).
       nitro({
+        // Nitro controls both SSR and final server maps. Preserve source content for Sentry.
+        sourcemap: true,
+        experimental: { sourcemapMinify: false },
         // `server.ts` is TanStack Start's SSR entry, not a Nitro entry;
         // without this Nitro's scan picks it up as both and warns.
         serverEntry: false,
@@ -764,7 +797,7 @@ export default defineConfig(({ command, mode }) => {
         },
         // Documents from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
-        modules: [vercelSpaRoutes({ basePath })],
+        modules: [vercelSpaRoutes({ basePath, prerenderedRoutes })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
       }),
       tanstackStart({
@@ -772,6 +805,10 @@ export default defineConfig(({ command, mode }) => {
         spa: {
           enabled: true,
         },
+        // Only the listed pages: crawling would follow their links into signed-in pages
+        // such as /organizations.
+        prerender: { crawlLinks: false, autoStaticPathsDiscovery: false },
+        pages: prerenderedRoutes.map((path) => ({ path, prerender: { enabled: true } })),
         // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
         // its slash-stripping branch. See the basePath comment above.
         ...(basePath && { router: { basepath: basePath } }),
@@ -784,15 +821,27 @@ export default defineConfig(({ command, mode }) => {
       // SENTRY_AUTH_TOKEN (and under SKIP_ASSET_UPLOAD). We disable the
       // middleware auto-wrap because start.ts wires the Sentry global
       // middlewares explicitly.
-      ...sentryTanstackStart({
+      ...sentryForFinalOutputs({
         org: process.env.SENTRY_ORG ?? 'supabase',
         project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
         authToken: process.env.SENTRY_AUTH_TOKEN,
         autoInstrumentMiddleware: false,
-        sourcemaps:
-          process.env.SKIP_ASSET_UPLOAD === '1' || !process.env.SENTRY_AUTH_TOKEN
-            ? { disable: true }
-            : undefined,
+        silent: true,
+        sourcemaps: {
+          disable: !shouldUploadSourceMaps,
+          // Intermediate SSR maps must survive until Nitro composes the final server maps.
+          // Skipped uploads retain private server maps for local diagnostics.
+          filesToDeleteAfterUpload: [
+            path.join(rootDir, '.output/public/**/*.map'),
+            path.join(rootDir, '.vercel/output/static/**/*.map'),
+            ...(shouldUploadSourceMaps
+              ? [
+                  path.join(rootDir, '.output/server/**/*.map'),
+                  path.join(rootDir, '.vercel/output/functions/**/*.map'),
+                ]
+              : []),
+          ],
+        },
       }),
     ],
   }

@@ -16,6 +16,25 @@ Access tokens are designed to be short lived, usually between 5 minutes and 1 ho
 
 This process is called **refreshing the session.**
 
+The `supabase-js` client library refreshes the session for you, because its `autoRefreshToken` option defaults to `true`. The client library checks the session at a short interval and exchanges the refresh token shortly before the access token expires. A browser app doesn't need its own refresh code. In the browser, auto refresh pauses while the tab is hidden, and resumes with a check of the session when the tab is visible again.
+
+To react to a new access token, listen for the `TOKEN_REFRESHED` event with [`onAuthStateChange`](/docs/reference/javascript/auth-onauthstatechange):
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'TOKEN_REFRESHED') {
+    // use session.access_token
+  }
+})
+```
+
+To force a refresh, for example to pick up changed custom claims, call [`refreshSession()`](/docs/reference/javascript/auth-refreshsession).
+
 A session terminates, depending on configuration, when:
 
 - The user clicks sign out.
@@ -87,7 +106,7 @@ As your users continue using your app, refresh tokens are being constantly excha
 The general rule is that a refresh token can only be used once. However, strictly enforcing this can cause certain issues to arise. There are two exceptions to this design to prevent the early and unexpected termination of user's sessions:
 
 - A refresh token can be used more than once within a defined reuse interval. By default this is 10 seconds and we do not recommend changing this value. This exception is granted for legitimate situations such as:
-  - Using server-side rendering where the same refresh token needs to be reused on the server and soon after on the client
+  - Using [server-side rendering](/docs/guides/auth/server-side) where the same refresh token needs to be reused on the server and soon after on the client
   - To allow some leeway for bugs or issues with serializing access to the refresh token request
 - If the parent of the currently active refresh token for the user's session is being used, the active token will be returned. This exception solves an important and often common situation:
   - All clients such as browsers, mobile or desktop apps, and even some servers are inherently unreliable due to network issues. A request does not indicate that they received a response or even processed the response they received.
@@ -125,7 +144,7 @@ This is possible, but only for apps that use the traditional server-only web app
 
 If your app uses any client side JavaScript to build a rich user experience, using HTTP-Only cookies is not feasible since only your server will be able to read and refresh the session of the user. The browser will not have access to the access and refresh tokens.
 
-Because of this, the Supabase JavaScript libraries provide only limited support. You can override the `storage` option when creating the Supabase client **on the server** to store the values in cookies or your preferred storage choice, for example:
+Because of this, the Supabase JavaScript libraries provide only limited support. You can override the `storage` option when creating the [Supabase client](/docs/reference/javascript/introduction) **on the server** to store the values in cookies or your preferred storage choice, for example:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'

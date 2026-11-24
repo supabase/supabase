@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { BarChart2Icon, ChevronRightIcon, ExternalLinkIcon, TelescopeIcon } from 'lucide-react'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   Chart,
@@ -43,10 +42,12 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
-import { Service } from '@/data/graphql/graphql'
+import { splitInternalUrl } from '@/lib/internal-url'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -67,13 +68,13 @@ const StatCard = ({
   href?: string
   tooltip?: string
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const actions = [
     {
       label: 'Go to Auth Report',
-      icon: <ExternalLink size={12} />,
-      onClick: href ? () => router.push(href) : undefined,
+      icon: <ExternalLinkIcon size={12} />,
+      onClick: href ? () => navigate(splitInternalUrl(href)) : undefined,
     },
   ]
 
@@ -104,8 +105,8 @@ const LogsLink = ({ href }: { href: string }) => (
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild
       >
-        <Link href={href} aria-label="Go to Logs">
-          <ChevronRight size={12} />
+        <Link {...splitInternalUrl(href)} aria-label="Go to Logs">
+          <ChevronRightIcon size={12} />
         </Link>
       </Button>
     </TooltipTrigger>
@@ -122,6 +123,8 @@ interface OverviewMetricsProps {
 export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsProps) => {
   const { ref } = useParams()
   const useOtel = useFlag('otelLegacyLogs')
+  const { isEnabled: isUnifiedLogsEnabled, isDefaultOptIn } = useUnifiedLogsPreview()
+  const shouldUseUnifiedLogs = isUnifiedLogsEnabled || isDefaultOptIn
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -214,12 +217,14 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <div className="flex items-center justify-between">
               <PageSectionTitle>Usage</PageSectionTitle>
               <Link
-                href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
+                {...splitInternalUrl(
+                  `/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`
+                )}
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
-                <Telescope size={14} className="text-foreground-lighter" />
+                <TelescopeIcon size={14} className="text-foreground-lighter" />
                 <span>Go to observability</span>
-                <ChevronRight size={14} className="text-foreground-lighter" />
+                <ChevronRightIcon size={14} className="text-foreground-lighter" />
               </Link>
             </div>
           </PageSectionSummary>
@@ -294,7 +299,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />
@@ -335,7 +340,29 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
-                            <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
+                            {ref && respErrData && (
+                              <LogsLink
+                                href={
+                                  shouldUseUnifiedLogs
+                                    ? buildUnifiedLogsUrl({
+                                        projectRef: ref,
+                                        logType: 'edge',
+                                        start: respErrData.start,
+                                        end: respErrData.end,
+                                        filters: [
+                                          { column: 'method', operator: '=', value: row.method },
+                                          { column: 'pathname', operator: '=', value: row.path },
+                                          {
+                                            column: 'status',
+                                            operator: '=',
+                                            value: String(row.status_code),
+                                          },
+                                        ],
+                                      })
+                                    : `/project/${ref}/logs/edge-logs?s=${encodeURIComponent(row.path)}`
+                                }
+                              />
+                            )}
                           </div>
                         ),
                       },
@@ -366,7 +393,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />
@@ -387,7 +414,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Error code',
                         className: 'w-full',
                         render: (row) => (
-                          <ErrorCodeTooltip errorCode={row.error_code} service={Service.Auth}>
+                          <ErrorCodeTooltip errorCode={row.error_code} service={'AUTH'}>
                             <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light cursor-default">
                               {row.error_code}
                             </span>

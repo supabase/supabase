@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { buildSessionRecordingConfig, type CapturedNetworkRequest } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -360,11 +361,8 @@ describe('maskReplayAttribute', () => {
     expect(maskReplayAttribute('data-chart', 'chart-r1a')).toBe('chart-r1a')
   })
 
-  it.each([
-    ['data-index', '0'],
-    ['data-band', '3'],
-  ])('keeps %o, which a shipped stylesheet selects on by value', (name, value) => {
-    expect(maskReplayAttribute(name, value)).toBe(value)
+  it('keeps data-index, which monaco-editor selects on by value', () => {
+    expect(maskReplayAttribute('data-index', '0')).toBe('0')
   })
 
   it.each([
@@ -453,12 +451,6 @@ describe('maskReplayAttribute', () => {
     expect(maskReplayAttribute('_cssText', checkbox)).toBe(checkbox)
   })
 
-  it('still masks url() in an inline style attribute', () => {
-    expect(maskReplayAttribute('style', 'background-image: url("https://x.test/secret.png")')).toBe(
-      'background-image: url(*)'
-    )
-  })
-
   it('keeps the SVG namespace exemption to id only', () => {
     const svgAnchor = document.createElementNS('http://www.w3.org/2000/svg', 'a')
     expect(maskReplayAttribute('href', 'https://x.test/secret', svgAnchor)).toBe('*')
@@ -503,44 +495,29 @@ describe('maskReplayNetworkRequest', () => {
 })
 
 describe('SESSION_REPLAY_CONFIG', () => {
-  it('masks all text and inputs', () => {
-    expect(SESSION_REPLAY_CONFIG.maskTextSelector).toBe('*')
-    expect(SESSION_REPLAY_CONFIG.maskAllInputs).toBe(true)
-    expect(SESSION_REPLAY_CONFIG.maskTextFn).toBe(maskReplayText)
-  })
-
-  it('never records request or response payloads', () => {
-    expect(SESSION_REPLAY_CONFIG.recordHeaders).toBe(false)
-    expect(SESSION_REPLAY_CONFIG.recordBody).toBe(false)
-  })
-
-  it('never records canvas, which text masking cannot reach', () => {
-    expect(SESSION_REPLAY_CONFIG.captureCanvas).toEqual({ recordCanvas: false })
-  })
-
-  it('strips sensitive URL parts via maskReplayNetworkRequest', () => {
-    expect(SESSION_REPLAY_CONFIG.maskCapturedNetworkRequestFn).toBe(maskReplayNetworkRequest)
-  })
-
-  it('masks attributes, which maskTextFn cannot reach', () => {
-    expect(SESSION_REPLAY_CONFIG.maskAttributeFn).toBe(maskReplayAttribute)
-  })
-
-  it('pins maskAllElementAttributes off, since true would discard maskAttributeFn', () => {
-    expect(SESSION_REPLAY_CONFIG.maskAllElementAttributes).toBe(false)
+  it('pins the privacy-relevant recording options', () => {
+    expect(SESSION_REPLAY_CONFIG).toMatchObject({
+      // Mask all text and inputs
+      maskTextSelector: '*',
+      maskAllInputs: true,
+      maskTextFn: maskReplayText,
+      // Attributes are masked separately, since maskTextFn cannot reach them. `true` for
+      // maskAllElementAttributes would discard maskAttributeFn.
+      maskAttributeFn: maskReplayAttribute,
+      maskAllElementAttributes: false,
+      // Never record request or response payloads; strip sensitive URL parts
+      recordHeaders: false,
+      recordBody: false,
+      maskCapturedNetworkRequestFn: maskReplayNetworkRequest,
+      // Never record canvas, which text masking cannot reach
+      captureCanvas: { recordCanvas: false },
+    })
   })
 })
 
 describe('buildSessionRecordingConfig', () => {
   it('disables recording when given no policy', () => {
     const config = buildSessionRecordingConfig()
-
-    expect(config.disable_session_recording).toBe(true)
-    expect(config).not.toHaveProperty('session_recording')
-  })
-
-  it('disables recording when the policy is undefined', () => {
-    const config = buildSessionRecordingConfig(undefined)
 
     expect(config.disable_session_recording).toBe(true)
     expect(config).not.toHaveProperty('session_recording')

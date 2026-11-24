@@ -3,12 +3,7 @@
 import { compact, debounce } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
-// This app's own base path, set only for apps deployed under a path prefix (docs' is '/docs').
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-// Public URL of the docs deployment, which hosts the search API routes.
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
-// From inside the docs app itself, call our own routes relatively; from studio/www, call docs directly.
-const SEARCH_API_BASE = BASE_PATH === '/docs' ? BASE_PATH : DOCS_URL
+import { useMountEffect } from './useMountEffect'
 
 interface DocsSearchV2Result {
   path: string
@@ -21,7 +16,7 @@ interface DocsSearchV2Result {
 
 type SearchState =
   | { status: 'initial'; key: number }
-  | { status: 'loading'; key: number; staleResults: DocsSearchV2Result[] }
+  | { status: 'loading'; key: number; staleResults: DocsSearchV2Result[]; staleQuery: string }
   | { status: 'results'; key: number; results: DocsSearchV2Result[]; query: string }
   | { status: 'noResults'; key: number; query: string }
   | { status: 'error'; key: number; message: string }
@@ -74,6 +69,8 @@ function reducer(state: SearchState, action: Action): SearchState {
         key: action.key,
         staleResults:
           'results' in state ? state.results : 'staleResults' in state ? state.staleResults : [],
+        // keep highlighted query while loading
+        staleQuery: 'query' in state ? state.query : 'staleQuery' in state ? state.staleQuery : '',
       }
     case 'reset':
       return { status: 'initial', key: action.key }
@@ -84,43 +81,59 @@ function reducer(state: SearchState, action: Action): SearchState {
   }
 }
 
-const useDocsSearchV2 = () => {
+interface UseDocsSearchV2Options {
+  /** URL of a search endpoint that takes `?q=` and returns a JSON array. Relative or absolute. */
+  endpoint: string
+  /**
+   * Turns one row of the endpoint's response into a result, or null to drop it. Defaults to the
+   * docs' row shape. Pass a stable reference (module scope), or every render restarts the debounce.
+   */
+  reshape?: (row: unknown) => DocsSearchV2Result | null
+}
+
+const useDocsSearchV2 = ({ endpoint, reshape = reshapeResult }: UseDocsSearchV2Options) => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const key = useRef(0)
 
-  const handleSearch = useCallback(async (query: string) => {
-    key.current += 1
-    const localKey = key.current
-    dispatch({ type: 'newSearchDispatched', key: localKey })
+  const handleSearch = useCallback(
+    async (query: string) => {
+      key.current += 1
+      const localKey = key.current
+      dispatch({ type: 'newSearchDispatched', key: localKey })
 
-    try {
-      const params = new URLSearchParams({ q: query.trim() })
-      const response = await fetch(`${SEARCH_API_BASE}/api/search_v2?${params}`)
-      const data = await response.json()
-      if (!Array.isArray(data)) {
-        throw new Error(data?.error ?? "didn't get expected results array")
+      try {
+        const params = new URLSearchParams({ q: query.trim() })
+        const response = await fetch(`${endpoint}?${params}`)
+        const data = await response.json()
+        if (!Array.isArray(data)) {
+          throw new Error(data?.error ?? "didn't get expected results array")
+        }
+        dispatch({
+          type: 'resultsReturned',
+          key: localKey,
+          results: compact(data.map(reshape)),
+          query: query.trim(),
+        })
+      } catch (error) {
+        console.error(`[ERROR] Error fetching docs search v2 results: ${error}`)
+        dispatch({
+          type: 'errored',
+          key: localKey,
+          message: error instanceof Error ? error.message : '',
+        })
       }
-      dispatch({
-        type: 'resultsReturned',
-        key: localKey,
-        results: compact(data.map(reshapeResult)),
-        query: query.trim(),
-      })
-    } catch (error) {
-      console.error(`[ERROR] Error fetching docs search v2 results: ${error}`)
-      dispatch({
-        type: 'errored',
-        key: localKey,
-        message: error instanceof Error ? error.message : '',
-      })
-    }
-  }, [])
+    },
+    [endpoint, reshape]
+  )
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 250), [handleSearch])
 
   const debounceCancel = useCallback(() => {
     debouncedSearch.cancel()
   }, [debouncedSearch])
+
+  // the dialog unmounts on close, so cancel any pending search instead of fetching after it's gone
+  useMountEffect(() => debounceCancel)
 
   const resetSearch = useCallback(() => {
     debounceCancel()
@@ -137,4 +150,4 @@ const useDocsSearchV2 = () => {
 }
 
 export { useDocsSearchV2 }
-export type { DocsSearchV2Result }
+export type { DocsSearchV2Result, UseDocsSearchV2Options, SearchState as DocsSearchV2State }

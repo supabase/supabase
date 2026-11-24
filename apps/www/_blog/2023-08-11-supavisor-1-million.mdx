@@ -23,7 +23,7 @@ And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgre
 
 ## What is Supavisor?
 
-Supavisor is a scalable, cloud-native Postgres connection pooler. It has been developed with multi-tenancy in mind, handling millions of connections without significant overhead or latency. Supavisor is built in Elixir, in partnership with [José Valim](https://twitter.com/josevalim) (the creator of Elixir) and the [Dashbit](https://dashbit.co/) team.
+[Supavisor](https://supabase.com/features/supavisor) is a scalable, cloud-native Postgres connection pooler. It has been developed with multi-tenancy in mind, handling millions of connections without significant overhead or latency. Supavisor is built in Elixir, in partnership with [José Valim](https://twitter.com/josevalim) (the creator of Elixir) and the [Dashbit](https://dashbit.co/) team.
 
 <Img
   alt="diagram of supavisor architecture"
@@ -46,7 +46,7 @@ We've benchmarked the characteristics Supavisor exhibits under load before rolli
 We use a [custom load-testing application](https://github.com/supabase/benchmarks) to test the features of the Supabase platform. It consists of:
 
 1. Terraform scripts for creating a testing environment on AWS.
-2. k6 as the load generator. We used the k6 guides for [running large-scale tests](https://k6.io/docs/testing-guides/running-large-tests/) and [fine-tuning OS](https://k6.io/docs/misc/fine-tuning-os/) to tweak the config for AWS instances.
+2. k6 as the load generator. We used the k6 guides for [running large-scale tests](https://grafana.com/docs/k6/latest/testing-guides/running-large-tests/) and [fine-tuning OS](https://grafana.com/docs/k6/latest/set-up/fine-tune-os/) to tweak the config for AWS instances.
 3. Grafana + Prometheus for monitoring.
 
 To simulate 1,000,000 concurrent active connections, we used 20 AWS EC2 instances with 16 cores and 32GB of RAM. We ran the tests for up to 2 hours to ensure that the Supavisor can handle load over long periods.
@@ -251,7 +251,7 @@ In the future, you connect to a distinct multi-tenant Supavisor cluster through 
   src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--supavisor-and-supabase.png"
 />
 
-We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the experiment more realistic, we enabled the PostGIS extension to store coordinates:
+We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the experiment more realistic, we enabled the [PostGIS](/docs/guides/database/extensions/postgis) extension to store coordinates:
 
 ```sql
 insert into positions (
@@ -333,7 +333,7 @@ Supavisor will be added to the self-hosted stack as soon as we have tested it ac
 
 ## Conclusion
 
-Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of edge functions and serverless.
+Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of [edge functions](/docs/guides/functions) and serverless.
 
 If you are interested in exploring Supavisor's potential or want to implement its scalability in your upcoming project, check out [the GitHub repository](https://github.com/supabase/supavisor) to know more.
 

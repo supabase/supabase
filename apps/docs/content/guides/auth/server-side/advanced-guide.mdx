@@ -24,6 +24,10 @@ In the PKCE flow, a redirect is made to your app, with an Auth Code contained in
 
 To maintain the session, these tokens must be stored in a storage medium securely shared between client and server, which is traditionally cookies. Whenever the session is refreshed, the auth and refresh tokens in the shared storage medium must be updated. Supabase client libraries provide a customizable `storage` option when a client is initiated, allowing you to change where tokens are stored.
 
+When the session changes, a client created with `createServerClient` from `@supabase/ssr` writes it through your `setAll` cookie handler. This happens when the client signs a user in, exchanges a code, refreshes the session, or updates the user. The session includes the access token and refresh token. The cookie is named `sb-<project_ref>-auth-token` by default, and a large session is split into numbered cookies such as `sb-<project_ref>-auth-token.0`. Your app must send those cookies, and the cache headers that `setAll` receives, on the response. When the client signs the user out, it clears the cookies through `setAll` in the same way.
+
+On a later request, create a new server client for that request. It reads the session back from the request's cookies through your `getAll` cookie handler. A sign-in on one server route carries over to every route that receives the cookie. You don't need to call `setSession` or pass the refresh token around yourself. For the `getAll` and `setAll` setup in each framework, see [Creating a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client).
+
 ## Frequently asked questions
 
 ### No session on the server side with Next.js route prefetching?
@@ -34,7 +38,7 @@ To improve experience for your users, we recommend redirecting users to one spec
 
 ### How do I make the cookies `HttpOnly`?
 
-This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway.
+This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway. See also [How do I make the cookies HttpOnly](/kb/troubleshooting/how-do-i-make-the-cookies-httponly-vwweFx).
 
 ### My server is getting invalid refresh token errors. What's going on?
 
@@ -46,7 +50,7 @@ A common cause is calling `supabase.auth.signOut()` without a `scope`. It defaul
 
 ### Should I set a shorter `Max-Age` parameter on the cookies?
 
-The `Max-Age` or `Expires` cookie parameters only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.
+The `Max-Age` or `Expires` [cookie parameters](/kb/troubleshooting/should-i-set-a-shorter-max-age-parameter-on-the-cookies-8sbF4V) only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.
 
 The only way to detect that a session ended server-side, for example because the user signed out on another device, is to fetch the user with `getUser()`. `getClaims()` verifies the token's signature and expiry, which is what authorizes a request, but an unexpired token stays valid even when the session behind it was revoked. Call `getUser()` where that gap matters.
 
@@ -110,7 +114,7 @@ If you need to cache SSR pages for performance, apply caching only to routes tha
 
 #### Vercel Fluid compute (in-memory client sharing)
 
-Vercel's Fluid compute model can keep server instances warm and reuse them across requests. In some cases this means a Supabase client initialized in module scope — or stored in a shared variable — may be reused across requests from different users, causing one user's session to leak into another user's request.
+Vercel's Fluid compute model can keep server instances warm and reuse them across requests. In some cases this means a [Supabase client](/docs/reference/javascript/introduction) initialized in module scope — or stored in a shared variable — may be reused across requests from different users, causing one user's session to leak into another user's request.
 
 Always initialize the Supabase client inside the request handler, not at module level. Do not store the client or any user-specific state in a variable that persists between requests.
 

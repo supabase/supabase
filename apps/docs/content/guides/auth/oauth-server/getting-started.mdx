@@ -49,9 +49,9 @@ OAuth 2.1 server is in beta and available on all Supabase plans. It has no separ
 </TabPanel>
 <TabPanel id="cli" label="CLI">
 
-Edit your `supabase/config.toml` file and add the OAuth server configuration:
+Edit your config file (`supabase/config.toml` or `supabase/config.jsonc`) and add the OAuth server configuration:
 
-```toml
+```toml supabase/config.toml
 [auth.oauth_server]
 enabled = true
 authorization_url_path = "/oauth/consent"
@@ -103,9 +103,9 @@ Once enabled, your project will expose the necessary OAuth endpoints:
 
 To test OAuth flows with external applications, you can expose your local Supabase instance using a tunnel solution (such as [ngrok](https://ngrok.com/) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)).
 
-When using a tunnel, configure the `jwt_issuer` field in your `supabase/config.toml` to match your tunnel URL:
+When using a tunnel, set `auth.jwt_issuer` in your config file to match your tunnel URL:
 
-```toml
+```toml supabase/config.toml
 [auth]
 jwt_issuer = "https://my-tunnel.url/auth/v1"
 ```
@@ -165,7 +165,7 @@ Your authorization UI should:
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
 2. **Authenticate the user** - If not already signed in, redirect to your sign-in page (preserving the authorization_id)
 3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information including requested scopes
-4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
+4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested (available as a [pre-built web component](/library/docs/nextjs/oauth-consent))
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
 
 The authorization details include a `scope` field (singular) containing a space-separated string of scopes requested by the client (e.g., `"openid email profile"`). You should display these scopes to the user so they understand what information will be shared.

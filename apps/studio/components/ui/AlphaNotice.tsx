@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge, Button } from 'ui'
@@ -24,7 +24,7 @@ export const AlphaNotice = ({
       type="note"
       layout="horizontal"
       actions={
-        <Button asChild icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
+        <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
           <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
             Share feedback
           </Link>
@@ -57,9 +57,11 @@ export const AlphaNotice = ({
             <p className="text-sm font-medium">Introducing {entity.toLocaleLowerCase()}</p>
           </div>
           <p className="text-sm text-foreground-lighter text-balance">
-            {entity} {entity.endsWith('s') ? 'are' : 'is'} now in private alpha. Expect rapid
-            changes, limited features, and possible breaking updates. Please share feedback as we
-            refine the experience and expand access.
+            {entity} {entity.endsWith('s') ? <span>are</span> : <span>is</span>}{' '}
+            <span>
+              now in private alpha. Expect rapid changes, limited features, and possible breaking
+              updates. Please share feedback as we refine the experience and expand access.
+            </span>
           </p>
           {children}
         </div>

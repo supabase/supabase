@@ -311,16 +311,12 @@ describe('formatAccessText', () => {
     expect(formatAccessText('no access')).toBe('No access')
   })
 
-  it('should capitalize a single word', () => {
-    expect(formatAccessText('read')).toBe('Read')
-  })
-
-  it('should capitalize each hyphen-separated word', () => {
-    expect(formatAccessText('read-write')).toBe('Read-Write')
-  })
-
-  it('should handle multi-segment actions', () => {
-    expect(formatAccessText('read-write-delete')).toBe('Read-Write-Delete')
+  it.each([
+    ['read', 'Read'],
+    ['read-write', 'Read-Write'],
+    ['read-write-delete', 'Read-Write-Delete'],
+  ])('capitalizes each hyphen-separated word of %s', (access, expected) => {
+    expect(formatAccessText(access)).toBe(expected)
   })
 })
 
@@ -338,33 +334,16 @@ describe('getExpirationDate', () => {
     vi.useRealTimers()
   })
 
-  it('should return a date exactly 1 hour from now for "hour"', () => {
-    const result = getExpirationDate('hour')!
-    expect(result).toBe(dayjs(FIXED_DATE).add(1, 'hours').toISOString())
-  })
-
-  it('should return a date exactly 1 day from now for "day"', () => {
-    const result = getExpirationDate('day')!
-    expect(result).toBe(dayjs(FIXED_DATE).add(1, 'day').toISOString())
-  })
-
-  it('should return a date exactly 7 days from now for "week"', () => {
-    const result = getExpirationDate('week')!
-    expect(result).toBe(dayjs(FIXED_DATE).add(7, 'days').toISOString())
-  })
-
-  it('should return a date exactly 30 days from now for "month"', () => {
-    const result = getExpirationDate('month')!
-    expect(result).toBe(dayjs(FIXED_DATE).add(30, 'days').toISOString())
+  it.each([
+    ['hour', 1, 'hours'],
+    ['day', 1, 'day'],
+    ['week', 7, 'days'],
+    ['month', 30, 'days'],
+  ] as const)('returns the ISO date %s from now', (key, amount, unit) => {
+    expect(getExpirationDate(key)).toBe(dayjs(FIXED_DATE).add(amount, unit).toISOString())
   })
 
   it('should return undefined for an unknown key', () => {
     expect(getExpirationDate('unknown')).toBeUndefined()
-  })
-
-  it('should return a valid ISO string', () => {
-    const result = getExpirationDate('hour')!
-    expect(dayjs(result).isValid()).toBe(true)
-    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T/)
   })
 })

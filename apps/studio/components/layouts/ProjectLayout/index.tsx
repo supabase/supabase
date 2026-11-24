@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -44,13 +44,14 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { isEligibleForFreeMicroUpgrade } from '@/components/interfaces/Support/FreeMicroUpgradeSuggestion.utils'
 import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
+import { isFreeMicroUpgradeBannerSnoozed } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -119,6 +120,8 @@ export interface ProjectLayoutProps {
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
+  /** Starting width of the product menu in pixels, for menus that list more than links */
+  productMenuDefaultSize?: number
   productMenuClassName?: string
 }
 
@@ -135,7 +138,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       children,
       selectedTable,
       resizableSidebar = false,
-
+      productMenuDefaultSize = 256,
       productMenuClassName,
     },
     ref
@@ -144,25 +147,20 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
-    const { data: resourceWarnings } = useResourceWarningsQuery({
-      slug: selectedOrganization?.slug,
+
+    const showUpgradeBanner = isEligibleForFreeMicroUpgrade({
+      planId: selectedOrganization?.plan?.id,
+      computeSize: selectedProject?.infra_compute_size,
     })
-    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
-      (w) => w.project === selectedProject?.ref
-    )
-    const isComputeNearExhaustion =
-      !!projectResourceWarnings?.cpu_exhaustion ||
-      !!projectResourceWarnings?.memory_and_swap_exhaustion ||
-      !!projectResourceWarnings?.disk_space_exhaustion ||
-      !!projectResourceWarnings?.disk_io_exhaustion
-    const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
 
     const isExplorerEnabled = useFlag('explorer')
 
-    const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
+    const [freeMicroUpgradeBannerDismissedAt] = useLocalStorageQuery<string | null>(
+      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT(selectedProject?.ref ?? ''),
+      null
+    )
+    const isFreeMicroUpgradeBannerDismissed = isFreeMicroUpgradeBannerSnoozed(
+      freeMicroUpgradeBannerDismissedAt
     )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
@@ -185,7 +183,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-    const currentSectionKey = getSectionKeyFromPathname(pathname)
+    const isIssuesInboxEnabled = useFlag('issuesInbox')
+    const sectionKey = getSectionKeyFromPathname(pathname)
+    const currentSectionKey =
+      sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
     const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
@@ -220,6 +221,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/branches') ||
       router.pathname.includes('/project/[ref]/settings') ||
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
@@ -307,11 +309,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             {productMenu && sideBarIsOpen && (
               <ResizablePanel
                 panelRef={panelRef}
-                minSize={256}
-                maxSize={resizableSidebar ? 512 : 256}
-                defaultSize={256}
+                minSize="256px"
+                maxSize={resizableSidebar ? '512px' : '256px'}
+                defaultSize={`${productMenuDefaultSize}px`}
+                groupResizeBehavior="preserve-pixel-size"
                 id="panel-left"
-                disabled={!resizableSidebar}
               >
                 <AnimatePresence initial={false}>
                   <motion.div

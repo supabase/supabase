@@ -2,7 +2,6 @@
 id: 'examples-postgres-on-the-edge'
 title: 'Integrating with Supabase Database (Postgres)'
 description: 'Connecting to Postgres from Edge Functions.'
-subtitle: 'Connect to your Postgres database from Edge Functions.'
 tocVideo: 'cl7EuF1-RsY'
 ---
 
@@ -13,7 +12,7 @@ You can also use other Postgres clients like [Deno Postgres](https://deno.land/x
 
 ## Using supabase-js
 
-The [`withSupabase`](/docs/guides/functions/auth) wrapper from `@supabase/server` hands you a `supabase-js` client (`ctx.supabase`) already scoped to the caller's Row Level Security policies, so you don't manage keys or authorization headers yourself. It also provides `ctx.supabaseAdmin` for privileged operations that bypass Row Level Security. Responses are automatically formatted as JSON. This is the recommended approach for most applications:
+The [`withSupabase`](/docs/guides/functions/auth) wrapper from `@supabase/server` hands you a `supabase-js` client (`ctx.supabase`) already scoped to the caller's Row Level Security policies, so you don't manage keys or authorization headers yourself. It also provides `ctx.supabaseAdmin` for privileged operations that bypass [Row Level Security](/docs/guides/database/postgres/row-level-security). Responses are automatically formatted as JSON. This is the recommended approach for most applications:
 
 ```ts index.ts
 import { withSupabase } from 'npm:@supabase/server@^1'
@@ -96,7 +95,7 @@ You can find the full example on [GitHub](https://github.com/supabase/supabase/t
 
 ### Production
 
-Deployed edge functions are pre-configured to use SSL for connections to the Supabase database. You don't need to add any extra configurations.
+Deployed edge functions are pre-configured to use SSL for connections to the [Supabase database](/docs/guides/database/overview). You don't need to add any extra configurations.
 
 ### Local development
 

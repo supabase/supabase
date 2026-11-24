@@ -95,7 +95,7 @@ export type QueryType =
   | 'pg_upgrade'
   | 'pg_cron'
   | 'pgbouncer'
-  | 'etl'
+  | 'pipelines'
   | 'multigres'
 
 export type Mode = 'simple' | 'custom'

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import type { AnyRouter } from '@tanstack/react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -94,7 +95,10 @@ describe('initSentryTanStackClient', () => {
 
     initSentryTanStackClient(fakeRouter)
 
-    expect(sentryMocks.tanstackRouterBrowserTracingIntegration).toHaveBeenCalledWith(fakeRouter)
+    expect(sentryMocks.tanstackRouterBrowserTracingIntegration).toHaveBeenCalledWith(
+      fakeRouter,
+      expect.any(Object)
+    )
 
     const [options] = sentryMocks.init.mock.calls[0]
     // `integrations` is the function form: Sentry.init calls it with the
@@ -115,11 +119,28 @@ describe('initSentryTanStackClient', () => {
     expect(integrations).not.toContainEqual({ name: 'ThirdPartyErrorsFilter' })
   })
 
+  it('opts out of per-asset resource spans', async () => {
+    // The Vite build ships ~250 immutable chunks on initial load and the
+    // browser tracing integration would make each one a child span of the
+    // pageload transaction — over half the project's span volume, enough to
+    // trip Sentry's spike protection (FE-4755). `http.client` spans are
+    // unaffected: the SDK excludes fetch/xhr initiators from resource spans.
+    const initSentryTanStackClient = await loadInitializer()
+
+    initSentryTanStackClient(fakeRouter)
+
+    expect(sentryMocks.tanstackRouterBrowserTracingIntegration).toHaveBeenCalledWith(
+      fakeRouter,
+      expect.objectContaining({
+        ignoreResourceSpans: ['resource.other', 'resource.link', 'resource.script'],
+      })
+    )
+  })
+
   it('passes the Vercel commit SHA as the release so session envelopes are sent', async () => {
     // The SDK silently drops session envelopes when the client has no release
     // (`Client.sendSession` early-returns) — without this, Release Health
-    // sends no /envelope traffic at all on the TanStack build. The Next build
-    // instead gets its release injected at build time by withSentryConfig.
+    // sends no /envelope traffic at all.
     vi.stubEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA', 'abc123commit')
     const initSentryTanStackClient = await loadInitializer()
 

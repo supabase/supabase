@@ -19,10 +19,10 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
 import { DOCS_URL } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface HighQueryCostErrorProps {
-  error: ResponseError
+  error: StudioError
   suggestions?: string[]
   onSelectLoadData?: () => void
 }
@@ -76,7 +76,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}
@@ -124,7 +124,7 @@ const LoadDataWarningDialog = ({
   error,
   onSelectLoadData,
 }: {
-  error: ResponseError
+  error: StudioError
   onSelectLoadData: () => void
 }) => {
   const metadata = error.metadata
@@ -150,7 +150,7 @@ const LoadDataWarningDialog = ({
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}

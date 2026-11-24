@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 type Highlight = {
   title: string
   badge?: string
@@ -75,7 +77,11 @@ export function HighlightsSection() {
               </div>
               <div className="mt-6">
                 <Button size="small" asChild>
-                  <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  {isCrossZoneHref(highlight.cta.href) ? (
+                    <a href={highlight.cta.href}>{highlight.cta.label}</a>
+                  ) : (
+                    <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  )}
                 </Button>
               </div>
             </div>

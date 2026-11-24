@@ -5,6 +5,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { PUBLICATION_FIELD_COPY } from './DestinationFormFieldCopy'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
@@ -13,11 +14,13 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
   onSelectNewPublication: () => void
+  showLoadError?: boolean
 }
 
 export const PublicationSelection = ({
   form,
   onSelectNewPublication,
+  showLoadError = true,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
@@ -49,14 +52,16 @@ export const PublicationSelection = ({
         ? 'Partitioned tables use the parent table identity.'
         : 'Each partition is replicated separately.'
     } else if (isPublicationError || isSourceUnavailable) {
-      partitionHandlingMessage = 'Partition handling could not be loaded.'
+      if (showLoadError || isSourceUnavailable) {
+        partitionHandlingMessage = 'Partition handling could not be loaded.'
+      }
     } else {
       isPartitionHandlingLoading = true
     }
   }
 
   const publicationDescription = [
-    'Tables in the selected publication will be replicated to this destination.',
+    PUBLICATION_FIELD_COPY.description,
     isPartitionHandlingLoading ? 'Loading partition handling...' : partitionHandlingMessage,
   ]
     .filter(Boolean)
@@ -69,7 +74,7 @@ export const PublicationSelection = ({
       render={({ field }) => (
         <FormItemLayout
           layout="horizontal"
-          label="Publication"
+          label={PUBLICATION_FIELD_COPY.label}
           description={publicationDescription}
         >
           <span role="status" className="sr-only">
@@ -101,6 +106,7 @@ export const PublicationSelection = ({
                     })
                   }
                   field.onChange(value)
+                  form.clearErrors('publicationName')
                 },
               }}
               sourceId={sourceId}

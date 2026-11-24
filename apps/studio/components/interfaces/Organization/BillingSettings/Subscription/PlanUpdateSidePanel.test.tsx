@@ -1,26 +1,23 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { createMockOrganization, render } from '@/tests/helpers'
+import { createMockOrganization } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
-const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
-const mockUsePHFlag = vi.hoisted(() => vi.fn())
-const mockFeatureFlags = vi.hoisted(() => vi.fn())
-const mockIsPlatform = vi.hoisted(() => ({ value: true }))
+const mockFlags = vi.hoisted(() => ({}) as Record<string, boolean>)
+const mockTrack = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
-    useFeatureFlags: mockFeatureFlags,
-    get IS_PLATFORM() {
-      return mockIsPlatform.value
-    },
+    useFlag: (name: string) => mockFlags[name] ?? false,
   }
 })
 
@@ -28,9 +25,11 @@ vi.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/org/[slug]/billing',
     query: {},
-    push: mockPush,
   }),
 }))
+
+const render = (ui: React.ReactElement) =>
+  customRender(ui, { nuqs: { searchParams: '?panel=subscriptionPlan' } })
 
 vi.mock('shared-data/plans', () => ({
   plans: [
@@ -62,18 +61,12 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({
-  useTrack: () => vi.fn(),
+  useTrack: () => mockTrack,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
-}))
-
-vi.mock('@/state/organization-settings', () => ({
-  useOrgSettingsPageStateSnapshot: () => ({
-    panelKey: 'subscriptionPlan',
-    setPanelKey: vi.fn(),
-  }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
 }))
 
 vi.mock('@/data/projects/org-projects-infinite-query', () => ({
@@ -90,7 +83,7 @@ vi.mock('@/data/organizations/organization-query', () => ({
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' } },
+    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
     isSuccess: true,
   }),
 }))
@@ -135,26 +128,21 @@ vi.mock('./UpgradeModal', () => ({
 }))
 
 vi.mock('./MembersExceedLimitModal', () => ({
-  default: () => null,
+  MembersExceedLimitModal: () => null,
+}))
+
+vi.mock('./SubscriptionPlanUpdateView', () => ({
+  SubscriptionPlanUpdateView: () => <div data-testid="plan-update-view" />,
 }))
 
 vi.mock('./SubscriptionPlanUpdateDialog', () => ({
-  SubscriptionPlanUpdateDialog: () => null,
-}))
-
-vi.mock('@/hooks/ui/useFlag', () => ({
-  usePHFlag: mockUsePHFlag,
-}))
-
-vi.mock('@/hooks/misc/useTrackExperimentExposure', () => ({
-  useTrackExperimentExposure: vi.fn(),
+  SubscriptionPlanUpdateDialog: () => <div data-testid="plan-update-dialog" />,
 }))
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
-    mockIsPlatform.value = true
-    mockFeatureFlags.mockReturnValue({ posthog: {}, configcat: {}, hasLoaded: true })
-    mockUsePHFlag.mockReturnValue('control')
+    for (const key of Object.keys(mockFlags)) delete mockFlags[key]
+    mockTrack.mockClear()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -219,72 +207,21 @@ describe('PlanUpdateSidePanel', () => {
     expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
   })
 
-  describe('parity variant', () => {
+  describe('plan presentation', () => {
     beforeEach(() => {
-      mockUsePHFlag.mockReturnValue('parity')
       mockSelectedOrganization.mockReturnValue(
         createMockOrganization({ slug: 'test-org', billing_partner: null })
       )
     })
 
-    it('renders plan description', () => {
-      render(<PlanUpdateSidePanel />)
-      expect(
-        screen.getByText('Perfect for passion projects & simple websites.')
-      ).toBeInTheDocument()
-    })
-
-    it('renders preface line', () => {
-      render(<PlanUpdateSidePanel />)
-      expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
-    })
-  })
-
-  describe('gaps variant', () => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue('gaps')
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
-      )
-    })
-
-    it('renders gap rows on the Free plan', () => {
-      render(<PlanUpdateSidePanel />)
-      expect(screen.getByText('Daily backups')).toBeInTheDocument()
-      // "Email support" appears twice: once as a Pro plan feature (✓), once as a Free plan gap (✗)
-      expect(screen.getAllByText('Email support')).toHaveLength(2)
-    })
-
-    it('shows log retention as a lesser value, not a missing feature', () => {
-      render(<PlanUpdateSidePanel />)
-      expect(screen.getByText('1-day log retention')).toBeInTheDocument()
-    })
-
-    it('renders the gap section heading on Free and Pro cards', () => {
-      render(<PlanUpdateSidePanel />)
-      // Free has a `lesser` item, so its heading is "Plan limits"; Pro has only `missing` items → "Not included"
-      expect(screen.getByText('Plan limits')).toBeInTheDocument()
-      expect(screen.getByText('Not included')).toBeInTheDocument()
-    })
-  })
-
-  describe.each(['fullscreen', 'fullscreen-gaps'])('%s variant', (flag) => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue(flag)
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
-      )
-    })
-
-    it('renders the full-screen shell instead of the sheet', () => {
+    it('renders the full-screen shell', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
-      expect(screen.queryByRole('link', { name: 'Pricing' })).not.toBeInTheDocument()
     })
 
-    it('renders parity cards', () => {
+    it('renders pricing-page style cards with description and preface', () => {
       render(<PlanUpdateSidePanel />)
 
       expect(
@@ -292,105 +229,85 @@ describe('PlanUpdateSidePanel', () => {
       ).toBeInTheDocument()
       expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
     })
-  })
 
-  describe('fullscreen variant', () => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue('fullscreen')
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
+    it('offers AWS Marketplace as a separate purchasing route', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View options' })).toHaveAttribute(
+        'href',
+        'https://supabase.com/aws-marketplace'
       )
     })
 
-    it('does not render gap rows', () => {
-      render(<PlanUpdateSidePanel />)
-
-      expect(screen.queryByText('Not included')).not.toBeInTheDocument()
-      expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('fullscreen-gaps variant', () => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue('fullscreen-gaps')
+    it('does not offer AWS Marketplace for partner-billed organizations', () => {
       mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
+        createMockOrganization({
+          slug: 'aws-org',
+          billing_partner: 'aws_marketplace',
+          managed_by: MANAGED_BY.AWS_MARKETPLACE,
+        })
       )
-    })
-
-    it('renders gap rows inside the full-screen shell', () => {
-      render(<PlanUpdateSidePanel />)
-
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
-      expect(screen.getByText('Daily backups')).toBeInTheDocument()
-      expect(screen.getByText('1-day log retention')).toBeInTheDocument()
-      // Free has a `lesser` item → "Plan limits"; Pro has only `missing` items → "Not included"
-      expect(screen.getByText('Plan limits')).toBeInTheDocument()
-      expect(screen.getByText('Not included')).toBeInTheDocument()
-    })
-  })
-
-  describe('while feature flags are still loading', () => {
-    beforeEach(() => {
-      mockFeatureFlags.mockReturnValue({ posthog: {}, configcat: {}, hasLoaded: false })
-      mockUsePHFlag.mockReturnValue(undefined)
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
-      )
-    })
-
-    it('opens neither shell, so the fullscreen variant cannot flash the sheet', () => {
-      render(<PlanUpdateSidePanel />)
-
-      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
-    })
-
-    it('does not gate the panel when self-hosted, where flags never load', () => {
-      mockIsPlatform.value = false
 
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: 'Upgrade to Pro' })).toBeInTheDocument()
-    })
-  })
-
-  describe.each(['control', 'parity', 'gaps'])('%s variant keeps the sheet shell', (flag) => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue(flag)
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
-      )
-    })
-
-    it('renders the sheet header and no full-screen chrome', () => {
-      render(<PlanUpdateSidePanel />)
-
-      expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
-    })
-  })
-
-  describe('control variant', () => {
-    beforeEach(() => {
-      mockUsePHFlag.mockReturnValue('control')
-      mockSelectedOrganization.mockReturnValue(
-        createMockOrganization({ slug: 'test-org', billing_partner: null })
-      )
-    })
-
-    it('does not render preface or description', () => {
-      render(<PlanUpdateSidePanel />)
-      expect(screen.queryByText('Everything in the Free Plan, plus:')).not.toBeInTheDocument()
       expect(
-        screen.queryByText('Perfect for passion projects & simple websites.')
+        screen.queryByText('Prefer purchasing through AWS Marketplace?')
       ).not.toBeInTheDocument()
     })
 
     it('does not render gap rows', () => {
       render(<PlanUpdateSidePanel />)
+
       expect(screen.queryByText('Not included')).not.toBeInTheDocument()
       expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
+    })
+  })
+
+  it('sends the panel opened event once, after the organization has loaded', () => {
+    mockSelectedOrganization.mockReturnValue(undefined)
+    const { rerender } = render(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({ slug: 'test-org', billing_partner: null })
+    )
+    rerender(<PlanUpdateSidePanel />)
+    rerender(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('studio_pricing_side_panel_opened', {
+      currentPlan: 'Free',
+    })
+  })
+
+  describe('plan change surface', () => {
+    beforeEach(() => {
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    const selectPro = async () => {
+      render(<PlanUpdateSidePanel />)
+      await userEvent.click(screen.getByRole('button', { name: 'Upgrade to Pro' }))
+    }
+
+    it('keeps the dialog while the redesign flag is off', async () => {
+      await selectPro()
+
+      expect(screen.getByTestId('plan-update-dialog')).toBeInTheDocument()
+      expect(screen.queryByTestId('plan-update-view')).not.toBeInTheDocument()
+    })
+
+    it('shows the redesigned full-screen view when the flag is on', async () => {
+      mockFlags.billingPlanUpdateRedesign = true
+
+      await selectPro()
+
+      expect(screen.getByTestId('plan-update-view')).toBeInTheDocument()
+      expect(screen.queryByTestId('plan-update-dialog')).not.toBeInTheDocument()
     })
   })
 })

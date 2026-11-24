@@ -1,8 +1,9 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import type { ExplorerQueryLocation } from 'common/telemetry-constants'
-import { CodeSquare, Eye, EyeOff } from 'lucide-react'
+import { CodeSquareIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
@@ -54,8 +55,8 @@ import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
   acceptUntrustedLogsSql,
@@ -72,6 +73,7 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { detectOS } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -138,6 +140,8 @@ type QueryEditorProps = {
   onShowQueryChange: (showQuery: boolean) => void
   /** Disables editor run actions and hides the toolbar run button (e.g. while an external confirm footer owns the run). */
   isRunDisabled?: boolean
+  /** Set while the query runs outside this editor (e.g. an approved Assistant tool call). */
+  isExternallyExecuting?: boolean
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
@@ -170,6 +174,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     showQuery,
     onShowQueryChange,
     isRunDisabled = false,
+    isExternallyExecuting = false,
     onTitleChange,
     onSqlChange,
     onSqlCommit,
@@ -229,9 +234,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       ? project?.connectionString
       : databases?.find((database) => database.identifier === databaseIdentifier)?.connectionString
 
-  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
-    { projectRef: project?.ref, connectionString },
-    { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions(
+      { projectRef: project?.ref, connectionString, grant: readGrant.grant },
+      { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+    )
   )
 
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
@@ -244,7 +256,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const isResolvingDatabase =
     databaseIdentifier !== undefined && databaseIdentifier !== project?.ref && isLoadingDatabases
-  const isExecuting = isExecutingSql || isExecutingLogs
+  const isExecuting = isExecutingSql || isExecutingLogs || isExternallyExecuting
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
   const handleRunQuery = async ({
@@ -336,10 +348,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       projectRef: project.ref,
       connectionString,
       sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
+      sqlOrigin: 'user',
       autoLimit: limitedSql.appendAutoLimit ? rowLimit : undefined,
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant: unguarded.migrating,
     }).then(
       (data) => {
         trackRunResult()
@@ -435,6 +449,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <QueryResultRenderer
         view={view}
         result={result}
+        isExecuting={isExecuting}
         chart={display?.chart}
         sql={result?.sql}
         source={result?.source}
@@ -576,7 +591,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={16} strokeWidth={2} />
+            <CodeSquareIcon size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
           {variant === 'viewport' ? (
             <ExplorerToolbarTitle className="text-muted text-xs italic">
@@ -611,7 +626,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             )}
             <ExplorerToolbarAction
               icon={
-                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+                showQuery ? (
+                  <EyeOffIcon size={16} strokeWidth={2} />
+                ) : (
+                  <EyeIcon size={16} strokeWidth={2} />
+                )
               }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}

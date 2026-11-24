@@ -11,7 +11,7 @@ import {
 } from '../Integrations/Warehouse/Warehouse.utils'
 import { WarehouseConnectionCard } from '../Integrations/Warehouse/WarehouseConnectSection'
 import { AlertError } from '@/components/ui/AlertError'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 
 const getNotProvisionedContent = (setupStatus?: WarehouseSetupStatus) => {
@@ -59,7 +59,7 @@ export const WarehouseTab = () => {
   if (isPending) content = <GenericSkeletonLoader />
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
-  else if (isError && checkLocalETLNotSetUp(error)) {
+  else if (isError && checkLocalPipelinesNotSetUp(error)) {
     content = (
       <Admonition
         type="default"

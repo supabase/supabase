@@ -1,6 +1,7 @@
 ---
 title: Quickstart
 subtitle: 'Learn how to use Supabase Queues to add and read messages'
+tocVideo: UEwfaElBnZk
 ---
 
 This guide is an introduction to interacting with Supabase Queues via the Dashboard and official client library. Check out [Queues API Reference](/docs/guides/queues/api) for more details on our API.
@@ -87,7 +88,7 @@ However, an "Unlogged Queue" creates `pgmq.q_<queue_name>` as an unlogged table 
 
 Queues, by default, are not exposed over the Supabase Data API and are only accessible via Postgres clients.
 
-However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of database functions in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
+However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of [database functions](/docs/guides/database/functions) in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
 
 This is to prevent direct access to the `pgmq` schema and its tables (RLS is not enabled by default on any tables) and database functions.
 
@@ -95,7 +96,7 @@ To get started, navigate to the [**Queues > Settings**](/dashboard/project/_/int
 
 ### Add an RLS policy on your tables in `pgmq` schema [#enable-rls-on-your-tables-in-pgmq-schema]
 
-If you expose your pgmq schema with the Data API, for security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`)
+If you expose your pgmq schema with the Data API, for security purposes, you must enable [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`)
 
 Add an RLS policy for any Queues you want your client-side consumers to interact with, by clicking the _Add RLS Policy_ button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 

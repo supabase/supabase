@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -8,19 +8,28 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { LogDetail } from './components/LogDetail'
-import { LogLevelDot } from './components/LogLevelDot'
+import { LogStepSummary } from './components/LogTimeline'
+import { LogUser } from './components/LogUser'
+import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import { useLogEnrichment } from './components/useLogEnrichment'
 import { LogSelectionActions } from './LogSelectionActions'
-import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
+import {
+  LogPanelCloseButton,
+  LogPanelNavigation,
+} from './ServiceFlow/components/ServiceFlowPanelControls'
 import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
+import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const TAB_TRIGGER_CLASS_NAME = 'py-2.5 data-[state=active]:shadow-none'
 
 interface ServiceFlowPanelProps {
   dock: 'bottom' | 'right'
@@ -36,12 +45,35 @@ export function ServiceFlowPanel({
   searchParameters,
 }: ServiceFlowPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
+  const overviewTabRef = useRef<HTMLButtonElement>(null)
+
+  const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
+  const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
   const hasMultiple = selectedRows.length > 1
   const selectedRow = selectedRows[0]
+  const activeLog =
+    (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
+  const isProcessLog = selectedRow?.log_type === 'compute' || selectedRow?.log_type === 'pipelines'
+  const showTimeline = isRequestTimelineEnabled && !isProcessLog
+  const showUser = !isProcessLog
+  const tabs = [
+    'overview',
+    'raw-json',
+    ...(showTimeline ? ['timeline'] : []),
+    ...(showUser ? ['user'] : []),
+  ]
+  const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
   const title = hasMultiple
     ? `${selectedRows.length} logs selected`
-    : getEventMessageDisplay(selectedRow?.log_type ?? '', selectedRow?.event_message).message ||
-      selectedRow?.id
+    : getEventMessageDisplay(activeLog?.log_type ?? '', activeLog?.event_message).message ||
+      activeLog?.id
+
+  const handleSelectTimelineLog = (log: ColumnSchema) => {
+    if (!selectedRow) return
+    setOpenedLog(log.id === selectedRow.id ? null : { fromId: selectedRow.id, log })
+    setActiveTab('overview')
+    overviewTabRef.current?.focus()
+  }
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
   const selectedJson = selectedRows.map((row) =>
     getLogDataForMetadataVisibility(getRawLogData(row), logsMetadata)
@@ -54,27 +86,23 @@ export function ServiceFlowPanel({
         id="log-sidepanel"
         defaultSize={400}
         minSize={dock === 'bottom' ? 300 : 400}
-        className="bg-dash-sidebar"
+        className="bg-card"
       >
         <div className="flex h-full flex-col overflow-hidden">
-          <div className="flex min-w-0 items-center gap-6 px-4 py-2">
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-              {!hasMultiple && (
-                <div className="flex h-4 w-4 shrink-0 items-center justify-center">
-                  <LogLevelDot level={selectedRow?.level} />
-                </div>
+          {/* Matches the table header height so the title lines up with the column labels */}
+          <div className="flex h-9 min-w-0 shrink-0 items-center gap-3 px-4">
+            <div className="flex min-w-0 flex-1" role="status" title={title}>
+              {!hasMultiple && activeLog ? (
+                <OpenLogSummary log={activeLog} searchParameters={searchParameters} />
+              ) : (
+                <span className="truncate text-sm font-medium leading-6 text-foreground">
+                  {title}
+                </span>
               )}
-              <span
-                className="min-w-0 flex-1 truncate heading-meta text-foreground"
-                role="status"
-                title={title}
-              >
-                {title}
-              </span>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-              <LogSelectionActions rows={selectedRows} />
-              <ServiceFlowPanelControls dock={dock} setDock={setDock} />
+            <div className="-mr-1 flex h-6 shrink-0 items-center gap-1">
+              <LogSelectionActions rows={hasMultiple || !activeLog ? selectedRows : [activeLog]} />
+              <LogPanelCloseButton />
             </div>
           </div>
           {hasMultiple ? (
@@ -83,46 +111,87 @@ export function ServiceFlowPanel({
               role="region"
               aria-label="Selected logs JSON"
             >
-              <CodeBlock
-                language="json"
-                hideCopy
-                wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
-              >
-                {JSON.stringify(selectedJson, null, 2)}
-              </CodeBlock>
+              <JsonCodeBlock>{JSON.stringify(selectedJson, null, 2)}</JsonCodeBlock>
             </div>
           ) : (
             <Tabs
-              value={activeTab}
+              value={currentTab}
               onValueChange={setActiveTab}
               className="flex min-h-0 flex-1 flex-col"
             >
-              <TabsList className="shrink-0 gap-x-4 px-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
+              <TabsList className="shrink-0 gap-x-5 px-4">
+                <TabsTrigger
+                  ref={overviewTabRef}
+                  value="overview"
+                  className={TAB_TRIGGER_CLASS_NAME}
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="raw-json" className={TAB_TRIGGER_CLASS_NAME}>
+                  Raw JSON
+                </TabsTrigger>
+                {showTimeline && (
+                  <TabsTrigger value="timeline" className={TAB_TRIGGER_CLASS_NAME}>
+                    Timeline
+                  </TabsTrigger>
+                )}
+                {showUser && (
+                  <TabsTrigger value="user" className={TAB_TRIGGER_CLASS_NAME}>
+                    User
+                  </TabsTrigger>
+                )}
                 <TabsIndicator />
               </TabsList>
-              {['overview', 'raw-json'].map((tab) => (
+              {tabs.map((tab) => (
                 <TabsContent
                   key={`${tab}-${selectedRow?.id}`}
                   value={tab}
                   className="mt-0 min-h-0 flex-1 overflow-auto"
                 >
-                  {selectedRow && (
-                    <LogDetail row={selectedRow} tab={tab} searchParameters={searchParameters} />
+                  {tab === 'timeline' && selectedRow && activeLog && (
+                    <RequestTimeline
+                      row={selectedRow}
+                      activeLog={activeLog}
+                      onSelectLog={handleSelectTimelineLog}
+                    />
+                  )}
+                  {tab === 'user' && activeLog && (
+                    <LogUser row={activeLog} searchParameters={searchParameters} />
+                  )}
+                  {(tab === 'overview' || tab === 'raw-json') && activeLog && (
+                    <LogDetail
+                      row={activeLog}
+                      tab={tab}
+                      searchParameters={searchParameters}
+                      overviewHeader={<LogTimestampHeader log={activeLog} />}
+                    />
                   )}
                 </TabsContent>
               ))}
             </Tabs>
           )}
-          <div className="flex shrink-0 flex-wrap items-center gap-2 border-t px-4 py-2 text-xs text-foreground-lighter">
-            <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW} />
-            <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW} />
-            <span>Extend selection</span>
+          <div className="flex shrink-0 items-center gap-2 border-t py-1.5 pl-4 pr-3 text-xs text-foreground-lighter">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW} />
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW} />
+              <span>Extend selection</span>
+            </div>
+            <LogPanelNavigation dock={dock} setDock={setDock} />
           </div>
         </div>
       </ResizablePanel>
     </>
   )
+}
+
+/** Shows a spinner in place of the log type icon while the open log's details load */
+function OpenLogSummary({
+  log,
+  searchParameters,
+}: {
+  log: ColumnSchema
+  searchParameters: QuerySearchParamsType
+}) {
+  const { isLoading } = useLogEnrichment({ row: log, searchParameters, shouldFetch: false })
+  return <LogStepSummary log={log} isLoading={isLoading} />
 }

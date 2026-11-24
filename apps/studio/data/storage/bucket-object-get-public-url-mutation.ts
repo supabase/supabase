@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketObjectPublicUrlParams = {
   projectRef: string
@@ -39,10 +40,10 @@ export const useGetBucketObjectPublicUrlMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>,
+  UseCustomMutationOptions<BucketObjectPublicUrlData, StudioError, BucketObjectPublicUrlParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>({
+  return useMutation<BucketObjectPublicUrlData, StudioError, BucketObjectPublicUrlParams>({
     mutationFn: (vars) => getPublicUrlForBucketObject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

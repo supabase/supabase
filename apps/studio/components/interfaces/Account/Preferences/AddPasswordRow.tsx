@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -22,9 +23,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from '@/components/interfaces/SignIn/PasswordConditionsHelper'
-import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useSetPasswordMutation } from '@/data/profile/profile-set-password-mutation'
-import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { passwordValidation } from '@/lib/password-validation'
 
 const FORM_ID = 'add-password-form'
@@ -42,29 +41,54 @@ const defaultValues: FormValues = { password: '' }
  * Auth creates the email identity for the user's current email when the password is
  * saved.
  */
-export const AddPasswordRow = ({ email }: { email: string }) => {
+export const AddPasswordRow = ({
+  email,
+  isPrimary = false,
+}: {
+  email: string
+  isPrimary?: boolean
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const providerDisplay = getProviderDisplay('email')
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+  const isOpen = isDialogOpen || securityAction === 'set-password'
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open && securityAction === 'set-password') void setSecurityAction(null)
+  }
 
   return (
     <>
-      <CardContent className="flex justify-between items-center py-4">
-        <div className="flex gap-x-4">
-          <IdentityProviderIcon display={providerDisplay} size={30} />
-          <div>
-            <p className="text-sm">{providerDisplay.displayName}</p>
-            <p className="text-sm text-foreground-lighter">{email}</p>
+      <CardContent
+        role="group"
+        aria-label="Password"
+        className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex min-w-0 gap-x-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+            <KeyRoundIcon size={18} strokeWidth={2} className="text-foreground-lighter" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm">Password</p>
+            <p className="text-sm text-foreground-lighter [overflow-wrap:anywhere]">
+              Add a password to sign in with {email}
+            </p>
           </div>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>Add password</Button>
+        <Button
+          variant={isPrimary ? 'primary' : 'default'}
+          aria-label="Add password"
+          onClick={() => handleOpenChange(true)}
+        >
+          Add
+        </Button>
       </CardContent>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader className="border-b">
             <DialogTitle>Add password</DialogTitle>
           </DialogHeader>
-          <AddPasswordForm email={email} onClose={() => setIsDialogOpen(false)} />
+          <AddPasswordForm email={email} onClose={() => handleOpenChange(false)} />
         </DialogContent>
       </Dialog>
     </>
@@ -117,7 +141,7 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
                     autoComplete="new-password"
                     actions={
                       <Button
-                        icon={passwordHidden ? <Eye /> : <EyeOff />}
+                        icon={passwordHidden ? <EyeIcon /> : <EyeOffIcon />}
                         aria-label={passwordHidden ? 'Show password' : 'Hide Password'}
                         className="w-7"
                         onClick={() => setPasswordHidden((prev) => !prev)}

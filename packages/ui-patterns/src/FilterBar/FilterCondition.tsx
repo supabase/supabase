@@ -117,8 +117,9 @@ export function FilterCondition({
         filterProperties,
         currentPropertyName: condition.propertyName,
         inputValue: propertySearchText,
+        isNested: path.length > 1,
       }),
-    [filterProperties, condition.propertyName, propertySearchText]
+    [filterProperties, condition.propertyName, propertySearchText, path.length]
   )
 
   const {

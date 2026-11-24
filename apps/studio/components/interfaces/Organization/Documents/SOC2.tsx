@@ -1,21 +1,23 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -24,9 +26,8 @@ export const SOC2 = () => {
   const slug = organization?.slug
 
   const track = useTrack()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.soc2_report')
@@ -52,16 +53,18 @@ export const SOC2 = () => {
   }
 
   return (
-    <ScaffoldSection className="py-12">
-      <ScaffoldSectionDetail>
-        <h4 className="mb-5">SOC2 Type 2</h4>
-        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
-          <p>
-            Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+    <PageSection orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>SOC2 Type 2</PageSectionTitle>
+          <PageSectionDescription className="space-y-2">
+            <p>
+              Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
+            </p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         {isLoadingPermissions || isLoadingEntitlement ? (
           <div className="@lg:flex items-center justify-center h-full">
             <ShimmeringLoader className="w-24" />
@@ -79,7 +82,7 @@ export const SOC2 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download SOC2 Type 2 Report
             </Button>
           </div>
@@ -127,7 +130,7 @@ export const SOC2 = () => {
             </li>
           </ol>
         </ConfirmationModal>
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }

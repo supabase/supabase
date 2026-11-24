@@ -23,21 +23,30 @@ const themes: Theme[] = [
     name: 'Build anything',
     description:
       "Your agent sets up the backend from code, your users' agents work with your app through its own MCP server, and long-running tasks run in Supabase Compute.",
-    cta: { label: 'Read the Build Blog', href: '/docs' },
+    cta: {
+      label: 'Read the Build Blog',
+      href: 'https://supabase.com/blog/select-2026-build-anything',
+    },
     icon: Hammer,
   },
   {
     name: 'Scale without limits',
     description:
       'The app your agent built in minutes stays on the same Postgres, from prototype to petabyte.',
-    cta: { label: 'Read the Scale Blog', href: '/docs' },
+    cta: {
+      label: 'Read the Scale Blog',
+      href: 'https://supabase.com/blog/select-2026-scale-without-limits',
+    },
     icon: Maximize2,
   },
   {
     name: 'Operate with confidence',
     description:
       'Your agent finds the problem, tests the fix, and reports what it found. You decide what ships.',
-    cta: { label: 'Read the Operate Blog', href: '/docs' },
+    cta: {
+      label: 'Read the Operate Blog',
+      href: 'https://supabase.com/blog/select-2026-operate-with-confidence',
+    },
     icon: ShieldCheck,
   },
 ]
@@ -88,8 +97,12 @@ const page: GoPageInput = {
     ctas: [
       {
         label: 'Read the Recap',
-        href: '/docs',
+        href: 'https://supabase.com/blog/select-2026-build-anything',
         variant: 'secondary',
+      },
+      {
+        label: 'Join our Discord',
+        href: 'https://discord.supabase.com/',
       },
     ],
   },

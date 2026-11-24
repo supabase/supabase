@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ExternalLink, Info } from 'lucide-react'
+import { ExternalLinkIcon, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction, useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -23,10 +23,10 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  InfoIcon,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
+  InfoIcon as StatusInfoIcon,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -179,7 +179,7 @@ const DiskSizeConfigurationModal = ({
               <>
                 <DialogSection className="w-full space-y-4">
                   <Alert variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
-                    <Info size={16} />
+                    <InfoIcon size={16} />
                     <AlertTitle>This operation is only possible every 4 hours</AlertTitle>
                     <AlertDescription>
                       <div className="mb-4">
@@ -191,7 +191,7 @@ const DiskSizeConfigurationModal = ({
                               'DD MMM YYYY, HH:mm (ZZ)'
                             )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
                       </div>
-                      <Button asChild iconRight={<ExternalLink size={14} />}>
+                      <Button asChild iconRight={<ExternalLinkIcon size={14} />}>
                         <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
@@ -241,7 +241,7 @@ const DiskSizeConfigurationModal = ({
           </>
         ) : (
           <Alert className="border-none">
-            <InfoIcon />
+            <StatusInfoIcon />
             <AlertTitle>
               {hasAccessToDiskModifications === false
                 ? 'Disk size configuration is not available for projects on the Free Plan'

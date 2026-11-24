@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { Loader2Icon, MessageSquareIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 import { Button } from 'ui'
@@ -52,7 +52,7 @@ export const ExplorerChatTab = () => {
   if (!aiAssistant.isInitialized || (chat && !chatInstance)) {
     return (
       <div className="h-full bg-surface-100 flex items-center justify-center">
-        <Loader2 className="animate-spin text-foreground-muted" />
+        <Loader2Icon className="animate-spin text-foreground-muted" />
       </div>
     )
   }
@@ -60,7 +60,7 @@ export const ExplorerChatTab = () => {
   if (!id || !chat) {
     return (
       <div className="h-full bg-surface-100 flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <MessageSquare className="text-foreground-muted" />
+        <MessageSquareIcon className="text-foreground-muted" />
         <div>
           <h2 className="text-sm text-foreground">Chat not found</h2>
           <p className="text-sm text-foreground-lighter">

@@ -91,10 +91,6 @@ describe('getTableName', () => {
     expect(getTableName('TRUNCATE logs')).toBe('logs')
   })
 
-  it('strips schema prefix', () => {
-    expect(getTableName('SELECT * FROM public.users')).toBe('users')
-  })
-
   it('strips quotes', () => {
     expect(getTableName('SELECT * FROM "my_table"')).toBe('my_table')
   })

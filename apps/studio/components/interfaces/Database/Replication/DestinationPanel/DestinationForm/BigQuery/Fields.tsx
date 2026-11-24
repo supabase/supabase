@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react'
+import { UploadIcon } from 'lucide-react'
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button, cn, FormControl, FormField, Input, TextArea } from 'ui'
@@ -137,7 +137,7 @@ export const BigQueryFields = ({
                   <Button
                     type="button"
                     size="tiny"
-                    icon={<Upload size={14} />}
+                    icon={<UploadIcon size={14} />}
                     onClick={() => serviceAccountFileInputRef.current?.click()}
                   >
                     Upload JSON file

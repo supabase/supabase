@@ -5,7 +5,8 @@ import { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
@@ -37,7 +38,7 @@ export async function getProjectStorageConfig(
 }
 
 export type ProjectStorageConfigData = Awaited<ReturnType<typeof getProjectStorageConfig>>
-export type ProjectStorageConfigError = ResponseError
+export type ProjectStorageConfigError = StudioError
 
 export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   { projectRef }: ProjectStorageConfigVariables,
@@ -60,9 +61,12 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const { data: isVectorBucketsEnabledData } = useProjectStorageConfigQuery(
+    { projectRef },
+    { select: (data) => data?.features.vectorBuckets?.enabled }
+  )
   const { isCli, isPlatform } = useDeploymentMode()
 
-  const isVectorBucketsEnabled = isCli || (isPlatform && !!data?.features.vectorBuckets?.enabled)
+  const isVectorBucketsEnabled = isCli || (isPlatform && !!isVectorBucketsEnabledData)
   return isVectorBucketsEnabled
 }

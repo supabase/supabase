@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -58,7 +58,7 @@ const toIntegrationProjectConnection = (
   } as IntegrationProjectConnection['metadata'],
 })
 
-export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: boolean }) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -121,7 +121,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   )
 
   return (
-    <PageSection>
+    <PageSection id="github">
       <PageSectionMeta>
         <div className="flex flex-1 items-start gap-5">
           <IntegrationSectionIcon title="github" />
@@ -150,6 +150,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                         disabled={!canUpdateGitHubConnection}
                         connection={toIntegrationProjectConnection(connection)}
                         type="GitHub"
+                        isProjectScoped={isProjectScoped}
                         onDeleteConnection={onDeleteGitHubConnection}
                       />
                     ))}
@@ -158,7 +159,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                     onClick={onAddGitHubConnection}
                     showNode={false}
                     disabled={!canCreateGitHubConnection}
-                    icon={<Plus />}
+                    icon={<PlusIcon />}
                   >
                     Add connection
                   </EmptyIntegrationConnection>
@@ -202,7 +203,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
         >
           {disabled ? (
             <ButtonTooltip
-              icon={<Plus />}
+              icon={<PlusIcon />}
               size="tiny"
               disabled
               tooltip={{
@@ -215,7 +216,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
               Add connection
             </ButtonTooltip>
           ) : (
-            <Button icon={<Plus />} size="tiny" type="button" onClick={onClick}>
+            <Button icon={<PlusIcon />} size="tiny" type="button" onClick={onClick}>
               Add connection
             </Button>
           )}

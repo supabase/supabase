@@ -2,6 +2,8 @@ export interface McpFeatureGroup {
   id: string
   name: string
   description: string
+  /** Opt-in groups that the server also leaves off when `features` is omitted. */
+  defaultDisabled?: boolean
 }
 
 export type McpOnCopyCallback = 'url' | 'config' | 'command'
@@ -60,15 +62,6 @@ export interface VSCodeMcpConfig {
     supabase: {
       type: 'http'
       url: string
-    }
-  }
-}
-
-export interface WindsurfMcpConfig {
-  mcpServers: {
-    supabase: {
-      command: 'npx'
-      args: ['-y', 'mcp-remote', string]
     }
   }
 }
@@ -163,10 +156,12 @@ export interface GeminiMcpConfig {
 export interface OpenCodeMcpConfig {
   $schema: string
   mcp: {
-    supabase: {
-      type: 'remote'
-      url: string
-      enabled?: boolean
+    servers: {
+      supabase: {
+        type: 'remote'
+        url: string
+        disabled?: boolean
+      }
     }
   }
 }
@@ -247,7 +242,6 @@ export type McpClientConfig =
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
-  | WindsurfMcpConfig
 
 // Type guards
 export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {
@@ -271,7 +265,12 @@ export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpC
 }
 
 export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCodeMcpConfig {
-  return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
+  return (
+    '$schema' in config &&
+    'mcp' in config &&
+    'servers' in config.mcp &&
+    'supabase' in config.mcp.servers
+  )
 }
 
 export function isFxMcpConfig(config: McpClientConfig): config is FxMcpConfig {
@@ -307,7 +306,7 @@ export function getMcpUrl(config: McpClientConfig): string {
     return config.mcpServers.supabase.httpUrl
   }
   if (isOpenCodeMcpConfig(config)) {
-    return config.mcp.supabase.url
+    return config.mcp.servers.supabase.url
   }
   if (isFxMcpConfig(config)) {
     return config.mcp.supabase.url

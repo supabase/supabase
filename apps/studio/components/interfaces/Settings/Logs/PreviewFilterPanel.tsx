@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, RefreshCwIcon, SearchIcon, TerminalIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState, type RefObject } from 'react'
@@ -151,7 +151,7 @@ export const PreviewFilterPanel = ({
               />
             </ShortcutTooltip>
             <InputGroupAddon>
-              <Search />
+              <SearchIcon />
             </InputGroupAddon>
             <InputGroupAddon align="inline-end">
               <div className="flex items-center gap-x-1">
@@ -176,7 +176,7 @@ export const PreviewFilterPanel = ({
                           handleInputSearch('')
                         }}
                       >
-                        <X />
+                        <XIcon />
                       </InputGroupButton>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">Clear search</TooltipContent>
@@ -202,7 +202,7 @@ export const PreviewFilterPanel = ({
                     </div>
                   </div>
                 )}
-                <RefreshCw />
+                <RefreshCwIcon />
               </div>
             }
             loading={isLoading}
@@ -258,7 +258,7 @@ export const PreviewFilterPanel = ({
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_CHART} side="bottom">
             <Button
               onClick={() => onToggleEventChart()}
-              icon={isShowingEventChart ? <Eye /> : <EyeOff />}
+              icon={isShowingEventChart ? <EyeIcon /> : <EyeOffIcon />}
             >
               Chart
             </Button>
@@ -279,7 +279,7 @@ export const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild className="px-1.5" icon={<Terminal />}>
+              <Button asChild className="px-1.5" icon={<TerminalIcon />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger>

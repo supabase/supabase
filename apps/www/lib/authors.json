@@ -53,6 +53,13 @@
     "author_image_url": "https://github.com/fracek.png"
   },
   {
+    "author_id": "grant_huston",
+    "author": "Grant Huston",
+    "position": "Growth",
+    "author_url": "https://www.linkedin.com/in/grant-huston/",
+    "author_image_url": "/images/blog/avatars/grant-huston.jpg"
+  },
+  {
     "author_id": "gurjeet",
     "author": "Gurjeet Singh",
     "username": "gurjeet",
@@ -957,7 +964,7 @@
     "author_id": "nick_littman",
     "author": "Nick Littman",
     "username": "NickLittman",
-    "position": "Customer Solutions Architect",
+    "position": "Solution Architect",
     "author_url": "https://github.com/NickLittman",
     "author_image_url": "https://github.com/NickLittman.png"
   },
@@ -1047,5 +1054,161 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "aditya_maruvada",
+    "author": "Aditya Maruvada",
+    "username": "supa-aditya",
+    "position": "Product",
+    "author_url": "https://github.com/supa-aditya",
+    "author_image_url": "https://github.com/supa-aditya.png"
+  },
+  {
+    "author_id": "daniel_mitterdorfer",
+    "author": "Daniel Mitterdorfer",
+    "username": "danielmitterdorfer",
+    "position": "Engineering",
+    "author_url": "https://github.com/danielmitterdorfer",
+    "author_image_url": "https://github.com/danielmitterdorfer.png"
+  },
+  {
+    "author_id": "alexander_korotkov",
+    "author": "Alexander Korotkov",
+    "username": "akorotkov",
+    "position": "Engineering",
+    "author_url": "https://github.com/akorotkov",
+    "author_image_url": "https://github.com/akorotkov.png"
+  },
+  {
+    "author_id": "rand_arete",
+    "author": "Rand Arete",
+    "username": "rand",
+    "position": "Product",
+    "author_url": "https://github.com/rand",
+    "author_image_url": "https://github.com/rand.png"
+  },
+  {
+    "author_id": "mrinali_umashankar",
+    "author": "Mrinali Umashankar",
+    "position": "Solutions Architect II",
+    "company": "AWS",
+    "author_url": "https://www.linkedin.com/in/mrinali-umashankar-79064a194/",
+    "author_image_url": "/images/blog/avatars/mrinali-umashankar.webp"
+  },
+  {
+    "author_id": "sam_meech_ward",
+    "author": "Sam Meech-Ward",
+    "username": "meech-ward",
+    "position": "DevRel",
+    "author_url": "https://x.com/meech_ward",
+    "author_image_url": "https://github.com/meech-ward.png"
+  },
+  {
+    "author_id": "saba_pochkhua",
+    "author": "Saba Pochkhua",
+    "username": "CSenshi",
+    "position": "Control Plane Engineer",
+    "author_url": "https://github.com/CSenshi",
+    "author_image_url": "/images/blog/avatars/saba-pochkhua.jpeg"
+  },
+  {
+    "author_id": "guillaume_faas",
+    "author": "Guillaume Faas",
+    "username": "tr00d",
+    "position": "Engineering",
+    "author_url": "https://github.com/tr00d",
+    "author_image_url": "https://github.com/tr00d.png"
+  },
+  {
+    "author_id": "raul_barroso",
+    "author": "Raúl Barroso",
+    "username": "raulb",
+    "position": "Engineering",
+    "author_url": "https://github.com/raulb",
+    "author_image_url": "https://github.com/raulb.png"
+  },
+  {
+    "author_id": "gildas_garcia",
+    "author": "Gildas Garcia",
+    "username": "djhi",
+    "position": "Engineering",
+    "author_url": "https://github.com/djhi",
+    "author_image_url": "https://github.com/djhi.png"
+  },
+  {
+    "author_id": "artur_zakirov",
+    "author": "Artur Zakirov",
+    "username": "za-arthur",
+    "position": "Engineering",
+    "author_url": "https://github.com/za-arthur",
+    "author_image_url": "https://github.com/za-arthur.png"
+  },
+  {
+    "author_id": "charislam",
+    "author": "Charis Lam",
+    "username": "charislam",
+    "position": "Engineering",
+    "author_url": "https://github.com/charislam",
+    "author_image_url": "https://github.com/charislam.png"
+  },
+  {
+    "author_id": "kris_talajic",
+    "author": "Kris Talajic",
+    "position": "Growth Lead",
+    "author_url": "https://www.linkedin.com/in/ktalajic/",
+    "author_image_url": "/images/blog/avatars/kris-talajic.png"
+  },
+  {
+    "author_id": "nate_asp",
+    "author": "Nate Asp",
+    "position": "VP Sales",
+    "author_url": "https://www.linkedin.com/in/nateasp/",
+    "author_image_url": "/images/blog/avatars/nate-asp.jpg"
+  },
+  {
+    "author_id": "brad_gyger",
+    "author": "Brad Gyger",
+    "position": "VP Success",
+    "author_url": "https://www.linkedin.com/in/bradgyger/",
+    "author_image_url": "/images/blog/avatars/brad-gyger.jpg"
+  },
+  {
+    "author_id": "harold_gimenez",
+    "author": "Harold Gimenez",
+    "position": "VP of Product, Engineering & Design",
+    "author_url": "https://www.linkedin.com/in/hgmnz/",
+    "author_image_url": "/images/blog/avatars/harold-gimenez.jpg"
+  },
+  {
+    "author_id": "anthony_lio",
+    "author": "Anthony Lio",
+    "username": "antlio",
+    "position": "Design",
+    "author_url": "https://github.com/antlio",
+    "author_image_url": "https://github.com/antlio.png"
+  },
+  {
+    "author_id": "jeremias_menichelli",
+    "author": "Jeremias Menichelli",
+    "username": "jeremenichelli",
+    "position": "Engineering",
+    "author_url": "https://github.com/jeremenichelli",
+    "author_image_url": "https://github.com/jeremenichelli.png"
+  },
+  {
+    "author_id": "kody_jackson",
+    "author": "Kody Jackson",
+    "username": "kodster28",
+    "position": "Engineering",
+    "author_url": "https://github.com/kodster28",
+    "author_image_url": "https://github.com/kodster28.png"
+  },
+  {
+    "author_id": "aleksi_immonen",
+    "author": "Aleksi Immonen",
+    "username": "4L3k51",
+    "position": "Marketing",
+    "author_url": "https://github.com/4L3k51",
+    "author_image_url": "https://github.com/4L3k51.png"
   }
 ]

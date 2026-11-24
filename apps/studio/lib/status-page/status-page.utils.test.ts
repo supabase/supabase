@@ -4,8 +4,10 @@ import type { AffectedComponent, StatusPageResponse } from './status-page.schema
 import {
   DEFAULT_UPCOMING_LEAD_DAYS,
   getRegionScope,
+  isDashboardComponent,
   isProjectCreationOnly,
   isRegionCode,
+  isRelevantToSignedOutUser,
   isRelevantToUser,
   normalizeStatusPage,
   type UserRegionContext,
@@ -320,5 +322,67 @@ describe('isRelevantToUser', () => {
       isComplete: true,
     }
     expect(isRelevantToUser(regionalItem, user)).toBe(true)
+  })
+})
+
+describe('isDashboardComponent', () => {
+  test('matches by component name, case-insensitively', () => {
+    expect(isDashboardComponent(component('Dashboard'))).toBe(true)
+    expect(isDashboardComponent(component('dashboard'))).toBe(true)
+  })
+
+  test('matches by group name', () => {
+    expect(isDashboardComponent(component('EU dashboard', 'Dashboard'))).toBe(true)
+  })
+
+  test('does not match unrelated components', () => {
+    expect(isDashboardComponent(component('Database'))).toBe(false)
+    expect(isDashboardComponent(component('us-east-1', 'Project Creation'))).toBe(false)
+  })
+})
+
+describe('isRelevantToSignedOutUser', () => {
+  const dashboardItem = normalizeStatusPage({
+    ...emptyStatusPage(),
+    ongoing_incidents: [
+      {
+        id: 'inc-dashboard',
+        name: 'Dashboard incident',
+        url: 'https://status.supabase.com/incidents/inc-dashboard',
+        last_update_at: '2026-01-01T00:00:00Z',
+        last_update_message: null,
+        affected_components: [component('Dashboard', 'Dashboard')],
+        status: 'investigating',
+        current_worst_impact: 'full_outage',
+        visible: true,
+        show_banner: true,
+      },
+    ],
+  }).items[0]
+
+  const nonDashboardItem = normalizeStatusPage({
+    ...emptyStatusPage(),
+    ongoing_incidents: [
+      {
+        id: 'inc-database',
+        name: 'Database incident',
+        url: 'https://status.supabase.com/incidents/inc-database',
+        last_update_at: '2026-01-01T00:00:00Z',
+        last_update_message: null,
+        affected_components: [component('us-east-1', 'Database')],
+        status: 'investigating',
+        current_worst_impact: 'full_outage',
+        visible: true,
+        show_banner: true,
+      },
+    ],
+  }).items[0]
+
+  test('true when Dashboard is one of the affected components', () => {
+    expect(isRelevantToSignedOutUser(dashboardItem)).toBe(true)
+  })
+
+  test('false when Dashboard is not affected, regardless of scope', () => {
+    expect(isRelevantToSignedOutUser(nonDashboardItem)).toBe(false)
   })
 })

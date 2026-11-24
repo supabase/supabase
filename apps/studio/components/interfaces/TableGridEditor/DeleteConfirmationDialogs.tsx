@@ -1,4 +1,5 @@
-import { ExternalLink } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, Checkbox } from 'ui'
@@ -7,29 +8,48 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { SupaRow } from '@/components/grid/types'
 import { useDatabaseColumnDeleteMutation } from '@/data/database-columns/database-column-delete-mutation'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { partitionCountQueryOptions } from '@/data/entity-types/partition-count-query'
 import { useMaterializedViewDeleteMutation } from '@/data/materialized-views/materialized-view-delete-mutation'
-import { Entity } from '@/data/table-editor/table-editor-types'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import type { Entity } from '@/data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from '@/data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from '@/data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from '@/data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from '@/data/tables/table-delete-mutation'
 import { useViewDeleteMutation } from '@/data/views/view-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { pluralize } from '@/lib/helpers'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export type DeleteConfirmationDialogsProps = {
+  /** The table open in the grid. Row and column deletes act on this table */
   selectedTable?: Entity
-  onTableDeleted?: () => void
+  onTableDeleted?: (table: Entity) => void
 }
 
-const DeleteConfirmationDialogs = ({
+export const DeleteConfirmationDialogs = ({
   selectedTable,
   onTableDeleted,
 }: DeleteConfirmationDialogsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { filters, setFilters } = useTableFilter()
+
+  const entityDialog =
+    snap.confirmationDialog?.type === 'table' ||
+    snap.confirmationDialog?.type === 'view' ||
+    snap.confirmationDialog?.type === 'materialized-view'
+      ? snap.confirmationDialog
+      : undefined
+  const { data: targetEntity } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: entityDialog?.tableId,
+  })
+  const targetTable = targetEntity ?? undefined
+  const isAwaitingTargetTable = entityDialog !== undefined && targetTable === undefined
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -58,39 +78,36 @@ const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     },
   })
-  const { mutate: deleteTable } = useTableDeleteMutation({
-    onSuccess: async () => {
-      toast.success(`Successfully deleted table "${selectedTable?.name}"`)
-      onTableDeleted?.()
+  const { mutateAsync: deleteTable } = useTableDeleteMutation({
+    onSuccess: async (_, variables) => {
+      toast.success(`Successfully deleted table "${variables.name}"`)
     },
-    onError: (error) => {
-      toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
-    },
-    onSettled: () => {
-      snap.closeConfirmationDialog()
-    },
-  })
-
-  const { mutate: deleteView } = useViewDeleteMutation({
-    onSuccess: async () => {
-      toast.success(`Successfully deleted view "${selectedTable?.name}"`)
-      onTableDeleted?.()
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
+    onError: (error, variables) => {
+      toast.error(`Failed to delete ${variables.name}: ${error.message}`)
     },
     onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
 
-  const { mutate: deleteMaterializedView } = useMaterializedViewDeleteMutation({
-    onSuccess: async () => {
-      toast.success(`Successfully deleted materialized view "${selectedTable?.name}"`)
-      onTableDeleted?.()
+  const { mutateAsync: deleteView } = useViewDeleteMutation({
+    onSuccess: async (_, variables) => {
+      toast.success(`Successfully deleted view "${variables.name}"`)
     },
-    onError: (error) => {
-      toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
+    onError: (error, variables) => {
+      toast.error(`Failed to delete ${variables.name}: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutateAsync: deleteMaterializedView } = useMaterializedViewDeleteMutation({
+    onSuccess: async (_, variables) => {
+      toast.success(`Successfully deleted materialized view "${variables.name}"`)
+    },
+    onError: (error, variables) => {
+      toast.error(`Failed to delete ${variables.name}: ${error.message}`)
     },
     onSettled: () => {
       snap.closeConfirmationDialog()
@@ -172,48 +189,86 @@ const DeleteConfirmationDialogs = ({
   }
 
   const onConfirmDeleteTable = async () => {
-    if (!(snap.confirmationDialog?.type === 'table')) return
-    const selectedTableToDelete = selectedTable
+    if (snap.confirmationDialog?.type !== 'table') return
+    if (!project || !targetTable) return
 
-    if (selectedTableToDelete === undefined) return
-
-    deleteTable({
-      projectRef: project?.ref!,
-      connectionString: project?.connectionString,
-      id: selectedTableToDelete.id,
-      name: selectedTableToDelete.name,
-      schema: selectedTableToDelete.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteTable({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
 
   const onConfirmDeleteView = async () => {
     if (snap.confirmationDialog?.type !== 'view') return
-    if (!project || !selectedTable) return
+    if (!project || !targetTable) return
 
-    deleteView({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      id: selectedTable.id,
-      name: selectedTable.name,
-      schema: selectedTable.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteView({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
 
   const onConfirmDeleteMaterializedView = async () => {
     if (snap.confirmationDialog?.type !== 'materialized-view') return
-    if (!project || !selectedTable) return
+    if (!project || !targetTable) return
 
-    deleteMaterializedView({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      id: selectedTable.id,
-      name: selectedTable.name,
-      schema: selectedTable.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteMaterializedView({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
+
+  const isPartitionedTableDialogOpen =
+    snap.confirmationDialog?.type === 'table' &&
+    targetTable?.entity_type === ENTITY_TYPE.PARTITIONED_TABLE
+  const {
+    data: partitionCount,
+    isError: isPartitionCountError,
+    isFetching: isFetchingPartitionCount,
+    refetch: refetchPartitionCount,
+  } = useQuery({
+    ...partitionCountQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: targetTable?.id,
+    }),
+    enabled: isPartitionedTableDialogOpen && !!project?.ref,
+  })
+
+  const isAwaitingPartitionCount = isPartitionedTableDialogOpen && partitionCount === undefined
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
@@ -303,7 +358,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertTitle>
               <AlertDescription>
-                <Button asChild size="tiny" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -323,16 +378,41 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
         title={
-          <span className="wrap-break-word">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
+          <span className="wrap-break-word">{`Confirm deletion of table "${targetTable?.name ?? ''}"`}</span>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
+        disabled={isAwaitingTargetTable || isAwaitingPartitionCount}
         onCancel={() => {
           snap.closeConfirmationDialog()
         }}
         onConfirm={onConfirmDeleteTable}
       >
         <div data-testid="confirm-delete-table-modal" className="space-y-4">
+          {isAwaitingPartitionCount && isPartitionCountError && (
+            <Alert variant="warning">
+              <AlertTitle>Failed to check this table's partitions</AlertTitle>
+              <AlertDescription>
+                Deleting a partitioned table also deletes its partitions. Retry to see how many will
+                be deleted.
+              </AlertDescription>
+              <AlertDescription className="mt-4">
+                <Button
+                  size="tiny"
+                  loading={isFetchingPartitionCount}
+                  onClick={() => refetchPartitionCount()}
+                >
+                  Retry
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          {isPartitionedTableDialogOpen && partitionCount !== undefined && partitionCount > 0 && (
+            <p className="text-sm text-foreground-light">
+              This will also delete its {partitionCount} {pluralize(partitionCount, 'partition')},
+              any nested partitions, and all of their data.
+            </p>
+          )}
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>
@@ -364,7 +444,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertDescription>
               <AlertDescription className="mt-4">
-                <Button asChild size="tiny" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -382,7 +462,7 @@ const DeleteConfirmationDialogs = ({
       <DropEntityConfirmationModal
         visible={snap.confirmationDialog?.type === 'view'}
         entityLabel="view"
-        entityName={selectedTable?.name}
+        entityName={targetTable?.name}
         isDeleteWithCascade={isDeleteWithCascade}
         onToggleCascade={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
         onCancel={() => snap.closeConfirmationDialog()}
@@ -392,7 +472,7 @@ const DeleteConfirmationDialogs = ({
       <DropEntityConfirmationModal
         visible={snap.confirmationDialog?.type === 'materialized-view'}
         entityLabel="materialized view"
-        entityName={selectedTable?.name}
+        entityName={targetTable?.name}
         isDeleteWithCascade={isDeleteWithCascade}
         onToggleCascade={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
         onCancel={() => snap.closeConfirmationDialog()}
@@ -429,8 +509,6 @@ const DeleteConfirmationDialogs = ({
     </>
   )
 }
-
-export default DeleteConfirmationDialogs
 
 type DropEntityConfirmationModalProps = {
   visible: boolean
@@ -497,7 +575,7 @@ const DropEntityConfirmationModal = ({
               recursively.
             </AlertDescription>
             <AlertDescription className="mt-4">
-              <Button asChild size="tiny" icon={<ExternalLink />}>
+              <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                 <Link
                   href="https://www.postgresql.org/docs/current/ddl-depend.html"
                   target="_blank"

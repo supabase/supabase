@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
@@ -100,7 +100,7 @@ export const ClickHouseFields = ({
                           className="w-7"
                           title={passwordVisibilityLabel}
                           aria-label={passwordVisibilityLabel}
-                          icon={showPassword ? <Eye /> : <EyeOff />}
+                          icon={showPassword ? <EyeIcon /> : <EyeOffIcon />}
                           onClick={() => setShowPassword(!showPassword)}
                         />
                       </div>

@@ -3,7 +3,8 @@ import { useCallback } from 'react'
 
 import { resourceKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ResourceVariables = {
   projectRef?: string
@@ -27,7 +28,7 @@ export async function getResource({ projectRef, id }: ResourceVariables, signal?
 }
 
 export type ResourceData = Awaited<ReturnType<typeof getResource>>
-export type ResourceError = ResponseError
+export type ResourceError = StudioError
 
 export const useResourceQuery = <TData = ResourceData>(
   { projectRef, id }: ResourceVariables,

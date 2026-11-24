@@ -3,7 +3,7 @@ import { literal } from '@supabase/pg-meta'
 import { PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
-const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'io'
+const WAREHOUSE_TLD = IS_STAGING_OR_LOCAL ? 'red' : 'co'
 
 /**
  * Name of the singleton replication publication (and destination) that Warehouse manages. Its table

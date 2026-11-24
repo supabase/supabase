@@ -1,6 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
-import { HelpCircle, Terminal } from 'lucide-react'
+import { HelpCircleIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
@@ -9,10 +10,11 @@ import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import InformationBox from '@/components/ui/InformationBox'
 import {
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
   type DatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 export interface ChooseFunctionFormProps {
   visible: boolean
@@ -23,10 +25,18 @@ export interface ChooseFunctionFormProps {
 const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { data = [] } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data = [] } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
   const triggerFunctions = data.filter((fn) => fn.return_type === 'trigger')
   const hasPublicSchemaFunctions = triggerFunctions.length >= 1
   const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
@@ -43,7 +53,6 @@ const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFor
       header="Pick a function"
       visible={visible}
       onCancel={() => setVisible(!visible)}
-      className="hooks-sidepanel"
     >
       <div className="py-6">
         {hasPublicSchemaFunctions ? (
@@ -74,7 +83,7 @@ const NoticeBox = () => {
   return (
     <div className="px-6">
       <InformationBox
-        icon={<HelpCircle size="20" strokeWidth={1.5} />}
+        icon={<HelpCircleIcon size="20" strokeWidth={1.5} />}
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
@@ -150,7 +159,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center rounded-sm bg-foreground p-1 text-background">
-                <Terminal strokeWidth={2} size={14} />
+                <TerminalIcon strokeWidth={2} size={14} />
               </div>
               <p className="mb-0 text-sm">{name}</p>
             </div>

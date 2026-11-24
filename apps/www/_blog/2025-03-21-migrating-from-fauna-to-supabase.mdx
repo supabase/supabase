@@ -25,10 +25,10 @@ Migrating away from Fauna requires adjustments in query logic, schema definition
 
 Supabase is an open-source Postgres development platform that offers:
 
-- **Managed Postgres database**: Stability, reliability, and strong SQL ecosystem with mature tooling.
+- **[Managed Postgres database](/solutions/hosted-postgres)**: Stability, reliability, and strong SQL ecosystem with mature tooling.
 - **Automatically generated REST APIs (via PostgREST)**: Direct analog to Fauna’s built-in API functionality.
 - **Native JSONB Support:** Supabase supports JSONB data types as well as JSON functions and operators to efficiently query collection-style data, prior to full-fledged normalization.
-- **Real-time database updates**, integrated authentication, secure file storage, and edge functions.
+- **Real-time database updates**, integrated authentication, secure file storage, and [edge functions](/docs/guides/functions).
 - **Row-level security**: Built directly into the database, allowing precise access control.
 - **Robust TypeScript support**: Seamless integration with modern development workflows.
 - **Full ACID compliance**: Stronger transactional guarantees than Fauna.
@@ -227,7 +227,7 @@ else console.log(data)
 Once your data is migrated, you can start to use Supabase to its fullest:
 
 - [**Authentication**](https://supabase.com/auth). Let your users login with email, Google, Apple, GitHub, and more. Secure and trusted.
-- [**Role-Based Access Control (RBAC)**](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac). Secure your data properly.
+- [**Role-Based Access Control (RBAC)**](https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac). Secure your data properly.
 - [**Storage**](https://supabase.com/storage). Affordable and fast, for all the videos and images you need in your app.
 - [**Edge Functions**](https://supabase.com/edge-functions). Custom backend logic when you want to dive into code.
 - [**Realtime**](https://supabase.com/realtime). Build immersive multi-player, collaborative experiences.
@@ -246,4 +246,4 @@ Once your data is migrated, you can start to use Supabase to its fullest:
 
 This is no doubt a stressful time as you transition away from Fauna. Supabase is here to help you every step of the way. Reach out to us and we can help you plan your transition and provide assistance.
 
-Supabase is a comprehensive, scalable replacement for Fauna. Supabase is built on Postgres and offers a robust relational model, powerful security features, and predictable pricing. Supabase enables engineering teams to confidently transition away from Fauna thanks to its SQL ecosystem, more mature/better tooling, row level security, strong typescript support, and full ACID compliance. Thoughtful planning and methodical execution will ensure a seamless migration and long-term reliability.
+Supabase is a comprehensive, scalable replacement for Fauna. Supabase is built on Postgres and offers a robust relational model, powerful security features, and predictable pricing. Supabase enables engineering teams to confidently transition away from Fauna thanks to its SQL ecosystem, more mature/better tooling, [row level security](/docs/guides/database/postgres/row-level-security), strong typescript support, and full ACID compliance. Thoughtful planning and methodical execution will ensure a seamless migration and long-term reliability.

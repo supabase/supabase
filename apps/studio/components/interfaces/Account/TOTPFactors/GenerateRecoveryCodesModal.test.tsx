@@ -1,21 +1,15 @@
 import { AuthError } from '@supabase/auth-js'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { consentState } from 'common'
+import { HttpResponse } from 'msw'
+import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
-import { formatRecoveryCode } from './RecoveryCodesModal.utils'
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
-
-const { mockCopyToClipboard } = vi.hoisted(() => ({
-  mockCopyToClipboard: vi.fn((_value: string, callback: () => void) => {
-    return callback()
-  }),
-}))
-vi.mock('ui', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('ui')>()),
-  copyToClipboard: mockCopyToClipboard,
-}))
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const codes = [
   'wto24t5xbeulvjmi',
@@ -31,7 +25,73 @@ const codes = [
 ]
 
 describe('GenerateRecoveryCodesModal', () => {
-  test('generate the recovery codes and allow users to copy them', async () => {
+  beforeEach(() => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
+  })
+
+  test('shows shimmer content while codes are being generated', () => {
+    customRender(
+      <RecoveryCodesModal
+        open
+        surface="account_security"
+        onOpenChange={vi.fn()}
+        mutation={{
+          data: undefined,
+          status: 'pending',
+          error: null,
+          isError: false,
+          isPending: true,
+          isSuccess: false,
+          reset: vi.fn(),
+        }}
+      />
+    )
+    expect(screen.getByRole('status', { name: 'Generating recovery codes' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
+  })
+
+  test('lets users copy and download generated recovery codes and tracks both actions', async () => {
+    userEvent.setup()
+    const hasFocus = vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+    const writeText = vi
+      .spyOn(navigator.clipboard, 'writeText')
+      .mockRejectedValueOnce(new Error('Clipboard unavailable'))
+    const previousConsent = consentState.hasConsented
+    consentState.hasConsented = true
+    const telemetryRequests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/telemetry/event',
+      response: async ({ request }) => {
+        telemetryRequests.push(await request.json())
+        return new HttpResponse(null, { status: 201 })
+      },
+    })
+
+    const downloadClick = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {})
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:recovery-codes')
+        static revokeObjectURL = vi.fn()
+      }
+    )
+    onTestFinished(() => {
+      hasFocus.mockRestore()
+      writeText.mockRestore()
+      downloadClick.mockRestore()
+      vi.unstubAllGlobals()
+      consentState.hasConsented = previousConsent
+    })
+
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -49,21 +109,41 @@ describe('GenerateRecoveryCodesModal', () => {
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
-    // Users have to copy the codes to close the modal, next click should fail if they managed to close it
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(1)
-    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy to clipboard' }))
-    await waitFor(() =>
-      expect(screen.getByRole('checkbox', { name: 'I have copied the codes' })).toBeChecked()
-    )
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(
-      codes.map((code) => formatRecoveryCode(code)).join('\n'),
-      expect.any(Function)
-    )
+    expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
+    const copyButton = screen.getByRole('button', { name: 'Copy' })
+    await act(async () => {
+      fireEvent.click(copyButton)
+    })
+    expect(telemetryRequests).toHaveLength(0)
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    fireEvent.click(copyButton)
+    await screen.findByRole('button', { name: 'Copied' })
+    await waitFor(() => {
+      expect(telemetryRequests).toMatchObject([
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+      ])
+    })
+    expect(await navigator.clipboard.readText()).toContain('WTO2-4T5X-BEUL-VJMI')
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+    expect(downloadClick).toHaveBeenCalledOnce()
+    await waitFor(() => {
+      expect(telemetryRequests).toMatchObject([
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+        {
+          action: 'recovery_codes_download_clicked',
+          custom_properties: { surface: 'account_security' },
+        },
+      ])
+    })
+    expect(JSON.stringify(telemetryRequests)).not.toMatch(/wto2-?4t5x-?beul-?vjmi/i)
+
+    // Done button is now enabled and closes the modal
+    const doneButton = await screen.findByRole('button', { name: 'Done' })
+    expect(doneButton).toBeEnabled()
+    fireEvent.click(doneButton)
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
   })
 
@@ -84,13 +164,12 @@ describe('GenerateRecoveryCodesModal', () => {
       })
     customRender(<GenerateRecoveryCodesModal />)
     fireEvent.click(await screen.findByRole('button', { name: 'Generate recovery codes' }))
-    await screen.findByText(
-      "We couldn't generate your recovery code. Please try again later or contact support if the problem persists."
+    await screen.findByText('Unable to generate recovery codes')
+    expect(await screen.findByText(/Try refreshing your browser/)).toHaveTextContent(
+      'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.'
     )
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
 
     // Retry

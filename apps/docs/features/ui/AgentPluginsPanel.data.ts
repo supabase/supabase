@@ -6,6 +6,8 @@ export interface PluginClient extends McpClient {
   docsLinkText?: string
 }
 
+export const AGENT_CLIENT_PARAM = 'client'
+
 export const PLUGIN_CLIENTS: PluginClient[] = [
   {
     key: 'claude-code',
@@ -29,6 +31,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/cursor-plugin',
     docsUrl: 'https://cursor.com/docs/plugins',
+  },
+  {
+    key: 'antigravity',
+    label: 'Antigravity',
+    icon: 'antigravity',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://antigravity.google/docs/plugins/#managing-plugins-by-surface',
+    docsLinkText: 'View Antigravity plugin documentation',
   },
   {
     key: 'gemini-cli',

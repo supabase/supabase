@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, Loader2, SquareCode } from 'lucide-react'
+import { ChevronRightIcon, FileTextIcon, Loader2Icon, SquareCodeIcon } from 'lucide-react'
 import {
   cn,
   Collapsible,
@@ -77,7 +77,7 @@ export const AssistantNotebookPreviewCell = ({
         className="group flex w-full items-center gap-2 bg-muted px-3 py-2 text-left transition-colors hover:bg-accent"
       >
         {mode === 'update' && <ChangeGlyph marker={marker} />}
-        <ChevronRight
+        <ChevronRightIcon
           size={12}
           className="shrink-0 text-foreground-lighter transition-transform group-data-[state=open]:rotate-90"
         />
@@ -95,7 +95,7 @@ export const AssistantNotebookPreviewCell = ({
             {metadata.status === 'loading' ? (
               <span className="flex items-center gap-1.5">
                 <span className="animate-spin">
-                  <Loader2 aria-hidden size={12} />
+                  <Loader2Icon aria-hidden size={12} />
                 </span>
                 Loading database…
               </span>
@@ -172,7 +172,7 @@ const ChangeGlyph = ({ marker }: { marker: ChangeMarker }) => {
 
 /** Same icons the notebook tab uses for query vs markdown cells. */
 const CellTypeIcon = ({ cell }: { cell: CellWire | AgentCell }) => {
-  const Icon = cell._tag === 'markdown_cell' ? FileText : SquareCode
+  const Icon = cell._tag === 'markdown_cell' ? FileTextIcon : SquareCodeIcon
   return <Icon aria-hidden size={14} className="shrink-0 text-foreground-muted" />
 }
 

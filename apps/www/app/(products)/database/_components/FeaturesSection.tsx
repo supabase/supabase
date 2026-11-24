@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Key } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -162,7 +162,7 @@ function PostgresSkeleton() {
           viewBox="0 0 390 430"
           className="w-80 h-80 relative z-[5]"
           style={{
-            color: hovered ? 'hsl(var(--brand-default))' : 'hsl(var(--foreground-muted))',
+            color: hovered ? 'hsl(var(--brand-default))' : 'var(--foreground-muted)',
             opacity: hovered ? 1 : 0.8,
             transition: 'color 0.5s, opacity 0.5s',
           }}

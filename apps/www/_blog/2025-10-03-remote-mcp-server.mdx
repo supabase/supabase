@@ -31,7 +31,7 @@ On top of this, we're adding even more tools to Supabase MCP that we hope will m
 
 ## What is MCP?
 
-MCP stands for [Model Context Protocol](https://modelcontextprotocol.io/). It standardizes how Large Language Models (LLMs) talk to platforms like Supabase. We released the initial version of our Supabase MCP server back in April which allowed folks to connect their favorite AI tools (like [Cursor](https://www.cursor.com/) or [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)) directly with Supabase. Since launch, we've added many new features:
+MCP stands for [Model Context Protocol](https://modelcontextprotocol.io/). It standardizes how Large Language Models (LLMs) talk to platforms like Supabase. We released the initial version of our Supabase MCP server back in April which allowed folks to connect their favorite AI tools (like [Cursor](https://cursor.com/) or [Claude Code](https://code.claude.com/docs/en/overview)) directly with Supabase. Since launch, we've added many new features:
 
 - Fetching and deploying Edge Functions
 - Fetching logs from any service in the Supabase stack
@@ -55,7 +55,7 @@ npx -y @supabase/mcp-server-supabase@latest ...
 
 This worked great at the time, because it meant that folks could connect their AI agents with Supabase immediately without a lot of infrastructure work on our end. But it came with some downsides:
 
-1. **Limited MCP clients:** Most web-based AI agents (like ChatGPT, Claude.ai, Builder.io) are limited to HTTP-based MCP servers due to the environments they run in. APIs like OpenAI's Response API also [have support for MCP](https://platform.openai.com/docs/guides/tools-remote-mcp) - but only with remote MCP servers, not `stdio`.
+1. **Limited MCP clients:** Most web-based AI agents (like ChatGPT, Claude.ai, Builder.io) are limited to HTTP-based MCP servers due to the environments they run in. APIs like OpenAI's Response API also [have support for MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) - but only with remote MCP servers, not `stdio`.
 2. **Authentication was clunky:** Folks needed to manually generate a personal access token (PAT) in order to authenticate with their Supabase account which added friction to the setup experience and not very secure (it was easy to accidentally commit this to source control).
 3. **Errors were hard to debug:** Not only did everyone need Node.js installed to run the server, they also needed to make sure their environment was configured correctly so that the correct version was used by each client (if you used `nvm`). Every operating system also had slight differences that required modifying the `npx` command accordingly.
 
@@ -67,7 +67,7 @@ https://mcp.supabase.com/mcp
 # or http://localhost:54321/mcp for local
 ```
 
-We also built an [interactive widget](https://supabase.com/mcp) to help you connect popular MCP clients to Supabase and customize the URL to your preferences (like project-scoped mode and read-only mode).
+We also built an [interactive widget](https://supabase.com/docs/guides/ai-tools/mcp) to help you connect popular MCP clients to Supabase and customize the URL to your preferences (like project-scoped mode and read-only mode).
 
 ## New features
 
@@ -101,7 +101,7 @@ Today we support the following feature groups:
 - [`storage`](https://github.com/supabase/mcp#storage)
 - [`branching`](https://github.com/supabase/mcp#branching-experimental-requires-a-paid-plan)
 
-See the [MCP docs](https://supabase.com/docs/guides/getting-started/mcp) for instructions on how to enable or disable these groups.
+See the [MCP docs](https://supabase.com/docs/guides/ai-tools/mcp) for instructions on how to enable or disable these groups.
 
 ### Doc search
 
@@ -127,7 +127,7 @@ This feature was actually a community contribution (thanks [Nico](https://github
 
 We have more exciting plans for MCP at Supabase:
 
-1. **Security:** Today our OAuth2 implementation requires you to make a binary decision on permissions: either grant _all_ permissions to your MCP client, or _none_. This isn't ideal if you know that you never want to, say, allow your client to access to your Edge Functions.
+1. **Security:** Today our OAuth2 implementation requires you to make a binary decision on permissions: either grant _all_ permissions to your MCP client, or _none_. This isn't ideal if you know that you never want to, say, allow your client to access to your [Edge Functions](/docs/guides/functions).
 
    To improve this, we're working to support fine-grain permissions that can be toggled during authorization. It's a big task to re-work our permission infrastructure to support this, but we believe it's worth it.
 

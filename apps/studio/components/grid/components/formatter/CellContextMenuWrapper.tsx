@@ -1,4 +1,4 @@
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
@@ -30,7 +30,7 @@ export const CellContextMenuWrapper = ({
       <ContextMenuTrigger className="flex items-center w-full">{children}</ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
-          <Copy size={12} />
+          <CopyIcon size={12} />
           <span className="text-xs">Copy cell</span>
         </ContextMenuItem>
       </ContextMenuContent>

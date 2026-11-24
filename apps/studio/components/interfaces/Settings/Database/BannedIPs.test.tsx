@@ -29,8 +29,9 @@ vi.mock('@/lib/constants', async (importOriginal) => ({
   IS_PLATFORM: true,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
@@ -47,7 +48,7 @@ test('shows a project-details error instead of leaving Network bans loading', as
 
   expect(await screen.findByText('Failed to retrieve project details')).toBeVisible()
   expect(screen.getByText('Error: Project unavailable')).toBeVisible()
-  expect(screen.getByRole('link', { name: 'Contact support' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /contact support/i })).toHaveAttribute(
     'href',
     expect.stringContaining('projectRef=default')
   )

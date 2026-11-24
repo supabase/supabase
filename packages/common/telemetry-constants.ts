@@ -450,35 +450,24 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
     /**
-     * Which region option was submitted. Only present for the region-recommendation experiment's
-     * eligible cohort (free plan + `project_creation:show_best_available_region` feature enabled —
-     * see `shouldTrackRegionRecommendation` in ProjectCreationForm.tsx). This is cohort-level
-     * eligibility, not "the option was shown" — it's present for both the PostHog flag's control
-     * and test arms so the two can be compared; omitted entirely outside the cohort (e.g. paid
-     * plans, or providers like AWS_NIMBUS where the feature is disabled).
-     * 'best_available' = the "Best available region" shortcut was used
-     * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
+     * freeTierGeneralRegionExperiment variant at submission time. Omitted when the org isn't
+     * in the experiment (paid plan, smart regions disabled for the selected cloud provider,
+     * or not enrolled via the freeTierGeneralRegionEnrollment ConfigCat flag).
      */
-    selectedRegionOption?: string
+    freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Which region list `selectedRegionOption` came from. Only present alongside `selectedRegionOption`.
-     * 'general' = picked from the "General regions" (smart group) list, or the "Best available
-     * region" shortcut was used (it always resolves to a general/smart region)
-     * 'specific' = picked from the "Specific regions" list
+     * Which kind of region was submitted. 'auto' = the Auto (best available) region option.
+     * 'general' = a smart region group (e.g. Americas). 'specific' = an exact region (e.g.
+     * us-east-1). An untouched field reports whichever default it holds. Only set when smart
+     * regions are enabled for the selected cloud provider.
      */
-    selectedRegionOptionType?: 'general' | 'specific'
+    regionSelectionType?: 'general' | 'auto' | 'specific'
     /**
-     * The region that was recommended/defaulted to on initial render, before any user
-     * interaction. Present under the same cohort gate as `selectedRegionOption`. Frozen the
-     * first time it's known, so a later refetch (e.g. switching cloud provider or instance size)
-     * doesn't overwrite what was actually shown to the user initially.
-     * 'best_available' = the user was in the PostHog flag's test arm, so the form defaulted to
-     * the "Best available region" shortcut
-     * otherwise = the name of the smart-group region recommended by the `available-regions`
-     * endpoint (e.g. 'Americas'), for users in the flag's control arm
-     * undefined = no recommendation had loaded yet at submission time
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
      */
-    initialRecommendedRegion?: string
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
@@ -513,6 +502,71 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
+  properties: { surface: 'follow_up' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Submit. Fires before the backend mutation; pair with
+ * OnboardingSurveySubmitFailedEvent for failure rate. The platform's own
+ * `onboarding_survey_submitted` event tracks actual completions.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitButtonClickedEvent {
+  action: 'onboarding_survey_submit_button_clicked'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+    hasCanCode: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User dismissed the onboarding survey.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyDismissedEvent {
+  action: 'onboarding_survey_dismissed'
+  properties: {
+    surface: OnboardingSurveySurface
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Onboarding survey submit failed.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitFailedEvent {
+  action: 'onboarding_survey_submit_failed'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+    hasCanCode: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
 /**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
@@ -533,6 +587,61 @@ export interface ProjectCreationFormExposedEvent {
      */
     surface?: 'main' | 'vercel'
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Org was targeted for the freeTierGeneralRegionExperiment: a free-plan org with smart
+ * regions enabled for the selected cloud provider, enrolled (control or test arm) via the
+ * freeTierGeneralRegionEnrollment ConfigCat flag.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionExperimentExposedEvent {
+  action: 'free_tier_general_region_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionUpgradeClickedEvent {
+  action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -979,16 +1088,96 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'kb'
+  | 'ask_ai_answer'
 
 /**
- * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * Part of the docs page actions split button that a user ran an action from.
+ */
+export type PageActionsOrigin = 'page_actions_button' | 'page_actions_menu'
+
+/**
+ * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
+ * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ *
+ * @group Events
+ * @source docs, kb
+ */
+export interface AgentSetupClickedEvent {
+  action: 'agent_setup_clicked'
+}
+
+/**
+ * User copied the URL of a page's Markdown version and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface MarkdownUrlCopiedEvent {
+  action: 'markdown_url_copied'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked "View as Markdown" to open a page's Markdown version.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface ViewAsMarkdownClickedEvent {
+  action: 'view_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
   properties: {
     /**
      * Page class the affordance sits on.
@@ -998,20 +1187,10 @@ export interface CopyAsMarkdownClickedEvent {
 }
 
 /**
- * User clicked the sidebar link to set up an AI coding agent with Supabase.
- *
- * @group Events
- * @source docs
- */
-export interface AgentSetupClickedEvent {
-  action: 'agent_setup_clicked'
-}
-
-/**
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
@@ -1021,6 +1200,10 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1060,7 +1243,9 @@ export interface DocsAiPromptCopiedEvent {
 }
 
 /**
- * User clicked a curated orientation link from a content listings MDX component.
+ * User clicked a curated orientation link from a content listings MDX component, or a
+ * link card or quickstart link in the getting started stepper (`listingId` is
+ * `getting-started-stepper`).
  *
  * @group Events
  * @source docs
@@ -1072,6 +1257,341 @@ export interface DocsContentListingClickedEvent {
     linkTitle: string
     groupTitle?: string
     listingId?: string
+  }
+}
+
+/**
+ * User clicked a link to an example in the supabase/supabase GitHub repo's examples/ folder.
+ *
+ * @group Events
+ * @source PageTelemetry, in every app that mounts it (docs, www, studio, learn, ui-library, kb)
+ */
+export interface ExampleLinkClickedEvent {
+  action: 'example_link_clicked'
+  properties: {
+    /**
+     * Path after examples/ in the GitHub URL, e.g. auth/nextjs.
+     */
+    examplePath: string
+  }
+}
+
+/**
+ * User copied a docs code block with its copy button, and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsCodeCopiedEvent {
+  action: 'docs_code_copied'
+  properties: {
+    /**
+     * Language of the code block, such as `bash` or `ts`.
+     */
+    lang?: string
+    /**
+     * Identifier that a page gives a code block it measures, such as
+     * `getting-started-install`.
+     */
+    copyId?: string
+  }
+}
+
+/**
+ * User picked an option in the getting started stepper: how to start, a framework, or a
+ * feature for the agent prompt.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides/getting-started
+ */
+export interface DocsGettingStartedOptionClickedEvent {
+  action: 'docs_getting_started_option_clicked'
+  properties: {
+    /**
+     * Stepper step the option belongs to.
+     */
+    optionType: 'start' | 'framework' | 'feature'
+    /**
+     * Start option id, framework slug, or feature id.
+     */
+    optionId: string
+    /**
+     * For a feature, true when the click selected it and false when it cleared it.
+     */
+    isSelected?: boolean
+  }
+}
+
+/**
+ * User opened the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2OpenedEvent {
+  action: 'docs_search_v2_opened'
+  properties: {
+    /**
+     * The trigger that opened the Search V2 dialog.
+     */
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
+  }
+}
+
+/**
+ * How a search term is reported. Free text can contain credentials and personal data, so the
+ * term's text is sent only when it is a short letters-only keyword.
+ */
+export interface SearchQueryProperties {
+  /**
+   * The search term, present only when it is a keyword: up to 4 letters-only parts of at most
+   * 16 letters each, joined by single spaces, hyphens or underscores, 40 characters at most.
+   */
+  query?: string
+  /** Length of the search term, trimmed and with repeated whitespace collapsed. */
+  queryLength: number
+  /** Number of whitespace-separated words in the search term. */
+  queryWordCount: number
+}
+
+/**
+ * User's search term was sent to the Search V2 endpoint.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2SearchSubmittedEvent {
+  action: 'docs_search_v2_search_submitted'
+  properties: SearchQueryProperties & {
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a Search V2 result, either by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ResultClickedEvent {
+  action: 'docs_search_v2_result_clicked'
+  properties: SearchQueryProperties & {
+    /**
+     * The path of the result that was activated.
+     */
+    resultPath: string
+  }
+}
+
+/**
+ * User opened the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchOpenedEvent {
+  action: 'kb_search_opened'
+  properties: {
+    /** The trigger that opened the dialog: Cmd+K or Ctrl+K, or a search button on the page. */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User closed the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchClosedEvent {
+  action: 'kb_search_closed'
+  properties: {
+    /** Why the dialog closed: the user dismissed it or opened a result. */
+    closeReason: 'dismissed' | 'result_navigated'
+  }
+}
+
+/**
+ * A knowledge base search returned, with or without results.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchSubmittedEvent {
+  action: 'kb_search_submitted'
+  properties: SearchQueryProperties & {
+    /** Number of results the search returned. */
+    resultCount: number
+    /** Whether the search returned at least one result. */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a knowledge base search result, by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchResultClickedEvent {
+  action: 'kb_search_result_clicked'
+  properties: {
+    /** The path of the result that was activated. */
+    resultPath: string
+    /** 1-based position of the result in the list. */
+    resultPosition: number
+    /** Number of results showing when the result was activated. */
+    resultCount: number
+  }
+}
+
+/**
+ * User closed the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ClosedEvent {
+  action: 'docs_search_v2_closed'
+  properties: {
+    /**
+     * Why the dialog closed: the user dismissed it, opened a result, or switched to Ask AI.
+     */
+    closeReason: 'dismissed' | 'result_navigated' | 'switched_to_ask_ai'
+  }
+}
+
+/**
+ * User opened Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiOpenedEvent {
+  action: 'docs_search_v2_ask_ai_opened'
+  properties: {
+    /**
+     * The trigger that opened Ask AI: the top bar button, Cmd+I or Ctrl+I, the item shown when a
+     * search has no results, or the button in the search results footer.
+     */
+    triggerType: 'ask_ai_button' | 'keyboard_shortcut' | 'no_results_item' | 'results_footer_button'
+  }
+}
+
+/**
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiQuestionSubmittedEvent {
+  action: 'docs_search_v2_ask_ai_question_submitted'
+  properties: {
+    /**
+     * The length of the question, in characters.
+     */
+    questionLength: number
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+  }
+}
+
+/**
+ * User clicked a source link under an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiSourceClickedEvent {
+  action: 'docs_search_v2_ask_ai_source_clicked'
+  properties: {
+    /**
+     * The path of the source that was clicked.
+     */
+    sourcePath: string
+  }
+}
+
+/**
+ * User closed Ask AI in the Search V2 dialog, by closing the dialog or by switching to search.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiClosedEvent {
+  action: 'docs_search_v2_ask_ai_closed'
+  properties: {
+    /**
+     * Why Ask AI closed: the user dismissed the dialog, or switched to search.
+     */
+    closeReason: 'dismissed' | 'switched_to_search'
+  }
+}
+
+/**
+ * Ask AI finished streaming an answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerCompletedEvent {
+  action: 'docs_search_v2_ask_ai_answer_completed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the end of the answer, in milliseconds.
+     */
+    durationMs: number
+    /**
+     * The number of source pages listed under the answer.
+     */
+    sourceCount: number
+  }
+}
+
+/**
+ * Ask AI failed to answer a question in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerFailedEvent {
+  action: 'docs_search_v2_ask_ai_answer_failed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the failure, in milliseconds.
+     */
+    durationMs: number
+  }
+}
+
+/**
+ * User clicked a link inside an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerLinkClickedEvent {
+  action: 'docs_search_v2_ask_ai_answer_link_clicked'
+  properties: {
+    /**
+     * The link's destination, as written in the answer.
+     */
+    href: string
   }
 }
 
@@ -1436,7 +1956,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio
@@ -1451,6 +1971,56 @@ export interface StudioBillingCancelSubscriptionClickedEvent {
     currentPlan: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed a downgrade to the Free Plan and was shown the modal saying members
+ * have exceeded their free project limits, which blocks the downgrade.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing or /billing?panel=subscriptionPlan
+ */
+export interface StudioBillingDowngradeBlockedModalOpenedEvent {
+  action: 'studio_billing_downgrade_blocked_modal_opened'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+    /**
+     * Number of organization members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
+  properties: {
+    /**
+     * The plan type of the organization the project is transferred from.
+     */
+    sourcePlan: string
+    /**
+     * The plan type of the selected target organization.
+     */
+    targetPlan: string | null
+    /**
+     * Number of members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -1471,6 +2041,14 @@ export interface StudioPricingPlanCtaClickedEvent {
      * The plan type the org is currently on.
      */
     currentPlan?: string
+    /**
+     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
+     */
+    planUpdateRedesignEnabled: boolean
+    /**
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+     */
+    origin?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -1495,6 +2073,82 @@ export interface StudioPricingSidePanelOpenedEvent {
 }
 
 /**
+ * Properties shared by the events on the plan change screen that follows a plan CTA click.
+ */
+export interface StudioPricingPlanChangeProperties {
+  /**
+   * The plan type being changed to, same values as studio_pricing_plan_cta_clicked.
+   */
+  selectedPlan?: string
+  /**
+   * The plan type the org is currently on.
+   */
+  currentPlan?: string
+  /**
+   * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+   */
+  origin?: string
+  /**
+   * Paused projects listed on the plan change bill. Counts the first page of org projects only.
+   */
+  pausedProjectCount: number
+}
+
+/**
+ * User expanded the "Billed every hour, even when idle" explainer on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingComputeBillingExplainerOpenedEvent {
+  action: 'studio_pricing_compute_billing_explainer_opened'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked a docs link on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeDocsLinkClickedEvent {
+  action: 'studio_pricing_plan_change_docs_link_clicked'
+  properties: StudioPricingPlanChangeProperties & {
+    docsLink: 'compute' | 'project_transfer'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the confirm button on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeConfirmClickedEvent {
+  action: 'studio_pricing_plan_change_confirm_clicked'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * The plan change submitted from the plan change screen in studio succeeded, including any payment confirmation step.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeCompletedEvent {
+  action: 'studio_pricing_plan_change_completed'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicks on grafana banner in studio Reports page.
  *
  * @group Events
@@ -1503,32 +2157,6 @@ export interface StudioPricingSidePanelOpenedEvent {
  */
 export interface ReportsDatabaseGrafanaBannerClickedEvent {
   action: 'reports_database_grafana_banner_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
- * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerExposedEvent {
-  action: 'logs_all_deprecation_banner_exposed'
-  groups: TelemetryGroups
-}
-
-/**
- * User dismissed the logs.all deprecation banner.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
-  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2075,6 +2703,109 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a standby URL signing key is created for a project's Storage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyCreatedEvent {
+  action: 'storage_url_signing_key_created'
+  properties: {
+    /** The algorithm the standby key was created with. */
+    algorithm: 'ES256' | 'HS512'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a URL signing key's role changes: a standby key is rotated to active,
+ * a standby key is revoked, or a revoked key is moved back to standby.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyUpdatedEvent {
+  action: 'storage_url_signing_key_updated'
+  properties: {
+    /** What happened to the key. */
+    change: 'rotated' | 'revoked' | 'moved_to_standby'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a lifecycle rule is added to a bucket from its card on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleCreatedEvent {
+  action: 'storage_bucket_lifecycle_rule_created'
+  properties: {
+    /** The new rule's status, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is edited, enabled, or disabled on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleUpdatedEvent {
+  action: 'storage_bucket_lifecycle_rule_updated'
+  properties: {
+    /** The rule's status after the save, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is deleted on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleRemovedEvent {
+  action: 'storage_bucket_lifecycle_rule_removed'
+  properties: {
+    /** How many rules remain; 0 means the configuration was removed. */
+    ruleCount: number
   }
   groups: TelemetryGroups
 }
@@ -2688,10 +3419,6 @@ export interface AuthUsersSearchSubmittedEvent {
      */
     user_type?: string
     /**
-     * The keywords being searched for
-     */
-    keywords?: string
-    /**
      * The column being filtered on, e.g. email, phone
      * (only included if filtering by a specific column and not all columns)
      */
@@ -2735,11 +3462,12 @@ export interface CommandMenuOpenedEvent {
  */
 export interface CommandMenuSearchSubmittedEvent {
   action: 'command_menu_search_submitted'
-  properties: {
+  properties: Omit<SearchQueryProperties, 'query'> & {
     /**
-     * Search term typed into the command menu input
+     * Search term typed into the command menu input, present only when it is a keyword (see
+     * `SearchQueryProperties`)
      */
-    value: string
+    value?: string
     /**
      * In which app the command input was typed
      */
@@ -2765,7 +3493,13 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
-     * The search query that was active when the command was clicked
+     * Heading of the section the command was listed under, e.g. `Related resources`.
+     * Absent when the command was not listed under one, as on a command menu sub-page.
+     */
+    command_section?: string
+    /**
+     * The search query that was active when the command was clicked, present only when it is
+     * a keyword (see `SearchQueryProperties`)
      */
     search_query?: string
     /**
@@ -3030,7 +3764,7 @@ type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ * @page /dashboard/project/{ref}/issues or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -3065,7 +3799,7 @@ export interface AdvisorDetailOpenedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/issues/{id} (issue detail)
  */
 export interface AdvisorAssistantButtonClickedEvent {
   action: 'advisor_assistant_button_clicked'
@@ -3121,6 +3855,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3753,25 +4488,6 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User was exposed to the plan-change panel presentation experiment.
- * Fires once per session per enrolled user in any variant (including control), so the
- * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
- * GROWTH experiment: `pricingPanelPlanPresentation`.
- *
- * @group Events
- * @page /org/[slug]/billing (plan-change side panel)
- * @source studio
- */
-export interface PricingPanelPlanPresentationExperimentExposedEvent {
-  action: 'pricing_panel_plan_presentation_experiment_exposed'
-  properties: {
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3838,12 +4554,102 @@ export interface UnifiedLogsRowClickedEvent {
       | 'auth'
       | 'storage'
       | 'edge function'
+      | 'edge function runtime'
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'pipelines'
       | 'compute'
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the Unified Logs saved views panel from the sidebar entry or the mobile drawer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewsPanelOpenedEvent {
+  action: 'unified_logs_views_panel_opened'
+  properties: {
+    surface: 'sidebar' | 'mobile_drawer'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User applied a preset or saved view to the Unified Logs filters.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewAppliedEvent {
+  action: 'unified_logs_view_applied'
+  properties: {
+    viewType: 'preset' | 'saved'
+    /** 'select' is a direct row click; 'reset' discards local edits by re-applying the active view. */
+    trigger: 'select' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User created a new saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewCreatedEvent {
+  action: 'unified_logs_view_created'
+  properties: {
+    source: 'new' | 'duplicate' | 'save_as_new'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing saved view's name or content in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewUpdatedEvent {
+  action: 'unified_logs_view_updated'
+  properties: {
+    /** 'content' covers filters and view options (sort, latency range, log type toggles), which are saved and compared together. */
+    updateType: 'name' | 'content'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User deleted a saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewRemovedEvent {
+  action: 'unified_logs_view_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the "this view has been modified" popover without updating, saving, or
+ * resetting.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewModifiedPopoverClosedEvent {
+  action: 'unified_logs_view_modified_popover_closed'
   groups: TelemetryGroups
 }
 
@@ -3953,7 +4759,7 @@ export interface HeaderFeedbackDropdownOpenedEvent {
 }
 
 /**
- * User clicked the Advisor Center toggle button in the page header.
+ * User clicked the Issues panel toggle button in the page header (formerly the Advisor Center).
  *
  * @group Events
  * @source studio
@@ -4057,9 +4863,84 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposedEvent {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryActionClickedEvent {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryTaskCompletedEvent {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryReminderClosedEvent {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposedEvent
+  | AccountRecoveryActionClickedEvent
+  | AccountRecoveryTaskCompletedEvent
+  | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4088,7 +4969,15 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
+  | OnboardingSurveySubmitButtonClickedEvent
+  | OnboardingSurveyDismissedEvent
+  | OnboardingSurveySubmitFailedEvent
   | ProjectCreationFormExposedEvent
+  | FreeTierGeneralRegionExperimentExposedEvent
+  | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -4117,9 +5006,30 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
+  | MarkdownUrlCopiedEvent
+  | ViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | ExampleLinkClickedEvent
+  | DocsCodeCopiedEvent
+  | DocsGettingStartedOptionClickedEvent
+  | DocsSearchV2OpenedEvent
+  | DocsSearchV2SearchSubmittedEvent
+  | DocsSearchV2ResultClickedEvent
+  | KbSearchOpenedEvent
+  | KbSearchClosedEvent
+  | KbSearchSubmittedEvent
+  | KbSearchResultClickedEvent
+  | DocsSearchV2ClosedEvent
+  | DocsSearchV2AskAiOpenedEvent
+  | DocsSearchV2AskAiQuestionSubmittedEvent
+  | DocsSearchV2AskAiSourceClickedEvent
+  | DocsSearchV2AskAiClosedEvent
+  | DocsSearchV2AskAiAnswerCompletedEvent
+  | DocsSearchV2AskAiAnswerFailedEvent
+  | DocsSearchV2AskAiAnswerLinkClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -4152,10 +5062,14 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
+  | StudioBillingDowngradeBlockedModalOpenedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
+  | StudioPricingComputeBillingExplainerOpenedEvent
+  | StudioPricingPlanChangeDocsLinkClickedEvent
+  | StudioPricingPlanChangeConfirmClickedEvent
+  | StudioPricingPlanChangeCompletedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -4188,6 +5102,12 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
+  | StorageUrlSigningKeyCreatedEvent
+  | StorageUrlSigningKeyUpdatedEvent
+  | StorageBucketLifecycleRuleCreatedEvent
+  | StorageBucketLifecycleRuleUpdatedEvent
+  | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
@@ -4255,7 +5175,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
@@ -4266,6 +5185,12 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
+  | UnifiedLogsViewsPanelOpenedEvent
+  | UnifiedLogsViewAppliedEvent
+  | UnifiedLogsViewCreatedEvent
+  | UnifiedLogsViewUpdatedEvent
+  | UnifiedLogsViewRemovedEvent
+  | UnifiedLogsViewModifiedPopoverClosedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent

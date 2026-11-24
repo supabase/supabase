@@ -1,4 +1,4 @@
-import { Box, Boxes } from 'lucide-react'
+import { BoxesIcon, BoxIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Badge, cn } from 'ui'
 
@@ -27,7 +27,7 @@ export const OrganizationAccessPill = ({
         'text-foreground': !isInaccessible,
       })}
     >
-      <Boxes
+      <BoxesIcon
         size={14}
         strokeWidth={1.5}
         className={cn('shrink-0', {
@@ -51,7 +51,7 @@ export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
         'text-foreground': !isInaccessible,
       })}
     >
-      <Box
+      <BoxIcon
         size={14}
         strokeWidth={1.5}
         className={cn('shrink-0', {

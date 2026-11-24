@@ -1,7 +1,7 @@
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import { AiTools } from '~/components/AiTools'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import { MarkdownActions } from '~/components/MarkdownActions'
 import PricingAddons from '~/components/Pricing/PricingAddons'
 import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
 import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
@@ -28,9 +28,10 @@ export default function PricingContent() {
             <p className="p text-lg leading-5">
               Start building for free, collaborate with your team, then scale to millions of users
             </p>
-            <MarkdownActions
+            <AiTools
               orientation="horizontal"
-              className="justify-center pt-4"
+              titleClassName="sr-only"
+              className="flex justify-center pt-4"
               pagePath="/pricing"
               pageType="pricing"
             />

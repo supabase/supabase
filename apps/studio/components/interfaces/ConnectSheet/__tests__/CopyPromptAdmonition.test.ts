@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, expect, test } from 'vitest'
 
 import { buildConnectPrompt } from '../CopyPromptAdmonition'
@@ -13,7 +14,7 @@ describe('buildConnectPrompt', () => {
       >
         <div data-step-content>
           <div
-            data-connect-copy-value="postgresql://postgres:[YOUR-PASSWORD]@db.example.supabase.co:5432/postgres"
+            data-connect-copy-value="postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.example.supabase.co:5432/postgres"
           >
             <pre>postgresql://postgres:temporary-password@db.example.supabase.co:5432/postgres</pre>
           </div>
@@ -24,7 +25,7 @@ describe('buildConnectPrompt', () => {
     const prompt = buildConnectPrompt(container)
 
     expect(prompt).toContain(
-      'postgresql://postgres:[YOUR-PASSWORD]@db.example.supabase.co:5432/postgres'
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.example.supabase.co:5432/postgres'
     )
     expect(prompt).not.toContain('temporary-password')
   })

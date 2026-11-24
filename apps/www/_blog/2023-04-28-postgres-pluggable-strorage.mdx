@@ -43,7 +43,7 @@ This leaves a few holes in that need to be fixed before the community can use th
 Even without a full API for pluggable storage, there are a couple of solutions available on the market today:
 
 - **Citus’s** [Columnar Storage](https://docs.citusdata.com/en/v11.1/admin_guide/table_management.html#columnar-storage), which powers Microsoft’s [Hyperscale](https://azure.microsoft.com/en-us/updates/azure-database-for-postgresql-hyperscale-citus-is-now-available/) offering. Citus has a few [limitations](https://docs.citusdata.com/en/v11.1/admin_guide/table_management.html#limitations) due to the restrictions of the current API.
-- EDB’s [Advanced Storage Pack](https://www.infoworld.com/article/3681112/3-key-features-in-edb-postgresql-15.html), which is appears to provide some enhancements to heap storage, although the source is not available for us to confirm.
+- EDB’s [Advanced Storage Pack](https://www.infoworld.com/article/2337504/3-key-features-in-edb-postgresql-15.html), which is appears to provide some enhancements to heap storage, although the source is not available for us to confirm.
 
 ## The future of pluggable storage
 
@@ -54,13 +54,13 @@ Right now, pluggable storage requires a fork of Postgres. But there are several 
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-Alexander Korotkov, the maintainer of OrioleDB, will be talking at PGCON 23 about some of the [changes](https://www.pgcon.org/events/pgcon_2023/schedule/session/470-future-of-table-access-methods/) they are making. They are solving many ["wicked Postgres problems"](https://www.slideshare.net/AlexanderKorotkov/solving-postgresql-wicked-problems) with [dual pointers](https://www.orioledata.com/blog/buffer-management/) instead of buffer mapping, row-level WAL instead of block-level WAL, undo logs instead of bloat-prone MVCC, and index-organized tables instead of heap.
+Alexander Korotkov, the maintainer of OrioleDB, will be talking at PGCON 23 about some of the [changes](https://www.pgcon.org/2023/schedule/session/470-future-of-table-access-methods/) they are making. They are solving many ["wicked Postgres problems"](https://www.slideshare.net/AlexanderKorotkov/solving-postgresql-wicked-problems) with [dual pointers](https://www.orioledata.com/blog/buffer-management/) instead of buffer mapping, row-level WAL instead of block-level WAL, undo logs instead of bloat-prone MVCC, and index-organized tables instead of heap.
 
 </div>
 
 ## Timelines for pluggable storage
 
-Ambitiously, many of the changes required for pluggable storage could land in Postgres 17. If that happens, new storage engines like OrioleDB would be available as a simple extension for developers to use in any Postgres instance. This paves the way for other Pluggable Storage Engines, just like MySQL’s [support for multiple storage engines](https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html).
+Ambitiously, many of the changes required for pluggable storage could land in Postgres 17. If that happens, new storage engines like [OrioleDB](https://supabase.com/features/orioledb) would be available as a simple extension for developers to use in any Postgres instance. This paves the way for other Pluggable Storage Engines, just like MySQL’s [support for multiple storage engines](https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html).
 
 As a community project, Postgres requires support for these initiatives. You can support pluggable storage by getting involved during Postgres [Commitfests](https://supabase.com/blog/postgresql-commitfest). Postgres is already one of the best database engines in the world, and pluggable storage would make it even more attractive and maintainable.
 

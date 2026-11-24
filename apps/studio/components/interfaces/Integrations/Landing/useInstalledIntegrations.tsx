@@ -83,7 +83,9 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
 
-  const isHooksEnabled = schemas.some((schema) => schema.name === 'supabase_functions')
+  const isHooksEnabled =
+    !!extensions.find((ext) => ext.name === 'pg_net')?.installed_version &&
+    schemas.some((schema) => schema.name === 'supabase_functions')
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations

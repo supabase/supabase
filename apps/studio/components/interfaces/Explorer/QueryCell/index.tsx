@@ -1,4 +1,4 @@
-import { AlignLeft } from 'lucide-react'
+import { AlignLeftIcon } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
@@ -145,7 +145,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         onDisplayChange={handleDisplayChange}
         toolbarActions={
           <ExplorerToolbarAction
-            icon={<AlignLeft size={16} strokeWidth={2} />}
+            icon={<AlignLeftIcon size={16} strokeWidth={2} />}
             tooltip={
               <div className="flex items-center gap-2.5">
                 <span>Prettify SQL</span>

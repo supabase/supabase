@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { mswServer } from '@/tests/lib/msw'
+import { getRouteHandler } from '@/tests/lib/server-route'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -131,6 +132,29 @@ describe('getStatusPage', () => {
 
     const { getStatusPage } = await import('./status-page')
     await expect(getStatusPage()).rejects.toThrow()
+  })
+
+  test('missing widget URL outside production → empty payload, isDegraded true', async () => {
+    vi.stubEnv('INCIDENT_IO_WIDGET_URL', '')
+    vi.stubEnv('NODE_ENV', 'development')
+    const errorSpy = vi.spyOn(console, 'error')
+
+    const { getStatusPage } = await import('./status-page')
+    const result = await getStatusPage()
+
+    expect(result.isDegraded).toBe(true)
+    expect(result.data.ongoing_incidents).toEqual([])
+    expect(result.data.in_progress_maintenances).toEqual([])
+    expect(result.data.scheduled_maintenances).toEqual([])
+    expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  test('missing widget URL in production → throws', async () => {
+    vi.stubEnv('INCIDENT_IO_WIDGET_URL', '')
+    vi.stubEnv('NODE_ENV', 'production')
+
+    const { getStatusPage } = await import('./status-page')
+    await expect(getStatusPage()).rejects.toThrow('INCIDENT_IO_WIDGET_URL is not set')
   })
 
   test('missing API key / status page ID → succeeds with default annotations everywhere, isDegraded true', async () => {
@@ -270,8 +294,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
       )
     )
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe(
       'public, s-maxage=300, stale-while-revalidate=300'
@@ -284,8 +313,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
     vi.stubEnv('INCIDENT_IO_STATUS_PAGE_ID', '')
     mswServer.use(http.get(WIDGET_URL, () => HttpResponse.json(widgetFixture())))
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe(
       'public, s-maxage=60, stale-while-revalidate=60'
@@ -296,8 +330,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
     stubHappyEnv()
     mswServer.use(http.get(WIDGET_URL, () => new HttpResponse(null, { status: 503 })))
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe('no-store')
   })

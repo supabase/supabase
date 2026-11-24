@@ -16,15 +16,9 @@ You can clone your Supabase project by restoring your data from an existing proj
 - Database roles, permissions and users
 - Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
 - Encryption root key (so [Vault](/docs/guides/database/vault) secrets and encrypted columns remain readable in the new project)
+- Key configurations from the original project, including the compute instance size, disk attributes, SSL enforcement settings, and network restrictions
 
-**What needs manual reconfiguration?**
-
-- Storage objects & settings (Your S3/storage files and bucket configurations are **NOT** copied)
-- Edge Functions
-- Auth settings & API keys
-- Realtime settings
-- Database extensions and settings
-- Read replicas
+<$Partial path="restore-manual-configurations.mdx" variables={{ "extensions": "",  "project_settings": "" }} />
 
 Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
 
@@ -38,7 +32,7 @@ To begin, switch to the source project—the project containing the data you wis
 
 A list of available backups is displayed. Select the backup you want to use and click the "Restore" button. For projects with PITR enabled, use the date and time selector to specify the exact point in time from which you wish to restore data.
 
-Once you’ve made your choice, Supabase takes care of the rest. A new project is automatically created, replicating key configurations from the original, including the compute instance size, disk attributes, SSL enforcement settings, and network restrictions. The data will remain in the same region as the source project to ensure compliance with data residency requirements. The entire process is fully automated.
+Once you’ve made your choice, Supabase takes care of the rest. The data will remain in the same region as the source project to ensure compliance with data residency requirements. The entire process is fully automated.
 
 <Admonition type="note">
 

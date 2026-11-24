@@ -1,6 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ShieldCheck, X } from 'lucide-react'
+import { ShieldCheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -21,10 +21,10 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseEventTriggerCreateMutation } from '@/data/database-event-triggers/database-event-trigger-create-mutation'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
@@ -39,11 +39,18 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
     false
   )
 
-  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } =
-    useDatabaseEventTriggersQuery({
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      grant: readGrant.grant,
     })
+  )
   const hasDefaultTrigger = useMemo(
     () =>
       eventTriggers.some(
@@ -52,6 +59,8 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
     [eventTriggers]
   )
 
+  // Without a read grant we can't tell whether the trigger exists, so don't offer to create it
+  if (readGrant.status !== 'granted') return null
   if (!projectRef || isLoadingEventTriggers || hasDefaultTrigger) return null
 
   if (iconOnly) {
@@ -68,7 +77,7 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
         <>
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
-            icon={<X />}
+            icon={<XIcon />}
             variant="text"
             className="w-6"
             tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
@@ -87,9 +96,10 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
   const [open, setOpen] = useState(false)
 
-  const { can: canCreateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
   )
 
   const { mutate: createEventTrigger, isPending: isCreating } =
@@ -104,9 +114,14 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
   const handleCreateTrigger = () => {
     if (!project) return
+    if (!writeGrant.grant) {
+      toast.error(getWriteGrantToastMessage(writeGrant.status, 'create', 'triggers'))
+      return
+    }
     track('rls_event_trigger_banner_create_button_clicked')
     createEventTrigger({
       projectRef: project.ref,
+      grant: writeGrant.grant,
       connectionString: project.connectionString,
       sql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
     })
@@ -117,7 +132,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            icon={<ShieldCheck />}
+            icon={<ShieldCheckIcon />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
@@ -137,9 +152,9 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas such as <code className="text-code-inline">public</code> are
-            reachable through your project’s API. Enable Row Level Security (RLS) on these tables so
-            access is governed by the policies you define, not just the project API key.
+            Tables in exposed schemas such as <code>public</code> are reachable through your
+            project’s API. Enable Row Level Security (RLS) on these tables so access is governed by
+            the policies you define, not just the project API key.
           </p>
           <p>
             This trigger automatically enables RLS whenever a new table is created. Review the SQL
@@ -160,15 +175,13 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
           </Button>
           <ButtonTooltip
             variant="primary"
-            disabled={!canCreateTriggers}
+            disabled={!writeGrant.grant}
             loading={isCreating}
             onClick={handleCreateTrigger}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !canCreateTriggers
-                  ? 'You need additional permissions to create triggers'
-                  : undefined,
+                text: getWriteGrantTooltip(writeGrant.status, 'create', 'triggers'),
               },
             }}
           >

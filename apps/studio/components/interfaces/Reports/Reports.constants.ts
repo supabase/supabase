@@ -10,6 +10,7 @@ import {
   safeSql as safeLogSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import type { Granularity } from '@/data/reports/report.utils'
 import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
@@ -184,7 +185,12 @@ export function generateOtelWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
-const OTEL_HOURLY_TIMESTAMP = safeLogSql`toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000`
+const OTEL_TIMESTAMP: Record<Granularity, SafeLogSqlFragment> = {
+  minute: safeLogSql`toUnixTimestamp(toStartOfMinute(logs.timestamp)) * 1000000`,
+  hour: safeLogSql`toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000`,
+  day: safeLogSql`toUnixTimestamp(toStartOfDay(logs.timestamp)) * 1000000`,
+}
+const OTEL_HOURLY_TIMESTAMP = OTEL_TIMESTAMP.hour
 const OTEL_STATUS_CODE = safeLogSql`toInt32OrZero(log_attributes['response.status_code'])`
 const OTEL_ORIGIN_TIME = safeLogSql`toFloat64OrNull(log_attributes['response.origin_time'])`
 const OTEL_ROUTE_SELECT = safeLogSql`
@@ -241,14 +247,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp
         ORDER BY
           timestamp ASC`,
-        safeSqlOtel: (filters) => safeLogSql`
+        safeSqlOtel: (filters, granularity = 'hour') => safeLogSql`
         select
-          ${OTEL_HOURLY_TIMESTAMP} as timestamp,
+          ${OTEL_TIMESTAMP[granularity]} as timestamp,
           toFloat64(count()) as count
         from logs
         ${otelWhere(filters)}
-        group by ${OTEL_HOURLY_TIMESTAMP}
-        order by ${OTEL_HOURLY_TIMESTAMP} asc
+        group by ${OTEL_TIMESTAMP[granularity]}
+        order by ${OTEL_TIMESTAMP[granularity]} asc
         limit 50000`,
       },
       topRoutes: {
@@ -303,14 +309,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
         `,
-        safeSqlOtel: (filters) => safeLogSql`
+        safeSqlOtel: (filters, granularity = 'hour') => safeLogSql`
         select
-          ${OTEL_HOURLY_TIMESTAMP} as timestamp,
+          ${OTEL_TIMESTAMP[granularity]} as timestamp,
           toFloat64(count()) as count
         from logs
         ${otelWhere(filters, OTEL_ERROR_STATUS)}
-        group by ${OTEL_HOURLY_TIMESTAMP}
-        order by ${OTEL_HOURLY_TIMESTAMP} asc
+        group by ${OTEL_TIMESTAMP[granularity]}
+        order by ${OTEL_TIMESTAMP[granularity]} asc
         limit 50000`,
       },
       topErrorRoutes: {
@@ -366,14 +372,14 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
       `,
-        safeSqlOtel: (filters) => safeLogSql`
+        safeSqlOtel: (filters, granularity = 'hour') => safeLogSql`
         select
-          ${OTEL_HOURLY_TIMESTAMP} as timestamp,
+          ${OTEL_TIMESTAMP[granularity]} as timestamp,
           avg(${OTEL_ORIGIN_TIME}) as avg
         from logs
         ${otelWhere(filters)}
-        group by ${OTEL_HOURLY_TIMESTAMP}
-        order by ${OTEL_HOURLY_TIMESTAMP} asc
+        group by ${OTEL_TIMESTAMP[granularity]}
+        order by ${OTEL_TIMESTAMP[granularity]} asc
         limit 50000`,
       },
       topSlowRoutes: {
@@ -447,15 +453,15 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
         `,
-        safeSqlOtel: (filters) => safeLogSql`
+        safeSqlOtel: (filters, granularity = 'hour') => safeLogSql`
         select
-          ${OTEL_HOURLY_TIMESTAMP} as timestamp,
+          ${OTEL_TIMESTAMP[granularity]} as timestamp,
           sum(toFloat64OrZero(log_attributes['request.headers.content_length'])) / 1000000 as ingress_mb,
           sum(toFloat64OrZero(log_attributes['response.headers.content_length'])) / 1000000 as egress_mb
         from logs
         ${otelWhere(filters)}
-        group by ${OTEL_HOURLY_TIMESTAMP}
-        order by ${OTEL_HOURLY_TIMESTAMP} asc
+        group by ${OTEL_TIMESTAMP[granularity]}
+        order by ${OTEL_TIMESTAMP[granularity]} asc
         limit 50000`,
       },
       requestsByCountry: {

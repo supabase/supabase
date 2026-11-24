@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { Search, X } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -156,7 +156,7 @@ export const Activity = ({ live }: ActivityProps) => {
       <div className="flex gap-2 flex-wrap">
         <Input
           size="tiny"
-          icon={<Search />}
+          icon={<SearchIcon />}
           placeholder="Search query"
           className="w-56"
           value={searchFilter}
@@ -222,7 +222,7 @@ export const Activity = ({ live }: ActivityProps) => {
           <ButtonTooltip
             variant="text"
             className="px-1"
-            icon={<X />}
+            icon={<XIcon />}
             onClick={onResetFilters}
             aria-label="Reset filters"
             tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}

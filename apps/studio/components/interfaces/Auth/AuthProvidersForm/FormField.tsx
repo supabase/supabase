@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink } from 'lucide-react'
+import { CalendarIcon, ExternalLinkIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -30,6 +30,7 @@ import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Enum } from './AuthProvidersForm.types'
+import { CommaSeparatedListInput } from './CommaSeparatedListInput'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -183,6 +184,39 @@ const FormField = ({
         </>
       )
 
+    case 'comma-separated-list':
+      return (
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl className="col-span-6">
+                    <CommaSeparatedListInput
+                      {...field}
+                      value={field.value ?? ''}
+                      readOnly={readOnly}
+                    />
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
+      )
+
     case 'multiline-string':
       return (
         <>
@@ -291,7 +325,7 @@ const FormField = ({
                       {description ? <Markdown content={description} /> : null}
                       {properties.link && (
                         <span>
-                          <Button asChild size="tiny" icon={<ExternalLink />}>
+                          <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                             <a href={properties.link} target="_blank" rel="noreferrer noopener">
                               Documentation
                             </a>

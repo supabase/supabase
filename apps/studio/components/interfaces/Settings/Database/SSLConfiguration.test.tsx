@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components, paths } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -20,8 +20,9 @@ const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedPr
     mockUseSelectedProjectQuery: vi.fn(),
   }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { DATABASE_SSL_CONFIG_WRITE: 'database_ssl_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
@@ -108,11 +109,10 @@ describe('SSLConfiguration', () => {
     // Nothing is loading for HA projects, so there is no announcement to make
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
 
-    // The tooltip trigger is the wrapper around the (disabled) switch
-    await userEvent.hover(sslSwitch.parentElement!)
-    expect((await screen.findAllByText(HA_TOOLTIP, {}, { timeout: 2000 })).length).toBeGreaterThan(
-      0
-    )
+    // The tooltip trigger is the wrapper around the (disabled) switch. Focus opens a Radix
+    // tooltip without the hover delay.
+    fireEvent.focus(sslSwitch.parentElement!)
+    expect((await screen.findAllByText(HA_TOOLTIP)).length).toBeGreaterThan(0)
 
     expect(sslEnforcementRequests.count).toBe(0)
   })
@@ -157,8 +157,8 @@ describe('SSLConfiguration', () => {
     await userEvent.click(sslSwitch)
 
     const dialog = await screen.findByRole('alertdialog')
-    expect(dialog).toHaveTextContent('Updating SSL enforcement involves a brief downtime')
-    expect(screen.getByRole('button', { name: 'Enable SSL' })).toBeInTheDocument()
+    expect(dialog).toHaveTextContent('Enforce SSL on connections?')
+    expect(screen.getByRole('button', { name: 'Enforce SSL' })).toBeInTheDocument()
     // Controlled switch must not flip while the dialog is open
     expect(sslSwitch).not.toBeChecked()
 
@@ -166,5 +166,31 @@ describe('SSLConfiguration', () => {
 
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
     expect(sslSwitch).not.toBeChecked()
+  })
+
+  it('disables SSL enforcement without a confirm dialog', async () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+    mockSSLEnforcement({ appliedSuccessfully: true, currentConfig: { database: true } })
+    const updateRequests: unknown[] = []
+    addAPIMock({
+      method: 'put',
+      path: '/v1/projects/:ref/ssl-enforcement',
+      response: async ({ request }) => {
+        updateRequests.push(await request.json())
+        return HttpResponse.json<SslEnforcementResponse>({
+          appliedSuccessfully: true,
+          currentConfig: { database: false },
+        })
+      },
+    })
+
+    customRender(<SSLConfiguration />)
+
+    const sslSwitch = await screen.findByRole('switch')
+    expect(sslSwitch).toBeChecked()
+    await userEvent.click(sslSwitch)
+
+    await waitFor(() => expect(updateRequests).toEqual([{ requestedConfig: { database: false } }]))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 })

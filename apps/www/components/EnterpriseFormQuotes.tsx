@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { AnimatePresence, motion, useAnimation } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 

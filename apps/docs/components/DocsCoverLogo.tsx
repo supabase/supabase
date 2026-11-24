@@ -1,6 +1,6 @@
 'use client'
 
-import { domAnimation, LazyMotion, m } from 'framer-motion'
+import { domAnimation, LazyMotion, m } from 'motion/react'
 import React, { type ComponentPropsWithoutRef } from 'react'
 
 const DocsCoverLogo = ({ className, ...props }: ComponentPropsWithoutRef<'div'>) => {

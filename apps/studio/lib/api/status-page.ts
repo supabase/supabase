@@ -24,6 +24,14 @@ const MAX_RETRIES = 2
 
 export type StatusPageResult = { data: StatusPageResponse; isDegraded: boolean }
 
+const EMPTY_STATUS_PAGE: StatusPageResponse = {
+  page_title: 'Supabase Status',
+  page_url: 'https://status.supabase.com/',
+  ongoing_incidents: [],
+  in_progress_maintenances: [],
+  scheduled_maintenances: [],
+}
+
 const LinkedResponseIncidentsSchema = z.object({
   incidents: z.array(z.object({ id: z.string(), linked_at: z.string() })),
 })
@@ -149,9 +157,13 @@ async function fetchResponseIncident(apiKey: string, id: string): Promise<Respon
 }
 
 export async function getStatusPage(): Promise<StatusPageResult> {
+  // Missing incident.io config is expected in local dev, so only treat it as an error in production
+  const isProduction = process.env.NODE_ENV === 'production'
+
   const widgetUrl = process.env.INCIDENT_IO_WIDGET_URL
   if (!widgetUrl) {
-    throw new InternalServerError('INCIDENT_IO_WIDGET_URL is not set')
+    if (isProduction) throw new InternalServerError('INCIDENT_IO_WIDGET_URL is not set')
+    return { data: EMPTY_STATUS_PAGE, isDegraded: true }
   }
 
   const widget = await fetchWidget(widgetUrl)
@@ -162,7 +174,7 @@ export async function getStatusPage(): Promise<StatusPageResult> {
   const statusPageId = process.env.INCIDENT_IO_STATUS_PAGE_ID
 
   if (!apiKey || !statusPageId) {
-    console.error('INCIDENT_IO_API_KEY or INCIDENT_IO_STATUS_PAGE_ID is not set')
+    if (isProduction) console.error('INCIDENT_IO_API_KEY or INCIDENT_IO_STATUS_PAGE_ID is not set')
     return { data: annotateWidget(widget, new Map(), modeFieldIds), isDegraded: true }
   }
 

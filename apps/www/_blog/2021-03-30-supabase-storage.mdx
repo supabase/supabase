@@ -67,7 +67,7 @@ We focused on performance, security and interoperability with the rest of the Su
 
 ### Integration with the Supabase ecosystem
 
-Supabase is a [collection of open source tools](/docs#how-it-works) which integrate very well with each other. We evaluated open source object storage servers like [Ceph](https://ceph.io/), [Swift](https://www.openstack.org/software/releases/ocata/components/swift), [Minio](https://min.io/) and [Zenko](https://github.com/scality/Zenko) but none of these tools were a good fit for our existing ecosystem.
+Supabase is a [collection of open source tools](/docs#how-it-works) which integrate very well with each other. We evaluated open source object storage servers like [Ceph](https://ceph.io/), [Swift](https://www.openstack.org/software/releases/ocata/components/swift), [Minio](https://www.min.io/) and [Zenko](https://github.com/scality/Zenko) but none of these tools were a good fit for our existing ecosystem.
 
 **Postgres Compatibility**
 
@@ -83,7 +83,7 @@ We are using managed services like [S3](https://aws.amazon.com/s3/), [Wasabi](ht
 
 Existing tools do not play well with our authentication system. For example, Minio is bundled with its own [auth system](https://docs.min.io/docs/minio-admin-complete-guide.html#user) and there is no easy way to map Minio users to [Supabase users](/docs/guides/auth).
 
-In the end, we opted to build our own [Storage API server](https://github.com/supabase/storage-api).
+In the end, we opted to build our own [Storage API server](https://github.com/supabase/storage).
 
 ## Security
 
@@ -97,7 +97,7 @@ For Authorization, we wanted to avoid creating a new DSL like Firebase. Instead,
 
 ![One True Language](/images/blog/storage/true-language.png)
 
-To do this, we leverage Postgres' Row Level Security. We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
+To do this, we leverage Postgres' [Row Level Security](/docs/guides/database/postgres/row-level-security). We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
 
 The idea is simple - if a user is able to `select` from the `objects` table, they can retrieve the object too. Using Postgres' Row Level Security, you can define fine-grained Policies to determine access levels for different users.
 
@@ -139,7 +139,7 @@ Using the power of Postgres' Row Level Security, you can create pretty much any 
 
 ### Performance
 
-The storage server is built with [Fastify](https://www.fastify.io/) and Typescript. Fastify is one of the [fastest](https://www.fastify.io/benchmarks/) Node frameworks and our initial benchmark results look very promising.
+The storage server is built with [Fastify](https://fastify.dev/) and Typescript. Fastify is one of the [fastest](https://fastify.dev/benchmarks/) Node frameworks and our initial benchmark results look very promising.
 
 We use Node streams everywhere. Objects are uploaded directly to S3 with minimal in-memory buffering. This minimizes RAM consumption even while uploading huge objects. The code does become a bit more complicated when using streams. For example, you can't figure out the size of the object being uploaded before streaming it to S3. But we believe this tradeoff is worth it.
 
@@ -157,7 +157,7 @@ We have intentionally kept the API surface for the storage backend very small, i
 
 ### Client libraries
 
-You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](/docs/reference/javascript/file-buckets-createbucket).
+You may be itching to get started tinkering around with our new [Supabase storage](/docs/guides/storage) - we have an example app prepared for you which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](/docs/reference/javascript/file-buckets-createbucket).
 
 ![Example app 1](/images/blog/storage/ph-7.png)
 

@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
@@ -13,7 +13,7 @@ export function ToolGroup({ label, isActive = false, children }: ToolGroupProps)
   return (
     <Collapsible className="w-full max-w-3xl mx-auto my-4 first:mt-0 last:mb-0 text-foreground-lighter">
       <CollapsibleTrigger className="group/tool-group flex items-center gap-2 w-full py-2 text-left">
-        <ChevronRight
+        <ChevronRightIcon
           strokeWidth={1.5}
           size={12}
           className="shrink-0 transition-transform duration-200 ease-out group-data-[state=open]/tool-group:rotate-90"

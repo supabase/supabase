@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -58,7 +58,7 @@ export const HelpPanel = ({
               variant="text"
               className="h-7 w-7"
               onClick={() => setView('home')}
-              icon={<ChevronLeft strokeWidth={1.5} />}
+              icon={<ChevronLeftIcon strokeWidth={1.5} />}
               tooltip={{ content: { side: 'bottom', text: 'Back' } }}
             />
           )}
@@ -70,7 +70,7 @@ export const HelpPanel = ({
             variant="text"
             className="w-7 h-7"
             onClick={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             tooltip={{ content: { side: 'bottom', text: 'Close' } }}
           />
         </div>

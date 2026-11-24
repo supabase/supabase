@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -48,34 +48,39 @@ const OrganizationCard = ({
             content: {
               text:
                 isSuccess && freePlanWithExceedingLimits ? (
-                  <div className="space-y-3 w-96 p-2">
-                    <p className="text-sm leading-normal">
-                      The following members have reached their maximum limits for the number of
-                      active free plan projects within organizations where they are an administrator
-                      or owner:
+                  <div className="flex flex-col gap-y-2 w-96 p-2">
+                    <p className="leading-normal">
+                      Owners and administrators are limited in how many active Free Plan projects
+                      they can have across all organizations. Members over the limit:
                     </p>
-                    <ul className="pl-5 list-disc">
-                      {membersExceededLimit.map((member, idx: number) => (
+
+                    <ul className="pl-6 list-disc">
+                      {membersExceededLimit?.map((member, idx: number) => (
                         <li key={`member-${idx}`}>
-                          {member.username || member.primary_email} (Limit:{' '}
-                          {member.free_project_limit} free projects)
+                          <span>{`${member.primary_email} (Limit: ${member.free_project_limit} free projects)`}</span>
+                          <ul className="text-foreground-light list-disc pl-4">
+                            {member.free_plan_organizations.map((org) => (
+                              <li key={org.slug || org.organization_name}>
+                                {org.organization_name}:{' '}
+                                {org.projects.map((x) => x.name).join(', ')}
+                              </li>
+                            ))}
+                          </ul>
                         </li>
                       ))}
                     </ul>
-                    <p className="text-sm leading-normal">
-                      These members will need to either delete, pause, or upgrade one or more of
-                      these projects before you're able to create a free project within this
-                      organization.
+
+                    <p className="leading-normal">
+                      They will need to delete, pause, or upgrade one or more of these projects
+                      before you can create a free project within this organization.
                     </p>
                   </div>
                 ) : undefined,
             },
           }}
           size="small"
-          onClick={() => {
-            onSelect(org.slug)
-          }}
           className="shrink-0"
+          onClick={() => onSelect(org.slug)}
           disabled={isSuccess && freePlanWithExceedingLimits}
         >
           Choose
@@ -152,7 +157,7 @@ export function OrganizationSelector({
             {organizations.length > maxOrgsToShow && !showAll && !search && (
               <div className="flex justify-center py-2">
                 <Button
-                  icon={<ChevronDown className="w-4 h-4" />}
+                  icon={<ChevronDownIcon className="w-4 h-4" />}
                   size="tiny"
                   onClick={() => {
                     setSearch('')

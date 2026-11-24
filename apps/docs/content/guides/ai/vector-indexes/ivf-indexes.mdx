@@ -9,12 +9,7 @@ IVFFlat is a type of vector index for approximate nearest neighbor search. It is
 
 ## Choosing an index
 
-Today `pgvector` supports two types of indexes:
-
-- [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)
-- [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes)
-
-In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes). If you have a special use case that requires IVFFlat instead, keep reading.
+In general we recommend HNSW over IVFFlat. For how the two compare, see [When to use each index type](/docs/guides/ai/vector-indexes#when-to-use-each-index-type). If you have a special use case that requires IVFFlat instead, keep reading.
 
 ## Usage
 
@@ -62,7 +57,7 @@ For example, to create an index with 100 lists on a column that uses the cosine 
 create index on items using ivfflat (column_name vector_cosine_ops) with (lists = 100);
 ```
 
-For more info on the different operators, see [Distance operations](#distance-operators).
+For more info on the different operators, see [Distance operators](/docs/guides/ai/vector-indexes#distance-operators).
 
 For every query, you can set the number of probes (1 by default). The number of probes corresponds to the number of nearby cells to probe for a match. Increase this for better recall at the expense of speed.
 
@@ -85,11 +80,11 @@ If the number of probes is the same as the number of lists, exact nearest neighb
 
 ### Approximate nearest neighbor
 
-One important note with IVF indexes is that nearest neighbor search is approximate, since exact search on high dimensional data can't be indexed efficiently. This means that similarity results will change (slightly) after you add an index (trading recall for speed).
+Nearest neighbor search with an IVFFlat index is approximate. For what that means for your results, see [Vector index trade-offs](/docs/guides/ai/vector-indexes#trade-offs).
 
 ## When should you create IVFFlat indexes?
 
-`pgvector` recommends building IVFFlat indexes only after the table has sufficient data, so that the internal IVFFlat cell clusters are based on your data's distribution. Anytime the distribution changes significantly, consider rebuilding indexes.
+Build an IVFFlat index only after the table has enough data. For why, and how this compares with HNSW, see [When to use each index type](/docs/guides/ai/vector-indexes#when-to-use-each-index-type).
 
 ## Resources
 

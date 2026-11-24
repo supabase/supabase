@@ -85,7 +85,7 @@ export interface Permission {
 }
 
 export interface ResponseFailure {
-  error: ResponseError
+  error: Error
 }
 
 export type SupaResponse<T> = T | ResponseFailure
@@ -98,34 +98,6 @@ type CostMetadata = {
 }
 
 export type ErrorMetadata = CostMetadata
-
-export class ResponseError extends Error {
-  code?: number
-  requestId?: string
-  retryAfter?: number
-  requestPathname?: string
-  metadata?: CostMetadata
-  errorType?: string
-  formattedError?: string
-
-  constructor(
-    message: string | undefined,
-    code?: number,
-    requestId?: string,
-    retryAfter?: number,
-    requestPathname?: string,
-    metadata?: CostMetadata,
-    formattedError?: string
-  ) {
-    super(message || 'API error happened while trying to communicate with the server.')
-    this.code = code
-    this.requestId = requestId
-    this.retryAfter = retryAfter
-    this.requestPathname = requestPathname
-    this.metadata = metadata
-    this.formattedError = formattedError
-  }
-}
 
 export interface Dictionary<T> {
   [Key: string]: T

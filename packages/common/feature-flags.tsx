@@ -2,14 +2,24 @@
 
 import { components } from 'api-types'
 import { FlagValues } from 'flags/react'
-import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
+import { gotrueClient } from './gotrue'
 import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
+import { setTelemetryFeatureFlags } from './telemetry-event'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse =
@@ -52,6 +62,28 @@ export type FeatureFlagContextType = {
   configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
+  /**
+   * True when the flags were fetched for the signed-in user. Flags fetched logged out
+   * stay in the store after sign-in until the refetch lands.
+   */
+  hasFlagsForSignedInUser?: boolean
+  /**
+   * True while ConfigCat flags are being re-evaluated after `getConfigCatFlags` changed,
+   * e.g. because its custom attributes changed. Until then, `configcat` holds values
+   * evaluated with the previous attributes.
+   */
+  isConfigCatStale?: boolean
+}
+
+type ConfigCatFlagsFetcher = (
+  userEmail?: string
+) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+
+type FeatureFlagStore = FeatureFlagContextType & {
+  /** The `getConfigCatFlags` that produced the current ConfigCat values */
+  configCatFetcher?: ConfigCatFlagsFetcher
+  /** The user the flags were fetched for. Undefined when they were fetched logged out. */
+  userId?: string
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
@@ -87,9 +119,7 @@ export const FeatureFlagProvider = ({
   organizationSlug?: string
   projectRef?: string
   /** Custom fetcher for ConfigCat flags if passing in custom attributes */
-  getConfigCatFlags?: (
-    userEmail?: string
-  ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+  getConfigCatFlags?: ConfigCatFlagsFetcher
 }>) => {
   const { isLoading } = useAuth()
   const user = useUser()
@@ -99,7 +129,7 @@ export const FeatureFlagProvider = ({
   const resolvedProjectRef = projectRef ?? params.ref
   const lastSentGroupContextRef = useRef<string | null>(null)
 
-  const [store, setStore] = useState<FeatureFlagContextType>({
+  const [store, setStore] = useState<FeatureFlagStore>({
     API_URL,
     configcat: {},
     posthog: {},
@@ -145,7 +175,12 @@ export const FeatureFlagProvider = ({
         (enabled === true || (typeof enabled === 'object' && enabled.ph)) && !!API_URL
       const loadCCFlags = enabled === true || (typeof enabled === 'object' && enabled.cc)
 
-      let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
+      let flagStore: FeatureFlagStore = {
+        configcat: {},
+        posthog: {},
+        configCatFetcher: getConfigCatFlags,
+        userId: user?.id,
+      }
 
       // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
       const [phResult, ccResult] = await Promise.allSettled([
@@ -229,6 +264,8 @@ export const FeatureFlagProvider = ({
       flagStore.hasLoaded = true
 
       if (mounted) {
+        // Before setStore: a child effect that sends an event on the re-render must already see these flags
+        setTelemetryFeatureFlags(flagStore.posthog)
         setStore(flagStore)
       }
     }
@@ -239,8 +276,14 @@ export const FeatureFlagProvider = ({
     // which subsequently all getValueAsync() calls are served from there
     processFlags()
 
+    // The flags endpoint refuses the pre-MFA token of a user with MFA enabled
+    const { data: auth } = gotrueClient.onAuthStateChange((event) => {
+      if (event === 'MFA_CHALLENGE_VERIFIED') processFlags()
+    })
+
     return () => {
       mounted = false
+      auth.subscription.unsubscribe()
     }
   }, [
     enabled,
@@ -253,8 +296,18 @@ export const FeatureFlagProvider = ({
     getConfigCatFlags,
   ])
 
+  // Memoized so consumers only re-render when the flags or their staleness change
+  const contextValue = useMemo<FeatureFlagContextType>(() => {
+    const { configCatFetcher, userId, ...flags } = store
+    return {
+      ...flags,
+      isConfigCatStale: configCatFetcher !== getConfigCatFlags,
+      hasFlagsForSignedInUser: !!user?.id && userId === user.id,
+    }
+  }, [store, getConfigCatFlags, user?.id])
+
   return (
-    <FeatureFlagContext.Provider value={store}>
+    <FeatureFlagContext.Provider value={contextValue}>
       {/*
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
         although I think it should be fairly simply to support PH too

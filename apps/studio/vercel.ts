@@ -9,17 +9,6 @@ import {
 } from './redirects.shared'
 import { getSecurityHeaders } from './security-headers'
 
-// STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
-// unset (the default — used by the Next.js prod deploy) this file returns
-// an empty `VercelConfig` so Vercel honours the dashboard-configured
-// Next.js preset untouched. Vercel reads `vercel.ts` regardless of the
-// framework preset (per vercel.com/docs/project-configuration —
-// `vercel.ts`'s `framework` field overrides the dashboard preset), so a
-// no-op early return is the only way to keep `framework: null` and the
-// headers below from clobbering the Next build. Set
-// `STUDIO_FRAMEWORK=tanstack` on the TanStack Vercel project to opt in.
-const isTanstack = process.env.STUDIO_FRAMEWORK === 'tanstack'
-
 // Routing lives in Nitro's Build Output config (`.vercel/output/config.json`,
 // shaped by scripts/vercel-spa-routes.ts). Vercel applies this file's
 // `redirects`/`headers` ahead of it, which is also why no `rewrites` belong
@@ -35,10 +24,12 @@ function headersFor(prefix: string) {
     // from the CDN, so they live at the edge. Matches next.config's `/(.*?)`
     // block (CSP, X-Frame-Options, HSTS, etc.).
     { source: `${prefix}/(.*)`, headers: getSecurityHeaders() },
-    // Dynamic function responses must not be cached by any shared cache —
-    // handlers can still opt in with their own Cache-Control on the
-    // Response when a response IS safe to cache.
-    routes.cacheControl(`${prefix}/api/(.*)`, { private: true, noStore: true }),
+    // Deployment metadata sets its own cache policy based on lookup success.
+    // All other API paths retain the private default, including nested paths.
+    routes.cacheControl(`${prefix}/api/((?!get-deployment-commit/?$).*)`, {
+      private: true,
+      noStore: true,
+    }),
     routes.cacheControl(`${prefix}/_serverFn/(.*)`, { private: true, noStore: true }),
     // Hashed chunks are covered by Nitro (`/_vercel/immutable/*`, immutable).
     // Static images and favicons aren't content-hashed, so they can't be
@@ -47,6 +38,9 @@ function headersFor(prefix: string) {
     // favicon: max-age=86400 = 1 day).
     routes.cacheControl(`${prefix}/img/(.*)`, { public: true, maxAge: '30days' }),
     routes.cacheControl(`${prefix}/favicon/(.*)`, { public: true, maxAge: '1day' }),
+    // Deno declarations are public TypeScript assets. Keep this override
+    // scoped to /deno so dynamic response types remain handler-owned.
+    routes.header(`${prefix}/deno/(.*)\\.ts`, [{ key: 'content-type', value: 'text/typescript' }]),
   ]
 }
 
@@ -82,7 +76,7 @@ function buildRedirects(): Redirect[] {
   ]
 }
 
-function buildTanstackConfig(): VercelConfig {
+function buildConfig(): VercelConfig {
   // Vercel's Flags Explorer probes `/.well-known/vercel/flags` and expects
   // JSON. next.config.ts proxies it to supabase.com's endpoint and forces
   // `content-type: application/json`; mirror that here. It lives at the domain
@@ -107,10 +101,7 @@ function buildTanstackConfig(): VercelConfig {
   }
 }
 
-// Empty config = no overrides; Vercel falls back to the dashboard preset.
-const passthrough: VercelConfig = {}
-
-export const config: VercelConfig = isTanstack ? buildTanstackConfig() : passthrough
+export const config: VercelConfig = buildConfig()
 
 // Belt-and-braces: local @vercel/config CLI reads module.default, but the
 // docs claim Vercel's platform looks for a named `config` export. Export

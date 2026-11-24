@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 
 import { getAPIKeysById } from '@/data/api-keys/api-key-id-query'
+import { useGrant } from '@/lib/grants'
 
 interface UseRevealedSecretOptions {
   projectRef?: string
@@ -12,14 +13,21 @@ export function useRevealedSecret({ projectRef, id }: UseRevealedSecretOptions) 
   const [isLoading, setIsLoading] = useState(false)
   const requestIdRef = useRef(0)
 
+  const revealGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys/{id}',
+    { projectRef },
+    { variant: 'reveal' }
+  )
+  const grant = revealGrant.grant
+
   const reveal = useCallback(async () => {
-    if (!projectRef || !id) return
+    if (!projectRef || !id || !grant) return
 
     const requestId = ++requestIdRef.current
     setIsLoading(true)
 
     try {
-      const result = await getAPIKeysById({ projectRef, id, reveal: true })
+      const result = await getAPIKeysById({ projectRef, id, grant })
       if (requestId !== requestIdRef.current) return
       setData(result.api_key)
       return result.api_key
@@ -32,12 +40,13 @@ export function useRevealedSecret({ projectRef, id }: UseRevealedSecretOptions) 
         setIsLoading(false)
       }
     }
-  }, [projectRef, id])
+  }, [projectRef, id, grant])
 
   const clear = useCallback(() => {
     requestIdRef.current++
     setData(undefined)
   }, [])
 
-  return { data, isLoading, reveal, clear }
+  /** Result of the reveal grant, for rendering denied and error states. `reveal()` does nothing unless granted. */
+  return { data, isLoading, reveal, clear, revealGrant }
 }

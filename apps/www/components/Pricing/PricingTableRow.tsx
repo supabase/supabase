@@ -1,5 +1,4 @@
 import ProductIcon from 'components/ProductIcon'
-import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
 import { FeatureKey } from 'shared-data/pricing'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -104,9 +103,9 @@ export const pricingTooltips: PricingTooltips = {
       <span className="prose text-xs">
         AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
         traffic within the AWS network. Read more in our{' '}
-        <Link href="/docs/guides/platform/privatelink" target="_blank">
+        <a href="/docs/guides/platform/privatelink" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -117,9 +116,9 @@ export const pricingTooltips: PricingTooltips = {
       <span className="prose text-xs">
         Supabase provides granular access controls to manage permissions across your organizations
         and projects. Read more in our{' '}
-        <Link href="/docs/guides/platform/access-control" target="_blank">
+        <a href="/docs/guides/platform/access-control" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -136,9 +135,9 @@ export const pricingTooltips: PricingTooltips = {
         automatically captured for all authentication events and help you monitor user
         authentication activities, detect suspicious behavior, and maintain compliance with security
         requirements. Read more in our{' '}
-        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+        <a href="/docs/guides/auth/audit-logs" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -150,9 +149,9 @@ export const pricingTooltips: PricingTooltips = {
         Any Platform API/Dashboard actions performed by organization members are logged
         automatically for auditing and security purposes. Includes actions such as creating a new
         project, inviting members or changing project settings. Read more in our{' '}
-        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+        <a href="/docs/guides/security/platform-audit-logs" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -164,9 +163,9 @@ export const pricingTooltips: PricingTooltips = {
         You are charged for the total volume of log data that Supabase ingests across all your
         project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and
         others) during the billing cycle. Read more in our{' '}
-        <Link href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
+        <a href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -179,9 +178,9 @@ export const pricingTooltips: PricingTooltips = {
         allowance that scales with how much log data you ingest. The allowance covers the volume of
         log data scanned when you read logs through the Studio UI, the Management API, the CLI, or
         any other interface. Read more in our{' '}
-        <Link href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
+        <a href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -220,7 +219,7 @@ export const PricingTableRowDesktop = (props: any) => {
 
         return (
           <Fragment key={feat.title}>
-            <tr className="divide-border" key={i}>
+            <tr key={i}>
               <th
                 className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
                 scope="row"
@@ -236,12 +235,16 @@ export const PricingTableRowDesktop = (props: any) => {
               {Object.entries(feat.plans).map((entry: any, i) => {
                 const planName = entry[0] as 'pro' | 'team' | 'enterprise'
                 const planValue = entry[1]
+                const label =
+                  typeof planValue === 'string' ? planValue : String(planValue?.[0] ?? '')
+                // the icon stays on the line of the last word, so it never wraps alone
+                const lastSpace = label.lastIndexOf(' ')
 
                 return (
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 py-5 tier-${planName}`,
+                      `pl-6 pr-2 py-5 align-top tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -253,17 +256,26 @@ export const PricingTableRowDesktop = (props: any) => {
                       </div>
                     ) : (
                       <div className="text-foreground text-xs flex flex-col justify-center gap-2">
-                        <span className="flex items-center gap-2">
-                          {tooltips?.[planName] && (
-                            <InfoTooltip
-                              side="top"
-                              className="max-w-[250px]"
-                              label={`About ${feat.title} on the ${planName} plan`}
-                            >
-                              {tooltips[planName]}
-                            </InfoTooltip>
+                        <span>
+                          {tooltips?.[planName] ? (
+                            <>
+                              {label.slice(0, lastSpace + 1)}
+                              <span className="whitespace-nowrap">
+                                {label.slice(lastSpace + 1)}
+                                <span className="ml-1.5 inline-flex align-middle">
+                                  <InfoTooltip
+                                    side="top"
+                                    className="max-w-[250px]"
+                                    label={`About ${feat.title} on the ${planName} plan`}
+                                  >
+                                    {tooltips[planName]}
+                                  </InfoTooltip>
+                                </span>
+                              </span>
+                            </>
+                          ) : (
+                            label
                           )}
-                          {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
                         {Array.isArray(planValue) &&
                           planValue.slice(1).map((val, idx) => (
@@ -295,7 +307,7 @@ export const PricingTableRowMobile = (props: any) => {
     <table className="mt-8 w-full -scroll-mt-5" id={`${props.sectionId}-mobile`}>
       <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium text-foreground">
         <span className="flex items-center gap-2">
-          {category.icon ? <ProductIcon icon={props.icon} /> : null}
+          {category.icon ? <ProductIcon icon={props.icon} color="green" /> : null}
           <span className="text-foreground font-normal">{category.title}</span>
         </span>
       </caption>
@@ -309,10 +321,10 @@ export const PricingTableRowMobile = (props: any) => {
           </th>
         </tr>
       </thead>
-      <tbody className="divide-border-default divide-y">
+      <tbody className="*:*:groove-page">
         {category.features.map((feat: any, i: number) => {
           return (
-            <tr key={i} className="border-default border-t">
+            <tr key={i}>
               <th
                 className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
                 scope="row"

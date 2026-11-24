@@ -1,7 +1,5 @@
 import { Badge, Card, CardContent, cn, Separator } from 'ui'
 
-import { useIsMarketplaceEnabled } from '../../App/FeaturePreview/FeaturePreviewContext'
-import { MissingExtensionAlert } from './MissingExtensionAlert'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -21,7 +19,6 @@ export const RequiredExtensionsSection = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const requiredExtensions = integration?.requiredExtensions ?? []
 
@@ -35,9 +32,9 @@ export const RequiredExtensionsSection = ({
   return (
     <>
       {!hideSeparator && <Separator />}
-      <div className={cn('flex flex-col gap-y-4', className)}>
-        <h4>Required extensions</h4>
-        <Card>
+      <div className={cn('md:grid md:grid-cols-12 gap-2', className)}>
+        <h4 className="col-span-4">Required extensions</h4>
+        <Card className="col-span-8">
           <CardContent className="p-0">
             <ul className="text-foreground-light text-sm">
               {requiredExtensions.map((requiredExtension, idx) => {
@@ -57,13 +54,9 @@ export const RequiredExtensionsSection = ({
 
                     <div className="shrink-0">
                       {extension ? (
-                        isInstalled ? (
-                          <Badge variant="secondary">Installed</Badge>
-                        ) : isMarketplaceEnabled ? (
-                          <Badge variant="warning">Required</Badge>
-                        ) : (
-                          <MissingExtensionAlert extension={extension} />
-                        )
+                        <Badge variant={isInstalled ? 'secondary' : 'warning'}>
+                          {isInstalled ? 'Installed' : 'Required'}
+                        </Badge>
                       ) : (
                         <span className="text-foreground-muted">Unavailable</span>
                       )}

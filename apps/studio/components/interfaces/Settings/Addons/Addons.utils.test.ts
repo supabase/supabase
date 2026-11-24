@@ -233,6 +233,17 @@ describe('getPitrAlertState', () => {
     ).toBe('hipaa')
   })
 
+  it('returns the non-compliant alert when HIPAA is enabled without 28-day PITR', () => {
+    expect(
+      getPitrAlertState({
+        hasHipaaAddon: true,
+        hasHipaaCompliantPitr: false,
+        sufficientPgVersion: true,
+        isOrioleDbInAws: false,
+      })
+    ).toBe('hipaa-non-compliant')
+  })
+
   it('returns the legacy-project alert when HIPAA is not enabled', () => {
     expect(
       getPitrAlertState({

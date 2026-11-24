@@ -232,6 +232,8 @@ By default, embedded relations use **left join** semantics from the parent table
 
 To filter out parent rows that do not match the related table, use `!inner` on the embedded relation.
 
+If you know the join you want in SQL, use the [SQL to REST API Translator](/docs/guides/api/sql-to-rest). It converts a SQL `select` query into the matching Data API request and Supabase JavaScript client code, with joins as embedded relations. The Data API supports only a subset of SQL, so some queries won't translate. For example, the translator handles only left and inner joins that compare columns with `=`. The request it returns works only when a foreign key links the two tables.
+
 ### What `:` and `!` mean in join syntax
 
 | Syntax                          | Meaning                                                                                 | Example                                 |
@@ -536,7 +538,7 @@ GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instrum
 </TabPanel>
 </Tabs>
 
-#### Result
+#### Result [#inner-join-inner-result]
 
 ```json
 [
@@ -654,7 +656,7 @@ GET https://[REF].supabase.co/rest/v1/instruments?select=id,name,orchestral_sect
 </TabPanel>
 </Tabs>
 
-#### Result
+#### Result [#filtering-using-joined-fields-result]
 
 ```json
 [
@@ -794,13 +796,6 @@ var result = await supabase
 </$Show>
 <TabPanel id="graphql" label="GraphQL">
 
-````javascript
-const Query = `
-  query {
-
-</TabPanel>
-<TabPanel id="graphql" label="GraphQL">
-
 ```javascript
 const Query = `
   query {
@@ -818,7 +813,7 @@ const Query = `
     }
   }
 `
-````
+```
 
 </TabPanel>
 <TabPanel id="url" label="URL">

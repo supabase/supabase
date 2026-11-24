@@ -82,7 +82,7 @@ addEventListener('unhandledrejection', (ev) => {
 
 <Admonition type="note">
 
-The maximum duration is capped based on the wall-clock, CPU, and memory limits. The function will shut down when it reaches one of these [limits](/docs/guides/functions/limits).
+The maximum duration is capped based on the wall-clock, CPU, and memory limits. The [function will shut down](/kb/troubleshooting/edge-function-shutdown-reasons-explained) when it reaches one of these [limits](/docs/guides/functions/limits).
 
 </Admonition>
 
@@ -90,11 +90,11 @@ The maximum duration is capped based on the wall-clock, CPU, and memory limits. 
 
 ## Testing background tasks locally
 
-When testing Edge Functions locally with Supabase CLI, the instances are terminated automatically after a request is completed. This will prevent background tasks from running to completion.
+When testing Edge Functions locally with [Supabase CLI](/docs/guides/local-development/cli/getting-started), the instances are terminated automatically after a request is completed. This will prevent background tasks from running to completion.
 
-To prevent that, you can update the `supabase/config.toml` with the following settings:
+To prevent that, you can update your config file (`supabase/config.toml` or `supabase/config.jsonc`) with the following settings:
 
-```toml
+```toml supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```

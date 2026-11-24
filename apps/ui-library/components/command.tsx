@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { CommandCopyButton } from './command-copy-button'

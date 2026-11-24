@@ -1,5 +1,5 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
@@ -159,7 +159,7 @@ export function SupportAssistantSuccessCardContent({
           </div>
         </CardHeader>
         <CardContent>
-          <Button asChild size="tiny" iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}>
+          <Button asChild size="tiny" iconRight={<ArrowUpRightIcon size={14} strokeWidth={1.5} />}>
             <Link
               href={`/project/${request.projectRef}?sidebar=ai-assistant&${ASSISTANT_HANDOFF_QUERY_PARAM}=${handoffToken}`}
               onClick={() =>
@@ -205,7 +205,7 @@ export function SupportAssistantSuccessCardContent({
             <CardDescription>Assistant may be able to help</CardDescription>
           </div>
         </div>
-        <ArrowUpRight
+        <ArrowUpRightIcon
           size={14}
           strokeWidth={1.5}
           className="shrink-0 text-foreground-lighter transition-colors group-hover:text-foreground"

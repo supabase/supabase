@@ -3,8 +3,9 @@ import { components } from 'api-types'
 
 import { projectKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useProfile } from '@/lib/profile'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const DEFAULT_LIMIT = 100
 
@@ -43,7 +44,7 @@ async function getProjects(
 }
 
 export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
-export type ProjectsInfiniteError = ResponseError
+export type ProjectsInfiniteError = StudioError
 
 export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   { limit = DEFAULT_LIMIT, sort = 'name_asc', search }: GetProjectsInfiniteVariables,

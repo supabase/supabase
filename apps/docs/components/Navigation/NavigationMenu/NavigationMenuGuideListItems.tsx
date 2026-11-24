@@ -3,16 +3,18 @@ import {
   NavSectionContent,
   NavSectionList,
 } from '~/components/Navigation/NavSection'
+import { useDocsPathname } from '~/features/IaNav'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Accordion } from 'radix-ui'
 import React, { useEffect, useRef } from 'react'
 
 import MenuIconPicker from './MenuIconPicker'
+import { SidebarGroupLabel } from './SidebarGroupLabel'
 
 type NavAccordionItem = {
+  name?: string
   url?: string
   enabled?: boolean
   items?: NavAccordionItem[]
@@ -31,12 +33,21 @@ function isRenderable(item: NavAccordionItem): boolean {
   return item.items?.some(isRenderable) ?? false
 }
 
+function groupLinks(item: NavAccordionItem): Array<{ name: string; url: string }> {
+  return (item.items ?? [])
+    .filter((child) => isRenderable(child))
+    .flatMap((child) => [
+      ...(child.url && child.name ? [{ name: child.name, url: child.url }] : []),
+      ...groupLinks(child),
+    ])
+}
+
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
   id: string
   url: string
 }) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
 
   return (
     <span
@@ -52,7 +63,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 })
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const { resolvedTheme } = useTheme()
   const childItems = props.subItem.items ?? []
   const activeItem =
@@ -74,6 +85,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     return (
       <Link
         href={props.url}
+        aria-current={props.isCurrent ? 'page' : undefined}
         className={props.className}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
@@ -106,12 +118,13 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
         >
           <Accordion.Item key={accordionValue} value={accordionValue}>
             <Accordion.Trigger
+              aria-current={activeItem ? 'page' : undefined}
               className={[
-                'flex items-center gap-2 w-full',
-                'cursor-pointer transition text-sm',
+                'flex items-center gap-2 w-full layout-v2:min-h-8 layout-v2:py-1.5',
+                'cursor-pointer transition text-sm text-left',
                 'focus-inset rounded-md',
                 activeItem
-                  ? 'text-primary font-medium'
+                  ? 'text-primary font-medium layout-v2:text-foreground layout-v2:[font-weight:inherit]'
                   : 'hover:text-foreground text-foreground-lighter',
               ].join(' ')}
             >
@@ -127,7 +140,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                   )}
                   {props.subItem.name}
                 </div>
-                <NavSectionCaret />
+                <NavSectionCaret className="layout-v2:h-lh layout-v2:self-start" />
               </span>
             </Accordion.Trigger>
             <Accordion.Content asChild>
@@ -142,18 +155,20 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                       <li key={`${props.subItem.name}-${child.url}`}>
                         <Link
                           href={child.url}
+                          aria-current={child.url === pathname ? 'page' : undefined}
                           className={[
                             'relative block py-1.25 pl-1 -ml-1 cursor-pointer transition text-sm',
-                            'focus-inset rounded-md',
+                            'layout-v2:py-1.5 layout-v2:pl-3 layout-v2:-ml-3 layout-v2:pr-2',
+                            'focus-inset rounded-md layout-v2:rounded-l-none layout-v2:hover:bg-surface-200',
                             child.url === pathname
-                              ? 'text-primary'
-                              : 'hover:text-primary text-foreground-lighter',
+                              ? 'text-primary layout-v2:text-foreground'
+                              : 'hover:text-primary text-foreground-lighter layout-v2:hover:text-foreground',
                           ].join(' ')}
                         >
                           {child.url === pathname && (
                             <span
                               aria-hidden
-                              className="absolute left-[-13px] top-1/2 h-[1em] w-px -translate-y-1/2 bg-current"
+                              className="absolute left-[-13px] top-1/2 h-[1em] w-px -translate-y-1/2 bg-current layout-v2:-left-px layout-v2:h-4 layout-v2:bg-brand"
                             />
                           )}
                           {child.name}
@@ -164,17 +179,26 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 </NavSectionList>
               </NavSectionContent>
             </Accordion.Content>
+            <ul hidden>
+              {groupLinks(props.subItem).map((child) => (
+                <li key={`${child.name}-${child.url}`}>
+                  <Link href={child.url}>{child.name}</Link>
+                </li>
+              ))}
+            </ul>
           </Accordion.Item>
         </Accordion.Root>
       ) : (
         <LinkContainer
           url={props.subItem.url}
+          isCurrent={activeItem}
           className={[
             'flex items-center gap-2',
+            'layout-v2:min-h-8 layout-v2:-ml-2 layout-v2:px-2 layout-v2:py-1.5',
             'cursor-pointer transition text-sm',
-            'focus-inset rounded-md',
+            'focus-inset rounded-md layout-v2:hover:bg-surface-200',
             activeItem
-              ? 'text-primary font-medium'
+              ? 'text-primary font-medium layout-v2:text-foreground layout-v2:[font-weight:inherit]'
               : 'hover:text-foreground text-foreground-lighter',
           ].join(' ')}
           parent={props.subItem.parent}
@@ -197,16 +221,21 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 })
 
 const ContentLink = React.memo(function ContentLink(props: any) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
 
   return (
-    <li className="mb-1.5">
+    <li className="mb-1.5 layout-v2:mb-0">
       <Link
         href={props.url}
+        aria-current={props.url === pathname ? 'page' : undefined}
         className={[
+          'layout-v2:flex layout-v2:min-h-8 layout-v2:items-center layout-v2:gap-2',
+          'layout-v2:-ml-2 layout-v2:px-2 layout-v2:py-1.5',
           'cursor-pointer transition text-sm',
-          'focus-inset rounded-md',
-          props.url === pathname ? 'text-primary' : 'hover:text-foreground text-foreground-lighter',
+          'focus-inset rounded-md layout-v2:hover:bg-surface-200',
+          props.url === pathname
+            ? 'text-primary layout-v2:text-foreground'
+            : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (
@@ -227,7 +256,7 @@ const Content = (props) => {
 
   return (
     <div className="relative w-full flex flex-col gap-0 pb-5">
-      <Link href={menu.url ?? ''}>
+      <Link href={menu.url ?? ''} className="max-lg:hidden layout-v2:hidden">
         <div className="flex items-center gap-3 my-3 text-primary">
           <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />
@@ -243,13 +272,16 @@ const Content = (props) => {
             if (enabledItems.length === 0) return null
 
             return (
-              <li key={entry.name}>
-                <div className="flex flex-col gap-2.5">
-                  <div className="h-px w-full bg-border my-3"></div>
-                  <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
+              <li key={entry.name} className="group/entry">
+                <div className="flex flex-col gap-2.5 layout-v2:gap-1">
+                  <div className="h-px w-full bg-border my-3 layout-v2:hidden"></div>
+                  <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider layout-v2:hidden">
                     {entry.name}
                   </span>
-                  <ul className="flex flex-col gap-2.5">
+                  <SidebarGroupLabel className="hidden layout-v2:flex pb-1.5 group-first/entry:pt-2">
+                    {entry.shortName ?? entry.name}
+                  </SidebarGroupLabel>
+                  <ul className="flex flex-col gap-2.5 layout-v2:gap-0">
                     {enabledItems.map((subItem) => (
                       <ContentAccordionLink key={subItem.name} subItem={subItem} />
                     ))}

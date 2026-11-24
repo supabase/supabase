@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface RowCountIndicatorProps {
@@ -29,13 +29,13 @@ export function RowCountIndicator({
         <TooltipTrigger asChild>
           <div className="flex items-center gap-1.5 cursor-help">
             <span className="text-foreground-light">{formatRowCount(totalRowsScanned)}</span>
-            <ArrowRight size={10} className="text-foreground-muted" />
+            <ArrowRightIcon size={10} className="text-foreground-muted" />
             <span className="text-destructive-600 font-medium">
               -{formatRowCount(rowsRemovedByFilter)}
             </span>
-            <ArrowRight size={10} className="text-foreground-muted" />
+            <ArrowRightIcon size={10} className="text-foreground-muted" />
             <span className="text-primary font-medium">
-              {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
+              {formatRowCount(actualRows)} {actualRows === 1 ? <span>row</span> : <span>rows</span>}
             </span>
           </div>
         </TooltipTrigger>
@@ -57,7 +57,7 @@ export function RowCountIndicator({
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="text-foreground-light cursor-help">
-            {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
+            {formatRowCount(actualRows)} {actualRows === 1 ? <span>row</span> : <span>rows</span>}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs font-sans">
@@ -76,7 +76,8 @@ export function RowCountIndicator({
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="text-foreground-muted cursor-help">
-            est. {formatRowCount(estimatedRows)} {estimatedRows === 1 ? 'row' : 'rows'}
+            est. {formatRowCount(estimatedRows)}{' '}
+            {estimatedRows === 1 ? <span>row</span> : <span>rows</span>}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs font-sans">

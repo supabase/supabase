@@ -1,4 +1,4 @@
-import { BarChart2, LineChart, Settings2, Table } from 'lucide-react'
+import { BarChart2Icon, LineChartIcon, Settings2Icon, TableIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useMemo } from 'react'
 import {
   Popover,
@@ -106,7 +106,7 @@ export const DisplaySettingsButton = ({
       <PopoverTrigger asChild>
         <ExplorerToolbarAction
           disabled={disabled}
-          icon={<Settings2 size={16} strokeWidth={2} />}
+          icon={<Settings2Icon size={16} strokeWidth={2} />}
           tooltip="Result settings"
         />
       </PopoverTrigger>
@@ -128,11 +128,11 @@ export const DisplaySettingsButton = ({
             className="w-full"
           >
             <ToggleGroupItem value="table" className="w-full gap-2">
-              <Table size={14} />
+              <TableIcon size={14} />
               <span>Table</span>
             </ToggleGroupItem>
             <ToggleGroupItem value="chart" className="w-full gap-2">
-              <BarChart2 size={14} />
+              <BarChart2Icon size={14} />
               <span>Chart</span>
             </ToggleGroupItem>
           </ToggleGroup>
@@ -157,11 +157,11 @@ export const DisplaySettingsButton = ({
                   className="w-full"
                 >
                   <ToggleGroupItem value="bar" className="w-full gap-2">
-                    <BarChart2 size={14} />
+                    <BarChart2Icon size={14} />
                     <span>Bar</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem value="line" className="w-full gap-2">
-                    <LineChart size={14} />
+                    <LineChartIcon size={14} />
                     <span>Line</span>
                   </ToggleGroupItem>
                 </ToggleGroup>

@@ -2,9 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
@@ -16,6 +18,7 @@ import {
   Form,
   FormControl,
   FormField,
+  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -23,18 +26,11 @@ import {
   SelectValue,
   Switch,
 } from 'ui'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import {
-  ORG_KIND_DEFAULT,
-  ORG_SIZE_DEFAULT,
-  OrganizationDetailsFields,
-  organizationDetailsSchema,
-  type OrgKind,
-  type OrgSize,
-} from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -44,8 +40,18 @@ import {
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
+import {
+  ORG_KIND_DEFAULT,
+  ORG_SIZE_DEFAULT,
+  onboardingSurveySchema,
+  type OrgKind,
+  type OrgSize,
+} from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
+import { OnboardingSurveyFields } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFields'
+import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
+import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
 import { useOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
 import { useOrganizationCreationPreview } from '@/data/organizations/organization-creation-preview'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -55,8 +61,10 @@ import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
+import { timeout } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import {
   classifyApiError,
@@ -66,6 +74,8 @@ import {
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
+const SURVEY_SUBMIT_MAX_WAIT_MS = 3_000
+
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
   setupIntent?: SetupIntentResponse
@@ -74,7 +84,8 @@ interface NewOrgFormProps {
 
 const plans = ['FREE', 'PRO', 'TEAM'] as const
 
-const formSchema = organizationDetailsSchema.extend({
+const formSchema = onboardingSurveySchema.extend({
+  name: z.string().trim().min(1, 'Organization name is required'),
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
@@ -88,10 +99,6 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'new-org-form'
 
-/**
- * No org selected yet, create a new one
- * [Joshen] Need to refactor to use Form_Shadcn here
- */
 export const NewOrgForm = ({
   onPaymentMethodReset,
   setupIntent,
@@ -151,8 +158,17 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
+      building: '',
+      can_code: '',
     },
   })
+
+  // What was submitted, fixed at submit: the survey step runs after creation
+  // (much later after a card confirmation), when the form values may have moved
+  // on. kind/size are left out of org creation: the survey endpoint saves them
+  // and keeps only the first response per user and org, so sending them at
+  // creation too would swallow the survey call.
+  const orgSubmission = useRef<FormState | null>(null)
 
   useEffect(() => {
     form.reset({
@@ -161,6 +177,8 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
+      building: form.getValues('building'),
+      can_code: form.getValues('can_code'),
     })
   }, [defaultValues, form])
 
@@ -202,7 +220,10 @@ export const NewOrgForm = ({
   }, [])
 
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
-  const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
+  const selectedSpendCap = useWatch({
+    control: form.control,
+    name: 'spend_cap',
+  })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -249,7 +270,7 @@ export const NewOrgForm = ({
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
         setPaymentIntentSecret(org.pending_payment_intent_secret)
       } else {
-        onOrganizationCreated(org as { slug: string })
+        await onOrganizationCreated(org as { slug: string })
       }
     },
     onError: (data) => {
@@ -258,15 +279,82 @@ export const NewOrgForm = ({
       setNewOrgLoading(false)
     },
   })
+  const { mutateAsync: submitOnboardingSurvey } = useOnboardingSurveyMutation()
+  const queryClient = useQueryClient()
+
+  const submitOrganizationSurvey = async (slug: string) => {
+    const submission = orgSubmission.current
+    if (!submission) return
+
+    const { building, can_code: canCode, kind } = submission
+    const size = kind === 'COMPANY' ? submission.size : undefined
+    // Kind and size always hold a value, so only count them as answered when changed
+    const hasKind = kind !== defaultValues.kind.toUpperCase()
+    const hasSize = size !== undefined && size !== defaultValues.size
+    const hasBuilding = building !== ''
+    const hasCanCode = canCode !== ''
+    const profileId = user.profile?.gotrue_id
+
+    const surveyProperties = {
+      surface: 'org_form' as const,
+      hasKind,
+      hasBuilding,
+      hasCanCode,
+    }
+    const groupOverrides = { organization: slug }
+
+    const markSurveyFollowUpPending = () => {
+      if (!profileId) return
+      markFollowUpPending({ profileId, orgSlug: slug, kind, size })
+      // A slow survey call can fail after the redirect to the new org, once the
+      // follow-up card has already read (and cached) this key as empty
+      queryClient.invalidateQueries({
+        queryKey: getLocalStorageQueryKey(
+          LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, slug)
+        ),
+      })
+    }
+
+    // Nothing answered: send nothing yet so the creator's follow-up answers
+    // aren't dropped (the survey endpoint keeps one response per user and org).
+    // Kind/size ride along with the follow-up, since this is their only save path.
+    if (!hasKind && !hasSize && !hasBuilding && !hasCanCode) {
+      track(
+        'onboarding_survey_dismissed',
+        { surface: 'org_form', reason: 'org_form_blank' },
+        groupOverrides
+      )
+      markSurveyFollowUpPending()
+      return
+    }
+
+    track('onboarding_survey_submit_button_clicked', surveyProperties, groupOverrides)
+
+    try {
+      await submitOnboardingSurvey({
+        slug,
+        kind,
+        size,
+        building: building || undefined,
+        can_code: canCode || undefined,
+      })
+    } catch {
+      track('onboarding_survey_submit_failed', surveyProperties, groupOverrides)
+      markSurveyFollowUpPending()
+    }
+  }
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data && 'slug' in data) {
-        onOrganizationCreated({ slug: data.slug })
+        await onOrganizationCreated({ slug: data.slug })
       }
     },
     onError: (error) => {
-      const toastId = toast.error(error.message, { dismissible: true, duration: 10_000 })
+      const toastId = toast.error(error.message, {
+        dismissible: true,
+        duration: 10_000,
+      })
       trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast', toastId)
     },
   })
@@ -275,12 +363,11 @@ export const NewOrgForm = ({
     // Reset payment intent secret to ensure another attempt works as expected
     setPaymentIntentSecret('')
 
-    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
+    const submission = orgSubmission.current
+    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded' && submission) {
       await confirmPendingSubscriptionChange({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-        name: form.getValues('name'),
-        kind: form.getValues('kind'),
-        size: form.getValues('size'),
+        name: submission.name,
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
@@ -299,7 +386,7 @@ export const NewOrgForm = ({
     }
   }
 
-  const onOrganizationCreated = (org: { slug: string }) => {
+  const onOrganizationCreated = async (org: { slug: string }) => {
     if (submittedTier.current) {
       track(
         'organization_creation_completed',
@@ -307,6 +394,8 @@ export const NewOrgForm = ({
         { organization: org.slug }
       )
     }
+
+    await Promise.race([submitOrganizationSurvey(org.slug), timeout(SURVEY_SUBMIT_MAX_WAIT_MS)])
 
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
@@ -337,7 +426,7 @@ export const NewOrgForm = ({
   const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
 
   async function createOrg(
-    formValues: z.infer<typeof formSchema>,
+    formValues: FormState,
     paymentMethodId?: string,
     customerData?: {
       address: CustomerAddress | null
@@ -355,9 +444,7 @@ export const NewOrgForm = ({
 
     createOrganization({
       name: formValues.name,
-      kind: formValues.kind,
       tier,
-      ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
       address: dbTier === 'FREE' ? null : customerData?.address,
@@ -369,6 +456,7 @@ export const NewOrgForm = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
     setNewOrgLoading(true)
+    orgSubmission.current = formValues
 
     if (formValues.plan === 'FREE') {
       await createOrg(formValues)
@@ -442,13 +530,32 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <OrganizationDetailsFields
-              control={form.control}
-              kind={useWatch({ control: form.control, name: 'kind' })}
-              renderFieldWrapper={(children, field) => (
-                <Panel.Content key={field}>{children}</Panel.Content>
-              )}
-            />
+            <Panel.Content>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    layout="horizontal"
+                    description="What's the name of your company or team? You can change this later."
+                  >
+                    <FormControl>
+                      <Input
+                        autoFocus
+                        type="text"
+                        placeholder="Organization name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </Panel.Content>
 
             {isBillingEnabled && (
               <Panel.Content>
@@ -504,7 +611,7 @@ export const NewOrgForm = ({
                         label={
                           <div className="flex space-x-2 text-sm items-center">
                             <span>Spend Cap</span>
-                            <HelpCircle
+                            <HelpCircleIcon
                               size={16}
                               strokeWidth={1.5}
                               className="transition opacity-50 cursor-pointer hover:opacity-100"
@@ -580,6 +687,16 @@ export const NewOrgForm = ({
             {hasFreeOrgWithProjects && form.getValues('plan') !== 'FREE' && (
               <UpgradeExistingOrganizationCallout />
             )}
+
+            <Panel.Content>
+              <CollapsibleCardSection
+                title="Help improve Supabase"
+                description="Optional questions to help improve the Supabase experience"
+                defaultOpen
+              >
+                <OnboardingSurveyFields control={form.control} />
+              </CollapsibleCardSection>
+            </Panel.Content>
           </div>
         </Panel>
 

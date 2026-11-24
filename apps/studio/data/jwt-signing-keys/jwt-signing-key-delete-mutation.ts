@@ -3,10 +3,18 @@ import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type JWTSigningKeyDeleteGrant = GrantFor<
+  'delete',
+  '/v1/projects/{ref}/config/auth/signing-keys/{id}'
+>
 
 interface JWTSigningKeyDeleteVariables {
   projectRef?: string
+  grant: JWTSigningKeyDeleteGrant
   keyId: string
 }
 
@@ -17,6 +25,7 @@ export async function deleteJWTSigningKey(payload: JWTSigningKeyDeleteVariables)
     params: {
       path: { ref: payload.projectRef, id: payload.keyId },
     },
+    grant: payload.grant,
   })
 
   if (error) handleError(error)
@@ -30,12 +39,12 @@ export const useJWTSigningKeyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>,
+  UseCustomMutationOptions<JWTSigningKeyDeleteData, StudioError, JWTSigningKeyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>({
+  return useMutation<JWTSigningKeyDeleteData, StudioError, JWTSigningKeyDeleteVariables>({
     mutationFn: (vars) => deleteJWTSigningKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

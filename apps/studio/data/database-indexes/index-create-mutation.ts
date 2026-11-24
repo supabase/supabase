@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseIndexesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseIndexCreateVariables = {
   projectRef: string
@@ -33,8 +35,11 @@ export async function createDatabaseIndex({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'index-create',
     sql,
     queryKey: ['indexes', schema],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -47,12 +52,12 @@ export const useDatabaseIndexCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseIndexCreateData, ResponseError, DatabaseIndexCreateVariables>,
+  UseCustomMutationOptions<DatabaseIndexCreateData, StudioError, DatabaseIndexCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseIndexCreateData, ResponseError, DatabaseIndexCreateVariables>({
+  return useMutation<DatabaseIndexCreateData, StudioError, DatabaseIndexCreateVariables>({
     mutationFn: (vars) => createDatabaseIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

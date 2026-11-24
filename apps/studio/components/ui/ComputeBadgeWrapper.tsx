@@ -4,12 +4,12 @@ import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } 
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { isEligibleForFreeMicroUpgrade } from '../interfaces/Support/FreeMicroUpgradeSuggestion.utils'
 import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ProjectDetail } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { getComputeCpuLabel } from '@/lib/compute-labels'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -51,7 +51,6 @@ interface ComputeBadgeWrapperProps {
   projectRef?: string
   cloudProvider?: string
   computeSize?: ProjectDetail['infra_compute_size']
-  resourceWarnings?: ResourceWarning
   badgeClassName?: string
 }
 
@@ -60,7 +59,6 @@ export const ComputeBadgeWrapper = ({
   projectRef,
   cloudProvider,
   computeSize,
-  resourceWarnings,
   badgeClassName,
 }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
@@ -84,16 +82,13 @@ export const ComputeBadgeWrapper = ({
 
   const { data, isPending: isLoadingSubscriptions } = useOrgSubscriptionQuery(
     { orgSlug: slug },
-    { enabled: open }
+    { enabled: !!slug }
   )
 
-  const isEligibleForFreeUpgrade = data?.plan.id !== 'free' && computeSize === 'nano'
-  const isComputeNearExhaustion =
-    !!resourceWarnings?.cpu_exhaustion ||
-    !!resourceWarnings?.memory_and_swap_exhaustion ||
-    !!resourceWarnings?.disk_space_exhaustion ||
-    !!resourceWarnings?.disk_io_exhaustion
-  const showUpgradeGlow = isEligibleForFreeUpgrade && isComputeNearExhaustion
+  const isEligibleForFreeUpgrade = isEligibleForFreeMicroUpgrade({
+    planId: data?.plan.id,
+    computeSize,
+  })
 
   const track = useTrack()
 
@@ -104,22 +99,23 @@ export const ComputeBadgeWrapper = ({
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div className={cn('flex items-center', showUpgradeGlow && 'animate-badge-pulse')}>
+        <div className={cn('flex items-center', isEligibleForFreeUpgrade && 'animate-badge-pulse')}>
           <div
             className={cn(
               'flex',
-              showUpgradeGlow && 'relative inline-flex overflow-hidden rounded-sm'
+              isEligibleForFreeUpgrade && 'relative inline-flex overflow-hidden rounded-sm'
             )}
           >
             <ComputeBadge
               infraComputeSize={computeSize}
-              icon={showUpgradeGlow && <ChevronsUpAnimated />}
+              icon={isEligibleForFreeUpgrade && <ChevronsUpAnimated />}
               className={cn(
-                showUpgradeGlow && 'text-brand-600 border-brand-500 bg-brand-default/10 gap-1',
+                isEligibleForFreeUpgrade &&
+                  'text-brand-600 border-brand-500 bg-brand-default/10 gap-1',
                 badgeClassName
               )}
             />
-            {showUpgradeGlow && (
+            {isEligibleForFreeUpgrade && (
               <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand-default/20 to-transparent blur-md" />
             )}
           </div>

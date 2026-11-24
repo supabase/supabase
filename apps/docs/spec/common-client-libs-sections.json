@@ -19,6 +19,34 @@
     "type": "function"
   },
   {
+    "id": "third-party-auth",
+    "title": "Third-party auth",
+    "slug": "third-party-auth",
+    "product": "auth",
+    "type": "function"
+  },
+  {
+    "id": "access-token-callback",
+    "title": "Access token callback",
+    "slug": "access-token-callback",
+    "product": "auth",
+    "type": "function"
+  },
+  {
+    "id": "request-timeout",
+    "title": "Set a request timeout",
+    "slug": "db-request-timeout",
+    "product": "database",
+    "type": "function"
+  },
+  {
+    "id": "third-party-access-token",
+    "title": "Supply an access token from a callback",
+    "slug": "third-party-access-token",
+    "product": "database",
+    "type": "function"
+  },
+  {
     "title": "TypeScript support",
     "id": "typescript-support",
     "slug": "typescript-support",
@@ -116,6 +144,13 @@
         "id": "delete",
         "title": "Delete data",
         "slug": "delete",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "max-affected",
+        "title": "Limit the rows an update or delete affects",
+        "slug": "db-max-affected",
         "product": "database",
         "type": "function"
       },
@@ -386,48 +421,12 @@
             "type": "function"
           },
           {
-            "id": "execute",
-            "title": "Execute a query",
-            "slug": "execute",
+            "id": "single-or-throw",
+            "title": "Retrieve exactly one row of data",
+            "slug": "db-single-or-throw",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "excludes": [
-              "reference_javascript_v1",
-              "reference_javascript_v2",
-              "reference_dart_v1",
-              "reference_dart_v2",
-              "reference_python_v2",
-              "reference_csharp_v0",
-              "reference_csharp_v1",
-              "reference_swift_v1",
-              "reference_swift_v2",
-              "reference_kotlin_v1",
-              "reference_kotlin_v2",
-              "reference_kotlin_v3"
-            ]
-          },
-          {
-            "id": "execute_to",
-            "title": "Execute and cast to struct",
-            "slug": "execute-to",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function",
-            "excludes": [
-              "reference_javascript_v1",
-              "reference_javascript_v2",
-              "reference_dart_v1",
-              "reference_dart_v2",
-              "reference_python_v2",
-              "reference_csharp_v0",
-              "reference_csharp_v1",
-              "reference_swift_v1",
-              "reference_swift_v2",
-              "reference_kotlin_v1",
-              "reference_kotlin_v2",
-              "reference_kotlin_v3"
-            ]
+            "type": "function"
           },
           {
             "id": "maybe-single",
@@ -507,9 +506,23 @@
         "type": "function"
       },
       {
+        "id": "sign-up-async",
+        "title": "SignUpAsync()",
+        "slug": "auth-signupasync",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "on-auth-state-change",
         "title": "Listen to auth events",
         "slug": "auth-onauthstatechange",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-out-reason",
+        "title": "SignOutReason",
+        "slug": "auth-signoutreason",
         "product": "auth",
         "type": "function"
       },
@@ -538,6 +551,13 @@
         "id": "sign-in-with-password",
         "title": "Sign in a user",
         "slug": "auth-signinwithpassword",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-password-options",
+        "title": "SignInWithPassword() with options",
+        "slug": "auth-signinwithpassword-options",
         "product": "auth",
         "type": "function"
       },
@@ -773,6 +793,20 @@
         "type": "function"
       },
       {
+        "id": "auth-flow-type",
+        "title": "AuthFlowType",
+        "slug": "auth-flowtype",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "session-persistence-disabled",
+        "title": "SessionPersistence.Disabled",
+        "slug": "auth-sessionpersistence-disabled",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "auth-mfa-api",
         "title": "Auth MFA",
         "slug": "auth-mfa-api",
@@ -824,6 +858,41 @@
             "id": "auth-js-gotruemfaapi-listfactors",
             "title": "List all factors for current user",
             "slug": "auth-mfa-listfactors",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-get-recovery-codes-status",
+            "title": "GetRecoveryCodesStatusAsync()",
+            "slug": "auth-mfa-getrecoverycodesstatus",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-generate-recovery-codes",
+            "title": "GenerateRecoveryCodesAsync()",
+            "slug": "auth-mfa-generaterecoverycodes",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-regenerate-recovery-codes",
+            "title": "RegenerateRecoveryCodesAsync()",
+            "slug": "auth-mfa-regeneraterecoverycodes",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-verify-recovery-code",
+            "title": "VerifyRecoveryCodeAsync()",
+            "slug": "auth-mfa-verifyrecoverycode",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-unenroll-recovery-codes",
+            "title": "UnenrollRecoveryCodesAsync()",
+            "slug": "auth-mfa-unenrollrecoverycodes",
             "product": "auth",
             "type": "function"
           }
@@ -1010,6 +1079,13 @@
             "type": "function"
           },
           {
+            "id": "admin-update-factor",
+            "title": "AdminAuth().UpdateFactorAsync()",
+            "slug": "auth-admin-mfa-updatefactor",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
             "id": "admin-passkey-api",
             "isFunc": false,
             "title": "Passkey Admin",
@@ -1032,6 +1108,76 @@
                 "type": "function"
               }
             ]
+          },
+          {
+            "id": "admin-create-custom-provider",
+            "title": "AdminAuth().CreateCustomProviderAsync()",
+            "slug": "auth-admin-customprovider-create",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-get-custom-provider",
+            "title": "AdminAuth().GetCustomProviderAsync()",
+            "slug": "auth-admin-customprovider-get",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-list-custom-providers",
+            "title": "AdminAuth().ListCustomProvidersAsync()",
+            "slug": "auth-admin-customprovider-list",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-update-custom-provider",
+            "title": "AdminAuth().UpdateCustomProviderAsync()",
+            "slug": "auth-admin-customprovider-update",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-delete-custom-provider",
+            "title": "AdminAuth().DeleteCustomProviderAsync()",
+            "slug": "auth-admin-customprovider-delete",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-create-sso-provider",
+            "title": "AdminAuth().CreateSsoProviderAsync()",
+            "slug": "auth-admin-ssoprovider-create",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-get-sso-provider",
+            "title": "AdminAuth().GetSsoProviderAsync()",
+            "slug": "auth-admin-ssoprovider-get",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-list-sso-providers",
+            "title": "AdminAuth().ListSsoProvidersAsync()",
+            "slug": "auth-admin-ssoprovider-list",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-update-sso-provider",
+            "title": "AdminAuth().UpdateSsoProviderAsync()",
+            "slug": "auth-admin-ssoprovider-update",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "admin-delete-sso-provider",
+            "title": "AdminAuth().DeleteSsoProviderAsync()",
+            "slug": "auth-admin-ssoprovider-delete",
+            "product": "auth-admin",
+            "type": "function"
           },
           {
             "id": "oauth-admin-api",
@@ -1143,6 +1289,13 @@
         "type": "function"
       },
       {
+        "id": "invoke-stream",
+        "title": "Invoke a Supabase Edge Function and stream the response",
+        "slug": "functions-invoke-stream",
+        "product": "functions",
+        "type": "function"
+      },
+      {
         "id": "cors-headers",
         "title": "CORS headers for Edge Functions",
         "slug": "functions-cors-headers",
@@ -1179,6 +1332,27 @@
         "id": "subscribe",
         "title": "Subscribe to channel",
         "slug": "subscribe",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-private-channel",
+        "title": "Private channel",
+        "slug": "realtime-privatechannel",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-presence-options",
+        "title": "Presence options",
+        "slug": "realtime-presenceoptions",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-presence-join-leave",
+        "title": "Presence join and leave handlers",
+        "slug": "realtime-presencejoinleave",
         "product": "realtime",
         "type": "function"
       },
@@ -1225,6 +1399,34 @@
         "type": "function"
       },
       {
+        "id": "realtime-connection-state",
+        "title": "Connection state",
+        "slug": "realtime-connectionstate",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-heartbeat-handlers",
+        "title": "Heartbeat handlers",
+        "slug": "realtime-heartbeat",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-probe-connection",
+        "title": "Probe the connection",
+        "slug": "realtime-probeconnection",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-disconnect-when-empty",
+        "title": "Disconnect when idle",
+        "slug": "realtime-disconnectwhenempty",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
@@ -1235,6 +1437,13 @@
         "id": "realtime-setauth",
         "title": "Set authentication token",
         "slug": "realtime-setauth",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-access-token-callback",
+        "title": "Realtime access token callback",
+        "slug": "realtime-accesstokencallback",
         "product": "realtime",
         "type": "function"
       }

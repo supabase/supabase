@@ -13,7 +13,7 @@ info:
   libraries:
     - name: 'C#'
       id: 'csharp'
-      version: '8.1.0'
+      version: '8.13.0'
 
 functions:
   - id: initializing
@@ -26,6 +26,16 @@ functions:
 
       Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
 
+    notes: |
+      - Pick the setup that matches your app. For ASP.NET Core and Blazor, use `AddSupabase()` from the `Supabase.Extensions.DependencyInjection` package. For other apps (console, desktop, mobile, Unity), create a `Supabase.Client` yourself, call `InitializeAsync()`, and reuse it. A new client per operation means a new `HttpClient` (and socket) each time.
+      - ASP.NET Core and Blazor: `AddSupabase()` registers a **scoped** `Supabase.Client`, and each sub-client individually: `IGotrueClient<User, Session>`, `IPostgrestClient`, `IStorageClient<Bucket, FileObject>`, `IFunctionsClient`, and `IRealtimeClient<RealtimeSocket, RealtimeChannel>`. Inject only the one a class needs.
+      - ASP.NET Core and Blazor: a scope gets its own `Client`, with its own Auth state. In ASP.NET Core a scope is one request. In Blazor Server it is one circuit, and in Blazor WebAssembly it lasts as long as the app runs.
+      - ASP.NET Core and Blazor: every client's traffic goes through pooled `HttpClient`s from `IHttpClientFactory`. Without the extension, a scoped or transient `Client` builds a new `HttpClient` per resolution, which exhausts the connection pool under load. `AddSupabase()` sets `SupabaseOptions.HttpClient` and the three `StorageClientOptions` HTTP clients (`HttpRequestClient`, `HttpUploadClient`, `HttpDownloadClient`) itself, so values you set for those in `configureOptions` are replaced. Everything else you set stays, including `Proxy`, `StorageClientOptions.Proxy`, the Storage timeouts, and the retry options such as `PostgrestRetry`.
+      - ASP.NET Core and Blazor: `AddSupabase()` does not call `InitializeAsync()` on the client it creates. `AutoConnectRealtime` and restoring a persisted session only happen in `InitializeAsync()`, so call it yourself if you rely on either. `Subscribe()` on a Realtime channel connects the socket on its own.
+      - ASP.NET Core and Blazor: if an `ILoggerFactory` is registered in the service provider and you did not set `SupabaseOptions.LoggerFactory`, the client uses it.
+      - Keep the key out of source control and read it from configuration, such as user secrets or an environment variable. Use a publishable or anon key unless the code runs on the server and needs to bypass Row Level Security.
+      - OpenTelemetry: the SDK emits traces and metrics through `System.Diagnostics` and propagates trace context. See [client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp).
+      - `SupabaseOptions.ThirdPartyAccessToken` authenticates the client through a third-party auth provider instead of Supabase Auth.
     examples:
       - id: csharp-init-standard
         name: Standard
@@ -41,6 +51,107 @@ functions:
 
           var supabase = new Supabase.Client(url, key, options);
           await supabase.InitializeAsync();
+          ```
+      - id: csharp-init-aspnetcore
+        name: 'ASP.NET Core: register the client'
+        description: |
+          Recommended for web apps. Install `Supabase.Extensions.DependencyInjection` (it brings in `Supabase`) and register the client once in `Program.cs`.
+        code: |
+          ```c#
+          using Supabase.Core.Http;
+          using Supabase.Extensions.DependencyInjection;
+
+          var builder = WebApplication.CreateBuilder(args);
+
+          builder.Services.AddSupabase(
+              supabaseUrl: builder.Configuration["Supabase:Url"]!,
+              supabaseKey: builder.Configuration["Supabase:Key"]!,
+              configureOptions: options =>
+              {
+                  options.AutoConnectRealtime = true;
+                  options.PostgrestRetry = new RetryOptions { MaxRetries = 3 };
+              });
+
+          var app = builder.Build();
+          ```
+      - id: csharp-init-aspnetcore-inject
+        name: 'ASP.NET Core: inject the client'
+        description: |
+          Inject `Supabase.Client` in a minimal API endpoint, a controller, or your own service.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (Supabase.Client supabase) =>
+          {
+              var result = await supabase.From<Todo>().Get();
+              return result.Models;
+          });
+
+          public class TodoService
+          {
+              private readonly Supabase.Client _supabase;
+
+              public TodoService(Supabase.Client supabase) => _supabase = supabase;
+
+              public async Task<List<Todo>> GetOpen()
+              {
+                  var result = await _supabase
+                      .From<Todo>()
+                      .Where(t => t.IsComplete == false)
+                      .Get();
+
+                  return result.Models;
+              }
+          }
+          ```
+      - id: csharp-init-aspnetcore-sub-client
+        name: 'ASP.NET Core: inject a single sub-client'
+        description: |
+          A handler that uses one service can depend on that client alone.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (IPostgrestClient postgrest) =>
+              await postgrest.Table<Todo>().Get());
+          ```
+      - id: csharp-init-aspnetcore-initialize
+        name: 'ASP.NET Core: initialize the client'
+        description: |
+          Call `InitializeAsync()` on the injected client when you need `AutoConnectRealtime` or a session restored from your `SessionHandler`.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (Supabase.Client supabase) =>
+          {
+              await supabase.InitializeAsync();
+
+              var result = await supabase.From<Todo>().Get();
+              return result.Models;
+          });
+          ```
+      - id: csharp-init-blazor
+        name: Blazor
+        description: |
+          Register the client in `Program.cs` as shown in the ASP.NET Core example, then inject it in a component. In Blazor Server, the client lives for the circuit.
+        code: |
+          ```c#
+          @page "/todos"
+          @using Supabase
+          @inject Client SupabaseClient
+
+          <ul>
+              @foreach (var todo in _todos)
+              {
+                  <li>@todo.Task</li>
+              }
+          </ul>
+
+          @code {
+              private List<Todo> _todos = new();
+
+              protected override async Task OnInitializedAsync()
+              {
+                  var result = await SupabaseClient.From<Todo>().Get();
+                  _todos = result.Models;
+              }
+          }
           ```
       - id: csharp-init-maui
         name: Dependency Injection (Maui-like)
@@ -63,6 +174,67 @@ functions:
                 // Note the creation as a singleton.
                 builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
           }
+          ```
+      - id: csharp-init-session-persistence
+        name: With session persistence
+        description: By default the session lives in memory only (`SessionPersistence.Disabled`). Implement `IGotrueSessionPersistence<Session>` and pass it as `SessionHandler` to keep the session between app launches.
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              SessionHandler = new MySessionHandler() // Implements IGotrueSessionPersistence<Session>
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+          ```
+      - id: csharp-init-oauth-flow
+        name: With the PKCE flow
+        description: Sets the OAuth flow type once for the client. A flow type set on a call's own options takes precedence. PKCE is recommended for mobile and server-side apps.
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              AuthFlowType = Supabase.Gotrue.Constants.OAuthFlowType.PKCE
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          ```
+      - id: csharp-init-logging
+        name: With logging
+        description: Sends request outcomes and retries (Debug) and background failures such as token refresh and Realtime reconnects (Warning) to your logger factory. Credentials, tokens, bodies, query strings, and header values are never logged.
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              LoggerFactory = loggerFactory
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          ```
+      - id: csharp-init-http-client
+        name: With your own HttpClient
+        description: Requests from every client, including Storage uploads and downloads, go through this client when you supply one. Set its `Timeout` to `Timeout.InfiniteTimeSpan` if you transfer large files.
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              HttpClient = new HttpClient(new MyLoggingHandler())
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          ```
+      - id: csharp-init-trace-propagation
+        name: Disable trace context propagation
+        description: By default the SDK adds `traceparent`, `tracestate`, and `baggage` from `Activity.Current` to each Auth, Database, Storage, and Functions request. Realtime does not propagate trace context.
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              TracePropagation = Supabase.Core.Http.TracePropagation.Disabled
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
           ```
       - id: csharp-init-showing-models
         name: With Models Example
@@ -354,7 +526,7 @@ functions:
       Creates a new anonymous user.
     notes: |
       - Returns an anonymous user with a session. The user's `IsAnonymous` claim is set to `true`.
-      - You can later convert an anonymous user into a permanent one by calling [`UpdateUser()`](/docs/reference/csharp/update-user) with an email or phone number, or by linking an OAuth identity with [`LinkIdentity()`](/docs/reference/csharp/link-identity).
+      - You can later convert an anonymous user into a permanent one by calling [`UpdateUser()`](/docs/reference/csharp/auth-updateuser) with an email or phone number, or by linking an OAuth identity with [`LinkIdentity()`](/docs/reference/csharp/auth-linkidentity).
       - Enable anonymous sign-ins in [your project's auth settings](https://supabase.com/dashboard/project/_/settings/auth).
     examples:
       - id: create-an-anonymous-user
@@ -502,7 +674,7 @@ functions:
       Sends a reauthentication nonce to the signed-in user's email or phone number.
     notes: |
       - Requires a signed-in user.
-      - Use this before updating a password when [secure password change](https://supabase.com/docs/guides/auth/passwords#secure-password-change) is enabled. Pass the nonce the user receives to [`UpdateUser()`](/docs/reference/csharp/update-user).
+      - Use this before updating a password when [secure password change](https://supabase.com/docs/guides/auth/passwords#secure-password-change) is enabled. Pass the nonce the user receives to [`UpdateUser()`](/docs/reference/csharp/auth-updateuser).
     examples:
       - id: send-a-reauthentication-nonce
         name: Send a reauthentication nonce
@@ -517,7 +689,7 @@ functions:
     description: |
       Starts the enrollment process for a new multi-factor authentication (MFA) factor.
     notes: |
-      - Creates a new `unverified` factor. Present the returned QR code or secret to the user, then verify it with [`Verify()`](/docs/reference/csharp/mfa-verify) or [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify).
+      - Creates a new `unverified` factor. Present the returned QR code or secret to the user, then verify it with [`Verify()`](/docs/reference/csharp/auth-mfa-verify) or [`ChallengeAndVerify()`](/docs/reference/csharp/auth-mfa-challengeandverify).
       - Only Time-based One-Time Password (TOTP) factors are supported. Set `FactorType` to `"totp"`.
     examples:
       - id: enroll-a-factor
@@ -540,8 +712,8 @@ functions:
     description: |
       Creates a challenge for an enrolled MFA factor.
     notes: |
-      - Pair the returned challenge with [`Verify()`](/docs/reference/csharp/mfa-verify) to complete verification.
-      - Use [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify) to create and verify a challenge in a single call.
+      - Pair the returned challenge with [`Verify()`](/docs/reference/csharp/auth-mfa-verify) to complete verification.
+      - Use [`ChallengeAndVerify()`](/docs/reference/csharp/auth-mfa-challengeandverify) to create and verify a challenge in a single call.
     examples:
       - id: create-a-challenge
         name: Create a challenge
@@ -580,7 +752,7 @@ functions:
     description: |
       Creates a challenge and immediately verifies it with the given code.
     notes: |
-      - A convenience method that combines [`Challenge()`](/docs/reference/csharp/mfa-challenge) and [`Verify()`](/docs/reference/csharp/mfa-verify).
+      - A convenience method that combines [`Challenge()`](/docs/reference/csharp/auth-mfa-challenge) and [`Verify()`](/docs/reference/csharp/auth-mfa-verify).
       - The code is the one the user reads from their authenticator app.
     examples:
       - id: create-and-verify-a-challenge
@@ -618,7 +790,7 @@ functions:
     description: |
       Returns the Authenticator Assurance Level (AAL) for the active session.
     notes: |
-      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social login).
+      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social sign-in).
       - `aal2` means the user also verified an MFA factor.
       - Use this to decide whether to prompt the user to complete an MFA challenge.
     examples:
@@ -676,7 +848,7 @@ functions:
       Creates a user.
     notes: |
       - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
-      - To send an invite link instead of setting a password directly, use [`InviteUserByEmail()`](/docs/reference/csharp/invite-user-by-email).
+      - To send an invite link instead of setting a password directly, use [`InviteUserByEmail()`](/docs/reference/csharp/auth-admin-inviteuserbyemail).
     examples:
       - id: create-a-user
         name: Create a user
@@ -804,6 +976,9 @@ functions:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - An empty response body returns `null` from `Invoke<T>()` instead of throwing.
+      - A `Content-Type` set in `InvokeFunctionOptions.Headers` is sent as given instead of the default `application/json`. `Body` is still serialized as JSON.
+      - To read a response while it is still being produced, see [`InvokeStream()`](/docs/reference/csharp/invoke-stream).
     examples:
       - id: basic-invocation
         name: Basic invocation.
@@ -842,6 +1017,7 @@ functions:
       - `From()` can be combined with [Modifiers](/docs/reference/csharp/using-modifiers)
       - `From()` can be combined with [Filters](/docs/reference/csharp/using-filters)
       - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - A request whose URL is too long (HTTP 414, for example a very long `Filter("id", Operator.In, ...)` list) throws a `PostgrestException` with `Reason` set to `FailureHint.Reason.UriTooLong`. Split the list into smaller requests or use `Rpc()`.
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -946,11 +1122,27 @@ functions:
             .Filter("address->postcode", Operator.Equals, 90210)
             .Get();
           ```
-
+      - id: handling-uri-too-long
+        name: Handling a URI that is too long
+        code: |
+          ```c#
+          try
+          {
+              await supabase.From<City>().Filter("id", Operator.In, ids).Get();
+          }
+          catch (PostgrestException ex) when (ex.Reason == FailureHint.Reason.UriTooLong)
+          {
+              // Fetch the ids in smaller batches.
+          }
+          ```
   - id: insert
     description: |
       Performs an INSERT into the table.
     title: 'Create data: Insert()'
+    notes: |
+      - Rows in one bulk call can carry different fields. The request names the union of the fields the rows write. A field that a row leaves out is written as `NULL`.
+      - A property is left out of a row when its `[Column]` sets `NullValueHandling = JsonIgnoreCondition.WhenWritingNull` and its value is `null`. Without that setting, a `null` value is always written.
+      - To write the column's database default for a field a row leaves out, set `MissingFields = QueryOptions.MissingFieldType.ColumnDefault`. A value you set to `null` on a property that is always written stays `null`.
     examples:
       - id: create-a-record
         name: Create a record
@@ -1011,7 +1203,36 @@ functions:
             .From<City>()
             .Insert(models, new QueryOptions { Returning = ReturnType.Representation });
           ```
+      - id: bulk-insert-rows-with-different-fields
+        name: Bulk insert rows with different fields
+        description: |
+          `Population` is left out of the first row, so the database default is used for it.
+        code: |
+          ```c#
+          [Table("cities")]
+          class City : BaseModel
+          {
+              [PrimaryKey("id", false)]
+              public int Id { get; set; }
 
+              [Column("name")]
+              public string? Name { get; set; }
+
+              [Column("population", NullValueHandling = JsonIgnoreCondition.WhenWritingNull)]
+              public int? Population { get; set; }
+          }
+
+          var rows = new List<City>
+          {
+              new City { Id = 1, Name = "The Shire" },
+              new City { Id = 2, Name = "Rivendell", Population = 1200 }
+          };
+
+          await supabase.From<City>().Insert(rows, new QueryOptions
+          {
+              MissingFields = QueryOptions.MissingFieldType.ColumnDefault
+          });
+          ```
   - id: update
     description: |
       Performs an UPDATE on the table.
@@ -1051,6 +1272,9 @@ functions:
     notes: |
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+      - Rows in one bulk call can carry different fields. The request names the union of the fields the rows write. A field that a row leaves out is written as `NULL`.
+      - A property is left out of a row when its `[Column]` sets `NullValueHandling = JsonIgnoreCondition.WhenWritingNull` and its value is `null`. Without that setting, a `null` value is always written.
+      - To write the column's database default for a field a row leaves out, set `MissingFields = QueryOptions.MissingFieldType.ColumnDefault`. A value you set to `null` on a property that is always written stays `null`.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -1101,7 +1325,36 @@ functions:
             .From<City>()
             .Upsert(model, new QueryOptions { Count = QueryOptions.CountType.Exact });
           ```
+      - id: bulk-upsert-rows-with-different-fields
+        name: Bulk upsert rows with different fields
+        description: |
+          `Population` is left out of the first row, so the database default is used for it.
+        code: |
+          ```c#
+          [Table("cities")]
+          class City : BaseModel
+          {
+              [PrimaryKey("id", false)]
+              public int Id { get; set; }
 
+              [Column("name")]
+              public string? Name { get; set; }
+
+              [Column("population", NullValueHandling = JsonIgnoreCondition.WhenWritingNull)]
+              public int? Population { get; set; }
+          }
+
+          var rows = new List<City>
+          {
+              new City { Id = 1, Name = "The Shire" },
+              new City { Id = 2, Name = "Rivendell", Population = 1200 }
+          };
+
+          await supabase.From<City>().Upsert(rows, new QueryOptions
+          {
+              MissingFields = QueryOptions.MissingFieldType.ColumnDefault
+          });
+          ```
   - id: delete
     description: |
       Performs a DELETE on the table.
@@ -1166,6 +1419,8 @@ functions:
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - Register every `postgres_changes` listener **before** calling `Subscribe()`. Adding one after the channel has joined throws a `RealtimeException`, because the set of changes to stream is sent to the server as part of the channel join. If you need a different set of changes later, create a new channel.
+      - State changes of every channel are sent at `Debug` level to the logger you supply (`SupabaseOptions.LoggerFactory`, or `ClientOptions.Logger` on the standalone Realtime client).
+      - The client reconnects as soon as the network comes back, without waiting out the rest of the reconnect delay. Turn this off with `ClientOptions.MonitorsNetworkPath = false` on the standalone Realtime client. It has no effect on runtimes without a network monitor.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages
@@ -1305,13 +1560,23 @@ functions:
 
           await channel.Subscribe();
           ```
+      - id: realtime-subscribe-connects
+        name: Subscribe without connecting first
+        description: '`Subscribe()` connects the socket when the client has none, so you do not need to call `ConnectAsync()` first.'
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("any");
+          var broadcast = channel.Register<CursorBroadcast>();
 
+          await channel.Subscribe();
+          ```
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'Unsubscribe()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - To remove every channel and close the socket in one call, use [`RemoveAll()`](/docs/reference/csharp/remove-all-channels).
     examples:
       - id: removes-a-channel
         name: Remove a channel
@@ -1580,7 +1845,7 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `insert`
-      - Pair this with [`UploadToSignedUrl()`](/docs/reference/csharp/from-upload-to-signed-url) to perform the upload.
+      - Pair this with [`UploadToSignedUrl()`](/docs/reference/csharp/storage-from-uploadtosignedurl) to perform the upload.
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -1592,7 +1857,7 @@ functions:
 
   - id: from-upload-to-signed-url
     description: |
-      Uploads a file to a signed URL created with [`CreateUploadSignedUrl()`](/docs/reference/csharp/from-create-signed-upload-url).
+      Uploads a file to a signed URL created with [`CreateUploadSignedUrl()`](/docs/reference/csharp/storage-from-createsigneduploadurl).
     title: 'From().UploadToSignedUrl()'
     notes: |
       - Policy permissions required:
@@ -2158,4 +2423,1456 @@ functions:
             .Select(x => x.Catchphrase)
             .Filter(x => x.Catchphrase, Operator.WFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
             .Get();
+          ```
+  - id: sign-up-async
+    title: 'SignUpAsync()'
+    description: |
+      Creates a new user and returns a `SignUpState` that tells a signed-in user apart from one who still has to confirm.
+    notes: |
+      - `SignUpAsync()` replaces `SignUp()`. `SignUp()` is marked `[Obsolete]` and is removed in v9. It ignores `SignUpOptions.FlowType` and `SignUpOptions.Channel`, and it returns a `Session` that means two different things depending on whether confirmation is required.
+      - `SignUpState.Session` is set when the user is signed in. It is `null` while the user has to confirm their email address or phone number. The client stores the session and raises `AuthState.SignedIn` when a session is returned.
+      - `SignUpState.User` is the signed-up user, including one that is waiting for confirmation.
+      - `SignUpState.PKCEVerifier` is set for an email sign-up with `FlowType = OAuthFlowType.PKCE`. Keep it and pass it with the code from the confirmation link to `ExchangeCodeForSession()`.
+      - For a phone sign-up, `SignUpOptions.Channel` chooses how the code is sent (SMS or WhatsApp). The default is SMS.
+      - Set `SignUpOptions.CaptchaToken` when CAPTCHA protection is enabled for your project.
+      - If the email or phone number already belongs to an account, the server does not reveal it. You get either an obfuscated user whose `Identities` list is empty, or a `GotrueException` with the reason `UserAlreadyRegistered`.
+    examples:
+      - id: sign-up-with-email-and-password
+        name: Sign up with an email and password
+        isSpotlight: true
+        code: |
+          ```c#
+          var signedUp = await supabase.Auth.SignUpAsync(SignUpType.Email, email, password);
+
+          if (signedUp.Session == null)
+          {
+              // The user has to confirm their email address before signing in.
+          }
+          ```
+      - id: sign-up-with-pkce
+        name: Sign up with the PKCE flow
+        code: |
+          ```c#
+          var signedUp = await supabase.Auth.SignUpAsync(SignUpType.Email, email, password,
+              new SignUpOptions { FlowType = OAuthFlowType.PKCE, RedirectTo = "https://example.com/confirm" });
+
+          // Keep the verifier until the user comes back with the code from the confirmation link.
+          var verifier = signedUp.PKCEVerifier;
+          ```
+      - id: sign-up-with-phone-and-captcha
+        name: Sign up with a phone number and a CAPTCHA token
+        code: |
+          ```c#
+          var signedUp = await supabase.Auth.SignUpAsync(SignUpType.Phone, "+13334445555", password,
+              new SignUpOptions
+              {
+                  CaptchaToken = captchaToken,
+                  Channel = SignInWithPasswordlessPhoneOptions.MessagingChannel.WHATSAPP
+              });
+          ```
+  - id: sign-in-with-password-options
+    title: 'SignInWithPassword() with options'
+    description: |
+      Signs in a user with a password and passes a CAPTCHA token.
+    notes: |
+      - Use this overload when CAPTCHA protection is enabled for your project. Set `SignInWithPasswordOptions.CaptchaToken` to the token your CAPTCHA widget returned.
+      - The `SignInType` says whether the identifier is an email address or a phone number.
+    examples:
+      - id: sign-in-with-password-and-captcha
+        name: Sign in with a CAPTCHA token
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInWithPassword(
+              SignInType.Email,
+              email,
+              password,
+              new SignInWithPasswordOptions { CaptchaToken = captchaToken });
+          ```
+  - id: sign-in-with-web3
+    title: 'SignInWithWeb3Async()'
+    description: |
+      Signs in a user with a signed message from a Solana or Ethereum wallet.
+    notes: |
+      - Your app asks the wallet to sign a Sign-In with Solana or Sign-In with Ethereum (EIP-4361) message. Pass the message and the signature to `Web3Credentials`.
+      - `Web3Credentials.ForSolana()` takes the 64-byte signature. `Web3Credentials.ForEthereum()` takes the 65-byte signature as a hex string, with or without the `0x` prefix. Both throw an `ArgumentException` when the signature has the wrong length.
+      - Enable the Web3 provider for the chain in [your project](https://supabase.com/dashboard/project/_/auth/providers). Otherwise the server returns the error code `web3_provider_disabled`.
+      - Set `SignInWithWeb3Options.CaptchaToken` when CAPTCHA protection is enabled.
+      - The client stores the session and raises `AuthState.SignedIn`.
+    examples:
+      - id: sign-in-with-ethereum
+        name: Sign in with Ethereum
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInWithWeb3Async(
+              Web3Credentials.ForEthereum(message, signatureHex));
+          ```
+      - id: sign-in-with-solana
+        name: Sign in with Solana
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInWithWeb3Async(
+              Web3Credentials.ForSolana(message, signatureBytes),
+              new SignInWithWeb3Options { CaptchaToken = captchaToken });
+          ```
+  - id: get-claims
+    title: 'GetClaimsAsync()'
+    description: |
+      Verifies an access token and returns its claims.
+    notes: |
+      - Without arguments, it reads the access token of the current session.
+      - The SDK verifies RS256 and ES256 tokens locally when a matching public key is available. Otherwise it asks the auth server to verify the token.
+      - An expired token throws, unless you set `GetClaimsOptions.AllowExpired` to `true`.
+      - `GetClaimsResponse.Claims` holds the standard claims (`Sub`, `Role`, `Aal`, `SessionId`, `Exp`, and so on). Any other claim is in `AdditionalClaims`.
+    examples:
+      - id: get-claims-of-current-session
+        name: Get the claims of the current session
+        isSpotlight: true
+        code: |
+          ```c#
+          var response = await supabase.Auth.GetClaimsAsync();
+          var userId = response.Claims.Sub;
+          ```
+      - id: get-claims-of-a-token
+        name: Get the claims of a given token
+        code: |
+          ```c#
+          var response = await supabase.Auth.GetClaimsAsync(jwt, new GetClaimsOptions { AllowExpired = true });
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'Resend()'
+    description: |
+      Resends a confirmation email or a one-time password (OTP) by SMS.
+    notes: |
+      - `ResendType.SignUp` and `ResendType.EmailChange` send an email. Set `Email` on the parameters.
+      - `ResendType.Sms` and `ResendType.PhoneChange` send an SMS. Set `Phone` on the parameters.
+      - Pass an `OAuthFlowType` as the second argument to send the PKCE code challenge. The call then returns a `ResendState` with the `PKCEVerifier` to keep. `Resend()` does not read the flow type set at client creation.
+      - Set `ResendOptions.CaptchaToken` when CAPTCHA protection is enabled. `EmailRedirectTo` applies to emails only.
+    examples:
+      - id: resend-a-signup-confirmation-email
+        name: Resend a sign-up confirmation email
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.Resend(
+              new ResendParameters(ResendType.SignUp, email, null, new ResendOptions(captchaToken: null, emailRedirectTo: "https://example.com/welcome")));
+          ```
+      - id: resend-a-phone-otp
+        name: Resend a phone OTP
+        code: |
+          ```c#
+          await supabase.Auth.Resend(new ResendParameters(ResendType.Sms, null, "+13334445555", null));
+          ```
+      - id: resend-with-pkce
+        name: Resend with the PKCE flow
+        code: |
+          ```c#
+          var state = await supabase.Auth.Resend(
+              new ResendParameters(ResendType.SignUp, email, null, null),
+              OAuthFlowType.PKCE);
+
+          var verifier = state.PKCEVerifier;
+          ```
+  - id: start-auto-refresh
+    title: 'StartAutoRefresh()'
+    description: |
+      Starts the background refresh of the session, or resumes it after `StopAutoRefresh()`.
+    notes: |
+      - The client starts the refresh when it is created, as long as `ClientOptions.AutoRefreshToken` is `true`, which is the default.
+      - Call it when your app returns to the foreground. If the session has expired, it is refreshed right away.
+    examples:
+      - id: start-auto-refresh
+        name: Resume the refresh when the app returns to the foreground
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Auth.StartAutoRefresh();
+          ```
+  - id: stop-auto-refresh
+    title: 'StopAutoRefresh()'
+    description: |
+      Stops the background refresh of the session.
+    notes: |
+      - The session is kept. Signing in again does not restart the refresh: call `StartAutoRefresh()`.
+      - Call it when your app goes to the background.
+    examples:
+      - id: stop-auto-refresh
+        name: Pause the refresh when the app goes to the background
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Auth.StopAutoRefresh();
+          ```
+  - id: get-user-identities
+    title: 'GetUserIdentitiesAsync()'
+    description: |
+      Lists the external identities linked to the signed-in user.
+    notes: |
+      - The list is read from the server, so identities linked or unlinked since sign-in are included. It is empty when the user has none.
+      - It throws a `GotrueException` with the reason `NoSessionFound` when no user is signed in.
+    examples:
+      - id: get-the-identities-of-a-user
+        name: Get the identities of the signed-in user
+        isSpotlight: true
+        code: |
+          ```c#
+          var identities = await supabase.Auth.GetUserIdentitiesAsync();
+          var github = identities.FirstOrDefault(identity => identity.Provider == "github");
+          ```
+  - id: sign-out-reason
+    title: 'SignOutReason'
+    description: |
+      Tells why the user was signed out. Read it while handling `AuthState.SignedOut`.
+    notes: |
+      - `SignOutReason.UserInitiated` is an explicit call to `SignOut()`.
+      - `SignOutReason.SessionExpired` is a session the server rejected, for example when a refresh token is no longer valid.
+      - `SignOutReason.SessionMissing` is a stored session that could not be restored when the client loaded.
+      - The value is `null` while a user is signed in, and when the client cannot tell why no user is signed in.
+    examples:
+      - id: show-a-notice-when-the-session-expires
+        name: Show a notice when the session expires
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Auth.AddStateChangedListener((sender, changed) =>
+          {
+              if (changed == AuthState.SignedOut && sender.SignOutReason == SignOutReason.SessionExpired)
+              {
+                  ShowSessionExpiredNotice();
+              }
+          });
+          ```
+  - id: auth-flow-type
+    title: 'AuthFlowType'
+    description: |
+      Chooses the OAuth flow type for the whole client when you create it.
+    notes: |
+      - The default is `OAuthFlowType.Implicit`. PKCE is recommended for mobile and server-side apps.
+      - The setting applies to OAuth, SSO, identity linking, email sign-up, email OTP, and password reset flows.
+      - A flow type set in the options of a single call overrides it. `Resend()` takes its flow type as an argument and ignores this setting.
+      - When you use the standalone auth client, set `ClientOptions.FlowType` instead.
+    examples:
+      - id: use-pkce-for-all-flows
+        name: Use PKCE for all flows
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              AuthFlowType = Constants.OAuthFlowType.PKCE
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+
+          var state = await supabase.Auth.SignIn(Provider.Github);
+
+          // After the user comes back with a code:
+          var session = await supabase.Auth.ExchangeCodeForSession(state.PKCEVerifier!, code);
+          ```
+  - id: passkey-list
+    title: 'ListPasskeysAsync()'
+    description: |
+      Lists the passkeys of the signed-in user.
+    notes: |
+      - Each `Passkey` has an `Id`, a `FriendlyName`, a `CreatedAt` date, and a `LastUsedAt` date that is `null` until the passkey is used.
+      - Passkeys must be enabled on your auth server. Otherwise the server returns the error code `passkey_disabled`.
+    examples:
+      - id: list-passkeys
+        name: List passkeys
+        isSpotlight: true
+        code: |
+          ```c#
+          var passkeys = await supabase.Auth.ListPasskeysAsync();
+          ```
+  - id: passkey-update
+    title: 'RenamePasskeyAsync()'
+    description: |
+      Renames a passkey of the signed-in user.
+    notes: |
+      - The name can be up to 120 characters. An empty name throws an `ArgumentException` before any request is sent.
+      - It works at any authenticator assurance level.
+    examples:
+      - id: rename-a-passkey
+        name: Rename a passkey
+        isSpotlight: true
+        code: |
+          ```c#
+          var passkey = await supabase.Auth.RenamePasskeyAsync(passkeyId, "Work laptop");
+          ```
+  - id: passkey-delete
+    title: 'DeletePasskeyAsync()'
+    description: |
+      Deletes a passkey of the signed-in user. The passkey can no longer be used to sign in.
+    notes: |
+      - If the user has MFA enabled, the session must be at the `aal2` assurance level. Otherwise the server returns the error code `insufficient_aal`.
+      - No admin privileges are needed.
+    examples:
+      - id: delete-a-passkey
+        name: Delete a passkey
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.DeletePasskeyAsync(passkeyId);
+          ```
+  - id: passkey-start-registration
+    title: 'StartPasskeyRegistrationAsync()'
+    description: |
+      Starts the registration of a passkey and returns a challenge for the platform authenticator.
+    notes: |
+      - The user must be signed in.
+      - `PasskeyChallenge.Options` is the WebAuthn creation options as JSON. Pass it to your platform API (for example the browser, or the Credential Manager on Android) to create the credential. The SDK does not talk to the authenticator.
+      - Finish the registration with `RegisterPasskeyAsync()` before `ExpiresAt`. A challenge can be used once, even when the attempt fails.
+    examples:
+      - id: start-passkey-registration
+        name: Start a passkey registration
+        isSpotlight: true
+        code: |
+          ```c#
+          var challenge = await supabase.Auth.StartPasskeyRegistrationAsync();
+          ```
+  - id: passkey-verify-registration
+    title: 'RegisterPasskeyAsync()'
+    description: |
+      Completes the registration of a passkey with the credential the authenticator created.
+    notes: |
+      - `credential` is the W3C `RegistrationResponseJSON` object, as a `JsonElement`. It is sent to the server unchanged. Passing anything but a JSON object throws an `ArgumentException`.
+      - The returned passkey is named after the authenticator. Use `RenamePasskeyAsync()` to change the name.
+    examples:
+      - id: register-a-passkey
+        name: Register a passkey
+        isSpotlight: true
+        code: |
+          ```c#
+          var challenge = await supabase.Auth.StartPasskeyRegistrationAsync();
+
+          // Create the credential with your platform API, using challenge.Options.
+          JsonElement credential = await CreateCredentialAsync(challenge.Options);
+
+          var passkey = await supabase.Auth.RegisterPasskeyAsync(challenge.Id, credential);
+          ```
+  - id: passkey-start-authentication
+    title: 'StartPasskeySignInAsync()'
+    description: |
+      Starts a passkey sign-in and returns a challenge for the platform authenticator.
+    notes: |
+      - No user needs to be signed in.
+      - Set `SignInWithPasskeyOptions.CaptchaToken` when CAPTCHA protection is enabled.
+      - `PasskeyChallenge.Options` is the WebAuthn request options as JSON. Finish with `SignInWithPasskeyAsync()` before `ExpiresAt`.
+    examples:
+      - id: start-passkey-sign-in
+        name: Start a passkey sign-in
+        isSpotlight: true
+        code: |
+          ```c#
+          var challenge = await supabase.Auth.StartPasskeySignInAsync(
+              new SignInWithPasskeyOptions { CaptchaToken = captchaToken });
+          ```
+  - id: passkey-verify-authentication
+    title: 'SignInWithPasskeyAsync()'
+    description: |
+      Signs in a user with the assertion the authenticator produced.
+    notes: |
+      - `credential` is the W3C `AuthenticationResponseJSON` object, as a `JsonElement`. It is sent to the server unchanged.
+      - The client stores the session and raises `AuthState.SignedIn`.
+    examples:
+      - id: sign-in-with-a-passkey
+        name: Sign in with a passkey
+        isSpotlight: true
+        code: |
+          ```c#
+          var challenge = await supabase.Auth.StartPasskeySignInAsync();
+
+          // Get the assertion with your platform API, using challenge.Options.
+          JsonElement assertion = await GetAssertionAsync(challenge.Options);
+
+          var session = await supabase.Auth.SignInWithPasskeyAsync(challenge.Id, assertion);
+          ```
+  - id: mfa-get-recovery-codes-status
+    title: 'GetRecoveryCodesStatusAsync()'
+    description: |
+      Returns how many MFA recovery codes the signed-in user has and how many are unused.
+    notes: |
+      - It returns `null` when the user has no recovery codes.
+      - Recovery codes are experimental on the auth server and must be enabled for your project.
+    examples:
+      - id: get-the-recovery-codes-status
+        name: Get the recovery codes status
+        isSpotlight: true
+        code: |
+          ```c#
+          var status = await supabase.Auth.GetRecoveryCodesStatusAsync();
+
+          if (status == null)
+          {
+              // Offer to generate recovery codes.
+          }
+          else if (status.Remaining == 0)
+          {
+              // Every code is used. Ask the user to regenerate them.
+          }
+          ```
+  - id: mfa-generate-recovery-codes
+    title: 'GenerateRecoveryCodesAsync()'
+    description: |
+      Creates the first set of MFA recovery codes for the signed-in user.
+    notes: |
+      - The session must be at the `aal2` assurance level, so verify an MFA factor first.
+      - The codes are returned once and cannot be read back. Show them to the user and ask them to store them safely.
+      - It fails with `mfa_verified_factor_exists` when the user already has recovery codes. Use `RegenerateRecoveryCodesAsync()` to replace them.
+    examples:
+      - id: generate-recovery-codes
+        name: Generate recovery codes
+        isSpotlight: true
+        code: |
+          ```c#
+          var recoveryCodes = await supabase.Auth.GenerateRecoveryCodesAsync(
+              new GenerateRecoveryCodesOptions { FriendlyName = "Backup codes" });
+
+          foreach (var code in recoveryCodes.Codes)
+          {
+              // Show each code to the user.
+          }
+          ```
+  - id: mfa-regenerate-recovery-codes
+    title: 'RegenerateRecoveryCodesAsync()'
+    description: |
+      Replaces the MFA recovery codes of the signed-in user with a new set.
+    notes: |
+      - Every previous code stops working at once.
+      - The session must be at the `aal2` assurance level, and the user must already have recovery codes.
+      - The new codes are returned once and cannot be read back.
+    examples:
+      - id: regenerate-recovery-codes
+        name: Regenerate recovery codes
+        isSpotlight: true
+        code: |
+          ```c#
+          var recoveryCodes = await supabase.Auth.RegenerateRecoveryCodesAsync();
+          ```
+  - id: mfa-verify-recovery-code
+    title: 'VerifyRecoveryCodeAsync()'
+    description: |
+      Verifies a recovery code and returns a session at the `aal2` assurance level.
+    notes: |
+      - Use it when the user cannot provide a code from their MFA factor. A recovery code can be used once.
+      - A wrong or used code throws a `GotrueException` with the reason `MfaChallengeUnverified`. After too many failed attempts the server locks verification and the reason is `UserTooManyRequests`.
+      - The current session is kept when verification fails.
+    examples:
+      - id: verify-a-recovery-code
+        name: Verify a recovery code
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.SignInWithPassword(email, password);
+
+          var session = await supabase.Auth.VerifyRecoveryCodeAsync("K4M9-X7QP-2AB8-HT3Z");
+          ```
+  - id: mfa-unenroll-recovery-codes
+    title: 'UnenrollRecoveryCodesAsync()'
+    description: |
+      Removes the MFA recovery codes of the signed-in user.
+    notes: |
+      - Every remaining code stops working.
+      - The session must be at the `aal2` assurance level.
+      - Sessions that reached `aal2` with a recovery code are lowered to `aal1` on the server. The current session keeps its tokens until it is refreshed.
+    examples:
+      - id: unenroll-recovery-codes
+        name: Unenroll recovery codes
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.UnenrollRecoveryCodesAsync();
+          ```
+  - id: auth-js-gotrueadminapi-signout
+    title: 'AdminAuth().SignOutAsync()'
+    description: |
+      Signs a user out on the server, using their access token.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - It revokes the refresh tokens of the sessions in `scope`. `Global` (the default) revokes every session of the user, `Local` only the session of the token, and `Others` every session but the one of the token.
+      - Access tokens that were already issued stay valid until they expire.
+      - The access token authenticates the request. An expired or malformed token throws a `GotrueException` with the reason `AdminTokenRequired`.
+    examples:
+      - id: sign-out-a-user
+        name: Sign out a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.SignOutAsync(userAccessToken, SignOutScope.Global);
+          ```
+  - id: admin-update-factor
+    title: 'AdminAuth().UpdateFactorAsync()'
+    description: |
+      Updates an MFA factor of a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - `userId` and `factorId` must be UUIDs in their hyphenated form. Otherwise an `ArgumentException` is thrown before any request is sent.
+      - An empty value does not clear a setting: the server reads it as unchanged. The server ignores `Phone` on a factor that is not a phone factor.
+    examples:
+      - id: rename-a-factor-for-a-user
+        name: Rename a factor for a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var factor = await admin.UpdateFactorAsync(userId, factorId, new FactorChanges
+          {
+            FriendlyName = "Work phone"
+          });
+          ```
+  - id: admin-list-passkeys
+    title: 'AdminAuth().ListPasskeysAsync()'
+    description: |
+      Lists the passkeys of a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: list-passkeys-for-a-user
+        name: List passkeys for a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var passkeys = await admin.ListPasskeysAsync(userId);
+          ```
+  - id: admin-delete-passkey
+    title: 'AdminAuth().DeletePasskeyAsync()'
+    description: |
+      Deletes a passkey of a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: delete-a-passkey-for-a-user
+        name: Delete a passkey for a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeletePasskeyAsync(userId, passkeyId);
+          ```
+  - id: admin-create-custom-provider
+    title: 'AdminAuth().CreateCustomProviderAsync()'
+    description: |
+      Registers a custom OAuth 2.0 or OpenID Connect (OIDC) provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - The identifier must start with `custom:`, for example `custom:mycompany`.
+      - Use `NewCustomProvider.Oidc()` with an issuer URL, or `NewCustomProvider.OAuth2()` with the authorization, token, and user info URLs.
+      - The client secret is never returned by the server.
+      - Custom providers must be enabled for your project. Otherwise the server returns the error code `feature_disabled`.
+    examples:
+      - id: create-an-oidc-provider
+        name: Create an OIDC provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.CreateCustomProviderAsync(
+              NewCustomProvider.Oidc("custom:mycompany", "My Company", clientId, clientSecret, new Uri("https://login.example.com")),
+              new CustomProviderOptions { Scopes = new[] { "openid", "email", "profile" } });
+          ```
+      - id: create-an-oauth2-provider
+        name: Create an OAuth 2.0 provider
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.CreateCustomProviderAsync(
+              NewCustomProvider.OAuth2(
+                  "custom:mycompany", "My Company", clientId, clientSecret,
+                  new Uri("https://login.example.com/authorize"),
+                  new Uri("https://login.example.com/token"),
+                  new Uri("https://login.example.com/userinfo")));
+          ```
+  - id: admin-get-custom-provider
+    title: 'AdminAuth().GetCustomProviderAsync()'
+    description: |
+      Retrieves a custom OAuth 2.0 or OIDC provider by its identifier.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: get-a-custom-provider
+        name: Get a custom provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.GetCustomProviderAsync("custom:mycompany");
+          ```
+  - id: admin-list-custom-providers
+    title: 'AdminAuth().ListCustomProvidersAsync()'
+    description: |
+      Lists the custom OAuth 2.0 and OIDC providers of your project.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Pass a `CustomProviderType` to list only OAuth 2.0 or only OIDC providers.
+    examples:
+      - id: list-custom-providers
+        name: List custom providers
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var providers = await admin.ListCustomProvidersAsync();
+          ```
+      - id: list-oidc-providers
+        name: List OIDC providers only
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var providers = await admin.ListCustomProvidersAsync(CustomProviderType.Oidc);
+          ```
+  - id: admin-update-custom-provider
+    title: 'AdminAuth().UpdateCustomProviderAsync()'
+    description: |
+      Updates a custom OAuth 2.0 or OIDC provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Only the members you set on `CustomProviderChanges` are sent. The others keep their value. An empty value does not clear a setting.
+    examples:
+      - id: update-a-custom-provider
+        name: Update a custom provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.UpdateCustomProviderAsync("custom:mycompany", new CustomProviderChanges
+          {
+            Name = "My Company SSO",
+            Options = new CustomProviderOptions { Enabled = false }
+          });
+          ```
+  - id: admin-delete-custom-provider
+    title: 'AdminAuth().DeleteCustomProviderAsync()'
+    description: |
+      Deletes a custom OAuth 2.0 or OIDC provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: delete-a-custom-provider
+        name: Delete a custom provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeleteCustomProviderAsync("custom:mycompany");
+          ```
+  - id: admin-create-sso-provider
+    title: 'AdminAuth().CreateSsoProviderAsync()'
+    description: |
+      Registers a single sign-on (SAML 2.0) identity provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Give the identity provider metadata with `SamlMetadata.FromUrl()` or `SamlMetadata.FromXml()`. A metadata URL must be absolute.
+      - Use `SsoProviderOptions` to set the email domains, the resource ID, the name ID format, the attribute mapping, and whether the provider is enabled.
+      - Users with an email address in one of the domains can then sign in with `SignInWithSSO()`.
+    examples:
+      - id: create-an-sso-provider
+        name: Create an SSO provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.CreateSsoProviderAsync(
+              SamlMetadata.FromUrl(new Uri("https://idp.acme.com/saml/metadata")),
+              new SsoProviderOptions
+              {
+                  Domains = new[] { "acme.com" },
+                  ResourceId = "acme",
+                  NameIdFormat = SamlNameIdFormat.EmailAddress
+              });
+          ```
+  - id: admin-get-sso-provider
+    title: 'AdminAuth().GetSsoProviderAsync()'
+    description: |
+      Retrieves a single sign-on provider, including its metadata and email domains.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Address the provider with `SsoProviderReference.ById()` or `SsoProviderReference.ByResourceId()`. A resource ID cannot contain `/`.
+      - It throws a `GotrueException` with the reason `SsoProviderNotFound` when no provider matches.
+    examples:
+      - id: get-an-sso-provider
+        name: Get an SSO provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var provider = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+          ```
+  - id: admin-list-sso-providers
+    title: 'AdminAuth().ListSsoProvidersAsync()'
+    description: |
+      Lists the single sign-on providers of your project.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Use `SsoProviderFilter.ByResourceId()` or `SsoProviderFilter.ByResourceIdPrefix()` to narrow the list.
+    examples:
+      - id: list-sso-providers
+        name: List SSO providers
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var providers = await admin.ListSsoProvidersAsync();
+          ```
+      - id: list-sso-providers-by-prefix
+        name: List SSO providers by resource ID prefix
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var providers = await admin.ListSsoProvidersAsync(SsoProviderFilter.ByResourceIdPrefix("acme-"));
+          ```
+  - id: admin-update-sso-provider
+    title: 'AdminAuth().UpdateSsoProviderAsync()'
+    description: |
+      Updates a single sign-on provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - `SsoProviderChanges` has no public constructor. Start from `KeepingNameIdFormatOf(provider)`, `WithNameIdFormat(format)`, or `WithoutNameIdFormat()`, then set the other members with `with`. This makes you choose what happens to the name ID format.
+      - New metadata must carry the same entity ID as the provider. Otherwise the server returns the error code `saml_entity_id_mismatch`.
+    examples:
+      - id: add-a-domain-to-an-sso-provider
+        name: Add a domain to an SSO provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var current = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+
+          var updated = await admin.UpdateSsoProviderAsync(
+              SsoProviderReference.ById(current.Id),
+              SsoProviderChanges.KeepingNameIdFormatOf(current) with { Domains = new[] { "acme.com", "acme.org" } });
+          ```
+  - id: admin-delete-sso-provider
+    title: 'AdminAuth().DeleteSsoProviderAsync()'
+    description: |
+      Deletes a single sign-on provider.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: delete-an-sso-provider
+        name: Delete an SSO provider
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeleteSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+          ```
+  - id: session-persistence-disabled
+    title: 'SessionPersistence.Disabled'
+    description: |
+      Keeps the session in memory only, and saves nothing.
+    notes: |
+      - A client that uses it starts signed out, because there is nothing to restore.
+      - It is the default for `SupabaseOptions.SessionHandler`, so you only set it to state the intent, or to turn persistence off again with `SetPersistence()`.
+      - It replaces `DefaultSupabaseSessionHandler`, which is `[Obsolete]` and is removed in v9.
+    examples:
+      - id: disable-session-persistence
+        name: Disable session persistence
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              SessionHandler = SessionPersistence.Disabled
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+          ```
+      - id: disable-persistence-on-an-existing-client
+        name: Disable persistence on an existing client
+        code: |
+          ```c#
+          supabase.Auth.SetPersistence(SessionPersistence.Disabled);
+          ```
+  - id: admin-oauth-create-client
+    title: 'AdminAuth().CreateOAuthClientAsync()'
+    description: |
+      Registers an OAuth client with the OAuth 2.1 server of your project.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Use `NewOAuthClient.Confidential()` for a client that can keep a secret, or `NewOAuthClient.Public()` for one that cannot. A name and at least one redirect URI are required.
+      - The server generates the client ID. For a confidential client it also generates a secret, and shows it only in this response (`ClientSecret`). Public clients have no secret.
+      - `OAuthClientOptions` sets the grant types, the client URI, and the logo URI.
+    examples:
+      - id: create-a-confidential-oauth-client
+        name: Create a confidential OAuth client
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var created = await admin.CreateOAuthClientAsync(
+              NewOAuthClient.Confidential("My App", new[] { new Uri("https://app.example.com/callback") }),
+              new OAuthClientOptions { ClientUri = new Uri("https://app.example.com") });
+
+          var clientId = created.Client.ClientId;
+          var clientSecret = created.ClientSecret;
+          ```
+      - id: create-a-public-oauth-client
+        name: Create a public OAuth client
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var created = await admin.CreateOAuthClientAsync(
+              NewOAuthClient.Public("My Mobile App", new[] { new Uri("myapp://callback") }));
+          ```
+  - id: admin-oauth-list-clients
+    title: 'AdminAuth().ListOAuthClientsAsync()'
+    description: |
+      Lists the OAuth clients registered with your project.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Client secrets are never returned.
+    examples:
+      - id: list-oauth-clients
+        name: List OAuth clients
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var clients = await admin.ListOAuthClientsAsync();
+          ```
+  - id: admin-oauth-get-client
+    title: 'AdminAuth().GetOAuthClientAsync()'
+    description: |
+      Retrieves an OAuth client by its client ID.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: get-an-oauth-client
+        name: Get an OAuth client
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var client = await admin.GetOAuthClientAsync(clientId);
+          ```
+  - id: admin-oauth-update-client
+    title: 'AdminAuth().UpdateOAuthClientAsync()'
+    description: |
+      Updates an OAuth client.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - Only the members you set on `OAuthClientChanges` are sent.
+    examples:
+      - id: update-an-oauth-client
+        name: Update an OAuth client
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var updated = await admin.UpdateOAuthClientAsync(clientId, new OAuthClientChanges
+          {
+            Name = "My App (production)",
+            RedirectUris = new[] { new Uri("https://app.example.com/callback") }
+          });
+          ```
+  - id: admin-oauth-delete-client
+    title: 'AdminAuth().DeleteOAuthClientAsync()'
+    description: |
+      Deletes an OAuth client.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+    examples:
+      - id: delete-an-oauth-client
+        name: Delete an OAuth client
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeleteOAuthClientAsync(clientId);
+          ```
+  - id: admin-oauth-regenerate-client-secret
+    title: 'AdminAuth().RegenerateOAuthClientSecretAsync()'
+    description: |
+      Generates a new secret for an OAuth client.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment. Never call it from a client app.
+      - The new secret is shown only in this response. Store it right away.
+    examples:
+      - id: regenerate-an-oauth-client-secret
+        name: Regenerate a client secret
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var credentials = await admin.RegenerateOAuthClientSecretAsync(clientId);
+          var newSecret = credentials.ClientSecret;
+          ```
+  - id: request-timeout
+    title: 'Request timeout'
+    description: |
+      Sets a time limit on Database requests. A request that runs longer than the limit, retries included, is cancelled.
+    notes: |
+      - The timeout is off by default. The underlying `HttpClient` timeout (100 seconds by default) still applies.
+      - A request that hits the limit throws a `TaskCanceledException` whose inner exception is a `TimeoutException`. Cancelling through your own `CancellationToken` throws the usual cancellation exception instead.
+    examples:
+      - id: set-a-timeout-on-the-supabase-client
+        name: Set a timeout on the Supabase client
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              PostgrestTimeout = TimeSpan.FromSeconds(10)
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+          ```
+      - id: set-a-timeout-on-a-standalone-postgrest-client
+        name: Set a timeout on a standalone Postgrest client
+        code: |
+          ```c#
+          var client = new Supabase.Postgrest.Client(url, new Supabase.Postgrest.ClientOptions
+          {
+              Timeout = TimeSpan.FromSeconds(10)
+          });
+          ```
+  - id: strip-nulls
+    title: 'StripNulls()'
+    description: |
+      Leaves null values out of the returned rows.
+    notes: |
+      - Requires PostgREST 11.2 or later.
+      - Columns that are null are missing from the response, so the matching model properties keep their default values.
+    examples:
+      - id: with-select
+        name: With `Select()`
+        isSpotlight: true
+        code: |
+          ```c#
+          var result = await supabase
+            .From<City>()
+            .Select("name, country_id")
+            .StripNulls()
+            .Get();
+          ```
+  - id: third-party-access-token
+    title: 'Supplying an access token from a callback'
+    description: |
+      Supplies the access token for Database, Storage and Edge Functions requests from an async callback. The callback is awaited before every request and its token is sent as `Authorization: Bearer`. Use it with a third-party auth provider such as Clerk, Auth0, Firebase or Cognito.
+    notes: |
+      - If the callback returns `null`, the request is sent with the project API key, as when no user is signed in. If the callback throws, the request fails with that exception.
+      - With `SupabaseOptions.ThirdPartyAccessToken`, the client builds no Supabase Auth client. `supabase.Auth` and `supabase.AdminAuth` throw `InvalidOperationException`.
+      - It cannot be combined with an `Authorization` entry in `SupabaseOptions.Headers`.
+      - The project must be configured to trust the provider's JWTs.
+      - Standalone clients expose the same callback as `RetrieveAccessToken` on their `ClientOptions` (`Supabase.Postgrest`, `Supabase.Storage` and `Supabase.Functions`). The Functions callback is skipped when the call passes a token or an `Authorization` header of its own.
+    examples:
+      - id: with-the-supabase-client
+        name: With the Supabase client
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              ThirdPartyAccessToken = cancellationToken => clerk.GetTokenAsync(cancellationToken)
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          var result = await supabase.From<City>().Get();
+          ```
+      - id: with-a-standalone-postgrest-client
+        name: With a standalone Postgrest client
+        code: |
+          ```c#
+          var client = new Supabase.Postgrest.Client(url, new Supabase.Postgrest.ClientOptions
+          {
+              RetrieveAccessToken = cancellationToken => tokenStore.GetTokenAsync(cancellationToken)
+          });
+          ```
+  - id: functions-setauth
+    title: 'SetAuth()'
+    description: |
+      Sets the access token that the Functions client sends as `Authorization: Bearer` on later invocations.
+    notes: |
+      - A token passed to `Invoke()` overrides the one set here.
+      - A `ClientOptions.RetrieveAccessToken` callback, when set, is used in place of this token.
+    examples:
+      - id: set-the-token
+        name: Set the token
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Functions.SetAuth(session.AccessToken);
+
+          await supabase.Functions.Invoke("hello");
+          ```
+  - id: invoke-stream
+    title: 'InvokeStream()'
+    description: |
+      Invokes a Supabase Function and returns the `HttpResponseMessage` as soon as the response headers arrive, so the body can be read as it is produced.
+    notes: |
+      - The caller must dispose the returned response.
+      - `InvokeFunctionOptions.HttpTimeout` (100 seconds by default) covers the request and any error body. Cancel reads of a successful body with their own `CancellationToken`.
+      - A non-success status code throws a `FunctionsException`.
+    examples:
+      - id: read-a-streamed-response
+        name: Read a streamed response
+        isSpotlight: true
+        code: |
+          ```c#
+          using var response = await supabase.Functions.InvokeStream("stream-numbers");
+          using var stream = await response.Content.ReadAsStreamAsync();
+          using var reader = new StreamReader(stream);
+
+          while (await reader.ReadLineAsync() is { } line)
+          {
+              Console.WriteLine(line);
+          }
+          ```
+  - id: storagefile-list-v2
+    title: 'From().ListV2Async()'
+    description: |
+      Lists the objects under a prefix, one page at a time.
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - The server returns at most 1,000 entries per page, which is also the default.
+      - Pass `NextCursor` from one page as `Cursor` in the options of the next page. Stop when `HasNext` is `false`.
+      - With `WithDelimiter = true`, sub-folders are returned in `Folders` and `Objects` holds only the objects directly under the prefix. Without it, `Objects` holds every nested object and `Name` is the full path.
+      - `SortBy` accepts the columns `name`, `updated_at` and `created_at`.
+    examples:
+      - id: list-the-first-page
+        name: List the first page
+        isSpotlight: true
+        code: |
+          ```c#
+          var page = await supabase.Storage
+            .From("avatars")
+            .ListV2Async(new SearchV2Options
+            {
+                Prefix = "public/",
+                Limit = 100
+            });
+
+          foreach (var file in page.Objects)
+              Console.WriteLine(file.Name);
+          ```
+      - id: page-through-all-objects
+        name: Page through all objects
+        code: |
+          ```c#
+          var bucket = supabase.Storage.From("avatars");
+          var options = new SearchV2Options { Prefix = "public/", Limit = 100 };
+
+          SearchV2Result? page;
+          do
+          {
+              page = await bucket.ListV2Async(options);
+              foreach (var file in page.Objects)
+                  Console.WriteLine(file.Name);
+
+              options.Cursor = page.NextCursor;
+          } while (page.HasNext);
+          ```
+      - id: group-folders-and-sort
+        name: Group folders and sort
+        code: |
+          ```c#
+          var page = await supabase.Storage
+            .From("avatars")
+            .ListV2Async(new SearchV2Options
+            {
+                Prefix = "public/",
+                WithDelimiter = true,
+                SortBy = new SortBy { Column = "updated_at", Order = "desc" }
+            });
+
+          var folders = page.Folders;
+          var files = page.Objects;
+          ```
+  - id: max-affected
+    title: 'MaxAffected()'
+    description: |
+      Sets the most rows an `Update()` or `Delete()` may affect. If the mutation would affect more rows, PostgREST rolls it back and the call throws.
+    notes: |
+      - Requires PostgREST 13 or later. An older server ignores the limit.
+      - The call throws a `PostgrestException` with `Reason` set to `FailureHint.Reason.MaxAffectedExceeded`.
+      - A negative value throws an `ArgumentOutOfRangeException`. A value of zero forbids any affected row.
+      - Using it with a terminal call other than `Update()` or `Delete()` throws an `InvalidOperationException`.
+    examples:
+      - id: cap-a-delete
+        name: Cap a delete
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase
+            .From<City>()
+            .Filter("country_id", Operator.Equals, "554")
+            .MaxAffected(10)
+            .Delete();
+          ```
+      - id: handle-the-limit-being-exceeded
+        name: Handle the limit being exceeded
+        code: |
+          ```c#
+          try
+          {
+              await supabase
+                .From<City>()
+                .Where(x => x.CountryId == 554)
+                .Set(x => x.Name, "Renamed")
+                .MaxAffected(5)
+                .Update();
+          }
+          catch (PostgrestException ex) when (ex.Reason == FailureHint.Reason.MaxAffectedExceeded)
+          {
+              // More than 5 rows matched, nothing was changed.
+          }
+          ```
+  - id: single-or-throw
+    title: 'SingleOrThrowAsync()'
+    description: |
+      Retrieves exactly one row. Returns the model when one row matches and throws a `PostgrestException` when no row or several rows match.
+    notes: |
+      - The exception has `Reason` set to `FailureHint.Reason.UnexpectedRowCount` and status code `406`.
+      - `Single()` returns `null` when no row matches. Use `SingleOrThrowAsync()` when a missing row is an error.
+      - Only reads are supported.
+    examples:
+      - id: read-one-row
+        name: Read one row
+        isSpotlight: true
+        code: |
+          ```c#
+          var city = await supabase
+            .From<City>()
+            .Filter("id", Operator.Equals, "554")
+            .SingleOrThrowAsync();
+          ```
+  - id: broadcast-message
+    title: 'Broadcast over HTTP'
+    description: |
+      Sends a broadcast message through the Realtime REST API instead of the websocket. The channel does not have to be subscribed.
+    notes: |
+      - Added in 8.11.0.
+      - The payload is serialized as JSON. A `byte[]` payload is sent as raw binary, which subscribers of this client do not receive.
+      - On a private channel (see `PrivateChannel()`), the request carries the client's current access token.
+      - Throws a `RealtimeException` with the HTTP status code when the server rejects the request.
+      - Since 8.13.0, `Channel()` no longer requires `ConnectAsync()` first. On 8.11.0 and 8.12.0, connect the client before creating the channel.
+    examples:
+      - id: broadcast-without-subscribing
+        name: Broadcast without subscribing
+        isSpotlight: true
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("cursor");
+
+          await channel.HttpSendAsync("cursor", new Dictionary<string, object>
+          {
+              { "cursorX", 123 },
+              { "cursorY", 456 }
+          });
+          ```
+      - id: broadcast-http-private
+        name: Broadcast on a private channel
+        code: |
+          ```c#
+          var channel = supabase.Realtime.PrivateChannel("room:1");
+
+          await channel.HttpSendAsync("announcement", new Dictionary<string, object>
+          {
+              { "text", "Hello" }
+          }, cancellationToken);
+          ```
+
+  - id: realtime-connection-state
+    title: 'ConnectionState'
+    description: |
+      Returns the current state of the Realtime connection: `Closed`, `Connecting`, or `Open`.
+    notes: |
+      - Added in 8.11.0.
+      - `Connecting` also covers a socket that is reconnecting after it lost the connection.
+      - To react to changes instead of polling, add a handler with `AddStateChangedHandler()`.
+    examples:
+      - id: read-connection-state
+        name: Read the connection state
+        isSpotlight: true
+        code: |
+          ```c#
+          var state = supabase.Realtime.ConnectionState;
+
+          if (state == Supabase.Realtime.Constants.ConnectionState.Open)
+          {
+              Debug.WriteLine("Connected");
+          }
+          ```
+      - id: listen-to-state-changes
+        name: Listen to socket state changes
+        code: |
+          ```c#
+          supabase.Realtime.AddStateChangedHandler((sender, state) =>
+          {
+              Debug.WriteLine($"Socket state: {state}");
+          });
+          ```
+
+  - id: realtime-access-token-callback
+    title: 'RetrieveAccessToken'
+    description: |
+      A callback on the Realtime client options that returns the current access token. The client calls it on connect and on every heartbeat, so a refreshed token reaches the server without a call to `SetAuth()`.
+    notes: |
+      - Added in 8.11.0.
+      - Returning `null` keeps the current token.
+      - A failure on connect propagates out of `ConnectAsync()`. A failure on a heartbeat is logged and keeps the current token.
+      - The `Supabase.Client` sets this callback for you when you use `SupabaseOptions.ThirdPartyAccessToken`. Set it yourself when you use the standalone `Supabase.Realtime` package.
+    examples:
+      - id: realtime-retrieve-access-token
+        name: Supply the token from a callback
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.Realtime.ClientOptions
+          {
+              RetrieveAccessToken = async () => await tokenStore.GetAccessTokenAsync()
+          };
+
+          var realtime = new Supabase.Realtime.Client("wss://<project>.supabase.co/realtime/v1", options);
+          await realtime.ConnectAsync();
+          ```
+
+  - id: realtime-heartbeat-handlers
+    title: 'AddHeartbeatHandler()'
+    description: |
+      Adds a handler that is called for each heartbeat the client sends and for its outcome. The status is `Sent`, `Ok`, `Error`, or `Timeout`.
+    notes: |
+      - Added in 8.10.0.
+      - `latency` is set only for `Ok` and `Error`.
+      - On `Timeout`, the socket reconnects.
+      - A handler that throws does not stop the socket.
+      - Remove handlers with `RemoveHeartbeatHandler()` or `ClearHeartbeatHandlers()`.
+      - Change the interval with `ClientOptions.HeartbeatInterval` (20 seconds by default).
+    examples:
+      - id: listen-to-heartbeats
+        name: Listen to heartbeats
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Realtime.AddHeartbeatHandler((sender, status, latency) =>
+          {
+              Debug.WriteLine($"Heartbeat {status} {latency?.TotalMilliseconds}ms");
+          });
+          ```
+
+  - id: realtime-probe-connection
+    title: 'ProbeConnection()'
+    description: |
+      Checks the connection now instead of waiting for the next heartbeat. If no reply arrives within `ClientOptions.ProbeTimeout` (5 seconds by default), the socket reconnects.
+    notes: |
+      - Added in 8.12.0.
+      - Call it when your app returns to the foreground, for example from `OnApplicationPause(false)` in Unity or the resume event in MAUI.
+      - Does nothing when the socket is not open.
+    examples:
+      - id: probe-on-foreground
+        name: Probe when the app returns to the foreground
+        isSpotlight: true
+        code: |
+          ```c#
+          void OnApplicationPause(bool paused)
+          {
+              if (!paused)
+              {
+                  supabase.Realtime.ProbeConnection();
+              }
+          }
+          ```
+
+  - id: remove-all-channels
+    title: 'RemoveAll()'
+    description: |
+      Unsubscribes from every channel and disconnects the Realtime socket.
+    notes: |
+      - Added in 8.9.0.
+      - To remove a single channel, use `Unsubscribe()` on the channel or `Remove(channel)` on the client.
+    examples:
+      - id: remove-all-channels-example
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```c#
+          supabase.Realtime.RemoveAll();
+          ```
+
+  - id: realtime-disconnect-when-empty
+    title: 'DisconnectOnEmptyChannelsAfter'
+    description: |
+      A Realtime client option that disconnects the socket once the last channel has been closed for the given time. Left unset, the socket stays open.
+    notes: |
+      - Added in 8.5.0.
+      - Opt-in. The default keeps the socket open.
+      - Since 8.13.0, the next `Subscribe()` connects the socket again. On earlier versions, call `ConnectAsync()` again before you create new channels.
+    examples:
+      - id: disconnect-when-idle
+        name: Disconnect after 30 seconds without channels
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.Realtime.ClientOptions
+          {
+              DisconnectOnEmptyChannelsAfter = TimeSpan.FromSeconds(30)
+          };
+
+          var realtime = new Supabase.Realtime.Client("wss://<project>.supabase.co/realtime/v1", options);
+          ```
+
+  - id: realtime-private-channel
+    title: 'PrivateChannel()'
+    description: |
+      Creates a private channel. The server authorizes the join against your Row Level Security policies on `realtime.messages`. The join carries the client's current access token, so a policy that uses `auth.uid()` sees the signed-in user.
+    notes: |
+      - Added in 8.12.0.
+      - The token is the one set by `SetAuth()` or returned by `ClientOptions.RetrieveAccessToken`. With `Supabase.Client`, it follows the signed-in session.
+      - To join with a token from another source, use `Channel(name, ChannelOptions.Private(...))`.
+      - See [Realtime authorization](/docs/guides/realtime/authorization).
+    examples:
+      - id: join-private-channel
+        name: Join a private channel
+        isSpotlight: true
+        code: |
+          ```c#
+          var channel = supabase.Realtime.PrivateChannel($"user:{userId}");
+          var broadcast = channel.Register<CursorBroadcast>();
+
+          await channel.Subscribe();
+          ```
+
+  - id: realtime-presence-options
+    title: 'PresenceOptions'
+    description: |
+      Controls whether a channel receives presence updates from other clients. `Register<T>(presenceKey)` enables presence. Use `PresenceOptions.WithoutPresence()` when this client only needs to make itself visible with `Track()`.
+    notes: |
+      - The `enabled` flag was added in 8.1.0.
+      - With presence off, the channel does not receive the initial `presence_state` sync or later updates from other clients.
+      - Adding presence handlers after `Subscribe()` while presence is off throws a `RealtimeException`.
+    examples:
+      - id: presence-enabled
+        name: Receive presence updates
+        isSpotlight: true
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("room");
+          var presence = channel.Register<UserPresence>(PresenceOptions.WithPresence("user-1"));
+
+          await channel.Subscribe();
+          ```
+      - id: presence-track-only
+        name: Track without receiving updates
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("room");
+          var presence = channel.Register<UserPresence>(PresenceOptions.WithoutPresence("user-1"));
+
+          await channel.Subscribe();
+          presence.Track(new UserPresence { LastSeen = DateTime.UtcNow });
+          ```
+
+  - id: realtime-presence-join-leave
+    title: 'AddJoinHandler() and AddLeaveHandler()'
+    description: |
+      Adds handlers that run once for each presence key that gains or loses presences. The handler receives the key and the presences involved.
+    notes: |
+      - Added in 8.13.0.
+      - A join handler receives `Key`, `CurrentPresences` (what the key already had, empty for a new key), and `NewPresences`.
+      - A leave handler receives `Key`, `CurrentPresences` (what the key still has), and `LeftPresences`.
+      - Handlers run before `CurrentState` changes.
+      - Remove them with `RemoveJoinHandler()` and `RemoveLeaveHandler()`.
+    examples:
+      - id: presence-join-leave
+        name: Listen to joins and leaves
+        isSpotlight: true
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("room");
+          var presence = channel.Register<UserPresence>("user-1");
+
+          presence.AddJoinHandler(join =>
+          {
+              Debug.WriteLine($"{join.Key} joined: {join.NewPresences.Count} new");
+          });
+
+          presence.AddLeaveHandler(leave =>
+          {
+              Debug.WriteLine($"{leave.Key} left: {leave.LeftPresences.Count} gone");
+          });
+
+          await channel.Subscribe();
+          ```
+
+  - id: third-party-auth
+    title: 'Third-party auth'
+    description: |
+      Authenticates the client through a third-party auth provider such as Clerk, Auth0, Firebase, or Cognito, instead of Supabase Auth. Set `SupabaseOptions.ThirdPartyAccessToken` to a callback that returns the provider's current JWT, or `null` when no user is signed in.
+    notes: |
+      - Added in 8.12.0.
+      - The callback is awaited before every Database, Storage, and Edge Functions request. The token is sent as `Authorization: Bearer`. Realtime asks for it on connect and on every heartbeat.
+      - A `null` token sends the request with the project API key. A callback that throws fails the request with the same exception. The client does not fall back to the API key.
+      - With this option set, `Auth` and `AdminAuth` throw `InvalidOperationException`, and `InitializeAsync()` restores no session. `SessionHandler`, `AutoRefreshToken`, and `AuthFlowType` are ignored.
+      - You cannot combine it with an `Authorization` entry in `SupabaseOptions.Headers`.
+      - Configure your project to trust the provider's JWTs. See [third-party auth](/docs/guides/auth/third-party/overview).
+    examples:
+      - id: third-party-auth-clerk
+        name: Use a third-party token
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.SupabaseOptions
+          {
+              ThirdPartyAccessToken = cancellationToken => clerk.GetTokenAsync(cancellationToken)
+          };
+
+          var supabase = new Supabase.Client(url, publishableKey, options);
+          await supabase.InitializeAsync();
+
+          var todos = await supabase.From<Todo>().Get();
+          ```
+
+  - id: access-token-callback
+    title: 'RetrieveAccessToken (HTTP clients)'
+    description: |
+      The standalone Postgrest, Storage, and Functions clients accept an async `RetrieveAccessToken` callback in their options. It supplies the bearer token for every request, so you do not need to call `SetAuth()` after each refresh.
+    notes: |
+      - Added in 8.12.0.
+      - Signature: `Func<CancellationToken, Task<string?>>`.
+      - The callback is awaited before every request. A `null` token leaves the headers unchanged.
+      - Storage uploads to a signed URL keep the URL's own token.
+      - For Functions, the callback is skipped when the call has a token argument or its own `Authorization` header.
+      - With `Supabase.Client`, use `SupabaseOptions.ThirdPartyAccessToken`, which wires this callback into each client for you.
+    examples:
+      - id: postgrest-access-token-callback
+        name: Postgrest
+        isSpotlight: true
+        code: |
+          ```c#
+          var options = new Supabase.Postgrest.ClientOptions
+          {
+              RetrieveAccessToken = async cancellationToken => await tokenStore.GetAccessTokenAsync(cancellationToken)
+          };
+
+          var postgrest = new Supabase.Postgrest.Client("https://<project>.supabase.co/rest/v1", options);
+          ```
+      - id: storage-access-token-callback
+        name: Storage
+        code: |
+          ```c#
+          var options = new Supabase.Storage.ClientOptions
+          {
+              RetrieveAccessToken = async cancellationToken => await tokenStore.GetAccessTokenAsync(cancellationToken)
+          };
+
+          var storage = new Supabase.Storage.Client("https://<project>.supabase.co/storage/v1", options);
+          ```
+      - id: functions-access-token-callback
+        name: Functions
+        code: |
+          ```c#
+          var options = new Supabase.Functions.ClientOptions
+          {
+              RetrieveAccessToken = async cancellationToken => await tokenStore.GetAccessTokenAsync(cancellationToken)
+          };
+
+          var functions = new Supabase.Functions.Client("https://<project>.supabase.co/functions/v1", options: options);
           ```

@@ -1,7 +1,8 @@
 ---
 id: 'views'
-title: 'Views'
+title: 'Database views'
 description: 'Creating and using views in Postgres.'
+tocVideo: 'C9kJwxhdw9A'
 ---
 
 Learn what views are and when to use them.
@@ -64,7 +65,7 @@ select * from transcripts;
 
 ## View security
 
-By default, Postgres checks permissions on a view's underlying tables against the view's owner rather than the role running the query. If a privileged role creates a view, everyone reading it does so through that role's permissions. Define the view with the `security_invoker` modifier to check the querying role's permissions instead, which is also what makes the underlying tables' row level security policies apply.
+By default, Postgres checks permissions on a view's underlying tables against the view's owner rather than the role running the query. If a privileged role creates a view, everyone reading it does so through that role's permissions. Define the view with the `security_invoker` modifier to check the querying role's permissions instead, which is also what makes the underlying tables' [row level security](/docs/guides/database/postgres/row-level-security) policies apply.
 
 ```sql
 -- switch an existing view to the querying role's permissions
@@ -76,6 +77,10 @@ create view <view name> with(security_invoker=true) as (
   select * from <some table>
 );
 ```
+
+When you query a `security_invoker` view through the Data API, Postgres checks the role from the request's API key or JWT: `anon`, `authenticated`, or `service_role`. That role needs privileges, such as `select`, on every table the view reads, not only on the view. Postgres logs show `authenticator`, but that's the role the Data API connects as, not the role the view checks.
+
+By default, API roles have no privileges on tables in the `auth` schema. A `security_invoker` view that reads `auth.users` fails with `permission denied for table users`, even with a secret key. To expose user data through the Data API, store it in a table in the `public` schema. See [User management](/docs/guides/auth/managing-user-data).
 
 ## When to use views
 

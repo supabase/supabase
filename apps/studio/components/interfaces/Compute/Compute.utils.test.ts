@@ -16,7 +16,7 @@ import {
   isComputeForbidden,
   isComputeUnavailable,
 } from './Compute.utils'
-import { ResponseError } from '@/types'
+import { classifyResponseError } from '@/data/error-classification'
 
 const instance = (
   overrides: Partial<ComputeInstance> & Pick<ComputeInstance, 'name'>
@@ -136,7 +136,7 @@ describe('formatResources', () => {
 })
 
 describe('compute error classification', () => {
-  const responseError = (code?: number) => new ResponseError('Denied', code)
+  const responseError = (code?: number) => classifyResponseError({ message: 'Denied', code })
 
   it('reads a 404 as the project being outside the alpha allow-list', () => {
     expect(isComputeUnavailable(responseError(404))).toBe(true)

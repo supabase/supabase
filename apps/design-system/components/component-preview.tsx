@@ -19,6 +19,7 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   wide?: boolean
   hideCode?: boolean
   padded?: boolean
+  squared?: boolean
 }
 
 export function ComponentPreview({
@@ -34,6 +35,7 @@ export function ComponentPreview({
   wide = false,
   hideCode = false,
   padded = true,
+  squared = false,
   ...props
 }: ComponentPreviewProps) {
   const [config] = useConfig()
@@ -51,11 +53,7 @@ export function ComponentPreview({
     if (!Component) {
       return (
         <p className="text-sm text-muted-foreground">
-          Component{' '}
-          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-            {name}
-          </code>{' '}
-          not found in registry.
+          Component <code>{name}</code> not found in registry.
         </p>
       )
     }
@@ -69,7 +67,7 @@ export function ComponentPreview({
         <div
           className={cn(
             'preview flex min-h-[256px] w-full justify-center',
-            padded && 'p-10',
+            padded && 'p-4 sm:p-10',
             {
               'items-center': align === 'center',
               'items-start': align === 'start',
@@ -97,7 +95,8 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
+            'relative overflow-hidden border-t border-l border-r bg-studio',
+            !squared && 'rounded-tl-md rounded-tr-md'
           )}
         >
           {showGrid && (
@@ -141,7 +140,7 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-studio', {
+        className={cn('relative overflow-hidden bg-studio', {
           'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
           'rounded-md border': hideCode,
         })}

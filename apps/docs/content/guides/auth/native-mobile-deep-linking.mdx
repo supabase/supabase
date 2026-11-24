@@ -9,7 +9,7 @@ Many Auth methods involve a redirect to your app. For example:
 - Signup confirmation emails, Magic Link signins, and password reset emails contain a link that redirects to your app.
 - In OAuth signins, an automatic redirect occurs to your app.
 
-With Deep Linking, you can configure this redirect to open a specific page. This is necessary if, for example, you need to display a form for [password reset](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password), or to manually exchange a token hash.
+With Deep Linking, you can configure this redirect to open a specific page. This is necessary if, for example, you need to display a form for [password reset](/docs/guides/auth/passwords#resetting-a-password), or to manually exchange a token hash.
 
 ## Setting up deep linking
 
@@ -109,7 +109,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     }
     ```
 
-    For the best user experience it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
+    For the best user experience it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/linking/overview/).
 
   </TabPanel>
   <TabPanel id="flutter" label="Flutter">

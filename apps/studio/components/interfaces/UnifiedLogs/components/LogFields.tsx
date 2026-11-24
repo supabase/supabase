@@ -1,5 +1,5 @@
 import type { Table } from '@tanstack/react-table'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { LogFieldRow } from './LogFieldRow'
@@ -16,7 +16,7 @@ export function LogFields<TData>({
 }) {
   if (Array.isArray(data)) {
     return (
-      <span className="block min-w-0 truncate font-mono text-sm leading-5">
+      <span className="block min-w-0 truncate font-mono text-xs leading-5">
         {JSON.stringify(data)}
       </span>
     )
@@ -25,7 +25,7 @@ export function LogFields<TData>({
   if (data === null || typeof data !== 'object' || data instanceof Date) {
     const value = data instanceof Date ? data.toISOString() : String(data)
     return (
-      <span className="min-w-0 whitespace-pre-wrap break-all font-mono text-sm leading-5">
+      <span className="min-w-0 whitespace-pre-wrap break-words text-right font-mono text-xs leading-5">
         {value}
       </span>
     )
@@ -33,7 +33,7 @@ export function LogFields<TData>({
 
   const entries = Object.entries(data).filter(([, value]) => value !== undefined)
   if (entries.length === 0) {
-    return <span className="font-mono text-sm leading-5">{'{}'}</span>
+    return <span className="font-mono text-xs leading-5">{'{}'}</span>
   }
 
   return (
@@ -63,7 +63,7 @@ export function LogFields<TData>({
             table={table}
           >
             {isNested ? (
-              <span className="font-mono text-sm leading-5 text-foreground-lighter">
+              <span className="font-mono text-xs leading-5 text-foreground-lighter">
                 {Object.keys(value).length}
               </span>
             ) : (
@@ -85,7 +85,7 @@ export function LogFields<TData>({
                 <Button
                   variant="text"
                   className="px-1 [&[data-state=open]_svg]:rotate-180"
-                  icon={<ChevronDown size={12} />}
+                  icon={<ChevronDownIcon size={12} />}
                   aria-label={`Expand ${key}`}
                 />
               </CollapsibleTrigger>

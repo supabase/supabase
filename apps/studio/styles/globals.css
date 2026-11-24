@@ -1,4 +1,5 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
 @import 'config/typography.css';
 
 @source '../pages/**/*.{js,ts,jsx,tsx}';
@@ -148,27 +149,8 @@
 }
 
 :root {
-  --sidebar-background: var(--background-dash-sidebar);
-  --sidebar-foreground: var(--foreground-default);
-  --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning);
-  --sidebar-accent: var(--background-selection);
-  --sidebar-accent-foreground: var(--foreground-default);
-  --sidebar-border: var(--border-default);
-  --sidebar-ring: var(--ring);
+  /* --sidebar-* aliases live in packages/ui compat.css (shared with other apps). */
   --header-height: 3rem;
-}
-
-[data-theme='dark'],
-.dark {
-  --sidebar-background: var(--background-dash-sidebar);
-  --sidebar-foreground: var(--foreground-default);
-  --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning);
-  --sidebar-accent: var(--background-selection);
-  --sidebar-accent-foreground: var(--foreground-default);
-  --sidebar-border: var(--border-default);
-  --sidebar-ring: var(--ring);
 }
 
 @layer base {
@@ -453,4 +435,35 @@ div[data-radix-portal]:not(.portal--toast) {
 strong,
 b {
   @apply font-bold;
+}
+
+@utility recessed-surface {
+  @apply border border-background/40 bg-surface-200;
+  box-shadow:
+    inset 0 -1px 2px hsl(var(--colors-black) / 0.05),
+    inset 0 1px 0 hsl(var(--colors-white) / 0.5);
+
+  @variant dark {
+    box-shadow:
+      inset 0 -1px 2px hsl(var(--colors-black) / 0.2),
+      inset 0 1px 0 hsl(var(--colors-white) / 0.02);
+  }
+}
+
+@utility codeblock-drop-shadow {
+  @variant dark {
+    filter: drop-shadow(0 1px 1px hsl(var(--colors-black) / 0.5));
+  }
+}
+
+@utility groove {
+  box-shadow:
+    inset 0 1px 0 var(--background),
+    inset 0 2px 0 hsl(var(--colors-white) / 0.8);
+
+  @variant dark {
+    box-shadow:
+      inset 0 1px 0 var(--background),
+      inset 0 2px 0 hsl(var(--colors-white) / 0.04);
+  }
 }

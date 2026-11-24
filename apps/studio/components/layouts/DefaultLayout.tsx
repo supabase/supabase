@@ -1,4 +1,4 @@
-import { useBreakpoint, useFlag, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
@@ -17,11 +17,13 @@ import {
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
-import { Sidebar } from '@/components/interfaces/Sidebar'
-import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
+import { OnboardingSurveyFollowUpCard } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUpCard'
+import { DEFAULT_SIDEBAR_BEHAVIOR, Sidebar } from '@/components/interfaces/Sidebar'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
+import { getPathSegment } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -45,7 +47,6 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
@@ -59,6 +60,10 @@ export const DefaultLayout = ({
   const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const [isMounted, setIsMounted] = useState(false)
+  const [sidebarBehavior] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
 
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
@@ -93,7 +98,7 @@ export const DefaultLayout = ({
   }
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={sidebarBehavior === 'open'}>
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
@@ -144,7 +149,10 @@ export const DefaultLayout = ({
             </div>
 
             <BannerStack />
-            <StudioMobileSheetNav />
+            {IS_PLATFORM && <OnboardingSurveyFollowUpCard />}
+            <StudioMobileSheetNav
+              shouldCloseOnQueryChange={getPathSegment(router.pathname, 3) !== 'issues'}
+            />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>

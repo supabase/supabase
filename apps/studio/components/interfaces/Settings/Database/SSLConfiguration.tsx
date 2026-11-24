@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { template } from 'lodash'
-import { Download, Loader2 } from 'lucide-react'
+import { DownloadIcon, Loader2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -25,14 +24,12 @@ import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
@@ -51,24 +48,19 @@ export const SSLConfiguration = () => {
   const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
   const isSuccess = isHighAvailability || isSSLEnforcementSuccess
   const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
-  const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
-    useSSLEnforcementUpdateMutation({
+  const { mutate: updateSSLEnforcement, isPending: isSubmitting } = useSSLEnforcementUpdateMutation(
+    {
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
         toast.error(`Failed to update SSL enforcement: ${error.message}`)
       },
-    })
-
-  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
     }
+  )
+
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE
   )
 
   // Derived directly from the query so a refetch triggered elsewhere (e.g.
@@ -130,9 +122,18 @@ export const SSLConfiguration = () => {
     [sslCertificateUrlTemplate, env]
   )
 
-  const toggleSSLEnforcement = async () => {
+  const setSSLEnforcement = (isTargetEnforced: boolean) => {
     if (!ref) return console.error('Project ref is required')
-    await updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
+    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: isTargetEnforced } })
+  }
+
+  // Only enabling enforcement closes existing connections, so only enabling needs a confirmation
+  const handleSwitchChange = (isChecked: boolean) => {
+    if (isChecked) {
+      setIsConfirmDialogOpen(true)
+    } else {
+      setSSLEnforcement(false)
+    }
   }
 
   return (
@@ -153,7 +154,7 @@ export const SSLConfiguration = () => {
             >
               <div className="flex items-center justify-end mt-2.5 space-x-2">
                 {(isLoading || isSubmitting) && (
-                  <Loader2
+                  <Loader2Icon
                     aria-hidden="true"
                     className="animate-spin motion-reduce:animate-none"
                     strokeWidth={1.5}
@@ -173,7 +174,7 @@ export const SSLConfiguration = () => {
                           size="large"
                           checked={isEnforced}
                           disabled={isSwitchDisabled}
-                          onCheckedChange={() => setIsConfirmDialogOpen(true)}
+                          onCheckedChange={handleSwitchChange}
                         />
                       </div>
                     </TooltipTrigger>
@@ -192,9 +193,8 @@ export const SSLConfiguration = () => {
               <SSLEnforcementConfirmDialog
                 open={isConfirmDialogOpen}
                 onOpenChange={setIsConfirmDialogOpen}
-                isTargetEnforced={!isEnforced}
                 isSubmitting={isSubmitting}
-                onConfirm={toggleSSLEnforcement}
+                onConfirm={() => setSSLEnforcement(true)}
               />
             </FormLayout>
             {isSSLEnforcementSuccess && !sslEnforcementConfiguration.appliedSuccessfully && (
@@ -222,7 +222,7 @@ export const SSLConfiguration = () => {
                 {!hasSSLCertificate ? (
                   <ButtonTooltip
                     disabled
-                    icon={<Download />}
+                    icon={<DownloadIcon />}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -233,7 +233,7 @@ export const SSLConfiguration = () => {
                     Download certificate
                   </ButtonTooltip>
                 ) : (
-                  <Button icon={<Download />}>
+                  <Button icon={<DownloadIcon />}>
                     <a href={sslCertificateUrl}>Download certificate</a>
                   </Button>
                 )}

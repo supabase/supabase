@@ -26,7 +26,7 @@ toc_depth: 3
 In this tutorial, you will learn to
 
 - Use Protomaps to excract an area into a static PMTiles file.
-- Upload the PMTiles file to Supabase Storage.
+- Upload the PMTiles file to [Supabase Storage](https://supabase.com/docs/guides/storage).
 - Use MapLibre to render the Map onto a Web Page.
 - Use Supabase Edge Functions to restrict File Access.
 
@@ -46,11 +46,11 @@ This will create a `my_area.pmtiles` file which you can upload to Supabase Stora
 
 ## Upload the PMTiles file to Supabase Storage
 
-In your [Supabase Dashboard](https://supabase.com/dashboard/project/_/storage/buckets) navigate to `Storage` and click "New Bucket" and create a new public bucket called `public-maps`.
+In your [Supabase Dashboard](https://supabase.com/dashboard/project/_/storage/files) navigate to `Storage` and click "New Bucket" and create a new public bucket called `public-maps`.
 
 Upload the `my_area.pmtiles` file created earlier to your public bucket. Once uploaded, click the file and tap "Get URL".
 
-Supabase Storage supports the required [HTTP Range Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) out of the box, allowing you to use the public storage URL directly from your maps client.
+Supabase Storage supports the required [HTTP Range Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Range_requests) out of the box, allowing you to use the public storage URL directly from your maps client.
 
 ## Use MapLibre to render the Map
 
@@ -117,7 +117,7 @@ This is a vanilla JS example which uses CDN releases of the libraries. You can v
 
 ## Use Supabase Edge Functions to restrict Access
 
-A public Supabase Storage bucket allows access from any origin, which might not be ideal for your use case. At the time of writing, you're not able to modify the CORS settings for Supabase Storage buckets, however you can utilize [Supabase Edge Functions](https://supabase.com/docs/guides/functions) to restrict access to your PMTiles files, allowing you to even pair it with [Supabase Auth](https://supabase.com/docs/guides/auth) to restrict access to certain users for example.
+A public Supabase [Storage bucket](/docs/guides/storage/buckets/fundamentals) allows access from any origin, which might not be ideal for your use case. At the time of writing, you're not able to modify the CORS settings for Supabase Storage buckets, however you can utilize [Supabase Edge Functions](https://supabase.com/docs/guides/functions) to restrict access to your PMTiles files, allowing you to even pair it with [Supabase Auth](https://supabase.com/docs/guides/auth) to restrict access to certain users for example.
 
 In your Supabase Dashboard, create a new private storage bucket called `maps-private` and upload your `my_area.pmtiles` file there. Files in private buckets can only be accessed through either a short-lived signed URL, or by passing the secret service role key as an authorization header. Since our Edge Function is a secure server-side environment, we can utilize the latter approach here.
 

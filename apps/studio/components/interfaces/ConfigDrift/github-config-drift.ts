@@ -184,11 +184,11 @@ export function getConfigDriftSummary({
         continue
       }
 
-      const isTrackedInConfigToml = isPathDeclaredInDocument(
+      const isTrackedInConfigFile = isPathDeclaredInDocument(
         decodedGithubConfig.document,
         configPath
       )
-      if (unmanagedByPushPaths.has(configPath) || !isTrackedInConfigToml) {
+      if (unmanagedByPushPaths.has(configPath) || !isTrackedInConfigFile) {
         unmanagedFields.push({ section, configPath, dashboardValue: rawValue })
         continue
       }
@@ -204,12 +204,16 @@ export function getConfigDriftSummary({
  * Turns `GitHubConfigDecodeIssue[]` into a single-sentence, user-facing message for `AlertError`,
  * which renders `error.message` in a `<p>` — Effect's own multi-line default reads badly there.
  */
-export function formatGitHubConfigDecodeMessage(issues: GitHubConfigDecodeIssue[]): string {
+export function formatGitHubConfigDecodeMessage(
+  issues: GitHubConfigDecodeIssue[],
+  configFileName?: string
+): string {
+  const subject = configFileName ?? 'The config file'
   if (issues.length === 1) {
     const [issue] = issues
-    return `config.toml has an invalid value at ${issue.path}: ${lowerFirst(issue.message)}.`
+    return `${subject} has an invalid value at ${issue.path}: ${lowerFirst(issue.message)}.`
   }
 
   const details = issues.map((issue) => `${issue.path} (${lowerFirst(issue.message)})`).join(', ')
-  return `config.toml has invalid values: ${details}.`
+  return `${subject} has invalid values: ${details}.`
 }

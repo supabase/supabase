@@ -1,4 +1,4 @@
-import { Check, Shield } from 'lucide-react'
+import { CheckIcon, ShieldIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { sanitizeRoute } from './ProjectDropdown.utils'
@@ -16,8 +16,9 @@ export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
   const track = useTrack()
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const href =
-    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+  const href = router.route.startsWith('/project/[ref]/branches')
+    ? `/project/${branch.project_ref}`
+    : (sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`)
 
   return (
     <CommandItemLink
@@ -33,10 +34,10 @@ export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
       }}
     >
       <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
-        {branch.is_default && <Shield size={14} className="text-amber-900" />}
+        {branch.is_default && <ShieldIcon size={14} className="text-amber-900" />}
         {branch.name}
       </p>
-      {isSelected && <Check size={14} strokeWidth={1.5} />}
+      {isSelected && <CheckIcon size={14} strokeWidth={1.5} />}
     </CommandItemLink>
   )
 }

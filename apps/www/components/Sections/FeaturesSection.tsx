@@ -1,7 +1,7 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
-import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
 import Link from 'next/link'
 import { ReactNode, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'

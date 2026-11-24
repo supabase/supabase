@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) on avatud lähtekoodiga Firebase'i alternatiiv. Me ehitame Firebase'i funktsioonid, kasutades ettevõtlusklassi avatud lähtekoodiga tööriistu.
 
-- [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database)
+- [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database/overview)
 - [x] Autentimine ja autoriseerimine. [Dokumendid](https://supabase.com/docs/guides/auth)
 - [x] Automaatselt genereeritud APId.
   - [x] REST. [Dokumendid](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase on avatud lähtekoodiga tööriistade kombinatsioon. Me ehitame Firebas
 **Arhitektuur**
 
 Supabase on [hostitud platvorm](https://supabase.com/dashboard). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
-Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
+Võite ka [ise hostida](https://supabase.com/docs/guides/self-hosting) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [a
 - [Realtime](https://github.com/supabase/realtime) on Elixir server, mis võimaldab kuulata PostgreSQL-i sisestusi, uuendusi ja kustutusi veebisokkide abil. Realtime küsib Postgres'i sisseehitatud replikatsioonifunktsioone andmebaasi muudatuste kohta, konverteerib muudatused JSON-iks ja edastab seejärel JSON-i üle websocketi volitatud klientidele.
 - [PostgREST](http://postgrest.org/) on veebiserver, mis muudab teie PostgreSQL andmebaasi otse RESTful API-ks
 - [pg_graphql](http://github.com/supabase/pg_graphql/) on PostgreSQLi laiendus, mis avab GraphQL API
-- [Storage](https://github.com/supabase/storage-api) pakub RESTful liidest S3-s salvestatud failide haldamiseks, kasutades Postgres'i õiguste haldamiseks.
+- [Storage](https://github.com/supabase/storage) pakub RESTful liidest S3-s salvestatud failide haldamiseks, kasutades Postgres'i õiguste haldamiseks.
 - [postgres-meta](https://github.com/supabase/postgres-meta) on RESTful API oma Postgres'i haldamiseks, mis võimaldab tabelite hankimist, rollide lisamist ja päringute käivitamist jne.
 - [GoTrue](https://github.com/netlify/gotrue) on SWT-põhine API kasutajate haldamiseks ja SWT-tokenite väljastamiseks.
 - [Kong](https://github.com/Kong/kong) on pilvepõhine API-värav.
@@ -79,14 +79,14 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
     <th>Klient</th>
     <th colspan="5">Funktsioon-kliendid (komplekteeritud Supabase'i kliendiga)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -100,9 +100,9 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ Ametlik ⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -121,12 +121,12 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚 Kogukond 💚</th>
-  
+
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -205,7 +205,7 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

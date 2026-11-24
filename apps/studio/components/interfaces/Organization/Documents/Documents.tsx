@@ -1,4 +1,6 @@
 import { Fragment } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { CustomDocument } from './CustomDocument'
 import { DPA } from './DPA'
@@ -8,12 +10,7 @@ import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
+import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
@@ -33,52 +30,52 @@ export const Documents = () => {
 
   return (
     <>
-      <ScaffoldContainer id="dpa" className="px-6 xl:px-10">
+      <PageContainer id="dpa">
         <DPA />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="tia" className="px-6 xl:px-10">
+      <PageContainer id="tia">
         <TIA />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="soc2" className="px-6 xl:px-10">
+      <PageContainer id="soc2">
         <SOC2 />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="iso27001" className="px-6 xl:px-10">
+      <PageContainer id="iso27001">
         <ISO27001 />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="hipaa" className="px-6 xl:px-10">
+      <PageContainer id="hipaa">
         <HIPAA />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="security-questionnaire" className="px-6 xl:px-10">
+      <PageContainer id="security-questionnaire">
         <SecurityQuestionnaire />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer className="px-6 xl:px-10">
-        <ScaffoldSection className="py-12">
-          <ScaffoldSectionDetail className="col-span-full">
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <p className="text-sm text-foreground-light m-0">
               <SupportLink className={InlineLinkClassName}>Submit a support request</SupportLink> if
               you require additional documents for financial or tax reasons, such as a W-9 form.
             </p>
-          </ScaffoldSectionDetail>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
     </>
   )
 }
