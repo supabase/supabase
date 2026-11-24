@@ -2,14 +2,7 @@
 
 import 'react-medium-image-zoom/dist/styles.css'
 
-import {
-  FrameworkImage,
-  useBreakpoint,
-  type FrameworkImageProps,
-  type StaticImageData,
-  type StaticImport,
-  type StaticRequire,
-} from 'common'
+import { FrameworkImage, useBreakpoint, type FrameworkImageProps, type StaticImport } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import Zoom from 'react-medium-image-zoom'
@@ -18,7 +11,6 @@ import { cn } from 'ui'
 import ZoomContent from './ZoomContent'
 
 export type CaptionAlign = 'left' | 'center' | 'right'
-export type { StaticImageData, StaticImport, StaticRequire }
 
 export type SourceType =
   | string
@@ -43,7 +35,15 @@ export interface ImageProps extends Omit<FrameworkImageProps, 'src'> {
  * - captionAlign: {'left' | 'center' | 'right'} (optional) to align the caption
  * - containerClassName: {string} (optional) to style the parent <figure> container
  */
-export const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
+export const Image = ({
+  src,
+  alt = '',
+  zoomable,
+  caption,
+  captionAlign,
+  containerClassName,
+  ...props
+}: ImageProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
   const isLessThanLgBreakpoint = useBreakpoint()
@@ -62,25 +62,15 @@ export const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   if (!mounted) return null
 
   return (
-    <figure className={cn('next-image--dynamic-fill', props.containerClassName)}>
+    <figure className={cn('next-image--dynamic-fill', containerClassName)}>
       <Component
         {...(zoomable
           ? { ZoomContent: ZoomContent, zoomMargin: isLessThanLgBreakpoint ? 20 : 80 }
           : undefined)}
       >
-        <FrameworkImage
-          key={resolvedTheme}
-          alt={alt}
-          src={source}
-          sizes={sizes}
-          className={props.className}
-          style={props.style}
-          {...props}
-        />
+        <FrameworkImage key={resolvedTheme} alt={alt} src={source} sizes={sizes} {...props} />
       </Component>
-      {props.caption && (
-        <figcaption className={cn(getCaptionAlign(props.captionAlign))}>{props.caption}</figcaption>
-      )}
+      {caption && <figcaption className={cn(getCaptionAlign(captionAlign))}>{caption}</figcaption>}
     </figure>
   )
 }
