@@ -1,4 +1,4 @@
-import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
+import { ConnectionTimeoutError, SupavisorSessionPoolError } from '@/lib/errors/studio-errors'
 import type { ClassifiedError, StudioErrorInput } from '@/lib/errors/studio-errors'
 
 type ErrorConstructor = new (input: StudioErrorInput) => ClassifiedError
@@ -15,6 +15,7 @@ export interface ErrorPattern {
  */
 const ERROR_PATTERN_MAP = new Map<ErrorConstructor, RegExp>([
   [ConnectionTimeoutError, /CONNECTION\s+TERMINATED\s+DUE\s+TO\s+CONNECTION\s+TIMEOUT/i],
+  [SupavisorSessionPoolError, /MaxClientsInSessionMode:\s*max clients reached/i],
 ])
 
 export const ERROR_PATTERNS: ErrorPattern[] = Array.from(ERROR_PATTERN_MAP.entries()).map(

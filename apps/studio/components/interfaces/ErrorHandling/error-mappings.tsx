@@ -1,11 +1,12 @@
 import { ComponentType } from 'react'
 
 import { ConnectionTimeoutTroubleshooting } from './errorMappings/ConnectionTimeout'
-import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
+import { SupavisorSessionPoolTroubleshooting } from './errorMappings/SupavisorSessionPool'
+import { ConnectionTimeoutError, SupavisorSessionPoolError } from '@/lib/errors/studio-errors'
 import type { ClassifiedError, StudioErrorInput } from '@/lib/errors/studio-errors'
 
 /** Mapping ID, also sent as `errorType` in troubleshooter telemetry. */
-type ErrorMappingId = 'connection-timeout'
+type ErrorMappingId = 'connection-timeout' | 'supavisor-session-pool'
 
 export interface ErrorMapping {
   id: ErrorMappingId
@@ -18,5 +19,9 @@ export const ERROR_MAPPINGS = new Map<ErrorConstructor, ErrorMapping>([
   [
     ConnectionTimeoutError,
     { id: 'connection-timeout', Troubleshooting: ConnectionTimeoutTroubleshooting },
+  ],
+  [
+    SupavisorSessionPoolError,
+    { id: 'supavisor-session-pool', Troubleshooting: SupavisorSessionPoolTroubleshooting },
   ],
 ])

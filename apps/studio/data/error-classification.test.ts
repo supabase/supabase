@@ -21,6 +21,7 @@ import {
   NetworkUnreachableError,
   PlatformError,
   RequestAbortedError,
+  SupavisorSessionPoolError,
   StudioSqlError,
   UnexpectedError,
   UserSqlError,
@@ -88,6 +89,16 @@ describe('classifyError', () => {
 })
 
 describe('classifyResponseError', () => {
+  it('classifies the Supavisor session mode pool limit without matching transaction mode errors', () => {
+    const message =
+      'MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size'
+
+    expect(classifyResponseError({ message, code: 500 })).toBeInstanceOf(SupavisorSessionPoolError)
+    expect(
+      classifyResponseError({ message: 'Max client connections reached', code: 500 })
+    ).toBeInstanceOf(PlatformError)
+  })
+
   it('passes endpoint and method through', () => {
     const err = classifyResponseError({
       message: 'x',
