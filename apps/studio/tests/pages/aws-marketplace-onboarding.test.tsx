@@ -141,14 +141,10 @@ function mockOrganizationCreation() {
 // Radix Selects render a hidden native <option> per item, so scope to the open listbox
 async function chooseOption(
   user: ReturnType<typeof userEvent.setup>,
-  currentValue: string,
+  question: string,
   option: string
 ) {
-  const trigger = screen
-    .getAllByRole('combobox')
-    .find((combobox) => combobox.textContent === currentValue)
-  if (!trigger) throw new Error(`No select showing "${currentValue}"`)
-  await user.click(trigger)
+  await user.click(screen.getByRole('combobox', { name: question }))
   await user.click(within(await screen.findByRole('listbox')).getByRole('option', { name: option }))
 }
 
@@ -277,14 +273,21 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     await user.click(await screen.findByRole('button', { name: 'Create organization' }))
     await user.click(screen.getByPlaceholderText('Organization name'))
     await user.paste('Mock Marketplace Org')
-    await chooseOption(user, 'Personal', 'Company')
-    await chooseOption(user, '1 - 10', '50 - 99')
-    await chooseOption(user, 'Select an option', 'B2B SaaS application')
+    await chooseOption(user, 'Who is this org for?', 'Company')
+    await chooseOption(user, 'How many people?', '50 - 99')
+    await chooseOption(user, 'What are you building?', 'B2B SaaS application')
+    await chooseOption(user, 'Do you know how to code?', 'Yes')
     fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
 
     await waitFor(() => {
       expect(requests.survey).toEqual([
-        { slug: 'mock-marketplace-org', kind: 'COMPANY', size: '50', building: 'b2b_saas' },
+        {
+          slug: 'mock-marketplace-org',
+          kind: 'COMPANY',
+          size: '50',
+          building: 'b2b_saas',
+          can_code: 'yes',
+        },
       ])
     })
     expect(requests.create).toEqual([{ name: 'Mock Marketplace Org', buyer_id: 'buyer-test' }])

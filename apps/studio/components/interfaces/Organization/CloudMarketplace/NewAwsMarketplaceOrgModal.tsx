@@ -34,7 +34,8 @@ interface Props {
 
 export const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Props) => {
   const surveyAnswers = useRef<Omit<OnboardingSurveyVariables, 'slug'> | null>(null)
-  const { mutate: submitOnboardingSurvey } = useOnboardingSurveyMutation()
+  // This flow has no follow-up card, so retrying is the answers' only second chance
+  const { mutate: submitOnboardingSurvey } = useOnboardingSurveyMutation({ retry: 2 })
   const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (org) => {
