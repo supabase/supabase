@@ -240,7 +240,7 @@ Authorization: Bearer <JWT>
 
 If the server responds with HTTP 200 OK, the JWT is valid, otherwise it is not.
 
-Because the Auth server runs only in your project's specified region and is not globally distributed, doing this check can be quite slow depending on where you're performing the check. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project.
+This check can be slow, depending on where you perform it. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project. For why, see the limits in [Auth architecture](/docs/guides/auth/architecture#limits).
 
 If you are using a shared secret (HS256) signing key, you may wish to verify using the shared secret. **We strongly recommend against this approach.**
 

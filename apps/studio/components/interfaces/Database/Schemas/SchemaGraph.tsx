@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import type { PGSchema } from '@supabase/pg-meta'
 import {
   Background,
@@ -11,6 +13,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -23,10 +26,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import '@xyflow/react/dist/style.css'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   AlertDialog,
   AlertDialogAction,

@@ -5,10 +5,12 @@ import { Form } from 'ui'
 import {
   ORG_KIND_DEFAULT,
   ORG_SIZE_DEFAULT,
+} from '../../OnboardingSurvey/OnboardingSurvey.constants'
+import {
   OrganizationDetailsFields,
   organizationDetailsSchema,
   type OrganizationDetailsFormValues,
-} from '../NewOrg/OrganizationDetailsFields'
+} from './OrganizationDetailsFields'
 
 interface Props {
   onSubmit: (values: NewMarketplaceOrgForm) => void

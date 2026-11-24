@@ -47,7 +47,7 @@ jobs:
       - name: Install required dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Prettier in fix mode
+      - name: Run oxfmt in fix mode
         run: pnpm run format
 
       - name: Create autofix patch

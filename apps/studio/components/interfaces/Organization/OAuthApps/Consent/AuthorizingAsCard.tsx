@@ -5,7 +5,7 @@ import { OAuthAppsAuthorizeRequestData } from '@/data/oauth-apps/oauth-apps-auth
 
 export interface AuthorizingAsCardProps {
   email: string
-  request: OAuthAppsAuthorizeRequestData
+  request: Pick<OAuthAppsAuthorizeRequestData, 'project_scoping_mode'>
   onSignOut: () => void
 }
 
@@ -38,11 +38,6 @@ export const AuthorizingAsCard = ({ email, request, onSignOut }: AuthorizingAsCa
           </div>
         )}
       </div>
-      {request.grant_kind === 'member_bound' && (
-        <p className="text-xs text-foreground-lighter">
-          This grant acts as you, it can never do more than your role in this organization allows.
-        </p>
-      )}
     </section>
   )
 }
