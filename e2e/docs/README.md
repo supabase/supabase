@@ -121,9 +121,7 @@ PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page scan limit described in
 [Limits](#limits), and tests every page listed by
 `pnpm -C e2e/docs resolve-docs-scope` across the whole `guides`
-tree — several hundred pages as of this writing. `--all`
-runs also default to `--max-failures=0`, so a full run isn't cut short by
-`playwright.config.ts`'s global `maxFailures: 3`. Expect a long run: the suite
+tree — several hundred pages as of this writing. Expect a long run: the suite
 runs one worker by default, so pass `--workers` to parallelize it, for
 example:
 
@@ -155,8 +153,10 @@ pages linking into reference docs or server-side auth guides.
 
 ### Limits
 
-The link check runs on every in-scope page, with no cap. The accessibility scan
-is slower, so it runs on at most 20 pages. If a change resolves to more pages
+The link check runs on every in-scope page, with no cap. The suite doesn't stop
+early on failures either, so a run reports every page with a broken link. The
+accessibility scan is slower, so it runs on at most 20 pages. If a change
+resolves to more pages
 than that, only the first 20 in sorted order get the scan (pages that a change
 requires, such as the sample pages for a guide list component change, go
 first). The run doesn't fail, but it says so. The scope step adds a warning
