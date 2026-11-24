@@ -1,6 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
-import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
@@ -177,11 +176,13 @@ export const PlanUpdateSidePanel = () => {
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
 
-  const onPanelOpened = useEffectEvent(
-    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
-      track('studio_pricing_side_panel_opened', properties)
-    }
-  )
+  const onPanelOpened = useEffectEvent(() => {
+    const source = Array.isArray(router.query.source) ? router.query.source[0] : router.query.source
+    track('studio_pricing_side_panel_opened', {
+      currentPlan: selectedOrganization?.plan.name,
+      ...(source && { origin: source }),
+    })
+  })
 
   useEffect(() => {
     if (visible) {
@@ -189,19 +190,15 @@ export const PlanUpdateSidePanel = () => {
       setLatestAddress(undefined)
       setLatestTaxId(undefined)
       setUseAsDefaultBillingAddress(true)
-      const source = Array.isArray(router.query.source)
-        ? router.query.source[0]
-        : router.query.source
-      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
-        currentPlan: subscription?.plan?.name,
-      }
-      if (source) {
-        properties.origin = source
-      }
-      onPanelOpened(properties)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
+
+  // On a page load that lands on the panel, the organization resolves after the panel is visible,
+  // and the event needs it for the current plan and the organization group.
+  const isOrganizationLoaded = selectedOrganization !== undefined
+  useEffect(() => {
+    if (visible && isOrganizationLoaded) onPanelOpened()
+  }, [visible, isOrganizationLoaded])
 
   useEffect(() => {
     if (visible && isSuccessSubscription && subscription.plan.id) {
