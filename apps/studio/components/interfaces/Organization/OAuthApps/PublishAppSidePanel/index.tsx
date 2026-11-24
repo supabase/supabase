@@ -219,6 +219,7 @@ export const PublishAppSidePanel = ({
 
     if (iconFile !== undefined && uploadedIconUrl === undefined) {
       toast.error('Failed to upload OAuth application icon')
+      setIsSavingApp(false)
       return
     }
 
