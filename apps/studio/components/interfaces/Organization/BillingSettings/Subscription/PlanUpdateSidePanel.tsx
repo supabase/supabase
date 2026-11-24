@@ -302,7 +302,7 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} />
+          <SubscriptionPlanUpdateView {...planChangeProps} origin={source} />
         ) : (
           <SubscriptionPlanUpdateDialog {...planChangeProps} />
         ))}

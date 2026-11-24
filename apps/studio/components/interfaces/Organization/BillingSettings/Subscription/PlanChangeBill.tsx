@@ -112,9 +112,11 @@ const ComputeProjectRow = ({
 const PausedProjectsRow = ({
   pausedProjects,
   perProjectMonthlyPrice,
+  onProjectTransferDocsClick,
 }: {
   pausedProjects: OrgProject[]
   perProjectMonthlyPrice: number | null
+  onProjectTransferDocsClick: () => void
 }) => (
   <div className="py-1.5">
     <div className="flex items-center justify-between gap-4">
@@ -148,6 +150,7 @@ const PausedProjectsRow = ({
                 target="_blank"
                 rel="noreferrer"
                 className="underline"
+                onClick={onProjectTransferDocsClick}
               >
                 transfer it
               </a>{' '}
@@ -173,8 +176,12 @@ const PausedProjectsRow = ({
  */
 const HourlyBillingPanel = ({
   perProjectMonthlyPrice,
+  onOpen,
+  onComputeDocsClick,
 }: {
   perProjectMonthlyPrice: number | null
+  onOpen: () => void
+  onComputeDocsClick: () => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [tick, setTick] = useState(0)
@@ -200,10 +207,15 @@ const HourlyBillingPanel = ({
   const elapsedHours = Math.min(tick, HOURLY_ACTIVITY.length)
   const readoutHour = Math.max(elapsedHours - 1, 0)
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (open) onOpen()
+  }
+
   return (
     <Collapsible
       open={isOpen}
-      onOpenChange={setIsOpen}
+      onOpenChange={handleOpenChange}
       className="overflow-hidden rounded-md border bg-field"
     >
       <CollapsibleTrigger className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground-light">
@@ -233,6 +245,7 @@ const HourlyBillingPanel = ({
             target="_blank"
             rel="noreferrer"
             className="underline"
+            onClick={onComputeDocsClick}
           >
             Learn about compute
           </a>
@@ -340,6 +353,8 @@ interface PlanChangeBillProps {
    * projects, so compute collapses to a single unchanged line instead of a project list.
    */
   isCondensed: boolean
+  onHourlyBillingOpen: () => void
+  onDocsLinkClick: (docsLink: 'compute' | 'project_transfer') => void
 }
 
 export const PlanChangeBill = ({
@@ -348,6 +363,8 @@ export const PlanChangeBill = ({
   pausedProjects,
   currentPlan,
   isCondensed,
+  onHourlyBillingOpen,
+  onDocsLinkClick,
 }: PlanChangeBillProps) => {
   const { computeProjects, computeTotal, perProjectMonthlyPrice, projectCount } = summary
   const hasActiveProjects = computeProjects.length > 0
@@ -397,7 +414,11 @@ export const PlanChangeBill = ({
 
           {canShowHourlyPanel && (
             <div className="mt-3">
-              <HourlyBillingPanel perProjectMonthlyPrice={perProjectMonthlyPrice} />
+              <HourlyBillingPanel
+                perProjectMonthlyPrice={perProjectMonthlyPrice}
+                onOpen={onHourlyBillingOpen}
+                onComputeDocsClick={() => onDocsLinkClick('compute')}
+              />
             </div>
           )}
 
@@ -421,6 +442,7 @@ export const PlanChangeBill = ({
 
             {pausedProjects.length > 0 && (
               <PausedProjectsRow
+                onProjectTransferDocsClick={() => onDocsLinkClick('project_transfer')}
                 pausedProjects={pausedProjects}
                 perProjectMonthlyPrice={perProjectMonthlyPrice}
               />

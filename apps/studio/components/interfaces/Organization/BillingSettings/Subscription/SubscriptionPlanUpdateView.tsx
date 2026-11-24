@@ -37,6 +37,7 @@ import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subsc
 import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -56,6 +57,8 @@ interface Props {
   isBillingPreviewPending?: boolean
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
+  /** The `source` query param the pricing panel was opened with, sent on telemetry events. */
+  origin?: string
 }
 
 export const SubscriptionPlanUpdateView = ({
@@ -71,7 +74,9 @@ export const SubscriptionPlanUpdateView = ({
   isBillingPreviewPending = false,
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
+  origin,
 }: Props) => {
+  const track = useTrack()
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -133,7 +138,20 @@ export const SubscriptionPlanUpdateView = ({
     [selectedTier]
   )
 
+  const pausedProjects = useMemo(() => getPausedProjects(projects), [projects])
+
+  const planChangeProperties = {
+    selectedPlan: subscriptionPlanMeta?.name,
+    currentPlan: subscription?.plan?.name,
+    origin,
+    pausedProjectCount: pausedProjects.length,
+  }
+
+  const trackDocsLinkClick = (docsLink: 'compute' | 'project_transfer') =>
+    track('studio_pricing_plan_change_docs_link_clicked', { ...planChangeProperties, docsLink })
+
   const onSuccessfulPlanChange = () => {
+    track('studio_pricing_plan_change_completed', planChangeProperties)
     setPaymentConfirmationLoading(false)
     toast.success(
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
@@ -194,6 +212,7 @@ export const SubscriptionPlanUpdateView = ({
     if (!selectedTier) return console.error('Selected plan is required')
     if (!subscriptionPreviewInitialized) return console.error('Plan preview is required')
 
+    track('studio_pricing_plan_change_confirm_clicked', planChangeProperties)
     setPaymentConfirmationLoading(true)
 
     if (paymentMethodSelectionRef.current) {
@@ -258,8 +277,6 @@ export const SubscriptionPlanUpdateView = ({
     () => getDueTodayBreakdown(subscriptionPreview, { planAmount: summary.planAmount }),
     [subscriptionPreview, summary.planAmount]
   )
-
-  const pausedProjects = useMemo(() => getPausedProjects(projects), [projects])
 
   // Features the org gives up, shown in place of the new plan's benefits on a downgrade.
   const featuresToLose = useMemo(() => {
@@ -340,12 +357,19 @@ export const SubscriptionPlanUpdateView = ({
                       ? { name: currentPlanName, price: currentPlanMeta?.price ?? 0 }
                       : undefined
                   }
+                  onHourlyBillingOpen={() =>
+                    track('studio_pricing_compute_billing_explainer_opened', planChangeProperties)
+                  }
+                  onDocsLinkClick={trackDocsLinkClick}
                 />
               </div>
             )}
 
             {!isCondensed && subscriptionPreviewInitialized && (
-              <PlanChangeNotes exampleProjectRef={exampleProjectRef} />
+              <PlanChangeNotes
+                exampleProjectRef={exampleProjectRef}
+                onProjectTransferDocsClick={() => trackDocsLinkClick('project_transfer')}
+              />
             )}
 
             {billingViaPartner && (
