@@ -4,6 +4,7 @@ import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } 
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { isEligibleForFreeMicroUpgrade } from '../interfaces/Support/FreeMicroUpgradeSuggestion.utils'
 import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ProjectDetail } from '@/data/projects/project-detail-query'
@@ -84,8 +85,10 @@ export const ComputeBadgeWrapper = ({
     { enabled: !!slug }
   )
 
-  const isEligibleForFreeUpgrade =
-    !!data && data.plan.id !== 'free' && data.plan.id !== 'platform' && computeSize === 'nano'
+  const isEligibleForFreeUpgrade = isEligibleForFreeMicroUpgrade({
+    planId: data?.plan.id,
+    computeSize,
+  })
 
   const track = useTrack()
 

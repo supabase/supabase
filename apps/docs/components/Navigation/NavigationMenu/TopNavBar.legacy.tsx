@@ -1,7 +1,6 @@
 // legacy layout for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 // End of third-party imports
 
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { DevToolbarTrigger } from 'dev-tools'
 import dynamic from 'next/dynamic'
@@ -11,14 +10,13 @@ import { useTheme } from 'next-themes'
 import type { FC, Ref } from 'react'
 import { memo } from 'react'
 import { Button, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
-import useDropdownMenu from './useDropdownMenu'
 import { AskAiTrigger, SearchV2Trigger } from '@/features/SearchV2'
 
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -39,10 +37,6 @@ export const LegacyTopNavBar: FC<TopNavBarProps> = ({
   scrolledTitle,
   menuButtonRef,
 }) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-  const user = useUser()
-  const menu = useDropdownMenu(user)
   const { theme, setTheme } = useTheme()
 
   return (
@@ -79,23 +73,22 @@ export const LegacyTopNavBar: FC<TopNavBarProps> = ({
           </div>
         </div>
         <div className="hidden lg:flex items-center justify-end gap-3">
-          {!isUserLoading && !isLoggedIn ? (
-            <Button variant="primary" asChild>
-              <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
-                Sign up
-              </a>
-            </Button>
-          ) : null}
+          <SignedInSwitch
+            signedIn={null}
+            signedOut={
+              <Button variant="primary" asChild>
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+                  Sign up
+                </a>
+              </Button>
+            }
+          />
           {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
             <Button asChild>
               <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
             </Button>
           )}
-          {isLoggedIn ? (
-            <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
-          ) : (
-            <TopNavDropdown />
-          )}
+          <TopNavDropdown />
         </div>
       </div>
     </nav>

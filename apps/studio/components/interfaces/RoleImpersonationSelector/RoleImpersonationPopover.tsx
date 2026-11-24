@@ -1,8 +1,8 @@
-import { RoleImpersonationSelector } from '.'
 import { ChevronDownIcon, UserIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
+import { RoleImpersonationSelector } from '.'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import type { User } from '@/data/auth/users-infinite-query'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
