@@ -9,7 +9,6 @@
     "jsx-a11y/label-has-associated-control": 33,
     "jsx-a11y/no-redundant-roles": 1,
     "jsx-a11y/anchor-is-valid": 5,
-    "jsx-a11y/heading-has-content": 2,
     "valtio/state-snapshot-rule": 1,
     "shadcn/no-arbitrary-values": 191,
     "shadcn/no-unknown-classes": 144,
@@ -853,9 +852,6 @@
       "components/interfaces/Settings/Database/DatabaseReadOnlyAlert.tsx": 2,
       "components/interfaces/TableGridEditor/GridHeaderActions.tsx": 1,
       "components/layouts/Navigation/LayoutHeader/BreadcrumbsView.tsx": 1
-    },
-    "jsx-a11y/heading-has-content": {
-      "components/layouts/Scaffold.tsx": 2
     },
     "valtio/state-snapshot-rule": {
       "state/storage-explorer.tsx": 1
