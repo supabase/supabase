@@ -10,10 +10,12 @@ import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
+import { PlanUpgradeSuccessView } from './PlanUpgradeSuccessView'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import { SubscriptionPlanUpdateView } from './SubscriptionPlanUpdateView'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
+import type { PlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
@@ -141,12 +143,16 @@ export const PlanUpdateSidePanel = () => {
 
   const { panel, setPanel } = useOrgSettingsPanel()
   const visible = panel === 'subscriptionPlan'
+  const isUpgradeComplete = panel === 'planUpgraded'
   // Panel was already open when the page loaded (deep link), so skip the entry animation delay
   const [isOpenedViaUrl] = useState(visible)
 
   const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery(
+    { slug },
+    { enabled: visible || isUpgradeComplete }
+  )
   const orgProjects =
     useMemo(
       () => orgProjectsData?.pages.flatMap((page) => page.projects),
@@ -268,7 +274,6 @@ export const PlanUpdateSidePanel = () => {
   const planChangeProps = {
     selectedTier,
     onClose: () => setSelectedTier(undefined),
-    onSuccess: onClose,
     planMeta,
     subscriptionPreviewQueryResult: subscriptionPreviewData,
     projects: orgProjects,
@@ -280,8 +285,35 @@ export const PlanUpdateSidePanel = () => {
     onUseAsDefaultBillingAddressChange: handleUseAsDefaultBillingAddressChange,
   }
 
+  // Upgrades land on the post-upgrade screen; anything else returns to the billing page.
+  const handlePlanChangeSuccess = ({ changeType }: { changeType: PlanChangeType }) => {
+    if (changeType === 'upgrade') {
+      setPanel('planUpgraded')
+    } else {
+      onClose()
+    }
+  }
+
+  // Read from the refreshed subscription so the screen also survives a reload of its URL.
+  const upgradedPlanId =
+    subscription?.plan.id === 'pro' || subscription?.plan.id === 'team'
+      ? subscription.plan.id
+      : undefined
+
   return (
     <>
+      {isUpgradeComplete && upgradedPlanId && slug && (
+        <PlanUpgradeSuccessView
+          planId={upgradedPlanId}
+          organizationName={selectedOrganization?.name}
+          organizationSlug={slug}
+          projects={orgProjects}
+          isSpendCapEnabled={subscription?.usage_billing_enabled === false}
+          onManageSpendCap={() => setPanel('costControl')}
+          onClose={onClose}
+        />
+      )}
+
       {visible && (
         <PlanUpdateFullScreenShell
           organizationName={selectedOrganization?.name}
@@ -302,9 +334,9 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} />
+          <SubscriptionPlanUpdateView {...planChangeProps} onSuccess={handlePlanChangeSuccess} />
         ) : (
-          <SubscriptionPlanUpdateDialog {...planChangeProps} />
+          <SubscriptionPlanUpdateDialog {...planChangeProps} onSuccess={onClose} />
         ))}
 
       <UpgradeSurveyModal
