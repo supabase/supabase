@@ -171,6 +171,10 @@
       "import": "./src/CommandMenu/api/hooks/useCommandMenuTelemetryContext.tsx",
       "types": "./src/CommandMenu/api/hooks/useCommandMenuTelemetryContext.tsx"
     },
+    "./CommandMenu/api/hooks/useCrossCompatRouter": {
+      "import": "./src/CommandMenu/api/hooks/useCrossCompatRouter.tsx",
+      "types": "./src/CommandMenu/api/hooks/useCrossCompatRouter.tsx"
+    },
     "./CommandMenu/api/hooks/useHistoryKeys": {
       "import": "./src/CommandMenu/api/hooks/useHistoryKeys.ts",
       "types": "./src/CommandMenu/api/hooks/useHistoryKeys.ts"
