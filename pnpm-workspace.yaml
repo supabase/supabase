@@ -5,6 +5,7 @@ packages:
   - e2e/*
 
 blockExoticSubdeps: true
+engineStrict: true
 updateNotifier: false
 # Doesn't work because of Typescript issues with peer dependencies, see https://github.com/pnpm/pnpm/issues/9739
 enableGlobalVirtualStore: false
