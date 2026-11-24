@@ -69,7 +69,9 @@ const CommandShortcut = ({
   return null
 }
 
-function CloseOnNavigation() {
+// Renders `children` as its only output so they keep a stable position in the tree. As a sibling
+// of other elements, a child that switches between one element and a fragment would remount.
+function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
 
@@ -83,7 +85,7 @@ function CloseOnNavigation() {
     resetCommandMenu()
   }, [asPath, resetCommandMenu, setIsOpen])
 
-  return null
+  return children
 }
 
 interface CommandProviderProps extends PropsWithChildren {
@@ -108,8 +110,7 @@ const CommandProvider = ({ children, openKey, app, onTelemetry }: CommandProvide
   <CommandProviderInternal>
     <CommandMenuTelemetryContext.Provider value={{ app: app ?? 'studio', onTelemetry }}>
       <CommandShortcut openKey={openKey ?? 'k'} app={app} onTelemetry={onTelemetry} />
-      <CloseOnNavigation />
-      {children}
+      <CloseOnNavigation>{children}</CloseOnNavigation>
     </CommandMenuTelemetryContext.Provider>
   </CommandProviderInternal>
 )

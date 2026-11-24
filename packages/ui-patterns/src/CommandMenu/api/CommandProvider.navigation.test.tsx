@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FrameworkProvider, useFramework, type FrameworkContextValue } from 'common'
 import {
   startTransition,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -98,6 +99,35 @@ const PagesRouterLikeProvider = ({
 
   return <FrameworkProvider value={value}>{children}</FrameworkProvider>
 }
+
+describe('CommandProvider', () => {
+  it('keeps a child mounted when its children change from one element to a fragment', () => {
+    let mounts = 0
+    const MountCounter = () => {
+      useEffect(() => {
+        mounts += 1
+      }, [])
+      return null
+    }
+
+    const { rerender } = render(
+      <CommandProvider openKey="">
+        <MountCounter />
+      </CommandProvider>
+    )
+    rerender(
+      <CommandProvider openKey="">
+        <>
+          <MountCounter />
+          <span>sibling</span>
+        </>
+      </CommandProvider>
+    )
+
+    expect(screen.getByText('sibling')).toBeInTheDocument()
+    expect(mounts).toBe(1)
+  })
+})
 
 describe('CloseOnNavigation', () => {
   it('does not initiate a never-opened menu on a real navigation', async () => {
