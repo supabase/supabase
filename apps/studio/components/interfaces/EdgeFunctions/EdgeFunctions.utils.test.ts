@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   formatFunctionBodyToFiles,
   getDefaultSelectedFileId,
+  getFallbackEntrypointPath,
   getFunctionZipEntries,
+  getStaticPatterns,
 } from './EdgeFunctions.utils'
 
 describe('formatFunctionBodyToFiles', () => {
@@ -287,5 +289,17 @@ describe('getFunctionZipEntries', () => {
       expect(path.split('/')).not.toContain('..')
       expect(path.split('/')).not.toContain('')
     }
+  })
+})
+
+describe('getFallbackEntrypointPath', () => {
+  it.each(['main.mjs', 'main.mts'])('selects %s as the entrypoint', (name) => {
+    expect(getFallbackEntrypointPath([{ name }])).toBe(name)
+  })
+})
+
+describe('getStaticPatterns', () => {
+  it.each(['main.mjs', 'main.mts'])('keeps %s out of static patterns', (name) => {
+    expect(getStaticPatterns([{ name }, { name: 'template.html' }])).toEqual(['template.html'])
   })
 })

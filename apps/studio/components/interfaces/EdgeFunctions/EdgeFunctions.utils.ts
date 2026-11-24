@@ -207,7 +207,7 @@ export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'
   // 1. If the function has only a single TS / JS file, if so set it as entrypoint
   const jsFiles = files.filter(
     ({ name }) =>
-      name.endsWith('.js') || name.endsWith('.ts') || name.endsWith('.jsx') || name.endsWith('.tsx')
+      name.endsWith('.js') || name.endsWith('.ts') || name.endsWith('.jsx') || name.endsWith('.tsx') || name.endsWith('.mjs') || name.endsWith('.mts')
   )
   if (jsFiles.length === 1) {
     return jsFiles[0].name
@@ -225,7 +225,7 @@ export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'
 
 export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   return files
-    .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm)$/i))
+    .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm|mjs|mts)$/i))
     .map(({ name }) => name)
 }
 
