@@ -20,7 +20,6 @@ export const Img = ({
   alt = '',
   ...props
 }: HTMLAttributes<HTMLImageElement> & { alt?: string }) => (
-  // eslint-disable-next-line @next/next/no-img-element
   <img className={cn('rounded-md border', className)} alt={alt} {...props} />
 )
 

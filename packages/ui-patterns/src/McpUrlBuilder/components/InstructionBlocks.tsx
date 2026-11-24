@@ -8,6 +8,7 @@ import { CodeBlock, isCodeBlockLang } from 'ui-patterns/CodeBlock'
 import antigravityAuthenticateScreenshot from '../assets/antigravity-authenticate-screenshot.png'
 import { calloutVariant, type McpInstructionContent } from '../clients.instructions.md'
 import type { McpOnCopyCallback } from '../types'
+import { normalizeAssetUrl, type ImportedAssetModule } from '../utils/mcpIconAssets'
 
 /**
  * Local image assets referenced by `image` nodes, keyed by the node's `url`
@@ -15,7 +16,7 @@ import type { McpOnCopyCallback } from '../types'
  * instructions module stays importable by the Node markdown build, which can't
  * resolve static png imports.
  */
-const INSTRUCTION_ASSETS: Record<string, { src: string } | string> = {
+const INSTRUCTION_ASSETS: Record<string, ImportedAssetModule> = {
   'antigravity-auth': antigravityAuthenticateScreenshot,
 }
 
@@ -83,8 +84,15 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
     image: (node) => {
       const asset = INSTRUCTION_ASSETS[node.url]
       if (!asset) return null
-      const src = typeof asset === 'string' ? asset : asset.src
-      return <img src={src} alt={node.alt ?? ''} className="rounded border border-muted w-full" />
+      return (
+        <img
+          src={normalizeAssetUrl(asset)}
+          alt={node.alt ?? ''}
+          loading="lazy"
+          decoding="async"
+          className="rounded border border-muted w-full"
+        />
+      )
     },
     blockquote: (node) => {
       // Callouts render as colored inline text (no quote chrome). The variant

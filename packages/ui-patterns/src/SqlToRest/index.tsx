@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
 import { Admonition } from '../Admonition'
-import { SqlToRestProps } from './sql-to-rest'
+import type { SqlToRestProps } from './sql-to-rest'
 
 function FallbackComponent({ error }: FallbackProps) {
   if (error instanceof Error && error.message === 'WebAssembly is not defined') {

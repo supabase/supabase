@@ -4,18 +4,11 @@ declare module '*.css' {
 }
 
 declare module '*.svg' {
-  const content: any
+  const content: string | { src: string }
   export default content
 }
 
 declare module '*.png' {
-  const content: {
-    src: string
-    height: number
-    width: number
-    blurDataURL?: string
-    blurWidth?: number
-    blurHeight?: number
-  }
+  const content: string | { src: string }
   export default content
 }
