@@ -15,7 +15,7 @@ export function useCrossCompatRouter() {
       push: (path: string) => {
         // Close once the push settles rather than on an `asPath` change alone, so pushes that
         // leave `asPath` unchanged (same URL, or search params in Next App Router) still close.
-        Promise.resolve(push(path))
+        new Promise((resolve) => resolve(push(path)))
           .catch((error) => console.error('Failed to navigate:', error))
           .finally(() => {
             setIsOpen(false)

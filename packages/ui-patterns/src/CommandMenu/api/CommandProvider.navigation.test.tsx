@@ -10,7 +10,7 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { CommandProvider } from './CommandProvider'
 import { useCrossCompatRouter } from './hooks/useCrossCompatRouter'
@@ -234,5 +234,33 @@ describe('useCrossCompatRouter', () => {
     await user.click(screen.getByRole('button', { name: 'Navigate' }))
 
     expect(await screen.findByText('closed')).toBeInTheDocument()
+  })
+
+  it('logs the error and closes the menu when push throws synchronously', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const error = new Error('push failed')
+    const user = userEvent.setup()
+    render(
+      <FrameworkProvider
+        value={{
+          asPath: '/guides',
+          push: () => {
+            throw error
+          },
+        }}
+      >
+        <MenuTree pushTo="/guides/auth" />
+      </FrameworkProvider>
+    )
+
+    try {
+      await user.click(screen.getByRole('button', { name: 'Open menu' }))
+      await user.click(screen.getByRole('button', { name: 'Navigate' }))
+
+      expect(await screen.findByText('closed')).toBeInTheDocument()
+      expect(consoleError).toHaveBeenCalledWith('Failed to navigate:', error)
+    } finally {
+      consoleError.mockRestore()
+    }
   })
 })
