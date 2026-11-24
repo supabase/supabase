@@ -158,7 +158,10 @@ export const MetricOptions = ({ config, onAddCharts }: MetricOptionsProps) => {
                       key={snippet.id}
                       value={snippet.id}
                       className="cursor-pointer"
-                      disabled={config?.layout?.some((chart) => chart.id === snippet.id)}
+                      disabled={config?.layout?.some(
+                        (chart) =>
+                          chart.id === snippet.id || chart.attribute === `snippet_${snippet.id}`
+                      )}
                       onSelect={() =>
                         toggleMetric({
                           id: snippet.id,
@@ -172,7 +175,10 @@ export const MetricOptions = ({ config, onAddCharts }: MetricOptionsProps) => {
                         aria-hidden="true"
                         className={cn(
                           'mr-2 shrink-0',
-                          !config?.layout?.some((chart) => chart.id === snippet.id) &&
+                          !config?.layout?.some(
+                            (chart) =>
+                              chart.id === snippet.id || chart.attribute === `snippet_${snippet.id}`
+                          ) &&
                             !selectedMetrics.some((metric) => metric.id === snippet.id) &&
                             'invisible'
                         )}
