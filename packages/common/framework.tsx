@@ -89,12 +89,17 @@ function defaultPush(path: string) {
   }
 }
 
-const FrameworkContext = createContext<FrameworkContextValue>({})
+const FrameworkContext = createContext<FrameworkContextValue | null>(null)
 
 export function useFramework(): FrameworkContextValue &
   Required<Pick<FrameworkContextValue, 'push'>> {
   const context = useContext(FrameworkContext)
-  return useMemo(() => ({ ...context, push: context.push ?? defaultPush }), [context])
+  return useMemo(() => ({ ...context, push: context?.push ?? defaultPush }), [context])
+}
+
+/** Whether a `FrameworkProvider` is mounted above. `useFramework()` falls back to defaults without one. */
+export function useHasFrameworkProvider(): boolean {
+  return useContext(FrameworkContext) !== null
 }
 
 export function FrameworkProvider({

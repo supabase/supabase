@@ -11,7 +11,7 @@ import { IS_PLATFORM } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { parseFirstReferrerCookie, parseMwDiagCookie } from './first-referrer-cookie'
-import { useFramework } from './framework'
+import { useFramework, useHasFrameworkProvider } from './framework'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
 import { handlePageLeaveTelemetry, handlePageTelemetry } from './page-telemetry'
@@ -87,6 +87,12 @@ export const PageTelemetry = ({
   setTelemetryPlatform(platform)
 
   const { pathname: frameworkPathname, asPath, isReady = true } = useFramework()
+  // Without a provider nothing re-renders this on client-side navigation, so only the landing
+  // pageview would be sent.
+  const hasFrameworkProvider = useHasFrameworkProvider()
+  if (process.env.NODE_ENV !== 'production' && !hasFrameworkProvider) {
+    throw new Error('PageTelemetry must be rendered inside a FrameworkProvider')
+  }
 
   const params = useParams()
   const slug = organizationSlug || params.slug

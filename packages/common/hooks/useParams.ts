@@ -28,11 +28,11 @@ export function useParams(): {
   return useMemo(() => {
     if (!params) return {}
 
-    const entries: Array<[string, string | undefined]> = []
-    for (const [key, value] of Object.entries(params)) {
-      const normalizedKey = convertToCamelCase(key)
-      entries.push([normalizedKey, Array.isArray(value) ? value[0] : value])
-    }
-    return Object.fromEntries(entries)
+    return Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [
+        convertToCamelCase(key),
+        Array.isArray(value) ? value[0] : value,
+      ])
+    )
   }, [params])
 }
