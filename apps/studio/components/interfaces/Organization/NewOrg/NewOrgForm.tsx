@@ -177,8 +177,8 @@ export const NewOrgForm = ({
   // What was submitted, fixed at submit: the survey step runs after creation
   // (much later after a card confirmation), when the form values may have moved
   // on. kind/size are left out of org creation: the survey endpoint saves them
-  // and keeps only the first response per user and org, so sending them on both
-  // paths would swallow the survey call.
+  // and keeps only the first response per user and org, so sending them at
+  // creation too would swallow the survey call.
   const orgSubmission = useRef<FormState | null>(null)
 
   useEffect(() => {
