@@ -439,6 +439,44 @@ describe('UnifiedLogs', () => {
     await waitFor(() => expect(lastFilterParam()).toEqual([group]), { timeout: 5_000 })
   }, 20_000)
 
+  it('stops filtering when the last condition is removed from a group', async () => {
+    const user = userEvent.setup()
+    const onUrlUpdate = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', {
+            filter: ['group:or:status:neq:200', 'method:eq:GET'],
+          }),
+        },
+      }
+    )
+
+    await user.click(await screen.findByTestId('filter-remove-status', {}, { timeout: 5_000 }))
+    await waitFor(
+      () =>
+        expect(
+          SEARCH_PARAMS_PARSER.filter.parse(
+            onUrlUpdate.mock.lastCall?.[0].searchParams.get('filter') ?? ''
+          )
+        ).toEqual(['method:eq:GET']),
+      { timeout: 5_000 }
+    )
+  }, 20_000)
+
   it('drops filter groups that use unavailable builtins from function URLs', async () => {
     const onUrlUpdate = vi.fn()
     const unavailable = 'group:or:status:neq:200,level:eq:error'

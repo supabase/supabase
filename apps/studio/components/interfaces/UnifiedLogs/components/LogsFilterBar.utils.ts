@@ -214,8 +214,8 @@ const toLogsFilter = (condition: FilterCondition): LogsFilter | undefined => {
 /**
  * Reduces the filter bar tree to what Unified Logs can express: top-level conditions ANDed
  * together plus any number of OR groups. Nested AND groups merge into the root and nested OR
- * groups inside an OR group merge into it. Returns null while anything is incomplete (empty
- * group, missing value) or can't be expressed (an AND group inside an OR group), so the caller
+ * groups inside an OR group merge into it. Empty groups are skipped. Returns null while anything
+ * is incomplete (missing value) or can't be expressed (an AND group inside an OR group), so the caller
  * leaves the applied filters untouched. The same goes for a column used with different
  * operators at the root.
  */
@@ -256,7 +256,10 @@ export const normalizeFilterGroup = (root: FilterGroup): NormalizedFilterGroup |
         continue
       }
       const filters = collectOrFilters(child)
-      if (!filters || filters.length === 0) return false
+      if (!filters) return false
+      // An empty group constrains nothing, so a group emptied by removing its last condition
+      // stops filtering instead of leaving the old group applied.
+      if (filters.length === 0) continue
       groups.push({ group: 'or', filters })
     }
     return true

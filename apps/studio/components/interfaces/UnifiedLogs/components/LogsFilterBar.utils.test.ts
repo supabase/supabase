@@ -371,13 +371,6 @@ describe('filter groups', () => {
 
   it.each([
     [
-      'an empty group',
-      {
-        logicalOperator: 'AND' as const,
-        conditions: [{ logicalOperator: 'OR' as const, conditions: [] }],
-      },
-    ],
-    [
       'a group condition without a value',
       {
         logicalOperator: 'AND' as const,
@@ -457,6 +450,16 @@ describe('filter groups', () => {
     })
   })
 
+  it('skips an empty group so a group emptied by removing its last condition stops filtering', () => {
+    const level = { propertyName: 'level', operator: '=', value: 'error' }
+    expect(
+      normalizeFilterGroup({
+        logicalOperator: 'AND',
+        conditions: [level, { logicalOperator: 'OR', conditions: [] }],
+      })
+    ).toEqual({ conditions: [level], groups: [] })
+  })
+
   describe('areFilterGroupsEquivalent', () => {
     const level = { propertyName: 'level', operator: '=', value: 'error' }
     const status = { propertyName: 'status', operator: '<>', value: '200' }
@@ -470,6 +473,18 @@ describe('filter groups', () => {
             conditions: [level, { logicalOperator: 'AND', conditions: [status, path] }],
           },
           { logicalOperator: 'AND', conditions: [level, status, path] }
+        )
+      ).toBe(true)
+    })
+
+    it('treats an empty group as equal to no group', () => {
+      expect(
+        areFilterGroupsEquivalent(
+          {
+            logicalOperator: 'AND',
+            conditions: [level, { logicalOperator: 'OR', conditions: [] }],
+          },
+          { logicalOperator: 'AND', conditions: [level] }
         )
       ).toBe(true)
     })
