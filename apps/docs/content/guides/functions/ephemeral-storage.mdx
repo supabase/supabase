@@ -162,6 +162,7 @@ Deno.serve(async (req) => {
 
 You can safely use the following synchronous Deno APIs (and their Node counterparts) _during initial script evaluation_:
 
+- Deno.lstatSync
 - Deno.statSync
 - Deno.removeSync
 - Deno.writeFileSync
@@ -170,7 +171,9 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 - Deno.readTextFileSync
 - Deno.mkdirSync
 - Deno.makeTempDirSync
+- Deno.makeTempFileSync
 - Deno.readDirSync
+- Deno.copyFileSync
 
 **Keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or `setTimeout`.
 

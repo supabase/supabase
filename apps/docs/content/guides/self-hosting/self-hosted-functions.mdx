@@ -208,6 +208,10 @@ For more details, see:
 - [Quick start - Download edge functions](/docs/guides/functions/quickstart-dashboard#download-edge-functions)
 - [CLI commands - Download a function](/docs/reference/cli/supabase-functions-download)
 
+## Synchronous file APIs
+
+The functions service runs the router in `volumes/functions/main/index.ts` as the main worker, and each of your functions in its own user worker. In a user worker, the [supported synchronous Deno file APIs](/docs/guides/functions/ephemeral-storage#using-synchronous-file-apis), such as `Deno.readFileSync`, work only during initial script evaluation. A call inside a request handler or a timer such as `setTimeout` throws `Deno.<name> is blocklisted on the current context`. The main worker isn't restricted.
+
 ## Memory management
 
 The functions service has two memory limits: a shared container budget and a per-worker limit. Idle-worker cleanup responds to usage of the container budget.
