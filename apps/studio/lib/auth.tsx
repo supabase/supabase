@@ -4,6 +4,7 @@ import {
   clearLocalStorage,
   gotrueClient,
   posthogClient,
+  resetServerTelemetryCookies,
   useAuthError,
 } from 'common'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
@@ -46,6 +47,7 @@ export function useSignOut() {
 
   return useCallback(async () => {
     const result = await gotrueClient.signOut()
+    await resetServerTelemetryCookies()
     posthogClient.reset()
     clearLocalStorage()
     // Clear Assistant IndexedDB
