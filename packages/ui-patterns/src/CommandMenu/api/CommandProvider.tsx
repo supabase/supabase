@@ -1,7 +1,7 @@
 'use client'
 
 import { useConstant, useFramework } from 'common'
-import { useCallback, useEffect, useMemo, useRef, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
@@ -13,7 +13,6 @@ import {
   type CommandMenuTelemetryCallback,
 } from './hooks/useCommandMenuTelemetry'
 import { CommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
-import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
 import {
   useCommandMenuOpen,
   useResetCommandMenu,
@@ -70,35 +69,21 @@ const CommandShortcut = ({
   return null
 }
 
-function CloseOnNavigation({ children }: PropsWithChildren) {
+function CloseOnNavigation() {
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
 
-  const { asPath, pathname } = useFramework()
-  const currentPath = asPath ?? pathname
-  const previousPathRef = useRef(currentPath)
-
-  const completeNavigation = useCallback(() => {
-    setIsOpen(false)
-    resetCommandMenu()
-  }, [resetCommandMenu, setIsOpen])
-
-  const ctx = useMemo(
-    () => ({
-      onPendingEnd: new Set([completeNavigation]),
-    }),
-    [completeNavigation]
-  )
+  const { asPath } = useFramework()
+  const previousAsPathRef = useRef(asPath)
 
   useEffect(() => {
-    if (previousPathRef.current === currentPath) return
-    previousPathRef.current = currentPath
-    completeNavigation()
-  }, [completeNavigation, currentPath])
+    if (previousAsPathRef.current === asPath) return
+    previousAsPathRef.current = asPath
+    setIsOpen(false)
+    resetCommandMenu()
+  }, [asPath, resetCommandMenu, setIsOpen])
 
-  return (
-    <CrossCompatRouterContext.Provider value={ctx}>{children}</CrossCompatRouterContext.Provider>
-  )
+  return null
 }
 
 interface CommandProviderProps extends PropsWithChildren {
@@ -123,7 +108,8 @@ const CommandProvider = ({ children, openKey, app, onTelemetry }: CommandProvide
   <CommandProviderInternal>
     <CommandMenuTelemetryContext.Provider value={{ app: app ?? 'studio', onTelemetry }}>
       <CommandShortcut openKey={openKey ?? 'k'} app={app} onTelemetry={onTelemetry} />
-      <CloseOnNavigation>{children}</CloseOnNavigation>
+      <CloseOnNavigation />
+      {children}
     </CommandMenuTelemetryContext.Provider>
   </CommandProviderInternal>
 )

@@ -1,65 +1,28 @@
 'use client'
 
 import { useFramework } from 'common'
-import { createContext, useContext, useMemo, useRef, useTransition } from 'react'
+import { useMemo } from 'react'
 
-type Handler = (...evts: any[]) => void
-
-export const CrossCompatRouterContext = createContext<{ onPendingEnd: Set<Handler> } | undefined>(
-  undefined
-)
-
-function useCrossCompatRouterContext() {
-  const ctx = useContext(CrossCompatRouterContext)
-  if (!ctx) {
-    throw Error(
-      'useCrossCompatRouterContext must be used within a CrossCompatRouterContext.Provider'
-    )
-  }
-  return ctx
-}
-
-function useHasChanged<T>(value: T, { onlyTo }: { onlyTo?: T } = {}) {
-  const prev = useRef(value)
-
-  let result = true
-
-  if (prev.current === value) result = false
-  if (onlyTo !== undefined && value !== onlyTo) result = false
-
-  prev.current = value
-
-  return result
-}
+import { useResetCommandMenu, useSetCommandMenuOpen } from './viewHooks'
 
 export function useCrossCompatRouter() {
-  const { onPendingEnd } = useCrossCompatRouterContext()
-  const { push: frameworkPush } = useFramework()
+  const { push } = useFramework()
+  const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
 
-  const [isPending, startTransition] = useTransition()
-  const hasPendingEnded = useHasChanged(isPending, { onlyTo: false })
-  if (hasPendingEnded) {
-    onPendingEnd.forEach((fn) => fn())
-  }
-
-  const api = useMemo(
+  return useMemo(
     () => ({
       push: (path: string) => {
-        startTransition(async () => {
-          if (frameworkPush) {
-            try {
-              await frameworkPush(path)
-            } catch (error) {
-              console.error('Failed to navigate:', error)
-            }
-          } else if (typeof window !== 'undefined') {
-            window.location.assign(path)
-          }
-        })
+        // Close once the push settles rather than on an `asPath` change alone, so pushes that
+        // leave `asPath` unchanged (same URL, or search params in Next App Router) still close.
+        Promise.resolve(push(path))
+          .catch((error) => console.error('Failed to navigate:', error))
+          .finally(() => {
+            setIsOpen(false)
+            resetCommandMenu()
+          })
       },
     }),
-    [frameworkPush]
+    [push, resetCommandMenu, setIsOpen]
   )
-
-  return api
 }
