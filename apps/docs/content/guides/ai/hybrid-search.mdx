@@ -188,8 +188,8 @@ Deno.serve(async (req) => {
   const [{ embedding }] = embeddingResponse.data
 
   // Instantiate the Supabase client
-  // (replace service role key with user's JWT if using Supabase auth and RLS)
-  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
+  // (replace the secret key with the user's JWT if using Supabase auth and RLS)
+  const supabase = createClient(supabaseUrl, supabaseSecretKey)
 
   // Call hybrid_search Postgres function via RPC
   const { data: documents } = await supabase.rpc('hybrid_search', {
