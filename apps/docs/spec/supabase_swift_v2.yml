@@ -3257,11 +3257,13 @@ functions:
             .from("cities")
             .select("name, country_id")
             .eq("name", value: "The Shire")    // Correct
+            .execute()
 
           try await supabase
             .from("citites")
             .eq("name", value: "The Shire")    // Incorrect
             .select("name, country_id")
+            .execute()
           ```
       - id: chaining-filters
         name: Chaining
@@ -3275,6 +3277,7 @@ functions:
             .select("name, country_id")
             .gte("population", value: 1000)
             .lt("population", value: 10000)
+            .execute()
           ```
       - id: conditional-chaining
         name: Conditional Chaining
@@ -3313,6 +3316,7 @@ functions:
             .from("users")
             .select()
             .eq("address->postcode", value: 90210)
+            .execute()
           ```
         data:
           sql: |
@@ -3361,6 +3365,7 @@ functions:
               """
             )
             .eq("instruments.name", value: "flute")
+            .execute()
           ```
         data:
           sql: |
@@ -3423,6 +3428,7 @@ functions:
             .from("instruments")
             .select("name")
             .or("id.eq.2,name.eq.cello")
+            .execute()
           ```
         data:
           sql: |
@@ -3462,6 +3468,7 @@ functions:
             .from("instruments")
             .select("name")
             .or("id.gt.3,and(id.eq.1,name.eq.violin)")
+            .execute()
           ```
         data:
           sql: |
@@ -3528,6 +3535,7 @@ functions:
             .from("instruments")
             .select("name")
             .match(["id": 2, "name": "viola"])
+            .execute()
           ```
         data:
           sql: |
@@ -3575,6 +3583,7 @@ functions:
             .from("instruments")
             .select()
             .filter("name", operator: "in", value: #"("cello","guzheng")"#)
+            .execute()
           ```
         data:
           sql: |
@@ -3619,6 +3628,7 @@ functions:
               """
             )
             .filter("instruments.name", operator: "eq", value: "flute")
+            .execute()
           ```
         data:
           sql: |
@@ -3675,6 +3685,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .eq("name", value: "The shire")
+            .execute()
           ```
         response: |
           ```json
@@ -3703,6 +3714,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .neq("name", value: "Paris")
+            .execute()
           ```
 
   - id: gt
@@ -3718,6 +3730,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .gt("country_id", value: 250)
+            .execute()
           ```
 
   - id: gte
@@ -3733,6 +3746,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .gte("country_id", value: 250)
+            .execute()
           ```
 
   - id: lt
@@ -3748,6 +3762,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .lt("country_id", value: 250)
+            .execute()
           ```
 
   - id: lte
@@ -3763,6 +3778,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .lte("country_id", value: 250)
+            .execute()
           ```
 
   - id: like
@@ -3778,6 +3794,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .like("name", pattern: "%la%")
+            .execute()
           ```
 
   - id: ilike
@@ -3793,6 +3810,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .ilike("name", pattern: "%la%")
+            .execute()
           ```
 
   - id: is
@@ -3808,6 +3826,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .is("name", value: nil)
+            .execute()
           ```
 
   - id: in
@@ -3823,6 +3842,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .in("name", values: ["Rio de Janeiro", "San Francisco"])
+            .execute()
           ```
 
   - id: notin
@@ -3838,6 +3858,7 @@ functions:
             .from("cities")
             .select("name, country_id")
             .notIn("name", values: ["Rio de Janeiro", "San Francisco"])
+            .execute()
           ```
 
   - id: contains
@@ -3853,6 +3874,7 @@ functions:
             .from("cities")
             .select("name, main_exports")
             .contains("main_exports", value: ["oil"])
+            .execute()
           ```
 
   - id: contained-by
@@ -3868,6 +3890,7 @@ functions:
             .from("cities")
             .select("name, main_exports")
             .containedBy("main_exports", value: ["cars", "food", "machine"])
+            .execute()
           ```
 
   - id: overlaps
@@ -3883,6 +3906,7 @@ functions:
             .from("cities")
             .select("name, main_exports")
             .overlaps("main_exports", value: ["exports", "tourism"])
+            .execute()
           ```
 
   - id: range-lt
@@ -3898,6 +3922,7 @@ functions:
             .from("reservations")
             .select()
             .rangeLt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .execute()
           ```
 
   - id: range-gt
@@ -3913,6 +3938,7 @@ functions:
             .from("reservations")
             .select()
             .rangeGt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .execute()
           ```
 
   - id: range-gte
@@ -3928,6 +3954,7 @@ functions:
             .from("reservations")
             .select()
             .rangeGte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .execute()
           ```
 
   - id: range-lte
@@ -3943,6 +3970,7 @@ functions:
             .from("reservations")
             .select()
             .rangeLte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .execute()
           ```
 
   - id: range-adjacent
@@ -3958,6 +3986,7 @@ functions:
             .from("reservations")
             .select()
             .rangeAdjacent("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .execute()
           ```
 
   - id: text-search
@@ -3973,6 +4002,7 @@ functions:
             .from("quotes")
             .select("catchphrase")
             .textSearch("catchphrase", query: "'fat' & 'cat'", config: "english")
+            .execute()
           ```
 
   - id: using-modifiers
