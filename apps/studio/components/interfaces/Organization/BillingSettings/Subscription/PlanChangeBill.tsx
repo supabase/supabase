@@ -19,6 +19,7 @@ import {
 } from './PlanChangeSummary.utils'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 /**
  * An illustrative day of traffic: idle overnight, busy in the afternoon. Each entry is
@@ -311,7 +312,7 @@ const MonthlyTotal = ({ total, tax }: { total: number; tax: PlanChangeSummary['m
       </TooltipTrigger>
       <TooltipContent side="top" align="end" className="p-3">
         <p className="text-foreground-light" translate="no">
-          Includes {formatRoundedCurrency(tax.amount)}
+          Includes {formatCurrency(tax.amount)}
           {rate} in tax
         </p>
       </TooltipContent>
@@ -376,10 +377,10 @@ export const PlanChangeBill = ({
         label={`${planName} Plan`}
         description={
           currentPlan
-            ? `Replaces your ${formatRoundedCurrency(currentPlan.price)} ${currentPlan.name} Plan`
+            ? `Replaces your ${formatCurrency(currentPlan.price)} ${currentPlan.name} Plan`
             : undefined
         }
-        amount={formatRoundedCurrency(summary.planAmount)}
+        amount={formatCurrency(summary.planAmount)}
       />
 
       {isCondensed ? (
