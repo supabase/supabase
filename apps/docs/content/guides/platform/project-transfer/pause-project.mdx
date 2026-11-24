@@ -1,0 +1,44 @@
+---
+title: 'Pause a Pro or Team Plan project'
+description: 'Pause a Supabase project that belongs to an organization on the Pro Plan or Team Plan: transfer the project to a Free Plan organization, then pause it there.'
+---
+
+Pause a project that belongs to an organization on the Pro Plan or Team Plan. Projects in these organizations **can't be paused**, so you transfer the project to a Free Plan organization and pause it there.
+
+## Prerequisites
+
+Before you transfer a project to pause it, check the following:
+
+- You're an Owner or Administrator of a Free Plan organization. Other roles can't pause a project. To create an organization, open [New organization](/dashboard/new).
+- The transfer runs every check in [Project transfer requirements](/docs/guides/platform/project-transfer/requirements), including overdue invoices and the free project limit.
+- To pause the project with the Management API, you have an [access token](/dashboard/account/tokens). A scoped token needs access to the Free Plan organization or to the project, and **Project Settings** with **Read-write** access.
+
+## Procedure
+
+To pause the project, follow these steps:
+
+1. Transfer the project to the Free Plan organization, with the steps in [Transfer a project](/docs/guides/platform/project-transfer).
+
+   <Admonition type="caution">
+
+   The transfer removes add-ons and features that the Free Plan doesn't include, and a second transfer doesn't restore the add-ons or settings. See [What a transfer to the Free Plan removes](/docs/guides/platform/project-transfer/what-changes#what-a-transfer-to-the-free-plan-removes).
+
+   </Admonition>
+
+2. Pause the project. In the project's [general settings](/dashboard/project/_/settings/general), click **Pause project**. With the Management API, use the [pause a project](/docs/reference/api/v1-pause-a-project) endpoint, and replace `YOUR_PROJECT_REF` and `YOUR_ACCESS_TOKEN` with your values:
+
+   ```bash
+   curl -X POST "https://api.supabase.com/v1/projects/YOUR_PROJECT_REF/pause" \
+     -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+   ```
+
+   On the Free Plan, you can resume a paused project only if its database is 1 GB or smaller. To resume a larger project, first transfer the paused project to an organization on the Pro Plan and above. You can transfer a project that's already paused, and it stays paused after the transfer.
+
+The transfer doesn't change the subscription of the organization that the project leaves, so that organization still pays its plan fee. See [Billing](/docs/guides/platform/project-transfer/what-changes#billing).
+
+## Next steps
+
+After you pause the project, use these pages:
+
+- [Project pausing](/docs/guides/platform/free-project-pausing): check the time limit for resuming a paused project.
+- [Changes after a project transfer](/docs/guides/platform/project-transfer/what-changes): check what the transfer changed for billing, access, and access tokens.

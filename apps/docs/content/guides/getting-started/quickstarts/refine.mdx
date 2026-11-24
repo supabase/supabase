@@ -10,7 +10,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## 3. Create a Refine app
 
-Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
+Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/core/docs/getting-started/quickstart/).
 
 The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a Refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
@@ -36,7 +36,7 @@ printf '\n' | npm create refine-app@latest -- --preset refine-supabase my-app
 
 ## 5. Update `supabaseClient` with environment variables
 
-Create a `.env` file and populate it with your Supabase URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&connectTab=frameworks).
+Create a `.env` file in the root of your project, next to `package.json`, and populate it with your Supabase URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&connectTab=frameworks).
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=refine">
@@ -76,7 +76,7 @@ npm install @refinedev/react-table @refinedev/react-hook-form react-live
 
 The `<HeadlessInferencer />` is a Refine Inferencer component that automatically generates necessary code for the `list`, `create`, `show` and `edit` pages.
 
-Read more on [how the Inferencer works is in the Refine docs](https://refine.dev/docs/packages/documentation/inferencer/).
+Read more on [how the Inferencer works is in the Refine docs](https://refine.dev/core/docs/packages/inferencer/).
 
 </Admonition>
 

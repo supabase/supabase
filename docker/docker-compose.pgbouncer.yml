@@ -23,7 +23,7 @@ services:
 
   pgbouncer:
     container_name: supabase-pgbouncer
-    image: edoburu/pgbouncer:v1.25.2-p0
+    image: edoburu/pgbouncer:v1.26.1-p0
     restart: unless-stopped
     ports:
       - ${POOLER_PROXY_PORT_TRANSACTION}:6432
@@ -54,3 +54,8 @@ services:
       # Only the `pgbouncer` role may run get_auth / the admin console.
       ADMIN_USERS: pgbouncer
       STATS_USERS: pgbouncer
+      # PgBouncer 1.26 accepts search_path in startup parameters, and in
+      # transaction mode it can leak between clients on Postgres 17 and earlier
+      # (pgbouncer/pgbouncer#1635). Ignore it instead: such clients get the
+      # default search_path. Use SET LOCAL search_path or qualified names.
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits,search_path

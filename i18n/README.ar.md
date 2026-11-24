@@ -11,7 +11,7 @@
 
 [Supabase](https://supabase.com)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
 
-- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database)
+- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database/overview)
 - [x] [الشرح](https://supabase.com/docs/guides/auth) المصادقة والترخيص
 - [x] واجهات برمجة التطبيقات التي يتم إنشاؤها تلقائيا.
   - [x] REST. [الشرح](https://supabase.com/docs/guides/api)
@@ -49,14 +49,14 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 **الهيكلة الحالية**
 
-(supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
+(supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/self-hosting) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) هي قاعدة بيانات قائمة على العلاقات الشيئية مع ٣٠ سنة من التطوير النشط التي اكسبتها سمعة وموثقية قوية وتمتاز بالمتانة والأداء.
 - [Realtime](https://github.com/supabase/realtime) هو خادم بلغة (Elixir) يمكنك من الاستماع لقاعدة البيانات لأي تغيرات سواء أنشاء أو تعديل أو مسح باستخدام ال(websocket).
 - [PostgREST](http://postgrest.org/) هو خادم ويب يستطيع تحويل قاعدة بيانات PostgreSQL مباشرة ألي RESTful API
-- [Storage](https://github.com/supabase/storage-api) يقدم واجهة RESTful لأدارة الملفات المخزنة فس S3, باستخدام Postgres لأدارة الصلاحيات
+- [Storage](https://github.com/supabase/storage) يقدم واجهة RESTful لأدارة الملفات المخزنة فس S3, باستخدام Postgres لأدارة الصلاحيات
 - [postgres-meta](https://github.com/supabase/postgres-meta) هو RESTful API لأدارة قاعدة البيانات الخاصة بك, تمكنك من الإستعلام عن الجداول, إضافة أدوار (مفرد دور), وتشغيل الأوامر.. الخ
 - [GoTrue](https://github.com/netlify/gotrue) هو API مبني على SWT لأدارة المستخدمين وإنشاء رمز SWT.
 - [Kong](https://github.com/Kong/kong) هو بوابة API لـcloud-native
@@ -75,9 +75,9 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
@@ -102,7 +102,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
   <th colspan="6">💚 المجتمعي 💚</th>
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -142,7 +142,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

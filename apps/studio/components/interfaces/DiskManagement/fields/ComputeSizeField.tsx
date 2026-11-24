@@ -78,8 +78,11 @@ export function ComputeSectionBillingBadge({
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { project, isProjectLoading, isEntitlementLoading, showMicroUpgradeBadge } =
-    useShowMicroUpgradeBadge()
+  const {
+    project,
+    isLoading: isMicroUpgradeLoading,
+    showMicroUpgradeBadge,
+  } = useShowMicroUpgradeBadge()
   const { isHighAvailability } = useHighAvailability()
 
   // High Availability projects run on a fixed compute size during Alpha,
@@ -96,7 +99,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
-  const isLoading = isProjectLoading || isAddonsLoading || isEntitlementLoading
+  const isLoading = isMicroUpgradeLoading || isAddonsLoading
 
   const { control, setValue, trigger } = form
 

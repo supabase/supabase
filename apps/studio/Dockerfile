@@ -8,7 +8,7 @@
 #    docker builder prune
 #    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:22-slim AS base
+FROM node:26-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
@@ -23,7 +23,7 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@11.13.1
+RUN npm install -g pnpm@12.21.0
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.9.14 prune studio --docker
+RUN pnpm dlx turbo@2.11.10 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base AS deps

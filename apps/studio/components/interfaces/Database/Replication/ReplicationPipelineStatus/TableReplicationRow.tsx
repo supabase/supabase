@@ -44,7 +44,9 @@ export const TableReplicationRow = ({
   const statusConfig = getStatusConfig(table.state as TableState['state'])
   const tableName = `${table.schema}.${table.name}`
   const canRestart = !showDisabledState && !isRestarting && !isAnyRestartInProgress
-  const pipelineAction = isPipelineStopped ? 'start' : 'restart'
+  const resetDescription = isPipelineStopped
+    ? 'Resetting saved progress. The pipeline stays stopped until you start it.'
+    : 'Resetting saved progress. The pipeline restarts automatically.'
 
   const isErrorState = table.state.name === 'error'
   const canShowError =
@@ -87,9 +89,7 @@ export const TableReplicationRow = ({
 
       <TableCell>
         {isRestarting ? (
-          <p className="text-sm text-foreground-lighter">
-            Resetting. The pipeline will {pipelineAction} automatically…
-          </p>
+          <p className="text-sm text-foreground-lighter">{resetDescription}</p>
         ) : showDisabledState ? (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : isErrorState ? (

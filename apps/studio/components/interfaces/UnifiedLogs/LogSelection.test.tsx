@@ -286,7 +286,7 @@ describe('selected log details', () => {
     await user.click(row('first'))
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Message')).toBeVisible()
-    expect(screen.getByRole('status')).toHaveTextContent('Realtime')
+    expect(within(screen.getByRole('status')).getByRole('img', { name: 'Realtime' })).toBeVisible()
     expect(screen.getByText('Logged')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Previous log' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Copy selected logs' })).toBeVisible()

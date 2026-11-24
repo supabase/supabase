@@ -124,6 +124,11 @@
       "permanent": true
     },
     {
+      "source": "/kb/troubleshooting/edge-function-cpu-limits",
+      "destination": "/kb/troubleshooting/edge-function-limits",
+      "permanent": true
+    },
+    {
       "source": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace",
       "destination": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace-1094d3",
       "permanent": true
@@ -131,6 +136,11 @@
     {
       "source": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace.md",
       "destination": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace-1094d3.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/edge-function-wall-clock-time-limit-reached-Nk38bW",
+      "destination": "/kb/troubleshooting/edge-function-limits",
       "permanent": true
     },
     {

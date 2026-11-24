@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { ComponentProps, useState } from 'react'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   MultiSelector,
@@ -20,11 +21,11 @@ class ResizeObserver {
 
 global.ResizeObserver = ResizeObserver
 
-function MultiSelectDemo() {
+function MultiSelectDemo(props: Partial<ComponentProps<typeof MultiSelector>>) {
   const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   return (
-    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues} {...props}>
       <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit="wrap" />
       <MultiSelectorContent>
         <MultiSelectorInput placeholder="Search fruits" showResetIcon />
@@ -219,18 +220,18 @@ describe('multi-select', () => {
     expect(trigger).not.toHaveTextContent('Apple') // "Apple" should not be selected anymore
   })
 
-  it('closes the dropdown when clicking outside the component', () => {
+  it('closes the dropdown when clicking outside the component', async () => {
     render(<MultiSelectDemo />)
 
     const trigger = screen.getByRole('combobox')
     fireEvent.click(trigger) // Open the dropdown
     expect(screen.getByText('Apple')).toBeInTheDocument() // Ensure it's open
 
-    fireEvent.click(document.body) // Click outside the component
+    userEvent.click(document.body) // Click outside the component
 
-    setTimeout(() => {
+    await waitFor(() => {
       expect(screen.queryByText('Apple')).not.toBeInTheDocument() // The dropdown should be closed
-    }, 100)
+    })
   })
 
   it('removes the last value when hitting Backspace', () => {
@@ -269,5 +270,18 @@ describe('multi-select', () => {
     const disabledItem = screen.getByText('Mango')
     fireEvent.click(disabledItem)
     expect(trigger).not.toHaveTextContent('Mango') // Mango should not be selectable
+  })
+
+  it('supports consumers filtering', async () => {
+    const onSearchChange = vi.fn()
+    render(<MultiSelectDemo onSearchChange={onSearchChange} />)
+
+    const trigger = screen.getByRole('combobox')
+    fireEvent.click(trigger) // Open the dropdown
+
+    const searchInput = screen.getByPlaceholderText('Search fruits')
+    fireEvent.change(searchInput, { target: { value: 'Ap' } }) // Search for "Ap"
+
+    await waitFor(() => expect(onSearchChange).toHaveBeenCalledWith('Ap'))
   })
 })

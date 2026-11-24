@@ -1,6 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
 import { renderHook } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
+import { Inbox, Issues } from 'icons'
+import { isValidElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -10,6 +12,8 @@ import {
   useGenerateOtherRoutes,
   useGenerateToolRoutes,
 } from './NavigationBar.utils'
+import type { Route } from '@/components/ui/ui.types'
+import { lintKeys } from '@/data/lint/keys'
 import { miscKeys } from '@/data/misc/keys'
 import type { Project } from '@/data/projects/project-detail-query'
 import { CustomWrapper } from '@/tests/lib/custom-render'
@@ -21,6 +25,8 @@ const buildingProject = { status: 'COMING_UP' } as Project
 const inactiveProject = { status: 'INACTIVE' } as Project
 
 const keys = (routes: { key: string }[]) => routes.map((r) => r.key)
+
+const iconOf = (route?: Route) => (isValidElement(route?.icon) ? route.icon.type : undefined)
 
 const mockUseParams = vi.fn()
 const mockUseSelectedProjectQuery = vi.fn()
@@ -152,11 +158,35 @@ describe('generateOtherRoutes', () => {
     expect(route?.link).toBe(`/project/${REF}/advisors/health`)
   })
 
+  it('uses the empty inbox icon when the project has no issues', () => {
+    const route = generateOtherRoutes(REF, activeProject, { issuesInbox: true }).find(
+      (route) => route.key === 'issues'
+    )
+    expect(iconOf(route)).toBe(Inbox)
+  })
+
+  it('swaps in the issues icon when the project has issues', () => {
+    const route = generateOtherRoutes(REF, activeProject, {
+      issuesInbox: true,
+      hasIssues: true,
+    }).find((route) => route.key === 'issues')
+    expect(iconOf(route)).toBe(Issues)
+  })
+
+  it('keeps the issues icon off the legacy Advisors route', () => {
+    const route = generateOtherRoutes(REF, activeProject, { hasIssues: true }).find(
+      (route) => route.key === 'advisors'
+    )
+    expect(iconOf(route)).not.toBe(Issues)
+    expect(iconOf(route)).not.toBe(Inbox)
+  })
+
   it.each([false, true])('wires the Issues flag into generated navigation: %s', (issuesInbox) => {
     mockUseParams.mockReturnValue({ ref: REF })
     mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
     queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
+    queryClient.setQueryData(lintKeys.lint(REF), [])
     const { result } = renderHook(() => useGenerateOtherRoutes(), {
       wrapper: ({ children }) => (
         <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>

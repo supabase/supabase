@@ -1,6 +1,7 @@
 'use client'
 
 import { useDocsSearchV2 } from 'common'
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import type { DocsSearchV2AskAiOpenedEvent } from 'common/telemetry-constants'
 import {
   SearchActionItem,
@@ -62,7 +63,10 @@ export function SearchV2Panel({
     if (searchState.status === 'results' || searchState.status === 'noResults') {
       sendTelemetryEvent({
         action: 'docs_search_v2_search_submitted',
-        properties: { query: searchState.query, hasResults: searchState.status === 'results' },
+        properties: {
+          ...describeSearchQuery(searchState.query),
+          hasResults: searchState.status === 'results',
+        },
       })
     }
   }, [searchState, sendTelemetryEvent])
@@ -82,7 +86,7 @@ export function SearchV2Panel({
       onResultActivate={(result, { query }) =>
         sendTelemetryEvent({
           action: 'docs_search_v2_result_clicked',
-          properties: { resultPath: result.path, query },
+          properties: { resultPath: result.path, ...describeSearchQuery(query) },
         })
       }
       onResultNavigate={(path) => onResultNavigate(path)}

@@ -1,9 +1,9 @@
 'use client'
 
-import { createContext, use, useCallback, useMemo, useState } from 'react'
+import { createContext, use, useCallback, useMemo, useRef, useState } from 'react'
 
-import type { RootProps, TraceIndex, ViewContextValue } from './types'
-import { buildTraceIndex } from './utils'
+import type { RootProps, TimeWindow, TraceIndex, ViewContextValue } from './types'
+import { buildTraceIndex, clampWindow, toggleAllCollapsed } from './utils'
 
 const TraceContext = createContext<TraceIndex | null>(null)
 const ViewContext = createContext<ViewContextValue | null>(null)
@@ -28,9 +28,37 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
     })
   }, [])
 
+  const toggleCollapseAll = useCallback(
+    () => setCollapsedIds((previous) => toggleAllCollapsed(index, previous)),
+    [index]
+  )
+
+  const { bounds } = index
+  const [zoom, setZoom] = useState<TimeWindow | null>(null)
+  const window = useMemo(() => (zoom ? clampWindow(zoom, bounds) : bounds), [zoom, bounds])
+  const setWindow = useCallback(
+    (start: number, end: number) => setZoom(clampWindow([start, end], bounds)),
+    [bounds]
+  )
+  const resetWindow = useCallback(() => setZoom(null), [])
+  const treeRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
   const view = useMemo<ViewContextValue>(
-    () => ({ selectedId, collapsed, select, setCollapsed }),
-    [selectedId, collapsed, setCollapsed]
+    () => ({
+      selectedId,
+      collapsed,
+      window,
+      isZoomed: zoom !== null,
+      select,
+      setCollapsed,
+      toggleCollapseAll,
+      setWindow,
+      resetWindow,
+      treeRef,
+      scrollRef,
+    }),
+    [selectedId, collapsed, window, zoom, setCollapsed, toggleCollapseAll, setWindow, resetWindow]
   )
 
   return (

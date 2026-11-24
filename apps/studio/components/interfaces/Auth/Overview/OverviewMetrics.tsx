@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { BarChart2Icon, ChevronRightIcon, ExternalLinkIcon, TelescopeIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   Chart,
@@ -43,9 +42,12 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { splitInternalUrl } from '@/lib/internal-url'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -66,13 +68,13 @@ const StatCard = ({
   href?: string
   tooltip?: string
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const actions = [
     {
       label: 'Go to Auth Report',
       icon: <ExternalLinkIcon size={12} />,
-      onClick: href ? () => router.push(href) : undefined,
+      onClick: href ? () => navigate(splitInternalUrl(href)) : undefined,
     },
   ]
 
@@ -103,7 +105,7 @@ const LogsLink = ({ href }: { href: string }) => (
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild
       >
-        <Link href={href} aria-label="Go to Logs">
+        <Link {...splitInternalUrl(href)} aria-label="Go to Logs">
           <ChevronRightIcon size={12} />
         </Link>
       </Button>
@@ -121,6 +123,8 @@ interface OverviewMetricsProps {
 export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsProps) => {
   const { ref } = useParams()
   const useOtel = useFlag('otelLegacyLogs')
+  const { isEnabled: isUnifiedLogsEnabled, isDefaultOptIn } = useUnifiedLogsPreview()
+  const shouldUseUnifiedLogs = isUnifiedLogsEnabled || isDefaultOptIn
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -213,7 +217,9 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <div className="flex items-center justify-between">
               <PageSectionTitle>Usage</PageSectionTitle>
               <Link
-                href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
+                {...splitInternalUrl(
+                  `/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`
+                )}
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
                 <TelescopeIcon size={14} className="text-foreground-lighter" />
@@ -334,7 +340,29 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
-                            <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
+                            {ref && respErrData && (
+                              <LogsLink
+                                href={
+                                  shouldUseUnifiedLogs
+                                    ? buildUnifiedLogsUrl({
+                                        projectRef: ref,
+                                        logType: 'edge',
+                                        start: respErrData.start,
+                                        end: respErrData.end,
+                                        filters: [
+                                          { column: 'method', operator: '=', value: row.method },
+                                          { column: 'pathname', operator: '=', value: row.path },
+                                          {
+                                            column: 'status',
+                                            operator: '=',
+                                            value: String(row.status_code),
+                                          },
+                                        ],
+                                      })
+                                    : `/project/${ref}/logs/edge-logs?s=${encodeURIComponent(row.path)}`
+                                }
+                              />
+                            )}
                           </div>
                         ),
                       },

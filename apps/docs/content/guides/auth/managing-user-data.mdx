@@ -38,7 +38,7 @@ Primary keys are **guaranteed not to change**. Columns, indices, constraints or 
 
 </Admonition>
 
-To update your `public.profiles` table every time a user signs up, set up a trigger. If the trigger fails, it could block signups, so test your code thoroughly.
+To create a row in your `public.profiles` table every time a user signs up, set up a trigger. If the trigger fails, it could block signups, so test your code thoroughly.
 
 ```sql
 -- inserts a row into public.profiles
@@ -59,6 +59,35 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+
+<Admonition type="caution">
+
+Put the schema in front of every table, function, and type in this function that isn't built in, such as `public.profiles`. The function sets `search_path = ''`, so Postgres can't find a name like `profiles` without its schema. The trigger then fails, and every sign-up fails with `Database error saving new user`. To learn why the search path stays empty, see [Security `definer` vs `invoker`](/docs/guides/database/functions#security-definer-vs-invoker).
+
+</Admonition>
+
+Don't insert the profile from the client after sign-up. The trigger already creates it, and the table has no insert policy, so a client insert fails with `new row violates row-level security policy for table "profiles"`. The trigger can insert the row because the function is `security definer`: it runs as its owner. A function created in the Dashboard or by a migration is owned by `postgres`, which bypasses Row Level Security.
+
+With RLS enabled and no policies, the `anon` and `authenticated` roles can't read or change any row of `public.profiles`. The following policies let each signed-in user read and update only their own profile:
+
+```sql
+-- Each user can read their own profile
+create policy "Users can view their own profile"
+on public.profiles for select
+to authenticated
+using ( (select auth.uid()) = id );
+
+-- Each user can update their own profile
+create policy "Users can update their own profile"
+on public.profiles for update
+to authenticated
+using ( (select auth.uid()) = id )
+with check ( (select auth.uid()) = id );
+```
+
+`auth.uid()` returns the ID of the user making the request. In the update policy, `using` limits which rows a user can update, and `with check` stops them from changing the row's `id` to another user's.
+
+For other patterns, such as [profiles that everyone can read](/docs/guides/database/postgres/row-level-security#authenticated-and-unauthenticated-roles), see the [Row Level Security](/docs/guides/database/postgres/row-level-security) guide.
 
 ## Adding and retrieving user metadata
 

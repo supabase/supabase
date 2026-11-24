@@ -15,34 +15,34 @@ toc_depth: 3
 
 Controlling access to data in Postgres is paramount for data security. Postgres provides a robust and flexible permissions model for users to manage access to their data. The permissions model is based on the familiar object, privilege, role model but has subtleties which must be understood by a database administrator to create airtight access. In this post we will take a detailed look at how roles and permissions work in Postgres.
 
-# Basic Concepts
+## Basic Concepts
 
 Let's first understand some basic concepts which will be used throughout the rest of the post.
 
-## Database Object
+### Database Object
 
 A database object is any entity created in the database. Tables, foreign tables, views, materialized views, types, domains, operators, functions, triggers etc. are database objects. Objects allow operations on them which vary for each object. For example, you can _select_ data from a table and you can _execute_ a function.
 
-## Privilege
+### Privilege
 
 A privilege controls what operation is allowed to be run on a database object. For example, the `select` privilege on a table controls the ability to read data from the table. Similarly, the `execute` privilege controls the ability to execute a function. Privileges are assigned to roles. A role must have the permission for the operation it is performing on an object.
 
-## Role
+### Role
 
 A role is a user or a group. A user is someone who can login to the database. A group is a collection of users to make it easier to manage privileges for users. Unlike a user, a group can't login to the database. The distinction between a user and a group doesn’t matter to Postgres for the most part as they are both roles, but it is still useful to think of them as separate concepts for ease of understanding.
 
-## Owner
+### Owner
 
 Every database object has an owner. The owner has complete control over the object. They can modify or delete the object or grant privileges to other users and groups. When a user creates a new object, they become the owner of the object. An owner can also transfer the ownership of objects to other roles. A role cannot be deleted before all its owned objects’ ownership is transferred to another role.
 
 With these basic terms defined, let's take a look at the permissions model in Postgres in depth. The rest of the post will be more like a tutorial, so you can follow along. I'll be using a hosted Supabase project, but you are free to use any Postgres installation.
 
-# Setting Up
+## Setting Up
 
 Create a new Supabase project (or use an existing one) and copy its connection string URI from the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings). The URI looks like the following:
 
 ```bash
-postgres://[USER].[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+postgres://[USER].[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 ```
 
 Where `USER` is the user to connect as. `YOUR-PROJECT-REF` is a string uniquely identifying your project. `YOUR-PASSWORD` is the database password for the `USER` user and `REGION-SUBDOMAIN` is the subdomain where your database is hosted.
@@ -50,7 +50,7 @@ Where `USER` is the user to connect as. `YOUR-PROJECT-REF` is a string uniquely 
 Use the [`psql` command line tool](https://www.postgresql.org/download/) to connect to the database:
 
 ```bash
-➜ psql postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 ```
 
 Once connected, confirm that you are connected as the `postgres` user by running `select current_role` command:
@@ -66,7 +66,7 @@ postgres=> select current_role;
 (1 row)
 ```
 
-## Creating Roles
+### Creating Roles
 
 Now, let's create two users named `junior_dev` and `senior_dev`. A database role can be created with the `create role` command. Since a user is a role that can login, use the `login` parameter:
 
@@ -81,7 +81,7 @@ CREATE ROLE
 You can now confirm that the `junior_dev` and `senior_dev` users can login to the database:
 
 ```bash
-➜ psql postgres://junior_dev.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://junior_dev.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 
 postgres=> select current_role;
 ┌──────────────┐
@@ -93,7 +93,7 @@ postgres=> select current_role;
 
 postgres=> exit
 
-➜ psql postgres://senior_dev.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://senior_dev.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 
 postgres=> select current_role;
 ┌──────────────┐
@@ -111,7 +111,7 @@ For the rest of the post, open three terminals and login each with `junior_dev`,
 postgres=> this command should be executed from the junior_dev's terminal
 ```
 
-## Creating Objects and Assigning Privileges
+### Creating Objects and Assigning Privileges
 
 Let's now try to create a table from as `junior_dev`:
 
@@ -331,7 +331,7 @@ postgres=> select * from public.apps;
 
 A `grant` command only adds privileges for existing objects. What if we want to grant certain privileges to objects as soon as they are created? That’s where default access privileges come in.
 
-### Default Access Privileges
+#### Default Access Privileges
 
 If `junior_dev` now creates another table, it has to grant the privileges again to `senior_dev`. To avoid doing this each time `junior_dev` creates a new table, we can alter `junior_dev`'s default access privileges. First let’s see the current default privileges on the `public` schema:
 
@@ -443,7 +443,7 @@ Note that we were immediately able to select data from `public.users` without ex
 
 It is clear from above that the owner has all the privileges on an object which they can grant to other roles. But it can become cumbersome for the owner to keep granting the same privileges to every new role. There is a better way. We can ensure that objects are owned by a group and then any users which need access to those objects are assigned membership to the group. Let’s see how this works.
 
-## Creating Groups
+### Creating Groups
 
 We want to create a new `developers` group which will own the `public.apps` table. Then we will make `junior_dev` and `senior_dev` members of the `developers` group. This will ensure that they both have the same kind of access, without explicitly granting privileges after creating a new object.
 
@@ -567,7 +567,7 @@ postgres=> select * from public.apps;
 
 The reason `junior_dev` and `senior_dev` are able to insert and select data is because they are part of the `developers` group. If a new developer is created later, they are just a `grant developers to <new dev>` away from having the same access as every other developer. Contrast this with the previous method in which the new user would have to ask the owner of every object to grant them permissions.
 
-## Grant Options
+### Grant Options
 
 Making a user part of another group might grant it three abilities:
 
@@ -600,7 +600,7 @@ REVOKE ROLE
 
 Without the `admin` option, `junior_dev` wouldn’t have been able to do this.
 
-## Role Attributes
+### Role Attributes
 
 Every role has some attributes associated with it which control the behavior of the role. Some of the common ones are listed below. For the full list and their details, refer to the [Postgres role attributes documentation](https://www.postgresql.org/docs/current/role-attributes.html).
 
@@ -609,19 +609,19 @@ Every role has some attributes associated with it which control the behavior of 
 - `createdb` - controls whether the role will be able to create databases.
 - `createrole` - controls whether the role will be able to create other roles.
 - `replication` - controls whether the role can be used to initiate replication.
-- `bypassrls` - controls whether the role can bypass row level security.
+- `bypassrls` - controls whether the role can bypass [row level security](/docs/guides/database/postgres/row-level-security).
 - `connection limit` - limits the maximum number of connections that the role can make to the database.
 - `inherit` - controls whether the role can inherit permissions from roles it is a member of.
 
-## Special Roles
+### Special Roles
 
 There are two special roles which play an important part in how roles and privileges are managed.
 
-### Superuser
+#### Superuser
 
 A `superuser` is a role with the `superuser` attribute set. A `superuser` is like a root user on the \*nix OSes. It is very powerful and bypasses all privilege checks except authentication during login. For this reason, you should avoid working with this role as much as possible. Only superusers can create other `superuser` roles.
 
-### Public
+#### Public
 
 `public` is a group role which every other role is automatically a part of. There is only one `public` role. So unlike `superuser`, there’s no `public` role attribute. The `public` role is used to provide privileges which are considered to be so common that every role should have them. These privileges are:
 
@@ -729,7 +729,7 @@ ERROR:  permission denied for function add
 
 Another thing to note here is that when we revoked `execute` privilege on `add` from `junior_dev`, there was actually nothing to revoke. But Postgres did not show us any warning. So it is important to always explicitly check the permissions, especially after a `revoke` command.
 
-## Summary
+### Summary
 
 To summarize:
 
@@ -743,6 +743,6 @@ To summarize:
 - `grant` command only grants privileges on existing objects.
 - Default privileges control privileges to be granted to objects created in the future.
 
-## Conclusion
+### Conclusion
 
 Postgres permissions follow the traditional objects, roles, privileges model but it has its subtleties which can surprise users unless they understand it in detail. In this post we experimented with this model to understand it in depth. Hope this understanding will allow you to manage and protect your Postgres database more effectively.

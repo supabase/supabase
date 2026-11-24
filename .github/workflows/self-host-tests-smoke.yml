@@ -91,6 +91,13 @@ jobs:
           cd docker
           sh tests/test-functions-cors.sh
 
+      - name: Run response sandbox tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-response-sandbox.sh
+
       - name: Run S3 protocol tests
         shell: bash
         run: |

@@ -140,8 +140,7 @@ describe('initSentryTanStackClient', () => {
   it('passes the Vercel commit SHA as the release so session envelopes are sent', async () => {
     // The SDK silently drops session envelopes when the client has no release
     // (`Client.sendSession` early-returns) — without this, Release Health
-    // sends no /envelope traffic at all on the TanStack build. The Next build
-    // instead gets its release injected at build time by withSentryConfig.
+    // sends no /envelope traffic at all.
     vi.stubEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA', 'abc123commit')
     const initSentryTanStackClient = await loadInitializer()
 

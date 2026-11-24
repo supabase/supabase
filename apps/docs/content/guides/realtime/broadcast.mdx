@@ -32,7 +32,7 @@ Regardless if it's public or private, the Realtime service connects to your data
 
 </Admonition>
 
-For Authorization, we insert a message and try to read it, and rollback the transaction to verify that the Row Level Security (RLS) policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in [Authorization](/docs/guides/realtime/authorization).
+For Authorization, we insert a message and try to read it, and rollback the transaction to verify that the [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in [Authorization](/docs/guides/realtime/authorization).
 
 ## Subscribe to messages
 
@@ -1090,7 +1090,7 @@ SECURITY DEFINER SET search_path = ''
 AS $$
 BEGIN
     PERFORM realtime.broadcast_changes(
-	    'topic:' || NEW.id::text,   -- topic
+	    'topic:' || coalesce(NEW.id, OLD.id)::text,   -- topic
 		   TG_OP,                          -- event
 		   TG_OP,                          -- operation
 		   TG_TABLE_NAME,                  -- table
