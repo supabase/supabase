@@ -118,6 +118,35 @@ describe('buildLlmsIndexes', () => {
     expect(platform.title).toBe('Supabase Platform guides')
   })
 
+  it('prefixes a page title with its parent section, so repeated titles stay distinct', () => {
+    const [js] = buildLlmsIndexes(
+      [
+        {
+          link: 'reference/javascript/file-buckets-createbucket',
+          title: 'createBucket',
+          parentTitle: 'File Buckets',
+        },
+        { link: 'reference/javascript/initializing', title: 'Initializing' },
+      ],
+      {}
+    )
+
+    expect(js.content).toContain(
+      '- [File Buckets: createBucket](https://supabase.com/docs/reference/javascript/file-buckets-createbucket)\n- [Initializing](https://supabase.com/docs/reference/javascript/initializing)'
+    )
+  })
+
+  it('escapes brackets in page titles so links stay intact', () => {
+    const [realtime] = buildLlmsIndexes(
+      [{ link: 'guides/realtime/beta', title: 'Use [beta] Realtime' }],
+      {}
+    )
+
+    expect(realtime.content).toContain(
+      '- [Use \\[beta\\] Realtime](https://supabase.com/docs/guides/realtime/beta.md)'
+    )
+  })
+
   it('capitalizes the section name when the section has no landing page', () => {
     const [database] = buildLlmsIndexes([{ link: 'guides/database/tables', title: 'Tables' }], {})
 
@@ -141,6 +170,8 @@ describe('buildDocsLlmsTxt', () => {
         '',
         '> Supabase is a Postgres development platform. Each index below lists every page in one area of the docs: a guide section, an SDK, the CLI, or the Management API.',
         '',
+        'For the complete documentation in a single file, see https://supabase.com/llms-full.txt. For product overviews and pricing, see the site-wide index at https://supabase.com/llms.txt.',
+        '',
         '## Guides',
         '',
         '- [Supabase Auth guides](https://supabase.com/docs/llms/guides/auth.txt)',
@@ -151,5 +182,16 @@ describe('buildDocsLlmsTxt', () => {
         '',
       ].join('\n')
     )
+  })
+})
+
+describe('buildDocsLlmsTxt with an unknown area', () => {
+  it('throws rather than leaving the index unlinked', () => {
+    const indexes = buildLlmsIndexes(
+      [{ link: 'troubleshooting/slow-queries', title: 'Slow queries' }],
+      {}
+    )
+
+    expect(() => buildDocsLlmsTxt(indexes)).toThrow('troubleshooting/slow-queries')
   })
 })

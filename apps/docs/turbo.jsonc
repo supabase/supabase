@@ -101,6 +101,7 @@
       "dependsOn": ["build:federated-content", "codegen:references"],
       "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["content/guides/**"] }],
       "outputs": ["public/sitemap.xml"],
+      "env": ["ENABLED_FEATURES_OVERRIDE_DISABLE_ALL"],
     },
     "build:llms-indexes": {
       "dependsOn": ["build:federated-content", "codegen:references"],

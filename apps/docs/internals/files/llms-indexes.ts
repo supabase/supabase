@@ -2,7 +2,7 @@ import type { SitemapPage } from './sitemap-pages'
 
 const DOCS_URL = 'https://supabase.com/docs'
 
-export type IndexedPage = Pick<SitemapPage, 'link' | 'title' | 'version'>
+export type IndexedPage = Pick<SitemapPage, 'link' | 'title' | 'version' | 'parentTitle'>
 
 export interface LlmsIndex {
   path: string
@@ -14,6 +14,10 @@ interface Area {
   section: string
   version?: string
   pages: Array<IndexedPage>
+}
+
+function linkText(text: string) {
+  return text.replace(/[\\[\]]/g, (char) => `\\${char}`)
 }
 
 function sectionOf(page: IndexedPage) {
@@ -50,7 +54,10 @@ function buildIndex(
     '',
     '## Pages',
     '',
-    ...pages.map((page) => `- [${page.title}](${pageUrl(page)})`),
+    ...pages.map((page) => {
+      const text = page.parentTitle ? `${page.parentTitle}: ${page.title}` : page.title
+      return `- [${linkText(text)}](${pageUrl(page)})`
+    }),
     '',
   ].join('\n')
 
@@ -59,15 +66,27 @@ function buildIndex(
 
 /** The docs-scoped llms.txt, served at /docs/llms.txt, linking one index per area. */
 export function buildDocsLlmsTxt(indexes: Array<LlmsIndex>): string {
+  const unlinked = indexes.filter(
+    (index) => !index.path.startsWith('guides/') && !index.path.startsWith('reference/')
+  )
+  if (unlinked.length > 0) {
+    throw new Error(
+      `No llms.txt heading for indexes: ${unlinked.map((index) => index.path).join(', ')}`
+    )
+  }
+
   const links = (prefix: string) =>
     indexes
       .filter((index) => index.path.startsWith(prefix))
-      .map((index) => `- [${index.title}](${DOCS_URL}/llms/${index.path}.txt)`)
+      .map((index) => `- [${linkText(index.title)}](${DOCS_URL}/llms/${index.path}.txt)`)
 
   return [
     '# Supabase Docs',
     '',
     '> Supabase is a Postgres development platform. Each index below lists every page in one area of the docs: a guide section, an SDK, the CLI, or the Management API.',
+    '',
+    // Bare URLs, not links, so AFDocs doesn't walk these large files as page indexes.
+    'For the complete documentation in a single file, see https://supabase.com/llms-full.txt. For product overviews and pricing, see the site-wide index at https://supabase.com/llms.txt.',
     '',
     '## Guides',
     '',

@@ -11,6 +11,8 @@ export interface SitemapPage {
   title: string
   /** Set only on reference pages from an older SDK version. */
   version?: string
+  /** The reference nav section a reference page sits in, such as "File Buckets". */
+  parentTitle?: string
 }
 
 export async function getSitemapPages(): Promise<SitemapPage[]> {
