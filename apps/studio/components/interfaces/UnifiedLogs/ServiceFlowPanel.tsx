@@ -18,7 +18,6 @@ import {
   RequestTimeline,
   useRequestTraceId,
 } from './components/RequestTimeline'
-import { RequestTraceWaterfall } from './components/RequestTraceWaterfall'
 import { useLogEnrichment } from './components/useLogEnrichment'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
@@ -69,7 +68,7 @@ export function ServiceFlowPanel({
   const showTimeline = isRequestTimelineEnabled && !isProcessLog
   const showUser = !isProcessLog
 
-  const { traceId, logCount } = useRequestTraceId(
+  const { traceId } = useRequestTraceId(
     {
       projectRef,
       logId: selectedRow?.id,
@@ -78,13 +77,12 @@ export function ServiceFlowPanel({
     },
     { enabled: showTimeline && enableTracesWaterfall }
   )
-  const showWaterfall = showTimeline && enableTracesWaterfall && !!traceId
+  const traceIdForTimeline = enableTracesWaterfall ? traceId : undefined
 
   const tabs = [
     'overview',
     'raw-json',
     ...(showTimeline ? ['timeline'] : []),
-    ...(showWaterfall ? ['waterfall'] : []),
     ...(showUser ? ['user'] : []),
   ]
   const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
@@ -155,11 +153,6 @@ export function ServiceFlowPanel({
                     Timeline
                   </TabsTrigger>
                 )}
-                {showWaterfall && (
-                  <TabsTrigger value="waterfall" className={TAB_TRIGGER_CLASS_NAME}>
-                    Waterfall
-                  </TabsTrigger>
-                )}
                 {showUser && (
                   <TabsTrigger value="user" className={TAB_TRIGGER_CLASS_NAME}>
                     User
@@ -178,13 +171,7 @@ export function ServiceFlowPanel({
                       row={selectedRow}
                       activeLog={activeLog}
                       onSelectLog={handleSelectTimelineLog}
-                    />
-                  )}
-                  {tab === 'waterfall' && traceId && (
-                    <RequestTraceWaterfall
-                      traceId={traceId}
-                      logCount={logCount}
-                      onViewTimeline={() => setActiveTab('timeline')}
+                      traceId={traceIdForTimeline}
                     />
                   )}
                   {tab === 'user' && activeLog && (
@@ -196,7 +183,6 @@ export function ServiceFlowPanel({
                       tab={tab}
                       searchParameters={searchParameters}
                       overviewHeader={<LogTimestampHeader log={activeLog} />}
-                      onViewWaterfall={showWaterfall ? () => setActiveTab('waterfall') : undefined}
                     />
                   )}
                 </TabsContent>

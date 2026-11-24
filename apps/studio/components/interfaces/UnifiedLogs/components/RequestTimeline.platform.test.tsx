@@ -303,101 +303,137 @@ describe('request timeline tab', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('shows a Waterfall tab once a trace_id resolves, rendering the trace spans', async () => {
-    const user = userEvent.setup()
-    const traceId = 'a'.repeat(32)
-    const rows = timelineRows.map((row) => ({
-      ...row,
-      metadata: { ...row.metadata, trace_id: traceId },
-    }))
+  const TRACE_ID = 'a'.repeat(32)
+  const tracedRows = timelineRows.map((row) => ({
+    ...row,
+    metadata: { ...row.metadata, trace_id: TRACE_ID, span_id: 'span-1' },
+  }))
+  const spanResponse = {
+    data: [
+      {
+        type: 'span',
+        id: 'span-1',
+        attributes: {
+          parent_span_id: null,
+          service_name: 'postgrest',
+          span_name: 'GET /rest/v1/orders',
+          span_kind: 'server',
+          status_code: 'ok',
+          start_time: '2026-01-01T10:00:00.000Z',
+          duration_ns: 1_500_000,
+        },
+      },
+      {
+        type: 'span',
+        id: 'span-2',
+        attributes: {
+          parent_span_id: 'span-1',
+          service_name: 'postgres',
+          span_name: 'SELECT orders',
+          span_kind: 'client',
+          status_code: 'ok',
+          start_time: '2026-01-01T10:00:00.002Z',
+          duration_ns: 900_000,
+        },
+      },
+    ],
+    meta: { partial: true },
+  }
+  const mockTrace = (response: typeof spanResponse = spanResponse) =>
     mswServer.use(
-      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, ({ params }) => {
-        expect(params.traceId).toBe(traceId)
-        return HttpResponse.json({
-          data: [
-            {
-              type: 'span',
-              id: 'span-1',
-              attributes: {
-                parent_span_id: null,
-                service_name: 'postgrest',
-                span_name: 'GET /rest/v1/orders',
-                span_kind: 'server',
-                status_code: 'ok',
-                start_time: '2026-01-01T10:00:00.000Z',
-                duration_ns: 1_500_000,
-              },
-            },
-          ],
-          meta: { partial: true },
-        })
-      })
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json(response)
+      )
     )
-    const { queryClient } = renderPanel(rows)
 
-    await user.click(await screen.findByRole('tab', { name: 'Waterfall' }))
+  it('shows the trace strip with its spans, services and a link to the filtered logs', async () => {
+    const user = userEvent.setup()
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows)
 
-    expect(await screen.findByRole('heading', { name: 'GET /rest/v1/orders' })).toBeVisible()
+    await openTimeline(user)
+
+    expect(await screen.findByText('2 spans')).toBeVisible()
+    expect(screen.getByText('postgres, postgrest')).toBeVisible()
+    expect(screen.getByText('aaaaaaaa…aaaa')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'View logs' })).toHaveAttribute(
+      'href',
+      expect.stringContaining(`filter=attribute.trace_id%3Aeq%3A${TRACE_ID}`)
+    )
+    expect(screen.getByRole('link', { name: 'View logs' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('date=')
+    )
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('hides the Waterfall tab when enableTracesWaterfall is off, even with a resolvable trace_id', async () => {
-    const traceId = 'a'.repeat(32)
-    const rows = timelineRows.map((row) => ({
-      ...row,
-      metadata: { ...row.metadata, trace_id: traceId },
-    }))
-    const { queryClient } = renderPanel(rows, { enableTracesWaterfall: false })
+  it('keeps the strip and its link when the trace fetch fails, without span details', async () => {
+    const user = userEvent.setup()
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json({ message: 'Not found' }, { status: 404 })
+      )
+    )
+    renderPanel(tracedRows)
 
-    await screen.findByRole('tab', { name: 'Timeline' })
-    expect(screen.queryByRole('tab', { name: 'Waterfall' })).not.toBeInTheDocument()
+    await openTimeline(user)
+
+    expect(await screen.findByRole('link', { name: 'View logs' })).toBeVisible()
+    expect(screen.queryByText(/spans?$/)).not.toBeInTheDocument()
+  })
+
+  it('renders nothing extra when the selected log has no trace_id', async () => {
+    const user = userEvent.setup()
+    const { queryClient } = renderPanel(timelineRows)
+
+    await openTimeline(user)
+
+    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('jumps to the Waterfall tab from the trace_id row on the Overview tab', async () => {
+  it('expands a row into its span and its direct children', async () => {
     const user = userEvent.setup()
-    const traceId = 'a'.repeat(32)
-    const rows = timelineRows.map((row) => ({
-      ...row,
-      metadata: { ...row.metadata, trace_id: traceId },
-    }))
-    mswServer.use(
-      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
-        HttpResponse.json({ data: [], meta: { partial: true } })
-      )
-    )
-    renderPanel(rows, { selectedLog: { ...gatewayLog, metadata: { trace_id: traceId } } })
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows)
 
-    // Wait for the Waterfall tab to resolve, which is also what gates the dropdown action.
-    await screen.findByRole('tab', { name: 'Waterfall' })
+    await openTimeline(user)
 
-    await user.click(await screen.findByRole('button', { name: 'Details' }))
-    await user.click(await screen.findByRole('button', { name: new RegExp(traceId) }))
-    await user.click(await screen.findByRole('menuitem', { name: 'View waterfall' }))
+    await user.click((await screen.findAllByRole('button', { name: 'Show spans' }))[0])
+    const spans = await screen.findByRole('list', { name: 'Spans' })
 
-    expect(screen.getByRole('tab', { name: 'Waterfall' })).toHaveAttribute('aria-selected', 'true')
+    expect(within(spans).getByText('GET /rest/v1/orders')).toBeVisible()
+    expect(within(spans).getByText('SELECT orders')).toBeVisible()
+    expect(within(spans).getByText('+0 ms')).toBeVisible()
+    expect(within(spans).getByText('+2 ms')).toBeVisible()
+    expect(within(spans).getByText('2 ms')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('offers to switch to Timeline when the waterfall has no spans but logs correlate', async () => {
+  it('leaves rows unexpandable when their span_id matches no span', async () => {
     const user = userEvent.setup()
-    const traceId = 'a'.repeat(32)
-    const rows = timelineRows.map((row) => ({
-      ...row,
-      metadata: { ...row.metadata, trace_id: traceId },
-    }))
-    mswServer.use(
-      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
-        HttpResponse.json({ data: [], meta: { partial: true } })
-      )
-    )
-    renderPanel(rows)
+    mockTrace({ data: [], meta: { partial: false } })
+    const { queryClient } = renderPanel(tracedRows)
 
-    await user.click(await screen.findByRole('tab', { name: 'Waterfall' }))
+    await openTimeline(user)
 
-    expect(await screen.findByText(/2 correlated logs/)).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'View in Timeline' }))
+    expect(await screen.findByRole('link', { name: 'View logs' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Partial')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
 
-    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
+  it('hides the trace strip when enableTracesWaterfall is off', async () => {
+    const user = userEvent.setup()
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows, { enableTracesWaterfall: false })
+
+    await openTimeline(user)
+
+    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
   // A spinner the size of the icon replaces a loading row, so nothing shifts when loading ends

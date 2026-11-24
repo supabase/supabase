@@ -1,4 +1,4 @@
-import { Loader2Icon } from 'lucide-react'
+import { ChevronRightIcon, Loader2Icon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 
@@ -8,6 +8,12 @@ import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { LogLevelDot } from './LogLevelDot'
 import { foldTimelineSteps } from './LogTimeline.utils'
 import { LogTypeIcon } from './LogTypeIcon'
+import {
+  formatDurationMs,
+  formatOffsetMs,
+  MAX_SPAN_ROWS,
+  type TraceSpanRow,
+} from './TraceSpans.utils'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface LogTimelineProps {
@@ -19,6 +25,8 @@ interface LogTimelineProps {
   getLogHref?: (log: ColumnSchema) => string
   collapsedStepCount?: number
   footer?: ReactNode
+  /** Spans recorded against a log, when the trace has any. Rows without spans don't expand. */
+  getLogSpans?: (log: ColumnSchema) => TraceSpanRow[]
 }
 
 export function LogTimeline({
@@ -30,6 +38,7 @@ export function LogTimeline({
   getLogHref,
   collapsedStepCount,
   footer,
+  getLogSpans,
 }: LogTimelineProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const items = foldTimelineSteps(logs, {
@@ -65,6 +74,7 @@ export function LogTimeline({
             hasNext={hasNext}
             href={getLogHref?.(item.log)}
             onSelect={onSelectLog}
+            spans={getLogSpans?.(item.log) ?? []}
           />
         )
       })}
@@ -140,6 +150,7 @@ interface TimelineStepProps {
   hasNext: boolean
   href?: string
   onSelect?: (log: ColumnSchema) => void
+  spans: TraceSpanRow[]
 }
 
 function TimelineStep({
@@ -150,7 +161,9 @@ function TimelineStep({
   hasNext,
   href,
   onSelect,
+  spans,
 }: TimelineStepProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
   const className = cn(
     'flex w-full min-w-0 items-center gap-3 px-4 py-1.5 text-left',
     'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-none',
@@ -169,22 +182,76 @@ function TimelineStep({
 
   return (
     <li>
-      {href ? (
-        <a href={href} aria-current={isActive ? 'true' : undefined} className={className}>
-          {content}
-        </a>
-      ) : (
-        <button
-          type="button"
-          tabIndex={0}
-          aria-current={isActive ? 'true' : undefined}
-          onClick={() => onSelect?.(log)}
-          className={className}
-        >
-          {content}
-        </button>
-      )}
+      <div className="flex items-stretch">
+        {href ? (
+          <a href={href} aria-current={isActive ? 'true' : undefined} className={className}>
+            {content}
+          </a>
+        ) : (
+          <button
+            type="button"
+            tabIndex={0}
+            aria-current={isActive ? 'true' : undefined}
+            onClick={() => onSelect?.(log)}
+            className={className}
+          >
+            {content}
+          </button>
+        )}
+        {spans.length > 0 && (
+          <button
+            type="button"
+            tabIndex={0}
+            aria-expanded={isExpanded}
+            aria-label={isExpanded ? 'Hide spans' : 'Show spans'}
+            onClick={() => setIsExpanded((current) => !current)}
+            className={cn(
+              'flex shrink-0 items-center px-2 text-foreground-lighter',
+              'hover:bg-surface-200 hover:text-foreground',
+              'focus-visible:bg-surface-200 focus-visible:outline-none',
+              isActive && 'bg-surface-200'
+            )}
+          >
+            <ChevronRightIcon
+              size={12}
+              className={cn('transition-transform', isExpanded && 'rotate-90')}
+            />
+          </button>
+        )}
+      </div>
+      {isExpanded && <SpanRows spans={spans} />}
     </li>
+  )
+}
+
+function SpanRows({ spans }: { spans: TraceSpanRow[] }) {
+  const visibleSpans = spans.slice(0, MAX_SPAN_ROWS)
+  const hiddenCount = spans.length - visibleSpans.length
+
+  return (
+    <ul aria-label="Spans" className="flex flex-col gap-0.5 py-1 pl-11 pr-4">
+      {visibleSpans.map((span) => (
+        <li
+          key={span.id}
+          className="flex min-w-0 items-center gap-2 font-mono text-xs leading-5 tracking-tight"
+        >
+          <span className="w-14 shrink-0 text-foreground-lighter">
+            {formatOffsetMs(span.offsetMs)}
+          </span>
+          <span className="shrink-0 text-foreground-light">{span.service}</span>
+          <span className="min-w-0 flex-1 truncate text-foreground-lighter">{span.name}</span>
+          {span.status === 'error' && (
+            <span className="shrink-0 text-destructive">{span.status}</span>
+          )}
+          <span className="shrink-0 text-foreground-lighter">
+            {formatDurationMs(span.durationMs)}
+          </span>
+        </li>
+      ))}
+      {hiddenCount > 0 && (
+        <li className="pl-16 text-xs leading-5 text-foreground-lighter">+{hiddenCount} more</li>
+      )}
+    </ul>
   )
 }
 

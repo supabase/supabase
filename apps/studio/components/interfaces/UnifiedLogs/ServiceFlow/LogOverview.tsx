@@ -82,13 +82,11 @@ export function LogOverview({
   header,
   attributes,
   onAddAttributeFilter,
-  onViewWaterfall,
   ...props
 }: LogOverviewProps & {
   header?: ReactNode
   attributes?: ColumnSchema['metadata']
   onAddAttributeFilter?: AddAttributeFilter
-  onViewWaterfall?: () => void
 }) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
 
@@ -100,11 +98,7 @@ export function LogOverview({
           <Renderer {...props} />
           {attributes && Object.keys(attributes).length > 0 && (
             <CollapsibleDetailSection title="Attributes" icon={BracesIcon} className="border-b">
-              <LogAttributes
-                attributes={attributes}
-                onAddFilter={onAddAttributeFilter}
-                onViewWaterfall={onViewWaterfall}
-              />
+              <LogAttributes attributes={attributes} onAddFilter={onAddAttributeFilter} />
             </CollapsibleDetailSection>
           )}
         </>
@@ -113,7 +107,6 @@ export function LogOverview({
           data={props.data}
           attributes={attributes}
           onAddAttributeFilter={onAddAttributeFilter}
-          onViewWaterfall={onViewWaterfall}
           filterFields={props.filterFields}
           table={props.table}
         />

@@ -26,7 +26,7 @@ const spanSchema = z.object({
 
 const traceSpansResponseSchema = z.object({
   data: z.array(spanSchema),
-  meta: z.object({ partial: z.literal(true) }),
+  meta: z.object({ partial: z.boolean() }),
 })
 
 export type TraceSpan = z.infer<typeof spanSchema>
