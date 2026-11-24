@@ -370,10 +370,11 @@ export const connectSchema: ConnectSchema = {
     useSharedPooler: {
       id: 'useSharedPooler',
       type: 'switch',
-      label: 'Use IPv4 connection',
-      description: 'Uses the shared pooler. Recommended on networks that do not support IPv6.',
+      label: 'Use IPv4 connection (shared pooler)',
+      description: 'Recommended on networks that do not support IPv6.',
       defaultValue: false,
       dependsOn: { connectionMethod: ['transaction'] },
+      inlineWithOption: { fieldId: 'connectionMethod', value: 'transaction' },
     },
     connectionType: {
       id: 'connectionType',

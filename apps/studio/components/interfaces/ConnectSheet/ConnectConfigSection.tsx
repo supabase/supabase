@@ -41,6 +41,7 @@ import {
   getConnectModeButtonCornerVariants,
   getConnectModeEmptySlotClasses,
 } from './ConnectModeButton'
+import { ConnectRadioListField } from './ConnectRadioListField'
 
 interface ConnectConfigSectionProps {
   activeFields: ResolvedField[]
@@ -137,27 +138,13 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
               >
-                <RadioGroupStacked
-                  value={String(value ?? '')}
-                  onValueChange={(v) => onFieldChange(field.id, v)}
-                  className="min-w-0 w-full"
-                >
-                  {options.map((option) => (
-                    <RadioGroupStackedItem
-                      key={option.value}
-                      id={`connect-${field.id}-${option.value}`}
-                      value={option.value}
-                      className="min-w-0 w-full text-left"
-                      label={
-                        <span className="flex min-w-0 items-center gap-2">
-                          {option.icon && <ConnectionIcon icon={option.icon} />}
-                          <span className="truncate">{option.label}</span>
-                        </span>
-                      }
-                      description={option.description}
-                    />
-                  ))}
-                </RadioGroupStacked>
+                <ConnectRadioListField
+                  field={field}
+                  options={options}
+                  state={state}
+                  activeFields={activeFields}
+                  onFieldChange={onFieldChange}
+                />
               </FormItemLayout>
             )
 
@@ -205,6 +192,9 @@ export function ConnectConfigSection({
             )
 
           case 'switch':
+            // Rendered inline within its parent field's option
+            if (field.inlineWithOption) return null
+
             return (
               <FormItemLayout
                 key={field.id}
