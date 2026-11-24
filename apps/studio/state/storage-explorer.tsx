@@ -1617,7 +1617,7 @@ export function createStorageExplorerState({
             { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
           )
         } else {
-          toast.success(
+          toast.warning(
             `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
               numberOfFilesToUpload > 1 ? 's' : ''
             }!`,
