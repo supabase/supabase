@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import {
   FormControl,
@@ -65,7 +64,6 @@ interface OrganizationDetailsFieldsProps<TFieldValues extends FieldValues> {
   nameField?: FieldPath<TFieldValues>
   kindField?: FieldPath<TFieldValues>
   sizeField?: FieldPath<TFieldValues>
-  renderFieldWrapper?: (children: ReactNode, field: 'name' | 'kind' | 'size') => ReactNode
 }
 
 export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
@@ -74,45 +72,69 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
   nameField = 'name' as FieldPath<TFieldValues>,
   kindField = 'kind' as FieldPath<TFieldValues>,
   sizeField = 'size' as FieldPath<TFieldValues>,
-  renderFieldWrapper = (children) => children,
 }: OrganizationDetailsFieldsProps<TFieldValues>) => (
   <>
-    {renderFieldWrapper(
+    <FormField
+      control={control}
+      name={nameField}
+      render={({ field }) => (
+        <FormItemLayout
+          label="Name"
+          layout="horizontal"
+          description="What's the name of your company or team? You can change this later."
+        >
+          <FormControl>
+            <Input
+              autoFocus
+              type="text"
+              placeholder="Organization name"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              data-bwignore
+              {...field}
+            />
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+    <FormField
+      control={control}
+      name={kindField}
+      render={({ field }) => (
+        <FormItemLayout
+          label="Type"
+          layout="horizontal"
+          description="What best describes your organization?"
+        >
+          <FormControl>
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {Object.entries(ORG_KIND_TYPES).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+
+    {kind === 'COMPANY' && (
       <FormField
         control={control}
-        name={nameField}
+        name={sizeField}
         render={({ field }) => (
           <FormItemLayout
-            label="Name"
+            label="Company size"
             layout="horizontal"
-            description="What's the name of your company or team? You can change this later."
-          >
-            <FormControl>
-              <Input
-                autoFocus
-                type="text"
-                placeholder="Organization name"
-                data-1p-ignore
-                data-lpignore="true"
-                data-form-type="other"
-                data-bwignore
-                {...field}
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />,
-      'name'
-    )}
-    {renderFieldWrapper(
-      <FormField
-        control={control}
-        name={kindField}
-        render={({ field }) => (
-          <FormItemLayout
-            label="Type"
-            layout="horizontal"
-            description="What best describes your organization?"
+            description="How many people are in your company?"
           >
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
@@ -121,7 +143,7 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
                 </SelectTrigger>
 
                 <SelectContent>
-                  {Object.entries(ORG_KIND_TYPES).map(([key, label]) => (
+                  {Object.entries(ORG_SIZE_TYPES).map(([key, label]) => (
                     <SelectItem key={key} value={key}>
                       {label}
                     </SelectItem>
@@ -131,40 +153,7 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
             </FormControl>
           </FormItemLayout>
         )}
-      />,
-      'kind'
+      />
     )}
-
-    {kind === 'COMPANY' &&
-      renderFieldWrapper(
-        <FormField
-          control={control}
-          name={sizeField}
-          render={({ field }) => (
-            <FormItemLayout
-              label="Company size"
-              layout="horizontal"
-              description="How many people are in your company?"
-            >
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {Object.entries(ORG_SIZE_TYPES).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />,
-        'size'
-      )}
   </>
 )
