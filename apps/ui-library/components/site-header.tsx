@@ -25,11 +25,11 @@ import { CommandMenu } from '@/components/command-menu'
 import { Sidebar } from '@/components/sidebar'
 import { ThemeSwitcherDropdown } from '@/components/theme-switcher-dropdown'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '@/config/library'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 import { useMenuAim } from '@/hooks/use-menu-aim'
 
 export function SiteHeader() {
-  const { framework } = useFramework()
+  const { framework } = useFrameworkPreference()
   const [activeCategory, setActiveCategory] = useState<string>(libraryCategories[0].name)
 
   const menuAim = useMenuAim(activeCategory, setActiveCategory)

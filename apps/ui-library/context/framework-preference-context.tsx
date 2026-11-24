@@ -11,9 +11,9 @@ type FrameworkContextType = {
   setFramework: (framework: Framework) => void
 }
 
-const FrameworkContext = createContext<FrameworkContextType | undefined>(undefined)
+const FrameworkPreferenceContext = createContext<FrameworkContextType | undefined>(undefined)
 
-export function FrameworkProvider({ children }: { children: React.ReactNode }) {
+export function FrameworkPreferenceProvider({ children }: { children: React.ReactNode }) {
   const [framework, setFrameworkState] = useState<Framework>('nextjs')
 
   // Initialize from localStorage on mount (client-side only)
@@ -31,17 +31,17 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <FrameworkContext.Provider value={{ framework, setFramework }}>
+    <FrameworkPreferenceContext.Provider value={{ framework, setFramework }}>
       {children}
-    </FrameworkContext.Provider>
+    </FrameworkPreferenceContext.Provider>
   )
 }
 
 // Custom hook to use the framework context
-export function useFramework() {
-  const context = useContext(FrameworkContext)
+export function useFrameworkPreference() {
+  const context = useContext(FrameworkPreferenceContext)
   if (context === undefined) {
-    throw new Error('useFramework must be used within a FrameworkProvider')
+    throw new Error('useFrameworkPreference must be used within a FrameworkPreferenceProvider')
   }
   return context
 }

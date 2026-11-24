@@ -1,12 +1,7 @@
 'use client'
 
 import { QueryClientProvider } from '@tanstack/react-query'
-import {
-  AuthProvider,
-  FrameworkProvider as AppFrameworkProvider,
-  ThemeProvider,
-  type FrameworkContextValue,
-} from 'common'
+import { AuthProvider, FrameworkProvider, ThemeProvider, type FrameworkContextValue } from 'common'
 import { Provider as JotaiProvider } from 'jotai'
 import NextImage from 'next/image'
 import NextLink from 'next/link'
@@ -14,7 +9,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { PropsWithChildren, useMemo } from 'react'
 import { TooltipProvider } from 'ui'
 
-import { FrameworkProvider } from '@/context/framework-context'
+import { FrameworkPreferenceProvider } from '@/context/framework-preference-context'
 import { MobileMenuProvider } from '@/context/mobile-menu-context'
 import { useRootQueryClient } from '@/lib/fetch/queryClient'
 
@@ -35,20 +30,20 @@ export function Providers({ children }: PropsWithChildren) {
   )
 
   return (
-    <AppFrameworkProvider value={framework}>
+    <FrameworkProvider value={framework}>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <JotaiProvider>
             <ThemeProvider>
               <MobileMenuProvider>
-                <FrameworkProvider>
+                <FrameworkPreferenceProvider>
                   <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
-                </FrameworkProvider>
+                </FrameworkPreferenceProvider>
               </MobileMenuProvider>
             </ThemeProvider>
           </JotaiProvider>
         </QueryClientProvider>
       </AuthProvider>
-    </AppFrameworkProvider>
+    </FrameworkProvider>
   )
 }
