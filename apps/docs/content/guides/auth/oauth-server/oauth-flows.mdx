@@ -798,6 +798,11 @@ Users can view and manage the OAuth applications they've authorized to access th
 Users can retrieve a list of all OAuth clients they've authorized:
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
 const { data: grants, error } = await supabase.auth.oauth.listGrants()
 
 if (error) {
@@ -829,6 +834,12 @@ The response includes details about each authorized OAuth client:
 Users can revoke access for a specific OAuth client at any time. When access is revoked, all active sessions and refresh tokens for that client are immediately invalidated:
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const clientId = '9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d'
+
+// ---cut---
 const { error } = await supabase.auth.oauth.revokeGrant({ clientId })
 
 if (error) {
