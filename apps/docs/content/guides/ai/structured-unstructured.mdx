@@ -86,7 +86,7 @@ create table docs (
   id uuid primary key,
   embedding extensions.vector(3),
   content text,
-  url string,
+  url text,
   meta jsonb
 );
 
