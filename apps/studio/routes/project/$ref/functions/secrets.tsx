@@ -38,7 +38,7 @@ function SecretsPage() {
 
   if (!IS_PLATFORM) {
     return (
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent className="space-y-4 md:space-y-8">
             {isCli && (
@@ -93,7 +93,7 @@ function SecretsPage() {
   }
 
   return (
-    <PageContainer size="large">
+    <PageContainer size="default">
       <PageSection>
         <PageSectionContent className="space-y-4 md:space-y-8">
           <EdgeFunctionSecrets />
@@ -105,7 +105,7 @@ function SecretsPage() {
 
 const SecretsPageWrapper = ({ children }: PropsWithChildren) => (
   <div className="w-full min-h-full flex flex-col items-stretch">
-    <PageHeader size="large">
+    <PageHeader size="default">
       <PageHeaderMeta>
         <PageHeaderSummary>
           <PageHeaderTitle>Edge Function Secrets</PageHeaderTitle>
