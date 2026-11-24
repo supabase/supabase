@@ -35,7 +35,6 @@ import {
   ORG_KIND_DEFAULT,
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
-  OrganizationDetailsFields,
   organizationDetailsSchema,
   type OrgKind,
   type OrgSize,
@@ -56,7 +55,6 @@ import {
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
 import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveySelect } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveySelect'
-import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
@@ -103,8 +101,6 @@ const formSchema = organizationDetailsSchema.extend({
 })
 
 type FormState = z.infer<typeof formSchema>
-
-type OrgSubmission = { values: FormState; hasSurveyInOrgForm: boolean }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -178,17 +174,12 @@ export const NewOrgForm = ({
     },
   })
 
-  const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant({
-    isFormExposed: user.isSuccess,
-  })
-  const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'org_form'
-  // What was submitted and whether the survey was on the form, fixed at submit:
-  // the survey step runs after creation (much later after a card confirmation),
-  // when the form values and flag may have moved on. With the survey on the
-  // form, kind/size are left out of org creation: the survey endpoint saves them
+  // What was submitted, fixed at submit: the survey step runs after creation
+  // (much later after a card confirmation), when the form values may have moved
+  // on. kind/size are left out of org creation: the survey endpoint saves them
   // and keeps only the first response per user and org, so sending them on both
   // paths would swallow the survey call.
-  const orgSubmission = useRef<OrgSubmission | null>(null)
+  const orgSubmission = useRef<FormState | null>(null)
 
   useEffect(() => {
     form.reset({
@@ -302,10 +293,10 @@ export const NewOrgForm = ({
 
   const submitOrganizationSurvey = async (slug: string) => {
     const submission = orgSubmission.current
-    if (!submission?.hasSurveyInOrgForm) return
+    if (!submission) return
 
-    const { building, can_code: canCode, kind } = submission.values
-    const size = kind === 'COMPANY' ? submission.values.size : undefined
+    const { building, can_code: canCode, kind } = submission
+    const size = kind === 'COMPANY' ? submission.size : undefined
     // Kind and size always hold a value, so only count them as answered when changed
     const hasKind = kind !== defaultValues.kind.toUpperCase()
     const hasSize = size !== undefined && size !== defaultValues.size
@@ -382,13 +373,7 @@ export const NewOrgForm = ({
     if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded' && submission) {
       await confirmPendingSubscriptionChange({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-        name: submission.values.name,
-        ...(submission.hasSurveyInOrgForm
-          ? {}
-          : {
-              kind: submission.values.kind,
-              size: submission.values.size,
-            }),
+        name: submission.name,
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
@@ -447,7 +432,7 @@ export const NewOrgForm = ({
   const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
 
   async function createOrg(
-    { values: formValues, hasSurveyInOrgForm }: OrgSubmission,
+    formValues: FormState,
     paymentMethodId?: string,
     customerData?: {
       address: CustomerAddress | null
@@ -465,12 +450,6 @@ export const NewOrgForm = ({
 
     createOrganization({
       name: formValues.name,
-      ...(hasSurveyInOrgForm
-        ? {}
-        : {
-            kind: formValues.kind,
-            ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
-          }),
       tier,
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
@@ -483,11 +462,10 @@ export const NewOrgForm = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
     setNewOrgLoading(true)
-    const submission = { values: formValues, hasSurveyInOrgForm: showOnboardingSurveyInOrgForm }
-    orgSubmission.current = submission
+    orgSubmission.current = formValues
 
     if (formValues.plan === 'FREE') {
-      await createOrg(submission)
+      await createOrg(formValues)
       return
     }
 
@@ -498,7 +476,7 @@ export const NewOrgForm = ({
     }
 
     setPaymentMethod(result.paymentMethod)
-    createOrg(submission, result.paymentMethod.id, {
+    createOrg(formValues, result.paymentMethod.id, {
       address: result.address,
       billing_name: result.customerName,
       tax_id: result.taxId,
@@ -634,42 +612,32 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            {showOnboardingSurveyInOrgForm ? (
-              <Panel.Content>
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Name"
-                      layout="horizontal"
-                      description="What's the name of your company or team? You can change this later."
-                    >
-                      <FormControl>
-                        <Input
-                          autoFocus
-                          type="text"
-                          placeholder="Organization name"
-                          data-1p-ignore
-                          data-lpignore="true"
-                          data-form-type="other"
-                          data-bwignore
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </Panel.Content>
-            ) : (
-              <OrganizationDetailsFields
+            <Panel.Content>
+              <FormField
                 control={form.control}
-                kind={selectedOrgKind}
-                renderFieldWrapper={(children, field) => (
-                  <Panel.Content key={field}>{children}</Panel.Content>
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    layout="horizontal"
+                    description="What's the name of your company or team? You can change this later."
+                  >
+                    <FormControl>
+                      <Input
+                        autoFocus
+                        type="text"
+                        placeholder="Organization name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
                 )}
               />
-            )}
+            </Panel.Content>
 
             {isBillingEnabled && (
               <Panel.Content>
@@ -802,17 +770,15 @@ export const NewOrgForm = ({
               <UpgradeExistingOrganizationCallout />
             )}
 
-            {showOnboardingSurveyInOrgForm && (
-              <Panel.Content>
-                <CollapsibleCardSection
-                  title="Help improve Supabase"
-                  description="Optional questions to help improve the Supabase experience"
-                  defaultOpen
-                >
-                  {onboardingSurveyFields}
-                </CollapsibleCardSection>
-              </Panel.Content>
-            )}
+            <Panel.Content>
+              <CollapsibleCardSection
+                title="Help improve Supabase"
+                description="Optional questions to help improve the Supabase experience"
+                defaultOpen
+              >
+                {onboardingSurveyFields}
+              </CollapsibleCardSection>
+            </Panel.Content>
           </div>
         </Panel>
 
