@@ -102,6 +102,12 @@
       "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["content/guides/**"] }],
       "outputs": ["public/sitemap.xml"],
     },
+    "build:llms-indexes": {
+      "dependsOn": ["build:federated-content", "codegen:references"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["content/guides/**"] }],
+      "outputs": ["public/llms.txt", "public/llms/**"],
+      "env": ["ENABLED_FEATURES_OVERRIDE_DISABLE_ALL"],
+    },
     "redirects:generate": {
       "outputs": ["lib/redirects/generated/**"],
     },
@@ -160,6 +166,7 @@
         "build:markdown",
         "build:gz-archive",
         "build:sitemap",
+        "build:llms-indexes",
         "redirects:generate",
       ],
       "env": [

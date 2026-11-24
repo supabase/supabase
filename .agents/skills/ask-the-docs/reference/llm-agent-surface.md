@@ -10,21 +10,30 @@ change independently.
 
 ## Scope boundary
 
-| App             | Role                                                                                                               |
-| --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **`apps/docs`** | Produces markdown exports, serves per-guide `.md`, reference static files, GraphQL search, agent onboarding guides |
-| **`apps/www`**  | Serves discovery indexes (`/llms.txt`, `/llms-full.txt`) and product-page `.md` negotiation                        |
+| App             | Role                                                                                                                                                                  |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`apps/docs`** | Produces markdown exports, serves per-guide `.md`, reference static files, GraphQL search, agent onboarding guides, and the docs `llms.txt` with its per-area indexes |
+| **`apps/www`**  | Serves the site-wide discovery indexes (`/llms.txt`, `/llms-full.txt`) and product-page `.md` negotiation                                                             |
 
-`llms.txt` is **not** a route in `apps/docs`. It is assembled at runtime
-by `apps/www/app/llms.txt/route.ts`, reading guide directory names from
-`apps/docs/content/guides/` and linking to docs + reference exports.
-There is no static `llms.txt` file in the repo — the www route handler
-builds it on each request.
+There are two `llms.txt` files:
+
+- **`/docs/llms.txt`** is owned by `apps/docs`. `build:llms-indexes`
+  (`internals/generate-llms-indexes.ts`) writes it as a static file, along
+  with one index per area under `/docs/llms/` (each guide section, each SDK
+  version, the CLI, and the Management API). It builds from the same page
+  list as the docs sitemap (`internals/files/sitemap-pages.ts`), so every
+  sitemap page is one nested index away.
+- **`/llms.txt`** is owned by `apps/www` and covers the whole site: docs,
+  product overviews, pricing, and agent resources. It is assembled at
+  runtime by `apps/www/app/llms.txt/route.ts`. www owns it because it
+  mixes in marketing content, and an earlier docs-built version needed the
+  docs build to read www's files.
 
 ### Key source files
 
 | What                  | Monorepo path                                    | Public URL (prod)                                 |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------- |
+| Docs `llms.txt`       | `apps/docs/internals/generate-llms-indexes.ts`   | `https://supabase.com/docs/llms.txt`              |
 | `llms.txt` route      | `apps/www/app/llms.txt/route.ts`                 | `https://supabase.com/llms.txt`                   |
 | `llms-full.txt` route | `apps/www/app/llms-full.txt/route.ts`            | `https://supabase.com/llms-full.txt`              |
 | Guide middleware      | `apps/docs/middleware.ts`                        | — (lines ~16–38: negotiate, rewrite to guides-md) |
@@ -68,15 +77,16 @@ flowchart TB
 
 ## Entry points
 
-| URL                                      | Owner       | Source                                                                                        |
-| ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `/llms.txt`                              | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                           |
-| `/llms-full.txt`                         | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews            |
-| `/docs/guides/<path>.md`                 | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`           |
-| `/docs/markdown/reference/<lib>.md`      | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                  |
-| `/docs/docs.tar.gz`                      | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                         |
-| `/docs/api/graphql` (`searchDocs`)       | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md) |
-| `/docs/reference/<sdk>/<section>` (bots) | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)                       |
+| URL                                       | Owner       | Source                                                                                        |
+| ----------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `/llms.txt`                               | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                           |
+| `/docs/llms.txt`, `/docs/llms/<area>.txt` | `apps/docs` | Static files from `internals/generate-llms-indexes.ts` — every sitemap page, by area          |
+| `/llms-full.txt`                          | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews            |
+| `/docs/guides/<path>.md`                  | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`           |
+| `/docs/markdown/reference/<lib>.md`       | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                  |
+| `/docs/docs.tar.gz`                       | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                         |
+| `/docs/api/graphql` (`searchDocs`)        | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md) |
+| `/docs/reference/<sdk>/<section>` (bots)  | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)                       |
 
 Homepage alternate link points agents at the full dump:
 `https://supabase.com/llms-full.txt` (`apps/docs/app/page.tsx`).
@@ -125,7 +135,9 @@ tools read the pre-generated `.md` transcript — not the live HTML DOM.
 
 Agents that don't know a specific URL can start from:
 
-- `/llms.txt` — section index with links to `.md` paths
+- `/llms.txt` — site-wide index of docs, product overviews, and pricing
+- `/docs/llms.txt` — docs index linking one index per area, which lists
+  every page (guides as `.md`, reference as HTML)
 - `/llms-full.txt` — concatenated guides + reference + product overviews
 - `rel="alternate" type="text/markdown"` on each guide page
   (`GuidesMdx.utils.tsx` → `${BASE_PATH}${pathname}.md`)

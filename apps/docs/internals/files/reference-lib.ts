@@ -36,6 +36,8 @@ export async function generateReferencePages() {
                   ? `reference/${libPath}/${section.slug}`
                   : `reference/${libPath}/${version}/${section.slug}`,
                 priority: 0.8,
+                title: section.title ?? section.slug!,
+                ...(isLatestVersion ? {} : { version }),
               })) ?? []
           )
         })

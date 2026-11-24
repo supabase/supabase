@@ -14,6 +14,7 @@
     "check:removed-anchors": "tsx ./scripts/check-removed-anchors.ts",
     "build:gz-archive": "maybe-turbo tsx ./internals/generate-gz-archive.ts",
     "build:sitemap": "maybe-turbo tsx ./internals/generate-sitemap.ts",
+    "build:llms-indexes": "maybe-turbo tsx ./internals/generate-llms-indexes.ts",
     "clean": "rimraf .next .turbo features/docs/generated examples __generated__ tsconfig.tsbuildinfo",
     "codegen:examples": "shx rm -rf examples && shx cp -r ../../examples ./examples",
     "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",

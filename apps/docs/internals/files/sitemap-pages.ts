@@ -8,6 +8,9 @@ import { generateReferencePages } from './reference-lib'
 export interface SitemapPage {
   link: string
   priority: number
+  title: string
+  /** Set only on reference pages from an older SDK version. */
+  version?: string
 }
 
 export async function getSitemapPages(): Promise<SitemapPage[]> {
@@ -18,12 +21,14 @@ export async function getSitemapPages(): Promise<SitemapPage[]> {
     contentFiles.map(async (filePath) => {
       const fileContents = await fs.promises.readFile(filePath, 'utf8')
       const {
-        data: { sitemapPriority },
+        data: { sitemapPriority, title },
       } = matter(fileContents)
+      const link = filePath.replace(/^content\//, '').replace(/\.mdx$/, '')
 
       return {
-        link: filePath.replace(/^content\//, '').replace(/\.mdx$/, ''),
+        link,
         priority: sitemapPriority ?? 0.8,
+        title: typeof title === 'string' && title ? title : link.split('/').at(-1)!,
       }
     })
   )

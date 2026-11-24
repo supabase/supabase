@@ -28,6 +28,9 @@ yarn-error.log*
 
 # Sitemap
 public/sitemap.xml
+# llms.txt and its per-area indexes
+public/llms.txt
+public/llms/
 # Generated guide and reference markdown files. manifest.json is committed
 # with a placeholder empty array so proxy.ts's import always resolves,
 # even when build:markdown hasn't run (e.g. in local dev, which skips it).

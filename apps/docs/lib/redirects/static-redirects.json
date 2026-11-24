@@ -2820,11 +2820,6 @@
     "permanent": true
   },
   {
-    "source": "/docs/llms.txt",
-    "destination": "/llms.txt",
-    "permanent": true
-  },
-  {
     "source": "/docs/deployment/branching/github-integration",
     "destination": "/docs/guides/deployment/branching/github-integration",
     "permanent": true
