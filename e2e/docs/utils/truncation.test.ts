@@ -34,13 +34,23 @@ test('job summary lists every page and a ready-to-paste page_paths value', () =>
   for (const page of pages) assert.ok(summary.includes(`- ${page}\n`))
   assert.ok(summary.includes(`\`\`\`\n${pages.join(',')}\n\`\`\``))
   assert.ok(summary.includes('<details>'))
+  assert.ok(summary.includes('Set `base_url` to this pull request\'s preview'))
+  assert.ok(!summary.includes('still ran'))
 })
 
 test('local warning shows only the count for many skipped pages', () => {
-  const warning = formatLocalWarning(truncation)
+  const warning = formatLocalWarning(truncation, 'DOCS_E2E_PAGE_PATHS')
 
   assert.ok(
     warning.includes('80 in-scope docs page(s) are over the 20-page accessibility scan limit')
   )
   assert.ok(!warning.includes('/docs/guides/'))
+})
+
+test('local warning names the env var and the all-pages command', () => {
+  const warning = formatLocalWarning(truncation, 'DOCS_E2E_PAGE_PATHS')
+
+  assert.ok(warning.includes("won't get it"))
+  assert.ok(warning.includes('set DOCS_E2E_PAGE_PATHS to them'))
+  assert.ok(warning.includes('`pnpm e2e:docs:all`'))
 })

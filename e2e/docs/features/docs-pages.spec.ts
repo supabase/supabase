@@ -23,8 +23,11 @@ import {
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 // The accessibility scan is slow, so the resolver may give it fewer pages than the
-// link check. Unset or empty means every page, as in manual runs.
-const a11yPagePaths = parsePagePaths(process.env.DOCS_E2E_A11Y_PAGE_PATHS)
+// link check. Unset or empty means every page, as in manual runs. Pages outside the
+// link check's list, such as a stale value from the shell, are ignored.
+const a11yPagePaths = parsePagePaths(process.env.DOCS_E2E_A11Y_PAGE_PATHS).filter((path) =>
+  pagePaths.includes(path)
+)
 const pagePathsForA11y = a11yPagePaths.length > 0 ? a11yPagePaths : pagePaths
 const LINK_CHECK_CONCURRENCY = 4
 

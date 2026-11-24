@@ -278,7 +278,7 @@ export async function resolveDocsScope(
     }
   }
 
-  // Required pages come first so the accessibility limit never drops them.
+  // Required pages come first so the accessibility limit drops them last.
   const orderedPages = [
     ...[...requiredPages].sort(),
     ...[...pages]

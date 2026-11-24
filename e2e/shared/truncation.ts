@@ -25,7 +25,7 @@ export function formatJobSummary({ label, check, limit, truncated }: Truncation)
   return [
     `### Some pages did not get the ${check}`,
     '',
-    `${truncated.length} in-scope ${label} page(s) are over the ${limit}-page ${check} limit. The link check still ran on them.`,
+    `${truncated.length} in-scope ${label} page(s) are over the ${limit}-page ${check} limit. The link check runs on them.`,
     '',
     '<details>',
     `<summary>Pages without the ${check} (${truncated.length})</summary>`,
@@ -34,7 +34,7 @@ export function formatJobSummary({ label, check, limit, truncated }: Truncation)
     '',
     '</details>',
     '',
-    `To run the ${check} on them, run the workflow manually with this \`page_paths\` value. Manual runs have no page limit.`,
+    `To run the ${check} on them, run the workflow manually with this \`page_paths\` value. Set \`base_url\` to this pull request's preview, because production doesn't have its changes. Manual runs have no page limit.`,
     '',
     '```',
     truncated.join(','),
@@ -47,10 +47,13 @@ export function formatLog({ check, truncated }: Truncation): string {
   return [`Pages without the ${check}:`, ...truncated.map((page) => `  ${page}`)].join('\n')
 }
 
-export function formatLocalWarning({ label, check, limit, truncated }: Truncation): string {
+export function formatLocalWarning(
+  { label, check, limit, truncated }: Truncation,
+  pagePathsEnv: string
+): string {
   return (
     `Warning: ${truncated.length} in-scope ${label} page(s) are over the ${limit}-page ${check} limit and ` +
-    `did not get it${listPages(truncated)}. ` +
-    'Pass them in the page-paths env var, or run the :all script, to test them.'
+    `won't get it${listPages(truncated)}. ` +
+    `To test them, set ${pagePathsEnv} to them or run \`pnpm e2e:${label}:all\`.`
   )
 }

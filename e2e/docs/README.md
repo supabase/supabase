@@ -162,8 +162,9 @@ requires, such as the sample pages for a guide list component change, go
 first). The run doesn't fail, but it says so. The scope step adds a warning
 annotation with the count of pages without the scan (it names them when there
 are five or fewer), and a job summary that lists every one of them along with a
-`page_paths` value you can paste into a manual run. Manual runs have no page
-limit and run both checks on every page. Locally, `pnpm e2e:docs` prints a short
+`page_paths` value you can paste into a manual run. Set `base_url` for that run
+to the pull request's preview, because production doesn't have its changes.
+Manual runs have no page limit and run both checks on every page. Locally, `pnpm e2e:docs` prints a short
 warning. To scan the skipped pages, use `page_paths` or run `pnpm e2e:docs:all`
 instead of raising the limit. See
 [Run every in-scope page](#run-every-in-scope-page).
@@ -231,7 +232,9 @@ owned docs content, partials, or `e2e/docs`.
    build as not affected, the newest ready preview from an earlier commit of the
    pull request is used instead. When no preview resolves, skip rather than test
    against production.
-4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list.
+4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list and
+   `DOCS_E2E_A11Y_PAGE_PATHS` set to the pages that get the accessibility scan
+   (see [Limits](#limits)).
 
 Draft pull requests stay skipped until you mark them ready for review. Manual
 `workflow_dispatch` runs require a `page_paths` input and accept an optional

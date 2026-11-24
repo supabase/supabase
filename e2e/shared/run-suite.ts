@@ -1,7 +1,8 @@
 import { spawn } from 'node:child_process'
 
 import { collectChangedFiles, repoRootFrom } from './git.ts'
-import { formatLocalWarning } from './truncation.ts'
+import { parsePagePaths } from './paths.ts'
+import { formatLocalWarning, formatLog } from './truncation.ts'
 
 export type ScopeResult = {
   pages: string[]
@@ -40,13 +41,6 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
   }
 }
 
-function splitPagePaths(raw: string): string[] {
-  return raw
-    .split(/[\n,]/)
-    .map((path) => path.trim())
-    .filter(Boolean)
-}
-
 type ResolvedPages = { pages: string[]; a11yPages?: string[] }
 
 async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
@@ -57,8 +51,8 @@ async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | nu
       ? process.env[config.a11yPagePathsEnv]?.trim()
       : undefined
     return {
-      pages: splitPagePaths(explicit),
-      ...(explicitA11y ? { a11yPages: splitPagePaths(explicitA11y) } : {}),
+      pages: parsePagePaths(explicit),
+      ...(explicitA11y ? { a11yPages: parsePagePaths(explicitA11y) } : {}),
     }
   }
 
@@ -81,19 +75,20 @@ async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | nu
     console.error(`  ${page}`)
   }
   if (result.truncated?.length) {
-    console.error(
-      formatLocalWarning({
-        label: config.label,
-        check: 'accessibility scan',
-        limit: result.limit ?? result.pages.length,
-        truncated: result.truncated,
-      })
-    )
+    const truncation = {
+      label: config.label,
+      check: 'accessibility scan',
+      limit: result.limit ?? result.pages.length,
+      truncated: result.truncated,
+    }
+    console.error(formatLog(truncation))
+    console.error(formatLocalWarning(truncation, config.pagePathsEnv))
   }
   return { pages: result.pages, a11yPages: result.a11yPages }
 }
 
-// Clears a stale scan list from the shell so runs without a resolved one scan every page.
+// Passes the resolved scan list, or clears one inherited from the shell when none was
+// resolved (as in --all runs) so the suite scans every page.
 export function buildChildEnv(
   config: Pick<SuiteConfig, 'pagePathsEnv' | 'a11yPagePathsEnv'>,
   resolved: ResolvedPages,
