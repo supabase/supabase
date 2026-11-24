@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Generates the Vercel bulk redirects file for apps/kb from redirects/static-redirects.json.
 //
-// Every entry also gets a `.md` variant, so a renamed or removed page redirects correctly when
-// fetched as markdown. Shape rules (/kb/ paths, no .md, internal destinations) are checked by
-// scripts/static-redirects.test.ts.
+// Every entry with a destination on this site also gets a `.md` variant, so a renamed or removed
+// page redirects correctly when fetched as markdown. Shape rules (/kb/ sources, no .md, valid
+// destinations) are checked by scripts/static-redirects.test.ts.
 //
 // Usage:
 //   pnpm run redirects:generate
@@ -16,13 +16,17 @@ const OUTPUT_PATH = join(redirectsDir, 'generated', 'static-redirects-md-variant
 
 const source = JSON.parse(readFileSync(join(redirectsDir, 'static-redirects.json'), 'utf8'))
 
+// Only destinations on this site have a markdown export, so other destinations (a /docs path or
+// an https:// URL) get no `.md` variant.
+const withMdVariant = (r) =>
+  r.destination.startsWith('/kb/')
+    ? [r, { ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }]
+    : [r]
+
 // Bulk redirects drop the query string unless `preserveQueryParams` is set.
-const output = source.flatMap((r) =>
-  [r, { ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }].map((entry) => ({
-    ...entry,
-    preserveQueryParams: true,
-  }))
-)
+const output = source
+  .flatMap(withMdVariant)
+  .map((entry) => ({ ...entry, preserveQueryParams: true }))
 
 // Bulk redirects match the source as a literal path, so route syntax would never match.
 const invalid = output.find((r) => /[:*()\\]/.test(r.source))
