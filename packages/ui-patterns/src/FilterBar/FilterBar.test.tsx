@@ -672,6 +672,41 @@ describe('FilterBar', () => {
     })
   })
 
+  it('lets keyboard users toggle a nested group operator but not a locked root operator', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [
+            { propertyName: 'name', value: 'test', operator: '=' },
+            {
+              logicalOperator: 'OR',
+              conditions: [
+                { propertyName: 'status', value: 'active', operator: '=' },
+                { propertyName: 'status', value: 'pending', operator: '=' },
+              ],
+            },
+          ],
+        }}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+        supportsOperators
+        isRootOperatorLocked
+      />
+    )
+
+    expect(screen.getAllByRole('button', { name: /operator$/ })).toHaveLength(1)
+
+    screen.getByRole('button', { name: 'Change OR operator' }).focus()
+    await user.keyboard('{Enter}')
+
+    expect(mockOnFilterChange).toHaveBeenCalledTimes(1)
+    expect(mockOnFilterChange.mock.calls[0][0].conditions[1].logicalOperator).toBe('AND')
+  })
+
   it('allows switching filter property by clicking the label', async () => {
     const user = userEvent.setup()
     let currentFilters: FilterGroup = {

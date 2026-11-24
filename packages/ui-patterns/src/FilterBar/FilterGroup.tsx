@@ -181,20 +181,28 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
 
           return (
             <React.Fragment key={index}>
-              {index > 0 && supportsOperators && (
-                <span
-                  className={`text-xs font-medium ${isOperatorLocked ? '' : 'cursor-pointer'} ${
-                    isHoveringOperator && !isOperatorLocked
-                      ? 'bg-surface-400 text-foreground dark:bg-surface-400'
-                      : 'text-foreground-muted'
-                  }`}
-                  onClick={handleLogicalOperatorClick}
-                  onMouseEnter={() => setIsHoveringOperator(true)}
-                  onMouseLeave={() => setIsHoveringOperator(false)}
-                >
-                  {group.logicalOperator}
-                </span>
-              )}
+              {index > 0 &&
+                supportsOperators &&
+                (isOperatorLocked ? (
+                  <span className="text-xs font-medium text-foreground-muted">
+                    {group.logicalOperator}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    aria-label={`Change ${group.logicalOperator} operator`}
+                    className={`text-xs font-medium cursor-pointer ${
+                      isHoveringOperator
+                        ? 'bg-surface-400 text-foreground dark:bg-surface-400'
+                        : 'text-foreground-muted'
+                    }`}
+                    onClick={handleLogicalOperatorClick}
+                    onMouseEnter={() => setIsHoveringOperator(true)}
+                    onMouseLeave={() => setIsHoveringOperator(false)}
+                  >
+                    {group.logicalOperator}
+                  </button>
+                ))}
               {'logicalOperator' in condition ? (
                 <FilterGroup group={condition} path={currentPath} />
               ) : (
