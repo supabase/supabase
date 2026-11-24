@@ -121,8 +121,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
-  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-    `free-micro-upgrade-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-at-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',

@@ -6,10 +6,11 @@ import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants
 import { ReportFilterItem } from '@/components/interfaces/Reports/Reports.types'
 import { getLogsSql, queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
 import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
+import type { ReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-export const useStorageReport = () => {
+export const useStorageReport = (dateRange: ReportDateRange) => {
   const { ref: projectRef } = useParams()
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const state = useDatabaseSelectorStateSnapshot()
@@ -24,17 +25,24 @@ export const useStorageReport = () => {
   const hasResolvedProjectRef = !IS_PLATFORM || projectRef !== undefined
   const areQueriesReady = hasAppliedQueryMode && hasResolvedProjectRef
 
+  const dateRangeParams = {
+    iso_timestamp_start: dateRange.period_start.date,
+    iso_timestamp_end: dateRange.period_end.date,
+  }
+
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
     resolvedProjectRef,
     useOtel,
-    areQueriesReady
+    areQueriesReady,
+    dateRangeParams
   )
   const storageQueryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
     PRESET_CONFIG.storage.queries,
     resolvedProjectRef,
     useOtel,
-    areQueriesReady
+    areQueriesReady,
+    dateRangeParams
   )
   const totalRequests = queryHooks.totalRequests()
   const topRoutes = queryHooks.topRoutes()

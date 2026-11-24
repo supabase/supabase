@@ -1,17 +1,16 @@
+import '@xyflow/react/dist/style.css'
+
 import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 
+import { SmoothstepEdge } from './Edges'
 import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { timeout } from '@/lib/helpers'
-
-import '@xyflow/react/dist/style.css'
-
-import { SmoothstepEdge } from './Edges'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
+import { timeout } from '@/lib/helpers'
 
 export const ReplicationDiagram = () => {
   return (

@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -82,20 +82,12 @@ const FollowUpStatus = () => {
   return <p>{`Follow-up: ${state?.status ?? 'none'}`}</p>
 }
 
-const renderForm = (flag: string | false | undefined) =>
+const renderForm = () =>
   customRender(
-    <FeatureFlagContext.Provider
-      value={{
-        configcat: {},
-        // An empty store reads as "flags not loaded yet"
-        posthog: flag === undefined ? {} : { onboardingSurveyPlacement: flag },
-        hasLoaded: true,
-        hasFlagsForSignedInUser: true,
-      }}
-    >
+    <>
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
       <FollowUpStatus />
-    </FeatureFlagContext.Provider>,
+    </>,
     {
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
@@ -131,97 +123,76 @@ describe('NewOrgForm onboarding survey', () => {
     safeLocalStorage.removeItem(followUpKey)
   })
 
-  describe('org_form arm', () => {
-    it('sends the answers to the survey, not to org creation', async () => {
-      const { createRequests, surveyRequests } = mockApi()
-      renderForm('org_form')
-
-      await chooseOption('Personal', 'Company')
-      await chooseOption('1 - 10', '50 - 99')
-      await chooseOption('Select an option', 'B2B SaaS application')
-      await fillNameAndSubmit()
-
-      expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
-      expect(surveyRequests).toEqual([
-        { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', building: 'b2b_saas' },
-      ])
-      expect(readFollowUpState()).toBeNull()
-    })
-
-    it('sends nothing for an untouched survey and leaves the org type for the follow-up', async () => {
-      const { createRequests, surveyRequests } = mockApi()
-      renderForm('org_form')
-      expect(await screen.findByText('Follow-up: none')).toBeInTheDocument()
-
-      await fillNameAndSubmit()
-
-      expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
-      expect(surveyRequests).toEqual([])
-      expect(readFollowUpState()).toMatchObject({ status: 'pending', kind: 'PERSONAL' })
-      expect(await screen.findByText('Follow-up: pending')).toBeInTheDocument()
-    })
-
-    it('counts a changed org type alone as an answer', async () => {
-      const { surveyRequests } = mockApi()
-      renderForm('org_form')
-
-      await chooseOption('Personal', 'Agency')
-      await fillNameAndSubmit()
-
-      expect(surveyRequests).toEqual([{ slug: NEW_ORG_SLUG, kind: 'AGENCY' }])
-      expect(readFollowUpState()).toBeNull()
-    })
-
-    it('sends a partly answered survey and asks for no follow-up', async () => {
-      const { surveyRequests } = mockApi()
-      renderForm('org_form')
-
-      await chooseOption('Personal', 'Company')
-      await chooseOption('1 - 10', '50 - 99')
-      const [, canCodeSelect] = screen
-        .getAllByRole('combobox')
-        .filter((combobox) => combobox.textContent === 'Select an option')
-      await user.click(canCodeSelect)
-      await user.click(
-        within(await screen.findByRole('listbox')).getByRole('option', { name: 'Yes' })
-      )
-      await fillNameAndSubmit()
-
-      expect(surveyRequests).toEqual([
-        { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', can_code: 'yes' },
-      ])
-      expect(readFollowUpState()).toBeNull()
-    })
-
-    it('keeps the answers for the follow-up when the survey request fails', async () => {
-      const { surveyRequests } = mockApi({ surveyStatus: 500 })
-      renderForm('org_form')
-
-      await chooseOption('Personal', 'Company')
-      await chooseOption('Select an option', 'Other')
-      await fillNameAndSubmit()
-
-      expect(surveyRequests).toHaveLength(1)
-      expect(readFollowUpState()).toMatchObject({ status: 'pending', kind: 'COMPANY', size: '1' })
-    })
-  })
-
-  it.each([
-    ['the control arm', 'control'],
-    ['a user the flag has not assigned', false],
-    ['flags that have not loaded', undefined],
-  ] as const)('creates the org with its type and no survey for %s', async (_, flag) => {
+  it('sends the answers to the survey, not to org creation', async () => {
     const { createRequests, surveyRequests } = mockApi()
-    renderForm(flag)
+    renderForm()
 
-    expect(screen.queryByText('Help improve Supabase')).toBeNull()
     await chooseOption('Personal', 'Company')
+    await chooseOption('1 - 10', '50 - 99')
+    await chooseOption('Select an option', 'B2B SaaS application')
     await fillNameAndSubmit()
 
-    expect(createRequests).toEqual([
-      { name: 'Acme', kind: 'COMPANY', size: '1', tier: 'tier_free' },
+    expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
+    expect(surveyRequests).toEqual([
+      { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', building: 'b2b_saas' },
     ])
-    expect(surveyRequests).toEqual([])
     expect(readFollowUpState()).toBeNull()
+  })
+
+  it('sends nothing for an untouched survey and leaves the org type for the follow-up', async () => {
+    const { createRequests, surveyRequests } = mockApi()
+    renderForm()
+    expect(await screen.findByText('Follow-up: none')).toBeInTheDocument()
+
+    await fillNameAndSubmit()
+
+    expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
+    expect(surveyRequests).toEqual([])
+    expect(readFollowUpState()).toMatchObject({ status: 'pending', kind: 'PERSONAL' })
+    expect(await screen.findByText('Follow-up: pending')).toBeInTheDocument()
+  })
+
+  it('counts a changed org type alone as an answer', async () => {
+    const { surveyRequests } = mockApi()
+    renderForm()
+
+    await chooseOption('Personal', 'Agency')
+    await fillNameAndSubmit()
+
+    expect(surveyRequests).toEqual([{ slug: NEW_ORG_SLUG, kind: 'AGENCY' }])
+    expect(readFollowUpState()).toBeNull()
+  })
+
+  it('sends a partly answered survey and asks for no follow-up', async () => {
+    const { surveyRequests } = mockApi()
+    renderForm()
+
+    await chooseOption('Personal', 'Company')
+    await chooseOption('1 - 10', '50 - 99')
+    const [, canCodeSelect] = screen
+      .getAllByRole('combobox')
+      .filter((combobox) => combobox.textContent === 'Select an option')
+    await user.click(canCodeSelect)
+    await user.click(
+      within(await screen.findByRole('listbox')).getByRole('option', { name: 'Yes' })
+    )
+    await fillNameAndSubmit()
+
+    expect(surveyRequests).toEqual([
+      { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', can_code: 'yes' },
+    ])
+    expect(readFollowUpState()).toBeNull()
+  })
+
+  it('keeps the answers for the follow-up when the survey request fails', async () => {
+    const { surveyRequests } = mockApi({ surveyStatus: 500 })
+    renderForm()
+
+    await chooseOption('Personal', 'Company')
+    await chooseOption('Select an option', 'Other')
+    await fillNameAndSubmit()
+
+    expect(surveyRequests).toHaveLength(1)
+    expect(readFollowUpState()).toMatchObject({ status: 'pending', kind: 'COMPANY', size: '1' })
   })
 })

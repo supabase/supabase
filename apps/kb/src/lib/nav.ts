@@ -15,8 +15,6 @@ export interface NavMenu {
   groups: NavLinkGroup[]
 }
 
-export const SIGN_UP_URL = 'https://supabase.com/dashboard/sign-up'
-
 const toTopicLink = (topic: Topic): NavLink => ({
   label: topic,
   href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`,
