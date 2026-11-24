@@ -178,6 +178,14 @@ export function TimelineChart<TChart extends BaseChartSchema>({
             fill="var(--color-success)"
             isAnimationActive={false}
           />
+          {chartConfig.no_level && (
+            <Bar
+              dataKey="no_level"
+              stackId="a"
+              fill="var(--color-no_level)"
+              isAnimationActive={false}
+            />
+          )}
           {showHighlight && (
             <ReferenceArea
               x1={chartHighlight.left}

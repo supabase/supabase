@@ -14,6 +14,14 @@ import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interface
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
+type UnifiedLogsChartPoint = {
+  timestamp: number
+  success: number
+  warning: number
+  error: number
+  no_level: number
+}
+
 export async function getUnifiedLogsChart(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal,
@@ -57,22 +65,8 @@ export async function getUnifiedLogsChart(
     headers: headersInit,
   })
 
-  const chartData: Array<{
-    timestamp: number
-    success: number
-    warning: number
-    error: number
-  }> = []
-
-  const dataByTimestamp = new Map<
-    number,
-    {
-      timestamp: number
-      success: number
-      warning: number
-      error: number
-    }
-  >()
+  const chartData: UnifiedLogsChartPoint[] = []
+  const dataByTimestamp = new Map<number, UnifiedLogsChartPoint>()
 
   if (data?.result) {
     data.result.forEach((row: any) => {
@@ -84,12 +78,15 @@ export async function getUnifiedLogsChart(
         ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`).getTime()
         : Math.floor(Number(ts) / 1000)
 
-      // Create chart data point
+      const success = Number(row.success) || 0
+      const warning = Number(row.warning) || 0
+      const error = Number(row.error) || 0
       const dataPoint = {
         timestamp: milliseconds, // Convert to milliseconds for the chart
-        success: Number(row.success) || 0,
-        warning: Number(row.warning) || 0,
-        error: Number(row.error) || 0,
+        success,
+        warning,
+        error,
+        no_level: Math.max(0, (Number(row.total_per_bucket) || 0) - success - warning - error),
       }
 
       // Zero out levels excluded by the active filter set.
@@ -98,6 +95,7 @@ export async function getUnifiedLogsChart(
         (f) => f.column === 'level'
       )
       if (levelFilters.length > 0) {
+        dataPoint.no_level = 0
         const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
         const excluded = new Set(
           levelFilters.filter((f) => f.operator === '<>').map((f) => f.value)
@@ -142,6 +140,7 @@ export async function getUnifiedLogsChart(
         success: 0,
         warning: 0,
         error: 0,
+        no_level: 0,
       })
     }
   }

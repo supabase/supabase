@@ -104,7 +104,10 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { unifiedLogQueryOptions } from '@/data/logs/unified-log-query'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsBackend,
+  useUnifiedLogsInfiniteQuery,
+} from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -114,6 +117,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const CHART_CONFIG = {
+  no_level: { label: 'No level', color: 'var(--chart-muted)' },
   success: {
     label: <TooltipLabel level="success" />,
     color: 'var(--chart-muted)',
@@ -150,6 +154,7 @@ export const UnifiedLogs = ({
   const orgSlug = selectedOrganization?.slug
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const useOtel = useUnifiedLogsBackend({ scope })
   const showMultigresLogs = useShowMultigresLogs()
   const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
@@ -218,7 +223,8 @@ export const UnifiedLogs = ({
         pipelines: canShowPipelinesLogs,
         compute: computeAvailability.preserveComputeFilter,
       },
-      scope
+      scope,
+      useOtel
     )
   )
 
@@ -261,21 +267,29 @@ export const UnifiedLogs = ({
       getLogTypeVisibility(
         {
           multigres: showMultigresLogs,
-          pipelines: canShowPipelinesLogs,
+          pipelines: showPipelinesLogs,
           compute: computeAvailability.canQueryCompute,
         },
-        scope
+        scope,
+        useOtel
       ),
-    [showMultigresLogs, canShowPipelinesLogs, computeAvailability.canQueryCompute, scope]
+    [showMultigresLogs, showPipelinesLogs, computeAvailability.canQueryCompute, scope, useOtel]
   )
 
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search, scope)
+    parameters.availableLogTypes = LOG_TYPES.filter(
+      (type) => queryLogTypeVisibility[type] !== false
+    )
     if (parameters.filter) {
-      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
+      parameters.filter =
+        gateLogTypeFilters(parameters.filter, {
+          ...queryLogTypeVisibility,
+          pipelines: canShowPipelinesLogs,
+        }) ?? undefined
     }
     return parameters
-  }, [search, scope, queryLogTypeVisibility])
+  }, [search, scope, queryLogTypeVisibility, canShowPipelinesLogs])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
   const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
   const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
@@ -286,6 +300,8 @@ export const UnifiedLogs = ({
     (selectedLogTypes.length === 0 &&
       parsedFilters.some((filter) => filter.column === 'pipeline_id'))
 
+  const isWaitingForLogTypes = isLoadingPipelinesLogs && isPipelinesLogsView
+
   const syncUrlFilters = useEffectEvent(() => {
     setLocalFilterOrigin(null)
     setColumnFilters(buildDefaultColumnFilters({ ...search, filter: visibleSearchFilters }))
@@ -293,7 +309,7 @@ export const UnifiedLogs = ({
   useEffect(() => syncUrlFilters(), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
-    scope: JSON.stringify([projectRef, searchParameters]),
+    scope: JSON.stringify([projectRef, { ...searchParameters, availableLogTypes: undefined }]),
     initialId: search.id ?? undefined,
   })
   const previousUrlId = useRef(search.id)
@@ -311,7 +327,7 @@ export const UnifiedLogs = ({
     data: unifiedLogsData,
     error,
     isError,
-    isLoading,
+    isLoading: isLoadingLogs,
     isFetching,
     isSuccess: hasLoadedLogs,
     isPlaceholderData,
@@ -321,26 +337,30 @@ export const UnifiedLogs = ({
     refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  } = useUnifiedLogsInfiniteQuery(
+    { projectRef, search: searchParameters },
+    { enabled: !isWaitingForLogTypes }
+  )
+  const isLoading = isLoadingLogs || isWaitingForLogTypes
 
   const {
     data: counts,
     isPending: isLoadingCounts,
     isFetching: isFetchingCounts,
     refetch: refetchCounts,
-  } = useUnifiedLogsCountQuery({
-    projectRef,
-    search: searchParameters,
-  })
+  } = useUnifiedLogsCountQuery(
+    { projectRef, search: searchParameters },
+    { enabled: !isWaitingForLogTypes }
+  )
 
   const {
     data: unifiedLogsChart = [],
     isFetching: isFetchingCharts,
     refetch: refetchCharts,
-  } = useUnifiedLogsChartQuery({
-    projectRef,
-    search: searchParameters,
-  })
+  } = useUnifiedLogsChartQuery(
+    { projectRef, search: searchParameters },
+    { enabled: !isWaitingForLogTypes }
+  )
 
   const refetchAllData = () => {
     refetchLogs()
@@ -388,15 +408,18 @@ export const UnifiedLogs = ({
     const excluded = new Set(levelFilters.filter((f) => f.operator === '<>').map((f) => f.value))
     const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
     const activeLevels = baseLevels.filter((l) => !excluded.has(l))
-    return Object.fromEntries(
-      LEVELS.filter((level) => activeLevels.includes(level)).map((level) => [
-        level,
-        {
-          ...CHART_CONFIG[level],
-          label: <TooltipLabel level={level} isProcessLog={isPipelinesLogsView} />,
-        },
-      ])
-    ) as ChartConfig
+    return {
+      ...(levelFilters.length === 0 ? { no_level: CHART_CONFIG.no_level } : {}),
+      ...Object.fromEntries(
+        LEVELS.filter((level) => activeLevels.includes(level)).map((level) => [
+          level,
+          {
+            ...CHART_CONFIG[level],
+            label: <TooltipLabel level={level} isProcessLog={isPipelinesLogsView} />,
+          },
+        ])
+      ),
+    } satisfies ChartConfig
   }, [search.filter, isPipelinesLogsView])
 
   const getRowClassName = (row: Row<ColumnSchema>) =>
