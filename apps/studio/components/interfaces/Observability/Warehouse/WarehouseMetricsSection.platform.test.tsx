@@ -127,8 +127,8 @@ const sections: {
       'table_deleted_row_ratio_mean',
     ],
     charts: [
-      'Files per table',
-      'Size per table',
+      'Average files per table',
+      'Average size per table',
       'Average file size',
       'Small files and deleted rows',
     ],

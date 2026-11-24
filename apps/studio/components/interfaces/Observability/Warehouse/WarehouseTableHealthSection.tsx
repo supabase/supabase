@@ -19,6 +19,9 @@ const TABLE_HEALTH_METRICS: WarehouseMetricName[] = [
   'table_deleted_row_ratio_mean',
 ]
 
+const formatFilesPerTable = (value: number) => `${formatWarehouseCount(value)} per table`
+const formatSizePerTable = (value: number) => `${formatWarehouseBytes(value)} per table`
+
 export const WarehouseTableHealthSection = ({
   range,
 }: {
@@ -35,25 +38,25 @@ export const WarehouseTableHealthSection = ({
       <div className="grid gap-4 md:grid-cols-2">
         <WarehouseMetricChart
           {...WAREHOUSE_ETL_LABEL_PROPS}
-          title="Files per table"
-          description="Average data files and delete files per table."
+          title="Average files per table"
+          description="Data files and delete files in each table, averaged across tables, so values can be fractional. Tables with only inlined data have no data files."
           metric={getMetric('table_active_data_files_mean')}
           series={[
             { metric: getMetric('table_active_data_files_mean'), label: 'Data files' },
             { metric: getMetric('table_active_delete_files_mean'), label: 'Delete files' },
           ]}
-          formatValue={formatWarehouseCount}
+          formatValue={formatFilesPerTable}
         />
         <WarehouseMetricChart
           {...WAREHOUSE_ETL_LABEL_PROPS}
-          title="Size per table"
-          description="Average size of data files and delete files per table."
+          title="Average size per table"
+          description="Total size of each table's data files and delete files, averaged across tables."
           metric={getMetric('table_active_data_bytes_mean')}
           series={[
             { metric: getMetric('table_active_data_bytes_mean'), label: 'Data files' },
             { metric: getMetric('table_active_delete_bytes_mean'), label: 'Delete files' },
           ]}
-          formatValue={formatWarehouseBytes}
+          formatValue={formatSizePerTable}
         />
         <WarehouseMetricChart
           {...WAREHOUSE_ETL_LABEL_PROPS}
