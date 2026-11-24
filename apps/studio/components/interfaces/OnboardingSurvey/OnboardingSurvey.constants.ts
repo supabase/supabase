@@ -1,4 +1,53 @@
-import { ORG_KIND_TYPES, type OrgKind } from '../Organization/NewOrg/OrganizationDetailsFields'
+import { z } from 'zod'
+
+export const ORG_KIND_TYPES = {
+  PERSONAL: 'Personal',
+  EDUCATIONAL: 'Educational',
+  STARTUP: 'Startup',
+  AGENCY: 'Agency',
+  COMPANY: 'Company',
+  UNDISCLOSED: 'N/A',
+}
+
+export const ORG_KIND_DEFAULT = 'PERSONAL'
+
+export const ORG_SIZE_TYPES = {
+  '1': '1 - 10',
+  '10': '10 - 49',
+  '50': '50 - 99',
+  '100': '100 - 299',
+  '300': 'More than 300',
+}
+
+export const ORG_SIZE_DEFAULT = '1'
+
+export type OrgKind = keyof typeof ORG_KIND_TYPES
+export type OrgSize = keyof typeof ORG_SIZE_TYPES
+
+const orgKindValues = [
+  'PERSONAL',
+  'EDUCATIONAL',
+  'STARTUP',
+  'AGENCY',
+  'COMPANY',
+  'UNDISCLOSED',
+] as const
+
+const orgSizeValues = ['1', '10', '50', '100', '300'] as const
+
+export const orgKindSchema = z
+  .string()
+  .transform((val) => val.toUpperCase())
+  .pipe(z.enum(orgKindValues))
+
+export const orgSizeSchema = z.enum(orgSizeValues)
+
+export const onboardingSurveySchema = z.object({
+  kind: orgKindSchema,
+  size: orgSizeSchema,
+  building: z.string(),
+  can_code: z.string(),
+})
 
 // How long after creating an org its creator can be asked the survey again
 export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000

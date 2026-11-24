@@ -31,14 +31,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import {
-  ORG_KIND_DEFAULT,
-  ORG_SIZE_DEFAULT,
-  ORG_SIZE_TYPES,
-  organizationDetailsSchema,
-  type OrgKind,
-  type OrgSize,
-} from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -49,12 +41,14 @@ import {
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
-  BUILDING_OPTIONS,
-  CAN_CODE_OPTIONS,
-  SURVEY_ORG_KIND_OPTIONS,
+  ORG_KIND_DEFAULT,
+  ORG_SIZE_DEFAULT,
+  onboardingSurveySchema,
+  type OrgKind,
+  type OrgSize,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
+import { OnboardingSurveyFields } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFields'
 import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
-import { OnboardingSurveySelect } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveySelect'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
@@ -90,14 +84,13 @@ interface NewOrgFormProps {
 
 const plans = ['FREE', 'PRO', 'TEAM'] as const
 
-const formSchema = organizationDetailsSchema.extend({
+const formSchema = onboardingSurveySchema.extend({
+  name: z.string().trim().min(1, 'Organization name is required'),
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
-  building: z.string(),
-  can_code: z.string(),
 })
 
 type FormState = z.infer<typeof formSchema>
@@ -106,10 +99,6 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'new-org-form'
 
-/**
- * No org selected yet, create a new one
- * [Joshen] Need to refactor to use Form_Shadcn here
- */
 export const NewOrgForm = ({
   onPaymentMethodReset,
   setupIntent,
@@ -231,8 +220,10 @@ export const NewOrgForm = ({
   }, [])
 
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
-  const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
-  const selectedOrgKind = useWatch({ control: form.control, name: 'kind' })
+  const selectedSpendCap = useWatch({
+    control: form.control,
+    name: 'spend_cap',
+  })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -360,7 +351,10 @@ export const NewOrgForm = ({
       }
     },
     onError: (error) => {
-      const toastId = toast.error(error.message, { dismissible: true, duration: 10_000 })
+      const toastId = toast.error(error.message, {
+        dismissible: true,
+        duration: 10_000,
+      })
       trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast', toastId)
     },
   })
@@ -487,82 +481,6 @@ export const NewOrgForm = ({
     setPaymentMethod(undefined)
     return onPaymentMethodReset()
   }
-
-  // Org type always has a value, so What are you building? shows right away.
-  const onboardingSurveyFields = (
-    <div className="flex flex-col gap-y-5">
-      <FormField
-        control={form.control}
-        name="kind"
-        render={({ field }) => (
-          <FormItemLayout label="Who is this org for?" layout="horizontal">
-            <FormControl>
-              <OnboardingSurveySelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={SURVEY_ORG_KIND_OPTIONS}
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
-      {selectedOrgKind == 'COMPANY' && (
-        <FormField
-          control={form.control}
-          name="size"
-          render={({ field }) => (
-            <FormItemLayout label="How many people?" layout="horizontal">
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>
-                        {v}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-      )}
-      <FormField
-        control={form.control}
-        name="building"
-        render={({ field }) => (
-          <FormItemLayout label="What are you building?" layout="horizontal">
-            <FormControl>
-              <OnboardingSurveySelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={BUILDING_OPTIONS}
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="can_code"
-        render={({ field }) => (
-          <FormItemLayout label="Do you know how to code?" layout="horizontal">
-            <FormControl>
-              <OnboardingSurveySelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={CAN_CODE_OPTIONS}
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
-    </div>
-  )
 
   return (
     <Form {...form}>
@@ -776,7 +694,7 @@ export const NewOrgForm = ({
                 description="Optional questions to help improve the Supabase experience"
                 defaultOpen
               >
-                {onboardingSurveyFields}
+                <OnboardingSurveyFields control={form.control} />
               </CollapsibleCardSection>
             </Panel.Content>
           </div>

@@ -12,48 +12,17 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-export const ORG_KIND_TYPES = {
-  PERSONAL: 'Personal',
-  EDUCATIONAL: 'Educational',
-  STARTUP: 'Startup',
-  AGENCY: 'Agency',
-  COMPANY: 'Company',
-  UNDISCLOSED: 'N/A',
-}
-
-export const ORG_KIND_DEFAULT = 'PERSONAL'
-
-export const ORG_SIZE_TYPES = {
-  '1': '1 - 10',
-  '10': '10 - 49',
-  '50': '50 - 99',
-  '100': '100 - 299',
-  '300': 'More than 300',
-}
-
-export const ORG_SIZE_DEFAULT = '1'
-
-export type OrgKind = keyof typeof ORG_KIND_TYPES
-export type OrgSize = keyof typeof ORG_SIZE_TYPES
-
-const orgKindValues = [
-  'PERSONAL',
-  'EDUCATIONAL',
-  'STARTUP',
-  'AGENCY',
-  'COMPANY',
-  'UNDISCLOSED',
-] as const
-
-const orgSizeValues = ['1', '10', '50', '100', '300'] as const
+import {
+  ORG_KIND_TYPES,
+  ORG_SIZE_TYPES,
+  orgKindSchema,
+  orgSizeSchema,
+} from '../../OnboardingSurvey/OnboardingSurvey.constants'
 
 export const organizationDetailsSchema = z.object({
   name: z.string().trim().min(1, 'Organization name is required'),
-  kind: z
-    .string()
-    .transform((val) => val.toUpperCase())
-    .pipe(z.enum(orgKindValues)),
-  size: z.enum(orgSizeValues),
+  kind: orgKindSchema,
+  size: orgSizeSchema,
 })
 
 export type OrganizationDetailsFormValues = z.infer<typeof organizationDetailsSchema>
