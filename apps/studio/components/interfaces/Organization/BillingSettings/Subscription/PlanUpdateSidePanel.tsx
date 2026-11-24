@@ -258,7 +258,6 @@ export const PlanUpdateSidePanel = () => {
       isPartnerBilledOrganization={isPartnerBilledOrganization}
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
-      entryDelay={contentDelay}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
