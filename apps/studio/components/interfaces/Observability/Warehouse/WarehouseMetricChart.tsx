@@ -3,6 +3,7 @@ import { ChartLine } from 'ui-patterns/Chart'
 
 import {
   expandWarehouseChartSeries,
+  formatWarehouseNumber,
   getWarehouseChartPoints,
   getWarehouseSeriesPeak,
   getWarehouseSeriesRank,
@@ -97,7 +98,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                YAxisProps={formatValue ? { tickFormatter: formatValue } : undefined}
+                YAxisProps={{ tickFormatter: formatValue ?? formatWarehouseNumber }}
                 tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
               />
             </>

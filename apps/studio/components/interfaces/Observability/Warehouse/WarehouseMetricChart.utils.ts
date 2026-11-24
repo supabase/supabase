@@ -182,10 +182,14 @@ export const getWarehouseSeriesPeak = ({ metric }: WarehouseChartSeries) =>
     ) ?? [])
   )
 
+// Fixed locale: sizes from formatBytes always use a period, so this keeps every chart consistent.
 const formatNumber = (value: number, maximumFractionDigits: number) =>
-  value.toLocaleString(undefined, { maximumFractionDigits })
+  value.toLocaleString('en-US', { maximumFractionDigits })
 
 export const formatWarehouseCount = (value: number) => formatNumber(value, 1)
+
+// For charts without their own formatter; 3 digits matches ChartLine's default toLocaleString()
+export const formatWarehouseNumber = (value: number) => formatNumber(value, 3)
 
 export const formatWarehousePerSecond = (perSecond: number) => `${formatNumber(perSecond, 2)}/s`
 

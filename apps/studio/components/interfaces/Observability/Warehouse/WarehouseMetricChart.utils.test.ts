@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import {
   expandWarehouseChartSeries,
@@ -7,6 +7,7 @@ import {
   formatWarehouseCount,
   formatWarehouseDuration,
   formatWarehouseEtlLabels,
+  formatWarehouseNumber,
   formatWarehousePaused,
   formatWarehousePerMinute,
   formatWarehousePerSecond,
@@ -235,5 +236,30 @@ describe('expandWarehouseChartSeries options', () => {
       formatLabels: formatWarehouseEtlLabels,
     }).map((item) => item.label)
     expect(labels).toEqual(['Lag · Pipeline 1'])
+  })
+})
+
+describe('warehouse number formatting', () => {
+  test('formats numbers the same way whatever the browser locale', () => {
+    const original = Number.prototype.toLocaleString
+    // Simulate a French browser: calls without an explicit locale use fr-FR
+    const spy = vi.spyOn(Number.prototype, 'toLocaleString').mockImplementation(function (
+      this: number,
+      locales?,
+      options?
+    ) {
+      return original.call(this, locales ?? 'fr-FR', options)
+    })
+
+    try {
+      expect(formatWarehouseCount(0.4)).toBe('0.4')
+      expect(formatWarehousePerSecond(1.25)).toBe('1.25/s')
+      expect(formatWarehouseRatio(0.325)).toBe('32.5%')
+      expect(formatWarehouseDuration(1.5)).toBe('1.5 s')
+      expect(formatWarehouseBytes(0.5)).toBe('0.5 bytes')
+      expect(formatWarehouseNumber(1234.5678)).toBe('1,234.568')
+    } finally {
+      spy.mockRestore()
+    }
   })
 })
