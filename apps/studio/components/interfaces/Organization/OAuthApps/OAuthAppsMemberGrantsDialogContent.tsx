@@ -181,7 +181,9 @@ export const OAuthAppsMemberGrantsDialogContent = ({
         {((isPreview && previewGrants?.some((grant) => grant.member)) ||
           (!isPreview &&
             memberGrants.some((grant) => grant.attributes.kind === 'member_bound'))) && (
-          <h2 className="mb-3 mt-8 text-base font-medium">Member access</h2>
+          <h2 className="-mx-5 mb-3 mt-8 border-t px-5 pt-6 text-base font-medium">
+            Member access
+          </h2>
         )}
         <OAuthGrantAccordion
           key={isPreview ? 'preview' : memberGrants.map((grant) => grant.id).join(',')}
@@ -350,7 +352,7 @@ function GrantAccess({
   )
   if (expanded)
     return (
-      <div className="mb-8 space-y-4">
+      <div className="-mx-5 mb-8 space-y-4 border-t px-5 pt-6">
         <h2 className="text-base font-medium">{title}</h2>
         {details}
       </div>
