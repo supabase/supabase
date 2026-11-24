@@ -567,6 +567,25 @@ on team_members
 using btree (user_id);
 ```
 
+A policy can also filter on a fixed condition that doesn't depend on the user, such as a status or visibility flag. Postgres applies it like a `where` clause, so queries on the table can use a [partial index](/docs/guides/database/postgres/indexes#partial-indexes) with the same predicate. Index the columns your queries sort or filter on, and use the policy's condition as the index predicate. For a policy like this:
+
+```sql
+create policy "rls_test_select" on test_table
+to authenticated
+using ( not is_archived );
+```
+
+You can add a partial index like:
+
+```sql
+create index active_created_at
+on test_table
+using btree (created_at)
+where not is_archived;
+```
+
+Write the policy condition and the index predicate the same way. Postgres matches only some equivalent forms, so a `using ( is_archived is false )` policy can't use this index.
+
 ### Call functions with `select`
 
 You can use `select` statement to improve policies that use functions. For example, instead of this:
