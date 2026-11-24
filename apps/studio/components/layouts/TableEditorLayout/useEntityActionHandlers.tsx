@@ -2,8 +2,8 @@ import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
 import {
-  ENTITY_ACTION_TO_TELEMETRY,
   ENTITY_TYPE_TO_TELEMETRY,
+  getTelemetryActionForEntityAction,
   type EntityActionId,
 } from './EntityActions.utils'
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
@@ -80,7 +80,7 @@ export const useEntityActionHandlers = ({
   }
 
   const onSelectAction = (actionId: EntityActionId) => {
-    const telemetryAction = ENTITY_ACTION_TO_TELEMETRY[actionId]
+    const telemetryAction = getTelemetryActionForEntityAction(actionId)
     if (telemetryAction) {
       track('table_editor_entity_action_clicked', {
         action: telemetryAction,

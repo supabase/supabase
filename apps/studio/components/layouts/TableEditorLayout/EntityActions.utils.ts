@@ -25,19 +25,27 @@ export const ENTITY_TYPE_TO_TELEMETRY: Record<ENTITY_TYPE, TableEditorEntityType
   [ENTITY_TYPE.PARTITIONED_TABLE]: 'partitioned_table',
 }
 
-export const ENTITY_ACTION_TO_TELEMETRY: Partial<Record<EntityActionId, TableEditorEntityAction>> =
-  {
-    'copy-name': 'copy_name',
-    'copy-schema': 'copy_schema',
-    'copy-definition': 'copy_definition',
-    'edit-table': 'edit',
-    'duplicate-table': 'duplicate',
-    'export-csv': 'export_csv',
-    'export-sql': 'export_sql',
-    'export-cli': 'export_cli',
-    'view-partitions': 'view_partitions',
-    delete: 'delete',
-  }
+type TrackedEntityActionId = Exclude<EntityActionId, 'view-policies' | 'export'>
+
+const TRACKED_ENTITY_ACTIONS: Record<TrackedEntityActionId, TableEditorEntityAction> = {
+  'copy-name': 'copy_name',
+  'copy-schema': 'copy_schema',
+  'copy-definition': 'copy_definition',
+  'edit-table': 'edit',
+  'duplicate-table': 'duplicate',
+  'export-csv': 'export_csv',
+  'export-sql': 'export_sql',
+  'export-cli': 'export_cli',
+  'view-partitions': 'view_partitions',
+  delete: 'delete',
+}
+
+export const getTelemetryActionForEntityAction = (
+  actionId: EntityActionId
+): TableEditorEntityAction | undefined => {
+  if (actionId === 'view-policies' || actionId === 'export') return undefined
+  return TRACKED_ENTITY_ACTIONS[actionId]
+}
 
 export type EntityAction = {
   id: EntityActionId

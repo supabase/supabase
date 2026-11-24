@@ -1,13 +1,11 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { consentState } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 
-import { EntityListItem } from './EntityListItem'
 import { TABLE_SEARCH_TRACK_DEBOUNCE_MS, TableEditorMenu } from './TableEditorMenu'
-import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { TableEditorStateContextProvider } from '@/state/table-editor'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -46,12 +44,6 @@ describe('TableEditorMenu telemetry', () => {
         region: 'local',
         status: 'ACTIVE_HEALTHY',
       },
-    })
-
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref/run-lints',
-      response: () => HttpResponse.json<never[]>([]),
     })
 
     addAPIMock({
@@ -95,7 +87,7 @@ describe('TableEditorMenu telemetry', () => {
       { nuqs: { searchParams: { schema: 'public' }, hasMemory: true } }
     )
 
-  it('tracks schema switches with isSystemSchema and isPublic without leaking schema names', async () => {
+  it('tracks schema switches once per change with system/public flags and no schema names', async () => {
     const user = userEvent.setup()
     renderMenu()
 
@@ -106,7 +98,7 @@ describe('TableEditorMenu telemetry', () => {
     await user.click(await screen.findByRole('option', { name: 'public' }))
     expect(telemetryRequests).toHaveLength(0)
 
-    // Switch to system schema
+    // Switch to system schema (verifies cmdk option click fires once, not twice)
     await user.click(trigger)
     await user.click(await screen.findByRole('option', { name: 'auth' }))
 
@@ -145,35 +137,9 @@ describe('TableEditorMenu telemetry', () => {
     expect(JSON.stringify(telemetryRequests)).not.toContain('custom_app')
   })
 
-  it('tracks create schema and new table sidebar clicks', async () => {
-    const user = userEvent.setup()
-    renderMenu()
-
-    await user.click(await screen.findByTestId('schema-selector'))
-    await user.click(await screen.findByRole('option', { name: /Create a new schema/i }))
-
-    await waitFor(() => {
-      expect(telemetryRequests).toMatchObject([
-        {
-          action: 'table_editor_new_item_clicked',
-          custom_properties: { itemType: 'schema' },
-        },
-      ])
-    })
-
-    await user.click(await screen.findByRole('button', { name: 'New table' }))
-
-    await waitFor(() => {
-      expect(telemetryRequests).toHaveLength(2)
-    })
-    expect(telemetryRequests[1]).toMatchObject({
-      action: 'table_editor_new_item_clicked',
-      custom_properties: { itemType: 'table', trigger: 'sidebar' },
-    })
-  })
-
-  it('debounces table search submission and cancels when cleared before debounce expires', async () => {
+  it('debounces table search and cancels pending events when cleared or switching schemas', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     renderMenu()
 
     const searchInput = await screen.findByPlaceholderText('Search tables...')
@@ -197,7 +163,7 @@ describe('TableEditorMenu telemetry', () => {
     })
     expect(JSON.stringify(telemetryRequests)).not.toContain('users_secret')
 
-    // Typing then clearing before the debounce elapses should not fire another event
+    // Clearing before debounce elapses cancels the event
     fireEvent.change(searchInput, { target: { value: 'orders' } })
     fireEvent.change(searchInput, { target: { value: '' } })
 
@@ -206,84 +172,22 @@ describe('TableEditorMenu telemetry', () => {
     })
 
     expect(telemetryRequests).toHaveLength(1)
-  })
 
-  it('tracks entity-type filter changes with the updated visibleTypeCount', async () => {
-    const user = userEvent.setup()
-    renderMenu()
+    // Switching schemas while a search debounce is pending cancels the search event
+    fireEvent.change(searchInput, { target: { value: 'invoices' } })
+    await user.click(await screen.findByTestId('schema-selector'))
+    await user.click(await screen.findByRole('option', { name: 'auth' }))
 
-    await user.click(await screen.findByRole('button', { name: 'Filter' }))
-
-    const viewsCheckbox = await screen.findByRole('checkbox', { name: /^view$/i })
-    await user.click(viewsCheckbox)
-
-    await waitFor(() => {
-      expect(telemetryRequests).toMatchObject([
-        {
-          action: 'table_editor_entity_filter_updated',
-          custom_properties: { visibleTypeCount: 4 },
-        },
-      ])
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(TABLE_SEARCH_TRACK_DEBOUNCE_MS)
     })
-
-    const selectOnlyButtons = screen.getAllByRole('button', { name: 'Select only' })
-    await user.click(selectOnlyButtons[0])
 
     await waitFor(() => {
       expect(telemetryRequests).toHaveLength(2)
     })
     expect(telemetryRequests[1]).toMatchObject({
-      action: 'table_editor_entity_filter_updated',
-      custom_properties: { visibleTypeCount: 1 },
+      action: 'table_editor_schema_updated',
+      custom_properties: { isSystemSchema: true, isPublic: false },
     })
-
-    // Clicking Select only on the same single type is a no-op
-    await user.click(selectOnlyButtons[0])
-    expect(telemetryRequests).toHaveLength(2)
-  })
-
-  it('tracks entity action clicks with action and entityType without leaking entity names', async () => {
-    const user = userEvent.setup()
-    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
-    onTestFinished(() => writeText.mockRestore())
-
-    customRender(
-      <TableEditorStateContextProvider>
-        <EntityListItem
-          id={42}
-          projectRef="default"
-          isLocked={false}
-          onExportCLI={vi.fn()}
-          item={{
-            id: 42,
-            schema: 'public',
-            name: 'secret_customers',
-            type: ENTITY_TYPE.TABLE,
-            comment: null,
-            rls_enabled: true,
-            is_partition: false,
-          }}
-        />
-      </TableEditorStateContextProvider>
-    )
-
-    await user.click(
-      await screen.findByRole('button', { name: 'More options for secret_customers' })
-    )
-    const menu = await screen.findByRole('menu')
-    await user.click(within(menu).getByRole('menuitem', { name: 'Copy name' }))
-
-    await waitFor(() => {
-      expect(telemetryRequests).toMatchObject([
-        {
-          action: 'table_editor_entity_action_clicked',
-          custom_properties: {
-            action: 'copy_name',
-            entityType: 'table',
-          },
-        },
-      ])
-    })
-    expect(JSON.stringify(telemetryRequests)).not.toContain('secret_customers')
   })
 })

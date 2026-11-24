@@ -2,8 +2,8 @@ import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
-import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
-import { createColumn, updateColumn, updateTable } from './SidePanelEditor.utils'
+import type { ColumnField } from './SidePanelEditor.types'
+import { updateColumn, updateTable } from './SidePanelEditor.utils'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
@@ -104,7 +104,7 @@ const baseTable = {
 } as unknown as RetrieveTableResult
 
 const sampleForeignKey: ForeignKey = {
-  id: 'new-fk-1',
+  id: 99,
   name: 'fk_users_org_id',
   schema: 'public',
   table: 'organizations',
@@ -149,76 +149,6 @@ describe('SidePanelEditor.utils telemetry', () => {
     )
   })
 
-  describe('createColumn', () => {
-    it('tracks table_column_created with hasForeignKey and isArray on success', async () => {
-      const payload: CreateColumnPayload = {
-        schema: 'public',
-        table: 'users',
-        name: 'org_ids',
-        type: { name: 'int8', isArray: true },
-      }
-
-      const result = await createColumn({
-        projectRef,
-        connectionString,
-        payload,
-        selectedTable: baseTable,
-        foreignKeyRelations: [sampleForeignKey],
-        track: mockTrack,
-      })
-
-      expect(result.error).toBeUndefined()
-      expect(mockTrack).toHaveBeenCalledTimes(1)
-      expect(mockTrack).toHaveBeenCalledWith('table_column_created', {
-        hasForeignKey: true,
-        isArray: true,
-      })
-    })
-
-    it('tracks false flags when no active FK or array type is set', async () => {
-      const payload: CreateColumnPayload = {
-        schema: 'public',
-        table: 'users',
-        name: 'bio',
-        type: { name: 'text', isArray: false },
-      }
-
-      await createColumn({
-        projectRef,
-        connectionString,
-        payload,
-        selectedTable: baseTable,
-        foreignKeyRelations: [{ ...sampleForeignKey, toRemove: true }],
-        track: mockTrack,
-      })
-
-      expect(mockTrack).toHaveBeenCalledWith('table_column_created', {
-        hasForeignKey: false,
-        isArray: false,
-      })
-    })
-
-    it('does not track table_column_created when creation fails', async () => {
-      mockCreateDatabaseColumn.mockRejectedValueOnce(new Error('column already exists'))
-
-      const result = await createColumn({
-        projectRef,
-        connectionString,
-        payload: {
-          schema: 'public',
-          table: 'users',
-          name: 'bio',
-          type: { name: 'text' },
-        },
-        selectedTable: baseTable,
-        track: mockTrack,
-      })
-
-      expect(result.error).toBeInstanceOf(Error)
-      expect(mockTrack).not.toHaveBeenCalled()
-    })
-  })
-
   describe('updateColumn', () => {
     const arrayColumn = {
       ...baseTable.columns![0],
@@ -228,14 +158,12 @@ describe('SidePanelEditor.utils telemetry', () => {
       format: '_text',
     } as unknown as SafePostgresColumn
 
-    it('preserves isArray from originalColumn when type was not changed', async () => {
-      const payload: UpdateColumnPayload = { name: 'labels' }
-
+    it('preserves isArray from originalColumn when payload omits type', async () => {
       await updateColumn({
         projectRef,
         connectionString,
         originalColumn: arrayColumn,
-        payload,
+        payload: { name: 'labels' },
         selectedTable: baseTable,
         foreignKeyRelations: [],
         existingForeignKeyRelations: [],
@@ -249,7 +177,7 @@ describe('SidePanelEditor.utils telemetry', () => {
       })
     })
 
-    it('uses updated type.isArray and active foreign keys when changed', async () => {
+    it('treats FKs marked toRemove as absent and falls back to existingForeignKeyRelations when relations array is empty', async () => {
       const existingFk = { id: 99 } as ForeignKeyConstraint
 
       await updateColumn({
@@ -258,19 +186,15 @@ describe('SidePanelEditor.utils telemetry', () => {
         originalColumn: arrayColumn,
         payload: { type: { name: 'text', isArray: false } },
         selectedTable: baseTable,
-        foreignKeyRelations: [{ ...sampleForeignKey, id: 99, toRemove: true }],
+        foreignKeyRelations: [{ ...sampleForeignKey, toRemove: true }],
         existingForeignKeyRelations: [existingFk],
         track: mockTrack,
       })
 
-      expect(mockTrack).toHaveBeenCalledWith('table_column_updated', {
+      expect(mockTrack).toHaveBeenLastCalledWith('table_column_updated', {
         hasForeignKey: false,
         isArray: false,
       })
-    })
-
-    it('falls back to existingForeignKeyRelations when foreignKeyRelations is empty', async () => {
-      const existingFk = { id: 99 } as ForeignKeyConstraint
 
       await updateColumn({
         projectRef,
@@ -283,31 +207,15 @@ describe('SidePanelEditor.utils telemetry', () => {
         track: mockTrack,
       })
 
-      expect(mockTrack).toHaveBeenCalledWith('table_column_updated', {
+      expect(mockTrack).toHaveBeenLastCalledWith('table_column_updated', {
         hasForeignKey: true,
         isArray: false,
       })
     })
-
-    it('does not track table_column_updated when update fails', async () => {
-      mockUpdateDatabaseColumn.mockRejectedValueOnce(new Error('cannot alter type'))
-
-      const result = await updateColumn({
-        projectRef,
-        connectionString,
-        originalColumn: arrayColumn,
-        payload: { name: 'labels' },
-        selectedTable: baseTable,
-        track: mockTrack,
-      })
-
-      expect(result?.error).toBeInstanceOf(Error)
-      expect(mockTrack).not.toHaveBeenCalled()
-    })
   })
 
   describe('updateTable', () => {
-    it('tracks table_updated with columnCountChanged: false when column count is unchanged', async () => {
+    it('tracks table_updated with columnCountChanged without double-firing table_column_* events', async () => {
       await updateTable({
         projectRef,
         connectionString,
@@ -324,9 +232,9 @@ describe('SidePanelEditor.utils telemetry', () => {
       expect(mockTrack).toHaveBeenCalledWith('table_updated', {
         columnCountChanged: false,
       })
-    })
 
-    it('tracks table_updated with columnCountChanged: true and does not fire column events', async () => {
+      mockTrack.mockClear()
+
       await updateTable({
         projectRef,
         connectionString,

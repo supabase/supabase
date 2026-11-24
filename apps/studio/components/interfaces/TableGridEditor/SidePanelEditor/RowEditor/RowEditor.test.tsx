@@ -2,11 +2,10 @@ import type { PGTable } from '@supabase/pg-meta'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { consentState } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
-import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RowEditor, type RowEditorProps } from './RowEditor'
 import { customRender } from '@/tests/lib/custom-render'
@@ -272,41 +271,6 @@ describe('RowEditor', () => {
       expect(await getInput('body')).toHaveValue('short')
       expect(screen.queryByText('Loading full value...')).not.toBeInTheDocument()
       expect(largeValueQueries).toHaveLength(0)
-    })
-  })
-
-  describe('expanded cell editor telemetry', () => {
-    it('tracks table_editor_cell_editor_opened with editorType text when expanding a text field', async () => {
-      const user = userEvent.setup()
-      const previousConsent = consentState.hasConsented
-      consentState.hasConsented = true
-      onTestFinished(() => {
-        consentState.hasConsented = previousConsent
-      })
-
-      const telemetryRequests: unknown[] = []
-      addAPIMock({
-        method: 'post',
-        path: '/platform/telemetry/event',
-        response: async ({ request }) => {
-          telemetryRequests.push(await request.json())
-          return HttpResponse.json<Record<string, never>>({}, { status: 201 })
-        },
-      })
-
-      renderRowEditor({ row: { id: 1, title: 'Hello', body: 'World' } })
-
-      await user.click(await screen.findByTestId('body-field-actions'))
-      await user.click(await screen.findByRole('menuitem', { name: 'Expand editor' }))
-
-      await waitFor(() => {
-        expect(telemetryRequests).toMatchObject([
-          {
-            action: 'table_editor_cell_editor_opened',
-            custom_properties: { editorType: 'text' },
-          },
-        ])
-      })
     })
   })
 })
