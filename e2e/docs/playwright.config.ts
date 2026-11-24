@@ -8,8 +8,6 @@ export default defineConfig({
   timeout: 60_000,
   forbidOnly: IS_CI,
   retries: IS_CI ? 2 : 0,
-  // No maxFailures: a broken link in a shared partial can fail many pages, and the
-  // run should report all of them, not stop after the first few.
   expect: {
     timeout: 15_000,
   },
