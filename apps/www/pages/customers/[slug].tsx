@@ -6,7 +6,6 @@ import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { generateTocFromMarkdown } from '~/lib/toc'
 import matter from 'gray-matter'
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { MDXClient } from 'next-mdx-remote-client/csr'
@@ -58,7 +57,6 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: await generateTocFromMarkdown(content, data.toc_depth ? data.toc_depth : 2),
       },
     },
   }
