@@ -2,6 +2,8 @@
 
 Rate limits are applied to prevent abuse and ensure fair usage of the Management API. Rate limits are based on a per-user, per-scope model, meaning each user gets independent rate limits for each project and organization they interact with.
 
+Only requests to the Management API at `https://api.supabase.com` count toward these limits. Requests to your project's own URL, `https://<project-ref>.supabase.co`, don't count. These include Edge Function invocations and Data API calls.
+
 ### Standard rate limit
 
 | Limit        | Duration | Scope                                               |
@@ -22,6 +24,8 @@ Rate limits are applied with per-user, per-scope, per-endpoint isolation:
 For example, you can make 120 requests to Project A and 120 requests to Project B within the same minute, as they are tracked separately. Within one organization, calling `GET /v1/organizations/{slug}/members` 120 times doesn't affect calls to `GET /v1/organizations/{slug}` or `POST /v1/projects` for that organization.
 
 `POST /v1/projects` is organization-scoped, using the `organization_slug` in the request body.
+
+The Supabase CLI calls the Management API for commands that act on a remote project, so these limits apply to it too. For example, `supabase functions deploy` sends at least one request to the project's functions endpoints for each function it deploys. Deploying many functions to one project at once might reach the per-endpoint limit for that project.
 
 ### How rate limits are tracked
 
