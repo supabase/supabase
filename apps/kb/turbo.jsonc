@@ -32,8 +32,11 @@
       ],
       "outputs": ["public/markdown/**"],
     },
+    "redirects:generate": {
+      "outputs": ["redirects/generated/**"],
+    },
     "build": {
-      "dependsOn": ["^build", "generate:markdown"],
+      "dependsOn": ["^build", "generate:markdown", "redirects:generate"],
       "inputs": [
         "$TURBO_DEFAULT$",
         { "mode": "jit", "globs": ["src/content/**", "public/markdown/**"] },

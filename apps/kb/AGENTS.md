@@ -71,6 +71,10 @@ rewrites guide, topic, troubleshooting, and FAQ page requests that send `Accept:
 Requests to `/` are redirected to `/kb` before rewrites run, so the homepage rule only needs to match `/kb`. The negotiated rewrites must stay above the generic
 `/kb/:path*` rewrite, since Vercel uses the first match.
 
+To redirect a renamed or removed page, add an entry to `redirects/static-redirects.json` — read
+[`redirects/README.md`](redirects/README.md) first. It is served by Vercel bulk redirects, and the `.md` variant is generated, so
+don't add one by hand or put page renames in `vercel.json`.
+
 If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and
 `Vary: Accept` header in `vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, the
 `Accept` rewrite to `/markdown/<section>/:path+.md`, and a `headers` entry for `/kb/<section>/:path+`), and
