@@ -426,23 +426,22 @@ export const duplicateTable = async (
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
     const identityColumns = columns.filter((column) => column.identity_generation !== null)
-    await Promise.all(
-      identityColumns.map((column) =>
-        executeSql({
-          projectRef,
-          connectionString,
-          sqlOrigin: 'studio',
-          queryName: 'table-duplicate-identity-sequence',
-          sql: getDuplicateIdentitySequenceSQL({
-            sourceTableName,
-            sourceTableSchema,
-            duplicatedTableName,
-            columnName: column.name,
-          }),
-          grant: unguarded.migrating,
-        })
-      )
-    )
+    const identitySequenceUpdates = identityColumns.map(async (column) => {
+      await executeSql({
+        projectRef,
+        connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-duplicate-identity-sequence',
+        sql: getDuplicateIdentitySequenceSQL({
+          sourceTableName,
+          sourceTableSchema,
+          duplicatedTableName,
+          columnName: column.name,
+        }),
+        grant: unguarded.migrating,
+      })
+    })
+    await Promise.all(identitySequenceUpdates)
   }
 
   const tables = await queryClient.fetchQuery({
