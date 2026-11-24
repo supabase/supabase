@@ -1,16 +1,24 @@
-import Link from 'next/link'
-import { useState } from 'react'
-import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
-import { ComputeBadge } from 'ui-patterns/ComputeBadge'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import Link from "next/link";
+import { useState } from "react";
+import {
+  Button,
+  cn,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  Separator,
+} from "ui";
+import { ComputeBadge } from "ui-patterns/ComputeBadge";
+import { ShimmeringLoader } from "ui-patterns/ShimmeringLoader";
 
-import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
-import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
-import { ProjectDetail } from '@/data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { getComputeCpuLabel } from '@/lib/compute-labels'
-import { useTrack } from '@/lib/telemetry/track'
+import { getAvailableComputeOptions } from "@/components/interfaces/DiskManagement/DiskManagement.utils";
+import { getInfrastructurePath } from "@/components/interfaces/Settings/Infrastructure/Infrastructure.utils";
+import { ProjectDetail } from "@/data/projects/project-detail-query";
+import { useOrgSubscriptionQuery } from "@/data/subscriptions/org-subscription-query";
+import { useProjectAddonsQuery } from "@/data/subscriptions/project-addons-query";
+import { getComputeCpuLabel } from "@/lib/compute-labels";
+import { useTrack } from "@/lib/telemetry/track";
+import { isEligibleForFreeMicroUpgrade } from "../interfaces/Support/FreeMicroUpgradeSuggestion.utils";
 
 export const ChevronsUpAnimated = () => (
   <svg
@@ -26,31 +34,37 @@ export const ChevronsUpAnimated = () => (
     <polyline
       points="17 18 12 13 7 18"
       className="animate-chevron-up"
-      style={{ animationDelay: '0s' }}
+      style={{ animationDelay: "0s" }}
     />
     <polyline
       points="17 11 12 6 7 11"
       className="animate-chevron-up"
-      style={{ animationDelay: '0.3s' }}
+      style={{ animationDelay: "0.3s" }}
     />
   </svg>
-)
+);
 
-const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
+const Row = ({
+  label,
+  stat,
+}: {
+  label: string;
+  stat: React.ReactNode | string;
+}) => {
   return (
     <div className="flex flex-row gap-2">
       <span className="text-sm text-foreground-light w-16">{label}</span>
       <span className="text-sm">{stat}</span>
     </div>
-  )
-}
+  );
+};
 
 interface ComputeBadgeWrapperProps {
-  slug?: string
-  projectRef?: string
-  cloudProvider?: string
-  computeSize?: ProjectDetail['infra_compute_size']
-  badgeClassName?: string
+  slug?: string;
+  projectRef?: string;
+  cloudProvider?: string;
+  computeSize?: ProjectDetail["infra_compute_size"];
+  badgeClassName?: string;
 }
 
 export const ComputeBadgeWrapper = ({
@@ -62,45 +76,64 @@ export const ComputeBadgeWrapper = ({
 }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
-  const [open, setOpenState] = useState(false)
+  const [open, setOpenState] = useState(false);
 
   // fetches addons
   const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
     { projectRef },
-    { enabled: open }
-  )
+    { enabled: open },
+  );
 
   // Derive cores/memory from the same source as the badge (infra_compute_size) by looking up
   // the matching variant in available_addons. Sourcing from selected_addons can drift out of
   // sync with infra_compute_size and produce a card that contradicts its own badge.
-  const computeOptions = getAvailableComputeOptions(addons?.available_addons ?? [], cloudProvider)
-  const meta = computeOptions.find((variant) => variant.identifier === `ci_${computeSize}`)?.meta
+  const computeOptions = getAvailableComputeOptions(
+    addons?.available_addons ?? [],
+    cloudProvider,
+  );
+  const meta = computeOptions.find(
+    (variant) => variant.identifier === `ci_${computeSize}`,
+  )?.meta;
 
-  const highestComputeAvailable = computeOptions[computeOptions.length - 1]?.identifier
-  const isHighestCompute = computeSize === highestComputeAvailable?.replace('ci_', '')
+  const highestComputeAvailable =
+    computeOptions[computeOptions.length - 1]?.identifier;
+  const isHighestCompute =
+    computeSize === highestComputeAvailable?.replace("ci_", "");
 
   const { data, isPending: isLoadingSubscriptions } = useOrgSubscriptionQuery(
     { orgSlug: slug },
-    { enabled: !!slug }
-  )
+    { enabled: !!slug },
+  );
 
-  const isEligibleForFreeUpgrade =
-    !!data && data.plan.id !== 'free' && data.plan.id !== 'platform' && computeSize === 'nano'
+  const isEligibleForFreeUpgrade = isEligibleForFreeMicroUpgrade({
+    planId: data?.plan.id,
+    computeSize,
+  });
 
-  const track = useTrack()
+  const track = useTrack();
 
-  const isLoading = isLoadingAddons || isLoadingSubscriptions
+  const isLoading = isLoadingAddons || isLoadingSubscriptions;
 
-  if (!computeSize) return null
+  if (!computeSize) return null;
 
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
-      <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div className={cn('flex items-center', isEligibleForFreeUpgrade && 'animate-badge-pulse')}>
+      <HoverCardTrigger
+        asChild
+        className="group"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className={cn(
+            "flex items-center",
+            isEligibleForFreeUpgrade && "animate-badge-pulse",
+          )}
+        >
           <div
             className={cn(
-              'flex',
-              isEligibleForFreeUpgrade && 'relative inline-flex overflow-hidden rounded-sm'
+              "flex",
+              isEligibleForFreeUpgrade &&
+                "relative inline-flex overflow-hidden rounded-sm",
             )}
           >
             <ComputeBadge
@@ -108,8 +141,8 @@ export const ComputeBadgeWrapper = ({
               icon={isEligibleForFreeUpgrade && <ChevronsUpAnimated />}
               className={cn(
                 isEligibleForFreeUpgrade &&
-                  'text-brand-600 border-brand-500 bg-brand-default/10 gap-1',
-                badgeClassName
+                  "text-brand-600 border-brand-500 bg-brand-default/10 gap-1",
+                badgeClassName,
               )}
             />
             {isEligibleForFreeUpgrade && (
@@ -124,7 +157,9 @@ export const ComputeBadgeWrapper = ({
         className="p-0 overflow-hidden w-96"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-2 px-5 text-xs text-foreground-lighter">Compute size</div>
+        <div className="p-2 px-5 text-xs text-foreground-lighter">
+          Compute size
+        </div>
         <Separator />
         <div className="p-3 px-5 flex flex-row gap-4">
           <div>
@@ -141,7 +176,7 @@ export const ComputeBadgeWrapper = ({
             ) : (
               <>
                 <div className="flex flex-col gap-1">
-                  {computeSize === 'nano' ? (
+                  {computeSize === "nano" ? (
                     <>
                       <Row label="CPU" stat="Shared compute" />
                       <Row label="Memory" stat="Up to 0.5 GB" />
@@ -150,9 +185,15 @@ export const ComputeBadgeWrapper = ({
                     <>
                       <Row
                         label="CPU"
-                        stat={getComputeCpuLabel(computeSize ?? '', meta.cpu_cores)}
+                        stat={getComputeCpuLabel(
+                          computeSize ?? "",
+                          meta.cpu_cores,
+                        )}
                       />
-                      <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
+                      <Row
+                        label="Memory"
+                        stat={`${meta.memory_gb ?? "-"} GB`}
+                      />
                     </>
                   ) : null}
                 </div>
@@ -167,29 +208,31 @@ export const ComputeBadgeWrapper = ({
               <div className="flex flex-col gap-0">
                 <p className="text-foreground">
                   {isEligibleForFreeUpgrade
-                    ? 'Free upgrade to Micro available'
-                    : 'Unlock more compute'}
+                    ? "Free upgrade to Micro available"
+                    : "Unlock more compute"}
                 </p>
                 <p className="text-foreground-light">
                   {isEligibleForFreeUpgrade
-                    ? 'Paid plans include a free upgrade to Micro compute.'
-                    : 'Scale your project up to 64 vCPUs and 256 GB RAM.'}
+                    ? "Paid plans include a free upgrade to Micro compute."
+                    : "Scale your project up to 64 vCPUs and 256 GB RAM."}
                 </p>
               </div>
               <div>
                 <Button
                   asChild
                   onClick={() => {
-                    track('compute_badge_upgrade_clicked', {
-                      computeSize: computeSize ?? 'unknown',
-                      planId: data?.plan.id ?? 'unknown',
+                    track("compute_badge_upgrade_clicked", {
+                      computeSize: computeSize ?? "unknown",
+                      planId: data?.plan.id ?? "unknown",
                       upgradeType: isEligibleForFreeUpgrade
-                        ? 'free_micro_upgrade'
-                        : 'compute_upgrade',
-                    })
+                        ? "free_micro_upgrade"
+                        : "compute_upgrade",
+                    });
                   }}
                 >
-                  <Link href={getInfrastructurePath(projectRef)}>Upgrade compute</Link>
+                  <Link href={getInfrastructurePath(projectRef)}>
+                    Upgrade compute
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -197,5 +240,5 @@ export const ComputeBadgeWrapper = ({
         )}
       </HoverCardContent>
     </HoverCard>
-  )
-}
+  );
+};
