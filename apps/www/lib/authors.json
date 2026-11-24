@@ -1154,7 +1154,7 @@
   {
     "author_id": "kris_talajic",
     "author": "Kris Talajic",
-    "position": "Growth Lead, East",
+    "position": "Growth Lead",
     "author_url": "https://www.linkedin.com/in/ktalajic/",
     "author_image_url": "/images/blog/avatars/kris-talajic.png"
   },
@@ -1178,5 +1178,37 @@
     "position": "VP of Product, Engineering & Design",
     "author_url": "https://www.linkedin.com/in/hgmnz/",
     "author_image_url": "/images/blog/avatars/harold-gimenez.jpg"
+  },
+  {
+    "author_id": "anthony_lio",
+    "author": "Anthony Lio",
+    "username": "antlio",
+    "position": "Design",
+    "author_url": "https://github.com/antlio",
+    "author_image_url": "https://github.com/antlio.png"
+  },
+  {
+    "author_id": "jeremias_menichelli",
+    "author": "Jeremias Menichelli",
+    "username": "jeremenichelli",
+    "position": "Engineering",
+    "author_url": "https://github.com/jeremenichelli",
+    "author_image_url": "https://github.com/jeremenichelli.png"
+  },
+  {
+    "author_id": "kody_jackson",
+    "author": "Kody Jackson",
+    "username": "kodster28",
+    "position": "Engineering",
+    "author_url": "https://github.com/kodster28",
+    "author_image_url": "https://github.com/kodster28.png"
+  },
+  {
+    "author_id": "aleksi_immonen",
+    "author": "Aleksi Immonen",
+    "username": "4L3k51",
+    "position": "Marketing",
+    "author_url": "https://github.com/4L3k51",
+    "author_image_url": "https://github.com/4L3k51.png"
   }
 ]

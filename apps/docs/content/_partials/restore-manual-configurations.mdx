@@ -1,0 +1,13 @@
+<Admonition type="caution" title="What needs manual reconfiguration?">
+
+Your new project won't work like the original until you reconfigure these items. The restore doesn't carry them over.
+
+- Storage objects and settings. Only [storage metadata](/docs/guides/storage/schema/design) is copied. See [Transfer Storage objects from one project to another](/docs/guides/platform/migrating-within-supabase/backup-restore#migrating-storage-objects).
+- [Edge Functions](/docs/guides/functions). See [Transfer Edge Function from one project to another](/kb/troubleshooting/transfer-edge-function-from-one-project-to-another).
+- Auth settings and API keys
+- Realtime settings
+- Database settings{{ .extensions }}
+- Integrations and settings
+- [Project Settings](/dashboard/project/_/settings/): for example, [Read Replicas](/docs/guides/platform/read-replicas), [Log Drains](/docs/guides/observability/log-drains), Add-ons{{ .project_settings }}
+
+</Admonition>
