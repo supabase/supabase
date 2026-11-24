@@ -3921,7 +3921,7 @@ functions:
           try await supabase
             .from("reservations")
             .select()
-            .rangeLt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .rangeLt("during", range: "[2000-01-02 08:30, 2000-01-02 09:30)")
             .execute()
           ```
 
@@ -3937,7 +3937,7 @@ functions:
           try await supabase
             .from("reservations")
             .select()
-            .rangeGt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .rangeGt("during", range: "[2000-01-02 08:30, 2000-01-02 09:30)")
             .execute()
           ```
 
@@ -3953,7 +3953,7 @@ functions:
           try await supabase
             .from("reservations")
             .select()
-            .rangeGte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .rangeGte("during", range: "[2000-01-02 08:30, 2000-01-02 09:30)")
             .execute()
           ```
 
@@ -3969,7 +3969,7 @@ functions:
           try await supabase
             .from("reservations")
             .select()
-            .rangeLte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .rangeLte("during", range: "[2000-01-02 08:30, 2000-01-02 09:30)")
             .execute()
           ```
 
@@ -3985,7 +3985,7 @@ functions:
           try await supabase
             .from("reservations")
             .select()
-            .rangeAdjacent("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+            .rangeAdjacent("during", range: "[2000-01-02 08:30, 2000-01-02 09:30)")
             .execute()
           ```
 
