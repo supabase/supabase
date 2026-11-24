@@ -12,6 +12,10 @@ import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/O
 
 export const Route = createFileRoute('/_app/org/$slug/apps')({
   component: OrgApps,
+  validateSearch: (search: Record<string, unknown>) => ({
+    mock_scenario: typeof search.mock_scenario === 'string' ? search.mock_scenario : undefined,
+    ...(typeof search.access_app === 'string' ? { access_app: search.access_app } : {}),
+  }),
   staticData: {
     orgLayoutTitle: 'OAuth Apps',
   },

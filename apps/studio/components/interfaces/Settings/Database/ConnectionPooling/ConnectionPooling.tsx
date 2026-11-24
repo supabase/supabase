@@ -267,7 +267,7 @@ export const ConnectionPooling = () => {
               <>
                 <div className="flex flex-row gap-2 justify-between w-full">
                   <div className="flex flex-col text-sm">
-                    <h5 className="text-foreground font-normal">Connection poolers</h5>
+                    <h5 className="settings-field-title text-foreground">Connection poolers</h5>
                     <p className="text-foreground-lighter">
                       {isHighAvailability
                         ? 'One pooler runs for each Postgres pod in the cluster.'
@@ -299,6 +299,7 @@ export const ConnectionPooling = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Connection pool size"
+                          labelClassName="settings-field-title"
                           description={
                             isHighAvailability ? (
                               <p>
@@ -371,6 +372,7 @@ export const ConnectionPooling = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max client connections"
+                          labelClassName="settings-field-title"
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
                           description={
                             isHighAvailability ? (

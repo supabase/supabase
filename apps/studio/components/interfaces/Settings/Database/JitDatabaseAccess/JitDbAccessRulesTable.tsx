@@ -1,4 +1,4 @@
-import { EllipsisVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -74,8 +74,8 @@ export function JitDbAccessRulesTable({
       <CardContent className="space-y-4 p-0">
         <div className="flex items-center justify-between px-4 pb-2 pt-6">
           <div>
-            <h3 className="text-sm text-foreground">Temporary access rules</h3>
-            <p className="text-sm text-foreground-light">
+            <h3 className="settings-field-title text-foreground">Temporary access rules</h3>
+            <p className="text-sm text-foreground-lighter">
               Manage member access, allowed roles, and expiry settings.
             </p>
           </div>
@@ -166,10 +166,9 @@ export function JitDbAccessRulesTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            icon={<EllipsisVerticalIcon />}
+                            icon={<MoreVerticalIcon />}
                             aria-label="More actions"
-                            size="tiny"
-                            className="w-7 hit-area-2"
+                            className="px-1"
                             disabled={!canUpdate || disableActions}
                           />
                         </DropdownMenuTrigger>

@@ -425,7 +425,8 @@ export const JitDbAccessConfiguration = () => {
                 <FormLayout
                   layout="flex-row-reverse"
                   label="Allow temporary access"
-                  description="Let project members request temporary database access."
+                  labelClassName="settings-field-title"
+                  description="Allow database sign-ins with a temporary grant."
                 >
                   <div className="flex w-fit shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (

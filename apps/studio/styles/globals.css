@@ -200,6 +200,10 @@ h6 {
   @apply font-semibold;
 }
 
+.settings-field-title {
+  @apply font-sans text-sm font-medium;
+}
+
 .form-group .form-text,
 .Form .form-text {
   @apply text-foreground-lighter;

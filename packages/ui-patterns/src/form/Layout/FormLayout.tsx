@@ -7,6 +7,7 @@ type Props = {
   description?: string | React.ReactNode
   error?: string | React.ReactNode
   label?: string | React.ReactNode
+  labelClassName?: string
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical' | 'flex' | 'flex-row-reverse'
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -295,6 +296,7 @@ export const FormLayout = React.forwardRef<
       description,
       id,
       label,
+      labelClassName,
       labelOptional,
       layout = 'vertical',
       style,
@@ -394,7 +396,10 @@ export const FormLayout = React.forwardRef<
             >
               {hasLabel && isReactForm ? (
                 <FormLabel
-                  className="text-foreground flex gap-2 items-center wrap-break-word"
+                  className={cn(
+                    'text-foreground flex gap-2 items-center wrap-break-word',
+                    labelClassName
+                  )}
                   data-formlayout-id="formLabel"
                   htmlFor={id}
                 >
@@ -402,7 +407,10 @@ export const FormLayout = React.forwardRef<
                 </FormLabel>
               ) : (
                 <Label
-                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
+                  className={cn(
+                    'text-foreground flex gap-2 items-center wrap-break-word leading-normal',
+                    labelClassName
+                  )}
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >

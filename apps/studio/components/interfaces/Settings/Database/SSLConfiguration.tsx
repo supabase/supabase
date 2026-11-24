@@ -140,6 +140,7 @@ export const SSLConfiguration = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="Enforce SSL on incoming connections"
+              labelClassName="settings-field-title"
               description="Reject non-SSL connections to your database"
             >
               <div className="flex items-center justify-end mt-2.5 space-x-2">
@@ -207,6 +208,7 @@ export const SSLConfiguration = () => {
             <FormLayout
               layout="flex-row-reverse"
               label="SSL Certificate"
+              labelClassName="settings-field-title"
               description="Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks."
             >
               <div className="flex items-end justify-end">
