@@ -8,40 +8,17 @@ import {
   type AnyRouter,
 } from '@tanstack/react-router'
 import {
+  DefaultFrameworkImage,
+  DefaultFrameworkLink,
   FrameworkProvider,
+  resolveStaticImageSrc,
   type FrameworkContextValue,
   type FrameworkImageProps,
   type FrameworkLinkProps,
 } from 'common'
-import { forwardRef, useMemo, type CSSProperties, type ForwardedRef, type ReactNode } from 'react'
+import { forwardRef, useMemo, type ForwardedRef, type ReactNode } from 'react'
 
-import { BASE_PATH } from '@/lib/constants'
-import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
-
-function toRoutePattern(routeId: string): string {
-  const withoutLayoutSegments = routeId.replace(/\/_[a-zA-Z0-9_]+(?=\/|$)/g, '')
-  const withBracketParams = withoutLayoutSegments.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
-  if (withBracketParams === '' || withBracketParams === '/') return '/'
-  return withBracketParams.replace(/\/$/, '')
-}
-
-function stripBasePath(href: string): string {
-  if (!BASE_PATH) return href
-  if (href === BASE_PATH) return '/'
-  if (href.startsWith(`${BASE_PATH}/`)) return href.slice(BASE_PATH.length)
-  if (href.startsWith(`${BASE_PATH}?`) || href.startsWith(`${BASE_PATH}#`)) {
-    return `/${href.slice(BASE_PATH.length)}`
-  }
-  return href
-}
-
-function applyBasePath(src: string): string {
-  if (!BASE_PATH) return src
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
-  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
-  if (src.startsWith('/')) return `${BASE_PATH}${src}`
-  return src
-}
+import { applyBasePath, isAbsoluteUrl, splitInternalUrl, toRoutePattern } from '@/lib/internal-url'
 
 function normalizeParams(
   search: Record<string, unknown> | undefined,
@@ -76,17 +53,10 @@ function resolveSearchOrHashOnlyTarget(
 }
 
 const StudioLink = forwardRef(function StudioLink(
-  {
-    href,
-    prefetch,
-    replace,
-    scroll: _scroll,
-    shallow: _shallow,
-    children,
-    ...rest
-  }: FrameworkLinkProps,
+  props: FrameworkLinkProps,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
+  const { href, prefetch, replace, scroll: _scroll, shallow: _shallow, children, ...rest } = props
   const { currentPathname, currentSearch } = useRouterState({
     select: (state) => {
       const committed = state.resolvedLocation ?? state.location
@@ -96,19 +66,11 @@ const StudioLink = forwardRef(function StudioLink(
       }
     },
   })
-  const resolvedHref = resolveSearchOrHashOnlyTarget(
-    href,
-    stripBasePath(currentPathname),
-    currentSearch
-  )
+  const resolvedHref = resolveSearchOrHashOnlyTarget(href, currentPathname, currentSearch)
   const { to, search, hash } = splitInternalUrl(resolvedHref)
 
   if (isAbsoluteUrl(to)) {
-    return (
-      <a ref={ref} href={href} {...rest}>
-        {children}
-      </a>
-    )
+    return <DefaultFrameworkLink ref={ref} {...props} />
   }
 
   const preload = prefetch === false ? false : prefetch ? 'intent' : undefined
@@ -128,53 +90,14 @@ const StudioLink = forwardRef(function StudioLink(
   )
 })
 
-function StudioImage({
-  src,
-  alt,
-  width,
-  height,
-  fill,
-  sizes,
-  priority,
-  preload: _preload,
-  loading,
-  quality: _quality,
-  placeholder: _placeholder,
-  blurDataURL: _blurDataURL,
-  unoptimized: _unoptimized,
-  overrideSrc: _overrideSrc,
-  style,
-  fetchPriority,
-  ...rest
-}: FrameworkImageProps) {
-  const rawSrc = typeof src === 'string' ? src : 'default' in src ? src.default.src : src.src
-  const resolvedSrc = applyBasePath(rawSrc)
-  const finalStyle: CSSProperties | undefined = fill
-    ? { position: 'absolute', inset: 0, width: '100%', height: '100%', ...style }
-    : style
-
-  return (
-    <img
-      {...rest}
-      src={resolvedSrc}
-      alt={alt}
-      width={fill ? undefined : width}
-      height={fill ? undefined : height}
-      sizes={sizes}
-      loading={loading ?? (priority ? 'eager' : 'lazy')}
-      fetchPriority={priority ? 'high' : fetchPriority}
-      style={finalStyle}
-    />
-  )
+function StudioImage({ src, ...props }: FrameworkImageProps) {
+  return <DefaultFrameworkImage {...props} src={applyBasePath(resolveStaticImageSrc(src))} />
 }
 
 export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
   const router = useTanStackRouter()
-  const { committedLocation, isPending } = useRouterState({
-    select: (state) => ({
-      committedLocation: state.resolvedLocation ?? state.location,
-      isPending: state.status === 'pending',
-    }),
+  const committedLocation = useRouterState({
+    select: (state) => state.resolvedLocation ?? state.location,
   })
   const leafRouteId =
     useMatches({ select: (matches) => matches[matches.length - 1]?.routeId }) ??
@@ -184,8 +107,8 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<FrameworkContextValue>(() => {
     const pathname = toRoutePattern(leafRouteId)
-    const asPath = stripBasePath(committedLocation.href)
-    const currentPathname = stripBasePath(committedLocation.pathname)
+    const asPath = committedLocation.href
+    const currentPathname = committedLocation.pathname
     const currentSearch = committedLocation.searchStr
     const params = normalizeParams(
       searchParams as Record<string, unknown> | undefined,
@@ -197,8 +120,6 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
       Image: StudioImage,
       pathname,
       asPath,
-      isReady: true,
-      isPending,
       params,
       push: async (path: string) => {
         const target = resolveSearchOrHashOnlyTarget(path, currentPathname, currentSearch)
@@ -219,7 +140,6 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
     committedLocation.href,
     committedLocation.pathname,
     committedLocation.searchStr,
-    isPending,
     leafRouteId,
     routeParams,
     router,

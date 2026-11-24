@@ -15,7 +15,7 @@ function ProbeComponent() {
       <span data-testid="asPath">{asPath}</span>
       <span data-testid="ref">{params.ref}</span>
       <span data-testid="sortOrder">{params.sortOrder}</span>
-      <button type="button" tabIndex={0} onClick={() => push?.('?sort-order=desc')}>
+      <button type="button" tabIndex={0} onClick={() => push('?sort-order=desc')}>
         Update query
       </button>
       <FrameworkLink href="/project/abc/editor?schema=public">Internal</FrameworkLink>

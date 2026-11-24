@@ -15,16 +15,15 @@ type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
 const TestFrameworkProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useMockRouter()
-  const { pathname, asPath, isReady, query } = router
   const value = useMemo(
     () => ({
-      pathname,
-      asPath,
-      isReady,
-      params: query,
+      pathname: router.pathname,
+      asPath: router.asPath,
+      isReady: router.isReady,
+      params: router.query,
       push: (path: string) => router.push(path),
     }),
-    [router, pathname, asPath, isReady, query]
+    [router]
   )
 
   return <FrameworkProvider value={value}>{children}</FrameworkProvider>

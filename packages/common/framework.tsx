@@ -4,6 +4,7 @@ import {
   createContext,
   forwardRef,
   useContext,
+  useMemo,
   type ComponentPropsWithoutRef,
   type ComponentType,
   type CSSProperties,
@@ -68,12 +69,14 @@ export interface FrameworkContextValue {
   Image?: FrameworkImageComponent
   /** Current route pattern or pathname (e.g. `/project/[ref]` or `/guides/auth`). */
   pathname?: string
-  /** Current resolved path including search/hash (without basePath). */
+  /**
+   * Current resolved path without basePath. Includes search and hash where the adapter can supply
+   * them; Next App Router adapters supply the pathname only, since reading search params at the
+   * root would opt static pages out of static rendering.
+   */
   asPath?: string
   /** Whether dynamic route params are hydrated (Next Pages Router `router.isReady`). Defaults to `true`. */
   isReady?: boolean
-  /** Whether a client-side route transition is still pending (loaders/matches not yet committed). */
-  isPending?: boolean
   /** Current route and search params consumed by `useParams()`. */
   params?: Record<string, string | string[] | undefined>
   /** Programmatic client-side navigation. Falls back to `window.location.assign`. */
@@ -86,13 +89,12 @@ function defaultPush(path: string) {
   }
 }
 
-export const FrameworkContext = createContext<FrameworkContextValue>({
-  push: defaultPush,
-})
+const FrameworkContext = createContext<FrameworkContextValue>({})
 
-export function useFramework(): FrameworkContextValue {
+export function useFramework(): FrameworkContextValue &
+  Required<Pick<FrameworkContextValue, 'push'>> {
   const context = useContext(FrameworkContext)
-  return context.push ? context : { ...context, push: defaultPush }
+  return useMemo(() => ({ ...context, push: context.push ?? defaultPush }), [context])
 }
 
 export function FrameworkProvider({
@@ -105,7 +107,7 @@ export function FrameworkProvider({
   return <FrameworkContext.Provider value={value}>{children}</FrameworkContext.Provider>
 }
 
-const DefaultLink = forwardRef(function DefaultLink(
+export const DefaultFrameworkLink = forwardRef(function DefaultFrameworkLink(
   {
     href,
     prefetch: _prefetch,
@@ -129,17 +131,17 @@ export const FrameworkLink = forwardRef(function FrameworkLink(
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
   const { Link } = useFramework()
-  const LinkComponent = Link ?? DefaultLink
+  const LinkComponent = Link ?? DefaultFrameworkLink
   return <LinkComponent ref={ref} {...props} />
 })
 
-function resolveStaticImageSrc(src: string | StaticImport): string {
+export function resolveStaticImageSrc(src: string | StaticImport): string {
   if (typeof src === 'string') return src
   if ('default' in src) return src.default.src
   return src.src
 }
 
-function DefaultImage({
+export function DefaultFrameworkImage({
   src,
   alt,
   width,
@@ -180,6 +182,6 @@ function DefaultImage({
 
 export function FrameworkImage(props: FrameworkImageProps) {
   const { Image } = useFramework()
-  const ImageComponent = Image ?? DefaultImage
+  const ImageComponent = Image ?? DefaultFrameworkImage
   return <ImageComponent {...props} />
 }

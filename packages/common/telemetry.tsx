@@ -86,7 +86,7 @@ export const PageTelemetry = ({
 }) => {
   setTelemetryPlatform(platform)
 
-  const { pathname: frameworkPathname, asPath, isReady = true, isPending = false } = useFramework()
+  const { pathname: frameworkPathname, asPath, isReady = true } = useFramework()
 
   const params = useParams()
   const slug = organizationSlug || params.slug
@@ -169,8 +169,6 @@ export const PageTelemetry = ({
   }, [isReady, enabled, hasAcceptedConsent, slug, ref])
 
   useEffect(() => {
-    if (isPending) return
-
     const currentRouteKey = routeKey ?? null
     const previousRouteKey = previousRouteKeyRef.current
     previousRouteKeyRef.current = currentRouteKey
@@ -183,7 +181,7 @@ export const PageTelemetry = ({
     if (url === lastSentUrlRef.current) return
     lastSentUrlRef.current = url
     sendPageTelemetry()
-  }, [isPending, routeKey, sendPageTelemetry])
+  }, [routeKey, sendPageTelemetry])
 
   useEffect(() => {
     if (!enabled) return
