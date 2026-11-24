@@ -129,16 +129,19 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
               </TableHeader>
               <TableBody>
                 {isPreview ? (
-                  authorizedAppsPreview.map(({ approval, projects, scopes, databaseAccess }) => (
-                    <OAuthAppsAuthorizedRow
-                      key={approval.id}
-                      approval={approval}
-                      databaseAccess={databaseAccess}
-                      previewScopes={scopes}
-                      previewProjects={projects}
-                      canRevoke
-                    />
-                  ))
+                  authorizedAppsPreview.map(
+                    ({ approval, projects, scopes, databaseAccess, grants }) => (
+                      <OAuthAppsAuthorizedRow
+                        key={approval.id}
+                        approval={approval}
+                        databaseAccess={databaseAccess}
+                        previewScopes={scopes}
+                        previewGrants={grants}
+                        previewProjects={projects}
+                        canRevoke
+                      />
+                    )
+                  )
                 ) : !data?.pages[0]?.data.length ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>

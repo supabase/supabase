@@ -52,11 +52,6 @@ export const OAuthAppsRevokeDialogContent = ({
   })
 
   if (!approval) return null
-  const coverage =
-    isPreview && projects
-      ? `${projects.length} ${projects.length === 1 ? 'project' : 'projects'} in this organization`
-      : 'the entire organization'
-
   const databaseLocation =
     projects?.length === 1 ? 'this project’s database' : 'each project’s database'
 
@@ -65,8 +60,8 @@ export const OAuthAppsRevokeDialogContent = ({
       <AlertDialogHeader>
         <AlertDialogTitle>Revoke access</AlertDialogTitle>
         <AlertDialogDescription>
-          Revoking access for “{approval.attributes.app.name}” will remove it from {coverage}. The
-          app will stop working on its next request.
+          Revoking access for “{approval.attributes.app.name}” will remove all of its grants from
+          this organization. The app will stop working on its next request.
         </AlertDialogDescription>
       </AlertDialogHeader>
       {databaseAccess && (

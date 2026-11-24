@@ -1,8 +1,14 @@
 import { ReactNode } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
-export const OAuthGrantAccordion = ({ children }: { children: ReactNode }) => (
-  <Accordion type="multiple" className="divide-y! divide-border!">
+export const OAuthGrantAccordion = ({
+  children,
+  defaultValue,
+}: {
+  children: ReactNode
+  defaultValue?: string[]
+}) => (
+  <Accordion defaultValue={defaultValue} type="multiple" className="divide-y! divide-border!">
     {children}
   </Accordion>
 )

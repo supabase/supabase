@@ -111,6 +111,26 @@ const createMockMemberGrants = (
 })
 
 describe('OAuthAppsAuthorizedList', () => {
+  test('keeps member and organization access scoped to their individual grants', async () => {
+    customRender(<OAuthAppsAuthorizedList isPreview />)
+    await openRowMenu('Example Members')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'View access' }))
+    const sheet = await screen.findByRole('dialog')
+    expect(sheet).toHaveTextContent('developer2@example.com')
+    await userEvent.click(within(sheet).getByRole('button', { name: /developer@example.com/ }))
+    expect(sheet).toHaveTextContent('northwind-cms')
+    expect(sheet).not.toHaveTextContent('Can run SQL')
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Close' }))
+    await openRowMenu('Example Mixed')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'View access' }))
+    const mixed = await screen.findByRole('dialog')
+    await userEvent.click(within(mixed).getByRole('button', { name: /Organization access/ }))
+    expect(mixed).toHaveTextContent('example_mixed_user')
+    expect(mixed).not.toHaveTextContent('Run SQL on your database')
+    await userEvent.click(within(mixed).getByRole('button', { name: /admin@example.com/ }))
+    expect(mixed).toHaveTextContent('Run SQL on your database')
+  })
+
   test('previews database access and the effects of revoking without allowing a revoke', async () => {
     customRender(<OAuthAppsAuthorizedList isPreview />)
 
@@ -208,7 +228,7 @@ describe('OAuthAppsAuthorizedList', () => {
     await userEvent.click(await screen.findByText('View access'))
 
     expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
-    expect(await screen.findByText(/All projects/)).toBeInTheDocument()
+    expect(await screen.findByText('All current and future projects.')).toBeInTheDocument()
   })
 
   test('offers Revoke to admins on an active row', async () => {
@@ -276,7 +296,7 @@ describe('OAuthAppsAuthorizedList', () => {
       await screen.findByText(/The app will stop working on its next request/)
     ).toBeInTheDocument()
     expect(
-      await screen.findByText(/will remove it from the entire organization/)
+      await screen.findByText(/will remove all of its grants from this organization/)
     ).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Revoke' }))

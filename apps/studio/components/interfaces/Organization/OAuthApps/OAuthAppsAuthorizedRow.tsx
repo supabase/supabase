@@ -13,7 +13,7 @@ import {
   TableRow,
 } from 'ui'
 
-import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
+import type { OAuthAppDatabaseAccess, PreviewGrant } from './OAuthAppsAuthorizedPreview'
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
 import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
 import { OAuthApproval, OAuthApprovalTarget } from '@/data/oauth-apps/oauth-apps-approvals-query'
@@ -23,6 +23,7 @@ export interface OAuthAppsAuthorizedRowProps {
   className?: string
   canRevoke: boolean
   databaseAccess?: OAuthAppDatabaseAccess
+  previewGrants?: PreviewGrant[]
   previewScopes?: string[]
   previewProjects?: { name: string; ref: string }[]
 }
@@ -33,6 +34,7 @@ export const OAuthAppsAuthorizedRow = ({
   canRevoke,
   databaseAccess,
   previewScopes,
+  previewGrants,
   previewProjects,
 }: OAuthAppsAuthorizedRowProps) => {
   const isPreview = previewScopes != null
@@ -87,20 +89,40 @@ export const OAuthAppsAuthorizedRow = ({
         </div>
       </TableCell>
       <TableCell>
-        {isPreview
-          ? previewProjects
-            ? `${previewProjects.length} ${previewProjects.length === 1 ? 'project' : 'projects'}`
-            : 'All projects'
-          : getGrantTargetLabel(approval.attributes.target)}
+        {previewGrants ? (
+          <>
+            <p>
+              {previewGrants.some((grant) => grant.projects == null)
+                ? 'All projects'
+                : `${new Set(previewGrants.flatMap((grant) => grant.projects?.map((project) => project.ref) ?? [])).size} projects`}
+            </p>
+            <p className="text-sm text-foreground-lighter">Varies by grant</p>
+          </>
+        ) : isPreview ? (
+          previewProjects ? (
+            `${previewProjects.length} ${previewProjects.length === 1 ? 'project' : 'projects'}`
+          ) : (
+            'All projects'
+          )
+        ) : (
+          getGrantTargetLabel(approval.attributes.target)
+        )}
       </TableCell>
       {isPreview && (
         <TableCell className="min-w-40 whitespace-normal">
           <p>
-            {permissionCount} {permissionCount === 1 ? 'permission' : 'permissions'}
+            {previewGrants
+              ? `${new Set(previewGrants.flatMap((grant) => [...grant.scopes.map((scope) => scope.split(':')[0]), ...(grant.databaseAccess ? ['table_data'] : [])])).size} permissions`
+              : `${permissionCount} ${permissionCount === 1 ? 'permission' : 'permissions'}`}
+
+            {(databaseAccess ||
+              previewScopes?.includes('database:write') ||
+              previewGrants?.some(
+                (grant) => grant.databaseAccess || grant.scopes.includes('database:write')
+              )) &&
+              ' including database access'}
           </p>
-          {(databaseAccess || previewScopes?.includes('database:write')) && (
-            <p className="text-sm text-warning">Database access</p>
-          )}
+          {previewGrants && <p className="text-sm text-foreground-lighter">Varies by grant</p>}
         </TableCell>
       )}
       <TableCell className="text-right">
@@ -151,6 +173,7 @@ export const OAuthAppsAuthorizedRow = ({
             <OAuthAppsMemberGrantsDialogContent
               approval={approval}
               previewScopes={previewScopes}
+              previewGrants={previewGrants}
               previewProjects={previewProjects}
               databaseAccess={databaseAccess}
               onRevoke={
@@ -167,7 +190,10 @@ export const OAuthAppsAuthorizedRow = ({
           {dialogContent === 'revoke' && (
             <OAuthAppsRevokeDialogContent
               approval={approval}
-              databaseAccess={databaseAccess}
+              databaseAccess={
+                databaseAccess ??
+                previewGrants?.find((grant) => grant.databaseAccess)?.databaseAccess
+              }
               isPreview={isPreview}
               projects={previewProjects}
               onClose={() => setDialogContent(null)}
