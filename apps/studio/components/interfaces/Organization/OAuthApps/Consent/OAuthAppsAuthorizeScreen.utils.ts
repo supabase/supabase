@@ -35,6 +35,7 @@ export function groupScopesByLevel(scopes: string[]) {
 }
 
 export function formatPermissionName(name: string) {
+  if (name === 'database') return 'Database management'
   return name
     .split('_')
     .map((part) => capitalize(part))

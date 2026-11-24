@@ -93,12 +93,12 @@ A `--remote=<postgres-url>` that points at a loopback host (`localhost`, `127.0.
 
 ## Which settings a command uses [#settings]
 
-The CLI resolves every config value, whether it comes from `supabase/config.toml` or a `SUPABASE_*` variable, in one order. Each step takes precedence over the steps after it:
+The CLI resolves every config value, whether it comes from your config file or a `SUPABASE_*` variable, in one order. Each step takes precedence over the steps after it:
 
 1. A command-line flag.
 2. A shell environment variable.
 3. A project env file.
-4. `supabase/config.json` or `supabase/config.toml` (`config.json` wins when both exist), with a matched `[remotes.<name>]` block over the base config.
+4. Your config file: `supabase/config.json`, `supabase/config.jsonc`, or `supabase/config.toml`. A JSON file wins over `config.toml` when both exist. Having both `config.json` and `config.jsonc` is an error. A matched `remotes.<name>` entry takes precedence over the base config.
 5. The default.
 
 For what the config file holds, see [Managing config and secrets](/docs/guides/local-development/managing-config).
@@ -129,20 +129,20 @@ A `[remotes.<name>]` block applies when its `project_id` equals the project ref 
 
 ### Common settings [#common-settings]
 
-| Setting                  | Flag                                                                         | Environment variable                    | `config.toml`                    |
-| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- | -------------------------------- |
-| Hosted database password | `--password`                                                                 | `SUPABASE_DB_PASSWORD`                  | —                                |
-| Seeding                  | `--include-seed` on `db push`, `--no-seed` on `db reset`                     | `SUPABASE_DB_SEED_ENABLED`              | `[db.seed] enabled`              |
-| Diff engine              | `--use-pg-delta` or `--use-migra` on `db diff`, `--diff-engine` on `db pull` | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED` | `[experimental.pgdelta] enabled` |
-| Studio port              | —                                                                            | `SUPABASE_STUDIO_PORT`                  | `[studio] port`                  |
-| Project directory        | `--workdir`                                                                  | `SUPABASE_WORKDIR`                      | —                                |
+| Setting                  | Flag                                                                         | Environment variable                    | Config file                    |
+| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- | ------------------------------ |
+| Hosted database password | `--password`                                                                 | `SUPABASE_DB_PASSWORD`                  | —                              |
+| Seeding                  | `--include-seed` on `db push`, `--no-seed` on `db reset`                     | `SUPABASE_DB_SEED_ENABLED`              | `db.seed.enabled`              |
+| Diff engine              | `--use-pg-delta` or `--use-migra` on `db diff`, `--diff-engine` on `db pull` | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED` | `experimental.pgdelta.enabled` |
+| Studio port              | —                                                                            | `SUPABASE_STUDIO_PORT`                  | `studio.port`                  |
+| Project directory        | `--workdir`                                                                  | `SUPABASE_WORKDIR`                      | —                              |
 
-Any config key can be set from the environment as `SUPABASE_` plus the key's path in upper case, with `_` between the parts. `[studio] port` is `SUPABASE_STUDIO_PORT`, and `[db.seed] enabled` is `SUPABASE_DB_SEED_ENABLED`. A key inside an optional section, such as an auth provider, applies only when that section exists in your config.
+Any config key can be set from the environment as `SUPABASE_` plus the key's path in upper case, with `_` between the parts. `studio.port` is `SUPABASE_STUDIO_PORT`, and `db.seed.enabled` is `SUPABASE_DB_SEED_ENABLED`. A key inside an optional section, such as an auth provider, applies only when that section exists in your config.
 
 The database password has two separate settings:
 
 - The hosted password applies only to a hosted target, never to the local stack or a database URL. If your checkout is linked to one project and you target another, the CLI doesn't send `SUPABASE_DB_PASSWORD` to it. It uses a temporary login role instead, which needs `supabase login` or `SUPABASE_ACCESS_TOKEN`. Pass `--password` to use a password for that project.
-- The local password is `[db] password` in `config.toml`. It has no flag or variable, and `SUPABASE_DB_PASSWORD` doesn't set it.
+- The local password is `db.password` in your config file. It has no flag or variable, and `SUPABASE_DB_PASSWORD` doesn't set it.
 
 ### Seeing where a value came from [#value-origin]
 
@@ -153,7 +153,7 @@ The database password has two separate settings:
 
 ### Validation [#validation]
 
-An invalid value in `config.toml` or in a `SUPABASE_*` variable, such as `SUPABASE_STUDIO_PORT=abc`, fails every command that loads the config with `CliConfigValueError`, and the error names the variable or file.
+An invalid value in your config file or in a `SUPABASE_*` variable, such as `SUPABASE_STUDIO_PORT=abc`, fails every command that loads the config with `CliConfigValueError`, and the error names the variable or file.
 
 ## When a command asks first [#confirmation]
 
@@ -189,13 +189,13 @@ Pass `--yes`, or export `SUPABASE_YES=1` in your shell. The CLI prints `Confirme
 
 ### Review a change before you confirm [#review]
 
-| Command                                          | What it does                                                                                                                    |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `supabase db push --dry-run --remote`            | Prints the roles, migrations, and seed files it would apply, and applies nothing. It asks nothing.                              |
-| `supabase pull --dry-run`                        | Shows what would be pulled, without writing or changing anything.                                                               |
-| `supabase secrets unset <name> --dry-run`        | Prints the secrets it would unset.                                                                                              |
-| `supabase config diff`                           | Shows how `config.toml` differs from the hosted project. The local side is what `config push` sends. It never changes anything. |
-| `supabase db query "<sql>" --read-only --remote` | Accepts only read statements and runs them read-only. A hosted target needs no confirmation.                                    |
+| Command                                          | What it does                                                                                                                       |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase db push --dry-run --remote`            | Prints the roles, migrations, and seed files it would apply, and applies nothing. It asks nothing.                                 |
+| `supabase pull --dry-run`                        | Shows what would be pulled, without writing or changing anything.                                                                  |
+| `supabase secrets unset <name> --dry-run`        | Prints the secrets it would unset.                                                                                                 |
+| `supabase config diff`                           | Shows how your config file differs from the hosted project. The local side is what `config push` sends. It never changes anything. |
+| `supabase db query "<sql>" --read-only --remote` | Accepts only read statements and runs them read-only. A hosted target needs no confirmation.                                       |
 
 ### Seeding [#seeding]
 

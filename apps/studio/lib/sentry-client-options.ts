@@ -6,7 +6,10 @@ import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import {
   BROWSER_NOISE_IGNORE_ERRORS,
+  BROWSER_TRANSLATION_SAMPLE_RATE,
   filterSentryEvent,
+  isBrowserTranslationDomError,
+  isPageTranslated,
   isSentryErrorBoundaryCrash,
 } from 'common/sentry'
 
@@ -127,6 +130,23 @@ export function shouldDropForSampleRate(
   return random() >= rate
 }
 
+/**
+ * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
+ * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
+ * `page_translated` is best-effort and only looked up for matching events. Keeps a `sample_rate`
+ * that is already set, such as an explicit `1`.
+ */
+export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?: boolean): void {
+  if (!isBrowserTranslationDomError(event)) return
+  event.tags = {
+    ...event.tags,
+    // After the spread: an explicit `sample_rate: undefined` must not replace the default
+    sample_rate: event.tags?.sample_rate ?? BROWSER_TRANSLATION_SAMPLE_RATE,
+    browser_translation: true,
+    page_translated: pageTranslated ?? isPageTranslated(),
+  }
+}
+
 export function buildSentryClientOptions({
   includeThirdPartyErrorFilter,
   extraIntegrations = [],
@@ -183,6 +203,9 @@ export function buildSentryClientOptions({
       const event = applyStudioErrorPolicy(rawEvent, hint.originalException)
       if (!event) return null
 
+      // Must run before `filterSentryEvent`, which skips its 1% sampling for tagged events.
+      tagBrowserTranslationError(event)
+
       if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
       }
@@ -195,9 +218,12 @@ export function buildSentryClientOptions({
 
       // Drop events where every exception has no stack trace — these are not debuggable.
       // Exempt error boundary crashes: even without stack frames, a page crash is always worth reporting.
+      // Also exempt browser-translation errors: they only need counting, and dropping them here
+      // would skip the sample.
       const exceptions = event.exception?.values ?? []
       if (
         !isErrorBoundaryCrash &&
+        event.tags?.browser_translation !== true &&
         exceptions.length > 0 &&
         exceptions.every((ex) => !ex.stacktrace?.frames?.length)
       ) {

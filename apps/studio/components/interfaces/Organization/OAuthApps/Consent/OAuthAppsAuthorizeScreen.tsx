@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -9,6 +9,7 @@ import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { getFailedProjects, getPreselectedProjectRefs } from './OAuthAppsAuthorizeScreen.utils'
+import { OrganizationSelect } from './OrganizationSelect'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
@@ -38,14 +39,12 @@ export interface OAuthAppsAuthorizeScreenProps {
   authId?: string
   organizationSlug?: string
   projectRef?: string
-  navigate: (destination: string) => void
 }
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
-  organizationSlug,
+  organizationSlug: initialOrganizationSlug,
   projectRef,
-  navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const signOut = useSignOut()
 
@@ -75,6 +74,8 @@ export const OAuthAppsAuthorizeScreen = ({
     isError: isErrorIdentity,
   } = useProfile()
 
+  const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
+
   const {
     data: memberOrg,
     error: memberOrgError,
@@ -85,7 +86,16 @@ export const OAuthAppsAuthorizeScreen = ({
     projectRef,
     request,
   })
+
   const [search, setSearch] = useState('')
+
+  const handleOrganizationChange = (slug: string) => {
+    if (slug === memberOrg?.slug) return
+    setOrganizationSlug(slug)
+    setSelectedProjectRefs([])
+    setAllProjectsSelected(false)
+    setSearch('')
+  }
 
   const {
     data: projectsData,
@@ -171,16 +181,13 @@ export const OAuthAppsAuthorizeScreen = ({
     }
   )
 
-  const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !preflightData || !memberOrg) return
+    if (!preflightData || !memberOrg) return
 
     const grant = preflightData.existing_grant
     const hasAllProjectsGrant =
       grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
     if (!hasAllProjectsGrant && !initialProjectsData) return
-
-    seeded.current = true
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -271,7 +278,7 @@ export const OAuthAppsAuthorizeScreen = ({
     return (
       <InterstitialLayout
         title="Application authorization"
-        description="An application wants to access your Supabase Account"
+        description="An application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={requestError} />
@@ -284,7 +291,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={identityError} />
@@ -298,7 +305,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={preflightError} />
@@ -312,7 +319,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError
@@ -329,7 +336,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError
@@ -380,13 +387,22 @@ export const OAuthAppsAuthorizeScreen = ({
     window.location.reload()
   }
 
-  const handleSwitchOrg = () => navigate('/organizations')
-
   const handleDeselectFlagged = () =>
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
 
+  const needsOrganizationRole =
+    !usesSelectedProjects &&
+    (preflightData?.validation_failure != null || roleFailure?.scope_target === 'all_projects')
+  const preflightRoleError =
+    isOAuthRoleValidationError(preflightError) &&
+    (!usesSelectedProjects || preflightError.validation.scope_target !== 'projects')
+      ? preflightError
+      : null
+  const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
+
   const handleApprove = () => {
-    if (hasNoSelection) return
+    if (hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure)
+      return
     const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
@@ -414,34 +430,14 @@ export const OAuthAppsAuthorizeScreen = ({
               utcTimestamp={preflightData.existing_grant.approved_at}
               labelFormat="D MMM YYYY"
             />
-            . It's now asking for different access.
+            . It’s now asking for different access.
           </>
         ) : (
-          'This application wants to access your Supabase Account'
+          'This application wants to access your Supabase account.'
         )
       }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
-        {isOAuthRoleValidationError(preflightError) && (
-          <Admonition
-            type="warning"
-            title={`Couldn't authorize ${request.name}`}
-            description={preflightError.message}
-          />
-        )}
-        {roleFailure?.scope_target === 'all_projects' && !request.project_scoping_mode && (
-          <Admonition
-            type="warning"
-            title={`Couldn't authorize ${request.name}`}
-            description={
-              <span>
-                Your <strong>{roleFailure.role.name}</strong> role in{' '}
-                <strong>{memberOrg.name}</strong> can't grant write access. Ask an admin to change
-                your role, or switch organization.
-              </span>
-            }
-          />
-        )}
         {hasRoleFailure && (
           <Admonition
             type="warning"
@@ -462,19 +458,16 @@ export const OAuthAppsAuthorizeScreen = ({
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={profile!.primary_email}
-            organizationName={memberOrg.name}
             onSignOut={handleSignOut}
             request={request}
           />
-
+          <OrganizationSelect
+            organization={memberOrg}
+            onOrganizationChange={handleOrganizationChange}
+          />
           {isBlockedOnProjects && (
-            <NoProjectsNotice
-              appName={request.name}
-              organizationName={memberOrg.name}
-              onSwitchOrg={handleSwitchOrg}
-            />
+            <NoProjectsNotice appName={request.name} organizationName={memberOrg.name} />
           )}
-
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
@@ -496,10 +489,18 @@ export const OAuthAppsAuthorizeScreen = ({
             </div>
           )}
 
-          {canProceed && (
+          {canProceed && !cannotGrantRequestedAccess && (
             <>
               <section className="flex flex-col gap-3">
-                <p className="text-sm text-foreground">Permissions requested</p>
+                <div className="space-y-1">
+                  <h2 className="text-sm font-medium text-foreground">Permissions requested</h2>
+                  {grantKind === 'member_bound' && (
+                    <p className="text-xs text-foreground-lighter">
+                      The app can only use the permissions listed below, and only where your role
+                      allows them.
+                    </p>
+                  )}
+                </div>
                 {preflightData?.existing_grant?.approved_scopes != null &&
                 request.scopes != null ? (
                   <ScopeGroupCardWithDiff
@@ -509,44 +510,34 @@ export const OAuthAppsAuthorizeScreen = ({
                 ) : request.scopes != null ? (
                   <ScopeGroupCard scopes={request.scopes} />
                 ) : null}
-                <p className="text-xs text-foreground-lighter">
-                  Authorizing {request.name} grants it access to the permissions
-                  {isProjectScopingModeEnabled && !allProjectsSelected ? (
-                    <span>{' and selected projects '}</span>
-                  ) : (
-                    ' '
-                  )}
-                  <span>above.</span>
-                </p>
               </section>
-
-              {grantKind === 'organization_bound' && (
-                <Admonition
-                  type="default"
-                  title="Want this scoped to one member?"
-                  description={`Have them authorize ${request.name} from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.`}
-                />
-              )}
             </>
           )}
         </fieldset>
 
+        {cannotGrantRequestedAccess && (
+          <Admonition
+            type="warning"
+            title="You don’t have permission to authorize this application"
+            description={
+              preflightRoleError?.message ??
+              `Your role in “${memberOrg.name}” can’t grant the requested access. Ask an admin or switch organizations.`
+            }
+          />
+        )}
+
         <div className="flex flex-col gap-2">
-          {canProceed ? (
-            <Button
-              block
-              variant={primaryActionVariant}
-              loading={isSubmitting || isPendingPreflight}
-              aria-label={primaryActionLabel}
-              onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
-            >
-              {isSubmitting ? 'Authorizing...' : primaryActionLabel}
-            </Button>
-          ) : (
-            <Button block variant="primary" onClick={handleSwitchOrg}>
-              Switch organization
-            </Button>
-          )}
+          <Button
+            block
+            variant={primaryActionVariant}
+            loading={isSubmitting || isPendingPreflight}
+            disabled={cannotGrantRequestedAccess}
+            aria-label={primaryActionLabel}
+            onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
+          >
+            {isSubmitting ? 'Authorizing...' : primaryActionLabel}
+          </Button>
+
           {!isSubmitting && (
             <Button variant="text" block onClick={handleDeny}>
               Cancel
@@ -554,22 +545,14 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </div>
 
-        <div className="flex flex-col gap-4 border-t pt-6 text-xs text-foreground-lighter">
+        <div className="flex flex-col gap-4 border-t pt-6 text-center text-xs text-foreground-lighter">
           {footerMessage ? (
             <p>{footerMessage}</p>
           ) : (
-            <>
-              <p>
-                {grantKind === 'member_bound' && (
-                  <span>No admin approval is needed if your role permits this access. </span>
-                )}
-                <span>This authorization will appear in Authorized apps.</span>
-              </p>
-              <p>
-                Authorizing will redirect you to{' '}
-                <span className="text-foreground">{request.redirect_uri}</span>
-              </p>
-            </>
+            <p>
+              Authorizing will redirect you to{' '}
+              <span className="text-foreground">{request.redirect_uri}</span>
+            </p>
           )}
         </div>
       </div>

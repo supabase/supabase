@@ -147,6 +147,49 @@ describe('/authorize', () => {
     expect(screen.queryByText(/is connected/)).not.toBeInTheDocument()
   })
 
+  test('correctly select the organization from the organization_slug', async () => {
+    flags.consent = true
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsAuthorizeRequestData>(createMockRequest()),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'anotherorg',
+            name: 'Another org',
+          }),
+          createMockOrganization({
+            id: 2,
+            slug: 'northwind-traders',
+            name: 'Northwind Traders',
+          }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
+    })
+    addAPIMock({
+      path: '/platform/projects/:ref',
+      method: 'get',
+      response: () => HttpResponse.json<ProjectDetail>(createMockProject()),
+    })
+    await renderAuthorize('/authorize?auth_id=some_id&organization_slug=northwind-traders')
+
+    await screen.findByText('Northwind Traders')
+  })
+
   test('preselects projects from repeated project_ref params', async () => {
     flags.consent = true
     addAPIMock({
