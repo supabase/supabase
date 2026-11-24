@@ -41,6 +41,7 @@ Before drafting, classify what's actually being asked for against `apps/docs`'s 
 
 - **Guide / tutorial** — hand-written MDX under `content/guides/`. This is what this skill drafts.
 - **Troubleshooting** — hand-written MDX under `content/troubleshooting/`, sometimes synced from GitHub issues. Also in scope.
+- **Knowledge base (`/kb`)**: plain Markdown under `apps/kb/src/content/` for content where the answer depends on the user's stack: comparisons, migration guides, buy-vs-build, applied how-tos. Also in scope, but follow `apps/kb/AGENTS.md`, not the `apps/docs` MDX conventions. Product facts stay in `/docs`; the `/kb` article links to them. See [reference/content-type-gate.md](reference/content-type-gate.md#what-goes-in-docs-and-what-goes-in-kb).
 - **Reference** — generated from `spec/` (OpenAPI, SDK YAML, CLI config) → `features/docs/generated/**`. **Not hand-authored via the standard MDX path.** If the ask is actually reference-type content (a new API endpoint, config option, or SDK method that needs a reference entry), stop drafting MDX — it would diverge from or get silently overwritten by the generator. Instead point to the spec/codegen pipeline (`apps/docs/spec/`, `apps/docs/generator/`; see `ask-the-docs`'s `management-api-reference.md` for the OpenAPI-specific flow) and say so explicitly rather than producing a page that looks done but isn't the real fix.
 
 When in doubt, ask `ask-the-docs` rather than guessing — this classification is the one call in this skill most likely to be wrong if made from outside knowledge of the app.
