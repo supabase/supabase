@@ -35,6 +35,15 @@ export const LOG_TYPES_LABELS = {
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
+export const BIGQUERY_LOG_TYPES: readonly LogType[] = [
+  'edge',
+  'postgrest',
+  'storage',
+  'postgres',
+  'edge function',
+  'auth',
+  'pipelines',
+]
 
 export const PIPELINE_LOG_LEVEL_LABELS = { success: 'Info', warning: 'Warning', error: 'Error' }
 

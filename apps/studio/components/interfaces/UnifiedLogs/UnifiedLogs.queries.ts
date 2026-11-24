@@ -153,8 +153,8 @@ const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
 
 const logTypeWhereCondition = (logTypes: string[]): SafeLogSqlFragment => {
   const effective = logTypes.filter((t) => t in LOG_TYPE_CONDITION)
-  const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
-  const branches = types.map((t) => safeSql`(${LOG_TYPE_CONDITION[t]})`)
+  if (effective.length === 0) return safeSql`0`
+  const branches = effective.map((t) => safeSql`(${LOG_TYPE_CONDITION[t]})`)
   return safeSql`(${joinSqlFragments(branches, ' OR ')})`
 }
 
@@ -373,6 +373,9 @@ const buildBaseWhere = (
 ): SafeLogSqlFragment[] => {
   const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
   const parts: SafeLogSqlFragment[] = []
+  if (search.availableLogTypes) {
+    parts.push(logTypeWhereCondition(search.availableLogTypes))
+  }
 
   if (excludeField !== 'log_type') {
     const logTypeFilter = grouped.log_type
@@ -384,7 +387,7 @@ const buildBaseWhere = (
       }
     } else if (grouped.pipeline_id) {
       parts.push(safeSql`source = 'etl_replication_logs'`)
-    } else if (!search.scope && !userFilterValue(search)) {
+    } else if (!search.availableLogTypes && !search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
       // and the default would otherwise exclude auth_logs, the primary attributable source.
@@ -618,8 +621,6 @@ HAVING value != ''
 `
   }
 
-  // log_type always scans alone: excluding it also drops the default-types
-  // filter, so its counts differ from the base scan even when unfiltered.
   const blocks = [scanBlock(['log_type'], whereFor('log_type'))]
 
   // A filtered facet gets its own scan so it can exclude its own filter and

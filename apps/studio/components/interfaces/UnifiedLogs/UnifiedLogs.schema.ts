@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { METHODS, REGIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, METHODS, REGIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
@@ -95,6 +95,7 @@ export const unifiedLogsScopeSchema = z.object({
 
 export const querySearchParamsSchema = z.object({
   scope: unifiedLogsScopeSchema.optional(),
+  availableLogTypes: z.array(z.enum(LOG_TYPES)).optional(),
   filter: z.array(z.string()).optional(),
   latency: z.array(z.number()).optional(),
   'timing.dns': z.array(z.number()).optional(),

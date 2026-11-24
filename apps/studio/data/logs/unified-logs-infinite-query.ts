@@ -55,7 +55,7 @@ type UnifiedLogsPageVariables = UnifiedLogsVariables & {
   pageSize?: number
 }
 
-export const useUnifiedLogsBackend = (search?: QuerySearchParamsType) => {
+export const useUnifiedLogsBackend = (search?: Pick<QuerySearchParamsType, 'scope'>) => {
   const { otelUnifiedLogs = true } = useFeatureFlags().configcat
   const isOtelEnabled = typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
   return isOtelEnabled || !!search?.scope

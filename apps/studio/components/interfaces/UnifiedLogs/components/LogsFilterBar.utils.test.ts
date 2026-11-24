@@ -251,6 +251,15 @@ describe('time range labels', () => {
 })
 
 describe('attribute discovery scope', () => {
+  it('uses every available source and keeps exclusions inside that universe', () => {
+    expect(
+      getLogAttributeSources({
+        ...createUnifiedLogsSearch({ filter: ['log_type:neq:auth'] }),
+        availableLogTypes: ['edge', 'auth', 'edge function', 'compute'],
+      })
+    ).toEqual(['edge_logs', 'function_edge_logs'])
+  })
+
   it('intersects the selected types with fixed resource scope', () => {
     const search = createUnifiedLogsSearch(
       { filter: ['log_type:neq:edge function runtime'] },

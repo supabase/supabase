@@ -179,8 +179,10 @@ export const formatTimeRangeValue = (value: FilterCondition['value']): string =>
 export const getLogAttributeSources = (search: QuerySearchParamsType): string[] => {
   const filter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
   const hasUser = !!search.user?.trim()
-  const hasDefaultSources = !filter && !search.scope && !hasUser
-  let types = Object.keys(LOG_TYPE_TO_SOURCE)
+  const hasDefaultSources = !search.availableLogTypes && !filter && !search.scope && !hasUser
+  let types = search.availableLogTypes
+    ? [...search.availableLogTypes]
+    : Object.keys(LOG_TYPE_TO_SOURCE)
   if (hasDefaultSources) types = [...DEFAULT_LOG_TYPES]
   if (filter?.operator === '=') types = types.filter((type) => filter.values.includes(type))
   if (filter?.operator === '<>') {

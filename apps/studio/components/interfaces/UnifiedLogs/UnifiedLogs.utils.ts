@@ -3,6 +3,7 @@ import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
 import {
+  BIGQUERY_LOG_TYPES,
   LOG_TYPE_TO_SOURCE,
   LOG_TYPES,
   LOG_TYPES_LABELS,
@@ -41,8 +42,17 @@ export function getComputeLogsAvailability({
 
 export function getLogTypeVisibility(
   visibility: Partial<Record<UnifiedLogType, boolean>>,
-  scope?: UnifiedLogsScope
+  scope?: UnifiedLogsScope,
+  useOtel = true
 ): Partial<Record<UnifiedLogType, boolean>> {
+  if (!useOtel) {
+    visibility = {
+      ...visibility,
+      ...Object.fromEntries(
+        LOG_TYPES.filter((type) => !BIGQUERY_LOG_TYPES.includes(type)).map((type) => [type, false])
+      ),
+    }
+  }
   const scopeLogTypes = scope?.filters
     .filter((filter) => filter.column === 'log_type' && filter.operator === '=')
     .map((filter) => filter.value)

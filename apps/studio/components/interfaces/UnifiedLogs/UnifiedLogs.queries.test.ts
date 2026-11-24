@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import { logAttributeFilterId, logsFiltersToUrlParams } from './UnifiedLogs.filters'
 import {
   getFacetCountQuery,
@@ -11,11 +12,12 @@ import {
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import {
+  getEffectiveLogTypes as getEffectiveLogTypesBQ,
   getLogsChartQuery as getLogsChartQueryBQ,
   getLogsCountQuery as getLogsCountQueryBQ,
   getUnifiedLogsQuery as getUnifiedLogsQueryBQ,
 } from './UnifiedLogs.queries.bq'
-import type { UnifiedLogsScope } from './UnifiedLogs.types'
+import type { QuerySearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
 
 const baseSearch = createUnifiedLogsSearch({
@@ -870,4 +872,74 @@ describe('Pipelines logs', () => {
       )
     }
   )
+})
+
+describe('picker-available log types', () => {
+  const availableLogTypes = ['edge', 'auth', 'edge function', 'compute'] as const
+  const search = { ...baseSearch, availableLogTypes: [...availableLogTypes] }
+
+  it.each([
+    ['rows', getUnifiedLogsQuery],
+    ['chart', getLogsChartQuery],
+    ['counts', getLogsCountQuery],
+    [
+      'pathname options',
+      (params: QuerySearchParamsType) => getFacetCountQuery({ search: params, facet: 'pathname' }),
+    ],
+    [
+      'log type options',
+      (params: QuerySearchParamsType) => getFacetCountQuery({ search: params, facet: 'log_type' }),
+    ],
+  ])('keeps the available universe in every %s scan', (_, buildQuery) => {
+    const sql = buildQuery({ ...search, filter: ['log_type:neq:auth'] })
+    const scans = [...sql.matchAll(/FROM logs\s+WHERE ([\s\S]*?)(?:GROUP BY|ORDER BY|$)/g)]
+    expect(scans.length).toBeGreaterThan(0)
+    for (const [, where] of scans) {
+      expect(where).toContain("source = 'edge_logs'")
+      expect(where).toContain("source = 'auth_logs'")
+      expect(where).toContain("source = 'function_edge_logs'")
+      expect(where).toContain(
+        "log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+      )
+      for (const [type, source] of Object.entries(LOG_TYPE_TO_SOURCE)) {
+        if (
+          availableLogTypes.some((available) => available === type) ||
+          type === 'edge function runtime'
+        )
+          continue
+        expect(where.split(' AND ')[0]).not.toContain(`source = '${source}'`)
+      }
+    }
+  })
+
+  it('returns no rows when the available universe is empty', () => {
+    expect(getUnifiedLogsQuery({ ...baseSearch, availableLogTypes: [] })).toContain('WHERE 0')
+  })
+
+  it('keeps BigQuery lists narrow while log type facets can count every available type', () => {
+    const params = { ...search, filter: ['log_type:eq:auth'] }
+    expect(getEffectiveLogTypesBQ(params)).toEqual(['auth'])
+    expect(getEffectiveLogTypesBQ(params, true)).toEqual(['edge', 'auth', 'edge function'])
+    const sql = getLogsCountQueryBQ(params)
+    expect(sql).toContain("COUNTIF(log_type IN ('auth')) AS total")
+    expect(sql).toContain('from function_edge_logs')
+    expect(sql).toContain('al.id as id')
+    expect(sql).toContain('al.timestamp as timestamp')
+  })
+
+  it('never falls back to gateway or postgres when every available BigQuery type is excluded', () => {
+    const sql = getUnifiedLogsQueryBQ({
+      ...baseSearch,
+      availableLogTypes: ['auth'],
+      filter: ['log_type:neq:auth'],
+    })
+    expect(sql).toContain('WHERE FALSE')
+    expect(
+      getEffectiveLogTypesBQ({
+        ...baseSearch,
+        availableLogTypes: ['auth'],
+        filter: ['log_type:eq:edge'],
+      })
+    ).toEqual([])
+  })
 })

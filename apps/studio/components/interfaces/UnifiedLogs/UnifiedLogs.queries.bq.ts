@@ -6,7 +6,7 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import { BIGQUERY_LOG_TYPES, DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -30,34 +30,28 @@ const NOT_IN_OP = safeSql`NOT IN`
 const LIKE_OP = safeSql`LIKE`
 const NOT_LIKE_OP = safeSql`NOT LIKE`
 
-const ALL_LOG_TYPES = [
-  'edge',
-  'postgrest',
-  'storage',
-  'postgres',
-  'edge function',
-  'auth',
-  'pipelines',
-]
-
-/**
- * Computes the log_type set that the CTE should union. With no filter, defaults
- * to the cheap two-source set. With `=` filters, narrows to those values. With
- * `<>` filters, excludes them from the full set.
- */
-export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
+export const getEffectiveLogTypes = (
+  search: QuerySearchParamsType,
+  excludeLogTypeFilter = false
+): string[] => {
   if (search.scope) throw new Error('Scoped unified logs queries are only supported on ClickHouse')
+  const available = search.availableLogTypes?.filter((type) => BIGQUERY_LOG_TYPES.includes(type))
+  if (excludeLogTypeFilter && available) return available
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
   if (filters.length === 0) {
     const hasPipelineFilter = parseLogsFilterUrlParams(search.filter).some(
       (filter) => filter.column === 'pipeline_id'
     )
-    return hasPipelineFilter ? ['pipelines'] : [...DEFAULT_LOG_TYPES]
+    if (hasPipelineFilter)
+      return (available ?? BIGQUERY_LOG_TYPES).filter((type) => type === 'pipelines')
+    return available ?? [...DEFAULT_LOG_TYPES]
   }
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
   const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
-  const base = included.length > 0 ? included : ALL_LOG_TYPES
-  return base.filter((t) => !excluded.has(t))
+  const base = available ?? BIGQUERY_LOG_TYPES
+  return base.filter(
+    (type) => (included.length === 0 || included.includes(type)) && !excluded.has(type)
+  )
 }
 
 /**
@@ -327,9 +321,9 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
  */
 const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
-      el_in_al.id as id,
+      al.id as id,
       al.id as source_id,
-      el_in_al.timestamp as timestamp,
+      al.timestamp as timestamp,
       'auth' as log_type,
       CAST(el_in_al_response.status_code AS STRING) as status,
       CASE
@@ -437,7 +431,7 @@ export const getUnifiedLogsCTE = (
     .map((type) => LOG_TYPE_QUERIES[type]())
 
   const effective =
-    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
+    queries.length > 0 ? queries : [safeSql`SELECT * FROM (${getEdgeLogsQuery()}) WHERE FALSE`]
 
   return safeSql`
 WITH unified_logs AS (
@@ -519,7 +513,14 @@ ${cteName} AS (
 }
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  const effectiveLogTypes = getEffectiveLogTypes(search)
+  const effectiveLogTypes = getEffectiveLogTypes(search, true)
+  const logTypeFilter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
+  const totalCondition = logTypeFilter
+    ? safeSql`log_type ${logTypeFilter.operator === '<>' ? NOT_IN_OP : IN_OP} (${joinSqlFragments(
+        logTypeFilter.values.map((value) => lit(value)),
+        ','
+      )})`
+    : safeSql`TRUE`
   const logTypeConditions = buildConditions(search, 'log_type')
   const levelConditions = buildConditions(search, 'level')
   const logTypeWhere: SafeLogSqlFragment =
@@ -534,10 +535,9 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)},
 
--- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
 log_type_counts AS (
   SELECT
-    COUNT(*) AS total,
+    COUNTIF(${totalCondition}) AS total,
     COUNTIF(log_type = 'edge') AS edge_count,
     COUNTIF(log_type = 'postgrest') AS postgrest_count,
     COUNTIF(log_type = 'storage') AS storage_count,

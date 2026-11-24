@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { LOG_TYPES } from './UnifiedLogs.constants'
 import type { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   buildUnifiedLogsUrl,
@@ -261,6 +262,22 @@ describe('isOfferedFilter', () => {
 })
 
 describe('getLogTypeVisibility', () => {
+  it('only offers log types supported by the legacy backend', () => {
+    const visibility = getLogTypeVisibility({ compute: true, pipelines: false }, undefined, false)
+    const fields = gateLogTypeOptions(
+      [{ value: 'log_type', options: LOG_TYPES.map((value) => ({ value, label: value })) }],
+      visibility
+    )
+    expect(fields[0].options?.map(({ value }) => value)).toEqual([
+      'edge',
+      'postgres',
+      'postgrest',
+      'auth',
+      'storage',
+      'edge function',
+    ])
+  })
+
   it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
     expect(getLogTypeVisibility({ compute: false })).toEqual({
       compute: false,
