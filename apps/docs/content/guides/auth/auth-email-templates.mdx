@@ -57,6 +57,12 @@ Where you edit templates depends on how you run Supabase.
 
 Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [template variables](#terminology).
 
+<Admonition type="note" title="Free plan projects need a custom email sender">
+
+On the Free plan, projects created on or after June 3, 2026 can't change email templates while they use the built-in email service. This applies to the dashboard and to the Management API, which returns an `entitlement_required` error. To edit templates, [set up custom SMTP](/docs/guides/auth/auth-smtp), turn on the [Send Email hook](/docs/guides/auth/auth-hooks/send-email-hook), or upgrade to a paid plan. Projects created before June 3, 2026 can still edit templates.
+
+</Admonition>
+
 You can also manage email templates using the Management API:
 
 ```bash
