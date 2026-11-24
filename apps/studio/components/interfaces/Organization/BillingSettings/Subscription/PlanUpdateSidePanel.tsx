@@ -2,7 +2,6 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isEqual } from 'lodash'
-import { useRouter } from 'next/router'
 import { useQueryState } from 'nuqs'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -97,7 +96,6 @@ const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
 }
 
 export const PlanUpdateSidePanel = () => {
-  const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
@@ -157,7 +155,7 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
-  const [, setSource] = useQueryState('source')
+  const [source, setSource] = useQueryState('source')
 
   const onClose = () => {
     setPanel(null)
@@ -187,8 +185,6 @@ export const PlanUpdateSidePanel = () => {
       track('studio_pricing_side_panel_opened', properties)
     }
   )
-
-  const source = Array.isArray(router.query.source) ? router.query.source[0] : router.query.source
 
   useEffect(() => {
     if (visible) {
@@ -306,7 +302,7 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} origin={source} />
+          <SubscriptionPlanUpdateView {...planChangeProps} origin={source ?? undefined} />
         ) : (
           <SubscriptionPlanUpdateDialog {...planChangeProps} />
         ))}
