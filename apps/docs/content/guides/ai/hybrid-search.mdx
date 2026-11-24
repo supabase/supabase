@@ -168,7 +168,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import OpenAI from 'npm:openai'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')!
+// Edge Functions get the secret keys as a JSON map. Change 'default' to use another key.
+const supabaseSecretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default']
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!
 
 Deno.serve(async (req) => {
@@ -188,7 +189,8 @@ Deno.serve(async (req) => {
   const [{ embedding }] = embeddingResponse.data
 
   // Instantiate the Supabase client
-  // (replace the secret key with the user's JWT if using Supabase auth and RLS)
+  // (to apply RLS for a signed-in user, use the publishable key and forward the
+  // request's Authorization header instead; see /docs/guides/functions/auth-headers)
   const supabase = createClient(supabaseUrl, supabaseSecretKey)
 
   // Call hybrid_search Postgres function via RPC
