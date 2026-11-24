@@ -235,7 +235,7 @@ function PrivilegesPage() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <div className="flex items-center gap-x-4">
@@ -251,7 +251,7 @@ function PrivilegesPage() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large" className="flex-1 flex flex-col">
+      <PageContainer size="default" className="flex-1 flex flex-col">
         <PageSection className="flex-1 last:pb-6">
           <div className="flex-1 flex flex-col pb-4 gap-y-4">
             {isEnabled ? (
