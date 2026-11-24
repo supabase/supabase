@@ -2,12 +2,18 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useIsMFAEnabled } from 'common'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
 import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 
@@ -20,9 +26,16 @@ export const Route = createFileRoute('/_app/org/$slug/')({
 
 function OrgSlugIndex() {
   return (
-    <PageLayout title="Projects">
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Projects</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <ProjectsPage />
-    </PageLayout>
+    </>
   )
 }
 
@@ -34,8 +47,8 @@ function ProjectsPage() {
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   return (
-    <ScaffoldContainer className="grow flex">
-      <ScaffoldSection isFullWidth className="pb-12">
+    <PageContainer>
+      <PageSection>
         {disableAccessMfa ? (
           <Admonition
             type="note"
@@ -70,7 +83,7 @@ function ProjectsPage() {
             </div>
           </div>
         )}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

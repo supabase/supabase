@@ -1,8 +1,10 @@
 import { capitalize } from 'lodash'
 
-import { OAuthScope } from '@/data/oauth-apps/types'
+import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
+import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
-export function groupScopesByLevel(scopes: OAuthScope[]) {
+export function groupScopesByLevel(scopes: string[]) {
   const read = new Set<string>()
   const write = new Set<string>()
   const readWrite = new Set<string>()
@@ -33,6 +35,7 @@ export function groupScopesByLevel(scopes: OAuthScope[]) {
 }
 
 export function formatPermissionName(name: string) {
+  if (name === 'database') return 'Database management'
   return name
     .split('_')
     .map((part) => capitalize(part))
@@ -66,8 +69,8 @@ export const getDiffBetweenScopes = ({
   scopes,
   previousScopes,
 }: {
-  scopes: OAuthScope[]
-  previousScopes: OAuthScope[]
+  scopes: string[]
+  previousScopes: string[]
 }) => {
   const unchanged: ScopeGroup = { 'read-write': [], write: [], read: [] }
   const changed: DiffScopeGroup = { 'read-write': [], write: [], read: [], removed: [] }
@@ -110,7 +113,7 @@ export const getDiffBetweenScopes = ({
   return { unchanged, changed }
 }
 
-export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
+export const getPermissionsWithLevel = (scopes: string[]) => {
   const scopesWithLevel: Partial<Record<ScopePermission, ScopeGroupLevel>> = {}
 
   for (const scope of scopes) {
@@ -137,8 +140,38 @@ export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
 }
 
 export const extractPermissionAndLevelFromScope = (
-  scope: OAuthScope
+  scope: string
 ): [ScopePermission, ScopeLevel] => {
   const [permission, level] = scope.split(':')
   return [permission as ScopePermission, level as ScopeLevel]
+}
+
+type OAuthScopeValidationProjectFailure = Extract<
+  OAuthScopeValidationResult,
+  { scope_target: 'projects' }
+>['failures'][number]
+
+export function getFailedProjects(
+  failure: OAuthScopeValidationResult | null | undefined
+): OAuthScopeValidationProjectFailure[] {
+  if (!failure) return []
+  return failure.scope_target === 'projects' ? failure.failures : []
+}
+
+export function getPreselectedProjectRefs({
+  existingGrant,
+  projectRef,
+  liveProjects,
+}: {
+  existingGrant: OAuthAppsPreflightValidationData['existing_grant']
+  projectRef: string | undefined
+  liveProjects: OrgProject[]
+}): string[] {
+  const liveRefs = new Set(liveProjects.map((project) => project.ref))
+  const candidates = existingGrant?.project_refs?.length
+    ? existingGrant.project_refs
+    : projectRef
+      ? [projectRef]
+      : []
+  return candidates.filter((ref) => liveRefs.has(ref))
 }

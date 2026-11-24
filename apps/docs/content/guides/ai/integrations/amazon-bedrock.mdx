@@ -6,7 +6,7 @@ sidebar_label: 'Amazon Bedrock'
 tocVideo: 'A3uND5sgiO0'
 ---
 
-[Amazon Bedrock](https://aws.amazon.com/bedrock) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
+[Amazon Bedrock](https://aws.amazon.com/bedrock/) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
 
 This guide will walk you through an example using Amazon Bedrock SDK with `vecs`. We will create embeddings using the Amazon Titan Embeddings G1 – Text v1.2 (amazon.titan-embed-text-v1) model, insert these embeddings into a Postgres database using vecs, and then query the collection to find the most similar sentences to a given query sentence.
 
@@ -22,7 +22,7 @@ pip install vecs boto3
 
 You'll also need:
 
-- [Credentials to your AWS account](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
+- [Credentials to your AWS account](https://docs.aws.amazon.com/boto3/latest/guide/credentials.html)
 - [A Postgres database with the pgvector extension](/docs/guides/database/extensions/pgvector)
 
 ## Create embeddings
@@ -134,6 +134,6 @@ This returns the most similar 3 records and their distance to the query vector.
 
 ## Resources
 
-- [Amazon Bedrock](https://aws.amazon.com/bedrock)
+- [Amazon Bedrock](https://aws.amazon.com/bedrock/)
 - [Amazon Titan](https://aws.amazon.com/bedrock/titan)
 - [Semantic Image Search with Amazon Titan](/docs/guides/ai/examples/semantic-image-search-amazon-titan)

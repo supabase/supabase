@@ -2,7 +2,7 @@ import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
 import { isExternalReferrer, isOAuthRedirectReferrer } from './first-referrer-cookie'
 import { posthogClient } from './posthog-client'
 import type { SharedTelemetryData } from './telemetry-first-touch-store'
-import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
+import { getSharedTelemetryData } from './telemetry-utils'
 
 export const FIRST_TOUCH_CLICK_ID_KEYS = [
   'gclid', // Google Ads
@@ -154,10 +154,6 @@ export function handlePageTelemetry({
         return undefined
       }
     })()
-
-    if (pageData.session_id) {
-      document.cookie = `session_id=${pageData.session_id}; ${getTelemetryCookieOptions()}`
-    }
 
     posthogClient.capturePageView({
       $current_url: pageData.page_url,

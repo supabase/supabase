@@ -33,7 +33,7 @@ We anonymously analyzed 25,000 deployed Edge Functions and saw the same pattern 
 
 Most functions needed to:
 
-- Create a Supabase client with `SUPABASE_ANON_KEY`
+- Create a [Supabase client](/docs/reference/javascript/introduction) with `SUPABASE_ANON_KEY`
 - Create another admin client with `SUPABASE_SERVICE_ROLE_KEY` that can bypass [Row Level Security](/docs/guides/database/postgres/row-level-security)
 - Verify the JWT
 - Parse claims

@@ -15,6 +15,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -23,8 +33,6 @@ import {
 } from '@/components/interfaces/BranchManagement/BranchPanels'
 import { BranchSelector } from '@/components/interfaces/BranchManagement/BranchSelector'
 import { PullRequestsEmptyState } from '@/components/interfaces/BranchManagement/EmptyStates'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -174,9 +182,9 @@ function MergeRequestsPage() {
   }
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
+    <PageContainer>
+      <PageSection>
+        <PageSectionContent>
           <div className="space-y-4">
             {branchesGrant.status === 'denied' && (
               <NoPermission resourceText="view this project's branches" />
@@ -329,9 +337,9 @@ function MergeRequestsPage() {
               </>
             )}
           </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
@@ -397,22 +405,29 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <PageLayout
-      title="Merge requests"
-      subtitle="Review and merge changes from one branch into another"
-      primaryActions={
-        canListBranches && (
-          <BranchSelector
-            branches={previewBranches}
-            onBranchSelected={handleMarkBranchForReview}
-            disabled={!projectRef || updateBranchGrant.status !== 'granted'}
-            isUpdating={isUpdating}
-          />
-        )
-      }
-      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
-    >
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Merge requests</PageHeaderTitle>
+            <PageHeaderDescription>
+              Review and merge changes from one branch into another
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
+            {canListBranches && (
+              <BranchSelector
+                branches={previewBranches}
+                onBranchSelected={handleMarkBranchForReview}
+                disabled={!projectRef || updateBranchGrant.status !== 'granted'}
+                isUpdating={isUpdating}
+              />
+            )}
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
       {children}
-    </PageLayout>
+    </>
   )
 }

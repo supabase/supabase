@@ -1,0 +1,46 @@
+name: Post docs PRs to Slack
+
+# Posts a docs PR to #team-docs-alerts whenever it's ready for review: when
+# it's opened as ready, and every time a draft is marked ready. Reuses the
+# webhook from docs-master-alert.yml.
+# pull_request_target is used so fork PRs can read the webhook secret. This
+# workflow only reads the event payload. It never checks out or runs PR code.
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+    paths:
+      - 'apps/docs/**'
+
+permissions: {}
+
+jobs:
+  post-to-slack:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Post to Slack
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DOCS_WEBHOOK_URL }}
+        with:
+          script: |
+            const webhookUrl = process.env.SLACK_WEBHOOK_URL
+            if (!webhookUrl) {
+              core.notice('SLACK_DOCS_WEBHOOK_URL is not set, skipping.')
+              return
+            }
+
+            const pr = context.payload.pull_request
+            const isExternal = !pr.head.repo || pr.head.repo.full_name !== pr.base.repo.full_name
+            const escape = (text) =>
+              text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            const text = `<${pr.html_url}|#${pr.number} ${escape(pr.title)}> · ${isExternal ? 'External' : 'Internal'}`
+
+            const response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text, unfurl_links: false }),
+            })
+            if (!response.ok) {
+              core.setFailed(`Slack returned ${response.status}: ${await response.text()}`)
+            }

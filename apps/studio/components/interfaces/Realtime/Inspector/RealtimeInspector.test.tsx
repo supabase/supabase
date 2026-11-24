@@ -1,4 +1,3 @@
-import { RealtimeInspector } from '.'
 import type { PGPublication } from '@supabase/pg-meta'
 import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
@@ -6,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { delay, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { RealtimeInspector } from '.'
 import type { LogData } from './Messages.types'
 import type { RealtimeConfig } from './useRealtimeMessages'
 import { databasePublicationsKeys } from '@/data/database-publications/keys'
