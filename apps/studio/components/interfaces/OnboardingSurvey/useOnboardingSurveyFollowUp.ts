@@ -81,7 +81,6 @@ export function useOnboardingSurveyFollowUp() {
       setStoredState((previous: unknown) => {
         const previousState = parseFollowUpState(previous)
         if (previousState) return { ...previousState, status }
-        // A Vercel Marketplace org has no marker yet: this answer or skip is its first record
         return isVercelOwnerToAsk ? { status, orgCreatedAt: vercelOrgCreatedAt } : previous
       })
     },
