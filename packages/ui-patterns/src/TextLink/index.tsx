@@ -1,7 +1,7 @@
 'use client'
 
+import { FrameworkLink } from 'common'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { cn } from 'ui'
 
 interface Props {
@@ -26,7 +26,7 @@ export function TextLink({
   ...props
 }: Props) {
   return (
-    <Link
+    <FrameworkLink
       href={url}
       className={cn(
         'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-ring focus-visible:rounded-xs focus-visible:text-foreground',
@@ -54,6 +54,6 @@ export function TextLink({
           </div>
         )}
       </div>
-    </Link>
+    </FrameworkLink>
   )
 }
