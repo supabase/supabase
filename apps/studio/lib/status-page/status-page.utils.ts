@@ -120,35 +120,29 @@ export function normalizeStatusPage(res: StatusPageResponse): NormalizedStatusPa
   const items: Array<StatusItem> = [
     ...res.ongoing_incidents
       .filter((incident) => incident.visible)
-      .map(
-        (incident): StatusItem => ({
-          ...buildBase(incident),
-          kind: 'incident',
-          status: incident.status,
-          impact: incident.current_worst_impact,
-        })
-      ),
+      .map((incident): StatusItem => ({
+        ...buildBase(incident),
+        kind: 'incident',
+        status: incident.status,
+        impact: incident.current_worst_impact,
+      })),
     ...res.in_progress_maintenances
       .filter((maintenance) => maintenance.visible)
-      .map(
-        (maintenance): StatusItem => ({
-          ...buildBase(maintenance),
-          kind: 'maintenance',
-          startedAt: maintenance.started_at,
-          scheduledEndAt: maintenance.scheduled_end_at ?? null,
-        })
-      ),
+      .map((maintenance): StatusItem => ({
+        ...buildBase(maintenance),
+        kind: 'maintenance',
+        startedAt: maintenance.started_at,
+        scheduledEndAt: maintenance.scheduled_end_at ?? null,
+      })),
     ...res.scheduled_maintenances
       .filter((maintenance) => maintenance.visible)
-      .map(
-        (maintenance): StatusItem => ({
-          ...buildBase(maintenance),
-          kind: 'upcoming_maintenance',
-          startsAt: maintenance.starts_at ?? null,
-          endsAt: maintenance.ends_at ?? null,
-          leadDays: maintenance.banner_lead_days ?? DEFAULT_UPCOMING_LEAD_DAYS,
-        })
-      ),
+      .map((maintenance): StatusItem => ({
+        ...buildBase(maintenance),
+        kind: 'upcoming_maintenance',
+        startsAt: maintenance.starts_at ?? null,
+        endsAt: maintenance.ends_at ?? null,
+        leadDays: maintenance.banner_lead_days ?? DEFAULT_UPCOMING_LEAD_DAYS,
+      })),
   ]
 
   return { pageUrl: res.page_url, items }

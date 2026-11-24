@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'

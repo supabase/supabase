@@ -48,22 +48,21 @@ function tolerantArray<T extends z.ZodTypeAny>(itemSchema: T, arrayName: string)
   return z
     .array(z.unknown())
     .default([])
-    .transform(
-      (items): Array<z.output<T>> =>
-        items.flatMap((item) => {
-          const result = itemSchema.safeParse(item)
-          if (result.success) return [result.data]
+    .transform((items): Array<z.output<T>> =>
+      items.flatMap((item) => {
+        const result = itemSchema.safeParse(item)
+        if (result.success) return [result.data]
 
-          const rawId =
-            typeof item === 'object' && item !== null && 'id' in item
-              ? (item as { id?: unknown }).id
-              : undefined
-          console.warn(`incident.io Widget API: dropping malformed item in ${arrayName}`, {
-            id: rawId,
-            issues: result.error.issues,
-          })
-          return []
+        const rawId =
+          typeof item === 'object' && item !== null && 'id' in item
+            ? (item as { id?: unknown }).id
+            : undefined
+        console.warn(`incident.io Widget API: dropping malformed item in ${arrayName}`, {
+          id: rawId,
+          issues: result.error.issues,
         })
+        return []
+      })
     )
 }
 

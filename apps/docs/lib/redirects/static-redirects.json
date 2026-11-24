@@ -1105,6 +1105,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/database/replication/pipelines-guarantees",
+    "destination": "/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/database/replication/replication-faq",
     "destination": "/docs/guides/database/replication/pipelines-faq",
     "permanent": true
@@ -2507,6 +2512,11 @@
   {
     "source": "/docs/reference/cli/supabase-help",
     "destination": "/docs/reference/cli/global-flags",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/cli/supabase-inspect-db-role-connections",
+    "destination": "/docs/reference/cli/supabase-inspect-db-role-stats",
     "permanent": true
   },
   {

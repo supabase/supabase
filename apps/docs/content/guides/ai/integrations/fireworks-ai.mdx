@@ -137,7 +137,7 @@ The function runs with the caller's permissions, so the `select` policy decides 
 
 ### Store embeddings
 
-Create an Edge Function that embeds text and inserts it into the `documents` table. Only callers that send your project's secret key can reach it, so call it from a backend job or another Edge Function.
+Create an [Edge Function](/docs/guides/functions) that embeds text and inserts it into the `documents` table. Only callers that send your project's secret key can reach it, so call it from a backend job or another Edge Function.
 
 1. Create the function:
 
@@ -145,9 +145,9 @@ Create an Edge Function that embeds text and inserts it into the `documents` tab
    supabase functions new fireworks-embed
    ```
 
-2. In `supabase/config.toml`, turn off the platform JWT check for the function:
+2. In your config file (`supabase/config.toml` or `supabase/config.jsonc`), turn off the platform JWT check for the function:
 
-   ```toml
+   ```toml supabase/config.toml
    [functions.fireworks-embed]
    verify_jwt = false
    ```
@@ -257,7 +257,7 @@ The response lists the five closest documents, each with a `similarity` score be
 
 Serve the `documents` table as a remote [Model Context Protocol](https://modelcontextprotocol.io/specification/2026-07-28) (MCP) server, so clients such as Claude, Cursor, or VS Code can search it. The server embeds each query with the same Fireworks model as [Search with embeddings](#search-with-embeddings), and every tool call runs as the signed-in user, so the `select` policy on `documents` decides what a client reads.
 
-The function composes the authenticated pipeline from [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp). `withOAuthProtectedResource()` answers MCP client discovery, and `withSupabase({ auth: 'user' })` verifies the user's token and scopes the Supabase client to them. Configure the OAuth 2.1 server, dynamic client registration, and a consent screen before you start. For those steps, see [Add authentication](/docs/guides/ai-tools/byo-mcp#add-authentication).
+The function composes the authenticated pipeline from [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp). `withOAuthProtectedResource()` answers MCP client discovery, and `withSupabase({ auth: 'user' })` verifies the user's token and scopes the [Supabase client](/docs/reference/javascript/introduction) to them. Configure the OAuth 2.1 server, dynamic client registration, and a consent screen before you start. For those steps, see [Add authentication](/docs/guides/ai-tools/byo-mcp#add-authentication).
 
 1. Create the function:
 
@@ -265,7 +265,7 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
    supabase functions new mcp
    ```
 
-2. In `supabase/config.toml`, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
+2. In your config file, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
 
    ```toml supabase/config.toml
    [functions.mcp]

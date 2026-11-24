@@ -1,59 +1,190 @@
 ---
 id: 'project-transfer'
-title: 'Project Transfers'
-description: 'Transfer a project to another organization.'
+title: 'Transfer a project'
+description: 'Transfer a Supabase project to another organization with the Dashboard or the Management API, while the project keeps its data, default URL, and API keys.'
 ---
 
-You can freely transfer projects between different organizations. Head to your [projects' general settings](/dashboard/project/_/settings/general) to initiate a project transfer.
+Transfer a project to another organization to change who pays for it, to hand it to a client, or to move it to a different plan. A transfer changes the project's organization. The project keeps its data, default URL, and API keys.
+
+## Overview
+
+The _source organization_ is the organization the project belongs to before the transfer. The _target organization_ is the organization you move the project to.
+
+Before you start, check what a transfer changes for downtime, billing, and access in [Changes after a project transfer](/docs/guides/platform/project-transfer/what-changes).
+
+## Prerequisites
+
+Before you transfer a project, check that you meet the following requirements:
+
+- You're an **Owner** of the source organization. Check your role in the organization's [team settings](/dashboard/org/_/team).
+- You're a member of the target organization with a [role for the whole organization](/docs/guides/platform/project-transfer/requirements#account-requirements).
+- You use the same account in both organizations.
+- Nothing [blocks the transfer](/docs/guides/platform/project-transfer/requirements#project-and-organization-requirements), such as a GitHub connection, an overdue invoice in a Free Plan or Pro Plan organization, or a feature that the target organization lacks.
+
+For every requirement and what to do when one isn't met, see [Project transfer requirements](/docs/guides/platform/project-transfer/requirements).
+
+To follow the Management API path, you also need an [access token](/dashboard/account/tokens). For a scoped token, under **Resource access**, select **Organization**, choose both the source and the target organization, and grant the following permissions:
+
+- **Project Settings** with **Read** access, for the preview
+- **Organization Settings** with **Read-write** access, for the transfer
+- **Organization Members** with **Read** access, for the check on the target organization
+
+A token with **Project** access can't preview or transfer a project. For more information, see [Personal access tokens](/docs/guides/platform/personal-access-tokens).
+
+## Procedure
+
+Transfer one project at a time. To transfer several projects, repeat the steps for each project. The Supabase CLI has no transfer command.
+
+If a check blocks the transfer, see [Troubleshoot a project transfer](/docs/guides/platform/project-transfer/troubleshooting) for the cause and the fix of each message.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To transfer a project in the Supabase Dashboard, follow these steps:
+
+1. Open the project's [general settings](/dashboard/project/_/settings/general).
+2. In the **Transfer project** section, click **Transfer project**.
+3. In **Select Target Organization**, select the organization to move the project to.
+4. Read the result of the checks, which run when you select the target organization. A **Project cannot be transferred** box lists what blocks the transfer. Warnings list what the transfer changes or removes, such as add-ons, compute size, costs, or a Vercel connection. **Transfer Project** stays disabled until every check passes.
+5. Click **Transfer Project**.
+
+   <Admonition type="caution">
+
+   A transfer to a Free Plan organization removes add-ons, and transferring the project back doesn't restore them. A transfer has no undo. To move a project back, transfer it again, which runs the same checks.
+
+   </Admonition>
 
 <Image
-  alt="Project Transfer: General Settings"
+  alt="The Transfer project section of the project's general settings, with a Transfer project button next to the text Transfer project to another organization."
   src={{
     light: '/docs/img/guides/platform/project-transfer-overview--light.png',
     dark: '/docs/img/guides/platform/project-transfer-overview.png',
   }}
   className="max-w-[600px] mx-auto! border rounded-md"
 
-width={677}
-height={224}
+width={1530}
+height={408}
 />
 
 <Image
-  alt="Project Transfer: Confirmation Modal"
+  alt="The Transfer project dialog, with a Select Target Organization list, a Cancel button, and a Transfer Project button."
   src={{
     light: '/docs/img/guides/platform/project-transfer-modal--light.png',
     dark: '/docs/img/guides/platform/project-transfer-modal.png',
   }}
   className="max-w-[600px] mx-auto!"
 
-width={773}
-height={581}
+width={1540}
+height={910}
 />
 
-Source organization - the organization the project currently belongs to
-Target organization - the organization you want to move the project to
+</TabPanel>
+<TabPanel id="api" label="Management API">
 
-## Pre-Requirements
+To transfer a project with the Management API, follow these steps:
 
-- You need to be the owner of the source organization.
-- You need to be at least a member of the target organization you want to move the project to.
-- No active GitHub integration connection
-- No project-scoped roles pointing to the project (Team/Enterprise plan)
-- No log drains configured
+1. Set the token, the project ref, and the target organization's slug. The project ref is the **Project ID** in the project's [general settings](/dashboard/project/_/settings/general), and the slug is the **Organization slug** in the target organization's [general settings](/dashboard/org/_/general). Replace `YOUR_ACCESS_TOKEN`, `YOUR_PROJECT_REF`, and `YOUR_TARGET_ORG_SLUG` with your values:
 
-## Usage-billing and project add-ons
+   ```bash
+   export SUPABASE_ACCESS_TOKEN="YOUR_ACCESS_TOKEN"
+   export PROJECT_REF="YOUR_PROJECT_REF"
+   export TARGET_ORG_SLUG="YOUR_TARGET_ORG_SLUG"
+   ```
 
-For usage metrics such as disk size, egress or image transformations and project add-ons such as [Compute Add-On](/docs/guides/platform/compute-and-disk), [Point-In-Time-Recovery](/docs/guides/platform/backups#point-in-time-recovery), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/observability/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone) or a [Custom Domain](/docs/guides/platform/custom-domains), the source organization will still be charged for the usage up until the transfer. The charges will be added to the invoice when the billing cycle resets.
+2. Preview the transfer:
 
-The target organization will be charged at the end of the billing cycle for usage after the project transfer.
+   ```bash
+   curl -X POST "https://api.supabase.com/v2/projects/$PROJECT_REF/transfers/previews" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": {
+       "type": "project_transfer_input",
+       "attributes": { "target_organization_slug": "$TARGET_ORG_SLUG" }
+     }
+   }
+   EOF
+   ```
 
-## Things to watch out for
+   The response has a `valid` field under `data.attributes`, next to lists of `errors`, `warnings`, and `info` messages. Continue when `valid` is `true`.
 
-- Transferring a project might come with a short 1-2 minute downtime if you're moving a project from a paid to a Free Plan.
-- You could lose access to certain project features depending on the plan of the target organization, i.e. moving a project from a Pro Plan to a Free Plan.
-- When moving your project to a Free Plan, we also ensure you’re not exceeding your two free project limit. In these cases, it is best to upgrade your target organization to Pro Plan first.
-- You could have less rights on the project depending on your role in the target organization, i.e. you were an Owner in the previous organization and only have a Read-Only role in the target organization.
+3. Transfer the project:
 
-## Transfer to a different region
+   <Admonition type="caution">
 
-Note that project transfers are only transferring your projects across an organization and cannot be used to transfer between different regions. To move your project to a different region, see [migrating your project](/docs/guides/platform/migrating-within-supabase).
+   A transfer to a Free Plan organization removes add-ons, and transferring the project back doesn't restore them. A transfer has no undo. To move a project back, transfer it again, which runs the same checks.
+
+   </Admonition>
+
+   ```bash
+   curl -X POST "https://api.supabase.com/v2/projects/$PROJECT_REF/transfers" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": {
+       "type": "project_transfer_input",
+       "attributes": { "target_organization_slug": "$TARGET_ORG_SLUG" }
+     }
+   }
+   EOF
+   ```
+
+   A successful transfer returns `200` with an empty body.
+
+For the full request and response schemas, see [Preview a project transfer](/docs/reference/api/v2-preview-a-project-transfer) and [Transfer a project](/docs/reference/api/v2-transfer-a-project) in the Management API reference.
+
+</TabPanel>
+</Tabs>
+
+The project now belongs to the target organization.
+
+## Verify
+
+To confirm that the transfer worked, check which organization the project belongs to.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To check the project's organization in the Dashboard, follow these steps:
+
+1. Open the list of [your organizations](/dashboard/organizations), and select the target organization.
+2. Check that the project appears in the organization's list of projects.
+
+</TabPanel>
+<TabPanel id="api" label="Management API">
+
+To check the project's organization with the Management API, follow these steps:
+
+1. Request the project. Replace `YOUR_ACCESS_TOKEN` and `YOUR_PROJECT_REF` with your values, or leave out the two `export` lines if you set the variables for the transfer:
+
+   ```bash
+   export SUPABASE_ACCESS_TOKEN="YOUR_ACCESS_TOKEN"
+   export PROJECT_REF="YOUR_PROJECT_REF"
+
+   curl "https://api.supabase.com/v1/projects/$PROJECT_REF" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+2. Check that `organization_slug` in the response is the target organization's slug.
+
+</TabPanel>
+</Tabs>
+
+## Next steps
+
+After the transfer, use these pages:
+
+- [Access and tokens](/docs/guides/platform/project-transfer/what-changes#access-and-tokens): replace access tokens and re-authorize apps that were scoped to the source organization.
+- [GitHub integration](/docs/guides/deployment/branching/github-integration): if you disconnected the project from GitHub for the transfer, reconnect it.
+
+## Related resources
+
+To read more about transfers and the tasks that use them, see these pages:
+
+- [Project transfer requirements](/docs/guides/platform/project-transfer/requirements): every check a transfer runs, and what to do about each one.
+- [Transfer project ownership](/docs/guides/platform/project-transfer/transfer-ownership): hand a project to a client or to another account.
+- [Transfer a Vercel-managed project](/docs/guides/platform/project-transfer/vercel-marketplace): move a project out of an organization managed through the Vercel Marketplace.
+- [Pause a Pro or Team Plan project](/docs/guides/platform/project-transfer/pause-project): use a transfer to pause a project that can't be paused on its plan.
+- [Migrating within Supabase](/docs/guides/platform/migrating-within-supabase): move a project to a different region, which a transfer can't do.

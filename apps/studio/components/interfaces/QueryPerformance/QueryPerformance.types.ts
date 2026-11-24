@@ -1,5 +1,6 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 
+import type { NumericFilter } from '../Reports/v2/ReportsNumericFilter'
 import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
 
 export interface QueryPerformanceRow {
@@ -53,8 +54,8 @@ export type QueryPerformanceSQLParams = {
   searchQuery?: string
   roles?: string[]
   sources?: QuerySource[]
-  minCalls?: number
-  minTotalTime?: number
+  callsFilter?: NumericFilter
+  totalTimeFilter?: NumericFilter
   runIndexAdvisor?: boolean
   filterIndexAdvisor?: boolean
   page?: number

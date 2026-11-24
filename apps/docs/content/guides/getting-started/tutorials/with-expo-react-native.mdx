@@ -25,7 +25,7 @@ Start by building the React Native app from scratch.
 
 ### Initialize a React Native app
 
-Use [`expo`](https://docs.expo.dev/get-started/create-a-new-app/) to initialize
+Use [`expo`](https://docs.expo.dev/get-started/create-a-project/) to initialize
 an app called `expo-user-management`:
 
 ```bash
@@ -63,7 +63,7 @@ These variables are safe to expose in your Expo app since Supabase has
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
 
-    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Make sure that:
 
@@ -179,7 +179,7 @@ meta="name=components/Auth.tsx"
 
 <Admonition type="note">
 
-By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
+By default [Supabase Auth](/docs/guides/auth) requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
 
 While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
 
