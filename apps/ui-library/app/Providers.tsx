@@ -27,10 +27,9 @@ export function Providers({ children }: PropsWithChildren) {
     () => ({
       Link: NextLink,
       Image: NextImage,
-      pathname: pathname ?? undefined,
-      asPath: pathname ?? undefined,
-      isReady: true,
-      push: (path: string) => router.push(path),
+      pathname,
+      asPath: pathname,
+      push: (path) => router.push(path),
     }),
     [pathname, router]
   )

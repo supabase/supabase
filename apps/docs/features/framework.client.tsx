@@ -14,10 +14,9 @@ export function DocsFrameworkProvider({ children }: { children: ReactNode }) {
     () => ({
       Link: NextLink,
       Image: NextImage,
-      pathname: pathname ?? undefined,
-      asPath: pathname ?? undefined,
-      isReady: true,
-      push: (path: string) => router.push(path),
+      pathname,
+      asPath: pathname,
+      push: (path) => router.push(path),
     }),
     [pathname, router]
   )
