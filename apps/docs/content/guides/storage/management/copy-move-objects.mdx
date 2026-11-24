@@ -22,7 +22,9 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
-await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png')
+const userId = 'your-user-id' // the destination's first folder must match the caller's sub claim
+
+await supabase.storage.from('avatars').copy('public/avatar1.png', `${userId}/avatar2.png`)
 ```
 
 ### Copying objects across buckets
@@ -35,7 +37,9 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
-await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png', {
+const userId = 'your-user-id' // the destination's first folder must match the caller's sub claim
+
+await supabase.storage.from('avatars').copy('public/avatar1.png', `${userId}/avatar2.png`, {
   destinationBucket: 'avatars2',
 })
 ```
