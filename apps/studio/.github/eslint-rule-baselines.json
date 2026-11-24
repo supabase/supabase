@@ -9,6 +9,7 @@
     "jsx-a11y/label-has-associated-control": 33,
     "jsx-a11y/no-redundant-roles": 1,
     "jsx-a11y/anchor-is-valid": 5,
+    "jsx-a11y/heading-has-content": 0,
     "valtio/state-snapshot-rule": 1,
     "shadcn/no-arbitrary-values": 191,
     "shadcn/no-unknown-classes": 144,
