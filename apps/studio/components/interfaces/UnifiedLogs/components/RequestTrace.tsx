@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AudioWaveformIcon, InfoIcon, WaypointsIcon } from 'lucide-react'
-import { Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AudioWaveformIcon, WaypointsIcon } from 'lucide-react'
+import { Badge, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Trace } from 'ui-patterns/Trace'
 
 import { getRequestCorrelationIds } from '../UnifiedLogs.queries'
@@ -117,10 +117,7 @@ export function RequestTrace({ row }: { row: ColumnSchema }) {
             {data.meta.partial && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="flex items-center gap-1 text-foreground-muted">
-                    <InfoIcon size={12} />
-                    Partial
-                  </span>
+                  <Badge variant="warning">Partial</Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-64">
                   This trace may be incomplete. Spans are still being collected, or some services
@@ -131,8 +128,13 @@ export function RequestTrace({ row }: { row: ColumnSchema }) {
           </span>
           {/* basis-full wraps this onto its own line beneath the title */}
           <span className="flex basis-full items-center gap-2 text-xs text-foreground-lighter">
+            {services.length > 0 && (
+              <>
+                <span>{services.join(', ')}</span>
+                <span aria-hidden>•</span>
+              </>
+            )}
             <span className="font-mono">{traceId}</span>
-            {services.length > 0 && <span>{services.join(', ')}</span>}
           </span>
         </Trace.Header>
         <Trace.Waterfall treeWidth={220} className="min-h-0 flex-1">
