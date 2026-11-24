@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useFlag } from 'common'
 import { useRef, useState } from 'react'
 import {
   ResizableHandle,
@@ -13,11 +13,8 @@ import {
 import { LogDetail } from './components/LogDetail'
 import { LogStepSummary } from './components/LogTimeline'
 import { LogUser } from './components/LogUser'
-import {
-  LogTimestampHeader,
-  RequestTimeline,
-  useRequestTraceId,
-} from './components/RequestTimeline'
+import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import { RequestTrace } from './components/RequestTrace'
 import { useLogEnrichment } from './components/useLogEnrichment'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
@@ -27,12 +24,7 @@ import {
 import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import {
-  getEventMessageDisplay,
-  getLogTypeSource,
-  getRawLogData,
-  getRowTimestampMs,
-} from './UnifiedLogs.utils'
+import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
 import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
@@ -55,7 +47,6 @@ export function ServiceFlowPanel({
   searchParameters,
 }: ServiceFlowPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
-  const { ref: projectRef } = useParams()
   const overviewTabRef = useRef<HTMLButtonElement>(null)
 
   const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
@@ -67,23 +58,16 @@ export function ServiceFlowPanel({
     (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
   const isProcessLog = selectedRow?.log_type === 'compute' || selectedRow?.log_type === 'pipelines'
   const showTimeline = isRequestTimelineEnabled && !isProcessLog
+  // Always present when the Timeline is: a request with no trace shows an empty state rather
+  // than a tab that appears and disappears as the trace resolves.
+  const showTrace = showTimeline && enableTracesWaterfall
   const showUser = !isProcessLog
-
-  const { traceId } = useRequestTraceId(
-    {
-      projectRef,
-      logId: selectedRow?.id,
-      source: selectedRow ? getLogTypeSource(selectedRow.log_type) : undefined,
-      logTimestampMs: selectedRow ? getRowTimestampMs(selectedRow) : null,
-    },
-    { enabled: showTimeline && enableTracesWaterfall }
-  )
-  const traceIdForTimeline = enableTracesWaterfall ? traceId : undefined
 
   const tabs = [
     'overview',
     'raw-json',
     ...(showTimeline ? ['timeline'] : []),
+    ...(showTrace ? ['trace'] : []),
     ...(showUser ? ['user'] : []),
   ]
   const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
@@ -159,6 +143,11 @@ export function ServiceFlowPanel({
                     Timeline
                   </TabsTrigger>
                 )}
+                {showTrace && (
+                  <TabsTrigger value="trace" className={TAB_TRIGGER_CLASS_NAME}>
+                    Trace
+                  </TabsTrigger>
+                )}
                 {showUser && (
                   <TabsTrigger value="user" className={TAB_TRIGGER_CLASS_NAME}>
                     User
@@ -177,9 +166,9 @@ export function ServiceFlowPanel({
                       row={selectedRow}
                       activeLog={activeLog}
                       onSelectLog={handleSelectTimelineLog}
-                      traceId={traceIdForTimeline}
                     />
                   )}
+                  {tab === 'trace' && selectedRow && <RequestTrace row={selectedRow} />}
                   {tab === 'user' && activeLog && (
                     <LogUser row={activeLog} searchParameters={searchParameters} />
                   )}

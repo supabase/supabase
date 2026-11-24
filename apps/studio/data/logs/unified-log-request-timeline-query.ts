@@ -18,7 +18,7 @@ import {
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
-export const TIMELINE_WINDOW_MS = 7 * 60 * 1000
+const TIMELINE_WINDOW_MS = 7 * 60 * 1000
 
 const MAX_LOOKUPS = 2
 

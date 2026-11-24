@@ -3,20 +3,13 @@ import { useParams } from 'common'
 import { ClockIcon, RouteIcon } from 'lucide-react'
 import { Skeleton } from 'ui'
 
-import { getRequestCorrelationIds } from '../UnifiedLogs.queries'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
 import { LogPanelEmptyState } from './LogPanelEmptyState'
 import { LogTimeline } from './LogTimeline'
-import { formatOffsetMs, getSpansForLog } from './TraceSpans.utils'
-import { TraceStrip } from './TraceStrip'
 import { AlertError } from '@/components/ui/AlertError'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
-import {
-  unifiedLogRequestTimelineQueryOptions,
-  type UnifiedLogRequestTimelineVariables,
-} from '@/data/logs/unified-log-request-timeline-query'
-import { unifiedLogTraceSpansQueryOptions } from '@/data/logs/unified-log-trace-spans-query'
+import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-request-timeline-query'
 import { useFormatDateTime } from '@/lib/datetime'
 
 const COLLAPSED_STEP_COUNT = 3
@@ -25,30 +18,6 @@ interface RequestTimelineProps {
   row: ColumnSchema
   activeLog: ColumnSchema
   onSelectLog: (log: ColumnSchema) => void
-  /** Resolved trace for the selected log, when the traces feature is on and one was found. */
-  traceId?: string
-}
-
-export function useRequestTraceId(
-  variables: UnifiedLogRequestTimelineVariables,
-  options: { enabled?: boolean } = {}
-) {
-  const queryOptions = unifiedLogRequestTimelineQueryOptions(variables)
-  const { data } = useQuery({
-    ...queryOptions,
-    enabled: (options.enabled ?? true) && queryOptions.enabled,
-  })
-
-  const traceId = data
-    ? getRequestCorrelationIds(
-        data.logs.map((log) => ({
-          source: getLogTypeSource(log.log_type) ?? '',
-          attributes: log.metadata,
-        }))
-      ).traceIds[0]
-    : undefined
-
-  return { traceId, logCount: data?.logs.length ?? 0 }
 }
 
 export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
@@ -64,7 +33,7 @@ export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
   )
 }
 
-export function RequestTimeline({ row, activeLog, onSelectLog, traceId }: RequestTimelineProps) {
+export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimelineProps) {
   const { ref: projectRef } = useParams()
   const formatDateTime = useFormatDateTime()
   const { data, error, isLoading, isError } = useQuery(
@@ -75,9 +44,6 @@ export function RequestTimeline({ row, activeLog, onSelectLog, traceId }: Reques
       logTimestampMs: getRowTimestampMs(row),
     })
   )
-
-  // The list must never wait on the trace: spans only ever add expandable rows to it.
-  const { data: trace } = useQuery(unifiedLogTraceSpansQueryOptions({ projectRef, traceId }))
 
   const logs = data?.logs ?? []
   const hasLogs = !isLoading && !isError && logs.length > 0
@@ -91,15 +57,6 @@ export function RequestTimeline({ row, activeLog, onSelectLog, traceId }: Reques
       <span aria-live="polite" className="sr-only">
         {hasNoLogs ? 'No related logs' : ''}
       </span>
-      {traceId !== undefined && projectRef !== undefined && (
-        <TraceStrip
-          traceId={traceId}
-          projectRef={projectRef}
-          logTimestampMs={getRowTimestampMs(row)}
-          spans={trace?.data}
-          isPartial={trace?.meta.partial === true}
-        />
-      )}
       {isLoading && (
         <div className="flex flex-col gap-3 p-4" aria-label="Loading related logs">
           {[0, 1, 2].map((i) => (
@@ -133,12 +90,16 @@ export function RequestTimeline({ row, activeLog, onSelectLog, traceId }: Reques
             getTimeLabel={(log) =>
               log.id === firstLog.id
                 ? formatDateTime(startMs)
-                : formatOffsetMs((getRowTimestampMs(log) ?? startMs) - startMs)
+                : formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)
             }
-            getLogSpans={trace === undefined ? undefined : (log) => getSpansForLog(trace.data, log)}
           />
         </div>
       )}
     </>
   )
+}
+
+function formatOffset(ms: number) {
+  if (ms < 1000) return `+${Math.round(ms)} ms`
+  return `+${(ms / 1000).toFixed(2)} s`
 }

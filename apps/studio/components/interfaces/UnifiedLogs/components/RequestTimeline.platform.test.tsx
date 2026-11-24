@@ -299,7 +299,7 @@ describe('request timeline tab', () => {
   const TRACE_ID = 'a'.repeat(32)
   const tracedRows = timelineRows.map((row) => ({
     ...row,
-    metadata: { ...row.metadata, trace_id: TRACE_ID, span_id: 'span-1' },
+    metadata: { ...row.metadata, trace_id: TRACE_ID },
   }))
   const spanResponse = {
     data: [
@@ -320,7 +320,7 @@ describe('request timeline tab', () => {
         type: 'span',
         id: 'span-2',
         attributes: {
-          parent_span_id: 'span-1',
+          parent_span_id: null,
           service_name: 'postgres',
           span_name: 'SELECT orders',
           span_kind: 'client',
@@ -339,28 +339,39 @@ describe('request timeline tab', () => {
       )
     )
 
-  it('shows the trace strip with its spans, services and a link to the filtered logs', async () => {
+  const openTrace = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('tab', { name: 'Trace' }))
+  }
+
+  it('always offers the Trace tab, with an empty state when the request has no trace id', async () => {
+    const user = userEvent.setup()
+    const { queryClient } = renderPanel(timelineRows)
+
+    await openTrace(user)
+
+    expect(await screen.findByText('No trace for this request')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('renders the trace header and waterfall once the spans come back', async () => {
     const user = userEvent.setup()
     mockTrace()
     const { queryClient } = renderPanel(tracedRows)
 
-    await openTimeline(user)
+    await openTrace(user)
 
-    expect(await screen.findByText('2 spans')).toBeVisible()
+    // Trace.Title is the root span's name; the rest of the header is ours
+    expect(await screen.findByRole('heading', { name: 'GET /rest/v1/orders' })).toBeVisible()
+    expect(screen.getByText(TRACE_ID)).toBeVisible()
     expect(screen.getByText('postgres, postgrest')).toBeVisible()
-    expect(screen.getByText('aaaaaaaa…aaaa')).toBeVisible()
-    expect(screen.getByRole('link', { name: 'View logs' })).toHaveAttribute(
-      'href',
-      expect.stringContaining(`filter=attribute.trace_id%3Aeq%3A${TRACE_ID}`)
-    )
-    expect(screen.getByRole('link', { name: 'View logs' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('date=')
-    )
+    expect(screen.getByText('Partial')).toBeVisible()
+    // The waterfall virtualises its rows against a measured viewport, which jsdom never lays
+    // out, so individual span rows can't be asserted here — only that the tree mounted.
+    expect(screen.getByRole('tree')).toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('keeps the strip and its link when the trace fetch fails, without span details', async () => {
+  it('shows an error in the Trace tab when the trace fetch fails', async () => {
     const user = userEvent.setup()
     mswServer.use(
       http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
@@ -369,63 +380,41 @@ describe('request timeline tab', () => {
     )
     renderPanel(tracedRows)
 
-    await openTimeline(user)
+    await openTrace(user)
 
-    expect(await screen.findByRole('link', { name: 'View logs' })).toBeVisible()
-    expect(screen.queryByText(/spans?$/)).not.toBeInTheDocument()
+    expect(await screen.findByText('Failed to retrieve trace')).toBeVisible()
   })
 
-  it('renders nothing extra when the selected log has no trace_id', async () => {
-    const user = userEvent.setup()
-    const { queryClient } = renderPanel(timelineRows)
-
-    await openTimeline(user)
-
-    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
-    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
-  })
-
-  it('expands a row into its span and its direct children', async () => {
-    const user = userEvent.setup()
-    mockTrace()
-    const { queryClient } = renderPanel(tracedRows)
-
-    await openTimeline(user)
-
-    await user.click((await screen.findAllByRole('button', { name: 'Show spans' }))[0])
-    const spans = await screen.findByRole('list', { name: 'Spans' })
-
-    expect(within(spans).getByText('GET /rest/v1/orders')).toBeVisible()
-    expect(within(spans).getByText('SELECT orders')).toBeVisible()
-    expect(within(spans).getByText('+0 ms')).toBeVisible()
-    expect(within(spans).getByText('+2 ms')).toBeVisible()
-    expect(within(spans).getByText('2 ms')).toBeVisible()
-    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
-  })
-
-  it('leaves rows unexpandable when their span_id matches no span', async () => {
+  it('shows a plain empty state when the trace has no spans', async () => {
     const user = userEvent.setup()
     mockTrace({ data: [], meta: { partial: false } })
     const { queryClient } = renderPanel(tracedRows)
 
-    await openTimeline(user)
+    await openTrace(user)
 
-    expect(await screen.findByRole('link', { name: 'View logs' })).toBeVisible()
-    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
+    expect(await screen.findByText('No spans recorded')).toBeVisible()
     expect(screen.queryByText('Partial')).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('hides the trace strip when enableTracesWaterfall is off', async () => {
+  it('keeps the Timeline free of trace UI even when a trace resolves', async () => {
     const user = userEvent.setup()
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows)
+
+    const list = await openTimeline(user)
+
+    expect(within(list).queryByText('GET /rest/v1/orders')).not.toBeInTheDocument()
+    expect(screen.queryByText('Partial')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('hides the Trace tab when enableTracesWaterfall is off', async () => {
     mockTrace()
     const { queryClient } = renderPanel(tracedRows, { enableTracesWaterfall: false })
 
-    await openTimeline(user)
-
-    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Show spans' })).not.toBeInTheDocument()
+    await screen.findByRole('tab', { name: 'Timeline' })
+    expect(screen.queryByRole('tab', { name: 'Trace' })).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
