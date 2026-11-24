@@ -325,6 +325,10 @@ Use the following command to recreate the container:
 sh run.sh recreate functions
 ```
 
+### `PermissionDenied`: `Deno.<name> is blocklisted on the current context`
+
+Your function called a synchronous Deno file API, such as `Deno.readFileSync`, after initial script evaluation, for example inside the request handler. Move the call to the top level of `index.ts`, outside the request handler, or use the async version, such as `await Deno.readFile`. Code at the top level runs once when the worker starts, not on each request. See [Synchronous file APIs](#synchronous-file-apis).
+
 ### Timeout errors
 
 The default timeouts in `volumes/functions/main/index.ts` apply to each worker:

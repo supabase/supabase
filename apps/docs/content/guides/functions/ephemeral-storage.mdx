@@ -181,11 +181,11 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 Deno.statSync('...') // ✅
 
 setTimeout(() => {
-  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+  Deno.statSync('...') // 💣 PermissionDenied: Deno.statSync is blocklisted on the current context
 })
 
 Deno.serve(() => {
-  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+  Deno.statSync('...') // 💣 PermissionDenied: Deno.statSync is blocklisted on the current context
 })
 ```
 
