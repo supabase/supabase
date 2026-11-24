@@ -1,18 +1,18 @@
-import "./lib/disabled-matchers";
+import './lib/disabled-matchers'
 
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-import { createDynamicRouteParser } from "next-router-mock/dist/dynamic-routes";
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
+import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 
-import { mswServer } from "./lib/msw";
-import { routerMock } from "./lib/route-mock";
+import { mswServer } from './lib/msw'
+import { routerMock } from './lib/route-mock'
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(relativeTime);
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 // Uncomment this if HTML in errors are being annoying.
 //
@@ -27,16 +27,14 @@ dayjs.extend(relativeTime);
 // These must stay at module scope: Vitest hoists `vi.mock` above imports.
 // Inside `renderRoute`, the router hooks defer to the app's `compat/next` shims so they reflect
 // the memory router's URL; elsewhere they use the static mocks.
-vi.mock("next/router", async () =>
-  (await import("./lib/route-aware-hooks")).mockNextRouter(),
-);
-vi.mock("next/compat/router", async () =>
-  (await import("./lib/route-aware-hooks")).mockNextRouter(),
-);
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation");
-  const { routeAwareHook } = await import("./lib/route-aware-hooks");
-  const compat = await import("@/compat/next/navigation");
+vi.mock('next/router', async () => (await import('./lib/route-aware-hooks')).mockNextRouter())
+vi.mock('next/compat/router', async () =>
+  (await import('./lib/route-aware-hooks')).mockNextRouter()
+)
+vi.mock('next/navigation', async () => {
+  const actual = await vi.importActual('next/navigation')
+  const { routeAwareHook } = await import('./lib/route-aware-hooks')
+  const compat = await import('@/compat/next/navigation')
   return {
     ...actual,
     useRouter: routeAwareHook(compat.useRouter, () => ({
@@ -45,32 +43,32 @@ vi.mock("next/navigation", async () => {
     })),
     usePathname: routeAwareHook(
       compat.usePathname,
-      () => require("next-router-mock").useRouter().asPath.split(/[?#]/, 1)[0],
+      () => require('next-router-mock').useRouter().asPath.split(/[?#]/, 1)[0]
     ),
     useSearchParams: routeAwareHook(compat.useSearchParams, () => ({
       get: vi.fn(),
     })),
-  };
-});
+  }
+})
 
-vi.mock("common", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("common")>();
-  const { routeAwareHook } = await import("./lib/route-aware-hooks");
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  const { routeAwareHook } = await import('./lib/route-aware-hooks')
   return {
     ...actual,
-    useParams: routeAwareHook(actual.useParams, () => ({ ref: "default" })),
-  };
-});
+    useParams: routeAwareHook(actual.useParams, () => ({ ref: 'default' })),
+  }
+})
 
 beforeAll(() => {
-  mswServer.listen({ onUnhandledRequest: `error` });
-  routerMock.useParser(createDynamicRouteParser(["/projects/[ref]"]));
-});
+  mswServer.listen({ onUnhandledRequest: `error` })
+  routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
+})
 
 afterEach(() => {
-  mswServer.resetHandlers();
-});
+  mswServer.resetHandlers()
+})
 
 afterAll(() => {
-  mswServer.close();
-});
+  mswServer.close()
+})
