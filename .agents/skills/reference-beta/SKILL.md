@@ -1,5 +1,5 @@
 ---
-name: reference-beta-definitions
+name: reference-beta
 description: Convert a project's API surface (library, CLI, or OpenAPI spec) into one Markdown file per definition with YAML frontmatter that follows the docs `reference-beta` schema, and add a check script that validates the output. Language-agnostic; use it when onboarding a library, CLI, or HTTP API to the reference-beta docs route.
 ---
 
@@ -11,6 +11,98 @@ The docs `reference-beta` route renders reference pages from **one Markdown file
 2. a **check** script that proves the files comply with the docs schema.
 
 The generator and the checker are separate programs. The checker must not trust the generator.
+
+## Example prompt
+
+Run this inside your library's repository, in a coding agent that has this skill loaded. Adjust the tags to the ones your doc comments use:
+
+```text
+Use the reference-beta skill to onboard this library to the docs reference-beta route.
+
+Our doc comments use these tags:
+- @category <name> marks a symbol as documented and sets its category
+- @subcategory <name> puts it in a sub-group of that category
+- @param, @returns, @throws, @example, @deprecated for the rest
+
+Readers already know our current reference, e.g.
+https://supabase.com/docs/reference/javascript/select. Keep its groups. That
+page builds its sidebar in the browser, so read the data behind it instead:
+https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/spec/common-client-libs-sections.json
+- top-level titles (Database, Auth, ...) are the `@category` values
+- titles of nested groups (e.g. "Using filters" with eq, neq, ...) are the
+  `@subcategory` values
+- match each symbol to an entry by its `id` (eq, select, ...), not by its
+  friendly title ("Column is equal to a value")
+Add the matching `@category` and `@subcategory` tags to the doc comments, so the
+source stays the single source of truth. List every symbol with no match so I
+can decide where it goes.
+
+1. Add a generate script that writes one definition per documented symbol to
+   docs/reference-beta/definitions, and a check script that validates them
+   against a vendored copy of definition.schema.json. Wire them up as
+   `docs:reference-beta` and `docs:check`.
+2. Run both. Compare the file count with the number of documented symbols.
+3. Break one file on purpose to prove the check fails, then regenerate.
+4. Show me three generated files and the frontmatter they came from.
+```
+
+The reference lines in the prompt are optional, and only help for a library that already has pages in the current reference. They give the agent the **names and membership** of the groups, not a rule for deriving them: those groups are curated by hand in that file, so there is no criterion to extract. Drop the lines for a new library, and expect to review the symbols the agent could not match. The example below uses `Filters`, while the current reference calls the same group "Using filters". Keep the existing name if you want readers to find the same group.
+
+To see how a comment maps to the schema, take this one:
+
+````ts
+/**
+ * Match only rows where every element appearing in `column` is contained by
+ * `value`. Only relevant for jsonb, array, and range columns.
+ *
+ * @category Database
+ * @subcategory Filters
+ * @param column - The jsonb, array, or range column to filter on.
+ * @param value - The jsonb, array, or range value to filter with.
+ * @example Filter rows by an array column
+ * ```ts
+ * const { data } = await supabase.from('posts').select().containedBy('tags', ['sql', 'auth'])
+ * ```
+ */
+containedBy(column: string, value: string | unknown[] | object): this
+````
+
+It should produce `docs/reference-beta/definitions/postgrest-filter-builder-contained-by.md`:
+
+```markdown
+---
+id: postgrest-filter-builder-contained-by
+kind: method
+category: Database
+subcategory: Filters
+title: containedBy
+symbol: PostgrestFilterBuilder.containedBy
+summary: Match only rows where every element appearing in `column` is contained by `value`. Only relevant for jsonb, array, and range columns.
+signature: 'containedBy(column: string, value: string | unknown[] | object): this'
+stability: stable
+deprecated: false
+parameters:
+  - name: column
+    location: argument
+    type: string
+    required: true
+    description: The jsonb, array, or range column to filter on.
+  - name: value
+    location: argument
+    type: string | unknown[] | object
+    required: true
+    description: The jsonb, array, or range value to filter with.
+returns: { type: this }
+examples:
+  - id: filter-rows-by-an-array-column
+    title: Filter rows by an array column
+    lang: ts
+    code: |
+      const { data } = await supabase.from('posts').select().containedBy('tags', ['sql', 'auth'])
+---
+```
+
+In the docs sidebar this definition shows under **Database**, inside a **Filters** group. See "Categories and subcategories" for how groups behave.
 
 ## 1. The output contract
 
@@ -68,8 +160,8 @@ Rules that apply to every ecosystem:
 Snapshot of `definition.schema.json` (JSON Schema draft 2020-12).
 
 - Source: <https://github.com/supabase/supabase/blob/jeremias/reference-beta/apps/docs/content/reference-beta/definition.schema.json> (a temporary location)
-- Fetched: 2026-11-17
-- SHA-256 of the upstream file: `d35060c40714a97ccdee920b6a0b0cf14f950a651d50bb03807cfcd918d01e2d`
+- Fetched: 2026-11-24
+- SHA-256 of the upstream file: `3a287f1094507663b0a22a9b62c41b899f0f41c8c09909b74213ef396e47a932`
 
 This snapshot goes stale. Before starting, refetch it and compare:
 
@@ -96,8 +188,12 @@ Commit the vendored copy next to the definitions and have the check script read 
       "enum": ["method", "command", "endpoint", "class", "type", "constant"]
     },
     "category": {
-      "description": "Groups definitions on the library index page.",
+      "description": "Groups definitions in the navigation.",
       "default": "general",
+      "type": "string"
+    },
+    "subcategory": {
+      "description": "Groups definitions within their category, as a sub-group in the navigation.",
       "type": "string"
     },
     "title": {
@@ -300,16 +396,7 @@ Commit the vendored copy next to the definitions and have the check script read 
         "location": {
           "description": "Where the parameter is passed.",
           "type": "string",
-          "enum": [
-            "argument",
-            "positional",
-            "flag",
-            "path",
-            "query",
-            "header",
-            "body",
-            "property"
-          ]
+          "enum": ["argument", "positional", "flag", "path", "query", "header", "body", "property"]
         },
         "type": {
           "type": "string"
@@ -384,6 +471,51 @@ Commit the vendored copy next to the definitions and have the check script read 
 
 Always required: `id`, `kind`, `title`, `summary`.
 
+### Categories and subcategories
+
+`category` groups definitions in the docs sidebar. `subcategory` is optional and splits a category further. Both normally come from doc tags on the symbol (Step 2):
+
+```ts
+/**
+ * Matches rows whose column contains every element of the given value.
+ *
+ * @category Database
+ * @subcategory Filters
+ */
+containedBy(column, value) {}
+```
+
+becomes this frontmatter:
+
+```yaml
+category: Database
+subcategory: Filters
+```
+
+**Expected result.** On the library's pages the left sidebar lists one group per category, with sub-groups inside it:
+
+```
+Database                 <- category: the group heading
+  select                 <- no subcategory: a plain link, listed first
+  Filters                <- subcategory: a collapsible group
+    containedBy
+    eq
+  Modifiers              <- another subcategory of Database
+    order
+Auth
+  signUp
+```
+
+How it behaves:
+
+- Definitions with the **same category and the same subcategory** share one group. The same subcategory name under two categories makes two separate groups.
+- A definition **without** a subcategory is a plain link directly under its category, above that category's groups.
+- Sub-groups are sorted alphabetically, and so are the definitions inside a group (by `title`). The docs team sets the order of the categories themselves in the library's `index.md`; categories it doesn't list follow alphabetically.
+- There is **one level** of nesting. A subcategory can't contain further subcategories.
+- **Always emit `category` when you emit `subcategory`.** A definition with only a subcategory falls back to the `general` category, which is rarely what you want.
+- Labels are shown exactly as written when they contain a capital letter or a space (`Filters`, `Realtime channels`). An all-lowercase value is capitalized and its hyphens become spaces (`user-management` shows as "User management"). Prefer written-out labels.
+- Neither field changes a definition's URL, which stays `/reference-beta/<library>/<id>`.
+
 ## 3. Build the generate script
 
 Write it in the language your project already uses to build or document itself, so contributors don't need a new toolchain. It needs only: read a structured description of your API, write text files, and emit YAML.
@@ -410,7 +542,7 @@ Run the tool as the first step of the same command that runs your generator, so 
 
 Public export is not the same as documented. Use an explicit marker so adding a page is a deliberate act:
 
-- **Libraries:** a doc tag on the symbol, e.g. `@category <name>`. Skip everything without it. This also drops re-exports, which have no comment of their own and are documented where they are defined.
+- **Libraries:** a doc tag on the symbol, e.g. `@category <name>`. Skip everything without it. This also drops re-exports, which have no comment of their own and are documented where they are defined. An optional `@subcategory <name>` next to it places the definition in a sub-group of its category (see "Categories and subcategories"); it never opts a symbol in on its own.
 - **OpenAPI:** include operations that have at least one tag, and skip `x-internal: true`.
 - **CLI:** include commands that are not hidden.
 
@@ -422,7 +554,8 @@ Also skip anything the doc tool already hides (`@hidden`/`@ignore`/private). `@i
 | ---------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | `kind`           | `method` / `class` / `type` / `constant`                           | `command`                                                                                     | `endpoint`                                                    |
 | `id`             | slug of `<module-path>-<name>`, e.g. `core-verify-credentials`     | command path: `db-push`                                                                       | `operationId`, else `<method>-<path>` slug                    |
-| `category`       | the grouping tag from Step 2                                       | command group / parent command                                                                | first tag                                                     |
+| `category`       | the `@category` tag from Step 2                                    | command group / parent command                                                                | first tag                                                     |
+| `subcategory`    | the optional `@subcategory` tag; omit the key when absent          | n/a                                                                                           | n/a                                                           |
 | `title`          | bare name, **no `()`**                                             | command path without the binary: `db push`                                                    | `summary` or `operationId`                                    |
 | `symbol`         | fully qualified name incl. package/module                          | full invocation: `supabase db push`                                                           | `POST /v1/projects`                                           |
 | `summary`        | first paragraph of the doc comment, newlines collapsed to one line | short help                                                                                    | `summary`                                                     |
@@ -443,6 +576,7 @@ Also skip anything the doc tool already hides (`@hidden`/`@ignore`/private). `@i
 Details that bite:
 
 - **`id` must match** `^[a-z0-9]+(?:-[a-z0-9]+)*$` and be unique across the whole folder. The same name can exist in several modules (adapters, versions), so always prefix the module path. Split camelCase (`verifyCredentials` → `verify-credentials`).
+- **`subcategory` needs a `category`.** Fail generation (or at least warn) when a symbol has `@subcategory` but no `@category`, and omit the key rather than writing an empty string.
 - **`required`** means "the caller must provide it". For function parameters, an optional marker or a default value makes it optional. For properties, a default/initializer is **not** an optional marker; only the language's optional marker is.
 - **Overloads:** pick one signature deliberately (document the choice in the script) or emit separate definitions with distinct ids. Don't silently take the first.
 - **Extra tags** that have no schema field (`@remarks`, deprecation text, default values you can't put in `default`) go in the Markdown notes after the frontmatter.
@@ -607,7 +741,7 @@ if invalid:
 print(f"All {len(files)} definitions match the schema")
 ```
 
-Optional hardening beyond the schema (it has no per-`kind` rules): `endpoint` has `http`, `command` has `usage`, `method` has `returns`, example ids are unique within a definition.
+Optional hardening beyond the schema (it has no per-`kind` rules): `endpoint` has `http`, `command` has `usage`, `method` has `returns`, example ids are unique within a definition, a `subcategory` always comes with a `category`.
 
 ### Prove the check can fail
 
@@ -632,6 +766,7 @@ Before trusting it, break a generated file on purpose, confirm the check fails w
 - [ ] `docs:reference-beta` regenerates the whole folder from scratch and finishes with the check.
 - [ ] `docs:check` passes, and you have seen it fail on a deliberately broken file.
 - [ ] Every opted-in item produced exactly one file; the count matches the doc tool's output.
+- [ ] Definitions with a `@subcategory` carry both `category` and `subcategory`, and show as a sub-group in the docs sidebar.
 - [ ] `definition.schema.json` is vendored next to the definitions and was refetched at the start.
 - [ ] Both commands run in CI.
 - [ ] No hand-edited files in `definitions/`: all changes come from the source of truth.
