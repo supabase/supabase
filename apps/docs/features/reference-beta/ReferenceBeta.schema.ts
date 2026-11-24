@@ -33,6 +33,12 @@ export const DEFINITION_KINDS = [
 
 export const STABILITY_LEVELS = ['stable', 'beta', 'experimental'] as const
 
+/**
+ * Labels a definition page shows next to a definition or parameter. A
+ * library's index can list some in `hidden_labels` to leave them out.
+ */
+export const LABELS = ['required', 'optional', 'deprecated', 'beta', 'experimental'] as const
+
 export interface Parameter {
   name: string
   location?: (typeof PARAMETER_LOCATIONS)[number]
@@ -83,7 +89,11 @@ export const definitionFrontmatterSchema = z.strictObject({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers and hyphens')
     .describe('Stable, shared across languages. Must match the file name.'),
   kind: z.enum(DEFINITION_KINDS),
-  category: z.string().default('general').describe('Groups definitions on the library index page.'),
+  category: z.string().default('general').describe('Groups definitions in the navigation.'),
+  subcategory: z
+    .string()
+    .optional()
+    .describe('Groups definitions within their category, as a sub-group in the navigation.'),
   title: z.string(),
   symbol: z.string().optional().describe('Fully qualified name, e.g. `supabase.auth.signUp`.'),
   summary: z.string().describe('One line, used in lists.'),
@@ -165,6 +175,12 @@ export const libraryIndexFrontmatterSchema = z.strictObject({
     .optional()
     .describe('Category ids in display order. Unlisted categories follow alphabetically.'),
   code_lang: z.string().optional().describe('Language used to label signatures.'),
+  hidden_labels: z
+    .array(z.enum(LABELS))
+    .optional()
+    .describe(
+      'Labels to leave out of definition pages, e.g. `optional` for a CLI where every flag is.'
+    ),
 })
 
 export type DefinitionFrontmatter = z.output<typeof definitionFrontmatterSchema>

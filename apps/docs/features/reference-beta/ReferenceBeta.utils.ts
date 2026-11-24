@@ -5,11 +5,13 @@ import matter from 'gray-matter'
 import { notFound } from 'next/navigation'
 import { z } from 'zod/v4'
 
+import type { ReferenceBetaNavMenu } from './ReferenceBeta.navigation'
 import {
   definitionFrontmatterSchema,
   libraryIndexFrontmatterSchema,
   type DefinitionFrontmatter,
   type LibraryIndexFrontmatter,
+  type Parameter,
 } from './ReferenceBeta.schema'
 
 /**
@@ -195,6 +197,24 @@ export function groupByCategory(definitions: Definition[], order: string[] = [])
   }))
 }
 
+/**
+ * Splits one category's definitions into those with no subcategory, then one
+ * group per subcategory (alphabetical).
+ */
+export function groupBySubcategory(definitions: Definition[]) {
+  const subcategories = [
+    ...new Set(definitions.flatMap(({ meta }) => (meta.subcategory ? [meta.subcategory] : []))),
+  ].sort((a, b) => a.localeCompare(b))
+
+  return {
+    ungrouped: definitions.filter(({ meta }) => !meta.subcategory),
+    subcategories: subcategories.map((subcategory) => ({
+      subcategory,
+      definitions: definitions.filter(({ meta }) => meta.subcategory === subcategory),
+    })),
+  }
+}
+
 /** `auth` -> `Auth`, `user-management` -> `User management`; leaves written-out labels alone. */
 export function categoryLabel(category: string) {
   if (/[A-Z\s]/.test(category)) return category
@@ -204,10 +224,18 @@ export function categoryLabel(category: string) {
 
 /**
  * The left sidebar's menu: an introduction link, then the library's
- * definitions grouped by category.
+ * definitions grouped by category. Within a category, definitions with a
+ * subcategory sit in a sub-group of that name, after the ones without.
  */
-export function buildNavigationMenu(library: Library, definitions: Definition[]) {
+export function buildNavigationMenu(
+  library: Library,
+  definitions: Definition[]
+): ReferenceBetaNavMenu {
   const href = referenceBetaHref(library.slug)
+  const link = ({ meta }: Definition) => ({
+    name: meta.title,
+    url: referenceBetaHref(library.slug, meta.id),
+  })
 
   return {
     title: library.meta.title,
@@ -216,14 +244,45 @@ export function buildNavigationMenu(library: Library, definitions: Definition[])
     items: [
       { name: 'Introduction', url: href },
       ...groupByCategory(definitions, library.meta.category_order).map(
-        ({ category, definitions }) => ({
-          name: categoryLabel(category),
-          items: definitions.map(({ meta }) => ({
-            name: meta.title,
-            url: referenceBetaHref(library.slug, meta.id),
-          })),
-        })
+        ({ category, definitions }) => {
+          const { ungrouped, subcategories } = groupBySubcategory(definitions)
+          return {
+            name: categoryLabel(category),
+            items: [
+              ...ungrouped.map(link),
+              ...subcategories.map(({ subcategory, definitions }) => ({
+                name: categoryLabel(subcategory),
+                items: definitions.map(link),
+              })),
+            ],
+          }
+        }
       ),
     ],
   }
+}
+
+/**
+ * Labels shown after a parameter's name: `required` or `optional`, and
+ * `deprecated`. Anything in `hidden` (the library's `hidden_labels`) is left out.
+ */
+export function parameterLabels(parameter: Parameter, hidden: ReadonlySet<string>) {
+  return [
+    parameter.required ? 'required' : 'optional',
+    ...(parameter.deprecated ? ['deprecated'] : []),
+  ].filter((label) => !hidden.has(label))
+}
+
+/**
+ * Labels shown under a definition's summary: its stability when not `stable`,
+ * and `deprecated`. Anything in `hidden` is left out.
+ */
+export function definitionLabels(
+  { stability, deprecated }: Pick<DefinitionFrontmatter, 'stability' | 'deprecated'>,
+  hidden: ReadonlySet<string>
+) {
+  return [
+    ...(stability !== 'stable' ? [stability] : []),
+    ...(deprecated ? ['deprecated'] : []),
+  ].filter((label) => !hidden.has(label))
 }

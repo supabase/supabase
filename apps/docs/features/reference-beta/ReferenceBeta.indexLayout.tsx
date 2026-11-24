@@ -1,9 +1,8 @@
 import { ClientLibHeader } from '~/features/docs/Reference.header'
+
 import { ReferenceBetaMdx } from './ReferenceBeta.markdown'
 import { ReferenceBetaPageTemplate } from './ReferenceBeta.pageTemplate'
-import {
-  type Library,
-} from './ReferenceBeta.utils'
+import { type Library } from './ReferenceBeta.utils'
 
 /**
  * A library's landing page: the same header as the SDK reference pages, the

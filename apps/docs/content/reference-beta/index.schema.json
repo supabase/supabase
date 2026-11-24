@@ -35,6 +35,20 @@
     "code_lang": {
       "description": "Language used to label signatures.",
       "type": "string"
+    },
+    "hidden_labels": {
+      "description": "Labels to leave out of definition pages, e.g. `optional` for a CLI where every flag is.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "required",
+          "optional",
+          "deprecated",
+          "beta",
+          "experimental"
+        ]
+      }
     }
   },
   "required": [

@@ -20,8 +20,12 @@
       ]
     },
     "category": {
-      "description": "Groups definitions on the library index page.",
+      "description": "Groups definitions in the navigation.",
       "default": "general",
+      "type": "string"
+    },
+    "subcategory": {
+      "description": "Groups definitions within their category, as a sub-group in the navigation.",
       "type": "string"
     },
     "title": {

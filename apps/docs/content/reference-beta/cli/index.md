@@ -4,6 +4,8 @@ package: supabase
 repo: https://github.com/supabase/cli
 icon: reference-cli
 description: Develop your project locally and deploy to the Supabase Platform.
+hidden_labels:
+ - optional
 ---
 
 The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform. The CLI is still under development, but it contains all the functionality for working with your Supabase projects and the Supabase Platform.

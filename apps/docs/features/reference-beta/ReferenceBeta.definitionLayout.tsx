@@ -13,7 +13,12 @@ import {
 import { ReferenceBetaMarkdown } from './ReferenceBeta.markdown'
 import { ReferenceBetaPageTemplate } from './ReferenceBeta.pageTemplate'
 import type { Parameter } from './ReferenceBeta.schema'
-import { referenceBetaHref, type Definition } from './ReferenceBeta.utils'
+import {
+  definitionLabels,
+  parameterLabels,
+  referenceBetaHref,
+  type Definition,
+} from './ReferenceBeta.utils'
 
 /**
  * How parameters are grouped depends on the kind of definition. Methods,
@@ -58,53 +63,57 @@ function groupParameters({ kind, parameters }: Definition['meta']) {
 
 const formatValue = (value: unknown) => (typeof value === 'string' ? value : JSON.stringify(value))
 
-function ParameterList({ parameters }: { parameters: Parameter[] }) {
+type HiddenLabels = ReadonlySet<string>
+
+function ParameterList({ parameters, hidden }: { parameters: Parameter[]; hidden: HiddenLabels }) {
   return (
     <ul>
-      {parameters.map((parameter) => (
-        <li key={parameter.name}>
-          <code>
-            {parameter.short ? `${parameter.short}, ` : ''}
-            {parameter.name}
-            {parameter.variadic ? ' …' : ''}
-          </code>
-          {parameter.type && <> {parameter.type}</>}
-          {` — ${parameter.required ? 'required' : 'optional'}`}
-          {parameter.deprecated && ', deprecated'}
-          {parameter.description && (
-            <ReferenceBetaMarkdown>{parameter.description}</ReferenceBetaMarkdown>
-          )}
-          {parameter.default !== undefined && parameter.default !== null && (
-            <p>
-              Default: <code>{formatValue(parameter.default)}</code>
-            </p>
-          )}
-          {parameter.allowed_values && parameter.allowed_values.length > 0 && (
-            <p>
-              One of:{' '}
-              {parameter.allowed_values.map((value, i) => (
-                <span key={String(value)}>
-                  {i > 0 && ', '}
-                  <code>{formatValue(value)}</code>
-                </span>
-              ))}
-            </p>
-          )}
-          {parameter.env && (
-            <p>
-              Environment variable: <code>{parameter.env}</code>
-            </p>
-          )}
-          {parameter.replaced_by && (
-            <p>
-              Use <code>{parameter.replaced_by}</code> instead.
-            </p>
-          )}
-          {parameter.children && parameter.children.length > 0 && (
-            <ParameterList parameters={parameter.children} />
-          )}
-        </li>
-      ))}
+      {parameters.map((parameter) => {
+        const labels = parameterLabels(parameter, hidden).join(', ')
+        return (
+          <li key={parameter.name}>
+            <code>
+              {parameter.short ? `${parameter.short}, ` : ''}
+              {parameter.name}
+              {parameter.variadic ? ' …' : ''}
+            </code>
+            {parameter.type && <> {parameter.type}</>}
+            {labels && ` — ${labels}`}
+            {parameter.description && (
+              <ReferenceBetaMarkdown>{parameter.description}</ReferenceBetaMarkdown>
+            )}
+            {parameter.default !== undefined && parameter.default !== null && (
+              <p>
+                Default: <code>{formatValue(parameter.default)}</code>
+              </p>
+            )}
+            {parameter.allowed_values && parameter.allowed_values.length > 0 && (
+              <p>
+                One of:{' '}
+                {parameter.allowed_values.map((value, i) => (
+                  <span key={String(value)}>
+                    {i > 0 && ', '}
+                    <code>{formatValue(value)}</code>
+                  </span>
+                ))}
+              </p>
+            )}
+            {parameter.env && (
+              <p>
+                Environment variable: <code>{parameter.env}</code>
+              </p>
+            )}
+            {parameter.replaced_by && (
+              <p>
+                Use <code>{parameter.replaced_by}</code> instead.
+              </p>
+            )}
+            {parameter.children && parameter.children.length > 0 && (
+              <ParameterList parameters={parameter.children} hidden={hidden} />
+            )}
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -123,6 +132,9 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 /** A single definition: signature, parameters, returns, notes and examples. */
 export function ReferenceBetaDefinitionLayout({ definition }: { definition: Definition }) {
   const { library, meta, content } = definition
+  const hidden: HiddenLabels = new Set(library.meta.hidden_labels)
+  const symbolLabel = meta.symbol && meta.symbol !== meta.title
+  const labels = definitionLabels(meta, hidden)
 
   return (
     <ReferenceBetaPageTemplate
@@ -152,14 +164,10 @@ export function ReferenceBetaDefinitionLayout({ definition }: { definition: Defi
           </div>
           <h1 className="mt-0 mb-0">{meta.title}</h1>
           <p className="mt-3 mb-0 text-xl leading-7 text-foreground-light">{meta.summary}</p>
-          {(meta.symbol && meta.symbol !== meta.title) ||
-          meta.stability !== 'stable' ||
-          meta.deprecated ||
-          meta.since ? (
+          {symbolLabel || labels.length > 0 || meta.since ? (
             <p className="mt-3 mb-0 text-sm text-foreground-lighter">
-              {meta.symbol && meta.symbol !== meta.title && <code>{meta.symbol}</code>}
-              {meta.stability !== 'stable' && ` ${meta.stability}`}
-              {meta.deprecated && ' deprecated'}
+              {symbolLabel && <code>{meta.symbol}</code>}
+              {labels.map((label) => ` ${label}`)}
               {meta.since && ` since ${meta.since}`}
             </p>
           ) : null}
@@ -197,13 +205,13 @@ export function ReferenceBetaDefinitionLayout({ definition }: { definition: Defi
 
       {groupParameters(meta).map(({ label, parameters }) => (
         <Section key={label} title={label}>
-          <ParameterList parameters={parameters} />
+          <ParameterList parameters={parameters} hidden={hidden} />
         </Section>
       ))}
 
       {meta.properties.length > 0 && (
         <Section title="Properties">
-          <ParameterList parameters={meta.properties} />
+          <ParameterList parameters={meta.properties} hidden={hidden} />
         </Section>
       )}
 
