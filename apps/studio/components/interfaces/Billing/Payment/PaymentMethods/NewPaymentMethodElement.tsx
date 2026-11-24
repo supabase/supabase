@@ -344,7 +344,7 @@ export const NewPaymentMethodElement = forwardRef(
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2 py-2">
+          <div className="flex items-center space-x-2 py-2 mt-4">
             <Checkbox
               id="business"
               checked={purchasingAsBusiness}

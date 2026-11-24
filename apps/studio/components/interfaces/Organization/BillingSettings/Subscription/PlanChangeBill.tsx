@@ -134,7 +134,7 @@ const PausedProjectsRow = ({
               ))}
             </ul>
             <p className="text-foreground-light">
-              No compute charges while paused. Restoring a paused project adds{' '}
+              No compute charges while paused. Resuming a paused project adds{' '}
               <span translate="no">
                 {`${perProjectMonthlyPrice === null ? '$10.00' : formatRoundedCurrency(perProjectMonthlyPrice)}/mo`}
               </span>{' '}
@@ -158,11 +158,11 @@ const PausedProjectsRow = ({
       </div>
       <Amount className="shrink-0 text-base text-foreground">{formatRoundedCurrency(0)}</Amount>
     </div>
-    {perProjectMonthlyPrice !== null && (
-      <p className="pl-3.5 text-sm text-foreground-lighter" translate="no">
-        +{formatRoundedCurrency(perProjectMonthlyPrice)}/mo each if restored
-      </p>
-    )}
+    <p className="pl-3.5 text-sm text-foreground-lighter" translate="no">
+      {perProjectMonthlyPrice !== null
+        ? `+${formatRoundedCurrency(perProjectMonthlyPrice)}/mo each if resumed`
+        : 'First project included, then +$10.00/mo each if resumed'}
+    </p>
   </div>
 )
 
@@ -219,8 +219,8 @@ const HourlyBillingPanel = ({
       <CollapsibleContent className="px-3 pb-3">
         <p className="text-sm text-foreground-light">
           Each project is a dedicated server. It bills{' '}
-          <span translate="no">{formatHourlyRate(ILLUSTRATIVE_HOURLY_RATE)}/hr</span> for every hour
-          it is provisioned, busy or idle
+          <span translate="no">{formatHourlyRate(ILLUSTRATIVE_HOURLY_RATE)}</span> for every hour it
+          is provisioned, busy or idle
           {perProjectMonthlyPrice !== null && (
             <span>
               , which adds up to about{' '}
@@ -431,7 +431,7 @@ export const PlanChangeBill = ({
             <div className="mt-3 flex items-center justify-between gap-4 border-t border-dashed pt-3">
               <div className="flex items-center gap-2 text-sm text-foreground-lighter">
                 <PlusIcon size={14} aria-hidden="true" />
-                <span>$10.00/mo for each new or restored project</span>
+                <span>$10.00/mo for each new project</span>
               </div>
             </div>
           )}

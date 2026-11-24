@@ -33,8 +33,8 @@ const Row = ({
     htmlFor={id}
     className={cn(
       'relative flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors',
-      'hover:bg-surface-300',
-      isSelected && 'bg-surface-300'
+      'hover:bg-surface-200',
+      isSelected && 'bg-selection hover:bg-selection'
     )}
   >
     {isSelected && (
@@ -73,7 +73,7 @@ export const PaymentMethodRadioList = ({
         value={value ?? ''}
         disabled={disabled}
         onValueChange={onValueChange}
-        className="gap-0 divide-y overflow-hidden rounded-md border bg-surface-200"
+        className="gap-0 divide-y overflow-hidden rounded-md border bg-surface-100"
       >
         {paymentMethods.map((method) => {
           const expiry = getCardExpiry(method.card)
@@ -93,7 +93,7 @@ export const PaymentMethodRadioList = ({
                   {getCardTitle(method.card)}
                 </p>
                 {expiry && (
-                  <p className="text-sm text-foreground-lighter" translate="no">
+                  <p className="text-sm text-foreground-light" translate="no">
                     Expires {expiry}
                   </p>
                 )}

@@ -251,19 +251,19 @@ export const PaymentBillingAddress = ({
 
   return (
     <>
-      <div className="flex items-start justify-between gap-4 rounded-md bg-surface-200 px-4 py-3">
+      <div className="flex items-start justify-between gap-4 rounded-md border bg-surface-100 px-4 py-3">
         <div className="min-w-0">
-          <p className="text-sm text-foreground-lighter">Billing address</p>
+          <p className="text-sm text-foreground-light">Billing address</p>
           {billingName && (
-            <p className="mt-1 text-base text-foreground-light" translate="no">
+            <p className="mt-1 text-base text-foreground" translate="no">
               {billingName}
             </p>
           )}
-          <p className="text-base text-foreground-light" translate="no">
+          <p className="text-base text-foreground" translate="no">
             {formatBillingAddress(address)}
           </p>
           {taxId && (
-            <p className="mt-1 text-base text-foreground-light">
+            <p className="mt-1 text-base text-foreground">
               <span translate="no">{formatTaxId(taxId, address.country)}</span>
             </p>
           )}

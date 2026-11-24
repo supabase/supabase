@@ -30,20 +30,13 @@ interface DueTodayRowProps {
   planName: string
   /** Set for an org moving off a plan it has already paid for. */
   currentPlanName?: string
-  /** Estimated recurring monthly total, shown as what follows today's payment. */
-  monthlyTotal: number
 }
 
 /**
  * What the customer pays right now, and — behind the amount — why it differs from the
  * plan's sticker price. Ongoing compute is invoiced at the end of the cycle, not today.
  */
-export const DueTodayRow = ({
-  breakdown,
-  planName,
-  currentPlanName,
-  monthlyTotal,
-}: DueTodayRowProps) => {
+export const DueTodayRow = ({ breakdown, planName, currentPlanName }: DueTodayRowProps) => {
   const { planAmount, creditBalance, proratedCredit, tax, dueToday, isReduced } = breakdown
   const hasCreditsApplied = creditBalance > 0 || proratedCredit > 0
 
@@ -95,8 +88,7 @@ export const DueTodayRow = ({
               </div>
               <p className="mt-2 text-foreground-lighter">
                 The plan fee is charged upfront. Compute and other usage is billed at the end of
-                each billing cycle, for an estimated{' '}
-                <span translate="no">{formatRoundedCurrency(monthlyTotal)}</span> per month.
+                each billing cycle.
               </p>
               {breakdown.isTaxEstimateUnavailable && (
                 <p className="mt-2 text-foreground-lighter">

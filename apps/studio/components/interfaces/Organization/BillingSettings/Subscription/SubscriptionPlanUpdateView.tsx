@@ -249,7 +249,15 @@ export const SubscriptionPlanUpdateView = ({
     })
   }, [isDowngrade, currentPlanMeta?.features, subscriptionPlanMeta?.features])
 
-  const exampleProjectRef = summary.computeProjects[0]?.ref ?? projects[0]?.ref
+  // If there is only a single project, we can directly link to the specific project - otherwise we default to the generic `_` placeholder
+  // which opens a project selection page
+  const activeProjectsOnNano = projects.filter(
+    (it) =>
+      it.status === 'ACTIVE_HEALTHY' ||
+      (it.status === 'COMING_UP' && it.databases[0].infra_compute_size === 'nano')
+  )
+  const exampleProjectRef = activeProjectsOnNano.length === 1 ? activeProjectsOnNano[0].ref : '_'
+
   const showPaymentMethodSelection =
     !billingViaPartner && subscriptionPreviewInitialized && changeType === 'upgrade'
 
@@ -384,7 +392,6 @@ export const SubscriptionPlanUpdateView = ({
                   breakdown={dueToday}
                   planName={newPlanName}
                   currentPlanName={currentPlanName}
-                  monthlyTotal={summary.monthlyTotal}
                 />
               )}
 
