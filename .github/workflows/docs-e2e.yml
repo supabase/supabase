@@ -225,6 +225,7 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
           DOCS_E2E_PAGE_PATHS: ${{ steps.scope.outputs.paths }}
+          DOCS_E2E_A11Y_PAGE_PATHS: ${{ steps.scope.outputs.a11y_paths }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
 
       - name: Upload Playwright report

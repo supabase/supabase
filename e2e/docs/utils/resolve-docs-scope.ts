@@ -11,7 +11,8 @@ export const FEDERATED_SECTIONS = [
   'deployment/ci',
 ] as const
 
-export const MAX_SCOPED_PAGES = 20
+// Cap on pages that get the slow accessibility scan. The link check runs on every page.
+export const MAX_A11Y_PAGES = 20
 
 const GUIDES_PREFIX = 'apps/docs/content/guides/'
 const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
@@ -72,13 +73,16 @@ async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
 export type ResolveDocsScopeOptions = {
   changedFiles: string[]
   repoRoot: string
-  maxPages?: number
+  maxA11yPages?: number
 }
 
 export type ResolveDocsScopeResult = {
+  // Every in-scope page. The link check runs on all of them.
   pages: string[]
+  // The pages that also get the accessibility scan, up to the limit.
+  a11yPages: string[]
   skip: boolean
-  // In scope but dropped by the page limit, so no test covers them.
+  // In scope but over the accessibility scan limit, so they get no scan.
   truncated: string[]
   limit: number
 }
@@ -240,7 +244,8 @@ export async function resolveDocsScope(
 ): Promise<ResolveDocsScopeResult> {
   await assertFederatedSectionsInSync(options.repoRoot)
 
-  const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
+  // At least 1: an empty scan list means "scan every page" to the spec.
+  const maxA11yPages = Math.max(1, options.maxA11yPages ?? MAX_A11Y_PAGES)
   const pages = new Set<string>()
   const requiredPages = new Set<string>()
   const changedPartials: string[] = []
@@ -273,22 +278,20 @@ export async function resolveDocsScope(
     }
   }
 
-  const sortedRequiredPages = [...requiredPages].sort()
-  const selectedRequiredPages = sortedRequiredPages.slice(0, maxPages)
-  const truncatedRequiredPages = sortedRequiredPages.slice(maxPages)
-  const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
-  const candidatePages = [...pages]
-    .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
-    .sort()
-  const selectedPages = candidatePages.slice(0, remainingSlots)
-  const truncated = [...truncatedRequiredPages, ...candidatePages.slice(remainingSlots)]
-  const sorted = [...selectedRequiredPages, ...selectedPages].sort()
+  // Required pages come first so the accessibility limit never drops them.
+  const orderedPages = [
+    ...[...requiredPages].sort(),
+    ...[...pages]
+      .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
+      .sort(),
+  ]
 
   return {
-    pages: sorted,
-    skip: sorted.length === 0,
-    truncated,
-    limit: maxPages,
+    pages: [...orderedPages].sort(),
+    a11yPages: orderedPages.slice(0, maxA11yPages).sort(),
+    skip: orderedPages.length === 0,
+    truncated: orderedPages.slice(maxA11yPages),
+    limit: maxA11yPages,
   }
 }
 

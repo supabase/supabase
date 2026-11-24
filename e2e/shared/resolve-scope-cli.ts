@@ -31,7 +31,8 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
   }
 
   const result = await config.resolveScope({ changedFiles, repoRoot: config.repoRoot })
-  const output = `skip=${result.skip}\npaths=${result.pages.join(',')}\n`
+  const a11yLine = result.a11yPages ? `a11y_paths=${result.a11yPages.join(',')}\n` : ''
+  const output = `skip=${result.skip}\npaths=${result.pages.join(',')}\n${a11yLine}`
 
   if (process.env.GITHUB_OUTPUT) {
     const { appendFileSync } = await import('node:fs')
@@ -52,11 +53,14 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
   if (result.truncated?.length) {
     const truncation = {
       label: config.label,
+      check: 'accessibility scan',
       limit: result.limit ?? result.pages.length,
       truncated: result.truncated,
     }
     console.error(formatLog(truncation))
-    console.error(`::warning title=Pages not tested::${formatAnnotation(truncation)}`)
+    console.error(
+      `::warning title=Pages without accessibility scan::${formatAnnotation(truncation)}`
+    )
     if (process.env.GITHUB_STEP_SUMMARY) {
       const { appendFileSync } = await import('node:fs')
       appendFileSync(process.env.GITHUB_STEP_SUMMARY, formatJobSummary(truncation))

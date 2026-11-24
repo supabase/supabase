@@ -22,6 +22,10 @@ import {
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+// The accessibility scan is slow, so the resolver may give it fewer pages than the
+// link check. Unset or empty means every page, as in manual runs.
+const a11yPagePaths = parsePagePaths(process.env.DOCS_E2E_A11Y_PAGE_PATHS)
+const pagePathsForA11y = a11yPagePaths.length > 0 ? a11yPagePaths : pagePaths
 const LINK_CHECK_CONCURRENCY = 4
 
 function annotate(testInfo: TestInfo, description: string) {
@@ -97,7 +101,7 @@ test.describe('Docs owned pages', () => {
     })
   }
 
-  for (const pagePath of pagePaths) {
+  for (const pagePath of pagePathsForA11y) {
     test(`${pagePath} has no blocking accessibility violations @a11y`, async ({
       page,
     }, testInfo) => {

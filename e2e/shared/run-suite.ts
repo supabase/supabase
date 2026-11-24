@@ -5,8 +5,10 @@ import { formatLocalWarning } from './truncation.ts'
 
 export type ScopeResult = {
   pages: string[]
+  // Pages that also get the accessibility scan. Defaults to `pages` when unset.
+  a11yPages?: string[]
   skip: boolean
-  // In scope but dropped by a page limit, so no test covers them.
+  // In scope but over the accessibility scan limit, so they get no scan.
   truncated?: string[]
   limit?: number
 }
@@ -16,6 +18,7 @@ export type SuiteConfig = {
   label: string
   devCommand: string
   pagePathsEnv: string
+  a11yPagePathsEnv?: string
   baseRefEnv: string
   defaultBaseUrl: string
   resolveScope: (options: { changedFiles: string[]; repoRoot: string }) => Promise<ScopeResult>
@@ -37,13 +40,17 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
   }
 }
 
-async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
+type ResolvedPages = { pages: string[]; a11yPages?: string[] }
+
+async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
   const explicit = process.env[config.pagePathsEnv]?.trim()
   if (explicit) {
-    return explicit
-      .split(/[\n,]/)
-      .map((path) => path.trim())
-      .filter(Boolean)
+    return {
+      pages: explicit
+        .split(/[\n,]/)
+        .map((path) => path.trim())
+        .filter(Boolean),
+    }
   }
 
   const baseRef = process.env[config.baseRefEnv]?.trim() || 'origin/master'
@@ -68,12 +75,13 @@ async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
     console.error(
       formatLocalWarning({
         label: config.label,
+        check: 'accessibility scan',
         limit: result.limit ?? result.pages.length,
         truncated: result.truncated,
       })
     )
   }
-  return result.pages
+  return { pages: result.pages, a11yPages: result.a11yPages }
 }
 
 export async function runSuite(config: SuiteConfig): Promise<void> {
@@ -81,14 +89,15 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
   const runAll = rawArgs.includes('--all')
   const playwrightArgs = rawArgs.filter((arg) => arg !== '--all' && arg !== '--')
 
-  let pages: string[] | null
+  let resolved: ResolvedPages | null
   if (runAll && config.resolveAllPages) {
-    pages = await config.resolveAllPages(repoRootFrom(config.root))
+    const pages = await config.resolveAllPages(repoRootFrom(config.root))
     console.error(`Resolved all ${pages.length} in-scope ${config.label} page(s).`)
+    resolved = { pages }
   } else {
-    pages = await resolvePagePaths(config)
+    resolved = await resolvePagePaths(config)
   }
-  if (pages === null) process.exit(0)
+  if (resolved === null) process.exit(0)
 
   const hasMaxFailuresArg = playwrightArgs.some(
     (arg) => arg === '-x' || arg.startsWith('--max-failures')
@@ -107,9 +116,19 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
     process.exit(1)
   }
 
+  // Clear a stale scan list from the shell so runs without one scan every page.
+  const childEnv: NodeJS.ProcessEnv = {
+    ...process.env,
+    [config.pagePathsEnv]: resolved.pages.join(','),
+  }
+  if (config.a11yPagePathsEnv) {
+    if (resolved.a11yPages) childEnv[config.a11yPagePathsEnv] = resolved.a11yPages.join(',')
+    else delete childEnv[config.a11yPagePathsEnv]
+  }
+
   const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalArgs], {
     cwd: config.root,
-    env: { ...process.env, [config.pagePathsEnv]: pages.join(',') },
+    env: childEnv,
     stdio: 'inherit',
     shell: process.platform === 'win32',
   })

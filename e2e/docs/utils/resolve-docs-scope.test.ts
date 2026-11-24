@@ -50,48 +50,86 @@ test('excludes a guide that the navigation disables from the full run', async ()
   assert.ok(!pages.includes('/docs/guides/ai-tools/agent-feedback'))
 })
 
-test('reports pages over the page limit instead of dropping them silently', async () => {
+test('checks links on every page and limits only the accessibility scan', async () => {
   const changedFiles = ['a', 'b', 'c'].map(
     (slug) => `apps/docs/content/guides/ai-tools/${slug}.mdx`
   )
 
-  const result = await resolveDocsScope({ changedFiles, repoRoot, maxPages: 2 })
+  const result = await resolveDocsScope({ changedFiles, repoRoot, maxA11yPages: 2 })
 
-  assert.deepEqual(result.pages, ['/docs/guides/ai-tools/a', '/docs/guides/ai-tools/b'])
+  assert.deepEqual(result.pages, [
+    '/docs/guides/ai-tools/a',
+    '/docs/guides/ai-tools/b',
+    '/docs/guides/ai-tools/c',
+  ])
+  assert.deepEqual(result.a11yPages, ['/docs/guides/ai-tools/a', '/docs/guides/ai-tools/b'])
   assert.deepEqual(result.truncated, ['/docs/guides/ai-tools/c'])
 })
 
-test('reports no truncated pages when everything fits', async () => {
+test('reports nothing truncated when every page gets the accessibility scan', async () => {
   const result = await resolveDocsScope({
     changedFiles: ['apps/docs/content/guides/ai-tools/mcp.mdx'],
     repoRoot,
   })
 
+  assert.deepEqual(result.a11yPages, result.pages)
   assert.deepEqual(result.truncated, [])
 })
 
-test('caps a default run at 20 pages and reports the rest', async () => {
+test('keeps every page in a large change and caps the accessibility scan at 20', async () => {
   const changedFiles = Array.from(
-    { length: 62 },
+    { length: 82 },
     (_, i) => `apps/docs/content/guides/ai-tools/page-${String(i).padStart(2, '0')}.mdx`
   )
 
   const result = await resolveDocsScope({ changedFiles, repoRoot })
 
-  assert.equal(result.pages.length, 20)
-  assert.equal(result.truncated.length, 42)
+  assert.equal(result.pages.length, 82)
+  assert.equal(result.a11yPages.length, 20)
+  assert.equal(result.truncated.length, 62)
+  assert.deepEqual(
+    [...result.a11yPages, ...result.truncated].sort(),
+    result.pages,
+    'every page is either scanned or reported'
+  )
 })
 
-test('reports required pages dropped by the page limit', async () => {
+test('gives required pages the accessibility scan before other pages', async () => {
   const result = await resolveDocsScope({
     changedFiles: [GUIDE_LIST_COMPONENT, 'apps/docs/content/guides/ai-tools/mcp.mdx'],
     repoRoot,
-    maxPages: 2,
+    maxA11yPages: 3,
   })
 
-  assert.equal(result.pages.length, 2)
+  assert.deepEqual(result.a11yPages, [...GUIDE_LIST_COMPONENT_PAGES].sort())
+  assert.deepEqual(result.truncated, ['/docs/guides/ai-tools/mcp'])
+  assert.equal(result.pages.length, 4)
+})
+
+test('always scans at least one page', async () => {
+  const result = await resolveDocsScope({
+    changedFiles: [
+      'apps/docs/content/guides/ai-tools/a.mdx',
+      'apps/docs/content/guides/ai-tools/b.mdx',
+    ],
+    repoRoot,
+    maxA11yPages: 0,
+  })
+
+  assert.equal(result.a11yPages.length, 1)
+  assert.equal(result.truncated.length, 1)
+})
+
+test('reports required pages dropped by a tiny accessibility limit', async () => {
+  const result = await resolveDocsScope({
+    changedFiles: [GUIDE_LIST_COMPONENT, 'apps/docs/content/guides/ai-tools/mcp.mdx'],
+    repoRoot,
+    maxA11yPages: 2,
+  })
+
+  assert.equal(result.a11yPages.length, 2)
   assert.deepEqual(
-    [...result.pages, ...result.truncated].sort(),
+    [...result.a11yPages, ...result.truncated].sort(),
     [...GUIDE_LIST_COMPONENT_PAGES, '/docs/guides/ai-tools/mcp'].sort()
   )
 })

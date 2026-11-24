@@ -10,6 +10,7 @@ runSuite({
   label: 'docs',
   devCommand: 'pnpm dev:docs',
   pagePathsEnv: 'DOCS_E2E_PAGE_PATHS',
+  a11yPagePathsEnv: 'DOCS_E2E_A11Y_PAGE_PATHS',
   baseRefEnv: 'DOCS_E2E_BASE_REF',
   defaultBaseUrl: 'http://localhost:3001',
   resolveScope: resolveDocsScope,

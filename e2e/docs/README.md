@@ -118,7 +118,7 @@ To test every guide instead of a changed-files scope
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 ```
 
-This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
+This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page scan limit described in
 [Limits](#limits), and tests every page listed by
 `pnpm -C e2e/docs resolve-docs-scope` across the whole `guides`
 tree — several hundred pages as of this writing. `--all`
@@ -155,15 +155,22 @@ pages linking into reference docs or server-side auth guides.
 
 ### Limits
 
-Resolved scope is capped at 20 pages so a widely shared partial cannot explode
-runtime. If a change resolves to more pages than that, only the first 20 in
-sorted order are tested. The run doesn't fail, but it says so. The scope step
-adds a warning annotation with the count of skipped pages (it names them when
-there are five or fewer), and a job summary that lists every skipped page along with a `page_paths` value you can
-paste into a manual run. Manual runs have no page limit. Locally, `pnpm e2e:docs`
-prints a short warning. To test the skipped pages, use `page_paths` or run
-`pnpm e2e:docs:all` instead of raising the cap. See
+The link check runs on every in-scope page, with no cap. The accessibility scan
+is slower, so it runs on at most 20 pages. If a change resolves to more pages
+than that, only the first 20 in sorted order get the scan (pages that a change
+requires, such as the sample pages for a guide list component change, go
+first). The run doesn't fail, but it says so. The scope step adds a warning
+annotation with the count of pages without the scan (it names them when there
+are five or fewer), and a job summary that lists every one of them along with a
+`page_paths` value you can paste into a manual run. Manual runs have no page
+limit and run both checks on every page. Locally, `pnpm e2e:docs` prints a short
+warning. To scan the skipped pages, use `page_paths` or run `pnpm e2e:docs:all`
+instead of raising the limit. See
 [Run every in-scope page](#run-every-in-scope-page).
+
+The scope step passes the full list in `DOCS_E2E_PAGE_PATHS` and the pages for
+the scan in `DOCS_E2E_A11Y_PAGE_PATHS`. When the second is unset or empty, the
+scan runs on every page.
 
 To inspect the resolved list without running Playwright, replicate the same
 scope `pnpm e2e:docs` uses by default: commits since `origin/master`, plus
@@ -179,8 +186,9 @@ staged and unstaged working-tree changes.
 
 ## Accessibility scans
 
-The `@a11y`-tagged test scans each in-scope page for WCAG 2.1 A/AA violations using
-`@axe-core/playwright`, limited to the main article.
+The `@a11y`-tagged test scans in-scope pages for WCAG 2.1 A/AA violations using
+`@axe-core/playwright`, limited to the main article. A changed-files run scans at
+most 20 pages (see [Limits](#limits)).
 
 ```bash
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y
