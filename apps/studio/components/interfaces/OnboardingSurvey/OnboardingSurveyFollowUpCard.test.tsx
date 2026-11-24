@@ -5,7 +5,7 @@ import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { delay, HttpResponse } from 'msw'
 import { Toaster } from 'sonner'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 
 import {
   ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS,
@@ -453,6 +453,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
     it('stays away after a skip that could not be stored', async () => {
       mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
       const setItem = vi.spyOn(safeLocalStorage, 'setItem').mockImplementation(() => {})
+      onTestFinished(() => setItem.mockRestore())
 
       renderCard({ organization: vercelOrg })
       fireEvent.click(await screen.findByRole('button', { name: 'Skip' }))
@@ -460,7 +461,6 @@ describe('OnboardingSurveyFollowUpCard', () => {
 
       expect(readStoredState()).toBeNull()
       expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull()
-      setItem.mockRestore()
     })
 
     it('sends the answers and does not ask again', async () => {
