@@ -567,33 +567,24 @@ on team_members
 using btree (user_id);
 ```
 
-A policy with a fixed condition, one that doesn't depend on who is asking, also lets Postgres use a [partial index](/docs/guides/database/postgres/indexes#partial-indexes). Postgres adds a policy's `using` expression to every query that the policy applies to, so the planner treats it like a `where` clause. The planner uses a partial index only when the query's conditions imply the index's predicate, and the policy supplies the predicate. For a public leaderboard that hides users who opted out:
+A policy can also filter on a fixed condition that doesn't depend on the user, such as a status or visibility flag. Postgres applies it like a `where` clause, so queries on the table can use a [partial index](/docs/guides/database/postgres/indexes#partial-indexes) with the same predicate. Index the columns your queries sort or filter on, and use the policy's condition as the index predicate. For a policy like this:
 
 ```sql
-create table scores (
-  id bigint generated always as identity primary key,
-  name text,
-  score int,
-  opted_out boolean not null default false
-);
-
-alter table scores enable row level security;
-revoke all on table scores from anon, authenticated;
-grant select on table scores to anon;
-
-create policy "scores_select_public" on scores
-for select
-to anon
-using ( not opted_out );
-
-create index scores_public_idx
-on scores (score desc)
-where not opted_out;
+create policy "rls_test_select" on test_table
+to authenticated
+using ( not is_archived );
 ```
 
-From `anon`, a query such as `select name, score from scores order by score desc limit 10` can use `scores_public_idx`. The client doesn't filter on `opted_out`. Postgres matches a few equivalent forms, such as `opted_out = false` in the policy. It doesn't match others, such as `opted_out is false`, so write the policy condition and the index predicate the same way. If neither the policy nor the query contains the condition, as with `using (true)`, Postgres can't use the partial index.
+You can add a partial index like:
 
-The policy alone decides which rows a role can see. The index changes only how fast Postgres finds them, never which rows or how many a query returns.
+```sql
+create index active_created_at
+on test_table
+using btree (created_at)
+where not is_archived;
+```
+
+Write the policy condition and the index predicate the same way. Postgres matches only some equivalent forms, so a `using ( is_archived is false )` policy can't use this index.
 
 ### Call functions with `select`
 
