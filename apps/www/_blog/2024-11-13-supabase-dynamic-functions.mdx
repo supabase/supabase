@@ -240,7 +240,7 @@ We'll create a function named `multi-purpose`:
 supabase functions new multi-purpose
 ```
 
-Now, we'll edit the code adding verification and the eval function, including the supabase client so we have it ready without the need to import.
+Now, we'll edit the code adding verification and the eval function, including the [supabase client](/docs/reference/javascript/introduction) so we have it ready without the need to import.
 
 ```tsx
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -470,4 +470,4 @@ $js$));
 
 As you can see, combining dynamic Javascript in Edge Functions with a few SQL support functions gets you a powerful new set of tools. By leveraging the edge_wrapper, edge.http_request, and `edge.exec` functions, developers can create robust and flexible serverless applications that can dynamically execute JavaScript code while interacting with PostgreSQL databases.
 
-As we continue to build and innovate with Supabase, combining edge functions and SQL support functions opens up new avenues for building scalable, efficient, and secure applications. Whether developing a simple project or a complex application, these tools provide the flexibility and power to bring your ideas to life.
+As we continue to build and innovate with Supabase, combining [edge functions](/docs/guides/functions) and SQL support functions opens up new avenues for building scalable, efficient, and secure applications. Whether developing a simple project or a complex application, these tools provide the flexibility and power to bring your ideas to life.

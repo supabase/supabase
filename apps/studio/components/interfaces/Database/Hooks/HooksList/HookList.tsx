@@ -12,12 +12,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 
-import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -71,8 +72,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
         const isEdgeFunction = isEdgeFunctionUrl(url, ref ?? '', restUrl)
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td>
+          <TableRow key={x.id}>
+            <TableCell>
               <div className="flex items-center space-x-4">
                 <div>
                   <Image
@@ -92,21 +93,21 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   {x.name}
                 </p>
               </div>
-            </Table.td>
-            <Table.td className="hidden space-x-2 lg:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-2 lg:table-cell">
               <p title={x.table}>{x.table}</p>
-            </Table.td>
-            <Table.td className="hidden space-x-1 xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-1 xl:table-cell">
               {x.events.map((event: string) => (
                 <Badge key={event}>{event}</Badge>
               ))}
-            </Table.td>
-            <Table.td className="hidden xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden xl:table-cell">
               <p className="truncate" title={url}>
                 <code>{method}</code>: {url}
               </p>
-            </Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
@@ -157,8 +158,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   />
                 )}
               </div>
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

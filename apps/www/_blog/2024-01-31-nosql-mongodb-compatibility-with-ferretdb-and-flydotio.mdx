@@ -158,7 +158,7 @@ FerretDB stores each collection in a table on the `ferretdb` schema, each docume
 
 ## Deploy to Fly.io
 
-For production use cases, you can easily deploy FerretDB on Fly. Simply create a `fly.toml` file (make sure to [update `primary_region`](https://fly.io/docs/reference/regions/))
+For production use cases, you can easily deploy FerretDB on Fly. Simply create a `fly.toml` file (make sure to [update `primary_region`](https://docs.fly.io/reference/regions))
 
 ```toml fly.toml
 app = "supa-ferretdb-<your-supabase-project-ref>"
@@ -180,7 +180,7 @@ primary_region = "bos"
   memory_mb = 1024
 ```
 
-And follow these [flyctl](https://fly.io/docs/hands-on/install-flyctl/) commands:
+And follow these [flyctl](https://docs.fly.io/flyctl/install) commands:
 
 - fly launch --no-deploy
   - An existing fly.toml file was found for app supa-ferretdb?

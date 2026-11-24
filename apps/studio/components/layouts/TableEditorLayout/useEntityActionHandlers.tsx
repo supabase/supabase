@@ -3,13 +3,13 @@ import { copyToClipboard } from 'ui'
 
 import type { EntityActionId } from './EntityActions.utils'
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
+import { useTableActions } from '@/components/interfaces/TableGridEditor/useTableActions'
 import { getTableDefinition } from '@/data/database/table-definition-query'
 import { getViewDefinition } from '@/data/database/view-definition-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 type UseEntityActionHandlersParams = {
   entity: Entity
@@ -27,7 +27,8 @@ export const useEntityActionHandlers = ({
   onViewPartitions,
 }: UseEntityActionHandlersParams) => {
   const { data: project } = useSelectedProjectQuery()
-  const snap = useTableEditorStateSnapshot()
+  const { editTable, duplicateTable, deleteTable, deleteView, deleteMaterializedView } =
+    useTableActions()
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv({
     enabled: true,
@@ -104,10 +105,10 @@ export const useEntityActionHandlers = ({
         })
         break
       case 'edit-table':
-        snap.onEditTable()
+        editTable(entity.id)
         break
       case 'duplicate-table':
-        snap.onDuplicateTable()
+        duplicateTable(entity.id)
         break
       case 'export-csv':
         exportCsv()
@@ -122,9 +123,9 @@ export const useEntityActionHandlers = ({
         onViewPartitions?.(entity.id)
         break
       case 'delete':
-        if (entity.type === ENTITY_TYPE.VIEW) snap.onDeleteView()
-        else if (entity.type === ENTITY_TYPE.MATERIALIZED_VIEW) snap.onDeleteMaterializedView()
-        else snap.onDeleteTable()
+        if (entity.type === ENTITY_TYPE.VIEW) deleteView(entity.id)
+        else if (entity.type === ENTITY_TYPE.MATERIALIZED_VIEW) deleteMaterializedView(entity.id)
+        else deleteTable(entity.id)
         break
       // Navigation (`view-policies`) is handled by the item's href, and `export` only opens a submenu
       default:

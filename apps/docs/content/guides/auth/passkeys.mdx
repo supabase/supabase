@@ -38,7 +38,7 @@ Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) from the **Auth
 
 - **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example, "My App").
 - **Relying Party ID**: the bare domain name for your application (for example, "example.com"). Do not include a scheme, port, or path. This determines which passkeys can be used.
-- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). Up to 5 origins.
+- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). Up to 10 origins.
   - HTTPS is required except for loopback addresses ("localhost", "127.0.0.1", "[::1]").
   - Each origin's hostname must match or be a subdomain of the Relying Party ID.
   - Android native apps can use an app origin of the form `android:apk-key-hash:<base64url SHA-256 of the signing certificate>`.
@@ -53,9 +53,9 @@ Passkeys are cryptographically bound to the Relying Party (RP) ID they were regi
 
 ### CLI
 
-Add the following to `supabase/config.toml`:
+Add the following to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.passkey]
 enabled = true
 
@@ -65,7 +65,7 @@ rp_id = "example.com"
 rp_origins = ["https://example.com", "https://app.example.com"]
 ```
 
-The `[auth.webauthn]` section is required when `auth.passkey.enabled` is `true`.
+The `auth.webauthn` section is required when `auth.passkey.enabled` is `true`.
 
 ### Management API
 

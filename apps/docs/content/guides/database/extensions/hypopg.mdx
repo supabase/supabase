@@ -78,7 +78,7 @@ explain select * from account where id=1;
 
 Using HypoPG, we can create a hypothetical index on the `account(id)` column to check if it would be useful to the query planner and then re-run the explain plan.
 
-Note that the virtual indexes created by HypoPG are only visible in the Postgres connection that they were created in. Supabase connects to Postgres through a connection pooler so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
+Note that the virtual indexes created by HypoPG are only visible in the Postgres connection that they were created in. Supabase connects to Postgres through a connection [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
 
 {/* prettier-ignore */}
 ```sql
@@ -102,11 +102,11 @@ create index on account(id);
 
 ## Functions
 
-- [`hypo_create_index(text)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#create-a-hypothetical-index): A function to create a hypothetical index.
+- [`hypopg_create_index(text)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#create-a-hypothetical-index): A function to create a hypothetical index.
 - [`hypopg_list_indexes`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A View that lists all hypothetical indexes that have been created.
 - [`hypopg()`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function that lists all hypothetical indexes that have been created with the same format as `pg_index`.
-- [`hypopg_get_index_def(oid)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to display the `create index` statement that would create the index.
-- [`hypopg_get_relation_size(oid)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to estimate how large a hypothetical index would be.
+- [`hypopg_get_indexdef(oid)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to display the `create index` statement that would create the index.
+- [`hypopg_relation_size(oid)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to estimate how large a hypothetical index would be.
 - [`hypopg_drop_index(oid)`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to remove a given hypothetical index by `oid`.
 - [`hypopg_reset()`](https://hypopg.readthedocs.io/en/rel1_stable/usage.html#manipulate-hypothetical-indexes): A function to remove all hypothetical indexes.
 

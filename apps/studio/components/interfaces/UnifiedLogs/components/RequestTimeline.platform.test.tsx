@@ -261,8 +261,7 @@ describe('request timeline tab', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  // Staying on the timeline lets the user step through the request one log at a time
-  it('lists logs sharing the request ID and opens one without leaving the timeline', async () => {
+  it('opens a selected related log in Overview while keeping the original request timeline', async () => {
     const user = userEvent.setup()
     const { queries, queryClient } = renderPanel()
 
@@ -279,22 +278,16 @@ describe('request timeline tab', () => {
     ).toBe(true)
 
     await user.click(items[1])
-    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('status')).toHaveTextContent('POST /token')
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
+    expect(await screen.findByText('Authentication')).toBeVisible()
+
+    await user.click(screen.getByRole('tab', { name: 'Timeline' }))
     const [gateway, auth] = stepsIn(screen.getByRole('list', { name: 'Related logs' }))
     expect(auth).toHaveAttribute('aria-current', 'true')
-
-    await user.click(gateway)
-    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('status')).toHaveTextContent('POST /auth/v1/token')
-    expect(gateway).toHaveAttribute('aria-current', 'true')
-
-    await user.click(auth)
-    await user.click(screen.getByRole('tab', { name: 'Overview' }))
-    expect(screen.getByText('Authentication')).toBeVisible()
-
-    await user.click(stepsIn(await openTimeline(user))[0])
-    await user.click(screen.getByRole('tab', { name: 'Overview' }))
+    gateway.focus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
     expect(await screen.findByText('Request headers')).toBeVisible()
 
     expect(screen.queryByText('method')).not.toBeInTheDocument()
@@ -485,10 +478,8 @@ describe('request timeline tab', () => {
     await user.click(screen.getByRole('button', { name: '+6 more' }))
     const expandedList = await screen.findByRole('list', { name: 'Related logs' })
     await user.click(stepsIn(expandedList)[6])
-    expect(stepsIn(expandedList)).toHaveLength(9)
-    expect(stepsIn(expandedList)[6]).toHaveAttribute('aria-current', 'true')
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
 
-    await user.click(screen.getByRole('tab', { name: 'Overview' }))
     const folded = stepsIn(await openTimeline(user))
     expect(folded).toHaveLength(4)
     expect(folded[3]).toHaveAttribute('aria-current', 'true')
@@ -499,9 +490,8 @@ describe('request timeline tab', () => {
     expect(buttons[5]).toHaveTextContent('+2 more')
     buttons[5].focus()
     await user.keyboard('{Enter}')
-    const expanded = stepsIn(list)
-    expect(expanded).toHaveLength(9)
-    expect(expanded[6]).toHaveAttribute('aria-current', 'true')
+    expect(stepsIn(list)).toHaveLength(9)
+    expect(stepsIn(list)[6]).toHaveAttribute('aria-current', 'true')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
   it('shows the user of the opened timeline log instead of the initially selected log', async () => {

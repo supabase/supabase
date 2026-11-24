@@ -257,6 +257,7 @@ export const SupportFormV3 = ({
             category={category}
             severity={severity}
             projectRef={projectRef}
+            subscriptionPlanId={subscriptionPlanId}
           />
         </div>
 

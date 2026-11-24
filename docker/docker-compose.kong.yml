@@ -11,7 +11,7 @@
 services:
   api-gw:
     container_name: supabase-kong
-    image: kong/kong:3.9.3
+    image: kong/kong:3.9.5
     healthcheck:
       test: !override ["CMD", "kong", "health"]
       interval: 5s

@@ -90,7 +90,6 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
     track('auth_users_search_submitted', {
       trigger: 'search_input',
       ...telemetryProps,
-      keywords: s,
     })
   }
 

@@ -192,13 +192,11 @@ export const getRestrictionsDiff = (enforced: string[], pending: string[]) => {
   const enforcedIssues = getRestrictionIssues(enforced)
   const pendingIssues = getRestrictionIssues(pending)
   return [
-    ...enforced.map(
-      (entry, index): ReviewedRestriction => ({
-        entry,
-        change: pendingKeys.has(getNetworkKey(entry)) ? 'unchanged' : 'removing',
-        issue: enforcedIssues[index],
-      })
-    ),
+    ...enforced.map((entry, index): ReviewedRestriction => ({
+      entry,
+      change: pendingKeys.has(getNetworkKey(entry)) ? 'unchanged' : 'removing',
+      issue: enforcedIssues[index],
+    })),
     ...pending.flatMap((entry, index): ReviewedRestriction[] =>
       enforcedKeys.has(getNetworkKey(entry))
         ? []

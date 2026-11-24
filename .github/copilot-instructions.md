@@ -12,7 +12,7 @@ Only comment when you are **>85% confident** the issue is a real bug, security v
 
 Our CI pipeline already validates the following. **Never comment on these topics:**
 
-- **Formatting or whitespace** — Prettier runs on every PR
+- **Formatting or whitespace** — oxfmt runs on every PR
 - **Linting issues** — ESLint with auto-fix runs on every PR
 - **Type errors** — TypeScript strict-mode typecheck runs on every PR
 - **Typos or spelling** — Automated typo detection runs on every PR

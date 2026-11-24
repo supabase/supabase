@@ -220,7 +220,18 @@ describe('formatGitHubConfigDecodeMessage', () => {
       { path: 'api.max_rows', message: 'Expected number' },
     ])
 
-    expect(message).toEqual('config.toml has an invalid value at api.max_rows: expected number.')
+    expect(message).toEqual(
+      'The config file has an invalid value at api.max_rows: expected number.'
+    )
+  })
+
+  it('names the config file when provided', () => {
+    const message = formatGitHubConfigDecodeMessage(
+      [{ path: 'api.max_rows', message: 'Expected number' }],
+      'config.jsonc'
+    )
+
+    expect(message).toEqual('config.jsonc has an invalid value at api.max_rows: expected number.')
   })
 
   it('formats multiple issues as a comma-separated list', () => {
@@ -230,7 +241,7 @@ describe('formatGitHubConfigDecodeMessage', () => {
     ])
 
     expect(message).toEqual(
-      'config.toml has invalid values: api.max_rows (expected number), api.port (expected number).'
+      'The config file has invalid values: api.max_rows (expected number), api.port (expected number).'
     )
   })
 })
