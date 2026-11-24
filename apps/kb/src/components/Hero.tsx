@@ -1,13 +1,11 @@
-import { Search } from 'lucide-react'
-import { useRef, useSyncExternalStore, type ReactNode } from 'react'
-import { cn, KeyboardShortcut } from 'ui'
+import type { ReactNode } from 'react'
+import { cn } from 'ui'
 
 import type { Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
 import { FrameGlyphs } from './FrameGlyphs'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
-import { openKbSearch } from './KbSearch'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
@@ -38,6 +36,7 @@ interface HeroFlanksProps {
 }
 
 export interface HomeHeroProps {
+  children: ReactNode
   className?: string
 }
 
@@ -51,12 +50,6 @@ const FLANK_BOX = cn(
 const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2'
 const UPRIGHT = 'inset-y-0 w-px origin-top'
 
-const subscribeToNothing = () => () => {}
-
-const getIsMac = () => /Mac|iPhone|iPad/.test(navigator.userAgent)
-
-const getIsMacOnServer = () => false
-
 export const Hero = ({
   title,
   description,
@@ -68,7 +61,6 @@ export const Hero = ({
 }: HeroProps) => {
   const isWarp = variant === 'warp'
   const text = `${title} + ${description} + `.toUpperCase()
-  const copyRef = useRef<HTMLDivElement>(null)
 
   return (
     <section
@@ -79,7 +71,7 @@ export const Hero = ({
         className
       )}
     >
-      {isWarp ? <WarpCanvas anchorRef={copyRef} text={text} /> : null}
+      {isWarp ? <WarpCanvas text={text} /> : null}
       {variant === 'construction' ? (
         <FrameGlyphs text={text} className="z-20 caret-background text-border-stronger" />
       ) : null}
@@ -111,7 +103,7 @@ export const Hero = ({
           />
         ) : null}
         <div
-          ref={copyRef}
+          data-warp-anchor={isWarp ? '' : undefined}
           className={cn(
             'relative flex flex-col items-center gap-5 text-center',
             isWarp ? 'py-16' : 'pt-12 pb-9.5'
@@ -139,14 +131,16 @@ export const Hero = ({
   )
 }
 
-export const HomeHero = ({ className }: HomeHeroProps) => {
+export const HomeHero = ({ children, className }: HomeHeroProps) => {
   return (
     <Hero
       title="Knowledge base"
       description="In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase"
       className={className}
     >
-      <HeroSearch />
+      <div data-warp-throat className="mt-2 w-full max-w-85 sm:max-w-107">
+        {children}
+      </div>
     </Hero>
   )
 }
@@ -211,25 +205,3 @@ const CopyFrame = ({ lines }: CopyFrameProps) =>
       className={cn('pointer-events-none invisible absolute', className)}
     />
   ))
-
-const HeroSearch = () => {
-  const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
-
-  return (
-    <button
-      type="button"
-      data-warp-throat
-      aria-keyshortcuts="Meta+K Control+K"
-      onClick={openKbSearch}
-      className={cn(
-        'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
-        'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
-        'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
-      )}
-    >
-      <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
-      <span className="flex-1 truncate">Search guides</span>
-      <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
-    </button>
-  )
-}

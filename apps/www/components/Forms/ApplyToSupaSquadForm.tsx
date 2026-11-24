@@ -222,8 +222,8 @@ const FormContent = memo(function FormContent({
                       <MultiSelector
                         onValuesChange={(values) => {
                           // Convert selected headings back to track objects
-                          const selectedTracks = values.map(
-                            (heading) => tracks.find((track) => track.heading === heading)!
+                          const selectedTracks = values.map((heading) =>
+                            tracks.find((track) => track.heading === heading)!
                           )
                           field.onChange(selectedTracks)
                         }}

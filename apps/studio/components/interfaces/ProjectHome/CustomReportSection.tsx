@@ -113,15 +113,13 @@ export function CustomReportSection() {
 
   const recomputeSimpleGrid = useCallback(
     (layout: Dashboards.Chart[]) =>
-      layout.map(
-        (block, idx): Dashboards.Chart => ({
-          ...block,
-          x: idx % 2,
-          y: Math.floor(idx / 2),
-          w: 1,
-          h: 1,
-        })
-      ),
+      layout.map((block, idx): Dashboards.Chart => ({
+        ...block,
+        x: idx % 2,
+        y: Math.floor(idx / 2),
+        w: 1,
+        h: 1,
+      })),
     []
   )
 

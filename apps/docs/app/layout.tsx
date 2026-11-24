@@ -10,6 +10,7 @@ import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
+import { SIGNED_IN_HINT_SCRIPT } from 'common/gotrue'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
@@ -65,6 +66,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: IA_NAV_CACHE_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: SIGNED_IN_HINT_SCRIPT }} />
       </head>
       <body>
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
