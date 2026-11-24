@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import type { PGSchema } from '@supabase/pg-meta'
 import {
   Background,
@@ -11,6 +13,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -23,10 +26,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import '@xyflow/react/dist/style.css'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +47,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useTableActions } from '../../TableGridEditor/useTableActions'
 import { DefaultEdge } from './DefaultEdge'
 import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
@@ -90,6 +90,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { editTable } = useTableActions()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
@@ -373,14 +374,10 @@ export const SchemaGraph = () => {
         snap.onEditColumn(column)
       },
       onEditTable: (tableId) => {
-        const table = tables.find((table) => table.id === tableId)
-        if (!table || table.columns == null) return
-
-        setSelectedTable(table)
-        snap.onEditTable()
+        void editTable(tableId)
       },
     }),
-    [tables, snap, isDownloading, selectedEdge]
+    [tables, snap, editTable, isDownloading, selectedEdge]
   )
 
   return (

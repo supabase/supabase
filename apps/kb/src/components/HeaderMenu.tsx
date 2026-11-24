@@ -21,9 +21,9 @@ const isThemeChoice = (value: string | null): value is ThemeChoice =>
 const readStoredChoice = (): ThemeChoice => {
   try {
     const stored = localStorage.getItem('theme')
-    return isThemeChoice(stored) ? stored : 'dark'
+    return isThemeChoice(stored) ? stored : 'system'
   } catch {
-    return 'dark'
+    return 'system'
   }
 }
 

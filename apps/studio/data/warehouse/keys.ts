@@ -5,15 +5,13 @@ export const warehouseKeys = {
     ['projects', projectRef, 'warehouse', 'setup-status'] as const,
   catalog: (projectRef: string | undefined) =>
     ['projects', projectRef, 'warehouse', 'catalog'] as const,
-  metricsAll: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'warehouse', 'metrics'] as const,
   metrics: (
     projectRef: string | undefined,
-    params: {
+    params?: {
       attributes: readonly WarehouseMetricName[]
       startDate: string
       endDate: string
       interval: WarehouseMetricsInterval
     }
-  ) => [...warehouseKeys.metricsAll(projectRef), params] as const,
+  ) => ['projects', projectRef, 'warehouse', 'metrics', ...(params ? [params] : [])] as const,
 }

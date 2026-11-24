@@ -1,6 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { components } from 'api-types'
 import { useEffect, useId } from 'react'
-import { Checkbox, cn } from 'ui'
+import { cn, RadioGroup, RadioGroupItem } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -10,13 +11,12 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
-
 export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
-  projects: OAuthAppsAuthorizeOrganizationProject[]
-  selectedProjects: OAuthAppsAuthorizeOrganizationProject[]
+  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  selectedProjectRefs: string[]
+  selectedProjects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
   onChange: (selectedProjects: string[]) => void
   maxSelected?: number
   error?: string
@@ -31,6 +31,7 @@ export interface ProjectMultiSelectProps {
 export const ProjectMultiSelect = ({
   projects,
   selectedProjects,
+  selectedProjectRefs,
   onChange,
   maxSelected = MAX_SELECTED_PROJECTS,
   error,
@@ -64,40 +65,54 @@ export const ProjectMultiSelect = ({
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p
+        <h2
           id={labelId}
-          className={cn('text-sm', hasFlagged ? 'text-destructive' : 'text-foreground')}
+          className={cn('text-sm font-medium', hasFlagged ? 'text-destructive' : 'text-foreground')}
         >
           Projects
-        </p>
+        </h2>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
-            {selectedProjects.length}/{maxSelected}
+            {selectedProjectRefs.length}/{maxSelected}
           </p>
         )}
       </div>
 
-      <label
-        htmlFor="select-all-projects"
-        className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
-      >
-        <Checkbox
-          id="select-all-projects"
-          checked={allProjectsSelected}
-          onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
-        />
-        All current and future projects
-      </label>
+      {onAllProjectsChange && (
+        <RadioGroup
+          aria-labelledby={labelId}
+          value={allProjectsSelected ? 'all' : 'selected'}
+          onValueChange={(value) => onAllProjectsChange(value === 'all')}
+          className="gap-2 py-1"
+        >
+          <label
+            htmlFor={`${labelId}-all`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-all`} value="all" />
+            All current and future projects
+          </label>
+          <label
+            htmlFor={`${labelId}-selected`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-selected`} value="selected" />
+            Selected projects only
+          </label>
+        </RadioGroup>
+      )}
 
       {!allProjectsSelected && (
         <>
           <MultiSelector
-            values={selectedProjects.map((p) => p.ref)}
+            values={selectedProjectRefs}
             onValuesChange={handleValuesChange}
             onSearchChange={onSearchChange}
           >
             <MultiSelectorTrigger
+              id="projects"
               aria-labelledby={labelId}
+              aria-describedby="projects-description"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
@@ -109,7 +124,7 @@ export const ProjectMultiSelect = ({
               <MultiSelectorInput placeholder="Search projects" showResetIcon />
               <MultiSelectorList emptyLabel="No projects found">
                 {projects.map((project) => {
-                  const isSelected = selectedProjects.some((p) => p.ref === project.ref)
+                  const isSelected = selectedProjectRefs.some((ref) => ref === project.ref)
                   return (
                     <MultiSelectorItem
                       key={project.ref}
@@ -127,20 +142,22 @@ export const ProjectMultiSelect = ({
               </MultiSelectorList>
             </MultiSelectorContent>
           </MultiSelector>
-
-          {hasFlagged && (
-            <p className="text-xs text-destructive">
-              {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
-            </p>
-          )}
-          {atCap && (
-            <p className="text-xs text-foreground-lighter">
-              Maximum reached. Deselect a project to choose a different one.
-            </p>
-          )}
-          {error && <p className="text-xs text-foreground-light">{error}</p>}
         </>
       )}
+
+      <div id="projects-description" aria-live="polite">
+        {hasFlagged && (
+          <p className="text-xs text-destructive">
+            {`${flaggedRefs.length} of ${selectedProjectRefs.length} ${selectedProjectRefs.length === 1 ? 'project' : 'projects'} unavailable`}
+          </p>
+        )}
+        {atCap && (
+          <p className="text-xs text-foreground-lighter">
+            Maximum reached. Deselect a project to choose a different one.
+          </p>
+        )}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
     </div>
   )
 }

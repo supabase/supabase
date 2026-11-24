@@ -11,7 +11,7 @@ import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
-  return { ...actual, useIsLoggedIn: () => true, useParams: () => ({ ref: 'default' }) }
+  return { ...actual, useIsLoggedIn: () => true }
 })
 
 vi.mock('@/components/layouts/DefaultLayout', () => ({

@@ -568,24 +568,6 @@ export interface OnboardingSurveySubmitFailedEvent {
 }
 
 /**
- * Signed-in user was shown the new organization form in either arm of the
- * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
- * profile loads and the flags for that user have resolved.
- *
- * @group Events
- * @source studio
- * @page new
- */
-export interface OnboardingSurveyPlacementExperimentExposedEvent {
-  action: 'onboarding_survey_placement_experiment_exposed'
-  properties: {
-    experiment_id: 'onboarding_survey_placement'
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'org_form'
-  }
-}
-
-/**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
  * after the org and create-project permission have resolved, so it tracks the form
@@ -4513,6 +4495,94 @@ export interface UnifiedLogsRowClickedEvent {
 }
 
 /**
+ * User opened the Unified Logs saved views panel from the sidebar entry or the mobile drawer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewsPanelOpenedEvent {
+  action: 'unified_logs_views_panel_opened'
+  properties: {
+    surface: 'sidebar' | 'mobile_drawer'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User applied a preset or saved view to the Unified Logs filters.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewAppliedEvent {
+  action: 'unified_logs_view_applied'
+  properties: {
+    viewType: 'preset' | 'saved'
+    /** 'select' is a direct row click; 'reset' discards local edits by re-applying the active view. */
+    trigger: 'select' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User created a new saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewCreatedEvent {
+  action: 'unified_logs_view_created'
+  properties: {
+    source: 'new' | 'duplicate' | 'save_as_new'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing saved view's name or content in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewUpdatedEvent {
+  action: 'unified_logs_view_updated'
+  properties: {
+    /** 'content' covers filters and view options (sort, latency range, log type toggles), which are saved and compared together. */
+    updateType: 'name' | 'content'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User deleted a saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewRemovedEvent {
+  action: 'unified_logs_view_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the "this view has been modified" popover without updating, saving, or
+ * resetting.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewModifiedPopoverClosedEvent {
+  action: 'unified_logs_view_modified_popover_closed'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Supabase logo in the top-left corner of the page header.
  *
  * @group Events
@@ -4832,7 +4902,6 @@ export type TelemetryEvent =
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent
-  | OnboardingSurveyPlacementExperimentExposedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
@@ -5042,6 +5111,12 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
+  | UnifiedLogsViewsPanelOpenedEvent
+  | UnifiedLogsViewAppliedEvent
+  | UnifiedLogsViewCreatedEvent
+  | UnifiedLogsViewUpdatedEvent
+  | UnifiedLogsViewRemovedEvent
+  | UnifiedLogsViewModifiedPopoverClosedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent

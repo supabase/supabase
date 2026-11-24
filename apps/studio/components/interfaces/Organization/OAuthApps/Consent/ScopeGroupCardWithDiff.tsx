@@ -1,4 +1,3 @@
-import { capitalize } from 'lodash'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { Fragment, useMemo, type ReactNode } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -9,7 +8,13 @@ import {
   getDiffBetweenScopes,
   ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
-import { ScopeGroupCardItem } from './ScopeGroupCardItem'
+import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
+
+const scopeLabels: Record<ScopeGroupLevel, string> = {
+  'read-write': 'Read and write',
+  write: 'Write',
+  read: 'Read only',
+}
 
 export interface ScopeGroupCardProps {
   scopes: string[]
@@ -31,38 +36,57 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
     <>
       <div className="divide-y rounded-md border bg-surface-75 px-4">
         <DiffScopeGroupItem
-          label="READ-WRITE"
+          label={scopeLabels['read-write']}
           level="read-write"
           permissions={diff.changed['read-write']}
         />
-        <DiffScopeGroupItem label="WRITE" level="write" permissions={diff.changed['write']} />
-        <DiffScopeGroupItem label="READ" level="read" permissions={diff.changed['read']} />
         <DiffScopeGroupItem
-          label="REMOVED"
+          label={scopeLabels['write']}
+          level="write"
+          permissions={diff.changed['write']}
+        />
+        <DiffScopeGroupItem
+          label={scopeLabels['read']}
+          level="read"
+          permissions={diff.changed['read']}
+        />
+        <DiffScopeGroupItem
+          label="Removed"
           level={undefined}
           permissions={diff.changed['removed']}
         />
       </div>
-      <Collapsible className="flex flex-col gap-2">
-        <CollapsibleTrigger asChild>
-          <Button
-            block
-            iconRight={<ChevronsUpDownIcon className="h-4 w-4" />}
-            variant="text"
-            size="tiny"
-            className="p-0 flex justify-center text-foreground-lighter"
-          >
-            <span>Already granted ({unchangedPermissionsCount})</span>
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="divide-y rounded-md border bg-surface-75 px-4">
-            <ScopeGroupCardItem label="READ-WRITE" permissions={diff.unchanged['read-write']} />
-            <ScopeGroupCardItem label="WRITE" permissions={diff.unchanged['write']} />
-            <ScopeGroupCardItem label="READ" permissions={diff.unchanged['read']} />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      {unchangedPermissionsCount > 0 ? (
+        <Collapsible className="flex flex-col gap-2">
+          <CollapsibleTrigger asChild>
+            <Button
+              block
+              iconRight={<ChevronsUpDownIcon className="h-4 w-4" />}
+              variant="text"
+              size="tiny"
+              className="p-0 flex justify-center text-foreground-lighter"
+            >
+              <span>Already granted ({unchangedPermissionsCount})</span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="divide-y rounded-md border bg-surface-75 px-4">
+              <ScopeGroupCardItem
+                label={scopeLabels['read-write']}
+                permissions={diff.unchanged['read-write']}
+              />
+              <ScopeGroupCardItem
+                label={scopeLabels['write']}
+                permissions={diff.unchanged['write']}
+              />
+              <ScopeGroupCardItem
+                label={scopeLabels['read']}
+                permissions={diff.unchanged['read']}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      ) : null}
     </>
   )
 }
@@ -84,7 +108,11 @@ const DiffScopeGroupItem = ({
         {permissions.map((permission, index) => (
           <Fragment key={permission.permission}>
             <span className="inline-block">
-              {formatPermissionName(permission.permission)}{' '}
+              {level === undefined ? (
+                formatPermissionName(permission.permission)
+              ) : (
+                <ScopePermissionLabel permission={permission.permission} />
+              )}{' '}
               <span className="text-foreground-lighter">
                 (<DiffDescription level={level} previousLevel={permission.previousLevel} />)
               </span>
@@ -105,18 +133,18 @@ const DiffDescription = ({
   previousLevel: ScopeGroupLevel | undefined
 }) => {
   // Removed
-  if (level == null) return capitalize(previousLevel!)
+  if (level == null) return scopeLabels[previousLevel!]
 
   // New
   if (previousLevel == null) return 'New'
 
   // Upgraded
-  if (level === 'read-write') return `Upgraded from ${capitalize(previousLevel)}`
+  if (level === 'read-write') return `Upgraded from ${scopeLabels[previousLevel]}`
 
   // Modified
   if (['read', 'write'].includes(level!) && ['read', 'write'].includes(previousLevel))
-    return `Changed from ${capitalize(previousLevel)}`
+    return `Changed from ${scopeLabels[previousLevel]}`
 
   // Downgraded
-  return `Demoted from ${capitalize(previousLevel)}`
+  return `Demoted from ${scopeLabels[previousLevel]}`
 }

@@ -1,7 +1,7 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { CheckIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -14,6 +14,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InvoiceEstimateTooltip } from './InvoiceEstimateTooltip'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { PlanCheckIcon, PlanMinusIcon } from './PlanIcons'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
@@ -22,6 +23,7 @@ import {
   getPlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -71,8 +73,11 @@ interface Props {
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
   projects: OrgProject[]
-  onAddressChange?: (address: CustomerAddress) => void
+  /** Receives null when there is no address to estimate against, which clears the preview address. */
+  onAddressChange?: (address: CustomerAddress | null) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  /** The billing address was edited and the plan preview has not caught up with it yet. */
+  isBillingPreviewPending?: boolean
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
@@ -87,6 +92,7 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
   onAddressChange,
   onTaxIdChange,
+  isBillingPreviewPending = false,
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
@@ -106,6 +112,9 @@ export const SubscriptionPlanUpdateDialog = ({
     isPending: subscriptionPreviewIsLoading,
     isFetching: subscriptionPreviewIsFetching,
     isSuccess: subscriptionPreviewInitialized,
+    isError: subscriptionPreviewIsError,
+    error: subscriptionPreviewError,
+    refetch: refetchSubscriptionPreview,
   } = subscriptionPreviewQueryResult
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -186,6 +195,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const onUpdateSubscription = async () => {
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
+    if (!subscriptionPreviewInitialized) return console.error('Plan preview is required')
 
     setPaymentConfirmationLoading(true)
 
@@ -394,6 +404,14 @@ export const SubscriptionPlanUpdateDialog = ({
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
+              {subscriptionPreviewIsError && (
+                <AlertError error={subscriptionPreviewError} subject="Failed to estimate your bill">
+                  <Button variant="default" onClick={() => refetchSubscriptionPreview()}>
+                    Try again
+                  </Button>
+                </AlertError>
+              )}
+
               {subscriptionPreviewInitialized && (
                 <>
                   <div
@@ -520,7 +538,12 @@ export const SubscriptionPlanUpdateDialog = ({
               <div className="flex space-x-2">
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
-                  disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
+                  disabled={
+                    !subscriptionPreviewInitialized ||
+                    subscriptionPreviewIsLoading ||
+                    subscriptionPreviewIsFetching ||
+                    isBillingPreviewPending
+                  }
                   variant="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
@@ -553,45 +576,45 @@ export const SubscriptionPlanUpdateDialog = ({
                     <p className="text-xs text-foreground-light mb-4">
                       Please review carefully before downgrading.
                     </p>
-                    <div className="space-y-2 mb-4 text-foreground-light">
+                    <ul className="mb-4 text-sm text-foreground-light">
                       {featuresToLose.map((feature) => (
-                        <div
+                        <li
                           key={typeof feature === 'string' ? feature : feature[0]}
-                          className="flex items-center gap-2"
+                          className="flex items-start py-1.5"
                         >
-                          <div className="w-4">
-                            <InfoIcon className="h-3 w-3 text-amber-900" strokeWidth={3} />
+                          <div className="flex h-lh w-6 shrink-0 items-center">
+                            <PlanMinusIcon className="size-5 -ml-0.5" />
                           </div>
-                          <p className="text-sm">
-                            {typeof feature === 'string' ? feature : feature[0]}
-                          </p>
-                        </div>
+                          <span>{typeof feature === 'string' ? feature : feature[0]}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )
               : topFeatures.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm mb-4">Upgrade features</h3>
 
-                    <div className="space-y-2 mb-4 text-foreground-light">
+                    <ul className="mb-4 text-sm">
                       {topFeatures.map((feature: string | string[]) => (
-                        <div
+                        <li
                           key={typeof feature === 'string' ? feature : feature[0]}
-                          className="flex items-center gap-2"
+                          className="flex items-start py-1.5"
                         >
-                          <div className="w-4">
-                            <CheckIcon className="h-3 w-3 text-primary" strokeWidth={3} />
+                          <div className="flex h-lh w-6 shrink-0 items-center">
+                            <PlanCheckIcon className="size-5 -ml-0.5" />
                           </div>
-                          <div className="text-sm">
-                            <p>{typeof feature === 'string' ? feature : feature[0]}</p>
+                          <div>
+                            <p className="text-foreground">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
                             {Array.isArray(feature) && feature.length > 1 && (
                               <p className="text-foreground-lighter text-xs">{feature[1]}</p>
                             )}
                           </div>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
           </div>

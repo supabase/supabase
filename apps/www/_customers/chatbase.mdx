@@ -144,6 +144,10 @@ That work is happening alongside the everyday support relationship, which Yasser
   helpful.
 </Quote>
 
+### Under the hood: AWS
+
+Chatbase's primary instance runs on AWS. Supabase provisions it on Amazon EC2 compute, and that single database carries the whole stack: source documents, pgvector embeddings, conversation state, Auth, and the analytical reporting workload that arrived in 2026. When those reports started pushing the disk's IOPS and throughput limits, the fix was a storage configuration change on the same instance rather than a migration, with a read replica planned to take over reporting. The result is a continuous AI agent workload running on AWS without Chatbase ever operating a server.
+
 ## Results
 
 Chatbase has crossed several thresholds on the back of the Supabase stack:
