@@ -96,7 +96,6 @@ export const OAuthAppsAuthorizedRow = ({
                 ? 'All projects'
                 : `${new Set(previewGrants.flatMap((grant) => grant.projects?.map((project) => project.ref) ?? [])).size} projects`}
             </p>
-            <p className="text-sm text-foreground-lighter">Varies by grant</p>
           </>
         ) : isPreview ? (
           previewProjects ? (
@@ -114,15 +113,12 @@ export const OAuthAppsAuthorizedRow = ({
             {previewGrants
               ? `${new Set(previewGrants.flatMap((grant) => [...grant.scopes.map((scope) => scope.split(':')[0]), ...(grant.databaseAccess ? ['table_data'] : [])])).size} permissions`
               : `${permissionCount} ${permissionCount === 1 ? 'permission' : 'permissions'}`}
-
-            {(databaseAccess ||
-              previewScopes?.includes('database:write') ||
-              previewGrants?.some(
-                (grant) => grant.databaseAccess || grant.scopes.includes('database:write')
-              )) &&
-              ' including database access'}
           </p>
-          {previewGrants && <p className="text-sm text-foreground-lighter">Varies by grant</p>}
+          {(databaseAccess ||
+            previewScopes?.includes('database:write') ||
+            previewGrants?.some(
+              (grant) => grant.databaseAccess || grant.scopes.includes('database:write')
+            )) && <p className="text-sm text-warning">Database access</p>}
         </TableCell>
       )}
       <TableCell className="text-right">

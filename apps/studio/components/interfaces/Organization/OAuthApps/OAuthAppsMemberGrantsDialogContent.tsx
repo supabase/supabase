@@ -104,7 +104,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
         </SheetTitle>
       </SheetHeader>
       <SheetSection className="min-h-0 grow overflow-y-auto">
-        <h3 className="mb-2 text-sm font-medium">Details</h3>
+        <h3 className="mb-2 text-base font-medium">Details</h3>
         <dl className="mt-3 mb-8 divide-y rounded-md border bg-surface-75 px-4 text-sm">
           <div className="flex items-center justify-between gap-4 py-3">
             <dt className="text-foreground-light">App ID</dt>
@@ -181,15 +181,19 @@ export const OAuthAppsMemberGrantsDialogContent = ({
         {((isPreview && previewGrants?.some((grant) => grant.member)) ||
           (!isPreview &&
             memberGrants.some((grant) => grant.attributes.kind === 'member_bound'))) && (
-          <h2 className="mb-3 mt-8 border-t pt-6 text-base font-medium">Member access</h2>
+          <h2 className="mb-3 mt-8 text-base font-medium">Member access</h2>
         )}
         <OAuthGrantAccordion
           key={isPreview ? 'preview' : memberGrants.map((grant) => grant.id).join(',')}
           defaultValue={
             isPreview
-              ? previewGrants?.filter((grant) => grant.member).map((grant) => grant.id)
+              ? previewGrants
+                  ?.filter((grant) => grant.member)
+                  .slice(0, 1)
+                  .map((grant) => grant.id)
               : memberGrants
                   .filter((grant) => grant.attributes.kind !== 'organization_bound')
+                  .slice(0, 1)
                   .map((grant) => grant.id)
           }
         >
@@ -281,7 +285,7 @@ function GrantAccess({
       : `${projects.length} ${pluralize(projects.length, 'project')}`
 
   const details = (
-    <div className="space-y-8 text-sm">
+    <div className="space-y-6 text-sm">
       <section className="space-y-1">
         <h3 className="text-sm font-medium">Projects</h3>
         {projects && projects.length > 0 ? (
@@ -308,7 +312,7 @@ function GrantAccess({
             {levels
               .filter(({ permissions }) => permissions.length > 0)
               .map(({ label, permissions }) => (
-                <div key={label} className="space-y-2 py-3.5">
+                <div key={label} className="space-y-1.5 py-3">
                   <h4 className="font-mono text-xs uppercase text-foreground-light">{label}</h4>
                   <p className="text-sm text-foreground">
                     {permissions.map((permission, index) => (
@@ -325,18 +329,9 @@ function GrantAccess({
         {(databaseAccess || scopes.includes('database:write')) && (
           <Admonition
             type="warning"
-            title="Includes database access"
             description={
               <div className="space-y-1">
-                <p>
-                  The above permissions let this app access{' '}
-                  {projects == null
-                    ? 'every project’s database'
-                    : projects.length === 1
-                      ? 'this project’s database'
-                      : 'these projects’ databases'}{' '}
-                  in the following ways:
-                </p>
+                <p>These permissions allow this app to:</p>
                 <ul className="list-disc space-y-1 pl-4">
                   {databaseAccess && <li>Read rows that your access rules normally hide</li>}
                   {databaseAccess?.mode === 'Read and write' && (
@@ -355,7 +350,7 @@ function GrantAccess({
   )
   if (expanded)
     return (
-      <div className="mb-8 space-y-3 border-t pt-6">
+      <div className="mb-8 space-y-4">
         <h2 className="text-base font-medium">{title}</h2>
         {details}
       </div>

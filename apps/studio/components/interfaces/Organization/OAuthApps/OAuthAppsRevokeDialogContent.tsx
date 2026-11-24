@@ -60,15 +60,15 @@ export const OAuthAppsRevokeDialogContent = ({
       <AlertDialogHeader>
         <AlertDialogTitle>Revoke access</AlertDialogTitle>
         <AlertDialogDescription>
-          Revoking access for “{approval.attributes.app.name}” will remove all of its grants from
-          this organization. The app will stop working on its next request.
+          “{approval.attributes.app.name}” will lose access for this organization and all its
+          members on its next request.
         </AlertDialogDescription>
       </AlertDialogHeader>
       {databaseAccess && (
         <p className="px-5 pb-4 text-sm text-foreground-light">
-          Database connections using <code>{databaseAccess.role}</code> will close, and new ones
-          will be blocked. The role will remain in {databaseLocation} with login disabled. Database
-          objects the app created will keep running.
+          Connections using <code>{databaseAccess.role}</code> will close. The role stays in{' '}
+          {databaseLocation} with login disabled, blocking new connections. Objects the app created
+          keep running.
         </p>
       )}
       {isError && <AlertError subject="Failed to revoke access" error={error} />}

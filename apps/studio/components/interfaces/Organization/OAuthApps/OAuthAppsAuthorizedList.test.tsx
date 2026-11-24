@@ -124,10 +124,8 @@ describe('OAuthAppsAuthorizedList', () => {
     await openRowMenu('Example Mixed')
     await userEvent.click(await screen.findByRole('menuitem', { name: 'View access' }))
     const mixed = await screen.findByRole('dialog')
-    await userEvent.click(within(mixed).getByRole('button', { name: /Organization access/ }))
     expect(mixed).toHaveTextContent('example_mixed_user')
-    expect(mixed).not.toHaveTextContent('Run SQL on your database')
-    await userEvent.click(within(mixed).getByRole('button', { name: /admin@example.com/ }))
+    expect(within(mixed).getByRole('heading', { name: 'Organization access' })).toBeInTheDocument()
     expect(mixed).toHaveTextContent('Run SQL on your database')
   })
 
@@ -163,8 +161,9 @@ describe('OAuthAppsAuthorizedList', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke access' }))
 
     const dialog = await screen.findByRole('alertdialog')
-    expect(dialog).toHaveTextContent('Database connections using')
+    expect(dialog).toHaveTextContent('Connections using')
     expect(dialog).toHaveTextContent('example_partner_user')
+    expect(dialog).toHaveTextContent('all its members')
     expect(within(dialog).getByRole('button', { name: 'Revoke' })).toBeDisabled()
   })
 
@@ -185,7 +184,6 @@ describe('OAuthAppsAuthorizedList', () => {
     await userEvent.click(await screen.findByText('View access'))
 
     expect(await screen.findByText('Access for Vercel')).toBeInTheDocument()
-    await userEvent.click(await screen.findByText('admin@example.com'))
 
     expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
     expect(await screen.findByText('Database management')).toBeInTheDocument()
@@ -227,7 +225,7 @@ describe('OAuthAppsAuthorizedList', () => {
     await openRowMenu('Vercel')
     await userEvent.click(await screen.findByText('View access'))
 
-    expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
+    expect(await screen.findByText('Organization access')).toBeInTheDocument()
     expect(await screen.findByText('All current and future projects.')).toBeInTheDocument()
   })
 
@@ -292,12 +290,8 @@ describe('OAuthAppsAuthorizedList', () => {
 
     expect(await screen.findByRole('heading', { name: 'Revoke access' })).toBeInTheDocument()
     expect(screen.queryByText(/organization-wide grant will be revoked/)).not.toBeInTheDocument()
-    expect(
-      await screen.findByText(/The app will stop working on its next request/)
-    ).toBeInTheDocument()
-    expect(
-      await screen.findByText(/will remove all of its grants from this organization/)
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/members on its next request/)).toBeInTheDocument()
+    expect(await screen.findByText(/will lose access for this organization/)).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Revoke' }))
 
