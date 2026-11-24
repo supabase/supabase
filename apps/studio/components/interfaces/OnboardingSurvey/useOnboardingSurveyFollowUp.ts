@@ -40,10 +40,15 @@ export function useOnboardingSurveyFollowUp() {
     useLocalStorageQuery<unknown>(storageKey, null)
   const followUpState = parseFollowUpState(storedState)
 
+  // An answer or skip may fail to persist (storage blocked or full); this keeps
+  // the card away for the rest of the page's life instead of asking again at once
+  const [resolvedOrgSlug, setResolvedOrgSlug] = useState<string>()
+
   // Until storage has been read, "no state" is only the default and can't count as never asked
   const isUnaskedVercelOwner =
     isStoredStateLoaded &&
     followUpState === null &&
+    orgSlug !== resolvedOrgSlug &&
     !!profileId &&
     organization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE &&
     organization.is_owner
@@ -78,13 +83,14 @@ export function useOnboardingSurveyFollowUp() {
 
   const resolveFollowUp = useCallback(
     (status: Exclude<OnboardingSurveyFollowUpStatus, 'pending'>) => {
+      setResolvedOrgSlug(orgSlug)
       setStoredState((previous: unknown) => {
         const previousState = parseFollowUpState(previous)
         if (previousState) return { ...previousState, status }
         return isVercelOwnerToAsk ? { status, orgCreatedAt: vercelOrgCreatedAt } : previous
       })
     },
-    [isVercelOwnerToAsk, setStoredState, vercelOrgCreatedAt]
+    [isVercelOwnerToAsk, orgSlug, setStoredState, vercelOrgCreatedAt]
   )
 
   // Undoes a dismissal whose save failed, keeping the original org details and

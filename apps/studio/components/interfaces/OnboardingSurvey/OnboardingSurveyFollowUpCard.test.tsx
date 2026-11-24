@@ -450,6 +450,19 @@ describe('OnboardingSurveyFollowUpCard', () => {
       expect(requests).toEqual([])
     })
 
+    it('stays away after a skip that could not be stored', async () => {
+      mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
+      const setItem = vi.spyOn(safeLocalStorage, 'setItem').mockImplementation(() => {})
+
+      renderCard({ organization: vercelOrg })
+      fireEvent.click(await screen.findByRole('button', { name: 'Skip' }))
+      await advance(1000)
+
+      expect(readStoredState()).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull()
+      setItem.mockRestore()
+    })
+
     it('sends the answers and does not ask again', async () => {
       mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
       const requests = mockSurveyEndpoint(204)

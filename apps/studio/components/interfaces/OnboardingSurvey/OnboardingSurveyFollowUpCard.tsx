@@ -17,9 +17,7 @@ import { useTrack } from '@/lib/telemetry/track'
 /**
  * Asks an org's creator the onboarding survey again when they left it blank on
  * the new-org form. Shows as a card in the banner stack for the first five
- * minutes after the org is created; Answer opens the survey dialog. Owners of
- * new Vercel Marketplace orgs, which skip that form, get the same card until
- * they answer or skip.
+ * minutes after the org is created; Answer opens the survey dialog.
  */
 export function OnboardingSurveyFollowUpCard() {
   const track = useTrack()
