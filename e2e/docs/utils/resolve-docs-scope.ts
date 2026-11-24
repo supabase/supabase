@@ -273,13 +273,15 @@ export async function resolveDocsScope(
     }
   }
 
-  const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
+  const sortedRequiredPages = [...requiredPages].sort()
+  const selectedRequiredPages = sortedRequiredPages.slice(0, maxPages)
+  const truncatedRequiredPages = sortedRequiredPages.slice(maxPages)
   const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
   const candidatePages = [...pages]
     .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
     .sort()
   const selectedPages = candidatePages.slice(0, remainingSlots)
-  const truncated = candidatePages.slice(remainingSlots)
+  const truncated = [...truncatedRequiredPages, ...candidatePages.slice(remainingSlots)]
   const sorted = [...selectedRequiredPages, ...selectedPages].sort()
 
   return {

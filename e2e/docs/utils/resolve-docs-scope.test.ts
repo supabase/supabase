@@ -81,3 +81,17 @@ test('caps a default run at 20 pages and reports the rest', async () => {
   assert.equal(result.pages.length, 20)
   assert.equal(result.truncated.length, 42)
 })
+
+test('reports required pages dropped by the page limit', async () => {
+  const result = await resolveDocsScope({
+    changedFiles: [GUIDE_LIST_COMPONENT, 'apps/docs/content/guides/ai-tools/mcp.mdx'],
+    repoRoot,
+    maxPages: 2,
+  })
+
+  assert.equal(result.pages.length, 2)
+  assert.deepEqual(
+    [...result.pages, ...result.truncated].sort(),
+    [...GUIDE_LIST_COMPONENT_PAGES, '/docs/guides/ai-tools/mcp'].sort()
+  )
+})
