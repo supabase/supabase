@@ -171,109 +171,109 @@ const AuthorizationPreview = ({
       savedValues.project_scoping !== isProjectScopingEnabled)
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-foreground">Preview: what someone connecting will see</p>
-
-      <div className="overflow-hidden rounded-lg border">
-        <div className="relative h-80 overflow-hidden bg-studio">
-          {/*
+    <div className="overflow-hidden rounded-lg border">
+      <div className="relative h-80 overflow-hidden bg-studio">
+        {/*
             The crop stays fixed across both states so that turning on project scoping only adds
             the Projects section below Organization, the way the real screen does, rather than
             shifting everything above it.
           */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-16 flex justify-center px-6 opacity-60 select-none"
-          >
-            <Card className={cn('w-full', INTERSTITIAL_WIDTH_CLASS)}>
-              <div className="flex flex-col items-center gap-1 px-6 pt-6 pb-5 text-center">
-                <p className="text-lg font-medium tracking-tight text-foreground">
-                  Authorize {appName}
-                </p>
-                <p className="text-sm text-foreground-lighter">
-                  This application wants to access your Supabase Account
-                </p>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-16 flex justify-center px-6 opacity-60 select-none"
+        >
+          <Card className={cn('w-full', INTERSTITIAL_WIDTH_CLASS)}>
+            <div className="flex flex-col items-center gap-1 px-6 pt-6 pb-5 text-center">
+              <p className="text-lg font-medium tracking-tight text-foreground">
+                Authorize {appName}
+              </p>
+              <p className="text-sm text-foreground-lighter">
+                This application wants to access your Supabase Account
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-5 px-6 pb-6">
+              <section className="flex flex-col gap-2">
+                <div className="divide-y rounded-md border bg-surface-75 px-4">
+                  <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+                    <span className="shrink-0 text-foreground-light">Authorizing as</span>
+                    <span className="min-w-0 truncate text-foreground">you@example.com</span>
+                  </div>
+                  {!isProjectScopingEnabled && (
+                    <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+                      <span className="shrink-0 text-foreground-light">Projects</span>
+                      <span className="min-w-0 truncate text-foreground">
+                        {getAllProjectsRowLabel(isMemberBoundGrant, organizationName)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                {isMemberBoundGrant && (
+                  <p className="text-xs text-foreground-lighter">{MEMBER_BOUND_GRANT_NOTICE}</p>
+                )}
+              </section>
+
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-foreground">Organization</p>
+                <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground">
+                  <span className="truncate">{organizationName ?? 'Your organization'}</span>
+                  <ChevronDownIcon size={14} className="shrink-0 text-foreground-lighter" />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-5 px-6 pb-6">
-                <section className="flex flex-col gap-2">
-                  <div className="divide-y rounded-md border bg-surface-75 px-4">
-                    <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
-                      <span className="shrink-0 text-foreground-light">Authorizing as</span>
-                      <span className="min-w-0 truncate text-foreground">you@example.com</span>
-                    </div>
-                    {!isProjectScopingEnabled && (
-                      <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
-                        <span className="shrink-0 text-foreground-light">Projects</span>
-                        <span className="min-w-0 truncate text-foreground">
-                          {getAllProjectsRowLabel(isMemberBoundGrant, organizationName)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  {isMemberBoundGrant && (
-                    <p className="text-xs text-foreground-lighter">{MEMBER_BOUND_GRANT_NOTICE}</p>
-                  )}
-                </section>
-
+              {isProjectScopingEnabled && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm text-foreground">Organization</p>
-                  <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground">
-                    <span className="truncate">{organizationName ?? 'Your organization'}</span>
-                    <ChevronDownIcon size={14} className="shrink-0 text-foreground-lighter" />
+                  <p className="text-sm text-foreground">Projects</p>
+                  <span className="flex items-center gap-2 py-1 text-sm text-foreground">
+                    <span className="size-4 rounded-xs border border-strong" />
+                    All current and future projects
+                  </span>
+                  <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground-lighter">
+                    <span className="truncate">Select projects...</span>
+                    <ChevronDownIcon size={14} className="shrink-0" />
                   </div>
                 </div>
+              )}
 
-                {isProjectScopingEnabled && (
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-foreground">Projects</p>
-                    <span className="flex items-center gap-2 py-1 text-sm text-foreground">
-                      <span className="size-4 rounded-xs border border-strong" />
-                      All current and future projects
-                    </span>
-                    <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground-lighter">
-                      <span className="truncate">Select projects...</span>
-                      <ChevronDownIcon size={14} className="shrink-0" />
-                    </div>
-                  </div>
-                )}
-
-                <section className="flex flex-col gap-3">
-                  <p className="text-sm text-foreground">Permissions requested</p>
-                  {scopes.length > 0 && <ScopeGroupCard scopes={scopes} />}
-                  <p className="text-xs text-foreground-lighter">
-                    Authorizing {appName} grants it access to the permissions
-                    {isProjectScopingEnabled ? <span>{' and selected projects '}</span> : ' '}
-                    <span>above.</span>
-                  </p>
-                </section>
-              </div>
-            </Card>
-          </div>
-
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-linear-to-b from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background to-transparent" />
+              <section className="flex flex-col gap-3">
+                <p className="text-sm text-foreground">Permissions requested</p>
+                {scopes.length > 0 && <ScopeGroupCard scopes={scopes} />}
+                <p className="text-xs text-foreground-lighter">
+                  Authorizing {appName} grants it access to the permissions
+                  {isProjectScopingEnabled ? <span>{' and selected projects '}</span> : ' '}
+                  <span>above.</span>
+                </p>
+              </section>
+            </div>
+          </Card>
         </div>
 
-        <div className="flex gap-x-2 border-t bg-surface-100 px-4 py-3">
-          <ScaleIcon size={14} className="mt-0.5 shrink-0 text-foreground-lighter" />
-          <div className="min-w-0">
-            <p className="text-sm">
-              <span className="text-foreground-lighter">Resulting grant: </span>
-              <span className="text-foreground-light">
-                {getResultingGrantDescription(isMemberBoundGrant, isProjectScopingEnabled)}
-              </span>
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-linear-to-b from-background to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background to-transparent" />
+
+        <Badge variant="success" className="absolute top-3 left-3">
+          Preview
+        </Badge>
+      </div>
+
+      <div className="flex gap-x-2 border-t bg-surface-100 px-4 py-3">
+        <ScaleIcon size={14} className="mt-0.5 shrink-0 text-foreground-lighter" />
+        <div className="min-w-0">
+          <p className="text-sm">
+            <span className="text-foreground-lighter">Resulting grant: </span>
+            <span className="text-foreground-light">
+              {getResultingGrantDescription(isMemberBoundGrant, isProjectScopingEnabled)}
+            </span>
+          </p>
+          {hasUnsavedChanges && (
+            <p className="text-sm text-foreground-lighter">
+              Today:{' '}
+              {getResultingGrantDescription(
+                savedValues.member_bound_grant,
+                savedValues.project_scoping
+              )}
             </p>
-            {hasUnsavedChanges && (
-              <p className="text-sm text-foreground-lighter">
-                Today:{' '}
-                {getResultingGrantDescription(
-                  savedValues.member_bound_grant,
-                  savedValues.project_scoping
-                )}
-              </p>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
