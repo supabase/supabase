@@ -1,76 +1,76 @@
-import { ChevronDownIcon, ScaleIcon } from "lucide-react";
-import { useId } from "react";
-import { Control, useWatch } from "react-hook-form";
-import { Badge, Card, cn, FormField, RadioGroupStacked, RadioGroupStackedItem } from "ui";
+import { ChevronDownIcon, ScaleIcon } from 'lucide-react'
+import { useId } from 'react'
+import { Control, useWatch } from 'react-hook-form'
+import { Badge, Card, cn, FormField, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
-import { MEMBER_BOUND_GRANT_NOTICE } from "../Consent/AuthorizingAsCard";
-import { ScopeGroupCard } from "../Consent/ScopeGroupCard";
+import { MEMBER_BOUND_GRANT_NOTICE } from '../Consent/AuthorizingAsCard'
+import { ScopeGroupCard } from '../Consent/ScopeGroupCard'
 import {
   AuthorizationValues,
   getAllProjectsRowLabel,
   getResultingGrantDescription,
-} from "./Authorization.utils";
-import { FormSchemaWithOAuthAppScopedGrants } from "./PublishAppSidePanel.utils";
-import { INTERSTITIAL_WIDTH_CLASS } from "@/components/layouts/InterstitialLayout";
+} from './Authorization.utils'
+import { FormSchemaWithOAuthAppScopedGrants } from './PublishAppSidePanel.utils'
+import { INTERSTITIAL_WIDTH_CLASS } from '@/components/layouts/InterstitialLayout'
 
 const APPROVER_OPTIONS = {
   looser: {
-    value: "organization",
-    label: "An owner, once for the whole organization",
-    description: "One shared grant for everyone in the org.",
+    value: 'organization',
+    label: 'An owner, once for the whole organization',
+    description: 'One shared grant for everyone in the org.',
   },
   stricter: {
-    value: "member",
-    label: "Each member, for themselves",
-    description: "A grant per person, never more than they can already do.",
+    value: 'member',
+    label: 'Each member, for themselves',
+    description: 'A grant per person, never more than they can already do.',
   },
-} as const;
+} as const
 
 const PROJECT_REACH_OPTIONS = {
   looser: {
-    value: "all",
-    label: "All projects",
-    description: "Every project, including ones created later. No choice shown.",
+    value: 'all',
+    label: 'All projects',
+    description: 'Every project, including ones created later. No choice shown.',
   },
   stricter: {
-    value: "choose",
-    label: "Let them choose",
+    value: 'choose',
+    label: 'Let them choose',
     description:
       "People connecting pick all projects or specific ones. Requests to projects they didn't pick return 403.",
   },
-} as const;
+} as const
 
 interface PermanentChoiceOption {
-  value: string;
-  label: string;
-  description: string;
+  value: string
+  label: string
+  description: string
 }
 
 const toChoiceValue = (
   options: { looser: PermanentChoiceOption; stricter: PermanentChoiceOption },
-  isStricter: boolean,
-) => (isStricter ? options.stricter.value : options.looser.value);
+  isStricter: boolean
+) => (isStricter ? options.stricter.value : options.looser.value)
 
 interface ChoiceBadge {
-  label: string;
-  variant?: "default" | "warning";
+  label: string
+  variant?: 'default' | 'warning'
 }
 
 interface PermanentChoiceItemProps {
-  option: PermanentChoiceOption;
-  badge?: ChoiceBadge;
-  isDisabled?: boolean;
+  option: PermanentChoiceOption
+  badge?: ChoiceBadge
+  isDisabled?: boolean
 }
 
 const PermanentChoiceItem = ({ option, badge, isDisabled = false }: PermanentChoiceItemProps) => {
-  const id = useId();
-  const titleId = `${id}-title`;
-  const descriptionId = `${id}-description`;
-  const badgeId = `${id}-badge`;
+  const id = useId()
+  const titleId = `${id}-title`
+  const descriptionId = `${id}-description`
+  const badgeId = `${id}-badge`
 
   const describedBy = [descriptionId, badge === undefined ? undefined : badgeId]
     .filter(Boolean)
-    .join(" ");
+    .join(' ')
 
   return (
     <RadioGroupStackedItem
@@ -94,17 +94,17 @@ const PermanentChoiceItem = ({ option, badge, isDisabled = false }: PermanentCho
         </span>
       }
     />
-  );
-};
+  )
+}
 
 interface PermanentChoiceFieldProps {
-  legend: string;
-  looser: PermanentChoiceOption;
-  stricter: PermanentChoiceOption;
-  value: string;
+  legend: string
+  looser: PermanentChoiceOption
+  stricter: PermanentChoiceOption
+  value: string
   /** The value currently persisted on the app, or undefined for an app that has never been saved. */
-  savedValue?: string;
-  onChange: (value: string) => void;
+  savedValue?: string
+  onChange: (value: string) => void
 }
 
 const PermanentChoiceField = ({
@@ -115,18 +115,18 @@ const PermanentChoiceField = ({
   savedValue,
   onChange,
 }: PermanentChoiceFieldProps) => {
-  const isLockedToStricter = savedValue === stricter.value;
+  const isLockedToStricter = savedValue === stricter.value
 
   const getLooserBadge = (): ChoiceBadge | undefined => {
-    if (isLockedToStricter) return { label: "Can't switch back", variant: "warning" };
-    if (savedValue === looser.value) return { label: "Current" };
-    return undefined;
-  };
+    if (isLockedToStricter) return { label: "Can't switch back", variant: 'warning' }
+    if (savedValue === looser.value) return { label: 'Current' }
+    return undefined
+  }
 
   const stricterBadge: ChoiceBadge =
     savedValue === stricter.value
-      ? { label: "Current" }
-      : { label: "Permanent", variant: "warning" };
+      ? { label: 'Current' }
+      : { label: 'Permanent', variant: 'warning' }
 
   return (
     <fieldset>
@@ -134,7 +134,7 @@ const PermanentChoiceField = ({
       <RadioGroupStacked
         value={value}
         onValueChange={(nextValue) => {
-          if (nextValue) onChange(nextValue);
+          if (nextValue) onChange(nextValue)
         }}
       >
         <PermanentChoiceItem
@@ -145,16 +145,16 @@ const PermanentChoiceField = ({
         <PermanentChoiceItem option={stricter} badge={stricterBadge} />
       </RadioGroupStacked>
     </fieldset>
-  );
-};
+  )
+}
 
 interface AuthorizationPreviewProps {
-  appName: string;
-  scopes: string[];
-  isMemberBoundGrant: boolean;
-  isProjectScopingEnabled: boolean;
-  organizationName?: string;
-  savedValues?: AuthorizationValues;
+  appName: string
+  scopes: string[]
+  isMemberBoundGrant: boolean
+  isProjectScopingEnabled: boolean
+  organizationName?: string
+  savedValues?: AuthorizationValues
 }
 
 const AuthorizationPreview = ({
@@ -168,7 +168,7 @@ const AuthorizationPreview = ({
   const hasUnsavedChanges =
     savedValues !== undefined &&
     (savedValues.member_bound_grant !== isMemberBoundGrant ||
-      savedValues.project_scoping !== isProjectScopingEnabled);
+      savedValues.project_scoping !== isProjectScopingEnabled)
 
   return (
     <section className="overflow-hidden rounded-lg border">
@@ -180,7 +180,7 @@ const AuthorizationPreview = ({
             shifting everything above it.
           */}
         <div className="pointer-events-none absolute inset-x-0 -top-16 flex justify-center px-6 opacity-60 select-none">
-          <Card className={cn("w-full", INTERSTITIAL_WIDTH_CLASS)}>
+          <Card className={cn('w-full', INTERSTITIAL_WIDTH_CLASS)}>
             <div className="flex flex-col items-center gap-1 px-6 pt-6 pb-5 text-center">
               <p className="text-lg font-medium tracking-tight text-foreground">
                 Authorize {appName}
@@ -214,7 +214,7 @@ const AuthorizationPreview = ({
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-foreground">Organization</p>
                 <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground">
-                  <span className="truncate">{organizationName ?? "Your organization"}</span>
+                  <span className="truncate">{organizationName ?? 'Your organization'}</span>
                   <ChevronDownIcon size={14} className="shrink-0 text-foreground-lighter" />
                 </div>
               </div>
@@ -238,7 +238,7 @@ const AuthorizationPreview = ({
                 {scopes.length > 0 && <ScopeGroupCard scopes={scopes} />}
                 <p className="text-xs text-foreground-lighter">
                   Authorizing {appName} grants it access to the permissions
-                  {isProjectScopingEnabled ? <span>{" and selected projects "}</span> : " "}
+                  {isProjectScopingEnabled ? <span>{' and selected projects '}</span> : ' '}
                   <span>above.</span>
                 </p>
               </div>
@@ -265,26 +265,26 @@ const AuthorizationPreview = ({
           </p>
           {hasUnsavedChanges && (
             <p className="text-sm text-foreground-lighter">
-              Today:{" "}
+              Today:{' '}
               {getResultingGrantDescription(
                 savedValues.member_bound_grant,
-                savedValues.project_scoping,
+                savedValues.project_scoping
               )}
             </p>
           )}
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
 export interface AuthorizationSectionProps {
-  control: Control<FormSchemaWithOAuthAppScopedGrants>;
+  control: Control<FormSchemaWithOAuthAppScopedGrants>
   /** The values persisted on the app, or undefined while publishing a new app. */
-  savedValues?: AuthorizationValues;
-  organizationName?: string;
+  savedValues?: AuthorizationValues
+  organizationName?: string
   /** The scopes the app is asking for, mirrored into the consent preview. */
-  scopes?: string[];
+  scopes?: string[]
 }
 
 export const AuthorizationSection = ({
@@ -295,8 +295,8 @@ export const AuthorizationSection = ({
 }: AuthorizationSectionProps) => {
   const [appName, isMemberBoundGrant, isProjectScopingEnabled] = useWatch({
     control,
-    name: ["name", "member_bound_grant", "project_scoping"],
-  });
+    name: ['name', 'member_bound_grant', 'project_scoping'],
+  })
 
   return (
     <div className="p-6 space-y-6">
@@ -342,7 +342,7 @@ export const AuthorizationSection = ({
       />
 
       <AuthorizationPreview
-        appName={appName.length > 0 ? appName : "your app"}
+        appName={appName.length > 0 ? appName : 'your app'}
         scopes={scopes}
         isMemberBoundGrant={isMemberBoundGrant}
         isProjectScopingEnabled={isProjectScopingEnabled}
@@ -350,5 +350,5 @@ export const AuthorizationSection = ({
         savedValues={savedValues}
       />
     </div>
-  );
-};
+  )
+}

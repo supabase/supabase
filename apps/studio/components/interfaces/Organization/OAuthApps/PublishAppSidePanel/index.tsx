@@ -1,10 +1,10 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { OAuthScope } from "@supabase/shared-types/out/constants";
-import { useFlag, useParams } from "common";
-import { EditIcon, UploadIcon } from "lucide-react";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
+import { EditIcon, UploadIcon } from 'lucide-react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -29,57 +29,57 @@ import {
   InputGroupButton,
   InputGroupInput,
   SidePanel,
-} from "ui";
-import { FormItemLayout } from "ui-patterns/form/FormItemLayout/FormItemLayout";
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { AuthorizeRequesterDetails } from "../AuthorizeRequesterDetails";
-import { OAuthSecrets } from "../OAuthSecrets/OAuthSecrets";
-import { AuthorizationSection } from "./Authorization";
+import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
+import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
+import { AuthorizationSection } from './Authorization'
 import {
   AuthorizationValues,
   getAuthorizationChanges,
   hasAuthorizationChanges,
-} from "./Authorization.utils";
-import { AuthorizationConfirmDialog } from "./AuthorizationConfirmDialog";
+} from './Authorization.utils'
+import { AuthorizationConfirmDialog } from './AuthorizationConfirmDialog'
 import {
   formSchema,
   FormSchema,
   FormSchemaWithOAuthAppScopedGrants,
   formSchemaWithOAuthAppScopedGrants,
-} from "./PublishAppSidePanel.utils";
-import { ScopesPanel } from "./Scopes";
-import { DocsButton } from "@/components/ui/DocsButton";
-import { Shortcut } from "@/components/ui/Shortcut";
+} from './PublishAppSidePanel.utils'
+import { ScopesPanel } from './Scopes'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
-} from "@/data/oauth/oauth-app-create-mutation";
-import { useOAuthAppUpdateMutation } from "@/data/oauth/oauth-app-update-mutation";
-import type { OAuthApp } from "@/data/oauth/oauth-apps-query";
-import { useSelectedOrganizationQuery } from "@/hooks/misc/useSelectedOrganization";
-import { DOCS_URL } from "@/lib/constants";
-import { uuidv4 } from "@/lib/helpers";
-import { uploadAttachment } from "@/lib/upload";
-import { SHORTCUT_IDS } from "@/state/shortcuts/registry";
+} from '@/data/oauth/oauth-app-create-mutation'
+import { useOAuthAppUpdateMutation } from '@/data/oauth/oauth-app-update-mutation'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { uploadAttachment } from '@/lib/upload'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
-  visible: boolean;
-  selectedApp?: OAuthApp;
-  onClose: () => void;
-  onCreateSuccess: (app: OAuthAppCreateResponse) => void;
+  visible: boolean
+  selectedApp?: OAuthApp
+  onClose: () => void
+  onCreateSuccess: (app: OAuthAppCreateResponse) => void
 }
 
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: true,
-): FormSchemaWithOAuthAppScopedGrants;
+  withOAuthAppScopedGrants: true
+): FormSchemaWithOAuthAppScopedGrants
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: false,
-): FormSchema;
+  withOAuthAppScopedGrants: false
+): FormSchema
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: boolean = false,
+  withOAuthAppScopedGrants: boolean = false
 ): FormSchema | FormSchemaWithOAuthAppScopedGrants {
   if (selectedApp) {
     if (!withOAuthAppScopedGrants) {
@@ -88,9 +88,9 @@ function getFormDefaultValues(
         website: selectedApp.website,
         redirect_uris:
           selectedApp.redirect_uris?.map((url) => {
-            return { id: uuidv4(), value: url };
+            return { id: uuidv4(), value: url }
           }) ?? [],
-      };
+      }
     }
 
     return {
@@ -98,37 +98,37 @@ function getFormDefaultValues(
       website: selectedApp.website,
       redirect_uris:
         selectedApp.redirect_uris?.map((url) => {
-          return { id: uuidv4(), value: url };
+          return { id: uuidv4(), value: url }
         }) ?? [],
       ...getSavedAuthorizationValues(selectedApp),
-    };
+    }
   }
 
   if (!withOAuthAppScopedGrants) {
     return {
-      name: "",
-      website: "",
-      redirect_uris: [{ id: uuidv4(), value: "" }],
-    };
+      name: '',
+      website: '',
+      redirect_uris: [{ id: uuidv4(), value: '' }],
+    }
   }
 
   return {
-    name: "",
-    website: "",
-    redirect_uris: [{ id: uuidv4(), value: "" }],
+    name: '',
+    website: '',
+    redirect_uris: [{ id: uuidv4(), value: '' }],
     member_bound_grant: false,
     project_scoping: false,
-  };
+  }
 }
 
 function getSavedAuthorizationValues(selectedApp: OAuthApp | undefined): AuthorizationValues {
   return {
-    member_bound_grant: selectedApp?.grant_kind === "member_bound",
+    member_bound_grant: selectedApp?.grant_kind === 'member_bound',
     project_scoping: selectedApp?.project_scoping_mode === true,
-  };
+  }
 }
 
-const FORM_ID = "publish-oauth-app-form";
+const FORM_ID = 'publish-oauth-app-form'
 
 export const PublishAppSidePanel = ({
   visible,
@@ -136,90 +136,90 @@ export const PublishAppSidePanel = ({
   onClose,
   onCreateSuccess,
 }: PublishAppSidePanelProps) => {
-  const { slug } = useParams();
-  const uploadButtonRef = useRef<HTMLInputElement | null>(null);
-  const areOAuthAppScopedGrantsEnabled = useFlag("enableScopedOAuthPublish");
+  const { slug } = useParams()
+  const uploadButtonRef = useRef<HTMLInputElement | null>(null)
+  const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
 
-  const { data: organization } = useSelectedOrganizationQuery();
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const [isSavingApp, setIsSavingApp] = useState(false);
+  const [isSavingApp, setIsSavingApp] = useState(false)
   const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
-      toast.success(`Successfully created OAuth app "${variables.name}"!`);
-      onClose();
-      onCreateSuccess(res);
+      toast.success(`Successfully created OAuth app "${variables.name}"!`)
+      onClose()
+      onCreateSuccess(res)
     },
     onError: (error) => {
-      toast.error(`Failed to create OAuth application: ${error.message}`);
+      toast.error(`Failed to create OAuth application: ${error.message}`)
     },
-  });
+  })
   const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthAppUpdateMutation({
     onSuccess: (_, variables) => {
-      toast.success(`Successfully updated OAuth app "${variables.name}"!`);
-      onClose();
+      toast.success(`Successfully updated OAuth app "${variables.name}"!`)
+      onClose()
     },
     onError: (error) => {
-      toast.error(`Failed to update OAuth application: ${error.message}`);
+      toast.error(`Failed to update OAuth application: ${error.message}`)
     },
-  });
+  })
 
-  const [showPreview, setShowPreview] = useState(false);
-  const [iconFile, setIconFile] = useState<File>();
-  const [iconUrl, setIconUrl] = useState<string>();
-  const [scopes, setScopes] = useState<OAuthScope[]>([]);
+  const [showPreview, setShowPreview] = useState(false)
+  const [iconFile, setIconFile] = useState<File>()
+  const [iconUrl, setIconUrl] = useState<string>()
+  const [scopes, setScopes] = useState<OAuthScope[]>([])
   const [valuesPendingConfirmation, setValuesPendingConfirmation] =
-    useState<FormSchemaWithOAuthAppScopedGrants>();
+    useState<FormSchemaWithOAuthAppScopedGrants>()
 
-  const savedAuthorizationValues = getSavedAuthorizationValues(selectedApp);
+  const savedAuthorizationValues = getSavedAuthorizationValues(selectedApp)
   const pendingAuthorizationChanges = getAuthorizationChanges(
     savedAuthorizationValues,
-    valuesPendingConfirmation ?? savedAuthorizationValues,
-  );
+    valuesPendingConfirmation ?? savedAuthorizationValues
+  )
 
   useEffect(() => {
-    setValuesPendingConfirmation(undefined);
+    setValuesPendingConfirmation(undefined)
 
     if (visible) {
-      setIconFile(undefined);
+      setIconFile(undefined)
 
       if (selectedApp !== undefined) {
-        setScopes((selectedApp?.scopes ?? []) as OAuthScope[]);
-        setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon);
+        setScopes((selectedApp?.scopes ?? []) as OAuthScope[])
+        setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon)
       } else {
-        setScopes([]);
-        setIconUrl(undefined);
+        setScopes([])
+        setIconUrl(undefined)
       }
     }
-  }, [visible, selectedApp]);
+  }, [visible, selectedApp])
 
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.persist();
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setIconFile(file);
-    setIconUrl(URL.createObjectURL(file));
-    event.target.value = "";
-  };
+    event.persist()
+    const file = event.target.files?.[0]
+    if (!file) return
+    setIconFile(file)
+    setIconUrl(URL.createObjectURL(file))
+    event.target.value = ''
+  }
 
   const saveApp = async (values: FormSchema | FormSchemaWithOAuthAppScopedGrants) => {
-    if (!slug) return console.error("Slug is required");
-    if (isSaving) return;
+    if (!slug) return console.error('Slug is required')
+    if (isSaving) return
 
-    setIsSavingApp(true);
-    const { name, website, redirect_uris } = values;
-    let member_bound_grant, project_scoping;
+    setIsSavingApp(true)
+    const { name, website, redirect_uris } = values
+    let member_bound_grant, project_scoping
     if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
-      member_bound_grant = values.member_bound_grant;
-      project_scoping = values.project_scoping;
+      member_bound_grant = values.member_bound_grant
+      project_scoping = values.project_scoping
     }
     const uploadedIconUrl =
       iconFile !== undefined
-        ? await uploadAttachment("oauth-app-icons", `${slug}/${uuidv4()}.png`, iconFile)
-        : iconUrl;
+        ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
+        : iconUrl
 
     if (iconFile !== undefined && uploadedIconUrl === undefined) {
-      toast.error("Failed to upload OAuth application icon");
-      return;
+      toast.error('Failed to upload OAuth application icon')
+      return
     }
 
     try {
@@ -234,11 +234,11 @@ export const PublishAppSidePanel = ({
           icon: uploadedIconUrl,
           ...(areOAuthAppScopedGrantsEnabled
             ? {
-                grant_kind: member_bound_grant ? "member_bound" : "organization_bound",
+                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
                 project_scoping_mode: project_scoping,
               }
             : {}),
-        });
+        })
       } else {
         // Update application
         await updateOAuthApp({
@@ -251,38 +251,38 @@ export const PublishAppSidePanel = ({
           icon: uploadedIconUrl,
           ...(areOAuthAppScopedGrantsEnabled
             ? {
-                grant_kind: member_bound_grant ? "member_bound" : "organization_bound",
+                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
                 project_scoping_mode: project_scoping,
               }
             : {}),
-        });
+        })
       }
     } catch {
       // Error side effects are handled in the mutation hook options
     } finally {
-      setIsSavingApp(false);
+      setIsSavingApp(false)
     }
-  };
+  }
 
   const onSubmit: SubmitHandler<FormSchema | FormSchemaWithOAuthAppScopedGrants> = async (
-    values,
+    values
   ) => {
     if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
-      const changes = getAuthorizationChanges(savedAuthorizationValues, values);
+      const changes = getAuthorizationChanges(savedAuthorizationValues, values)
       if (hasAuthorizationChanges(changes)) {
-        setValuesPendingConfirmation(values);
-        return;
+        setValuesPendingConfirmation(values)
+        return
       }
     }
 
-    await saveApp(values);
-  };
+    await saveApp(values)
+  }
 
   const onConfirmPermanentChanges = async () => {
-    if (valuesPendingConfirmation === undefined) return;
-    await saveApp(valuesPendingConfirmation);
-    setValuesPendingConfirmation(undefined);
-  };
+    if (valuesPendingConfirmation === undefined) return
+    await saveApp(valuesPendingConfirmation)
+    setValuesPendingConfirmation(undefined)
+  }
 
   const form = useForm<
     typeof areOAuthAppScopedGrantsEnabled extends true
@@ -292,39 +292,39 @@ export const PublishAppSidePanel = ({
     // @ts-expect-error known issue in TS https://github.com/microsoft/TypeScript/issues/50754
     defaultValues: getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled),
     resolver: zodResolver(
-      areOAuthAppScopedGrantsEnabled ? formSchemaWithOAuthAppScopedGrants : formSchema,
+      areOAuthAppScopedGrantsEnabled ? formSchemaWithOAuthAppScopedGrants : formSchema
     ),
-  });
-  const { reset } = form;
-  const { errors, isSubmitting } = form.formState;
-  const isSaving = isSubmitting || isSavingApp || isCreating || isUpdating;
+  })
+  const { reset } = form
+  const { errors, isSubmitting } = form.formState
+  const isSaving = isSubmitting || isSavingApp || isCreating || isUpdating
 
   useEffect(() => {
     if (visible) {
       // @ts-expect-error known issue in TS https://github.com/microsoft/TypeScript/issues/50754
-      const defaultValues = getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled);
-      reset(defaultValues);
+      const defaultValues = getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled)
+      reset(defaultValues)
     }
-  }, [visible, selectedApp, reset, areOAuthAppScopedGrantsEnabled]);
+  }, [visible, selectedApp, reset, areOAuthAppScopedGrantsEnabled])
 
-  const name = useWatch({ name: "name", control: form.control });
-  const website = useWatch({ name: "website", control: form.control });
+  const name = useWatch({ name: 'name', control: form.control })
+  const website = useWatch({ name: 'website', control: form.control })
 
   const {
     fields: callbackUrlsFields,
     append: appendCallbackUrl,
     remove: removeCallbackUrl,
   } = useFieldArray({
-    name: "redirect_uris",
+    name: 'redirect_uris',
     control: form.control,
-  });
+  })
 
   return (
     <SidePanel
       size="large"
       visible={visible}
       header={
-        selectedApp !== undefined ? "Update OAuth application" : "Publish a new OAuth application"
+        selectedApp !== undefined ? 'Update OAuth application' : 'Publish a new OAuth application'
       }
       onCancel={() => onClose()}
       customFooter={
@@ -395,12 +395,12 @@ export const PublishAppSidePanel = ({
                 {iconUrl !== undefined ? (
                   <div
                     className={cn(
-                      "shadow-sm transition group relative",
-                      "bg-center bg-cover bg-no-repeat",
-                      "mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center",
+                      'shadow-sm transition group relative',
+                      'bg-center bg-cover bg-no-repeat',
+                      'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
                     )}
                     style={{
-                      backgroundImage: iconUrl ? `url("${iconUrl}")` : "none",
+                      backgroundImage: iconUrl ? `url("${iconUrl}")` : 'none',
                     }}
                   >
                     <div className="absolute bottom-1 right-1">
@@ -414,7 +414,7 @@ export const PublishAppSidePanel = ({
                           <DropdownMenuItem
                             key="upload"
                             onClick={() => {
-                              uploadButtonRef.current?.click();
+                              uploadButtonRef.current?.click()
                             }}
                           >
                             <p>Upload image</p>
@@ -422,8 +422,8 @@ export const PublishAppSidePanel = ({
                           <DropdownMenuItem
                             key="remove"
                             onClick={() => {
-                              setIconFile(undefined);
-                              setIconUrl(undefined);
+                              setIconFile(undefined)
+                              setIconUrl(undefined)
                             }}
                           >
                             <p>Remove image</p>
@@ -435,11 +435,11 @@ export const PublishAppSidePanel = ({
                 ) : (
                   <div
                     className={cn(
-                      "border border-strong transition opacity-75 hover:opacity-100",
-                      "mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer",
+                      'border border-strong transition opacity-75 hover:opacity-100',
+                      'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
                     )}
                     onClick={() => {
-                      uploadButtonRef.current?.click();
+                      uploadButtonRef.current?.click()
                     }}
                   >
                     <UploadIcon size={18} strokeWidth={1.5} className="text-foreground" />
@@ -469,7 +469,7 @@ export const PublishAppSidePanel = ({
                   All URLs must use HTTPS, except for localhost
                 </p>
               </div>
-              <Button onClick={() => appendCallbackUrl({ id: uuidv4(), value: "" })}>
+              <Button onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}>
                 Add URL
               </Button>
             </div>
@@ -584,19 +584,19 @@ export const PublishAppSidePanel = ({
         onConfirm={() => onConfirmPermanentChanges()}
       />
     </SidePanel>
-  );
-};
+  )
+}
 
 const isFormSchemaWithOAuthAppScopedGrants = (
   _schema: Control<FormSchema> | Control<FormSchemaWithOAuthAppScopedGrants>,
-  withOAuthAppScopedGrants: boolean,
+  withOAuthAppScopedGrants: boolean
 ): _schema is Control<FormSchemaWithOAuthAppScopedGrants> => {
-  return withOAuthAppScopedGrants;
-};
+  return withOAuthAppScopedGrants
+}
 
 const isFormValuesWithOAuthAppScopedGrants = (
   _values: FormSchema | FormSchemaWithOAuthAppScopedGrants,
-  withOAuthAppScopedGrants: boolean,
+  withOAuthAppScopedGrants: boolean
 ): _values is FormSchemaWithOAuthAppScopedGrants => {
-  return withOAuthAppScopedGrants;
-};
+  return withOAuthAppScopedGrants
+}
