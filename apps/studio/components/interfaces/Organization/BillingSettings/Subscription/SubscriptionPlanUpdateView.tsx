@@ -64,7 +64,7 @@ export const SubscriptionPlanUpdateView = ({
   onSuccess,
   planMeta,
   subscriptionPreviewQueryResult,
-  currentPlanMeta,
+  currentPlanMeta: liveCurrentPlanMeta,
   projects,
   onAddressChange,
   onTaxIdChange,
@@ -84,16 +84,36 @@ export const SubscriptionPlanUpdateView = ({
   }>(null)
 
   const {
-    data: subscriptionPreview,
+    data: liveSubscriptionPreview,
     isPending: subscriptionPreviewIsLoading,
-    isFetching: subscriptionPreviewIsFetching,
+    isFetching: liveSubscriptionPreviewIsFetching,
     isSuccess: subscriptionPreviewInitialized,
-    isError: subscriptionPreviewIsError,
+    isError: liveSubscriptionPreviewIsError,
     error: subscriptionPreviewError,
     refetch: refetchSubscriptionPreview,
   } = subscriptionPreviewQueryResult
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: liveSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  /**
+   * The subscription, preview and current plan the change was submitted against. On success the
+   * mutations refetch these before the view closes, which would briefly re-render it as a change
+   * from the new plan to itself (condensed bill, no payment form, $0 due, no features to lose).
+   * Held until the change fails.
+   */
+  const [submittedState, setSubmittedState] = useState<{
+    subscription: typeof liveSubscription
+    subscriptionPreview: typeof liveSubscriptionPreview
+    currentPlanMeta: typeof liveCurrentPlanMeta
+  }>()
+  const isSubmitted = submittedState !== undefined
+  const subscription = isSubmitted ? submittedState.subscription : liveSubscription
+  const subscriptionPreview = isSubmitted
+    ? submittedState.subscriptionPreview
+    : liveSubscriptionPreview
+  const currentPlanMeta = isSubmitted ? submittedState.currentPlanMeta : liveCurrentPlanMeta
+  const subscriptionPreviewIsFetching = !isSubmitted && liveSubscriptionPreviewIsFetching
+  const subscriptionPreviewIsError = !isSubmitted && liveSubscriptionPreviewIsError
   const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
 
@@ -134,6 +154,7 @@ export const SubscriptionPlanUpdateView = ({
         onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setSubmittedState(undefined)
         setPaymentConfirmationLoading(false)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
@@ -146,6 +167,7 @@ export const SubscriptionPlanUpdateView = ({
         onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setSubmittedState(undefined)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
     })
@@ -160,6 +182,7 @@ export const SubscriptionPlanUpdateView = ({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
       })
     } else {
+      setSubmittedState(undefined)
       setPaymentConfirmationLoading(false)
       // If the payment intent is not successful, we reset the payment method and show an error
       toast.error(`Could not confirm payment. Please try again or use a different card.`)
@@ -198,6 +221,7 @@ export const SubscriptionPlanUpdateView = ({
         ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
         : selectedTier
 
+    setSubmittedState({ subscription, subscriptionPreview, currentPlanMeta })
     updateOrgSubscription({
       slug: selectedOrganization?.slug,
       tier,
