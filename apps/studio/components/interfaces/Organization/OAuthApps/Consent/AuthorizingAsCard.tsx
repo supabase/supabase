@@ -9,7 +9,7 @@ export const MEMBER_BOUND_GRANT_NOTICE =
 
 export interface AuthorizingAsCardProps {
   email: string
-  request: OAuthAppsAuthorizeRequestData
+  request: Pick<OAuthAppsAuthorizeRequestData, 'project_scoping_mode' | 'grant_kind'>
   onSignOut: () => void
 }
 

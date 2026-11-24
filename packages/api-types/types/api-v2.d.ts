@@ -803,6 +803,72 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/warehouse/replication/add': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Add source tables to Warehouse replication
+     * @description Adds one eligible source table or the currently eligible tables in a schema to an enabled Warehouse. Existing selections and layouts are preserved; already-selected tables are unchanged. Schema selection excludes future tables, except future partitions of selected partition roots. An active pipeline restarts once, interrupting replication for other tables; their in-progress initial copies may restart from scratch. A stopped pipeline remains stopped and requires an explicit start before copying. Initial copy adds source reads; duration is unknown. Unsafe reattachment of retained data is rejected. The response describes configuration and restart acceptance, not completed copy or streaming. Failures may have partial effects; inspect table and pipeline state before retrying.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-add-warehouse-replication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/replication/remove': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Remove source tables from Warehouse replication
+     * @description Removes one selected source table or all selected tables in a schema as a batch. Source PostgreSQL rows and existing Warehouse data are retained. The retained copy stops receiving updates. An active pipeline restarts once, interrupting replication for other tables; their in-progress initial copies may restart from scratch. A stopped pipeline stays stopped. Removing an unselected target is unchanged. Removing the last target leaves Warehouse enabled with an empty selection. Publication changes and restart acceptance do not establish observed exclusion by active replication. Failures may have partial effects; inspect the selection and pipeline before retrying.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-remove-warehouse-replication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/replication/resync': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Reset and rebuild one Warehouse table
+     * @description Resets replication for one selected source table using its currently saved layout. Source rows, saved layouts and completed replication state for unrelated tables are preserved. In-progress initial copies of other tables may restart from scratch. The Warehouse copy is deleted and rebuilt when replication resumes; table reads may be unavailable, freshness can lag, and the source incurs additional reads. Stopping and restarting the pipeline interrupts replication for other tables. Duration is unknown. The pipeline must be started and initial sync enabled for the table before the reset. The immediate response retains ETL reset states; it does not establish recopy completion. Inspect warehouse tables get and warehouse status separately. Do not automatically retry an uncertain response: repeating this request may reset the table again. There is no server-side preview, revision check, idempotency key or operation polling.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-resync-warehouse-replication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/warehouse/setups': {
     parameters: {
       query?: never
@@ -3902,6 +3968,170 @@ export interface components {
         type: 'warehouse_metric'
       }[]
     }
+    V2WarehouseReplicationRequest: {
+      data: {
+        attributes: {
+          /** @description Literal source PostgreSQL schema. Omit table to select its current tables. */
+          schema: string
+          /** @description Literal source table name. Omit to select the schema. */
+          table?: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_replication_change'
+      }
+    }
+    V2WarehouseReplicationResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          action: 'add' | 'remove'
+          affected_tables: {
+            id: number
+            name: string
+            schema: string
+          }[]
+          /**
+           * @description Immediate orchestration result. Restart acceptance does not establish runtime application or copy completion.
+           * @enum {string}
+           */
+          application_status: 'unchanged' | 'restart_requested' | 'configured'
+          changed: boolean
+          /** @enum {boolean} */
+          includes_future_tables: false
+          pipeline_id: string
+          pipeline_status_before: string
+          selected_table_count: number
+          /** @enum {boolean} */
+          source_data_preserved: true
+          /** @description Resulting configured selection, with best-effort replication observations. */
+          tables: {
+            copy_name: string
+            id: number
+            lag_ms: number | null
+            name: string
+            replication_state: string | null
+            schema: string
+            /**
+             * @description Last observed table state; null when unavailable. Does not establish completion of this request.
+             * @enum {string|null}
+             */
+            state: 'syncing' | 'live' | 'error' | null
+          }[]
+          unchanged_tables: {
+            id: number
+            name: string
+            schema: string
+          }[]
+          /** @enum {boolean} */
+          warehouse_data_retained: true
+          /** @enum {boolean} */
+          warehouse_enabled: true
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_replication_change'
+      }
+    }
+    V2WarehouseResyncRequest: {
+      data: {
+        attributes: {
+          /** @description Literal source PostgreSQL schema. Omit table to select its current tables. */
+          schema: string
+          /** @description Literal name of the single source table to reset and recopy. */
+          table: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_replication_resync'
+      }
+    }
+    V2WarehouseResyncResponse_Output: {
+      data: {
+        attributes: {
+          /**
+           * @description ETL reset replication state. Destination rebuild and recopy may still be pending.
+           * @enum {string}
+           */
+          application_status: 'reset'
+          /**
+           * @description Pipeline ID
+           * @example 03dg2o5teb2eucxr9ggh3uie6
+           */
+          pipeline_id: string
+          /** @enum {boolean} */
+          source_data_preserved: true
+          source_table: {
+            id: number
+            name: string
+            schema: string
+          }
+          /** @description Rolled back tables */
+          tables: {
+            /** @description Table replication state */
+            new_state:
+              | {
+                  /** @enum {string} */
+                  name: 'queued'
+                }
+              | {
+                  /** @enum {string} */
+                  name: 'copying_table'
+                }
+              | {
+                  /** @enum {string} */
+                  name: 'copied_table'
+                }
+              | {
+                  /** @enum {string} */
+                  name: 'following_wal'
+                }
+              | {
+                  /** @enum {string} */
+                  name: 'error'
+                  reason: string
+                  retry_policy:
+                    | {
+                        /** @enum {string} */
+                        policy: 'no_retry'
+                      }
+                    | {
+                        /** @enum {string} */
+                        policy: 'manual_retry'
+                      }
+                    | {
+                        /**
+                         * @description Next retry time (RFC 3339 timestamp)
+                         * @example 2025-01-02T03:04:05Z
+                         */
+                        next_retry: string
+                        /** @enum {string} */
+                        policy: 'timed_retry'
+                      }
+                  solution?: string | null
+                }
+            /**
+             * @description Table id (Postgres OID)
+             * @example 16408
+             */
+            table_id: number
+          }[]
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_replication_resync'
+      }
+    }
     V2WarehouseSetupAcceptedResponse_Output: {
       data: {
         attributes: {
@@ -4279,72 +4509,139 @@ export interface components {
     }
     V2WarehouseTableLayoutUpdateRequest: {
       data: {
-        attributes: {
-          /** @description Omit to preserve the saved partitioning. Null makes partitioning unmanaged. An empty list explicitly clears partitioning. Otherwise, supply all ordered partition keys. */
-          partition_by?:
-            | {
-                /** @description Source column name. */
-                column: string
-                transform:
-                  | {
-                      /** @enum {string} */
-                      kind: 'identity'
-                    }
-                  | {
-                      /** @enum {string} */
-                      kind: 'year'
-                    }
-                  | {
-                      /** @enum {string} */
-                      kind: 'month'
-                    }
-                  | {
-                      /** @enum {string} */
-                      kind: 'day'
-                    }
-                  | {
-                      /** @enum {string} */
-                      kind: 'hour'
-                    }
-                  | {
-                      /** @description Number of hash buckets. */
-                      count: number
-                      /** @enum {string} */
-                      kind: 'bucket'
-                    }
-              }[]
-            | null
-          /** @description Defaults to false, preserving historical files and replication progress. When the layout changes, true resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never resets the table. */
-          reset_table?: boolean
-          /** @description Omit to preserve the saved sorting. Null makes sorting unmanaged. The none selector explicitly clears sorting. Otherwise, supply the complete sort selector. */
-          sort_by?:
-            | (
+        attributes:
+          | {
+              /** @description Omit to preserve the saved partitioning. Null makes partitioning unmanaged. An empty list explicitly clears partitioning. Otherwise, supply all ordered partition keys. */
+              partition_by?:
                 | {
-                    /** @enum {string} */
-                    kind: 'none'
-                  }
+                    /** @description Source column name. */
+                    column: string
+                    transform:
+                      | {
+                          /** @enum {string} */
+                          kind: 'identity'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'year'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'month'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'day'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'hour'
+                        }
+                      | {
+                          /** @description Number of hash buckets. */
+                          count: number
+                          /** @enum {string} */
+                          kind: 'bucket'
+                        }
+                  }[]
+                | null
+              /** @description Defaults to false, preserving historical files and replication progress. When the layout changes, true resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never resets the table. */
+              reset_table?: boolean
+              /** @description Omit to preserve the saved sorting. Null makes sorting unmanaged. The none selector explicitly clears sorting. Otherwise, supply the complete sort selector. */
+              sort_by:
+                | (
+                    | {
+                        /** @enum {string} */
+                        kind: 'none'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'primary_key'
+                      }
+                    | {
+                        columns: {
+                          /** @enum {string} */
+                          direction: 'asc' | 'desc'
+                          /** @description Source column name. */
+                          name: string
+                          /**
+                           * @description Null placement. Null uses DuckLake's default placement.
+                           * @enum {string|null}
+                           */
+                          nulls?: 'first' | 'last' | null
+                        }[]
+                        /** @enum {string} */
+                        kind: 'columns'
+                      }
+                  )
+                | (never | null)
+            }
+          | {
+              /** @description Omit to preserve the saved partitioning. Null makes partitioning unmanaged. An empty list explicitly clears partitioning. Otherwise, supply all ordered partition keys. */
+              partition_by:
                 | {
-                    /** @enum {string} */
-                    kind: 'primary_key'
-                  }
-                | {
-                    columns: {
-                      /** @enum {string} */
-                      direction: 'asc' | 'desc'
-                      /** @description Source column name. */
-                      name: string
-                      /**
-                       * @description Null placement. Null uses DuckLake's default placement.
-                       * @enum {string|null}
-                       */
-                      nulls?: 'first' | 'last' | null
-                    }[]
-                    /** @enum {string} */
-                    kind: 'columns'
-                  }
-              )
-            | (never | null)
-        }
+                    /** @description Source column name. */
+                    column: string
+                    transform:
+                      | {
+                          /** @enum {string} */
+                          kind: 'identity'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'year'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'month'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'day'
+                        }
+                      | {
+                          /** @enum {string} */
+                          kind: 'hour'
+                        }
+                      | {
+                          /** @description Number of hash buckets. */
+                          count: number
+                          /** @enum {string} */
+                          kind: 'bucket'
+                        }
+                  }[]
+                | null
+              /** @description Defaults to false, preserving historical files and replication progress. When the layout changes, true resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never resets the table. */
+              reset_table?: boolean
+              /** @description Omit to preserve the saved sorting. Null makes sorting unmanaged. The none selector explicitly clears sorting. Otherwise, supply the complete sort selector. */
+              sort_by?:
+                | (
+                    | {
+                        /** @enum {string} */
+                        kind: 'none'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'primary_key'
+                      }
+                    | {
+                        columns: {
+                          /** @enum {string} */
+                          direction: 'asc' | 'desc'
+                          /** @description Source column name. */
+                          name: string
+                          /**
+                           * @description Null placement. Null uses DuckLake's default placement.
+                           * @enum {string|null}
+                           */
+                          nulls?: 'first' | 'last' | null
+                        }[]
+                        /** @enum {string} */
+                        kind: 'columns'
+                      }
+                  )
+                | (never | null)
+            }
         /**
          * @description Resource type.
          * @enum {string}
@@ -10645,6 +10942,300 @@ export interface operations {
         }
       }
       /** @description warehouse_metrics_unavailable: Metrics query capacity is temporarily unavailable; retry after a short delay. warehouse_setup_unavailable: Warehouse feature or project metadata unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-add-warehouse-replication': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseReplicationRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseReplicationResponse_Output']
+        }
+      }
+      /** @description Invalid or ineligible source selection */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse pipeline, publication or selected table not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse lifecycle, initial sync or retained data conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Backend unavailable or outcome uncertain; inspect table and pipeline state before retrying */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-remove-warehouse-replication': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseReplicationRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseReplicationResponse_Output']
+        }
+      }
+      /** @description Invalid or ineligible source selection */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse pipeline, publication or selected table not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse lifecycle, initial sync or retained data conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Backend unavailable or outcome uncertain; inspect table and pipeline state before retrying */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-resync-warehouse-replication': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseResyncRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseResyncResponse_Output']
+        }
+      }
+      /** @description Invalid or ineligible source selection */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse pipeline, publication or selected table not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse lifecycle, initial sync or retained data conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Backend unavailable or outcome uncertain; inspect table and pipeline state before retrying */
       503: {
         headers: {
           [name: string]: unknown

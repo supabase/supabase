@@ -37,15 +37,7 @@ create index on items using hnsw (column_name vector_ip_ops);
 create index on items using hnsw (column_name vector_cosine_ops);
 ```
 
-For [pgvector](/docs/guides/database/extensions/pgvector) versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
-
-- vector: up to 2,000 dimensions
-- halfvec: up to 4,000 dimensions
-- bit: up to 64,000 dimensions
-
-You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
-
-If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/general).
+For the maximum dimensions you can index and how to check your pgvector version, see [Vector index limits](/docs/guides/ai/vector-indexes#limits).
 
 ## Example with high-dimensional vectors
 
@@ -115,7 +107,7 @@ Like skip lists, search starts at the top layer and works its way down until it 
 
 HNSW should be your default choice when creating a vector index. Add the index when you don't need 100% accuracy and are willing to trade a small amount of accuracy for a lot of throughput.
 
-Unlike [IVFFlat indexes](/docs/guides/ai/vector-indexes/ivf-indexes), you are safe to build an HNSW index immediately after the table is created. HNSW indexes are based on graphs which inherently are not affected by the same limitations as IVFFlat. As new data is added to the table, the index will be filled automatically and the index structure will remain optimal.
+HNSW indexes are based on graphs, so they aren't affected by the same limitations as IVFFlat. For when you can build each index type, see [When to use each index type](/docs/guides/ai/vector-indexes#when-to-use-each-index-type).
 
 ## Filtering with HNSW indexes
 
