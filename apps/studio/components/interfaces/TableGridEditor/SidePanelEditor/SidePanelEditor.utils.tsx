@@ -407,7 +407,15 @@ export const duplicateTable = async (
 
   // Duplicate rows if needed
   if (isDuplicateRows) {
-    const columns = duplicateTable.columns ?? []
+    // Read the source columns at duplication time so columns added after the
+    // panel loaded are still copied instead of being filled with defaults.
+    const sourceTable = await getTableQuery({
+      projectRef,
+      connectionString,
+      name: sourceTableName,
+      schema: sourceTableSchema,
+    })
+    const columns = sourceTable.columns ?? []
     const copyableColumns = columns
       .filter((column) => !column.is_generated)
       .map((column) => column.name)
@@ -470,11 +478,7 @@ export const duplicateTable = async (
     })
   }
 
-  if (failedIdentitySequenceUpdate) {
-    throw failedIdentitySequenceUpdate.reason
-  }
-
-  return duplicatedTable
+  return { table: duplicatedTable, identitySequenceError: failedIdentitySequenceUpdate }
 }
 
 export const createTable = async ({

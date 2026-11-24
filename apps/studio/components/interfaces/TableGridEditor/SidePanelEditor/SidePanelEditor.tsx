@@ -719,12 +719,17 @@ export const SidePanelEditor = ({
         const tableToDuplicate = selectedTable
         toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
-        const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
-          isRLSEnabled,
-          isDuplicateRows,
-          duplicateTable: tableToDuplicate,
-          foreignKeyRelations,
-        })
+        const { table, identitySequenceError } = await duplicateTable(
+          project?.ref!,
+          project?.connectionString,
+          payload,
+          {
+            isRLSEnabled,
+            isDuplicateRows,
+            duplicateTable: tableToDuplicate,
+            foreignKeyRelations,
+          }
+        )
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
@@ -746,6 +751,10 @@ export const SidePanelEditor = ({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
         ])
+
+        if (identitySequenceError) {
+          throw identitySequenceError.reason
+        }
 
         toast.success(
           `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
