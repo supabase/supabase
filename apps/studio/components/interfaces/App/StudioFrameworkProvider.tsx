@@ -99,6 +99,9 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
   const committedLocation = useRouterState({
     select: (state) => state.resolvedLocation ?? state.location,
   })
+  // `resolvedLocation` stays unset until the first load commits. Before then `location` can already
+  // point at a redirect target while the initial matches are still pending.
+  const isReady = useRouterState({ select: (state) => state.resolvedLocation !== undefined })
   const leafRouteId =
     useMatches({ select: (matches) => matches[matches.length - 1]?.routeId }) ??
     committedLocation.pathname
@@ -120,6 +123,7 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
       Image: StudioImage,
       pathname,
       asPath,
+      isReady,
       params,
       push: async (path: string) => {
         const target = resolveSearchOrHashOnlyTarget(path, currentPathname, currentSearch)
@@ -140,6 +144,7 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
     committedLocation.href,
     committedLocation.pathname,
     committedLocation.searchStr,
+    isReady,
     leafRouteId,
     routeParams,
     router,

@@ -1,8 +1,15 @@
-import { createRootRoute, createRoute } from '@tanstack/react-router'
-import { act, screen } from '@testing-library/react'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { FrameworkImage, FrameworkLink, useFramework, useParams } from 'common'
 import { describe, expect, it } from 'vitest'
 
+import { StudioFrameworkProvider } from './StudioFrameworkProvider'
 import { renderRoute } from '@/tests/lib/route-render'
 
 function ProbeComponent() {
@@ -66,5 +73,46 @@ describe('StudioFrameworkProvider', () => {
     })
     expect(screen.getByTestId('pathname')).toHaveTextContent('/project/[ref]/editor')
     expect(screen.getByTestId('sortOrder')).toHaveTextContent('desc')
+  })
+
+  it('reports isReady only once the initial route load has committed', async () => {
+    let finishLoading!: () => void
+    const loading = new Promise<void>((resolve) => {
+      finishLoading = resolve
+    })
+
+    function ReadyProbe() {
+      const { isReady } = useFramework()
+      return <span data-testid="isReady">{String(isReady)}</span>
+    }
+
+    const rootRoute = createRootRoute({
+      shellComponent: ({ children }) => (
+        <StudioFrameworkProvider>
+          <ReadyProbe />
+          {children}
+        </StudioFrameworkProvider>
+      ),
+    })
+    const editorRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: 'project/$ref/editor',
+      beforeLoad: () => loading,
+      component: () => null,
+    })
+
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([editorRoute]),
+      history: createMemoryHistory({ initialEntries: ['/project/my-proj/editor'] }),
+      defaultPendingMs: 0,
+      defaultPendingMinMs: 0,
+      defaultPendingComponent: () => null,
+    })
+
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByTestId('isReady')).toHaveTextContent('false')
+
+    finishLoading()
+    await waitFor(() => expect(screen.getByTestId('isReady')).toHaveTextContent('true'))
   })
 })
