@@ -312,6 +312,9 @@ export const fgaRequirements = {
   'POST /v2/projects/{ref}/warehouse/replication/remove': [
     ['project_admin_write', 'database_write'],
   ],
+  'POST /v2/projects/{ref}/warehouse/replication/restart': [
+    ['project_admin_write', 'database_write'],
+  ],
   'POST /v2/projects/{ref}/warehouse/replication/resync': [
     ['project_admin_write', 'database_write'],
   ],
