@@ -1,7 +1,7 @@
 import type { NavMenuConstant } from '@/components/Navigation/Navigation.types'
 
 export const selfHosting: NavMenuConstant = {
-  title: 'Self-Hosting',
+  title: 'Self-hosting',
   icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [

@@ -160,7 +160,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'Self-Hosting',
+      label: 'Self-hosting',
       icon: 'self-hosting',
       href: '/guides/self-hosting',
       level: 'self_hosting',
