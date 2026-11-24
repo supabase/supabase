@@ -45,17 +45,3 @@ export const SURVEY_ORG_KIND_OPTIONS: readonly OnboardingSurveyOption[] = (
     ? { value: kind, label: 'Prefer not to say', isOptOut: true }
     : { value: kind, label: ORG_KIND_TYPES[kind] }
 )
-
-export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
-
-// `org_form` gets the survey and its follow-up. `control` gets the default form
-// but still records exposure; users the flag doesn't assign record none.
-export const ONBOARDING_SURVEY_VARIANTS = ['control', 'org_form'] as const
-
-export type OnboardingSurveyVariant = (typeof ONBOARDING_SURVEY_VARIANTS)[number]
-
-export function isOnboardingSurveyVariant(value: unknown): value is OnboardingSurveyVariant {
-  return (
-    typeof value === 'string' && (ONBOARDING_SURVEY_VARIANTS as readonly string[]).includes(value)
-  )
-}
