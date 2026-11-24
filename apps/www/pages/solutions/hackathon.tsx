@@ -29,8 +29,6 @@ const Hackathon: NextPage = () => {
           description: data.metadata.metaDescription,
           url: `https://supabase.com/solutions/hackathon`,
         }}
-        noindex={true}
-        nofollow={true}
       />
       <Layout className="overflow-visible">
         <SolutionsStickyNav activeItem={Solutions.hackathon} type="use-case" />

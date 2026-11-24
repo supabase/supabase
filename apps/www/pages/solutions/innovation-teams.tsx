@@ -36,8 +36,6 @@ const InnovationTeams: NextPage = () => {
           description: data.metadata.metaDescription,
           url: `https://supabase.com/solutions/innovation-teams`,
         }}
-        noindex={true}
-        nofollow={true}
       />
       <Layout className="overflow-visible">
         <SolutionsStickyNav activeItem={Solutions.innovationTeams} type="use-case" />
