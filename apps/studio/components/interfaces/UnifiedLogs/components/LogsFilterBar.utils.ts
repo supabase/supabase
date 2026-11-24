@@ -216,7 +216,8 @@ const toLogsFilter = (condition: FilterCondition): LogsFilter | undefined => {
  * together plus any number of OR groups. Nested AND groups merge into the root and nested OR
  * groups inside an OR group merge into it. Returns null while anything is incomplete (empty
  * group, missing value) or can't be expressed (an AND group inside an OR group), so the caller
- * leaves the applied filters untouched.
+ * leaves the applied filters untouched. The same goes for a column used with different
+ * operators at the root.
  */
 export const normalizeFilterGroup = (root: FilterGroup): NormalizedFilterGroup | null => {
   if (root.logicalOperator !== 'AND') return null
@@ -261,7 +262,18 @@ export const normalizeFilterGroup = (root: FilterGroup): NormalizedFilterGroup |
     return true
   }
 
-  return collectRoot(root) ? { conditions, groups } : null
+  if (!collectRoot(root)) return null
+
+  // The column-filter shape holds one operator per column, so `status <> 200 AND status = 500`
+  // can't be stored without one operator silently replacing the other.
+  const operatorByColumn = new Map<string, FilterCondition['operator']>()
+  for (const { propertyName, operator } of conditions) {
+    const existing = operatorByColumn.get(propertyName)
+    if (existing !== undefined && existing !== operator) return null
+    operatorByColumn.set(propertyName, operator)
+  }
+
+  return { conditions, groups }
 }
 
 export const formatTimeRangeValue = (value: FilterCondition['value']): string => {

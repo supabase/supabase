@@ -429,6 +429,34 @@ describe('filter groups', () => {
     expect(normalizeFilterGroup(group)).toBeNull()
   })
 
+  it('does not apply a root that uses one column with different operators', () => {
+    expect(
+      normalizeFilterGroup({
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            logicalOperator: 'AND',
+            conditions: [
+              { propertyName: 'status', operator: '<>', value: '200' },
+              { propertyName: 'status', operator: '=', value: '500' },
+            ],
+          },
+        ],
+      })
+    ).toBeNull()
+  })
+
+  it('applies a root that repeats a column with the same operator', () => {
+    const conditions = [
+      { propertyName: 'status', operator: '<>', value: '200' },
+      { propertyName: 'status', operator: '<>', value: '500' },
+    ]
+    expect(normalizeFilterGroup({ logicalOperator: 'AND', conditions })).toEqual({
+      conditions,
+      groups: [],
+    })
+  })
+
   describe('areFilterGroupsEquivalent', () => {
     const level = { propertyName: 'level', operator: '=', value: 'error' }
     const status = { propertyName: 'status', operator: '<>', value: '200' }

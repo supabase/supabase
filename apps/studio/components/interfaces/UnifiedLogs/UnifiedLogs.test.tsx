@@ -367,6 +367,32 @@ describe('UnifiedLogs', () => {
     })
   }, 15_000)
 
+  it('does not offer filter groups on the legacy backend', async () => {
+    const user = userEvent.setup()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs hasFilterSideBar={false} />
+      </FeatureFlagContext.Provider>,
+      { nuqs: { hasMemory: true }, queryClient }
+    )
+
+    expect(await screen.findByText('No results found', {}, { timeout: 5_000 })).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0), { timeout: 5_000 })
+    await user.click(screen.getByTestId('filter-bar-freeform-input'))
+    const options = await screen.findAllByRole('option', {}, { timeout: 5_000 })
+    expect(options.map((option) => option.textContent)).toContain('Log Type')
+    expect(options.map((option) => option.textContent)).not.toContain('New filter group')
+  }, 20_000)
+
   it('lets a filter group be toggled to AND and back to OR', async () => {
     const user = userEvent.setup()
     const onUrlUpdate = vi.fn()

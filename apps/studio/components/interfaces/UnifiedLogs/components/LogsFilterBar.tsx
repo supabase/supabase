@@ -226,7 +226,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
         ref={filterBarRef}
         variant="pill"
         freeformDefaultProperty="event_message"
-        supportsOperators
+        supportsOperators={isOtel}
         defaultGroupOperator="OR"
         newGroupPosition="top"
         isRootOperatorLocked

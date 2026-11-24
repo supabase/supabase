@@ -62,6 +62,7 @@ import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
+  countLogsFilterUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import {
@@ -508,7 +509,7 @@ export const UnifiedLogs = ({
     [...PRESET_VIEWS, ...savedViews].find((view) => view.id === activeViewId) ?? null
   const isActiveViewPreset = isPresetViewId(activeViewId)
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
-  const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
+  const activeFilterCount = countLogsFilterUrlParams(search.filter)
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
   const filterCombinationKey = getFilterCombinationKey(search.filter)
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null

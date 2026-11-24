@@ -144,7 +144,9 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
   if (!Array.isArray(filter)) return []
   return filter.flatMap((raw): LogsFilter[] => {
     const [column, abbrev, ...rest] = raw.split(':')
-    const operator = ABBREV_TO_OPERATOR[abbrev]
+    const operator = Object.hasOwn(ABBREV_TO_OPERATOR, abbrev)
+      ? ABBREV_TO_OPERATOR[abbrev]
+      : undefined
     if (!column || !operator) return []
     const value = rest.join(':')
     if (!column.startsWith('attribute.')) return [{ column, operator, value }]
@@ -155,6 +157,10 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
     }
   })
 }
+
+/** Counts flat filters and OR groups, so a view holding only a group still counts as filtered. */
+export const countLogsFilterUrlParams = (filter?: string[] | null): number =>
+  parseLogsFilterUrlParams(filter).length + parseLogsFilterGroupUrlParams(filter).length
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
   return filters.map((filter) => {
@@ -185,7 +191,9 @@ const parseLogsFilterGroup = (raw: string): LogsFilterGroup | undefined => {
   const filters: LogsFilter[] = []
   for (const part of raw.slice(GROUP_URL_PREFIX.length).split(',')) {
     const [encodedColumn, abbrev, encodedValue, ...rest] = part.split(':')
-    const operator = ABBREV_TO_OPERATOR[abbrev]
+    const operator = Object.hasOwn(ABBREV_TO_OPERATOR, abbrev)
+      ? ABBREV_TO_OPERATOR[abbrev]
+      : undefined
     if (!encodedColumn || !operator || encodedValue === undefined || rest.length > 0) {
       return undefined
     }

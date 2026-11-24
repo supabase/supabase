@@ -7,6 +7,7 @@ import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
+  countLogsFilterUrlParams,
   groupLogsFiltersByColumn,
   isLogsFilterGroupColumnFilterId,
   logAttributeFilterId,
@@ -335,6 +336,22 @@ describe('filter groups', () => {
     expect(parseLogsFilterGroupUrlParams(['group:or:status:neq'])).toEqual([])
     expect(parseLogsFilterGroupUrlParams(['group:or:'])).toEqual([])
     expect(parseLogsFilterGroupUrlParams(['group:or:status:neq:%E0%A4%A'])).toEqual([])
+  })
+
+  it('rejects operator abbreviations inherited from Object.prototype', () => {
+    expect(
+      parseLogsFilterGroupUrlParams(['group:or:status:eq:200,pathname:constructor:x'])
+    ).toEqual([])
+    expect(parseLogsFilterUrlParams(['status:toString:200', 'level:eq:error'])).toEqual([
+      { column: 'level', operator: '=', value: 'error' },
+    ])
+  })
+
+  it('counts a group as an active filter even when no flat filter is set', () => {
+    expect(countLogsFilterUrlParams([encoded])).toBe(1)
+    expect(countLogsFilterUrlParams(['level:eq:error', encoded])).toBe(2)
+    expect(countLogsFilterUrlParams(['group:or:status:bogus:1'])).toBe(0)
+    expect(countLogsFilterUrlParams(undefined)).toBe(0)
   })
 
   it('rejects groups that contain top-level-only columns', () => {
