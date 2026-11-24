@@ -80,7 +80,7 @@
   },
   "engines": {
     "pnpm": "11.13",
-    "node": "24.x"
+    "node": "26.x"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@11.13.1"
