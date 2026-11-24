@@ -1,7 +1,6 @@
 'use client'
 
 import type { Content } from 'mdast'
-import Image, { type StaticImageData } from 'next/image'
 import { Fragment, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { CodeBlock, isCodeBlockLang } from 'ui-patterns/CodeBlock'
@@ -16,7 +15,7 @@ import type { McpOnCopyCallback } from '../types'
  * instructions module stays importable by the Node markdown build, which can't
  * resolve static png imports.
  */
-const INSTRUCTION_ASSETS: Record<string, StaticImageData | string> = {
+const INSTRUCTION_ASSETS: Record<string, { src: string } | string> = {
   'antigravity-auth': antigravityAuthenticateScreenshot,
 }
 
@@ -82,10 +81,10 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
       />
     ),
     image: (node) => {
-      const src = INSTRUCTION_ASSETS[node.url]
-      return src ? (
-        <Image src={src} alt={node.alt ?? ''} className="rounded border border-muted w-full" />
-      ) : null
+      const asset = INSTRUCTION_ASSETS[node.url]
+      if (!asset) return null
+      const src = typeof asset === 'string' ? asset : asset.src
+      return <img src={src} alt={node.alt ?? ''} className="rounded border border-muted w-full" />
     },
     blockquote: (node) => {
       // Callouts render as colored inline text (no quote chrome). The variant

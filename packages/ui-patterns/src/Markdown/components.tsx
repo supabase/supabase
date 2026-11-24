@@ -1,13 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import React, { isValidElement, type HTMLAttributes } from 'react'
+import React, { isValidElement, lazy, Suspense, type HTMLAttributes } from 'react'
 import { cn } from 'ui'
 import { type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-const DynamicCodeBlock = dynamic(() =>
-  import('../CodeBlock').then((m) => ({ default: m.CodeBlock }))
-)
+const LazyCodeBlock = lazy(() => import('../CodeBlock').then((m) => ({ default: m.CodeBlock })))
 
 export const InlineCode = (props: HTMLAttributes<HTMLElement>) => <code {...props} />
 
@@ -78,12 +75,9 @@ export const CodeBlockPre = ({ children, ...props }: HTMLAttributes<HTMLPreEleme
   }
 
   return (
-    <DynamicCodeBlock
-      value={content}
-      language={language}
-      hideLineNumbers={false}
-      className="my-4"
-    />
+    <Suspense fallback={<SimplePre {...props}>{children}</SimplePre>}>
+      <LazyCodeBlock value={content} language={language} hideLineNumbers={false} className="my-4" />
+    </Suspense>
   )
 }
 
