@@ -94,7 +94,7 @@ You can use information about the SSO identity provider in Row Level Security po
 Here are some commonly used statements to extract SSO related information from the user's JWT:
 
 - `auth.jwt()#>>'{amr,0,method}'`
-  Returns the name of the last method used to verify the identity of this user. With SAML SSO this is `sso/saml`.
+  Returns the name of the most recent method used to verify the identity of this user. After a SAML SSO sign-in this is `sso/saml`. After an MFA step it is the MFA method, such as `totp`.
 - `auth.jwt()->'amr'`
   Returns the authentication methods for the session. Find the entry whose `method` is `sso/saml` and read its `provider` to get the UUID of the SSO identity provider used to sign in. The policy example below shows the full lookup.
 - `auth.jwt()#>>'{user_metadata,iss}'`
