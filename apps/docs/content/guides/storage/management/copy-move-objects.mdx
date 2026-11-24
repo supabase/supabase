@@ -90,7 +90,7 @@ on storage.objects
 for select
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.jwt()->>'sub')
 );
 
 create policy "User can insert in their own folders (in any buckets)"
@@ -98,7 +98,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-    (storage.foldername(name))[1] = (select auth.uid())
+    (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
 );
 
 create policy "User can update their own objects (in any buckets)"
@@ -106,6 +106,6 @@ on storage.objects
 for update
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.jwt()->>'sub')
 );
 ```
