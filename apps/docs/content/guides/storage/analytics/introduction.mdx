@@ -1,7 +1,14 @@
 ---
-title: 'Analytics Buckets'
+title: 'Analytics buckets'
+description: 'Learn what Supabase Analytics buckets are, why they suit analytical workloads better than Postgres tables, and which use cases they fit, from BI to archiving.'
 subtitle: 'Store large datasets for analytics and reporting.'
 ---
+
+Knowing what analytics buckets are for tells you when to move analytical workloads off your Postgres tables. For how to create one, see [Create an analytics bucket](/docs/guides/storage/analytics/creating-analytics-buckets).
+
+## Analytics buckets vs Postgres tables
+
+Analytics buckets store large datasets in [Apache Iceberg](https://iceberg.apache.org/), an open table format, so you can run analytical workflows on them while keeping your primary database optimized for transactional operations.
 
 <Admonition type="caution" title="This feature is in alpha">
 
@@ -9,26 +16,43 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-Analytics buckets enable analytical workflows on large-scale datasets while keeping your primary database optimized for transactional operations.
-
-## Why Analytics buckets?
-
-Postgres tables are purpose-built for transactional workloads with frequent inserts, updates, deletes, and low-latency queries. Analytical workloads have fundamentally different requirements:
+Postgres tables are purpose-built for transactional workloads with frequent inserts, updates, deletes, and low-latency queries. Analytical workloads have different requirements:
 
 - Processing large volumes of historical data
 - Running complex queries and aggregations
 - Minimizing storage costs
-- Preventing analytical queries from impacting production traffic
+- Preventing analytical queries from slowing production traffic
 
-Analytics buckets address these requirements using [Apache Iceberg](https://iceberg.apache.org/), an open-table format specifically designed for efficient management of large analytical datasets.
+Analytics buckets address these requirements using Iceberg, which is designed for efficient management of large analytical datasets.
 
-## Ideal use cases
+## Services
 
-Analytics buckets are perfect for:
+Analytics buckets work through two services:
 
-- **Data warehousing and business intelligence** - Build scalable data warehouses for BI tools
-- **Historical data archiving** - Retain large volumes of historical data cost-effectively
-- **Periodically refreshed analytics** - Maintain near real-time analytical views
-- **Complex analytical queries** - Execute sophisticated aggregations and joins over large datasets
+| Service                        | What it does                                                                                                                                                                                                      |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Iceberg REST Catalog           | Manages the metadata for your Iceberg tables: tables and namespaces, schemas and schema evolution, partitions and snapshots, and transactional consistency and isolation. It stores only metadata, not your data. |
+| S3-compatible storage endpoint | Stores and retrieves the data itself, in Parquet format, and is optimized for reading and writing large analytical datasets.                                                                                      |
 
-By separating transactional and analytical workloads, Supabase lets you build scalable analytics pipelines without compromising your primary Postgres performance.
+Iceberg clients such as PyIceberg and Apache Spark use the REST Catalog to work with your tables. For how to connect one, see [Iceberg Catalog](/docs/guides/storage/analytics/connecting-to-analytics-bucket).
+
+## Limits
+
+During the alpha, limits apply to the number of buckets, namespaces, and tables. For the full list, see [Analytics buckets limits](/docs/guides/storage/analytics/limits).
+
+<$Partial path="pipelines-replication-unsupported.mdx" />
+
+## When to use analytics buckets
+
+Analytics buckets suit the following use cases:
+
+- **Data warehousing and business intelligence**: Build scalable data warehouses for BI tools
+- **Historical data archiving**: Retain large volumes of historical data cost-effectively
+- **Periodically refreshed analytics**: Maintain near real-time analytical views
+- **Complex analytical queries**: Run aggregations and joins over large datasets
+
+## Related resources
+
+- [Create an analytics bucket](/docs/guides/storage/analytics/creating-analytics-buckets): create your first analytics bucket.
+- [Iceberg Catalog](/docs/guides/storage/analytics/connecting-to-analytics-bucket): connect a query engine to an analytics bucket.
+- [Analytics buckets limits](/docs/guides/storage/analytics/limits): the limits that apply during the alpha.
