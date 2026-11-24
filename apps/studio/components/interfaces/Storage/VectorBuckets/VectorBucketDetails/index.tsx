@@ -112,13 +112,13 @@ export const VectorBucketDetails = () => {
   return (
     <>
       {isErrorBucket ? (
-        <PageContainer>
+        <PageContainer size="default">
           <PageSection>
             <AlertError subject="Failed to fetch vector buckets" error={bucketError} />
           </PageSection>
         </PageContainer>
       ) : (
-        <PageContainer>
+        <PageContainer size="default">
           <PageSection className="gap-y-4">
             <PageSectionMeta>
               <PageSectionSummary>

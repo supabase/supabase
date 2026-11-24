@@ -101,13 +101,13 @@ export const AnalyticBucketDetails = () => {
   return (
     <>
       {isErrorBucket ? (
-        <PageContainer>
+        <PageContainer size="default">
           <PageSection>
             <AlertError subject="Failed to fetch analytics buckets" error={bucketError} />
           </PageSection>
         </PageContainer>
       ) : (
-        <PageContainer>
+        <PageContainer size="default">
           {state === 'loading' ? (
             <PageSection>
               <BucketHeader showActions={false} />
