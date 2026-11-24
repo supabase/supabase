@@ -225,14 +225,16 @@ navigation, focus management, and screen reader behavior need manual testing.
 The workflow at `.github/workflows/docs-e2e.yml` runs on pull requests that touch
 owned docs content, partials, or `e2e/docs`.
 
-1. Diff the pull request against its base branch and resolve in-scope page paths.
-2. Skip Playwright when nothing in scope changed.
-3. When `apps/docs` changed, wait for the Vercel docs preview and set
+1. When `e2e/docs` or `e2e/shared` changed, run the harness unit tests
+   (`pnpm -C e2e/docs test`).
+2. Diff the pull request against its base branch and resolve in-scope page paths.
+3. Skip Playwright when nothing in scope changed.
+4. When `apps/docs` changed, wait for the Vercel docs preview and set
    `PLAYWRIGHT_BASE_URL` to that preview. If Vercel skipped the head commit's
    build as not affected, the newest ready preview from an earlier commit of the
    pull request is used instead. When no preview resolves, skip rather than test
    against production.
-4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list and
+5. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list and
    `DOCS_E2E_A11Y_PAGE_PATHS` set to the pages that get the accessibility scan
    (see [Limits](#limits)).
 
