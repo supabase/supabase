@@ -618,6 +618,60 @@ describe('FilterBar', () => {
     expect(screen.queryByText('AND')).not.toBeInTheDocument()
   })
 
+  describe('isRootOperatorLocked', () => {
+    const groupedFilters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'name', value: 'test', operator: '=' },
+        {
+          logicalOperator: 'OR',
+          conditions: [
+            { propertyName: 'status', value: 'active', operator: '=' },
+            { propertyName: 'status', value: 'pending', operator: '=' },
+          ],
+        },
+      ],
+    }
+
+    const renderGrouped = (isRootOperatorLocked: boolean) =>
+      render(
+        <FilterBar
+          filterProperties={mockFilterProperties}
+          filters={groupedFilters}
+          onFilterChange={mockOnFilterChange}
+          freeformText=""
+          onFreeformTextChange={mockOnFreeformTextChange}
+          supportsOperators
+          isRootOperatorLocked={isRootOperatorLocked}
+        />
+      )
+
+    it('lets the root logical operator be toggled by default', async () => {
+      const user = userEvent.setup()
+      renderGrouped(false)
+
+      await user.click(screen.getByText('AND'))
+
+      expect(mockOnFilterChange).toHaveBeenCalledWith(
+        expect.objectContaining({ logicalOperator: 'OR' })
+      )
+    })
+
+    it('ignores clicks on the root operator but still toggles nested groups', async () => {
+      const user = userEvent.setup()
+      renderGrouped(true)
+
+      await user.click(screen.getByText('AND'))
+      expect(mockOnFilterChange).not.toHaveBeenCalled()
+
+      await user.click(screen.getByText('OR'))
+      expect(mockOnFilterChange).toHaveBeenCalledTimes(1)
+      const [next] = mockOnFilterChange.mock.calls[0]
+      expect(next.logicalOperator).toBe('AND')
+      expect(next.conditions[1].logicalOperator).toBe('AND')
+    })
+  })
+
   it('allows switching filter property by clicking the label', async () => {
     const user = userEvent.setup()
     let currentFilters: FilterGroup = {

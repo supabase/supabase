@@ -22,6 +22,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     activeInput,
     freeformText,
     supportsOperators,
+    newGroupPosition,
+    isRootOperatorLocked,
     actions,
     variant,
     highlightedConditionPath,
@@ -62,6 +64,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     setLocalFreeformValue(e.target.value)
     handleGroupFreeformChange(path, e.target.value)
   }
+
+  const isOperatorLocked = isRootOperatorLocked && path.length === 0
 
   const handleLogicalOperatorClick = () => {
     handleLogicalOperatorChange(path)
@@ -104,6 +108,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         inputValue: (isActive ? freeformText : localFreeformValue) || '',
         actions,
         supportsOperators,
+        newGroupPosition,
         freeformDefaultProperty: resolvedFreeformDefaultProperty,
         isNested: path.length > 0,
       }),
@@ -114,6 +119,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
       localFreeformValue,
       actions,
       supportsOperators,
+      newGroupPosition,
       resolvedFreeformDefaultProperty,
       path.length,
     ]
@@ -140,7 +146,14 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
       if (items[index]) handleSelectMenuItem(items[index])
     },
     handleKeyDown,
-    { skipEnterWhenFilterHighlighted: highlightedConditionPath !== null }
+    {
+      skipEnterWhenFilterHighlighted: highlightedConditionPath !== null,
+      // Don't preselect "New filter group" — Enter should pick a property, not start a group.
+      defaultIndex: Math.max(
+        items.findIndex((item) => item.value !== '__new_group__'),
+        0
+      ),
+    }
   )
 
   useEffect(() => {
@@ -170,8 +183,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             <React.Fragment key={index}>
               {index > 0 && supportsOperators && (
                 <span
-                  className={`text-xs font-medium cursor-pointer ${
-                    isHoveringOperator
+                  className={`text-xs font-medium ${isOperatorLocked ? '' : 'cursor-pointer'} ${
+                    isHoveringOperator && !isOperatorLocked
                       ? 'bg-surface-400 text-foreground dark:bg-surface-400'
                       : 'text-foreground-muted'
                   }`}

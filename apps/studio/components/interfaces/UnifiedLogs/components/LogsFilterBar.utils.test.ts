@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createUnifiedLogsSearch } from '../UnifiedLogs.utils'
 import {
+  areFilterGroupsEquivalent,
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
@@ -9,6 +10,7 @@ import {
   formatTimeRangeValue,
   getLogAttributeSources,
   getUserFilterValue,
+  normalizeFilterGroup,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
   type FilterableField,
@@ -70,7 +72,15 @@ describe('buildFilterProperties', () => {
       type: 'string',
       options: [],
       operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
+      topLevelOnly: true,
     })
+  })
+
+  it('keeps properties that change which sources are queried out of nested groups', () => {
+    const topLevelOnly = buildFilterProperties({ fields })
+      .filter((property) => property.topLevelOnly)
+      .map((property) => property.name)
+    expect(topLevelOnly).toEqual(['date', 'log_type', USER_PROPERTY])
   })
 
   it('wires a provided async options function into the user property', () => {
@@ -273,5 +283,196 @@ describe('attribute discovery scope', () => {
       }
     )
     expect(getLogAttributeSources(search)).toEqual([])
+  })
+})
+
+describe('filter groups', () => {
+  const orGroup = {
+    logicalOperator: 'OR' as const,
+    conditions: [
+      { propertyName: 'status', operator: '<>', value: '200' },
+      { propertyName: 'pathname', operator: '<>', value: '/health' },
+    ],
+  }
+
+  it('renders group column filters as nested OR groups after the flat conditions', () => {
+    const group = buildFilterGroup(
+      [
+        {
+          id: 'group.0',
+          value: {
+            group: 'or',
+            filters: [
+              { column: 'status', operator: '<>', value: '200' },
+              { column: 'pathname', operator: '<>', value: '/health' },
+            ],
+          },
+        },
+        { id: 'level', value: { operator: '=', values: ['error'] } },
+      ],
+      new Set(['level'])
+    )
+    expect(group).toEqual({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'level', operator: '=', value: 'error' }, orGroup],
+    })
+  })
+
+  it('splits the bar into flat conditions and OR groups', () => {
+    const normalized = normalizeFilterGroup({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'level', operator: '=', value: 'error' }, orGroup],
+    })
+    expect(normalized).toEqual({
+      conditions: [{ propertyName: 'level', operator: '=', value: 'error' }],
+      groups: [
+        {
+          group: 'or',
+          filters: [
+            { column: 'status', operator: '<>', value: '200' },
+            { column: 'pathname', operator: '<>', value: '/health' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('merges nested AND groups into the root and nested OR groups into their parent OR', () => {
+    const normalized = normalizeFilterGroup({
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'level', operator: '=', value: 'error' }],
+        },
+        {
+          logicalOperator: 'OR',
+          conditions: [
+            { propertyName: 'status', operator: '=', value: '500' },
+            {
+              logicalOperator: 'OR',
+              conditions: [{ propertyName: 'status', operator: '=', value: '502' }],
+            },
+          ],
+        },
+      ],
+    })
+    expect(normalized?.conditions).toHaveLength(1)
+    expect(normalized?.groups).toEqual([
+      {
+        group: 'or',
+        filters: [
+          { column: 'status', operator: '=', value: '500' },
+          { column: 'status', operator: '=', value: '502' },
+        ],
+      },
+    ])
+  })
+
+  it.each([
+    [
+      'an empty group',
+      {
+        logicalOperator: 'AND' as const,
+        conditions: [{ logicalOperator: 'OR' as const, conditions: [] }],
+      },
+    ],
+    [
+      'a group condition without a value',
+      {
+        logicalOperator: 'AND' as const,
+        conditions: [
+          {
+            logicalOperator: 'OR' as const,
+            conditions: [{ propertyName: 'status', operator: '=', value: '' }],
+          },
+        ],
+      },
+    ],
+    [
+      'an AND group inside an OR group',
+      {
+        logicalOperator: 'AND' as const,
+        conditions: [
+          {
+            logicalOperator: 'OR' as const,
+            conditions: [
+              {
+                logicalOperator: 'AND' as const,
+                conditions: [{ propertyName: 'status', operator: '=', value: '200' }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [
+      'a top-level-only column inside a group',
+      {
+        logicalOperator: 'AND' as const,
+        conditions: [
+          {
+            logicalOperator: 'OR' as const,
+            conditions: [{ propertyName: 'log_type', operator: '=', value: 'auth' }],
+          },
+        ],
+      },
+    ],
+    [
+      'an OR root',
+      {
+        logicalOperator: 'OR' as const,
+        conditions: [{ propertyName: 'status', operator: '=', value: '200' }],
+      },
+    ],
+  ])('does not apply %s', (_, group) => {
+    expect(normalizeFilterGroup(group)).toBeNull()
+  })
+
+  describe('areFilterGroupsEquivalent', () => {
+    const level = { propertyName: 'level', operator: '=', value: 'error' }
+    const status = { propertyName: 'status', operator: '<>', value: '200' }
+    const path = { propertyName: 'pathname', operator: '<>', value: '/health' }
+
+    it('treats a nested AND group as equal to the same conditions at the root', () => {
+      expect(
+        areFilterGroupsEquivalent(
+          {
+            logicalOperator: 'AND',
+            conditions: [level, { logicalOperator: 'AND', conditions: [status, path] }],
+          },
+          { logicalOperator: 'AND', conditions: [level, status, path] }
+        )
+      ).toBe(true)
+    })
+
+    it('ignores condition and group order', () => {
+      expect(
+        areFilterGroupsEquivalent(
+          { logicalOperator: 'AND', conditions: [level, { ...orGroup }] },
+          {
+            logicalOperator: 'AND',
+            conditions: [
+              { logicalOperator: 'OR', conditions: [...orGroup.conditions].reverse() },
+              level,
+            ],
+          }
+        )
+      ).toBe(true)
+    })
+
+    it('tells an OR group apart from the same conditions ANDed together', () => {
+      expect(
+        areFilterGroupsEquivalent(
+          { logicalOperator: 'AND', conditions: [orGroup] },
+          { logicalOperator: 'AND', conditions: [status, path] }
+        )
+      ).toBe(false)
+    })
+
+    it('is false while either side is incomplete', () => {
+      const draft = { logicalOperator: 'AND' as const, conditions: [{ ...level, value: '' }] }
+      expect(areFilterGroupsEquivalent(draft, draft)).toBe(false)
+    })
   })
 })

@@ -12,7 +12,12 @@ import {
   type FilterBarVariant,
 } from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
-import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
+import {
+  FilterBarAction,
+  FilterGroup as FilterGroupType,
+  FilterProperty,
+  NewGroupPosition,
+} from './types'
 
 export type FilterBarProps = {
   filterProperties: FilterProperty[]
@@ -24,6 +29,10 @@ export type FilterBarProps = {
   supportsOperators?: boolean
   /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
   defaultGroupOperator?: FilterGroupType['logicalOperator']
+  /** Where "New filter group" sits in the property menu. Defaults to 'bottom'. */
+  newGroupPosition?: NewGroupPosition
+  /** Prevents toggling the root group's logical operator, for consumers that can only express a root `AND`. */
+  isRootOperatorLocked?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
   /**
@@ -144,6 +153,8 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     className,
     supportsOperators = false,
     defaultGroupOperator,
+    newGroupPosition = 'bottom',
+    isRootOperatorLocked = false,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -163,6 +174,8 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       isLoading={isLoading}
       supportsOperators={supportsOperators}
       defaultGroupOperator={defaultGroupOperator}
+      newGroupPosition={newGroupPosition}
+      isRootOperatorLocked={isRootOperatorLocked}
       variant={variant}
       icon={icon}
       freeformDefaultProperty={freeformDefaultProperty}

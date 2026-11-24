@@ -8,9 +8,12 @@ import {
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
   groupLogsFiltersByColumn,
+  isLogsFilterGroupColumnFilterId,
   logAttributeFilterId,
+  logsFilterGroupsToUrlParams,
   logsFiltersToColumnFilters,
   logsFiltersToUrlParams,
+  parseLogsFilterGroupUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import { serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
@@ -289,5 +292,77 @@ describe('addLogsColumnFilter', () => {
     expect(addLogsColumnFilter([], { field: 'status', operator: '<>', value: 500 })).toEqual([
       { id: 'status', value: { operator: '<>', values: ['500'] } },
     ])
+  })
+})
+
+describe('filter groups', () => {
+  const group = {
+    operator: 'or' as const,
+    filters: [
+      { column: 'status', operator: '<>' as const, value: '200' },
+      { column: 'pathname', operator: '<>' as const, value: '/health' },
+    ],
+  }
+  const encoded = 'group:or:status:neq:200,pathname:neq:%2Fhealth'
+
+  it('serializes a group as one URL entry with encoded values', () => {
+    expect(logsFilterGroupsToUrlParams([group])).toEqual([encoded])
+  })
+
+  it('round-trips values containing the URL delimiters', () => {
+    const tricky = {
+      operator: 'or' as const,
+      filters: [
+        { column: 'attribute.request.headers.x-a:b', operator: '=' as const, value: 'a,b:c%d' },
+        { column: 'event_message', operator: '~~*' as const, value: '' },
+      ],
+    }
+    expect(parseLogsFilterGroupUrlParams(logsFilterGroupsToUrlParams([tricky]))).toEqual([tricky])
+  })
+
+  it('does not serialize empty groups', () => {
+    expect(logsFilterGroupsToUrlParams([{ operator: 'or', filters: [] }])).toEqual([])
+  })
+
+  it('keeps group entries out of the flat filter parser, so older readers ignore them', () => {
+    expect(parseLogsFilterUrlParams(['level:eq:error', encoded])).toEqual([
+      { column: 'level', operator: '=', value: 'error' },
+    ])
+  })
+
+  it('drops a malformed group whole instead of narrowing it', () => {
+    expect(parseLogsFilterGroupUrlParams(['group:or:status:neq:200,pathname:bogus:x'])).toEqual([])
+    expect(parseLogsFilterGroupUrlParams(['group:or:status:neq'])).toEqual([])
+    expect(parseLogsFilterGroupUrlParams(['group:or:'])).toEqual([])
+    expect(parseLogsFilterGroupUrlParams(['group:or:status:neq:%E0%A4%A'])).toEqual([])
+  })
+
+  it('rejects groups that contain top-level-only columns', () => {
+    expect(parseLogsFilterGroupUrlParams(['group:or:log_type:eq:auth,status:neq:200'])).toEqual([])
+  })
+
+  it('seeds groups as column filters and writes them back to the URL', () => {
+    const columnFilters = buildDefaultColumnFilters({ filter: ['level:eq:error', encoded] })
+    expect(columnFilters).toEqual([
+      { id: 'level', value: { operator: '=', values: ['error'] } },
+      { id: 'group.0', value: { group: 'or', filters: group.filters } },
+    ])
+    expect(buildFilterSearchUpdate(columnFilters, []).filter).toEqual(['level:eq:error', encoded])
+  })
+
+  it('does not treat a group column filter as a flat filter', () => {
+    expect(
+      columnFiltersToLogsFilters([
+        { id: 'group.0', value: { group: 'or', filters: group.filters } },
+      ])
+    ).toEqual([])
+  })
+
+  it('only treats `group.<index>` ids as group filters, not attributes that start with "group."', () => {
+    expect(isLogsFilterGroupColumnFilterId('group.0')).toBe(true)
+    expect(isLogsFilterGroupColumnFilterId('group.12')).toBe(true)
+    expect(isLogsFilterGroupColumnFilterId('group.id')).toBe(false)
+    expect(isLogsFilterGroupColumnFilterId('group.0.name')).toBe(false)
+    expect(isLogsFilterGroupColumnFilterId('attribute.group.0')).toBe(false)
   })
 })

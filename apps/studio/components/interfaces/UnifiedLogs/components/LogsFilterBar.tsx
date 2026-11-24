@@ -5,23 +5,30 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
   FilterBar,
-  FilterCondition,
   type CustomOptionProps,
   type FilterBarHandle,
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
 import { filterFields as defaultFilterFields } from '../UnifiedLogs.fields'
-import { getLogAttributeKey, logAttributeFilterId } from '../UnifiedLogs.filters'
+import {
+  getLogAttributeKey,
+  isLogsFilterGroupColumnFilterId,
+  logAttributeFilterId,
+  logsFilterGroupColumnFilterId,
+} from '../UnifiedLogs.filters'
 import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
+  areFilterGroupsEquivalent,
   buildAttributeFilterProperty,
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
+  collectFilterConditions,
   getLogAttributeSources,
   getUserFilterValue,
+  normalizeFilterGroup,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
 } from './LogsFilterBar.utils'
@@ -106,7 +113,11 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const ownedFilterNames = new Set([
     ...filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY),
     ...columnFilters
-      .filter(({ id }) => !defaultFilterFields.some((field) => field.value === id))
+      .filter(
+        ({ id }) =>
+          !isLogsFilterGroupColumnFilterId(id) &&
+          !defaultFilterFields.some((field) => field.value === id)
+      )
       .map(({ id }) => id),
   ])
 
@@ -134,8 +145,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   }
   const attributeKeys = new Set(keyQueries.flatMap(({ data }) => data ?? []))
   if (isOtel && freeformText.trim()) attributeKeys.add(freeformText.trim())
-  for (const condition of filters.conditions) {
-    if (!('propertyName' in condition)) continue
+  for (const condition of collectFilterConditions(filters)) {
     const key = getLogAttributeKey(condition.propertyName)
     if (key !== undefined) attributeKeys.add(key)
   }
@@ -143,6 +153,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     .filter(
       ({ id }) =>
         id !== USER_PROPERTY &&
+        !isLogsFilterGroupColumnFilterId(id) &&
         getLogAttributeKey(id) === undefined &&
         !defaultFilterFields.some((field) => field.value === id)
     )
@@ -164,7 +175,10 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
 
   // Read latest values without making the effect depend on their (per-render) identity.
   const syncFromColumnFilters = useEffectEvent(() => {
-    setFilters(withUserCondition(buildFilterGroup(columnFilters, ownedFilterNames)))
+    const applied = withUserCondition(buildFilterGroup(columnFilters, ownedFilterNames))
+    // Keep what's on screen when it already applies the same filters, so a group toggled to
+    // AND (which merges into the root once applied) stays put and can be toggled back.
+    setFilters((current) => (areFilterGroupsEquivalent(current, applied) ? current : applied))
   })
 
   const applyUser = (raw: string | undefined) => {
@@ -172,27 +186,29 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     setUser(value || null)
   }
 
-  // No nested conditions in unified logs — type-cast to FilterCondition on read.
+  // Nested OR groups are supported; anything the URL can't express (an AND group inside an OR
+  // group) or that is still incomplete isn't applied.
   const onApply = (next: FilterGroup) => {
-    const isValid = next.conditions.every(
-      (x) =>
-        !!(x as FilterCondition).operator &&
-        !!(x as FilterCondition).value &&
-        !!(x as FilterCondition).propertyName
-    )
-    if (!isValid) return
+    const normalized = normalizeFilterGroup(next)
+    if (!normalized) return
 
-    const timeRangeCondition = (next.conditions as FilterCondition[]).find(
+    const timeRangeCondition = normalized.conditions.find(
       (condition) => condition.propertyName === TIME_RANGE_PROPERTY
     )
     const timeRange = parseTimeRange(timeRangeCondition?.value)
     if (timeRangeCondition && !timeRange) return
 
-    applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
-    const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
+    applyUser(getUserFilterValue(normalized.conditions))
+    const columnFilterValues = buildColumnFilterValues(normalized.conditions)
     table.setColumnFilters((current) => [
-      ...current.filter(({ id }) => !ownedFilterNames.has(id)),
+      ...current.filter(
+        ({ id }) => !ownedFilterNames.has(id) && !isLogsFilterGroupColumnFilterId(id)
+      ),
       ...Array.from(columnFilterValues, ([id, value]) => ({ id, value })),
+      ...normalized.groups.map((value, index) => ({
+        id: logsFilterGroupColumnFilterId(index),
+        value,
+      })),
       ...(timeRange ? [{ id: TIME_RANGE_PROPERTY, value: timeRange }] : []),
     ])
   }
@@ -210,6 +226,10 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
         ref={filterBarRef}
         variant="pill"
         freeformDefaultProperty="event_message"
+        supportsOperators
+        defaultGroupOperator="OR"
+        newGroupPosition="top"
+        isRootOperatorLocked
         className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
         filterProperties={filterPropertiesWithAvailability}
         freeformText={freeformText}
