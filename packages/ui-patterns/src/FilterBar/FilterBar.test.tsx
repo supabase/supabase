@@ -737,6 +737,37 @@ describe('FilterBar', () => {
     })
   })
 
+  it('removes a nested group when Backspace removes its last condition', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [
+            { propertyName: 'name', value: 'test', operator: '=' },
+            {
+              logicalOperator: 'OR',
+              conditions: [{ propertyName: 'status', value: 'active', operator: '=' }],
+            },
+          ],
+        }}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+        supportsOperators
+      />
+    )
+
+    await user.click(screen.getByPlaceholderText('+ Add filter'))
+    await user.keyboard('{Backspace}{Backspace}')
+
+    expect(mockOnFilterChange).toHaveBeenLastCalledWith({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'name', value: 'test', operator: '=' }],
+    })
+  })
+
   it('allows switching filter property by clicking the label', async () => {
     const user = userEvent.setup()
     let currentFilters: FilterGroup = {
