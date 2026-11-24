@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -114,6 +114,44 @@ function mockAwsEndpoints({
   })
 }
 
+function mockOrganizationCreation() {
+  const requests: { create: unknown[]; survey: unknown[] } = { create: [], survey: [] }
+
+  mswServer.use(
+    http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
+      requests.create.push(await request.json())
+      return HttpResponse.json(
+        createMockOrganizationResponse({
+          id: 3,
+          name: 'Mock Marketplace Org',
+          slug: 'mock-marketplace-org',
+          billing_partner: 'aws_marketplace',
+        })
+      )
+    }),
+    http.post(`${API_URL}/platform/organizations/onboarding-survey`, async ({ request }) => {
+      requests.survey.push(await request.json())
+      return new HttpResponse(null, { status: 204 })
+    })
+  )
+
+  return requests
+}
+
+// Radix Selects render a hidden native <option> per item, so scope to the open listbox
+async function chooseOption(
+  user: ReturnType<typeof userEvent.setup>,
+  currentValue: string,
+  option: string
+) {
+  const trigger = screen
+    .getAllByRole('combobox')
+    .find((combobox) => combobox.textContent === currentValue)
+  if (!trigger) throw new Error(`No select showing "${currentValue}"`)
+  await user.click(trigger)
+  await user.click(within(await screen.findByRole('listbox')).getByRole('option', { name: option }))
+}
+
 function renderScreen(props: Partial<Parameters<typeof AwsMarketplaceOnboardingScreen>[0]> = {}) {
   return customRender(<AwsMarketplaceOnboardingScreen buyerId="buyer-test" {...props} />, {
     profileContext: DEFAULT_PROFILE_CONTEXT,
@@ -198,25 +236,12 @@ describe('AwsMarketplaceOnboardingScreen', () => {
 
   test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {
     const user = userEvent.setup()
-    let createRequest: unknown
 
     mockAwsEndpoints({
       organizations: [],
       onboardingInfo: createOnboardingInfo({ organizations: [] }),
     })
-    mswServer.use(
-      http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
-        createRequest = await request.json()
-        return HttpResponse.json(
-          createMockOrganizationResponse({
-            id: 3,
-            name: 'Mock Marketplace Org',
-            slug: 'mock-marketplace-org',
-            billing_partner: 'aws_marketplace',
-          })
-        )
-      })
-    )
+    const requests = mockOrganizationCreation()
 
     renderScreen()
 
@@ -232,13 +257,37 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
 
     await waitFor(() => {
-      expect(createRequest).toEqual({
-        name: 'Mock Marketplace Org',
-        kind: 'PERSONAL',
-        buyer_id: 'buyer-test',
-      })
+      expect(requests.create).toEqual([{ name: 'Mock Marketplace Org', buyer_id: 'buyer-test' }])
     })
     expect(await screen.findByText('Organization linked')).toBeInTheDocument()
+    expect(requests.survey).toEqual([])
+  })
+
+  test('sends survey answers to the survey endpoint and keeps them out of organization creation', async () => {
+    const user = userEvent.setup()
+
+    mockAwsEndpoints({
+      organizations: [],
+      onboardingInfo: createOnboardingInfo({ organizations: [] }),
+    })
+    const requests = mockOrganizationCreation()
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: 'Create organization' }))
+    await user.click(screen.getByPlaceholderText('Organization name'))
+    await user.paste('Mock Marketplace Org')
+    await chooseOption(user, 'Personal', 'Company')
+    await chooseOption(user, '1 - 10', '50 - 99')
+    await chooseOption(user, 'Select an option', 'B2B SaaS application')
+    fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
+
+    await waitFor(() => {
+      expect(requests.survey).toEqual([
+        { slug: 'mock-marketplace-org', kind: 'COMPANY', size: '50', building: 'b2b_saas' },
+      ])
+    })
+    expect(requests.create).toEqual([{ name: 'Mock Marketplace Org', buyer_id: 'buyer-test' }])
   })
 
   test('renders setup unavailable when the buyer ID is missing', async () => {
