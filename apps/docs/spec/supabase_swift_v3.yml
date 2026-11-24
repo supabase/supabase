@@ -3635,9 +3635,9 @@ functions:
               );
 
             insert into
-              users (id, handle, display_name)
+              users (handle, display_name)
             values
-              (1, 'saoirse', null);
+              ('saoirse', null);
             ```
         response: |
           ```json
