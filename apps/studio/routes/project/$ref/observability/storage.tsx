@@ -21,10 +21,7 @@ import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
-import {
-  DatePickerValue,
-  LogsDatePicker,
-} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
@@ -45,43 +42,23 @@ export const Route = createFileRoute('/project/$ref/observability/storage')({
 const REPORT_TITLE = 'Storage'
 
 function StorageReport() {
-  const report = useStorageReport()
-
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
-
   const {
     datePickerHelpers,
     datePickerValue,
-    handleDatePickerChange: handleDatePickerChangeFromHook,
+    handleDatePickerChange,
     showUpgradePrompt,
     setShowUpgradePrompt,
     selectedDateRange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const handleDatepickerChange = (vals: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(vals)
-    if (!promptShown) {
-      mergeParams({
-        iso_timestamp_start: vals.from ?? '',
-        iso_timestamp_end: vals.to ?? '',
-      })
-    }
-  }
+  const report = useStorageReport(selectedDateRange)
+
+  const { data, error, filters, isLoading, params, removeFilters, addFilter, refresh } = report
 
   const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
-    handleDatepickerChange,
+    handleDatePickerChange,
     refresh
   )
 
@@ -114,7 +91,7 @@ function StorageReport() {
                 />
               </ShortcutTooltip>
               <LogsDatePicker
-                onSubmit={handleDatepickerChange}
+                onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
                 open={showDatePicker}
@@ -149,7 +126,7 @@ function StorageReport() {
             </div>
             <ReportFilterBar
               onRemoveFilters={removeFilters}
-              onDatepickerChange={handleDatepickerChange}
+              onDatepickerChange={handleDatePickerChange}
               datepickerFrom={params.totalRequests.iso_timestamp_start}
               datepickerTo={params.totalRequests.iso_timestamp_end}
               onAddFilter={addFilter}

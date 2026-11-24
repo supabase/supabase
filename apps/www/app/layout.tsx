@@ -4,6 +4,7 @@ import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
 import { inter, manrope, sourceCodePro } from '~/lib/fonts'
+import { SIGNED_IN_HINT_SCRIPT } from 'common/gotrue'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 
@@ -52,6 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SIGNED_IN_HINT_SCRIPT }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

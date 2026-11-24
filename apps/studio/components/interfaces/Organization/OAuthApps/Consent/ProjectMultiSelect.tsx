@@ -1,7 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { components } from 'api-types'
 import { useEffect, useId } from 'react'
-import { Checkbox, cn } from 'ui'
+import { cn, RadioGroup, RadioGroupItem } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -65,12 +65,12 @@ export const ProjectMultiSelect = ({
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p
+        <h2
           id={labelId}
-          className={cn('text-sm', hasFlagged ? 'text-destructive' : 'text-foreground')}
+          className={cn('text-sm font-medium', hasFlagged ? 'text-destructive' : 'text-foreground')}
         >
           Projects
-        </p>
+        </h2>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
             {selectedProjectRefs.length}/{maxSelected}
@@ -78,17 +78,29 @@ export const ProjectMultiSelect = ({
         )}
       </div>
 
-      <label
-        htmlFor="select-all-projects"
-        className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
-      >
-        <Checkbox
-          id="select-all-projects"
-          checked={allProjectsSelected}
-          onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
-        />
-        All current and future projects
-      </label>
+      {onAllProjectsChange && (
+        <RadioGroup
+          aria-labelledby={labelId}
+          value={allProjectsSelected ? 'all' : 'selected'}
+          onValueChange={(value) => onAllProjectsChange(value === 'all')}
+          className="gap-2 py-1"
+        >
+          <label
+            htmlFor={`${labelId}-all`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-all`} value="all" />
+            All current and future projects
+          </label>
+          <label
+            htmlFor={`${labelId}-selected`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-selected`} value="selected" />
+            Selected projects only
+          </label>
+        </RadioGroup>
+      )}
 
       {!allProjectsSelected && (
         <>

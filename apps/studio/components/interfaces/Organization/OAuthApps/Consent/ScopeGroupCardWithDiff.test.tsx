@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
+import { customRender } from '@/tests/lib/custom-render'
 
 describe('<ScopeGroupCardWithDiff>', () => {
   const findPermissionDiffInSection = async (section: string, permissionDiff: string) => {
@@ -33,7 +34,7 @@ describe('<ScopeGroupCardWithDiff>', () => {
   }
 
   test('shows new, upgraded, downgraded, removed, and unchanged permissions', async () => {
-    render(
+    customRender(
       <ScopeGroupCardWithDiff
         previousScopes={[
           'database:read',
@@ -52,23 +53,29 @@ describe('<ScopeGroupCardWithDiff>', () => {
       />
     )
 
-    await findPermissionDiffInSection('WRITE', 'Analytics (New)')
-    await findPermissionDiffInSection('READ-WRITE', 'Database (Upgraded from Read)')
-    await findPermissionDiffInSection('READ', 'Domains (Demoted from Read-write)')
-    await findPermissionDiffInSection('REMOVED', 'Organizations (Read)')
+    await findPermissionDiffInSection('Write', 'Analytics (New)')
+    await findPermissionDiffInSection(
+      'Read and write',
+      'Database management (Upgraded from Read only)'
+    )
+    await findPermissionDiffInSection('Read only', 'Domains (Demoted from Read and write)')
+    await findPermissionDiffInSection('Removed', 'Organizations (Read only)')
     fireEvent.click(await screen.findByRole('button', { name: 'Already granted (1)' }))
-    await findAlreadyGrantedPermissionInSection('READ', 'Projects')
+    await findAlreadyGrantedPermissionInSection('Read only', 'Projects')
   })
 
   test('hides unchanged permissions if empty', async () => {
-    render(
+    customRender(
       <ScopeGroupCardWithDiff
         previousScopes={['database:read']}
         scopes={['database:read', 'database:write']}
       />
     )
 
-    await findPermissionDiffInSection('READ-WRITE', 'Database (Upgraded from Read)')
+    await findPermissionDiffInSection(
+      'Read and write',
+      'Database management (Upgraded from Read only)'
+    )
     expect(screen.queryByRole('button', { name: /Already granted/ })).toBeNull()
   })
 })
