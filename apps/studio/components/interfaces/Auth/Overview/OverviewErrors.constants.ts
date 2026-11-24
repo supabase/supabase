@@ -121,7 +121,7 @@ export const fetchTopResponseErrors = async (projectRef: string, useOtel = false
   if (data?.error) {
     throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
   }
-  return data
+  return { ...data, start, end }
 }
 
 export const fetchTopAuthErrorCodes = async (projectRef: string, useOtel = false) => {
