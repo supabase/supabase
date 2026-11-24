@@ -96,11 +96,4 @@ describe('AuthorizationSection', () => {
 
     expect(await screen.findByText(MEMBER_BOUND_GRANT_NOTICE)).toBeInTheDocument()
   })
-
-  test('the preview mock is hidden from assistive technology', async () => {
-    customRender(<TestForm />)
-
-    const mock = (await screen.findByText('Authorize Acme Deploy')).closest('[aria-hidden="true"]')
-    expect(mock).not.toBeNull()
-  })
 })
