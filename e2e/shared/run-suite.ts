@@ -40,16 +40,25 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
   }
 }
 
+function splitPagePaths(raw: string): string[] {
+  return raw
+    .split(/[\n,]/)
+    .map((path) => path.trim())
+    .filter(Boolean)
+}
+
 type ResolvedPages = { pages: string[]; a11yPages?: string[] }
 
 async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
   const explicit = process.env[config.pagePathsEnv]?.trim()
   if (explicit) {
+    // CI passes both lists from the scope step, so keep the scan list when it is set.
+    const explicitA11y = config.a11yPagePathsEnv
+      ? process.env[config.a11yPagePathsEnv]?.trim()
+      : undefined
     return {
-      pages: explicit
-        .split(/[\n,]/)
-        .map((path) => path.trim())
-        .filter(Boolean),
+      pages: splitPagePaths(explicit),
+      ...(explicitA11y ? { a11yPages: splitPagePaths(explicitA11y) } : {}),
     }
   }
 
@@ -84,6 +93,20 @@ async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | nu
   return { pages: result.pages, a11yPages: result.a11yPages }
 }
 
+// Clears a stale scan list from the shell so runs without a resolved one scan every page.
+export function buildChildEnv(
+  config: Pick<SuiteConfig, 'pagePathsEnv' | 'a11yPagePathsEnv'>,
+  resolved: ResolvedPages,
+  env: NodeJS.ProcessEnv
+): NodeJS.ProcessEnv {
+  const childEnv: NodeJS.ProcessEnv = { ...env, [config.pagePathsEnv]: resolved.pages.join(',') }
+  if (config.a11yPagePathsEnv) {
+    if (resolved.a11yPages) childEnv[config.a11yPagePathsEnv] = resolved.a11yPages.join(',')
+    else delete childEnv[config.a11yPagePathsEnv]
+  }
+  return childEnv
+}
+
 export async function runSuite(config: SuiteConfig): Promise<void> {
   const rawArgs = process.argv.slice(2)
   const runAll = rawArgs.includes('--all')
@@ -116,15 +139,7 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
     process.exit(1)
   }
 
-  // Clear a stale scan list from the shell so runs without one scan every page.
-  const childEnv: NodeJS.ProcessEnv = {
-    ...process.env,
-    [config.pagePathsEnv]: resolved.pages.join(','),
-  }
-  if (config.a11yPagePathsEnv) {
-    if (resolved.a11yPages) childEnv[config.a11yPagePathsEnv] = resolved.a11yPages.join(',')
-    else delete childEnv[config.a11yPagePathsEnv]
-  }
+  const childEnv = buildChildEnv(config, resolved, process.env)
 
   const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalArgs], {
     cwd: config.root,
