@@ -273,10 +273,13 @@ functions:
           A custom storage conforms to `AuthStorage`, whose `load(key:)`, `save(_:key:)`, and `remove(key:)` methods are `async`. `load(key:)` returns `nil` when no value is stored. When you omit `storage`, the client uses the Keychain on Apple platforms and memory on other platforms.
         code: |
           ```swift
-          struct MyCustomStorage: AuthStorage {
-            func load(key: String) async throws -> Data? { /* ... */ }
-            func save(_ data: Data, key: String) async throws { /* ... */ }
-            func remove(key: String) async throws { /* ... */ }
+          // An in-memory store. Replace the dictionary with your own storage.
+          actor MyCustomStorage: AuthStorage {
+            private var values: [String: Data] = [:]
+
+            func load(key: String) async throws -> Data? { values[key] }
+            func save(_ data: Data, key: String) async throws { values[key] = data }
+            func remove(key: String) async throws { values[key] = nil }
           }
 
           let supabase = try SupabaseClient(
@@ -421,10 +424,10 @@ functions:
           - Use this to clean up any local storage your application has associated with the user.
         - `tokenRefreshed`
           - Emitted each time a new access and refresh token are fetched for the signed-in user.
-          - Auto refresh refreshes the session 90 seconds before the access token expires, so you will always receive valid tokens by listening to this event.
+          - With auto refresh, the client refreshes the session before the access token expires. The token in the event can still be expired when your handler runs, for example after the app resumes. When you need a session for a new request, call `try await supabase.auth.session()`.
           - The frequency of this event is related to the JWT expiry limit configured on your project.
         - `userUpdated`
-          - Emitted each time `updateUser(_:redirectTo:)`, `linkIdentity`, or `unlinkIdentity(_:)` finishes successfully, and when the signed-in user verifies an email or phone change. Listen to it to update your application's UI based on new profile information.
+          - Emitted each time `updateUser(_:redirectTo:)` or `linkIdentity` finishes successfully, after `unlinkIdentity(_:)` when the client can fetch the updated user, and when the signed-in user verifies an email or phone change. Listen to it to update your application's UI based on new profile information.
         - `passwordRecovery`
           - Emitted instead of the `signedIn` event when the user opens a password recovery link, or verifies a code with `verifyOTP` and type `.recovery`.
           - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
@@ -1027,7 +1030,7 @@ functions:
   - id: get-user
     title: 'user()'
     description: |
-      - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
+      - This method validates the user's access token JWT on the server and returns the authenticated user. It does not check what the user can do. Your RLS policies and endpoints do that.
       - Fetches the user object from the database instead of local session.
       - Should be used only when you require the most current user data. For faster results, `currentUser` is recommended.
       - `user()` sends the access token of the current session and refreshes it first when it has expired. `user(jwt:)` sends the token you pass as is.
@@ -1264,6 +1267,7 @@ functions:
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
       - After the unlink, the client fetches the user from the server, stores it in `currentUser`, and emits `.userUpdated`.
+      - If that fetch fails, the unlink still succeeds, but `currentUser` keeps the old identities and no `.userUpdated` is emitted. Call `user()` to read the identities again. Do not retry the unlink.
     examples:
       - id: unlink-identity
         name: Unlink an identity
@@ -2374,6 +2378,13 @@ functions:
           try await admin.customProviders.delete(identifier: "custom:acme")
           ```
 
+  - id: oauth-admin-api
+    title: 'Overview'
+    notes: |
+      Admin methods to manage OAuth clients. They live in the `admin.oauth` namespace and require a `secret` key.
+
+      They are only relevant when the OAuth 2.1 server is enabled in Supabase Auth. Call them only on a server. Never ship your `secret` key in an app.
+
   - id: admin-oauth-list-clients
     title: 'oauth.listClients()'
     description: |
@@ -2524,8 +2535,11 @@ functions:
           let client = try await admin.oauth.regenerateClientSecret(
             id: UUID(uuidString: "12345678-1234-1234-1234-123456789012")!
           )
-          // The response contains the new secret
-          print("New secret: \(client.clientSecret ?? "")")
+          // Store the new secret in your secret manager. Do not log it.
+          if let secret = client.clientSecret {
+            try await secretManager.store(secret, name: "oauth-client-secret")
+          }
+          print("Rotated the OAuth client secret")
           ```
   - id: select
     title: 'Fetch data: select()'
@@ -2690,7 +2704,7 @@ functions:
             "data": [
               {
                 "name": "strings",
-                "cities": [
+                "instruments": [
                   {
                     "name": "violin"
                   }
@@ -2698,7 +2712,7 @@ functions:
               },
               {
                 "name": "woodwinds",
-                "cities": [
+                "instruments": [
                   {
                     "name": "flute"
                   }
@@ -2887,7 +2901,12 @@ functions:
           ```swift
           struct Instrument: Decodable {
             let name: String
-            let orchestralSections: [OrchestralSection]?
+            let orchestralSections: OrchestralSection?
+
+            enum CodingKeys: String, CodingKey {
+              case name
+              case orchestralSections = "orchestral_sections"
+            }
           }
 
           struct OrchestralSection: Decodable {
@@ -3310,6 +3329,11 @@ functions:
             ```sql
             create table
               instruments (id int8 primary key, name text);
+
+            insert into
+              instruments (id, name)
+            values
+              (1, 'piano');
             ```
         response: |
           ```json
@@ -3326,7 +3350,8 @@ functions:
           ```
         description: |
           A bulk create operation is handled in a single transaction.
-          If any of the inserts fail, none of the rows are inserted.
+          If any of the inserts fail, none of the rows are inserted. Here, a row
+          with `id` 1 already exists, so `tuba` is not inserted either.
         hideCodeBlock: true
 
   - id: update
@@ -3581,12 +3606,10 @@ functions:
         code: |
           ```swift
           struct User: Encodable {
-            let id: Int
             let handle: String
             let displayName: String
 
             enum CodingKeys: String, CodingKey {
-              case id
               case handle
               case displayName = "display_name"
             }
@@ -3595,9 +3618,10 @@ functions:
           try await supabase
             .from("users")
             .upsert(
-              User(id: 42, handle: "saoirse", displayName: "Saoirse"),
+              User(handle: "saoirse", displayName: "Saoirse"),
               onConflict: "handle"
             )
+            .select()
             .execute()
           ```
         data:
@@ -3618,23 +3642,23 @@ functions:
         response: |
           ```json
           {
-            "error": {
-              "code": "23505",
-              "details": "Key (handle)=(saoirse) already exists.",
-              "hint": null,
-              "message": "duplicate key value violates unique constraint \"users_handle_key\""
-            },
-            "status": 409,
-            "statusText": "Conflict"
+            "data": [
+              {
+                "id": 1,
+                "handle": "saoirse",
+                "display_name": "Saoirse"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
           }
           ```
         description: |
-          In the following query, `upsert()` implicitly uses the `id`
-          (primary key) column to determine conflicts. If there is no existing
-          row with the same `id`, `upsert()` inserts a new row, which
-          will fail in this case as there is already a row with `handle` `"saoirse"`.
-          Using the `onConflict` option, you can instruct `upsert()` to use
-          another column with a unique constraint to determine conflicts.
+          By default, `upsert()` uses the primary key to find conflicts. This row
+          has no `id`, so without `onConflict`, `upsert()` inserts a new row. That
+          insert fails, because a row with `handle` `"saoirse"` already exists.
+          With `onConflict: "handle"`, `upsert()` uses the unique `handle` column
+          instead, so it updates the existing row.
         hideCodeBlock: true
 
   - id: delete
@@ -3825,8 +3849,8 @@ functions:
               (1, 'klaxon'),
               (2, 'marimba');
 
-            create function list_stored_countries() returns setof countries as $$
-              select * from countries;
+            create function list_stored_instruments() returns setof instruments as $$
+              select * from instruments;
             $$ language sql;
             ```
         response: |
@@ -4280,7 +4304,7 @@ functions:
             "data": [
               {
                 "name": "woodwinds",
-                "cities": [
+                "instruments": [
                   {
                     "name": "flute"
                   }
@@ -4733,7 +4757,7 @@ functions:
               (3, 'cello');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -4796,12 +4820,12 @@ functions:
               (2, 1, 'violin');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
                 "name": "strings",
-                "cities": [
+                "instruments": [
                   {
                     "name": "violin"
                   },
@@ -4812,7 +4836,7 @@ functions:
               },
               {
                 "name": "woodwinds",
-                "cities": []
+                "instruments": []
               }
             ],
             "status": 200,
@@ -4864,16 +4888,16 @@ functions:
               (2, 2, 'flute');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
                 "name": "violin",
-                "country": { "name": "strings" }
+                "section": { "name": "strings" }
               },
               {
                 "name": "flute",
-                "country": { "name": "woodwinds" }
+                "section": { "name": "woodwinds" }
               }
             ],
             "status": 200,
@@ -4972,7 +4996,7 @@ functions:
             "data": [
               {
                 "name": "woodwinds",
-                "cities": [
+                "instruments": [
                   {
                     "name": "flute"
                   }
@@ -5013,7 +5037,7 @@ functions:
               (3, 'cello');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -5081,12 +5105,23 @@ functions:
         description: |
           Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of functions.
 
+          PostgREST counts the rows that the function returns, not the rows that it writes. For this check to protect your data, the function must return one row for each row it changes:
+
+          ```sql
+          create function delete_inactive_users() returns setof users as $$
+            delete from users
+            where last_seen_at < now() - interval '1 year'
+            returning *;
+          $$ language sql;
+          ```
+
   - id: dry-run
     title: dryRun()
     description: |
-      Executes the mutation but rolls back the transaction instead of committing it, so no changes are persisted.
+      Executes the mutation but rolls back the transaction instead of committing it, so its changes in the transaction are not persisted.
     notes: |
-      - The mutation runs and its result (including side effects such as triggers) is returned in the response, but the transaction is rolled back afterward.
+      - The mutation runs and its result (including the changes made by triggers) is returned in the response, but the transaction is rolled back afterward.
+      - The rollback does not undo effects outside the transaction. For example, values taken from a sequence stay used, so an identity column skips them.
       - Useful for testing mutations without touching real data.
       - Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
     examples:
@@ -5557,9 +5592,15 @@ functions:
             body: .json(["foo": "bar"])
           )
 
-          var data = Data()
+          // Write each chunk to a file, so memory use stays small.
+          let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("hello-response")
+          FileManager.default.createFile(atPath: fileURL.path, contents: nil)
+          let file = try FileHandle(forWritingTo: fileURL)
+          defer { try? file.close() }
+
           for try await chunk in response.body {
-            data.append(contentsOf: chunk)
+            try file.write(contentsOf: chunk)
           }
           ```
 
@@ -5580,7 +5621,10 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = await supabase.channel("room1")
+          // This client sends the message too, so it must receive its own messages.
+          let channel = await supabase.channel("room1") {
+            $0.broadcast.receivesOwnMessages = true
+          }
 
           let broadcastStream = await channel.broadcasts(event: "cursor-pos")
 
@@ -5611,7 +5655,10 @@ functions:
             let y: Double
           }
 
-          let channel = await supabase.channel("room1")
+          // This client sends the message too, so it must receive its own messages.
+          let channel = await supabase.channel("room1") {
+            $0.broadcast.receivesOwnMessages = true
+          }
 
           let broadcastStream = await channel.broadcasts(event: "cursor-pos")
 
@@ -5776,8 +5823,12 @@ functions:
           for await change in changeStream {
             switch change.kind {
             case .insert, .update:
-              let user = try change.row()
-              print("Upserted: \(user)")
+              do {
+                let user = try change.row()
+                print("Upserted: \(user)")
+              } catch {
+                print("Could not decode the row: \(error)")
+              }
             case .delete: print("Deleted id: \(change.oldRecord?["id"]?.intValue ?? 0)")
             default: break
             }
@@ -5853,6 +5904,8 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
+        description: |
+          You can only filter delete events when the table's replica identity is `full`. Run `alter table users replica identity full;` first.
         code: |
           ```swift
           let channel = await supabase.channel("channelId")

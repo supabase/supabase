@@ -164,7 +164,9 @@ v3 changes many public names and types, so expect compile errors when you upgrad
 
     `HTTPError` is removed. Each module throws its own error (`AuthError`, `PostgrestError`, `StorageError`, `FunctionsError`, or `RealtimeError`). Each one conforms to `SupabaseError` and has a `kind`, a `code`, the `response`, and an `underlyingError`.
 
-    A `URLError` or `DecodingError` no longer reaches you as itself. It arrives as the module error, with the original in `underlyingError`. A cancelled task now throws `CancellationError` in every module.
+    A `URLError` or `DecodingError` from the SDK no longer reaches you as itself. It arrives as the module error, with the original in `underlyingError`. A cancelled task now throws `CancellationError` in every module.
+
+    Errors that your own transport or middleware throws are not wrapped. Keep the handlers for those errors.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
