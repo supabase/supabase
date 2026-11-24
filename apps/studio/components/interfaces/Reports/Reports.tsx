@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { groupBy, isEqual, isNull } from 'lodash'
+import { isEqual } from 'lodash'
 import { PlusIcon, RefreshCwIcon, SaveIcon } from 'lucide-react'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -8,9 +8,9 @@ import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Log
 
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
+import { appendReportCharts } from './CustomReport.utils'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
-import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -151,67 +151,25 @@ const Reports = () => {
     }
   }
 
-  const handleChartSelection = ({
-    metric,
-    isAddingChart,
-  }: {
-    metric: Metric
-    isAddingChart: boolean
-  }) => {
-    if (isAddingChart) pushChart({ metric })
-    else popChart({ metric })
-  }
+  const handleAddCharts = (metrics: Metric[]) => {
+    if (!canUpdateReport) return
 
-  const pushChart = ({ metric }: { metric: Metric }) => {
-    if (!config) return
-    const current = [...config.layout]
-
-    let x = 0
-    let y = null
-
-    const chartsByY = groupBy(config.layout, 'y')
-    const yValues = Object.keys(chartsByY)
-    const isSnippet = metric.key?.startsWith('snippet_')
-
-    if (yValues.length === 0) {
-      y = 0
-    } else {
-      // Find if any row has space to fit in a new chart
-      for (const yValue of yValues) {
-        const totalWidthTaken = chartsByY[yValue].reduce((a, b) => a + b.w, 0)
-        if (LAYOUT_COLUMN_COUNT - totalWidthTaken >= DEFAULT_CHART_COLUMN_COUNT) {
-          y = Number(yValue)
-
-          // Given that there can not be any gaps between charts, it's safe to
-          // assume that we can set x using the accumulative widths
-          x = totalWidthTaken
-          break
-        }
-      }
-
-      // If no rows have space to fit the new chart, bring it to a new row
-      if (isNull(y)) {
-        y = Number(yValues[yValues.length - 1]) + DEFAULT_CHART_ROW_COUNT
-      }
-    }
-
-    current.push({
-      x,
-      y,
+    const charts = metrics.map((metric): Dashboards.Chart => ({
+      x: 0,
+      y: 0,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
-      id: metric?.id ?? uuidv4(),
+      id: metric.id ?? uuidv4(),
       label: metric.label,
       attribute: metric.key as Dashboards.ChartType,
-      provider: metric.provider as any,
+      provider: metric.provider as Dashboards.Chart['provider'],
       chart_type: 'bar',
-      ...(isSnippet ? { chartConfig: DEFAULT_CHART_CONFIG } : {}),
-    })
+      ...(metric.key.startsWith('snippet_') ? { chartConfig: DEFAULT_CHART_CONFIG } : {}),
+    }))
 
-    setConfig({
-      ...config,
-      layout: [...current],
-    })
+    setConfig((current) =>
+      current ? { ...current, layout: appendReportCharts(current.layout, charts) } : current
+    )
   }
 
   const popChart = ({ metric }: { metric: Partial<Metric> }) => {
@@ -440,7 +398,7 @@ const Reports = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center" className="w-44">
-                  <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                  <MetricOptions config={config} onAddCharts={handleAddCharts} />
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -478,7 +436,7 @@ const Reports = () => {
                   <Button iconRight={<PlusIcon size={14} />}>Add your first chart</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center">
-                  <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                  <MetricOptions config={config} onAddCharts={handleAddCharts} />
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
