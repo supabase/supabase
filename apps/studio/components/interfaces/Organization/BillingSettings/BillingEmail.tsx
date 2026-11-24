@@ -13,13 +13,16 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { z } from 'zod'
 
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
@@ -104,16 +107,16 @@ const BillingEmail = () => {
   }, [form, customerProfile, isDirty])
 
   return (
-    <ScaffoldSection ref={ref}>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12">
-          <p className="text-foreground text-base m-0">Email Recipient</p>
-          <p className="text-sm text-foreground-light m-0">
+    <PageSection ref={ref} orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Email Recipient</PageSectionTitle>
+          <PageSectionDescription>
             All billing correspondence will go to this email
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         {isPermissionsLoaded && !canReadBillingEmail ? (
           <NoPermission resourceText="view this organization's email recipients" />
         ) : (
@@ -215,8 +218,8 @@ const BillingEmail = () => {
             </form>
           </Form>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

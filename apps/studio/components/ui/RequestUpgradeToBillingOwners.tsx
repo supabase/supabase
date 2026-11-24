@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PropsWithChildren, useState } from 'react'
+import { ComponentProps, PropsWithChildren, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -49,6 +49,7 @@ interface RequestUpgradeToBillingOwnersProps {
   featureProposition?: string
   className?: string
   variant?: 'primary' | 'default'
+  size?: ComponentProps<typeof Button>['size']
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -59,6 +60,7 @@ export const RequestUpgradeToBillingOwners = ({
   children,
   className,
   variant = 'primary',
+  size,
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -162,7 +164,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} variant={variant} className={className}>
+        <Button block={block} variant={variant} size={size} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>

@@ -1,28 +1,52 @@
 ---
-title: 'Identities'
+title: 'Auth identities'
+description: 'Learn what an identity is in Supabase Auth, which identity types a user can have, and which attributes the user identity object holds for each linked identity.'
 ---
 
-An identity is an authentication method associated with a user. Supabase Auth supports the following types of identity:
+Knowing a user's identities tells you which sign-in methods they can use. For how to add or remove identities, see [Identity linking](/docs/guides/auth/auth-identity-linking).
+
+## Identity types
+
+An identity is an authentication method associated with a user. Each way a user signs in, such as email or an OAuth provider, is a separate identity on the same user, so a user can have more than one. Anonymous users have no identity until they link an identity to their user.
+
+Supabase Auth supports the following types of identity:
 
 - Email
 - Phone
 - OAuth
 - SAML
 
-A user can have more than one identity. Anonymous users have no identity until they link an identity to their user.
+## How Auth links identities
+
+Supabase Auth automatically links identities with the same email address to a single user. When your app offers several OAuth sign-in options, the user doesn't need to remember which one they signed up with. When a new user signs in with OAuth, Auth looks for an existing user with the same email address. If it finds one, it links the new identity to that user.
+
+For automatic linking to find the right user, Auth needs every user's email to be unique. Linking an identity to a user with an unverified email address could lead to pre-account takeover attacks. To prevent this, when Auth can link a new identity to an existing user, it removes any other unconfirmed identities linked to that user.
+
+You can also link identities manually, which is in beta. For how, see [Manual linking](/docs/guides/auth/auth-identity-linking#manual-linking-beta).
 
 ## The user identity object
 
 The user identity object contains the following attributes:
 
-| Attributes      | Type     | Description                                                                                                                                                                                                                              |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| provider_id     | `string` | The provider id returned by the provider. If the provider is an OAuth provider, the id refers to the user's account with the OAuth provider. If the provider is `email` or `phone`, the id is the user's id from the `auth.users` table. |
-| user_id         | `string` | The user's id that the identity is linked to.                                                                                                                                                                                            |
-| identity_data   | `object` | The identity metadata. For OAuth and SAML identities, this contains information about the user from the provider.                                                                                                                        |
-| id              | `string` | The unique id of the identity.                                                                                                                                                                                                           |
-| provider        | `string` | The provider name.                                                                                                                                                                                                                       |
-| email           | `string` | The email is a generated column that references the optional email property in the identity_data                                                                                                                                         |
-| created_at      | `string` | The timestamp that the identity was created.                                                                                                                                                                                             |
-| last_sign_in_at | `string` | The timestamp that the identity was last used to sign in.                                                                                                                                                                                |
-| updated_at      | `string` | The timestamp that the identity was last updated.                                                                                                                                                                                        |
+| Attributes        | Type     | Description                                                                                                              |
+| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `provider_id`     | `string` | The provider ID returned by the provider: the user's OAuth account ID, or their `auth.users` ID for `email` and `phone`. |
+| `user_id`         | `string` | The ID of the user that the identity is linked to.                                                                       |
+| `identity_data`   | `object` | The identity metadata. For OAuth and SAML identities, this contains information about the user from the provider.        |
+| `id`              | `string` | The unique ID of the identity.                                                                                           |
+| `provider`        | `string` | The provider name.                                                                                                       |
+| `email`           | `string` | The email is a generated column that references the optional email property in `identity_data`.                          |
+| `created_at`      | `string` | The timestamp that the identity was created.                                                                             |
+| `last_sign_in_at` | `string` | The timestamp that the identity was last used to sign in.                                                                |
+| `updated_at`      | `string` | The timestamp that the identity was last updated.                                                                        |
+
+## Limits
+
+- Users who signed up with [SAML SSO](/docs/guides/auth/enterprise-sso/auth-sso-saml) aren't considered for identity linking, automatic or manual, for security reasons.
+- To unlink an identity, the user must be signed in and have at least two linked identities.
+
+## Related resources
+
+- [Identity linking](/docs/guides/auth/auth-identity-linking): link or unlink an identity.
+- [Users](/docs/guides/auth/users): the user object that identities belong to.
+- [Anonymous sign-ins](/docs/guides/auth/auth-anonymous): users with no identity until they link one.

@@ -232,6 +232,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             category={category}
             severity={severity}
             projectRef={projectRef}
+            subscriptionPlanId={subscriptionPlanId}
           />
         </div>
 

@@ -1,9 +1,10 @@
+import { PageContainer } from 'ui-patterns/PageContainer'
+
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
 import { DiskUsage } from './DiskUsage'
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import { DataPoint } from '@/data/analytics/constants'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -54,13 +55,13 @@ const UsageSection = ({
 
   return (
     <>
-      <ScaffoldContainer>
+      <PageContainer>
         <SectionHeader
           title={categoryMeta.name}
           description={categoryMeta.description}
           className="pb-0"
         />
-      </ScaffoldContainer>
+      </PageContainer>
 
       {categoryMeta.attributes.map((attribute) =>
         attribute.key === 'diskSize' ? (
