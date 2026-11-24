@@ -12,17 +12,12 @@ vi.mock('react-use', () => ({
   useWindowSize: () => mockWindowSize,
 }))
 
+function FrameworkWrapper({ children }: { children: React.ReactNode }) {
+  return <FrameworkProvider value={{ asPath: mockRouter.asPath }}>{children}</FrameworkProvider>
+}
+
 function renderWithFramework(ui: React.ReactElement) {
-  const utils = render(
-    <FrameworkProvider value={{ asPath: mockRouter.asPath }}>{ui}</FrameworkProvider>
-  )
-  return {
-    ...utils,
-    rerender: (nextUi: React.ReactElement) =>
-      utils.rerender(
-        <FrameworkProvider value={{ asPath: mockRouter.asPath }}>{nextUi}</FrameworkProvider>
-      ),
-  }
+  return render(ui, { wrapper: FrameworkWrapper })
 }
 
 function MobileSheetNavWithState({

@@ -25,10 +25,10 @@ const MobileSheetNav: React.FC<{
   shouldCloseOnViewportResize = true,
   onPointerDownOutside,
 }) => {
-  const { asPath, pathname } = useFramework()
+  const { asPath } = useFramework()
   const { width } = useWindowSize()
 
-  const fullPath = asPath ?? pathname ?? ''
+  const fullPath = asPath ?? ''
   const previousPath = useRef(fullPath)
   useEffect(() => {
     const hasPathnameChanged = previousPath.current.split(/[?#]/)[0] !== fullPath.split(/[?#]/)[0]
