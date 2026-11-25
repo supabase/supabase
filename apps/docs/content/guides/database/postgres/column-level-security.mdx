@@ -138,6 +138,10 @@ supabase migration new create_posts_table
       updated_at timestamptz default now()
       );
 
+      -- Enable row-level security
+      alter table
+      posts enable row level security;
+
       -- Add row-level security
       create policy "Allow update for owners" on posts for
       update
@@ -146,9 +150,19 @@ supabase migration new create_posts_table
       -- Add column-level security
       revoke
       update
-      (title) on table public.posts
+        on table public.posts
       from
-      authenticated;
+        authenticated;
+
+      grant
+      update
+        (title, content) on table public.posts to authenticated;
+
+      revoke
+      update
+        (title) on table public.posts
+      from
+        authenticated;
       ```
 
     </StepHikeCompact.Code>
