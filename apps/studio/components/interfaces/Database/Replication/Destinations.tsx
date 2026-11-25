@@ -129,7 +129,7 @@ export const Destinations = () => {
     ({ visibleDestinations }) => visibleDestinations.length > 0
   )
   const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
-  const shouldShowTable = !isDestinationsLoading && !hasClusterErrors && hasDestinations
+  const shouldShowTable = hasDestinations
   const tableColumnCount = 6
 
   const {
