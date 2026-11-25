@@ -136,15 +136,19 @@ describe('applyView', () => {
     expect(dropped).toEqual(expect.arrayContaining(['level', 'user', 'sort.desc', 'date']))
   })
 
-  it('drops a nested filter group and reports it instead of throwing', () => {
+  it('drops an empty or non-OR nested group and reports it instead of throwing', () => {
     const view = toView({
-      name: 'Has nested group',
+      name: 'Has bad groups',
       logSource: 'edge_logs',
       filters: {
         logicalOperator: 'AND',
         conditions: [
           { propertyName: 'level', operator: '=', value: 'error' },
           { logicalOperator: 'OR', conditions: [] },
+          {
+            logicalOperator: 'AND',
+            conditions: [{ propertyName: 'status', operator: '<>', value: '200' }],
+          },
         ],
       },
       viewOptions: {},
@@ -152,8 +156,61 @@ describe('applyView', () => {
 
     const { params, dropped } = applyView(view, { filterableNames })
 
-    expect(dropped).toContain('(nested group)')
+    expect(dropped).toEqual(['(filter group)', '(filter group)'])
     expect(params.filter).toEqual(['level:eq:error'])
+  })
+
+  it('drops a whole OR group when one of its conditions is unusable', () => {
+    const view = toView({
+      name: 'Group with top-level-only column',
+      logSource: 'edge_logs',
+      filters: {
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            logicalOperator: 'OR',
+            conditions: [
+              { propertyName: 'log_type', operator: '=', value: 'auth' },
+              { propertyName: 'status', operator: '<>', value: '200' },
+            ],
+          },
+        ],
+      },
+      viewOptions: {},
+    })
+
+    const { params, dropped } = applyView(view, { filterableNames })
+
+    expect(dropped).toEqual(['(filter group)'])
+    expect(params.filter).toEqual([])
+  })
+
+  it('round-trips an OR group alongside flat filters', () => {
+    const filter = ['level:eq:error', 'group:or:status:neq:200,pathname:neq:%2Fhealth']
+    const draft = serializeView({
+      name: 'Hide healthy health checks',
+      logSource: 'edge_logs',
+      search: { filter },
+    })
+
+    expect(draft.filters).toEqual({
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'level', operator: '=', value: 'error' },
+        {
+          logicalOperator: 'OR',
+          conditions: [
+            { propertyName: 'status', operator: '<>', value: '200' },
+            { propertyName: 'pathname', operator: '<>', value: '/health' },
+          ],
+        },
+      ],
+    })
+
+    const { params, dropped } = applyView(toView(draft), { filterableNames })
+    expect(dropped).toEqual([])
+    expect(params.filter).toEqual(filter)
+    expect(countActiveFilters(toView(draft))).toBe(3)
   })
 
   it('round-trips custom attributes and legacy dynamic filters', () => {

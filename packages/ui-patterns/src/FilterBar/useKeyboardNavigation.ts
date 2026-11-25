@@ -6,7 +6,12 @@ import {
   KeyboardNavigationConfig,
   NavigationDirection,
 } from './types'
-import { findConditionByPath, findGroupByPath, removeFromGroup } from './utils'
+import {
+  findConditionByPath,
+  findGroupByPath,
+  removeConditionAndEmptiedGroups,
+  removeFromGroup,
+} from './utils'
 
 export function useKeyboardNavigation({
   activeInput,
@@ -133,8 +138,21 @@ export function useKeyboardNavigation({
         e.preventDefault()
 
         if (highlightedConditionPath) {
-          removeByPath(highlightedConditionPath)
+          const updatedFilters = removeConditionAndEmptiedGroups(
+            activeFilters,
+            highlightedConditionPath
+          )
+          commitFilters(updatedFilters)
           setHighlightedConditionPath(null)
+          // Removing a group's last condition removes the group, so move focus to the nearest
+          // group that survived.
+          let survivingPath = activeInput.path
+          while (survivingPath.length > 0 && !findGroupByPath(updatedFilters, survivingPath)) {
+            survivingPath = survivingPath.slice(0, -1)
+          }
+          if (survivingPath.length !== activeInput.path.length) {
+            setActiveInput({ type: 'group', path: survivingPath })
+          }
         } else {
           const result = getHighlightNavigationPath('prev')
           applyHighlightNavigation(result)
@@ -162,6 +180,7 @@ export function useKeyboardNavigation({
       activeInput,
       activeFilters,
       removeByPath,
+      commitFilters,
       setActiveInput,
       highlightedConditionPath,
       setHighlightedConditionPath,

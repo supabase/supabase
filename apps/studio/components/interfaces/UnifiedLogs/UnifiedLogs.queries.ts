@@ -4,7 +4,9 @@ import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
+  parseLogsFilterGroupUrlParams,
   parseLogsFilterUrlParams,
+  type LogsFilterGroup,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
@@ -256,6 +258,26 @@ const translateFilter = (
   }
 }
 
+/**
+ * Translates one `group:or:…` filter entry into `(cond1 OR cond2 …)`. Returns null when any
+ * condition can't be translated, so the caller drops the whole group — dropping a single
+ * condition would silently narrow the OR.
+ */
+const translateFilterGroup = (group: LogsFilterGroup): SafeLogSqlFragment | null => {
+  const conditions: SafeLogSqlFragment[] = []
+  for (const { column, operator, value } of group.filters) {
+    try {
+      const condition = translateFilter(column, [value], operator)
+      if (!condition) return null
+      conditions.push(condition)
+    } catch {
+      return null
+    }
+  }
+  if (conditions.length === 0) return null
+  return safeSql`(${joinSqlFragments(conditions, ' OR ')})`
+}
+
 const NO_ROWS: SafeLogSqlFragment = safeSql`0`
 
 export const getUnifiedLogsScopeCondition = (
@@ -404,6 +426,11 @@ const buildBaseWhere = (
     } catch {
       // analyticsLiteral rejected an unsupported input — drop the condition.
     }
+  }
+
+  for (const group of parseLogsFilterGroupUrlParams(search.filter)) {
+    const condition = translateFilterGroup(group)
+    if (condition) parts.push(condition)
   }
 
   const searchParamsFilter = applySearchParamsFilter(search)
