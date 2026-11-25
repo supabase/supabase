@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, renderHook, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import {
   STORAGE_ROW_STATUS,
@@ -7,21 +7,8 @@ import {
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItemWithColumn } from '@/components/interfaces/Storage/Storage.types'
 import { ConfirmDeleteModal } from '@/components/interfaces/Storage/StorageExplorer/ConfirmDeleteModal'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 import { customRender as render } from '@/tests/lib/custom-render'
-
-const { selectedItemsToDelete } = vi.hoisted(() => ({
-  selectedItemsToDelete: { current: [] as StorageItemWithColumn[] },
-}))
-
-vi.mock('@/state/storage-explorer', () => ({
-  useStorageExplorerStateSnapshot: () => ({
-    selectedBucket: { id: 'my-bucket', name: 'my-bucket', public: false },
-    selectedItemsToDelete: selectedItemsToDelete.current,
-    deleteFolder: vi.fn(),
-    deleteFiles: vi.fn(),
-    setSelectedItemsToDelete: vi.fn(),
-  }),
-}))
 
 const buildItem = (name: string, type: StorageItemWithColumn['type']): StorageItemWithColumn => ({
   id: name,
@@ -36,13 +23,17 @@ const buildItem = (name: string, type: StorageItemWithColumn['type']): StorageIt
   columnIndex: 0,
 })
 
+// Seeds the real storage explorer state, which `ConfirmDeleteModal` reads through the same hook.
+const selectItemsToDelete = (items: StorageItemWithColumn[]) => {
+  const { result } = renderHook(() => useStorageExplorerStateSnapshot())
+  act(() => result.current.setSelectedItemsToDelete(items))
+}
+
 describe('ConfirmDeleteModal', () => {
-  beforeEach(() => {
-    selectedItemsToDelete.current = []
-  })
+  afterEach(() => selectItemsToDelete([]))
 
   it('warns that deleting a folder also deletes the files inside it', () => {
-    selectedItemsToDelete.current = [buildItem('dest', STORAGE_ROW_TYPES.FOLDER)]
+    selectItemsToDelete([buildItem('dest', STORAGE_ROW_TYPES.FOLDER)])
     render(<ConfirmDeleteModal />)
 
     expect(screen.getByText('Delete dest?')).toBeInTheDocument()
@@ -54,7 +45,7 @@ describe('ConfirmDeleteModal', () => {
   })
 
   it('keeps the existing confirmation for a single file', () => {
-    selectedItemsToDelete.current = [buildItem('report.pdf', STORAGE_ROW_TYPES.FILE)]
+    selectItemsToDelete([buildItem('report.pdf', STORAGE_ROW_TYPES.FILE)])
     render(<ConfirmDeleteModal />)
 
     expect(screen.getByText('Delete report.pdf?')).toBeInTheDocument()
