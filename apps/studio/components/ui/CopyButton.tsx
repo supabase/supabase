@@ -6,8 +6,8 @@ type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
-  /** Called once the clipboard write has succeeded */
-  onCopied?: () => void
+  /** Called once the clipboard write has succeeded, with the text that was copied */
+  onCopied?: (copiedText: string) => void
 }
 
 type CopyButtonWithText = CopyButtonBaseProps & {
@@ -56,7 +56,8 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
           const textToCopy = asyncText ? asyncText() : text
           copyToClipboard(textToCopy, () => {
             setShowCopied(true)
-            onCopied?.()
+            // The write only succeeds after the text resolves, so this adds no wait
+            Promise.resolve(textToCopy).then((copiedText) => onCopied?.(copiedText))
           })
           onClick?.(e)
         }}

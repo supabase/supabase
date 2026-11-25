@@ -167,6 +167,9 @@ describe('ApiKeyPill', () => {
     fireEvent.click(copy)
 
     await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
+    // The mock is called before the reveal request settles, so wait for it to finish
+    await mockCopyToClipboard.mock.results[0].value
+    await new Promise((resolve) => setTimeout(resolve, 0))
     expect(mockTrack).not.toHaveBeenCalled()
   })
 

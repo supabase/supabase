@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -17,8 +17,6 @@ export function ApiKeyPill({
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const [show, setShow] = useState(false)
-  // Set when onCopy resolved a key, so a failed reveal isn't tracked as a copy
-  const hasKeyToCopy = useRef(false)
 
   const isSecret = apiKey.type === 'secret'
 
@@ -69,21 +67,12 @@ export function ApiKeyPill({
   }
 
   async function onCopy() {
-    hasKeyToCopy.current = false
-
-    if (!isSecret) {
-      hasKeyToCopy.current = true
-      return apiKey.api_key
-    }
-    if (revealedKey) {
-      hasKeyToCopy.current = true
-      return revealedKey
-    }
+    if (!isSecret) return apiKey.api_key
+    if (revealedKey) return revealedKey
 
     try {
       const key = await reveal()
       clear()
-      hasKeyToCopy.current = !!key
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
@@ -91,9 +80,11 @@ export function ApiKeyPill({
     }
   }
 
-  // Fires after the clipboard write succeeds, so failed writes aren't recorded
-  function onCopied() {
-    if (hasKeyToCopy.current) track('api_key_copied', { keyType: apiKey.type })
+  // Fires after the clipboard write succeeds, so failed writes aren't recorded. A failed reveal
+  // copies an empty string, which isn't a copied key either. Each copy carries its own text, so
+  // overlapping copies can't affect each other.
+  function onCopied(copiedText: string) {
+    if (copiedText) track('api_key_copied', { keyType: apiKey.type })
   }
 
   const isRestricted = isSecret && !isLoadingPermission && !canManageSecretKeys
