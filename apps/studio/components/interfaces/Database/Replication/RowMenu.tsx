@@ -32,7 +32,6 @@ import {
   canModifyDestination,
   type ReplicationDestinationType,
 } from './ReplicationDiagram/Nodes.utils'
-import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
@@ -193,10 +192,7 @@ export const RowMenu = ({
         <DropdownMenuContent side="bottom" align="end" className="w-44">
           <DropdownMenuItem className="gap-x-2" asChild disabled={!pipeline}>
             <Link
-              href={withReplicationCluster(
-                `/project/${projectRef}/database/pipelines/${pipeline?.id}`,
-                clusterId
-              )}
+              href={`/project/${projectRef}/database/pipelines/${pipeline?.id}${clusterId ? `?cluster_id=${encodeURIComponent(clusterId)}` : ''}`}
             >
               <EyeIcon size={14} />
               <p>View details</p>
