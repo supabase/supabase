@@ -7,11 +7,10 @@ import {
 } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { BoxesIcon } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useContext, useMemo } from 'react'
+import { lazy, useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
-import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
+import { INTEGRATIONS, type IntegrationDefinition } from './Integrations.constants'
 import {
   useMarketplaceIntegrationsQuery,
   type MarketplaceIntegration,
@@ -19,6 +18,12 @@ import {
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
+
+const MarketplaceIntegrationSettingsTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationSettingsTab').then(
+    (mod) => ({ default: mod.MarketplaceIntegrationSettingsTab })
+  )
+)
 
 const renderMarketplaceLogo = (listingLogo?: string | null) => {
   const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
@@ -170,15 +175,7 @@ export const useAvailableIntegrations = () => {
             navigate: ({ pageId = 'overview' }) => {
               switch (pageId) {
                 case 'settings':
-                  return dynamic(
-                    () =>
-                      import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationSettingsTab').then(
-                        (mod) => mod.MarketplaceIntegrationSettingsTab
-                      ),
-                    {
-                      loading: Loading,
-                    }
-                  )
+                  return MarketplaceIntegrationSettingsTab
               }
               return null
             },

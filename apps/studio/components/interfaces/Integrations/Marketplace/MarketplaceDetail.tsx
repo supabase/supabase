@@ -1,4 +1,5 @@
 import { ArrowUpRightIcon, BookOpenIcon, GaugeIcon, SettingsIcon } from 'lucide-react'
+import { Suspense } from 'react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -9,6 +10,7 @@ import { OverviewTab } from './OverviewTab'
 import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
+import { Loading } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import { AddWrapperButton } from '@/components/interfaces/Integrations/Wrappers/AddWrapperButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -162,17 +164,25 @@ export const MarketplaceDetail = () => {
       {activeRoute === 'overview' ? (
         <div className={centeredContentClass}>
           <OverviewTab integration={integration} isInstalled={isInstalled}>
-            {OverviewComponent && <OverviewComponent />}
+            {OverviewComponent && (
+              <Suspense fallback={<Loading />}>
+                <OverviewComponent />
+              </Suspense>
+            )}
           </OverviewTab>
         </div>
       ) : CustomPageComponent ? (
         layout === 'constrained' ? (
           <div className={centeredContentClass}>
-            <CustomPageComponent />
+            <Suspense fallback={<Loading />}>
+              <CustomPageComponent />
+            </Suspense>
           </div>
         ) : (
           <div className="flex-1 min-h-0">
-            <CustomPageComponent />
+            <Suspense fallback={<Loading />}>
+              <CustomPageComponent />
+            </Suspense>
           </div>
         )
       ) : null}

@@ -1,7 +1,14 @@
+import { ClientOnly } from '@tanstack/react-router'
 import { useParams } from 'common'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useMemo, useRef, type ComponentType } from 'react'
+import {
+  lazy,
+  Suspense,
+  useMemo,
+  useRef,
+  type ComponentType,
+  type LazyExoticComponent,
+} from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -157,6 +164,36 @@ if (!import.meta.env?.SSR) {
 
 type StepContentModule = { default: ComponentType<StepContentProps> }
 
+const stepContentComponents = new Map<
+  string,
+  LazyExoticComponent<ComponentType<StepContentProps>>
+>()
+
+function getStepContentComponent(
+  filePath: string
+): LazyExoticComponent<ComponentType<StepContentProps>> {
+  const cached = stepContentComponents.get(filePath)
+  if (cached) return cached
+
+  const viteLoader =
+    contentModules[`./content/${filePath}/content.tsx`] ??
+    contentModules[`./content/${filePath}/content.ts`]
+
+  const loader = viteLoader
+    ? (viteLoader as () => Promise<StepContentModule>)
+    : () => import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
+
+  const Component = lazy(loader)
+  stepContentComponents.set(filePath, Component)
+  return Component
+}
+
+const stepContentFallback = (
+  <div className="p-4 min-h-[200px]">
+    <GenericSkeletonLoader />
+  </div>
+)
+
 /**
  * Dynamically loads and renders a content component from the content directory.
  * All step content uses this unified loader - no built-in component registry needed.
@@ -176,34 +213,19 @@ function StepContent({
 }) {
   // Resolve any template placeholders in the content path
   const filePath = useMemo(() => resolveContentPath(contentId, state), [contentId, state])
-
-  // Dynamically import the content component
-  const ContentComponent = useMemo(() => {
-    const viteLoader =
-      contentModules[`./content/${filePath}/content.tsx`] ??
-      contentModules[`./content/${filePath}/content.ts`]
-
-    const loader = viteLoader
-      ? (viteLoader as () => Promise<StepContentModule>)
-      : () =>
-          import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
-
-    return dynamic<StepContentProps>(loader, {
-      loading: () => (
-        <div className="p-4 min-h-[200px]">
-          <GenericSkeletonLoader />
-        </div>
-      ),
-    })
-  }, [filePath])
+  const ContentComponent = getStepContentComponent(filePath)
 
   return (
-    <ContentComponent
-      state={state}
-      projectKeys={projectKeys}
-      connectionStringPooler={connectionStringPooler}
-      deploymentMode={deploymentMode}
-    />
+    <ClientOnly fallback={stepContentFallback}>
+      <Suspense fallback={stepContentFallback}>
+        <ContentComponent
+          state={state}
+          projectKeys={projectKeys}
+          connectionStringPooler={connectionStringPooler}
+          deploymentMode={deploymentMode}
+        />
+      </Suspense>
+    </ClientOnly>
   )
 }
 

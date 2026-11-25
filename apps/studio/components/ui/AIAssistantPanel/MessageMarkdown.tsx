@@ -1,7 +1,14 @@
-import dynamic from 'next/dynamic'
+import { ClientOnly } from '@tanstack/react-router'
 import Link from 'next/link'
-import React, { isValidElement, memo, ReactNode, useMemo, type ReactElement } from 'react'
-import type { StreamdownProps } from 'streamdown'
+import React, {
+  isValidElement,
+  lazy,
+  memo,
+  ReactNode,
+  Suspense,
+  useMemo,
+  type ReactElement,
+} from 'react'
 import {
   Button,
   cn,
@@ -23,10 +30,7 @@ import { AssistantQueryCell } from './AssistantQueryCell'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
 
-const Streamdown = dynamic<StreamdownProps>(
-  () => import('streamdown').then((mod) => mod.Streamdown),
-  { ssr: false }
-)
+const Streamdown = lazy(() => import('streamdown').then((mod) => ({ default: mod.Streamdown })))
 
 // Streamdown splits ordered lists with complex content (e.g. code blocks) into
 // separate <ol> elements. The `start` attribute preserves semantics for screen
@@ -167,9 +171,13 @@ export const MessageMarkdown = memo(function MessageMarkdown({
   )
 
   return (
-    <Streamdown className={className} components={allMarkdownComponents}>
-      {markdownSource}
-    </Streamdown>
+    <ClientOnly>
+      <Suspense fallback={null}>
+        <Streamdown className={className} components={allMarkdownComponents}>
+          {markdownSource}
+        </Streamdown>
+      </Suspense>
+    </ClientOnly>
   )
 })
 

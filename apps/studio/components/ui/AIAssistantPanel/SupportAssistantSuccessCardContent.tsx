@@ -1,8 +1,17 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
+import { ClientOnly } from '@tanstack/react-router'
 import { ArrowUpRightIcon } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import type { JSX } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
@@ -38,10 +47,7 @@ type SupportAssistantPreviewChat = AiAssistantState['chatInstances'][string]
 
 const EMPTY_MESSAGES: MessageType[] = []
 
-const Streamdown = dynamic<StreamdownProps>(
-  () => import('streamdown').then((mod) => mod.Streamdown),
-  { ssr: false }
-)
+const Streamdown = lazy(() => import('streamdown').then((mod) => ({ default: mod.Streamdown })))
 
 interface SupportAssistantSuccessCardContentProps {
   request: SubmittedSupportRequest
@@ -271,12 +277,16 @@ function SupportAssistantResponsePreview({ chat }: { chat: SupportAssistantPrevi
 
 function SupportAssistantPreviewMarkdown({ children }: { children: string }) {
   return (
-    <Streamdown
-      className="prose prose-sm dark:prose-dark max-w-none space-y-3 text-sm text-foreground-light prose-p:my-0 prose-strong:font-medium prose-strong:text-foreground prose-code:text-xs prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
-      components={supportAssistantPreviewMarkdownComponents}
-    >
-      {children}
-    </Streamdown>
+    <ClientOnly>
+      <Suspense fallback={null}>
+        <Streamdown
+          className="prose prose-sm dark:prose-dark max-w-none space-y-3 text-sm text-foreground-light prose-p:my-0 prose-strong:font-medium prose-strong:text-foreground prose-code:text-xs prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
+          components={supportAssistantPreviewMarkdownComponents}
+        >
+          {children}
+        </Streamdown>
+      </Suspense>
+    </ClientOnly>
   )
 }
 
