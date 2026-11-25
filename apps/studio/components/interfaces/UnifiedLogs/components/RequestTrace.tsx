@@ -105,6 +105,16 @@ export function RequestTrace({ row }: { row: ColumnSchema }) {
 
   const { trace, unplacedCount } = toTraceData(traceId, data)
 
+  if (trace.spans.length === 0 && unplacedCount > 0) {
+    return (
+      <LogPanelEmptyState
+        icon={WaypointsIcon}
+        title={unplacedCount === 1 ? "Couldn't display this span" : "Couldn't display these spans"}
+        description="Start time is missing or invalid."
+      />
+    )
+  }
+
   if (trace.spans.length === 0) {
     return (
       <LogPanelEmptyState
