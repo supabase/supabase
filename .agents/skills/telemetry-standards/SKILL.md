@@ -3,8 +3,8 @@ name: telemetry-standards
 description: PostHog event tracking standards for Supabase Studio. Use when adding
   useTrack() calls, defining events in packages/common/telemetry-constants.ts,
   implementing tracking for a new feature, or reviewing PRs for telemetry compliance.
-  Covers event naming, property conventions, approved patterns, and implementation
-  guide.
+  Covers event naming, property conventions, privacy rules for event properties,
+  URL state and consent, approved patterns, and implementation guide.
 ---
 
 # Telemetry Standards for Supabase Studio
@@ -97,6 +97,34 @@ This section takes precedence over "match similar events" guidance elsewhere in 
 
 `data-attr` attributes are not tracked while PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`). Keep their values static strings, and never build them from user-defined names, in case autocapture is enabled later.
 
+## Privacy: Secrets, Project Content and URL State
+
+Telemetry only runs for visitors who accepted analytics. Consent does not make it acceptable to collect secrets or the data customers keep in their projects.
+
+**Also never send, in any property:**
+
+- Secrets: API keys, JWTs, access or refresh tokens, passwords, connection strings, invite or OAuth codes. Pasted input often contains them
+- Content read from a project: row values, log lines, query results, AI responses
+- Ids of a customer's end users, and phone numbers
+
+**Helpers that send the shape instead of the text:**
+
+- Search input: `describeSearchQuery` in `packages/common/search-query-telemetry.ts`
+- Errors: `useTrackFunnelError` in `apps/studio/lib/telemetry/use-track-funnel-error.ts`, which only accepts a classified reason from `funnel-errors.ts`
+
+**The page URL goes out with every event.** Pageviews and custom events carry the current URL and the referrer automatically, so URL state is telemetry:
+
+- Do not put tokens, user input or row values in the query string or hash of a route
+- If a feature needs URL state like that, redact it in `packages/common/telemetry-utils.ts` in the same PR and add a test
+
+## Consent and Transport
+
+- Send events only through `useTrack` (Studio) or the app's `useSendTelemetryEvent`, and pageviews through `PageTelemetry`. They check consent. Never import `posthog-js` outside `packages/common/posthog-client.ts` or post to an analytics endpoint directly
+- Always pass the real consent state to `posthogClient` methods. Never rely on a parameter default
+- Do not write analytics cookies or storage (ids, attribution, experiment assignment) before the visitor accepts. Anything stored after consent must be cleared in `revokeTrackingConsent` (`packages/common/consent-state.ts`) when consent is withdrawn
+- A new third-party script, pixel or embed that receives visitor data needs a consent gate and a Legal review before it merges. Ask @supabase/growth-eng to route it
+- Nothing may be sent when `IS_PLATFORM` is false. Self-hosted Studio sends no telemetry
+
 ## Required Pattern
 
 Import `useTrack` from `@/lib/telemetry/track` (within `apps/studio/`).
@@ -177,6 +205,7 @@ When reviewing a PR, flag these as **required changes:**
 4. **Inaccurate docs** — `@source`/`@page` descriptions that don't match the actual implementation
 5. **Unmeasured feature flags** — a PostHog flag gates new behavior but its value is not captured in any `track()` call, or there is no outcome tracking for the gated behavior
 6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, raw error messages, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one (feature flag values excepted). Required even when the value looks harmless; ask for a count, enum, boolean or category instead
+7. **Secrets, project content, URL state or consent** — a property that can carry a secret or content read from a project; new query-string or hash state holding tokens, user input or row values with no redaction; a send path that bypasses the consent check; analytics storage written before consent
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
@@ -232,4 +261,6 @@ To add tracking for a user action:
 - [ ] No PII in event properties (emails, names, IPs, etc.)
 - [ ] No user-defined names or identifiers in properties (schema, table, column, function, bucket, policy, project, branch), and no free text, raw error messages or extra IDs
 - [ ] New properties are typed as string-literal unions, booleans or numbers, not plain `string` (feature flag values excepted)
+- [ ] No secrets or content read from a project in any property
+- [ ] No new query-string or hash state that holds tokens, user input or row values
 - [ ] Property names consistent with similar events
