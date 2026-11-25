@@ -6,6 +6,36 @@ icon: reference-cli
 description: Develop your project locally and deploy to the Supabase Platform.
 hidden_labels:
  - optional
+category_order:
+ - General
+ - Testing
+ - Generate Types
+ - Database
+ - Migrations
+ - Seed
+ - Inspect
+ - Organizations
+ - Projects
+ - Config
+ - Branches
+ - Edge Functions
+ - Secrets
+ - Storage
+ - Authentication
+ - Custom Domains
+ - Vanity Subdomains
+ - Network Bans
+ - Network Restrictions
+ - SSL Enforcement
+ - Postgres Config
+ - SQL Snippets
+ - Notebooks
+ - Services
+ - Autocompletion Scripts
+ - Telemetry
+ - Encryption
+ - Backups
+ - Feedback and Support
 ---
 
 The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform. The CLI is still under development, but it contains all the functionality for working with your Supabase projects and the Supabase Platform.
