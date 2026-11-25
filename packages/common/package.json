@@ -9,6 +9,7 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -44,7 +45,6 @@
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "lucide-react": "catalog:",
-    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   }

@@ -13,6 +13,8 @@ import { isAsyncOptionsFunction } from './utils'
 
 export type HighlightNavigationOptions = {
   skipEnterWhenFilterHighlighted?: boolean
+  /** Index highlighted until the user moves the highlight. Defaults to 0. */
+  defaultIndex?: number
 }
 
 export function useFilterBarState() {
@@ -134,24 +136,27 @@ export function useHighlightNavigation(
   fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void,
   options?: HighlightNavigationOptions
 ) {
-  const [highlightedIndex, setHighlightedIndex] = useState(0)
+  // Until the user moves the highlight, it follows `defaultIndex`, which can change as the
+  // items do (e.g. a freeform item appearing above the first property while typing).
+  const [navigatedIndex, setNavigatedIndex] = useState<number | null>(null)
+  const defaultIndex = options?.defaultIndex ?? 0
+  const highlightedIndex = Math.min(navigatedIndex ?? defaultIndex, Math.max(itemsLength - 1, 0))
 
-  useEffect(() => {
-    if (highlightedIndex > itemsLength - 1) {
-      setHighlightedIndex(itemsLength > 0 ? itemsLength - 1 : 0)
-    }
-  }, [itemsLength, highlightedIndex])
+  const setHighlightedIndex = setNavigatedIndex
+  const reset = useCallback(() => setNavigatedIndex(null), [])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        setHighlightedIndex((prev) => (prev < itemsLength - 1 ? prev + 1 : prev))
+        setHighlightedIndex(
+          highlightedIndex < itemsLength - 1 ? highlightedIndex + 1 : highlightedIndex
+        )
         return
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
+        setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : 0)
         return
       }
       if (e.key === 'Enter') {
@@ -182,8 +187,6 @@ export function useHighlightNavigation(
       options?.skipEnterWhenFilterHighlighted,
     ]
   )
-
-  const reset = useCallback(() => setHighlightedIndex(0), [])
 
   return { highlightedIndex, setHighlightedIndex, handleKeyDown, reset }
 }

@@ -6,10 +6,10 @@ import { branchKeys } from './keys'
 import { upsertMigration } from '@/data/database/migration-upsert-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantForVariants } from '@/lib/grants'
+import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
 
-export type BranchMergeGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/merge'>
+export type BranchMergeGrant = GrantFor<'post', '/v1/branches/{branch_id_or_ref}/merge'>
 
 export type BranchMergeVariables = {
   grant: BranchMergeGrant

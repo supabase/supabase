@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) είναι μια εναλλακτική λύση της Firebase ανοιχτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας εργαλεία ανοιχτού κώδικα επιχειρηματικού επιπέδου.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://supabase.com/docs/guides/auth)
 - [x] Αυτόματα παραγόμενα APIs.
   - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@
 **Αρχιτεκτονική**
 
 Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
-Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
+Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/self-hosting) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
 
 ![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@
 - [Realtime](https://github.com/supabase/realtime) είναι ένας διακομιστής Elixir που σας επιτρέπει να ακούτε τις εισαγωγές, ενημερώσεις και διαγραφές της PostgreSQL χρησιμοποιώντας websockets. Το Realtime ρωτάει την ενσωματωμένη λειτουργία αντιγραφής της Postgres για αλλαγές στη βάση δεδομένων, μετατρέπει τις αλλαγές σε JSON και στη συνέχεια μεταδίδει το JSON μέσω websockets σε εξουσιοδοτημένους πελάτες.
 - [PostgREST](http://postgrest.org/) είναι ένας διακομιστής ιστού που μετατρέπει τη βάση δεδομένων PostgreSQL απευθείας σε ένα RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) μια επέκταση της PostgreSQL που εκθέτει ένα GraphQL API
-- [Storage](https://github.com/supabase/storage-api) παρέχει μια RESTful διεπαφή για τη διαχείριση αρχείων που είναι αποθηκευμένα στο S3, χρησιμοποιώντας το Postgres για τη διαχείριση των δικαιωμάτων.
+- [Storage](https://github.com/supabase/storage) παρέχει μια RESTful διεπαφή για τη διαχείριση αρχείων που είναι αποθηκευμένα στο S3, χρησιμοποιώντας το Postgres για τη διαχείριση των δικαιωμάτων.
 - [postgres-meta](https://github.com/supabase/postgres-meta) είναι ένα RESTful API για τη διαχείριση του Postgres σας, επιτρέποντάς σας να αντλείτε πίνακες, να προσθέτετε ρόλους και να εκτελείτε ερωτήματα κ.λπ.
 - το [GoTrue](https://github.com/netlify/gotrue) είναι ένα API βασισμένο στο SWT για τη διαχείριση χρηστών και την έκδοση SWT tokens.
 - το [Kong](https://github.com/Kong/kong) είναι μια πύλη API cloud-native.
@@ -79,14 +79,14 @@
     <th>Πελάτης</th>
     <th colspan="5">Πελάτες-χαρακτηριστικά (που περιλαμβάνονται στον πελάτη Supabase)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -100,9 +100,9 @@
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ Επίσημο ⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -121,12 +121,12 @@
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚 Κοινότητα 💚</th>
-  
+
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -205,7 +205,7 @@
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

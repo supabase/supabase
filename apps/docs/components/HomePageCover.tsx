@@ -10,6 +10,7 @@ import {
 } from '~/features/ui/PromptPanel'
 import { isFeatureEnabled } from 'common'
 import { type ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
@@ -40,10 +41,22 @@ const HomePageCover = ({ title, cliCode }: { title: string; cliCode: ReactNode }
   const { homepageHeading } = getCustomContent(['homepage:heading'])
 
   return (
-    <div className="w-full border-b bg-muted/10">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-16">
-          <div className="flex w-full min-w-0 flex-1 items-center gap-4 sm:gap-8 mt-10">
+    <div className="@container w-full border-b bg-muted/10 layout-v2:border-b-0">
+      <div className="mx-auto max-w-7xl px-6 py-16 layout-v2:pb-0">
+        <div
+          className={cn(
+            'flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-16',
+            'layout-v2:border-b layout-v2:pb-16',
+            'layout-v2:lg:flex-col layout-v2:lg:items-stretch layout-v2:lg:gap-10',
+            'layout-v2:@4xl:grid layout-v2:@4xl:grid-cols-12 layout-v2:@4xl:items-start layout-v2:@4xl:gap-x-16'
+          )}
+        >
+          <div
+            className={cn(
+              'flex w-full min-w-0 flex-1 items-center gap-4 sm:gap-8 mt-10',
+              'layout-v2:@4xl:col-span-4 layout-v2:@4xl:only:col-span-full'
+            )}
+          >
             <DocsCoverLogo aria-hidden="true" className="w-12 shrink-0 sm:w-[60px] md:w-[100px]" />
             <div className="flex min-w-0 flex-col">
               <h1 className="m-0 text-3xl text-foreground sm:text-4xl">
@@ -56,7 +69,14 @@ const HomePageCover = ({ title, cliCode }: { title: string; cliCode: ReactNode }
             </div>
           </div>
           {fullGettingStartedEnabled && (
-            <div className="w-full lg:max-w-[478px] lg:shrink-0">
+            <div
+              className={cn(
+                'w-full lg:max-w-[478px] lg:shrink-0',
+                'layout-v2:lg:max-w-none layout-v2:lg:shrink layout-v2:@4xl:col-span-8',
+                'layout-v2:@4xl:grid layout-v2:@4xl:grid-cols-12 layout-v2:@4xl:gap-x-6',
+                'layout-v2:@4xl:*:col-span-8 layout-v2:@4xl:*:col-start-5'
+              )}
+            >
               <SetupPrompt cliCode={cliCode} />
             </div>
           )}

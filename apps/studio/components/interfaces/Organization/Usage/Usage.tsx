@@ -2,10 +2,18 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { useQueryStates } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -17,15 +25,9 @@ import OrgLogUsage from './OrgLogUsage'
 import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import { getUsageBranchOptions, resolveUsageProjectRef } from './Usage.utils'
+import { getUsageBranchOptions, resolveUsageProjectRef, usageFilterParsers } from './Usage.utils'
 import { UsageBranchFilter } from './UsageBranchFilter'
 import { UsageFilterNotice } from './UsageFilterNotice'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
@@ -45,10 +47,7 @@ export const Usage = () => {
 
   const [dateRange, setDateRange] = useState<any>()
 
-  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates({
-    projectRef: parseAsString,
-    branchRef: parseAsString,
-  })
+  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates(usageFilterParsers)
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
   const {
@@ -89,13 +88,15 @@ export const Usage = () => {
     isError: isErrorBranchesQuery,
     isSuccess: isSuccessBranches,
     error: branchesQueryError,
-  } = useQuery({
-    ...branchesQueryOptions({
-      projectRef: selectedProjectRef ?? undefined,
-      grant: branchesGrant.grant,
-    }),
-    enabled: isBranchesQueryEnabled,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: selectedProjectRef ?? undefined,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranchesQueryEnabled }
+    )
+  )
   const isPendingBranches =
     isBranchesQueryEnabled &&
     (branchesGrant.status === 'loading' ||
@@ -214,13 +215,15 @@ export const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader className="pt-8">
-          <ScaffoldTitle>Usage</ScaffoldTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Usage</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <div className="sticky top-0 border-b bg-sidebar z-1">
-        <ScaffoldContainer>
+        <PageContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
               <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
@@ -352,54 +355,54 @@ export const Usage = () => {
               </div>
             )}
           </div>
-        </ScaffoldContainer>
+        </PageContainer>
       </div>
 
       {isErrorOrgDailyStats && (
-        <ScaffoldContainer>
-          <ScaffoldSection isFullWidth className="pb-0">
+        <PageContainer>
+          <PageSection className="last:pb-0">
             <AlertError
               error={orgDailyStatsError}
               subject="Failed to retrieve usage statistics for organization"
             />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
       )}
 
       {isProjectLookupBlocked && (
-        <ScaffoldContainer className="mt-5">
+        <PageContainer className="mt-5">
           <AlertError subject="Failed to retrieve project" error={selectedProjectError} />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {isErrorBranches && (
-        <ScaffoldContainer className="mt-5">
+        <PageContainer className="mt-5">
           <AlertError subject="Failed to retrieve branches" error={branchesError} />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {isBranchLookupDenied && (
-        <ScaffoldContainer className="mt-5">
+        <PageContainer className="mt-5">
           <NoPermission resourceText="view this branch's usage" />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {isResolvingBranch && (
-        <ScaffoldContainer className="mt-5">
+        <PageContainer className="mt-5">
           <div role="status" aria-label="Loading branch usage">
             <ShimmeringLoader />
           </div>
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {isBranchUnavailable && (
-        <ScaffoldContainer className="mt-5">
+        <PageContainer className="mt-5">
           <Admonition
             type="warning"
             title="Branch unavailable"
             description="The selected branch could not be found for this project. Showing usage for the parent project. Usage from deleted branches still counts toward the organization total."
           />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {canShowUsage && (
@@ -411,9 +414,9 @@ export const Usage = () => {
               onViewOrganizationUsage={() => setUsageFilter({ projectRef: null, branchRef: null })}
             />
           ) : (
-            <ScaffoldContainer id="restriction" className="mt-5">
+            <PageContainer id="restriction" className="mt-5">
               <Restriction />
-            </ScaffoldContainer>
+            </PageContainer>
           )}
 
           <TotalUsage

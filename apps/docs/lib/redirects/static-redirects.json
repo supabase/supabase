@@ -1105,6 +1105,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/database/replication/pipelines-guarantees",
+    "destination": "/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/database/replication/replication-faq",
     "destination": "/docs/guides/database/replication/pipelines-faq",
     "permanent": true
@@ -1142,6 +1147,11 @@
   {
     "source": "/docs/guides/database/timeouts",
     "destination": "/docs/guides/database/postgres/timeouts",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/database/triggers",
+    "destination": "/docs/guides/database/postgres/triggers",
     "permanent": true
   },
   {
@@ -1540,6 +1550,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/local-development/cli/customizing-email-templates",
+    "destination": "/docs/guides/local-development/customizing-email-templates",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/local-development/cli/github-action/generating-types",
     "destination": "/docs/guides/deployment/ci/generating-types",
     "permanent": true
@@ -1547,6 +1562,11 @@
   {
     "source": "/docs/guides/local-development/cli/github-action/testing",
     "destination": "/docs/guides/deployment/ci/testing",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/local-development/cli/managing-config",
+    "destination": "/docs/guides/local-development/managing-config",
     "permanent": true
   },
   {
@@ -2492,6 +2512,11 @@
   {
     "source": "/docs/reference/cli/supabase-help",
     "destination": "/docs/reference/cli/global-flags",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/cli/supabase-inspect-db-role-connections",
+    "destination": "/docs/reference/cli/supabase-inspect-db-role-stats",
     "permanent": true
   },
   {

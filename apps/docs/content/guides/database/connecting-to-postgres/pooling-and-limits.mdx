@@ -32,7 +32,7 @@ There are two kinds, and they work together.
 
 **Application-side poolers** are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and Postgres.js. They keep a few connections open and reuse them. On a persistent backend, such as a long-running container or VM, an application-side pooler is enough on its own.
 
-**Server-side poolers**, such as the shared pooler in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or edge functions, or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
+**Server-side poolers**, such as the shared pooler in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or [edge functions](/docs/guides/functions), or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
 
 ### Shared and dedicated poolers [#shared-pooler]
 

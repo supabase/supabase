@@ -20,7 +20,7 @@ download.api.v1:
 # Download tool permissions from the public Management API projection of its enforcement rules.
 download.mcp-tools-permissions:
 	curl -sSf https://api.supabase.com/platform/mcp-tools-permissions > $(REPO_DIR)/mcp_tools_permissions.json
-	npx prettier --write $(REPO_DIR)/mcp_tools_permissions.json
+	pnpm exec oxfmt $(REPO_DIR)/mcp_tools_permissions.json
 
 # This flow needs to be updated, so we'l comment out for the moment
 # Manual flow for now:
@@ -65,7 +65,7 @@ download.analytics.v0:
 ###############################################################################
 # `download.tsdoc.v2` now writes raw TypeDoc JSON directly under
 # `reference/javascript/v2/` — the new pipeline (`scripts/build-reference-content.ts`,
-# wired into `predev`/`prebuild` via `codegen:references:new`) walks those files
+# run as a turbo dependency of `dev` and `build` via `codegen:references:new`) walks those files
 # at build time, so no separate `dereference` / `combine` step is needed.
 transform: dereference.api.v1 dereference.auth.v1 dereference.storage.v0
 
@@ -105,7 +105,7 @@ generate.partials.access-control:
 		$(REPO_DIR)/mcp_tools_permissions.json \
 		$(REPO_DIR)/../content/_partials/access-control/scoped_pat_permissions.mdx \
 		$(REPO_DIR)/../content/_partials/access-control/scoped_pat_mcp_tools.mdx
-	npx prettier --write $(REPO_DIR)/../content/_partials/access-control/*.mdx
+	pnpm exec oxfmt $(abspath $(REPO_DIR)/../content/_partials/access-control)/*.mdx
 
 ###############################################################################
 # Validate OpenAPI 3.0
@@ -118,4 +118,4 @@ validate.analytics.v0:
 # Format everything - easier for git to track changes.
 ###############################################################################
 format:
-	npx prettier --cache --write .
+	pnpm exec oxfmt .

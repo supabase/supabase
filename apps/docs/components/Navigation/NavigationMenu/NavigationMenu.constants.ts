@@ -78,6 +78,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Products',
+      icon: 'products',
       menuItems: [
         [
           { label: 'Features' },
@@ -151,6 +152,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'build',
       menuItems: [
         [
           {
@@ -194,6 +196,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Manage',
+      icon: 'manage',
       menuItems: [
         [
           {
@@ -221,6 +224,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      icon: 'reference',
       menuItems: [
         [
           {
@@ -430,6 +434,11 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
+        },
+        {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
         },
         {
           name: 'Flask (Python)',
@@ -1048,6 +1057,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (basics)',
+      shortName: 'Basics',
       url: undefined,
       items: [
         {
@@ -1072,6 +1082,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (intermediate)',
+      shortName: 'Intermediate',
       url: undefined,
       items: [
         {
@@ -2489,6 +2500,12 @@ export const ai_tools: NavMenuConstant = {
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
       enabled: agentSkillsEnabled,
     },
+    // agent-only instructions: the html page returns 404, and the .md stays available
+    {
+      name: 'Report documentation problems: instructions for agents',
+      url: '/guides/ai-tools/agent-feedback',
+      enabled: false,
+    },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
@@ -2573,6 +2590,11 @@ export const local_development: NavMenuConstant = {
         {
           name: 'CLI configuration',
           url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
+        {
+          name: 'Config file formats',
+          url: '/guides/local-development/cli/config-formats',
           enabled: localDevelopmentEnabled,
         },
         { name: 'CLI commands', url: '/reference/cli' },
@@ -2744,9 +2766,39 @@ export const platform: NavMenuConstant = {
           ],
         },
         {
-          name: 'Transfer Project',
+          name: 'Project transfers',
           url: '/guides/platform/project-transfer' as `/${string}`,
           enabled: fullPlatformEnabled,
+          items: [
+            {
+              name: 'Transfer a project',
+              url: '/guides/platform/project-transfer' as `/${string}`,
+            },
+            {
+              name: 'Requirements',
+              url: '/guides/platform/project-transfer/requirements' as `/${string}`,
+            },
+            {
+              name: 'Changes after a transfer',
+              url: '/guides/platform/project-transfer/what-changes' as `/${string}`,
+            },
+            {
+              name: 'Transfer project ownership',
+              url: '/guides/platform/project-transfer/transfer-ownership' as `/${string}`,
+            },
+            {
+              name: 'Transfer a Vercel-managed project',
+              url: '/guides/platform/project-transfer/vercel-marketplace' as `/${string}`,
+            },
+            {
+              name: 'Pause a Pro or Team Plan project',
+              url: '/guides/platform/project-transfer/pause-project' as `/${string}`,
+            },
+            {
+              name: 'Troubleshooting',
+              url: '/guides/platform/project-transfer/troubleshooting' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Restore to a new project',
@@ -3031,6 +3083,7 @@ export const telemetry: NavMenuConstant = {
       items: [
         { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
         { name: 'Logs in Studio', url: '/guides/observability/logs' },
+        { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
         { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
         { name: 'Inspect the database', url: '/guides/observability/inspect' },
         { name: 'Advisors', url: '/guides/observability/advisors' },
@@ -3124,6 +3177,10 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
+        {
+          name: 'Configure OAuth 2.1 Server',
+          url: '/guides/self-hosting/self-hosted-oauth-server',
+        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',

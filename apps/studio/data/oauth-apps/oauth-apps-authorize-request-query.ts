@@ -1,43 +1,44 @@
-import { useQuery } from '@tanstack/react-query'
+import { QueryOptions, queryOptions } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAppsAuthorizeRequest, USE_MOCKS } from './mocks'
-import type { OAuthAppsAuthorizeRequest } from './types'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeRequestVariables = {
   id?: string
 }
 
-export type { OAuthAppsAuthorizeRequest } from './types'
-
-export async function getOAuthAppsAuthorizeRequest({
-  id,
-}: OAuthAppsAuthorizeRequestVariables): Promise<OAuthAppsAuthorizeRequest> {
+async function getOAuthAppsAuthorizeRequest(
+  { id }: OAuthAppsAuthorizeRequestVariables,
+  signal?: AbortSignal
+) {
   if (!id) throw new Error('Authorization request id is required')
-  if (!USE_MOCKS) throw new Error('OAuth app authorization request is not yet implemented')
 
-  return getMockOAuthAppsAuthorizeRequest(id)
+  const { data, error } = await get('/platform/oauth/authorizations/{id}', {
+    params: { path: { id } },
+    grant: unguarded.byDesign('Only already-approved authorizations should check grants'),
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthAppsAuthorizeRequestData = Awaited<ReturnType<typeof getOAuthAppsAuthorizeRequest>>
 export type OAuthAppsAuthorizeRequestError = StudioError
 
-export const useOAuthAppsAuthorizeRequestQuery = <TData = OAuthAppsAuthorizeRequestData>(
+export const getOAuthAppsAuthorizeRequestQueryOptions = (
   { id }: OAuthAppsAuthorizeRequestVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<
+  options?: QueryOptions<
     OAuthAppsAuthorizeRequestData,
     OAuthAppsAuthorizeRequestError,
-    TData
-  > = {}
+    OAuthAppsAuthorizeRequestData,
+    ReturnType<typeof oauthAppsKeys.authorizeRequest>
+  >
 ) =>
-  useQuery<OAuthAppsAuthorizeRequestData, OAuthAppsAuthorizeRequestError, TData>({
+  queryOptions({
     queryKey: oauthAppsKeys.authorizeRequest(id),
-    queryFn: () => getOAuthAppsAuthorizeRequest({ id }),
-    enabled: enabled && USE_MOCKS && Boolean(id),
+    queryFn: ({ signal }) => getOAuthAppsAuthorizeRequest({ id }, signal),
+    enabled: id != null,
     ...options,
   })

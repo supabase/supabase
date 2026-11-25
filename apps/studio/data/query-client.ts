@@ -1,5 +1,4 @@
 import { MutationCache, onlineManager, QueryCache, QueryClient } from '@tanstack/react-query'
-import { match } from 'path-to-regexp'
 import { useState } from 'react'
 
 import { IS_PLATFORM } from '@/lib/constants'
@@ -12,21 +11,21 @@ if (!IS_PLATFORM) {
   onlineManager.setOnline(true)
 }
 
-const SKIP_RETRY_PATHNAME_MATCHERS = [
-  '/platform/projects/:ref/run-lints',
-  '/platform/organizations/:slug/usage',
-  '/platform/pg-meta/:ref/query',
-  '/v1/projects/:ref/analytics/endpoints/logs.all',
-].map((pathname) => match(pathname))
+// OpenAPI path patterns, as set on `error.endpoint`
+const PG_META_QUERY_ENDPOINT = '/platform/pg-meta/{ref}/query'
+export const SKIP_RETRY_ENDPOINTS = new Set([
+  '/platform/projects/{ref}/run-lints',
+  '/platform/organizations/{slug}/usage',
+  PG_META_QUERY_ENDPOINT,
+  '/v1/projects/{ref}/analytics/endpoints/logs.all',
+])
 
 export const MAX_RETRY_FAILURE_COUNT = 3
 
 function isQueryEndpointStatementTimeout(error: unknown) {
-  const PG_META_QUERY_PATHNAME_MATCHER = match('/platform/pg-meta/:ref/query')
   return (
     isStudioError(error) &&
-    !!error.requestPathname &&
-    !!PG_META_QUERY_PATHNAME_MATCHER(error.requestPathname) &&
+    error.endpoint === PG_META_QUERY_ENDPOINT &&
     !!error.message?.includes('canceling statement due to statement timeout')
   )
 }
@@ -56,16 +55,16 @@ export function getQueryClient() {
               return false
             }
 
-            // Skip retries for specific pathnames to avoid unnecessary load
-            // CRITICAL: We must still retry 429 (rate limit) errors even on these pathnames.
+            // Skip retries for specific endpoints to avoid unnecessary load
+            // CRITICAL: We must still retry 429 (rate limit) errors even on these endpoints.
             // Without this exception, queries fail immediately on rate limits, causing the
             // frontend to issue fresh requests (via refetch/user actions), which amplifies
             // the rate limiting problem. By retrying 429s with proper backoff (using the
             // retryAfter header below), we respect rate limits and prevent request storms.
             if (
               isStudioError(error) &&
-              error.requestPathname &&
-              SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!)) &&
+              error.endpoint !== undefined &&
+              SKIP_RETRY_ENDPOINTS.has(error.endpoint) &&
               error.code !== 429
             ) {
               return false

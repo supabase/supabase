@@ -110,10 +110,12 @@ export const GitHubIntegrationConnectionForm = ({
     data: existingBranches,
     error: branchesError,
     isSuccess: isSuccessBranches,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
-    enabled: !!selectedProject?.ref,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      { projectRef: selectedProject?.ref, grant: branchesGrant.grant },
+      { enabled: !!selectedProject?.ref }
+    )
+  )
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })

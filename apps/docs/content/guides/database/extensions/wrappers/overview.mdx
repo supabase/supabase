@@ -50,7 +50,7 @@ Although a foreign table behaves like any other table, the data is not stored in
 
 ETL stands for Extract, Transform, Load. It's an established process for moving data from one system to another. For example, it's common to move data from a production database to a data warehouse.
 
-There are many popular ETL tools, such as [Fivetran](https://fivetran.com/) and [Airbyte](https://airbyte.io/).
+There are many popular ETL tools, such as [Fivetran](https://www.fivetran.com/) and [Airbyte](https://airbyte.com/).
 
 Wrappers provide an alternative to these tools. You can use SQL to move data from one table to another:
 
@@ -125,7 +125,7 @@ width={1600}
 height={929}
 />
 
-This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
+This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://www.fivetran.com/) or [Airbyte](https://airbyte.com/).
 
 ### WebAssembly Wrappers
 
@@ -135,7 +135,7 @@ To learn more about Wasm FDW, visit [Wrappers official documentation](https://su
 
 ## Security
 
-Foreign Data Wrappers do not provide Row Level Security, thus it is not advised to expose them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
+Foreign Data Wrappers do not provide [Row Level Security](/docs/guides/database/postgres/row-level-security), thus it is not advised to expose them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
 If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
 
@@ -211,7 +211,7 @@ As an example, go to [SQL Editor](/dashboard/project/_/sql/new) and then follow 
    grant execute on function public.get_stripe_products to authenticated;
    ```
 
-Once the preceding steps are finished, the function can be invoked from Supabase client to query the foreign table:
+Once the preceding steps are finished, the function can be invoked from [Supabase client](/docs/reference/javascript/introduction) to query the foreign table:
 
 ```js
 const { data, error } = await supabase

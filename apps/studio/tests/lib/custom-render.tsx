@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
+import { AuthContext, AuthContext as AuthContextType, FrameworkProvider } from 'common'
+import { useRouter as useMockRouter } from 'next-router-mock'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { useMemo } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
@@ -10,16 +13,34 @@ import { ProfileContext, type ProfileContextType } from '@/lib/profile'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
+const TestFrameworkProvider = ({ children }: { children: React.ReactNode }) => {
+  const router = useMockRouter()
+  const value = useMemo(
+    () => ({
+      pathname: router.pathname,
+      asPath: router.asPath,
+      isReady: router.isReady,
+      params: router.query,
+      push: (path: string) => router.push(path),
+    }),
+    [router]
+  )
+
+  return <FrameworkProvider value={value}>{children}</FrameworkProvider>
+}
+
 export const CustomWrapper = ({
   children,
   queryClient,
   nuqs,
   profileContext,
+  authContext,
 }: {
   children: React.ReactNode
   queryClient?: QueryClient
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
+  authContext?: AuthContext
 }) => {
   const _queryClient =
     queryClient ??
@@ -30,27 +51,34 @@ export const CustomWrapper = ({
       },
     })
 
-  const content = (
-    <QueryClientProvider client={_queryClient}>
-      <NuqsTestingAdapter {...nuqs}>
-        <TooltipProvider>
-          <CommandProvider openKey="">{children}</CommandProvider>
-        </TooltipProvider>
-      </NuqsTestingAdapter>
-    </QueryClientProvider>
+  let content = (
+    <TestFrameworkProvider>
+      <QueryClientProvider client={_queryClient}>
+        <NuqsTestingAdapter {...nuqs}>
+          <TooltipProvider>
+            <CommandProvider openKey="">{children}</CommandProvider>
+          </TooltipProvider>
+        </NuqsTestingAdapter>
+      </QueryClientProvider>
+    </TestFrameworkProvider>
   )
 
-  return profileContext ? (
-    <ProfileContext.Provider value={profileContext}>{content}</ProfileContext.Provider>
-  ) : (
-    content
-  )
+  if (profileContext) {
+    content = <ProfileContext.Provider value={profileContext}>{content}</ProfileContext.Provider>
+  }
+
+  if (authContext) {
+    content = <AuthContext.Provider value={authContext}>{content}</AuthContext.Provider>
+  }
+
+  return content
 }
 
 type CustomRenderOpts = RenderOptions & {
   queryClient?: QueryClient
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
+  authContext?: AuthContextType
 }
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
@@ -60,6 +88,7 @@ export const customRender = (component: React.ReactElement, renderOptions?: Cust
         queryClient: renderOptions?.queryClient,
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
+        authContext: renderOptions?.authContext,
         children,
       }),
     ...renderOptions,
@@ -74,6 +103,7 @@ export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRender
         queryClient: renderOptions?.queryClient,
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
+        authContext: renderOptions?.authContext,
       }),
     ...renderOptions,
   })

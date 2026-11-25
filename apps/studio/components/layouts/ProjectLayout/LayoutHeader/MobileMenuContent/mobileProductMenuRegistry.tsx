@@ -47,6 +47,11 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
       default: m.AdvisorsSidebarMenu,
     }))
   ),
+  issues: React.lazy(() =>
+    import('@/components/layouts/IssuesLayout/IssuesSidebar').then((m) => ({
+      default: m.IssuesSidebar,
+    }))
+  ),
   observability: React.lazy(() =>
     import('@/components/layouts/ObservabilityLayout/ObservabilityMenu').then((m) => ({
       default: m.ObservabilityMenu,

@@ -14,7 +14,7 @@ export const runAndManage: NavMenuConstant = {
   url: '/guides/platform',
   items: [
     {
-      name: 'Projects, compute and scaling',
+      name: 'Projects, organizations and compute',
       items: [
         {
           name: 'Compute and Disk',
@@ -32,9 +32,35 @@ export const runAndManage: NavMenuConstant = {
           name: 'Transfer, pause or delete a project',
           items: [
             {
-              name: 'Transfer Project',
-              url: '/guides/platform/project-transfer',
+              name: 'Transfer to another organization',
               enabled: fullPlatformEnabled,
+              items: [
+                { name: 'Transfer a project', url: '/guides/platform/project-transfer' },
+                {
+                  name: 'Requirements',
+                  url: '/guides/platform/project-transfer/requirements',
+                },
+                {
+                  name: 'Changes after a transfer',
+                  url: '/guides/platform/project-transfer/what-changes',
+                },
+                {
+                  name: 'Transfer project ownership',
+                  url: '/guides/platform/project-transfer/transfer-ownership',
+                },
+                {
+                  name: 'Transfer a Vercel-managed project',
+                  url: '/guides/platform/project-transfer/vercel-marketplace',
+                },
+                {
+                  name: 'Pause a Pro or Team Plan project',
+                  url: '/guides/platform/project-transfer/pause-project',
+                },
+                {
+                  name: 'Troubleshooting',
+                  url: '/guides/platform/project-transfer/troubleshooting',
+                },
+              ],
             },
             { name: 'Project Pausing', url: '/guides/platform/free-project-pausing' },
             { name: 'Delete Project', url: '/guides/platform/delete-project' },
@@ -116,27 +142,35 @@ export const runAndManage: NavMenuConstant = {
       items: [
         {
           name: 'Compliance: SOC 2, HIPAA, GDPR',
-          enabled: complianceEnabled,
           items: [
-            { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
+            {
+              name: 'Shared responsibility model',
+              url: '/guides/deployment/shared-responsibility-model',
+            },
+            {
+              name: 'SOC 2 compliance',
+              url: '/guides/security/soc-2-compliance',
+              enabled: complianceEnabled,
+            },
             {
               name: 'HIPAA compliance',
+              enabled: complianceEnabled,
               items: [
                 { name: 'Overview', url: '/guides/security/hipaa-compliance' },
                 { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
               ],
             },
-            { name: 'GDPR compliance', url: '/guides/security/gdpr-compliance' },
+            {
+              name: 'GDPR compliance',
+              url: '/guides/security/gdpr-compliance',
+              enabled: complianceEnabled,
+            },
           ],
         },
         { name: 'Secure platform configuration', url: '/guides/security/platform-security' },
         { name: 'Secure product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
-        {
-          name: 'Rotate a leaked API key',
-          url: '/guides/security/rotate-leaked-api-keys',
-        },
         {
           name: 'Production security checklist',
           url: '/guides/security/production-checklist',

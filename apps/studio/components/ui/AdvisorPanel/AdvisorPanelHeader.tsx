@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { Badge } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -19,6 +20,7 @@ interface AdvisorPanelHeaderProps {
 }
 
 export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPanelHeaderProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const displayTitle = selectedItem ? getAdvisorPanelItemDisplayTitle(selectedItem) : undefined
   const secondaryText = selectedItem ? getAdvisorItemSecondaryText(selectedItem) : undefined
   const createdAt = selectedItem?.createdAt
@@ -62,7 +64,12 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
         className="w-7 h-7 p-0"
         icon={<XIcon strokeWidth={1.5} />}
         onClick={onClose}
-        tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: isIssuesInboxEnabled ? 'Close Issues' : 'Close Advisor Center',
+          },
+        }}
       />
     </div>
   )

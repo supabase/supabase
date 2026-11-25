@@ -6,6 +6,7 @@ import {
   type ReportFilterItem,
   type ReportQuery,
 } from './Reports.types'
+import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
@@ -49,18 +50,20 @@ export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
   projectRef?: string,
   useOtel = false,
-  enabled = true
+  enabled = true,
+  initialParams: Partial<LogsEndpointParams> = {}
 ): PresetHooks => {
   const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
     if (query.queryType === 'db') {
       return {
         ...acc,
-        [k]: () => useDbQuery({ sql: query.safeSql }),
+        [k]: () =>
+          useDbQuery({ sql: query.safeSql, sqlOrigin: 'studio', queryName: 'report-db-query' }),
       }
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery({ projectRef, enabled, options: { useOtel } }),
+        [k]: () => useLogsQuery({ projectRef, enabled, initialParams, options: { useOtel } }),
       }
     }
   }, {})
@@ -167,6 +170,26 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
   }, {})
 
   return Object.values(pivotedData)
+}
+
+/**
+ * Sums pivoted status code rows ({ timestamp, [status_code]: count }) into the
+ * warning (4xx) and error (5xx) counts shown in chart headers. Other codes only
+ * count towards the chart's total.
+ */
+export function getStatusClassCounts(rows: Record<string, unknown>[]) {
+  let warnings = 0
+  let errors = 0
+
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row)) {
+      if (typeof value !== 'number' || !/^\d{3}$/.test(key)) continue
+      if (key.startsWith('4')) warnings += value
+      else if (key.startsWith('5')) errors += value
+    }
+  }
+
+  return { warnings, errors }
 }
 
 /**

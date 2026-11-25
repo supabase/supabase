@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { tableRowKeys } from './keys'
+import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -56,6 +57,9 @@ export async function updateTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-update',
+    isUserFaultSqlState: isUserFaultForValues,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['table-row-update', table.id],

@@ -37,6 +37,7 @@ import {
   convertFromBytes,
   convertToBytes,
   encodeBucketLimitErrorMessage,
+  isFileSizeReducedBySpendCap,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
 import { AlertError } from '@/components/ui/AlertError'
@@ -96,8 +97,6 @@ export const StorageSettings = () => {
     isLoading: isLoadingImageTransformationEntitlement,
   } = useCheckEntitlements('storage.image_transformations')
 
-  const isSpendCapOn =
-    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
   const hasLimitedStorageAccess =
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
@@ -110,6 +109,13 @@ export const StorageSettings = () => {
       return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
+
+  const showSpendCapBanner = isFileSizeReducedBySpendCap({
+    planId: organization?.plan.id,
+    isUsageBillingEnabled: organization?.usage_billing_enabled,
+    entitledMaxBytes: getEntitlementNumericValue(),
+    isEntitlementUnlimited: isEntitlementUnlimited(),
+  })
 
   const isLoading =
     isLoadingProjectStorageConfig ||
@@ -305,7 +311,7 @@ export const StorageSettings = () => {
                                     Learn more
                                   </InlineLink>
                                   .
-                                  {!shouldAutoValidateBucketLimits && (
+                                  {!isBucketEstimatePending && !shouldAutoValidateBucketLimits && (
                                     <p>
                                       Ensure that the global limit is greater than that of
                                       individual buckets
@@ -394,7 +400,7 @@ export const StorageSettings = () => {
                           )} and unlock image transformations.`}
                         />
                       )}
-                      {isSpendCapOn && (
+                      {showSpendCapBanner && (
                         <UpgradeToPro
                           fullWidth
                           addon="spendCap"
@@ -402,7 +408,7 @@ export const StorageSettings = () => {
                           source="storageSizeLimit"
                           featureProposition="increase the file upload size limits in Storage"
                           buttonText="Disable spend cap"
-                          primaryText="Reduced max upload file size limit due to spend cap"
+                          primaryText={`Max upload file size limit reduced to ${formatBytes(maxBytes)} due to spend cap`}
                           secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                             STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                           )}.`}

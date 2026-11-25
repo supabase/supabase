@@ -1,7 +1,6 @@
 'use client'
 
 import type { Content } from 'mdast'
-import Image, { type StaticImageData } from 'next/image'
 import { Fragment, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { CodeBlock, isCodeBlockLang } from 'ui-patterns/CodeBlock'
@@ -9,15 +8,20 @@ import { CodeBlock, isCodeBlockLang } from 'ui-patterns/CodeBlock'
 import antigravityAuthenticateScreenshot from '../assets/antigravity-authenticate-screenshot.png'
 import { calloutVariant, type McpInstructionContent } from '../clients.instructions.md'
 import type { McpOnCopyCallback } from '../types'
+import { normalizeAssetUrl, type ImportedAssetModule } from '../utils/mcpIconAssets'
 
 /**
  * Local image assets referenced by `image` nodes, keyed by the node's `url`
  * (used as an asset id, not a real URL). Kept here so the React-free
  * instructions module stays importable by the Node markdown build, which can't
- * resolve static png imports.
+ * resolve static png imports. `width`/`height` are the intrinsic size, so the image's space is
+ * reserved before it loads.
  */
-const INSTRUCTION_ASSETS: Record<string, StaticImageData> = {
-  'antigravity-auth': antigravityAuthenticateScreenshot,
+const INSTRUCTION_ASSETS: Record<
+  string,
+  { src: ImportedAssetModule; width: number; height: number }
+> = {
+  'antigravity-auth': { src: antigravityAuthenticateScreenshot, width: 1316, height: 258 },
 }
 
 /**
@@ -82,10 +86,19 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
       />
     ),
     image: (node) => {
-      const src = INSTRUCTION_ASSETS[node.url]
-      return src ? (
-        <Image src={src} alt={node.alt ?? ''} className="rounded border border-muted w-full" />
-      ) : null
+      const asset = INSTRUCTION_ASSETS[node.url]
+      if (!asset) return null
+      return (
+        <img
+          src={normalizeAssetUrl(asset.src)}
+          width={asset.width}
+          height={asset.height}
+          alt={node.alt ?? ''}
+          loading="lazy"
+          decoding="async"
+          className="rounded border border-muted w-full h-auto"
+        />
+      )
     },
     blockquote: (node) => {
       // Callouts render as colored inline text (no quote chrome). The variant

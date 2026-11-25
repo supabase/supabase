@@ -119,10 +119,9 @@ export const ConnectSheet = () => {
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { data: apiKeysData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
 
   const projectKeys: ProjectKeys = useMemo(() => {
     const { anonKey, publishableKey } = apiKeysData ?? {}

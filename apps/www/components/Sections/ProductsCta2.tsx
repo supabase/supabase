@@ -28,7 +28,12 @@ function ProductsCta(props: Props) {
       <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
         <h2 className="h2 w-max">Ready to start building?</h2>
         <div className="flex gap-2 py-2">
-          <StartYourProjectButton size="small" className="h-full" variant="primary">
+          <StartYourProjectButton
+            size="small"
+            className="h-full"
+            variant="primary"
+            buttonLocation="Wrapped page CTA"
+          >
             Start for free
           </StartYourProjectButton>
           <Button asChild size="small">

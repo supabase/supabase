@@ -54,25 +54,9 @@
       "import": "./src/AuthenticatedDropdownMenu/index.tsx",
       "types": "./src/AuthenticatedDropdownMenu/index.tsx"
     },
-    "./Banners/Announcement": {
-      "import": "./src/Banners/Announcement.tsx",
-      "types": "./src/Banners/Announcement.tsx"
-    },
-    "./Banners/AnnouncementBanner": {
-      "import": "./src/Banners/AnnouncementBanner.tsx",
-      "types": "./src/Banners/AnnouncementBanner.tsx"
-    },
     "./Banners/Countdown": {
       "import": "./src/Banners/Countdown.tsx",
       "types": "./src/Banners/Countdown.tsx"
-    },
-    "./Banners/LW15Banner": {
-      "import": "./src/Banners/LW15Banner.tsx",
-      "types": "./src/Banners/LW15Banner.tsx"
-    },
-    "./Banners": {
-      "import": "./src/Banners/index.ts",
-      "types": "./src/Banners/index.ts"
     },
     "./Chart/charts/chart-bar": {
       "import": "./src/Chart/charts/chart-bar.tsx",
@@ -435,9 +419,17 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
+    "./GlyphLines/flatten-color": {
+      "import": "./src/GlyphLines/flatten-color.ts",
+      "types": "./src/GlyphLines/flatten-color.ts"
+    },
     "./GlyphLines": {
       "import": "./src/GlyphLines/index.tsx",
       "types": "./src/GlyphLines/index.tsx"
+    },
+    "./GlyphLines/start-glyph-lines": {
+      "import": "./src/GlyphLines/start-glyph-lines.ts",
+      "types": "./src/GlyphLines/start-glyph-lines.ts"
     },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
@@ -454,6 +446,22 @@
     "./InnerSideMenu": {
       "import": "./src/InnerSideMenu/index.tsx",
       "types": "./src/InnerSideMenu/index.tsx"
+    },
+    "./IsoShape/IsoShape.geometry": {
+      "import": "./src/IsoShape/IsoShape.geometry.ts",
+      "types": "./src/IsoShape/IsoShape.geometry.ts"
+    },
+    "./IsoShape/IsoShape.glyphs": {
+      "import": "./src/IsoShape/IsoShape.glyphs.ts",
+      "types": "./src/IsoShape/IsoShape.glyphs.ts"
+    },
+    "./IsoShape/IsoShape.shapes": {
+      "import": "./src/IsoShape/IsoShape.shapes.ts",
+      "types": "./src/IsoShape/IsoShape.shapes.ts"
+    },
+    "./IsoShape/IsoShape": {
+      "import": "./src/IsoShape/IsoShape.tsx",
+      "types": "./src/IsoShape/IsoShape.tsx"
     },
     "./LogsBarChart": {
       "import": "./src/LogsBarChart/index.tsx",
@@ -551,6 +559,10 @@
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
     },
+    "./MobileNav/MobileNavAccountActions": {
+      "import": "./src/MobileNav/MobileNavAccountActions.tsx",
+      "types": "./src/MobileNav/MobileNavAccountActions.tsx"
+    },
     "./MobileNav/MobileNavDrawer": {
       "import": "./src/MobileNav/MobileNavDrawer.tsx",
       "types": "./src/MobileNav/MobileNavDrawer.tsx"
@@ -620,23 +632,6 @@
       "import": "./src/PrivacySettings/index.tsx",
       "types": "./src/PrivacySettings/index.tsx"
     },
-    "./PromoToast/PromoBg": {
-      "import": "./src/PromoToast/PromoBg.tsx",
-      "types": "./src/PromoToast/PromoBg.tsx"
-    },
-    "./PromoToast/PromoToast": {
-      "import": "./src/PromoToast/PromoToast.tsx",
-      "types": "./src/PromoToast/PromoToast.tsx"
-    },
-    "./PromoToast": {
-      "import": "./src/PromoToast/index.ts",
-      "types": "./src/PromoToast/index.ts"
-    },
-    "./PromoToast/styles.css": {
-      "style": "./src/PromoToast/styles.css",
-      "import": "./src/PromoToast/styles.css",
-      "types": "./src/PromoToast/styles.css"
-    },
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
@@ -661,6 +656,10 @@
     "./ShimmeringLoader": {
       "import": "./src/ShimmeringLoader/index.tsx",
       "types": "./src/ShimmeringLoader/index.tsx"
+    },
+    "./SignedInSwitch/SignedInSwitch": {
+      "import": "./src/SignedInSwitch/SignedInSwitch.tsx",
+      "types": "./src/SignedInSwitch/SignedInSwitch.tsx"
     },
     "./SimpleCodeBlock/SimpleCodeBlock": {
       "import": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx",
@@ -799,6 +798,46 @@
       "import": "./src/TopNav/TopNavMenuToggle.tsx",
       "types": "./src/TopNav/TopNavMenuToggle.tsx"
     },
+    "./Trace/Bar": {
+      "import": "./src/Trace/Bar.tsx",
+      "types": "./src/Trace/Bar.tsx"
+    },
+    "./Trace/Header": {
+      "import": "./src/Trace/Header.tsx",
+      "types": "./src/Trace/Header.tsx"
+    },
+    "./Trace/Inspector": {
+      "import": "./src/Trace/Inspector.tsx",
+      "types": "./src/Trace/Inspector.tsx"
+    },
+    "./Trace/Minimap": {
+      "import": "./src/Trace/Minimap.tsx",
+      "types": "./src/Trace/Minimap.tsx"
+    },
+    "./Trace/Rows": {
+      "import": "./src/Trace/Rows.tsx",
+      "types": "./src/Trace/Rows.tsx"
+    },
+    "./Trace/Trace": {
+      "import": "./src/Trace/Trace.tsx",
+      "types": "./src/Trace/Trace.tsx"
+    },
+    "./Trace/Waterfall": {
+      "import": "./src/Trace/Waterfall.tsx",
+      "types": "./src/Trace/Waterfall.tsx"
+    },
+    "./Trace": {
+      "import": "./src/Trace/index.ts",
+      "types": "./src/Trace/index.ts"
+    },
+    "./Trace/types": {
+      "import": "./src/Trace/types.ts",
+      "types": "./src/Trace/types.ts"
+    },
+    "./Trace/utils": {
+      "import": "./src/Trace/utils.ts",
+      "types": "./src/Trace/utils.ts"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
@@ -858,6 +897,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
@@ -920,7 +960,6 @@
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "config": "workspace:*",
-    "next-router-mock": "^0.9.13",
     "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
     "typescript": "catalog:",
@@ -928,8 +967,5 @@
     "vfile": "^6.0.3",
     "vite": "catalog:",
     "vitest": "catalog:"
-  },
-  "peerDependencies": {
-    "next": "catalog:"
   }
 }

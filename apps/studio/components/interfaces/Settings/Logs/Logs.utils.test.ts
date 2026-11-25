@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
@@ -14,6 +15,7 @@ import {
   genCountQuery,
   genDefaultQuery,
   getAuthLogSeverity,
+  isStartOutsideRetention,
   parseMultigresEventMessage,
 } from './Logs.utils'
 
@@ -25,6 +27,24 @@ const createLog = (overrides: Partial<LogData> = {}): LogData => ({
 })
 
 describe('Logs.utils', () => {
+  describe('isStartOutsideRetention', () => {
+    const hoursAgo = (hours: number) => dayjs().subtract(hours, 'hour').toISOString()
+
+    test('prompts for a start 36 hours ago with a one-day entitlement', () => {
+      expect(isStartOutsideRetention(hoursAgo(36), 1)).toBe(true)
+    })
+
+    test('does not prompt within the entitlement, including presets computed just before the check', () => {
+      expect(isStartOutsideRetention(hoursAgo(12), 1)).toBe(false)
+      expect(isStartOutsideRetention(hoursAgo(24), 1)).toBe(false)
+      expect(isStartOutsideRetention(hoursAgo(24 * 7), 7)).toBe(false)
+    })
+
+    test('does not prompt without an entitlement value', () => {
+      expect(isStartOutsideRetention(hoursAgo(24 * 30), undefined)).toBe(false)
+    })
+  })
+
   describe('formatLogsAsJson', () => {
     test('formats single log as JSON', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'test message' })]
@@ -364,8 +384,8 @@ describe('Logs.utils', () => {
   })
 
   describe('genChartQuery', () => {
-    test.each([150, '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
-      'reads pipeline %s through the table alias in every legacy query',
+    test.each([150, '00150', '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
+      'reads only pipeline_id_v2 for pipeline %s in every legacy query',
       (pipelineId) => {
         const params = {
           iso_timestamp_start: '2026-10-30T10:00:00Z',
@@ -381,7 +401,7 @@ describe('Logs.utils', () => {
         ]) {
           expect(sql).toContain('etl_replication_logs t')
           expect(sql).toContain("json_value(to_json_string(t), '$.pipeline_id_v2')")
-          expect(sql).toContain('cast(t.pipeline_id as string)')
+          expect(sql).not.toContain('cast(t.pipeline_id as string)')
           expect(sql).not.toContain('etl_replication_logs.pipeline_id')
           expect(sql).not.toContain('to_json_string(etl_replication_logs)')
           expect(sql).toContain(`= '${expectedId}'`)

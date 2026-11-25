@@ -29,7 +29,7 @@ Dev and preview only redirects (`/`, `/dashboard/*`, `/blog/*`) are in a separat
    pnpm run redirects:generate
    ```
 
-   The build (`prebuild`) regenerates it on every deploy, so do not commit it.
+   The build (`redirects:generate` is a turbo dependency of `build`) regenerates it on every deploy, so do not commit it.
 
 4. In `dynamic-redirects.js`, include `basePath: false`, because the sources are full public paths and Next must not add `/docs` again. `.md` variants for `/docs/guides/` entries are generated in `next.config.mjs`, so do not add them here:
 
@@ -55,7 +55,7 @@ Dev and preview only redirects (`/`, `/dashboard/*`, `/blog/*`) are in a separat
 - It fails if a hand-written `.md` entry conflicts with a generated variant, or if a source is duplicated.
 - It groups each base entry with its `.md` variant, base first, and sorts the groups by base path.
 
-The generator runs in `prebuild`, so an invalid source fails the build before anything deploys. The output is gitignored, so generated redirects do not appear in PR diffs. Run `pnpm run redirects:generate` to review them.
+The generator runs as a turbo dependency of `build`, so an invalid source fails the build before anything deploys. The output is gitignored, so generated redirects do not appear in PR diffs. Run `pnpm run redirects:generate` to review them.
 
 ## Notes
 

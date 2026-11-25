@@ -44,7 +44,7 @@ describe('docs proxy — /guides/* content negotiation', () => {
     expect(md.headers.get('cache-control')).toBe('no-store')
     const body = await md.text()
     expect(body).toContain('<https://supabase.com/docs/guides/doesnotexist>')
-    expect(body).toContain('<https://supabase.com/llms.txt>')
+    expect(body).toContain('<https://supabase.com/docs/llms.txt>')
     const accept = makeRequest('/docs/guides/doesnotexist', { accept: 'text/markdown' })
     expect(proxy(accept).headers.get(REWRITE_HEADER)).toBeNull()
   })
@@ -215,5 +215,36 @@ describe('docs proxy — reference paths', () => {
         REWRITE_HEADER
       )
     ).toBe('https://supabase.com/docs/api/crawlers')
+  })
+})
+
+describe('docs proxy — forced IA nav variant', () => {
+  const OPTION_1 = '?docs-ia-mvp-v1=option-1'
+
+  it('renders option-1 guides and the home page from the option-1 route', () => {
+    expect(proxy(makeRequest(`/docs/guides/auth${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `https://supabase.com/docs/ia/option-1/guides/auth${OPTION_1}`
+    )
+    expect(proxy(makeRequest(`/docs${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `https://supabase.com/docs/ia/option-1${OPTION_1}`
+    )
+  })
+
+  it('still serves markdown for an option-1 .md request', () => {
+    expect(proxy(makeRequest(`/docs/guides/auth.md${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `${GUIDES_MD_REWRITE('auth')}${OPTION_1}`
+    )
+  })
+
+  it("leaves requests without option-1 on today's route", () => {
+    for (const path of [
+      '/docs/guides/auth',
+      '/docs',
+      '/docs/guides/auth?docs-ia-mvp-v1=control',
+      '/docs/guides/auth?docs-ia-mvp-v1=nope',
+      `/docs/guides/doesnotexist${OPTION_1}`,
+    ]) {
+      expect(proxy(makeRequest(path)).headers.get(REWRITE_HEADER)).toBeNull()
+    }
   })
 })

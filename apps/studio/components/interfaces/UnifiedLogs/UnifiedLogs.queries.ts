@@ -4,7 +4,9 @@ import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
+  parseLogsFilterGroupUrlParams,
   parseLogsFilterUrlParams,
+  type LogsFilterGroup,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
@@ -55,9 +57,12 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
     END`
 
 // storage-service rows expose method/path under `req.method` / `req.url`
-// rather than the gateway's `request.method` / `request.path`.
+// rather than the gateway's `request.method` / `request.path`, and
+// edge function rows expose their path as `request.pathname`. A missing map
+// key reads as '', so edge function rows without `request.pathname` fall
+// through to `request.path`.
 const HTTP_METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.method'], ${ATTR.method})`
-const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.url'], ${ATTR.path})`
+const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], ${ATTR.path})`
 
 /**
  * Condition that matches rows belonging to a given log_type. Mirrors the
@@ -211,8 +216,8 @@ const translateFilter = (
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
     case 'pathname': {
       // Match the displayed pathname: gateway rows read `request.path`,
-      // storage rows read `req.url`. Inline HTTP_PATH_EXPR so filtering
-      // picks up storage rows too.
+      // storage rows read `req.url`, and edge function rows read
+      // `request.pathname`. Inline HTTP_PATH_EXPR so filtering picks up all of them.
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
@@ -221,10 +226,7 @@ const translateFilter = (
           join
         )})`
       }
-      return safeSql`(${joinSqlFragments(
-        values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${likeOp} ${lit('%' + v + '%')}`),
-        joinAndOr
-      )})`
+      return safeSql`(${HTTP_PATH_EXPR}) ${inOp} ${inList(values)}`
     }
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
@@ -254,6 +256,26 @@ const translateFilter = (
     default:
       return safeSql`log_attributes[${lit(key)}] ${inOp} ${inList(values)}`
   }
+}
+
+/**
+ * Translates one `group:or:…` filter entry into `(cond1 OR cond2 …)`. Returns null when any
+ * condition can't be translated, so the caller drops the whole group — dropping a single
+ * condition would silently narrow the OR.
+ */
+const translateFilterGroup = (group: LogsFilterGroup): SafeLogSqlFragment | null => {
+  const conditions: SafeLogSqlFragment[] = []
+  for (const { column, operator, value } of group.filters) {
+    try {
+      const condition = translateFilter(column, [value], operator)
+      if (!condition) return null
+      conditions.push(condition)
+    } catch {
+      return null
+    }
+  }
+  if (conditions.length === 0) return null
+  return safeSql`(${joinSqlFragments(conditions, ' OR ')})`
 }
 
 const NO_ROWS: SafeLogSqlFragment = safeSql`0`
@@ -404,6 +426,11 @@ const buildBaseWhere = (
     } catch {
       // analyticsLiteral rejected an unsupported input — drop the condition.
     }
+  }
+
+  for (const group of parseLogsFilterGroupUrlParams(search.filter)) {
+    const condition = translateFilterGroup(group)
+    if (condition) parts.push(condition)
   }
 
   const searchParamsFilter = applySearchParamsFilter(search)

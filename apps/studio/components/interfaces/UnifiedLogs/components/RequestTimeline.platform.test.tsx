@@ -132,12 +132,14 @@ function renderPanel(
     timezone,
     selectedLog,
     onSelectRow,
+    attributesReady,
   }: {
     scope?: UnifiedLogsScope
     flag?: boolean | null
     timezone?: string
     selectedLog?: ColumnSchema
     onSelectRow?: (id: string) => void
+    attributesReady?: Promise<void>
   } = {}
 ) {
   const queries: string[] = []
@@ -171,6 +173,7 @@ function renderPanel(
       const { sql } = requestSchema.parse(await request.json())
       queries.push(sql)
       if (sql.includes('SELECT source, log_attributes')) {
+        await attributesReady
         return HttpResponse.json<LogsResponse>({
           result: [
             {
@@ -250,13 +253,12 @@ describe('request timeline tab', () => {
     const { queryClient } = renderPanel(timelineRows, { timezone: 'Asia/Tokyo' })
     expect(await screen.findByText('01 Jan 2026 19:00:00')).toBeVisible()
     const items = stepsIn(await openTimeline(user))
-    expect(screen.getByText('01 Jan 2026 19:00:00')).toBeVisible()
-    expect(items[0]).toHaveTextContent('+0 ms')
+    expect(items[0]).toHaveTextContent('01 Jan 2026 19:00:00')
     expect(items[1]).toHaveTextContent('+45 ms')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('lists logs sharing the request ID and opens one in the overview', async () => {
+  it('opens a selected related log in Overview while keeping the original request timeline', async () => {
     const user = userEvent.setup()
     const { queries, queryClient } = renderPanel()
 
@@ -274,19 +276,37 @@ describe('request timeline tab', () => {
 
     await user.click(items[1])
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('status')).toHaveTextContent('POST /token')
-    expect(screen.getByText('Authentication')).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
+    expect(await screen.findByText('Authentication')).toBeVisible()
 
-    const [gateway, auth] = stepsIn(await openTimeline(user))
+    await user.click(screen.getByRole('tab', { name: 'Timeline' }))
+    const [gateway, auth] = stepsIn(screen.getByRole('list', { name: 'Related logs' }))
     expect(auth).toHaveAttribute('aria-current', 'true')
-    await user.click(gateway)
-    expect(screen.getByRole('status')).toHaveTextContent('POST /auth/v1/token')
-
+    gateway.focus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
     expect(await screen.findByText('Request headers')).toBeVisible()
 
     expect(screen.queryByText('method')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  // A spinner the size of the icon replaces a loading row, so nothing shifts when loading ends
+  it('spins in place of the log type icon until the log details load', async () => {
+    const attributes = Promise.withResolvers<void>()
+    const { queryClient } = renderPanel(timelineRows, { attributesReady: attributes.promise })
+    const header = screen.getByRole('status')
+    expect(await within(header).findByRole('img', { name: 'Loading log details' })).toBeVisible()
+
+    attributes.resolve()
+    await waitFor(() =>
+      expect(
+        within(header).queryByRole('img', { name: 'Loading log details' })
+      ).not.toBeInTheDocument()
+    )
+    expect(within(header).getByRole('img')).toBeVisible()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
@@ -297,6 +317,10 @@ describe('request timeline tab', () => {
     await user.click(screen.getByRole('tab', { name: 'Timeline' }))
 
     expect(await screen.findByRole('heading', { name: 'No related logs' })).toBeVisible()
+    // Announced through a live region, since the empty state replaces the loader silently
+    expect(
+      screen.getByText('No related logs', { selector: '[aria-live="polite"]' })
+    ).toBeInTheDocument()
     expect(
       screen.getByText(
         'Logs appear here when they share a request, trace, or function execution ID.'
@@ -316,8 +340,9 @@ describe('request timeline tab', () => {
 
     expect(stepsIn(await openTimeline(user))).toHaveLength(3)
     await user.click(screen.getByRole('button', { name: '+6 more' }))
-    await user.click(stepsIn(await screen.findByRole('list', { name: 'Related logs' }))[6])
-    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    const expandedList = await screen.findByRole('list', { name: 'Related logs' })
+    await user.click(stepsIn(expandedList)[6])
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveFocus()
 
     const folded = stepsIn(await openTimeline(user))
     expect(folded).toHaveLength(4)
@@ -329,9 +354,8 @@ describe('request timeline tab', () => {
     expect(buttons[5]).toHaveTextContent('+2 more')
     buttons[5].focus()
     await user.keyboard('{Enter}')
-    const expanded = stepsIn(list)
-    expect(expanded).toHaveLength(9)
-    expect(expanded[6]).toHaveAttribute('aria-current', 'true')
+    expect(stepsIn(list)).toHaveLength(9)
+    expect(stepsIn(list)[6]).toHaveAttribute('aria-current', 'true')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
   it('shows the user of the opened timeline log instead of the initially selected log', async () => {
@@ -385,7 +409,7 @@ describe('request timeline tab', () => {
     const field = await screen.findByRole('button', { name: `User ID ${userId}` })
     field.focus()
     await user.keyboard('{Enter}')
-    expect(await screen.findByRole('menuitem', { name: 'Add filter' })).toHaveFocus()
+    expect(await screen.findByRole('menuitem', { name: 'Filter: equals' })).toHaveFocus()
     await user.keyboard('{ArrowDown}')
     expect(screen.getByRole('menuitem', { name: 'Copy User ID' })).toHaveFocus()
     expect(onSelectRow).not.toHaveBeenCalled()

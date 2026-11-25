@@ -26,10 +26,12 @@ export const GitHubStatus = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: !!parentProjectRef,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: !!parentProjectRef }
+    )
+  )
 
   const githubConnection = connections?.find(
     (connection) => connection.project.ref === parentProjectRef

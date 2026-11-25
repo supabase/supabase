@@ -5,7 +5,11 @@ import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
-import { classifyResponseError } from '@/data/error-classification'
+import {
+  classifyResponseError,
+  parseRateLimitResetSeconds,
+  parseRetryAfterSeconds,
+} from '@/data/error-classification'
 import { handleError, post, unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -79,10 +83,10 @@ export async function sendSupportTicket({
   if (error) {
     const httpResponse: unknown = response
     if (httpResponse instanceof Response && httpResponse.status === 429) {
-      const resetHeader =
-        httpResponse.headers.get('Retry-After') ?? httpResponse.headers.get('X-RateLimit-Reset')
-      const parsedReset = resetHeader ? parseInt(resetHeader, 10) : NaN
-      const waitSeconds = Number.isFinite(parsedReset) ? parsedReset : RATE_LIMIT_FALLBACK_SECONDS
+      const waitSeconds =
+        parseRetryAfterSeconds(httpResponse.headers.get('Retry-After')) ??
+        parseRateLimitResetSeconds(httpResponse.headers.get('X-RateLimit-Reset')) ??
+        RATE_LIMIT_FALLBACK_SECONDS
       throw classifyResponseError({
         message: `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
         code: 429,

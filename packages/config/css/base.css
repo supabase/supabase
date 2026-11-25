@@ -14,4 +14,9 @@
   input[type='number'] {
     -moz-appearance: textfield;
   }
+
+  :is(:has(> [role='switch']:enabled), :has(> * > [role='switch']:enabled)) > label,
+  :is(:has(> [role='switch']:enabled), :has(> * > [role='switch']:enabled)) > * > label {
+    cursor: pointer;
+  }
 }

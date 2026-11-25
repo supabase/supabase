@@ -15,6 +15,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { FreeMicroUpgradeSuggestion } from './FreeMicroUpgradeSuggestion'
 import {
   CATEGORY_OPTIONS,
   SEVERITY_OPTIONS,
@@ -23,12 +24,14 @@ import {
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
+import type { OrganizationPlanID } from '@/data/organizations/organization-query'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
   category: ExtendedSupportCategories
   severity?: string
   projectRef: string
+  subscriptionPlanId?: OrganizationPlanID
   showSeverity?: boolean
   showIssueSuggestion?: boolean
 }
@@ -38,6 +41,7 @@ export function CategoryAndSeverityInfo({
   category,
   severity,
   projectRef,
+  subscriptionPlanId,
   showSeverity = true,
   showIssueSuggestion = true,
 }: CategoryAndSeverityInfoProps) {
@@ -50,7 +54,13 @@ export function CategoryAndSeverityInfo({
     >
       <CategorySelector form={form} />
       {showSeverity && <SeveritySelector form={form} />}
-      {showIssueSuggestion && <IssueSuggestion category={category} projectRef={projectRef} />}
+      {showIssueSuggestion && (
+        <IssueSuggestion
+          category={category}
+          projectRef={projectRef}
+          subscriptionPlanId={subscriptionPlanId}
+        />
+      )}
       {(severity === 'Urgent' || severity === 'High') && (
         <Admonition
           type="default"
@@ -166,7 +176,15 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
   )
 }
 
-const IssueSuggestion = ({ category, projectRef }: { category: string; projectRef?: string }) => {
+const IssueSuggestion = ({
+  category,
+  projectRef,
+  subscriptionPlanId,
+}: {
+  category: string
+  projectRef?: string
+  subscriptionPlanId?: OrganizationPlanID
+}) => {
   const baseUrl = `/project/${projectRef === NO_PROJECT_MARKER ? '_' : projectRef}`
 
   const className = 'col-span-2 mb-0'
@@ -201,15 +219,22 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
 
   if (category === SupportCategories.PERFORMANCE_ISSUES) {
     return (
-      <Admonition
-        type="default"
-        className={className}
-        title="Have you checked the Query Performance Advisor?"
-      >
-        Identify slow running queries and get actionable insights on how to optimize them with Query
-        Performance{' '}
-        <InlineLink href={`${baseUrl}/observability/query-performance`}>here</InlineLink>.
-      </Admonition>
+      <>
+        <FreeMicroUpgradeSuggestion
+          className={className}
+          projectRef={projectRef}
+          planId={subscriptionPlanId}
+        />
+        <Admonition
+          type="default"
+          className={className}
+          title="Have you checked the Query Performance Advisor?"
+        >
+          Identify slow running queries and get actionable insights on how to optimize them with
+          Query Performance{' '}
+          <InlineLink href={`${baseUrl}/observability/query-performance`}>here</InlineLink>.
+        </Admonition>
+      </>
     )
   }
 

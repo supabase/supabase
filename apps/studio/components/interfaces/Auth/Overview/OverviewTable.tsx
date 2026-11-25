@@ -2,7 +2,7 @@ import { Loader2Icon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 
 export type OverviewTableColumn<T> = {
   key: keyof T | string

@@ -4,8 +4,8 @@ import { Input, Label } from 'ui'
 
 export default function CopyFormLabels() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4 w-[300px]">
+    <div className="flex flex-col gap-8 w-full max-w-[300px]">
+      <div className="flex flex-col gap-4 w-full">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="table-name-bad">Name your table</Label>
@@ -16,7 +16,7 @@ export default function CopyFormLabels() {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-[300px]">
+      <div className="flex flex-col gap-4 w-full">
         <span className="text-xs text-foreground-muted">Good Example</span>
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="table-name-good">Table name</Label>

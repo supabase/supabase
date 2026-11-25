@@ -16,7 +16,6 @@ import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -82,8 +81,6 @@ export const ActivityStats = () => {
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
-  const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
   const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
@@ -93,10 +90,12 @@ export const ActivityStats = () => {
     data: branchesData,
     isPending: isPendingBranches,
     isError: isBranchesQueryError,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: !isHighAvailability,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: !isHighAvailability }
+    )
+  )
   const isLoadingBranches =
     branchesGrant.status === 'loading' || (branchesGrant.status === 'granted' && isPendingBranches)
   const isBranchesError = isBranchesQueryError || branchesGrant.status === 'error'
@@ -175,7 +174,6 @@ export const ActivityStats = () => {
                   slug={organization?.slug}
                   cloudProvider={project?.cloud_provider}
                   computeSize={project.infra_compute_size}
-                  resourceWarnings={projectResourceWarnings}
                 />
               ) : (
                 <p className="text-foreground-lighter">Unknown</p>

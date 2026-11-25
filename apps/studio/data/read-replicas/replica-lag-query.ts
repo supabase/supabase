@@ -23,6 +23,8 @@ export async function getReplicationLag(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'replica-lag',
       sql,
       queryKey: ['replica-lag', id],
       grant: unguarded.migrating,

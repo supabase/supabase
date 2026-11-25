@@ -77,7 +77,7 @@ export const AuditLogsProjectOption = ({
         onValueChange={setSearch}
         placeholder="Find project..."
         handleReset={() => setSearch('')}
-        className="text-base sm:text-sm"
+        className="text-sm"
         // FilterBar keeps focus on the chip's input, so move it here for cmdk's arrow/enter keys
         autoFocus
       />

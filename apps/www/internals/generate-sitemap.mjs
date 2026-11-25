@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
-import prettier from 'prettier'
+import { format } from 'oxfmt'
 
 import { parseFrontmatter } from '../lib/frontmatter.mjs'
 
@@ -75,8 +75,6 @@ function urlEntry(loc, lastmod) {
 }
 
 async function generate() {
-  const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
-
   const unsortedPages = await globby([
     'pages/*.js',
     'pages/*.tsx',
@@ -233,10 +231,14 @@ async function generate() {
     </urlset>
     `
 
-  const formatted = await prettier.format(sitemap, {
-    ...prettierConfig,
-    parser: 'html',
+  const { code: formatted, errors } = await format('sitemap.html', sitemap, {
+    tabWidth: 2,
+    printWidth: 100,
+    endOfLine: 'lf',
   })
+  if (errors.length > 0) {
+    throw new Error(`Failed to format www sitemap: ${errors.map((e) => e.message).join('; ')}`)
+  }
 
   /**
    * generate sitemap router

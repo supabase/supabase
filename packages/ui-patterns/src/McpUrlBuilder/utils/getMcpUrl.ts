@@ -19,6 +19,8 @@ export type McpSkipElicitation =
   | 'apply_migration'
   | 'create_project'
   | 'create_branch'
+  | 'run_notebook'
+  | 'delete_notebook'
 
 interface GetMcpUrlOptions {
   projectRef?: string

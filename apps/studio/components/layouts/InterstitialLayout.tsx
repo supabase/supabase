@@ -8,6 +8,9 @@ import { BASE_PATH } from '@/lib/constants'
 
 const MotionCard = motion.create(Card)
 
+/** Width of the interstitial card. Shared so previews of these screens match them. */
+export const INTERSTITIAL_WIDTH_CLASS = 'max-w-[400px]'
+
 interface InterstitialLayoutProps {
   logo?: ReactNode
   title?: ReactNode
@@ -16,7 +19,7 @@ interface InterstitialLayoutProps {
   footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
-  /** Shared max-width for the card and footer column. Defaults to `max-w-[400px]`. */
+  /** Shared max-width for the card and footer column. Defaults to `INTERSTITIAL_WIDTH_CLASS`. */
   widthClassName?: string
   titleClassName?: string
   descriptionClassName?: string
@@ -36,7 +39,7 @@ export const InterstitialLayout = ({
   footer,
   containerClassName,
   cardClassName,
-  widthClassName = 'max-w-[400px]',
+  widthClassName = INTERSTITIAL_WIDTH_CLASS,
   titleClassName,
   descriptionClassName,
   children,
@@ -47,10 +50,7 @@ export const InterstitialLayout = ({
 
   const titleElement = title ? (
     <TitleElement
-      className={cn(
-        'font-sans tracking-tight text-balance text-lg font-medium normal-case text-foreground',
-        titleClassName
-      )}
+      className={cn('tracking-tight text-balance text-lg text-foreground', titleClassName)}
     >
       {title}
     </TitleElement>
@@ -112,16 +112,31 @@ export const InterstitialLayout = ({
  * Partner logos fill edge-to-edge (see `PartnerLogo`); the Supabase symbol and
  * Lucide icons sit inset (sized at `size-7`).
  */
-export const LogoBox = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <div
-    className={cn(
-      'flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted',
-      className
-    )}
-  >
-    {children}
-  </div>
-)
+export const LogoBox = ({
+  children,
+  className,
+  badge,
+}: PropsWithChildren<{ className?: string; badge?: ReactNode }>) => {
+  const box = (
+    <div
+      className={cn(
+        'flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted',
+        className
+      )}
+    >
+      {children}
+    </div>
+  )
+
+  if (!badge) return box
+
+  return (
+    <div className="relative">
+      {box}
+      {badge}
+    </div>
+  )
+}
 
 /** Two pre-boxed logos side-by-side with a swap separator. */
 export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
@@ -163,8 +178,14 @@ export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string
 export const CONNECT_LOGO_LIGHT_TILE_CLASSNAME = 'border-black/10 bg-white'
 
 /** Supabase symbol (not the wordmark) rendered inset inside a LogoBox. */
-export const SupabaseLogo = ({ forceLight = false }: { forceLight?: boolean } = {}) => (
-  <LogoBox className={forceLight ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
+export const SupabaseLogo = ({
+  forceLight = false,
+  badge,
+}: { forceLight?: boolean; badge?: ReactNode } = {}) => (
+  <LogoBox
+    badge={badge}
+    className={forceLight ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}
+  >
     <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )
@@ -217,3 +238,19 @@ export const InterstitialActionError = ({ error }: { error?: ReactNode }) => {
     </div>
   )
 }
+
+export const InterstitialLogoBadge = ({
+  children,
+  variant = 'neutral',
+}: PropsWithChildren<{ variant?: 'neutral' | 'warning' }>) => (
+  <span
+    className={cn(
+      'absolute -top-2 -right-2 inline-flex size-5 items-center justify-center rounded-sm [&>svg]:size-3.5',
+      variant === 'warning'
+        ? 'bg-warning-600 text-warning-200'
+        : 'bg-foreground-muted text-background'
+    )}
+  >
+    {children}
+  </span>
+)
