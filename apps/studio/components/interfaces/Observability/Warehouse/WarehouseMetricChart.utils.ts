@@ -191,6 +191,12 @@ export const formatWarehouseCount = (value: number) => formatNumber(value, 1)
 // For charts without their own formatter; 3 digits matches ChartLine's default toLocaleString()
 export const formatWarehouseNumber = (value: number) => formatNumber(value, 3)
 
+export type WarehouseChartUnit = 'ms' | '/s'
+
+// "12.3 ms" but "1.2/s", like formatWarehouseDuration and formatWarehousePerSecond
+export const formatWarehouseUnitValue = (value: number, unit: WarehouseChartUnit) =>
+  unit === 'ms' ? `${formatWarehouseNumber(value)} ms` : `${formatWarehouseNumber(value)}/s`
+
 export const formatWarehousePerSecond = (perSecond: number) => `${formatNumber(perSecond, 2)}/s`
 
 export const formatWarehousePerMinute = (perSecond: number) =>

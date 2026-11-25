@@ -12,6 +12,7 @@ import {
   formatWarehousePerMinute,
   formatWarehousePerSecond,
   formatWarehouseRatio,
+  formatWarehouseUnitValue,
   WAREHOUSE_ETL_LABEL_PROPS,
 } from './WarehouseMetricChart.utils'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
@@ -239,6 +240,15 @@ describe('expandWarehouseChartSeries options', () => {
   })
 })
 
+describe('formatWarehouseUnitValue', () => {
+  test('appends the unit the way the matching formatters do', () => {
+    expect(formatWarehouseUnitValue(0.4125, '/s')).toBe('0.413/s')
+    expect(formatWarehouseUnitValue(1234.5, '/s')).toBe('1,234.5/s')
+    expect(formatWarehouseUnitValue(12.3456, 'ms')).toBe('12.346 ms')
+    expect(formatWarehouseUnitValue(0, 'ms')).toBe('0 ms')
+  })
+})
+
 describe('warehouse number formatting', () => {
   test('formats numbers the same way whatever the browser locale', () => {
     const original = Number.prototype.toLocaleString
@@ -258,6 +268,7 @@ describe('warehouse number formatting', () => {
       expect(formatWarehouseDuration(1.5)).toBe('1.5 s')
       expect(formatWarehouseBytes(0.5)).toBe('0.5 bytes')
       expect(formatWarehouseNumber(1234.5678)).toBe('1,234.568')
+      expect(formatWarehouseUnitValue(0.4125, '/s')).toBe('0.413/s')
     } finally {
       spy.mockRestore()
     }

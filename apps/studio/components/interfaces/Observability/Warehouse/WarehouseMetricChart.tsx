@@ -4,11 +4,13 @@ import { ChartLine } from 'ui-patterns/Chart'
 import {
   expandWarehouseChartSeries,
   formatWarehouseNumber,
+  formatWarehouseUnitValue,
   getWarehouseChartPoints,
   getWarehouseSeriesPeak,
   getWarehouseSeriesRank,
   type WarehouseSeriesLabelOptions,
   type WarehouseChartSeries,
+  type WarehouseChartUnit,
 } from './WarehouseMetricChart.utils'
 import { getEmptyMessage } from './WarehouseMetricsReport.utils'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
@@ -29,12 +31,15 @@ export const WarehouseMetricChart = ({
   metric?: WarehouseMetric
   title: string
   description: string
-  unit?: 'ms' | '/s'
+  unit?: WarehouseChartUnit
   scale?: number
   emptyMessage?: string
   series?: WarehouseChartSeries[]
   formatValue?: (value: number) => string
 } & WarehouseSeriesLabelOptions) => {
+  const valueFormatter =
+    formatValue ??
+    (unit ? (value: number) => formatWarehouseUnitValue(value, unit) : formatWarehouseNumber)
   const allSeries = expandWarehouseChartSeries(inputSeries, { formatLabels, hideSharedLabels })
   const selectedSeries = [...allSeries]
     .sort(
@@ -98,8 +103,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                YAxisProps={{ tickFormatter: formatValue ?? formatWarehouseNumber }}
-                tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
+                YAxisProps={{ tickFormatter: valueFormatter }}
               />
             </>
           ) : (
