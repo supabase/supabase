@@ -11,6 +11,7 @@ import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunc
 import {
   formatFunctionBodyToFiles,
   getDefaultSelectedFileId,
+  getFunctionEditorImportMapPath,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { AlertError } from '@/components/ui/AlertError'
@@ -119,7 +120,13 @@ function CodePage() {
       const entrypoint_path =
         functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction.entrypoint_path
       const newEntrypointPath = entrypoint_path?.split('/').pop()
-      const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
+      const newImportMapPath = functionBody
+        ? getFunctionEditorImportMapPath({
+            functionBody,
+            entrypointPath: selectedFunction.entrypoint_path,
+            importMapPath: selectedFunction.import_map_path,
+          })
+        : undefined
 
       const entrypointExists = fileExists(newEntrypointPath)
       const importMapExists = fileExists(newImportMapPath)
