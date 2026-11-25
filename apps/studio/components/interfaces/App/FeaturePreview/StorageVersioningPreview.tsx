@@ -22,9 +22,12 @@ export const StorageVersioningPreview = () => {
       <Admonition
         type="warning"
         title="Object versioning is in Public Alpha"
-        description="The feature may change as we improve it, avoid relying
-                on it for production workloads during the alpha."
+        description="This feature may change during development and is not recommended for production workloads."
       />
+      <p className="text-sm text-foreground-light">
+        The Studio preview is on by default and can be disabled here. Versioning stays off until you
+        enable it for each bucket.
+      </p>
       <Image
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
@@ -57,8 +60,8 @@ export const StorageVersioningPreview = () => {
         <h4 className="text-sm">Storage usage and retained versions</h4>
         <p className="text-sm text-foreground-light">
           Retained versions count toward Storage usage and may increase your bill. Set a lifecycle
-          policy to expire versions you no longer need. Turning versioning off suspends it without
-          removing versions you already have.
+          policy to expire versions you no longer need. Disabling object versioning on a versioned
+          bucket suspends it but retains its existing versions.
         </p>
       </div>
       <DocsButton href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-versioning`} />

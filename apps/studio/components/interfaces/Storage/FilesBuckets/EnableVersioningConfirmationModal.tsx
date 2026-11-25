@@ -28,7 +28,7 @@ export const EnableVersioningConfirmationModal = ({
     alert={{
       title: 'Object versioning is in Public Alpha',
       description:
-        'This feature may change during development and is not recommended yet for production workloads.',
+        'This feature may change during development and is not recommended for production workloads.',
     }}
   >
     <div className="space-y-2">

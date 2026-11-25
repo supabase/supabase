@@ -33,7 +33,10 @@ export const StorageVersioningPreviewBanner = () => {
   return (
     <div className="mx-3 mb-4 mt-auto space-y-3 rounded-lg border p-4 text-left">
       <div className="flex items-start justify-between gap-3">
-        <Badge variant="warning">Public Alpha</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="success">New</Badge>
+          <Badge variant="warning">Public Alpha</Badge>
+        </div>
         <Button
           variant="text"
           size="tiny"
