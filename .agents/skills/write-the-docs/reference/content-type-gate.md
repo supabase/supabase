@@ -5,7 +5,7 @@ Before drafting anything, classify the request against `apps/docs`'s real conten
 | Type | Location | Hand-authored by this skill? |
 |---|---|---|
 | **Guide / tutorial** | `content/guides/` | Yes — hand-written MDX, goal-oriented. This is the default case. |
-| **Troubleshooting** | `content/troubleshooting/` | Yes, though some entries sync from GitHub issues — check before assuming a fresh page is needed. |
+| **Troubleshooting** | `/kb/troubleshooting/`, fetched into `apps/kb/src/content/troubleshooting/` from a private repo | No. Troubleshooting articles go through an internal process, not direct contributions. See `apps/kb/README.md`. |
 | **Reference** | Generated from `spec/` (OpenAPI, SDK YAML, CLI config) → `features/docs/generated/**` | **No.** Reference pages do not use the standard MDX path — see `ask-the-docs`'s `docs-app-direction.md` for why, and `management-api-reference.md` for the OpenAPI-specific spec → codegen → reference-page flow. |
 | **Federated** | External repos, pulled at build time | No — out of scope for this skill; see `ask-the-docs`'s `federated-docs.md`. |
 | **Knowledge base (`/kb`)** | `apps/kb/src/content/guides/` and `apps/kb/src/content/faqs/` | Yes, but not as `apps/docs` MDX. Use `/kb` when the answer depends on the user's stack, scale, or alternatives: comparisons, migration guides, buy-vs-build, applied how-tos. Plain GitHub-flavored Markdown with no components; frontmatter needs `title`, `description`, and `topics`. See `apps/kb/AGENTS.md`. |
