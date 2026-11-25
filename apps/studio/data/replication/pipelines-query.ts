@@ -33,7 +33,7 @@ async function fetchReplicationPipelines(
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
-const replicationPipelinesQueryOptions = <TData = ReplicationPipelinesData>({
+export const replicationPipelinesQueryOptions = <TData = ReplicationPipelinesData>({
   projectRef,
   clusterId,
 }: ReplicationPipelinesParams) =>

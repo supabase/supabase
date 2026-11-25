@@ -27,7 +27,7 @@ async function fetchReplicationSources(
 
 export type ReplicationSourcesData = Awaited<ReturnType<typeof fetchReplicationSources>>
 
-const replicationSourcesQueryOptions = <TData = ReplicationSourcesData>({
+export const replicationSourcesQueryOptions = <TData = ReplicationSourcesData>({
   projectRef,
   clusterId,
 }: ReplicationSourcesParams) =>
