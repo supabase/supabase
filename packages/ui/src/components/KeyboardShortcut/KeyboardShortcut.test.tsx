@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { KeyboardShortcut } from './KeyboardShortcut'
@@ -53,5 +54,10 @@ describe('KeyboardShortcut', () => {
 
     expect(screen.getByText('⌘')).toBeInTheDocument()
     expect(screen.getByText('K')).toBeInTheDocument()
+  })
+
+  it('hides platform keys in server html so hydration cannot mismatch', () => {
+    expect(renderToString(<KeyboardShortcut keys={['Meta', 'k']} />)).toContain('invisible')
+    expect(renderToString(<KeyboardShortcut keys={['Enter']} />)).not.toContain('invisible')
   })
 })
