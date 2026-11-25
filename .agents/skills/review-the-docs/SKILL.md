@@ -232,9 +232,11 @@ each change. Each of these problems is a blocker:
 
 - **It repeats a fact.** Another section of the page, or another page, already states
   it. Link to that section instead.
-- **It contradicts the docs.** A sentence on the page or on another page says the
-  opposite, or a nearby sentence is no longer true, such as "the steps above".
-  Fix the other sentence in the same change, or change the new one.
+- **It disagrees with the docs.** A sentence on the page or on another page says the
+  opposite, or a nearby sentence is no longer true, such as "the steps above". The
+  published docs can be wrong. Decide which sentence is true with the
+  [Fact check](#fact-check), not by which one is published. Fix the wrong one in the
+  same change, so the docs agree when it merges.
 - **The reader can't act on it.** It describes internal mechanism that the reader
   can't observe, configure, or decide on. See
   [Document what the reader can use](../../../apps/docs/style-guide/01-voice-and-tone.md#document-what-the-reader-can-use).
@@ -323,7 +325,8 @@ SQL run through `psql` and through the Data API is two claims.
 
 1. List each claim on the new and changed lines, with the file and line. Split a
    sentence that makes two claims. A claim on a line that the change didn't touch is
-   out of scope, unless the change contradicts it.
+   out of scope, unless the change disagrees with it. Then give both claims a verdict,
+   on whichever page each one is.
 2. Give each claim one verdict:
    - **Ran:** it ran, and the result matches the claim. Give the command and the
      result. For a snippet, cite the `test-the-docs` verification report when one
