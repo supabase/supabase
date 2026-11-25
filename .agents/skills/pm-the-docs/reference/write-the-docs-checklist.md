@@ -36,6 +36,7 @@ _Skill:_ `/ask-the-docs` for IA placement, architecture, and where content lives
 
 - [ ] P: Pick the content type(s): tutorial (learning), how-to (a task), reference (lookup), explanation (the why). Do not mix types on one page (refer to [Diátaxis](https://diataxis.fr/))
 - [ ] P: Decide where the page lives in the existing IA and what links in and out (avoid orphan pages)
+- [ ] P: Decide if part of the content belongs in `/kb` instead of `/docs`: comparisons, migration guides, or anything where the answer depends on the user's stack. Product facts stay in `/docs`, and `/kb` links to them ([content-type gate](../../write-the-docs/reference/content-type-gate.md#what-goes-in-docs-and-what-goes-in-kb))
 - [ ] P: List prerequisites and assumed knowledge up front
 
 ### 3. Draft
