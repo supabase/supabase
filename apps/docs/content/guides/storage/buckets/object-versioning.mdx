@@ -8,9 +8,9 @@ sidebar_label: 'Object Versioning'
 
 Object versioning keeps multiple versions of each object in a bucket. Turn it on for a bucket to read or restore an earlier version of an object, and to undo a delete.
 
-<Admonition type="caution" title="Private alpha">
+<Admonition type="note" title="Public Alpha">
 
-Object versioning is in private alpha. If you're interested in trying it, request access through the [object versioning access request form](https://supabase.com/go/storage-object-versioning-early-access).
+Object versioning is currently in public alpha. Features and behavior may change.
 
 </Admonition>
 
@@ -45,6 +45,16 @@ The following table shows what happens to the current version when you upload to
 | `DISABLED`  | Overwrites the current version.                                                                       | Removes the object.                                                                                                       |
 | `ENABLED`   | Keeps the current version as a noncurrent version.                                                    | Adds a delete marker and keeps the current version as a noncurrent version.                                               |
 | `SUSPENDED` | Keeps the current version if it was written while versioning was turned on. Otherwise, overwrites it. | Adds a delete marker. Keeps the current version if it was written while versioning was turned on. Otherwise, replaces it. |
+
+<Admonition type="caution">
+
+A path can have only one version with `is_versioned` set to `false`. In a `SUSPENDED` bucket, an upload or delete replaces that version even if it's noncurrent. For example:
+
+1. Upload `public/avatar1.png` while the bucket is `DISABLED`. This is version 1.
+2. Turn on versioning and upload to the same path. Version 1 becomes noncurrent, and version 2 is current.
+3. Suspend versioning and upload to the same path. Version 2 is kept as a noncurrent version, and version 3 replaces version 1.
+
+</Admonition>
 
 A delete that has a version ID removes that version permanently, whatever the bucket status.
 
