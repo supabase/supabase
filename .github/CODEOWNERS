@@ -10,9 +10,8 @@
 /apps/studio/ @supabase/Dashboard
 
 /apps/docs/ @supabase/docs
-/apps/docs/content/guides/self-hosting/ @supabase/docs @supabase/self-hosted
-/apps/docs/content/guides/self-hosting.mdx @supabase/docs @supabase/self-hosted
-/apps/docs/content/guides/**/*self-hosted*.mdx @supabase/docs @supabase/self-hosted
+/apps/docs/content/guides/self-hosting* @supabase/docs @supabase/self-hosted
+/apps/docs/content/guides/**/*self-hosted* @supabase/docs @supabase/self-hosted
 
 # intentionally blank so anyone with write access can approve here
 /apps/docs/public/humans.txt
