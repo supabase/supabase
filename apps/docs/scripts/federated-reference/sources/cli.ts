@@ -9,8 +9,8 @@ const cli: FederatedReferenceSource = {
       path: 'cli',
       // TODO: temporary branch, point back to `main` once the definitions are
       // merged there.
-      ref: { branch: 'mdonnalley/reference-beta-output' },
-      definitionsDir: 'docs/reference-beta/definitions',
+      ref: { branch: 'avallete/cli-reference-beta-definitions' },
+      definitionsDir: 'apps/cli/docs/reference-beta/definitions',
     },
   ],
 }
