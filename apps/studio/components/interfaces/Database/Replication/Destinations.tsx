@@ -21,6 +21,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -150,6 +151,13 @@ export const Destinations = () => {
     sourcesResult,
   }: (typeof clusterResults)[number]) =>
     destinationsResult.isFetching || pipelinesResult.isFetching || sourcesResult.isFetching
+
+  const failedRegions = clusterResults.filter(({ error }) => error !== null)
+  const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
+  const failedRegionTitle =
+    failedRegions.length === 1
+      ? `Pipelines could not be loaded from ${failedRegions[0].group.region?.region_name ?? 'one region'}`
+      : `Pipelines could not be loaded from ${failedRegions.length} regions`
 
   const {
     data: defaultSources,
@@ -377,20 +385,33 @@ export const Destinations = () => {
           />
         )}
 
-        {!hasMultipleRegions && clusterResults[0].error && (
-          <AlertError
-            error={clusterResults[0].error}
-            projectRef={projectRef}
-            subject="Failed to retrieve pipelines"
-            additionalActions={
+        {hasClusterErrors && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title={failedRegionTitle}
+            actions={
               <Button
-                loading={isRetryingRegion(clusterResults[0])}
-                onClick={() => retryRegion(clusterResults[0])}
+                loading={failedRegions.some(isRetryingRegion)}
+                onClick={() => failedRegions.forEach(retryRegion)}
               >
                 Retry
               </Button>
             }
-          />
+          >
+            <details>
+              <summary className="cursor-pointer text-foreground-light">
+                View affected regions
+              </summary>
+              <ul className="mt-2 space-y-1">
+                {failedRegions.map(({ group, error }) => (
+                  <li key={group.clusterId ?? 'default'}>
+                    {group.region?.region_name ?? 'Default region'}: {error?.message}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </Admonition>
         )}
 
         {isDestinationsLoading && !shouldShowTable && (
@@ -441,43 +462,14 @@ export const Destinations = () => {
                       />
                     </ReplicationClusterProvider>
                   ))}
-                  {hasMultipleRegions &&
-                    clusterResults.map((result) => {
-                      const { group, error, isPending, sourcesResult } = result
-                      const regionName = group.region?.region_name
-                      if (!isPending && !error) return null
-
-                      return (
-                        <TableRow key={group.clusterId ?? 'default'}>
-                          <TableCell colSpan={tableColumnCount}>
-                            {error ? (
-                              <AlertError
-                                error={error}
-                                projectRef={projectRef}
-                                subject={
-                                  error === sourcesResult.error
-                                    ? `Failed to retrieve pipeline enablement status in ${regionName}`
-                                    : `Failed to retrieve pipelines in ${regionName}`
-                                }
-                                additionalActions={
-                                  <Button
-                                    loading={isRetryingRegion(result)}
-                                    onClick={() => retryRegion(result)}
-                                  >
-                                    Retry
-                                  </Button>
-                                }
-                              />
-                            ) : (
-                              <>
-                                <span className="sr-only">Loading pipelines in {regionName}</span>
-                                <ShimmeringLoader />
-                              </>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                  {pendingRegions.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={tableColumnCount}>
+                        <span className="sr-only">Loading pipelines from remaining regions</span>
+                        <ShimmeringLoader />
+                      </TableCell>
+                    </TableRow>
+                  )}
 
                   {!isDestinationsLoading &&
                     !hasClusterErrors &&
