@@ -23,7 +23,7 @@ export type ComputeDiskLimit = {
 }
 
 const COMPUTE_SIZE_NAMES = {
-  ci_nano: 'Nano (free)',
+  ci_nano: 'Nano (Free Plan)',
   ci_micro: 'Micro',
   ci_small: 'Small',
   ci_medium: 'Medium',
