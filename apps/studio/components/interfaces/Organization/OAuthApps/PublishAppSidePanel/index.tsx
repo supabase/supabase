@@ -1,3 +1,4 @@
+import { useLocation } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
@@ -35,6 +36,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { AuthorizationSection } from './Authorization'
+import { DirectDatabaseAccessPreview } from './DirectDatabaseAccessPreview'
 import {
   formSchema,
   FormSchema,
@@ -128,6 +130,12 @@ export const PublishAppSidePanel = ({
   onCreateSuccess,
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
+  const search = useLocation({ select: (location) => location.searchStr })
+  const databaseAccessPreview = import.meta.env.DEV
+    ? new URLSearchParams(search).get('preview_database_access')
+    : null
+  const isDatabaseAccessPreview =
+    databaseAccessPreview === 'approved' || databaseAccessPreview === 'member-bound'
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
   const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
 
@@ -493,6 +501,15 @@ export const PublishAppSidePanel = ({
               <DocsButton href={`${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`} />
             </div>
 
+            {visible && isDatabaseAccessPreview && (
+              <DirectDatabaseAccessPreview
+                key={selectedApp?.id}
+                isPreviewMemberBound={
+                  databaseAccessPreview === 'member-bound' ||
+                  selectedApp?.grant_kind === 'member_bound'
+                }
+              />
+            )}
             <ScopesPanel scopes={scopes} setScopes={setScopes} />
           </div>
 
