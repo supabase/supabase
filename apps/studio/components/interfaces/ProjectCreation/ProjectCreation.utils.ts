@@ -13,6 +13,21 @@ import {
 /** Form value of the "Auto" option in the region selector, which maps to `{ code: 'auto', type: 'auto' }` */
 export const AUTO_REGION_VALUE = 'best_available'
 
+export function isProductionEnvironment(environment = process.env.NEXT_PUBLIC_ENVIRONMENT) {
+  return environment === 'prod'
+}
+
+export function canOverrideKubernetesCluster(
+  cloudProvider: string,
+  isV3AdvancedDeploymentEnabled: boolean
+) {
+  if (isProductionEnvironment()) {
+    return isV3AdvancedDeploymentEnabled && cloudProvider === 'AWS_K8S'
+  }
+
+  return cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
+}
+
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
   // available-versions doesn't accept 'auto', so look versions up against the Americas region for Auto
   const smartRegion = smartOrExactRegion === AUTO_REGION_VALUE ? 'Americas' : smartOrExactRegion
@@ -28,7 +43,7 @@ export function getAvailableRegions(
     case 'AWS_K8S':
       return AWS_REGIONS
     case 'AWS_NIMBUS':
-      if (environment !== 'prod') {
+      if (!isProductionEnvironment(environment)) {
         // Only allow Southeast Asia for Nimbus (local/staging)
         return {
           SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,

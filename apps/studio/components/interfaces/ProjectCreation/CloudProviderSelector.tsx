@@ -13,10 +13,12 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { isProductionEnvironment } from './ProjectCreation.utils'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { PROVIDERS } from '@/lib/constants'
 
 const HA_SUPPORTED_PROVIDERS = ['AWS_K8S']
+const CLOUD_PROVIDERS = Object.values(PROVIDERS)
 
 interface CloudProviderSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -25,7 +27,7 @@ interface CloudProviderSelectorProps {
 export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
-  const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+  const isProduction = isProductionEnvironment()
 
   return (
     <FormField
@@ -44,19 +46,26 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
           }
         >
           <Select
-            onValueChange={(value) => field.onChange(value)}
+            onValueChange={(value) => {
+              // The underlying select can emit an empty value when a configured Nimbus
+              // default is absent from the production options.
+              if (value) field.onChange(value)
+            }}
             defaultValue={field.value}
             value={field.value}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select a cloud provider" />
+                <SelectValue placeholder="Select a cloud provider">
+                  {CLOUD_PROVIDERS.find((provider) => provider.id === field.value)?.name}
+                </SelectValue>
               </SelectTrigger>
             </FormControl>
             <SelectContent>
               <SelectGroup>
-                {Object.values(PROVIDERS)
-                  .filter((provider) => validCloudProviders?.includes(provider.id) ?? true)
+                {CLOUD_PROVIDERS.filter(
+                  (provider) => validCloudProviders?.includes(provider.id) ?? true
+                )
                   .filter((provider) => !isProduction || provider.id !== 'AWS_NIMBUS')
                   .map((providerObj) => {
                     const label = providerObj['name']

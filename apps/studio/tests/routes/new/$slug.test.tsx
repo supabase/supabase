@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import customContent from '@/hooks/custom-content/custom-content.json'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { StatusPageResponse } from '@/lib/status-page/status-page.schema'
 import { Route } from '@/routes/new/$slug'
@@ -531,6 +532,47 @@ describe('project creation wizard', () => {
         }
       }
     )
+
+    test('omits cluster placement when disabling HA restores Nimbus', async ({
+      onTestFinished,
+    }) => {
+      const originalProviders = customContent['infra:cloud_providers']
+      customContent['infra:cloud_providers'] = ['AWS_NIMBUS', 'AWS_K8S']
+      onTestFinished(() => {
+        customContent['infra:cloud_providers'] = originalProviders
+      })
+
+      mockWizardEndpoints()
+      mswServer.use(
+        http.get('https://www.cloudflare.com/cdn-cgi/trace', () => HttpResponse.text('loc=US'))
+      )
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+      await renderWizard({ flags: { orgsAllowedToUseV3AdvancedDeployment: ORG_SLUG } })
+
+      await fillProjectName('Nimbus Deployment Project')
+      await generateAndWaitForStrongPassword()
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+      fireEvent.change(
+        await screen.findByPlaceholderText('e.g dev-gbl-a001-c003-k001-0-eksCluster-038b450'),
+        { target: { value: 'prod-cluster-eksCluster-123' } }
+      )
+      await user.click(screen.getByRole('checkbox', { name: 'Force-deploy to this cluster' }))
+      await user.click(highAvailabilitySwitch)
+
+      expect(getSelectTriggerByLabel('Cloud provider')).toHaveTextContent('AWS (Nimbus)')
+      expect(screen.queryByText('Kubernetes cluster ID')).not.toBeInTheDocument()
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toBeEnabled())
+      await selectRegion(/East US/)
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].cloud_provider).toBe('AWS_NIMBUS')
+      expect(onRequest.mock.calls[0][0].custom_supabase_internal_requests).toBeUndefined()
+    })
 
     test('clears cluster placement when switching back to AWS', async () => {
       mockWizardEndpoints()

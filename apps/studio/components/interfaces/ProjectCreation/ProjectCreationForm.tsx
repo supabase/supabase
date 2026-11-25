@@ -29,6 +29,7 @@ import {
 import { FormSchema } from './ProjectCreation.schema'
 import {
   AUTO_REGION_VALUE,
+  canOverrideKubernetesCluster,
   getAvailableRegions,
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
@@ -152,9 +153,9 @@ export const ProjectCreationForm = ({
   const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const internalOnlyConfigurationEnabled = useFlag('newProjectInternalOnlyConfiguration')
-  const v3AdvancedDeploymentEnabled = useIsV3AdvancedDeploymentEnabled(slug)
+  const isV3AdvancedDeploymentEnabled = useIsV3AdvancedDeploymentEnabled(slug)
   const showInternalOnlyConfiguration =
-    (internalOnlyConfigurationEnabled || v3AdvancedDeploymentEnabled) && !isVercelIntegrationFlow
+    (internalOnlyConfigurationEnabled || isV3AdvancedDeploymentEnabled) && !isVercelIntegrationFlow
   const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
@@ -623,7 +624,12 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (customPostgresVersion || instanceType || kubernetesClusterId) {
+    const canOverrideCluster =
+      showInternalOnlyConfiguration &&
+      canOverrideKubernetesCluster(cloudProvider, isV3AdvancedDeploymentEnabled)
+    const allowedClusterId = canOverrideCluster ? kubernetesClusterId : undefined
+
+    if (customPostgresVersion || instanceType || allowedClusterId) {
       data['customSupabaseRequest'] = {
         ...((customPostgresVersion || instanceType) && {
           ami: {
@@ -633,8 +639,8 @@ export const ProjectCreationForm = ({
             ...(instanceType && { instance_type: instanceType }),
           },
         }),
-        ...(kubernetesClusterId && { kubernetes_cluster_id: kubernetesClusterId }),
-        ...(kubernetesClusterId &&
+        ...(allowedClusterId && { kubernetes_cluster_id: allowedClusterId }),
+        ...(allowedClusterId &&
           kubernetesClusterForce && { kubernetes_cluster_force: kubernetesClusterForce }),
       }
     }
@@ -877,7 +883,12 @@ export const ProjectCreationForm = ({
                       !!availableOrioleVersion &&
                       highAvailability !== true && <AdvancedConfiguration form={form} />}
 
-                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
+                    {showInternalOnlyConfiguration && (
+                      <InternalOnlyConfiguration
+                        form={form}
+                        isV3AdvancedDeploymentEnabled={isV3AdvancedDeploymentEnabled}
+                      />
+                    )}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition

@@ -18,26 +18,30 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CloudProviderSelector } from './CloudProviderSelector'
 import { PostgresVersionSelector } from './PostgresVersionSelector'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { canOverrideKubernetesCluster, isProductionEnvironment } from './ProjectCreation.utils'
 import Panel from '@/components/ui/Panel'
-import { useIsV3AdvancedDeploymentEnabled } from '@/hooks/misc/useIsV3AdvancedDeploymentEnabled'
 
 interface InternalOnlyConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
+  isV3AdvancedDeploymentEnabled: boolean
 }
 
-export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationProps) => {
+export const InternalOnlyConfiguration = ({
+  form,
+  isV3AdvancedDeploymentEnabled,
+}: InternalOnlyConfigurationProps) => {
   const { slug } = useParams()
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-  const v3AdvancedDeploymentEnabled = useIsV3AdvancedDeploymentEnabled(slug)
-  const canConfigureDeployment = showNonProdFields || v3AdvancedDeploymentEnabled
+  const showNonProdFields = !isProductionEnvironment()
+  const canConfigureDeployment = showNonProdFields || isV3AdvancedDeploymentEnabled
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
   const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' })
   const dbRegion = useWatch({ control: form.control, name: 'dbRegion' })
   const kubernetesClusterId = useWatch({ control: form.control, name: 'kubernetesClusterId' })
   const useOrioleDbForCreate = useWatch({ control: form.control, name: 'useOrioleDb' })
-  const canOverrideCluster =
-    canConfigureDeployment &&
-    (cloudProvider === 'AWS_K8S' || (showNonProdFields && cloudProvider === 'AWS_NIMBUS'))
+  const canOverrideCluster = canOverrideKubernetesCluster(
+    cloudProvider,
+    isV3AdvancedDeploymentEnabled
+  )
   // Held here (outside the collapsible content) so the selector's last valid
   // selection survives the section being collapsed and reopened.
   const lastValidPostgresVersionSelection = useRef('')
