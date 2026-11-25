@@ -1,7 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
-import { AuthContext, AuthContext as AuthContextType } from 'common'
+import { AuthContext, AuthContext as AuthContextType, FrameworkProvider } from 'common'
+import { useRouter as useMockRouter } from 'next-router-mock'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { useMemo } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
@@ -10,6 +12,22 @@ import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ProfileContext, type ProfileContextType } from '@/lib/profile'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
+
+const TestFrameworkProvider = ({ children }: { children: React.ReactNode }) => {
+  const router = useMockRouter()
+  const value = useMemo(
+    () => ({
+      pathname: router.pathname,
+      asPath: router.asPath,
+      isReady: router.isReady,
+      params: router.query,
+      push: (path: string) => router.push(path),
+    }),
+    [router]
+  )
+
+  return <FrameworkProvider value={value}>{children}</FrameworkProvider>
+}
 
 export const CustomWrapper = ({
   children,
@@ -34,13 +52,15 @@ export const CustomWrapper = ({
     })
 
   let content = (
-    <QueryClientProvider client={_queryClient}>
-      <NuqsTestingAdapter {...nuqs}>
-        <TooltipProvider>
-          <CommandProvider openKey="">{children}</CommandProvider>
-        </TooltipProvider>
-      </NuqsTestingAdapter>
-    </QueryClientProvider>
+    <TestFrameworkProvider>
+      <QueryClientProvider client={_queryClient}>
+        <NuqsTestingAdapter {...nuqs}>
+          <TooltipProvider>
+            <CommandProvider openKey="">{children}</CommandProvider>
+          </TooltipProvider>
+        </NuqsTestingAdapter>
+      </QueryClientProvider>
+    </TestFrameworkProvider>
   )
 
   if (profileContext) {

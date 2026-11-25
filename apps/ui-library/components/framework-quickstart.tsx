@@ -4,10 +4,10 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { frameworkTitles } from '@/config/docs'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 
 export function FrameworkQuickstart({ children }: { children: ReactNode }) {
-  const { framework, setFramework } = useFramework()
+  const { framework, setFramework } = useFrameworkPreference()
   const tabStripRef = useRef<HTMLDivElement>(null)
   const activeTabRef = useRef<HTMLButtonElement>(null)
 

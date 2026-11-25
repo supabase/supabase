@@ -8,9 +8,6 @@ import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
 
-// table of contents extractor
-const toc = require('markdown-toc')
-
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_alternatives')
   return {
@@ -53,7 +50,6 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }

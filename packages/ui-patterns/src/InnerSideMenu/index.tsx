@@ -1,5 +1,5 @@
+import { FrameworkLink, type FrameworkLinkProps } from 'common'
 import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
-import Link from 'next/link'
 // Required to avoid issues:
 // The inferred type of InnerSideMenuCollapsible cannot be named without a reference to CollapsibleProps
 // The inferred type of InnerSideBarFilterSortDropdown cannot be named without a reference to DropdownMenuProps
@@ -91,14 +91,14 @@ const InnerSideMenuSeparator = forwardRef<HTMLDivElement, React.ComponentPropsWi
 )
 
 const InnerSideMenuItem = forwardRef<
-  ElementRef<typeof Link>,
-  React.ComponentPropsWithoutRef<typeof Link> & {
+  HTMLAnchorElement,
+  FrameworkLinkProps & {
     isActive?: boolean
     forceHoverState?: boolean | null
   }
 >(({ className, isActive, forceHoverState, ...props }, ref) => {
   return (
-    <Link
+    <FrameworkLink
       ref={ref}
       {...props}
       aria-current={isActive}
@@ -116,8 +116,8 @@ const InnerSideMenuItem = forwardRef<
 })
 
 const InnerSideMenuDataItem = forwardRef<
-  ElementRef<typeof Link>,
-  React.ComponentPropsWithoutRef<typeof Link> & {
+  HTMLAnchorElement,
+  FrameworkLinkProps & {
     isActive?: boolean
     forceHoverState?: boolean | null
     isPreview?: boolean
@@ -125,7 +125,7 @@ const InnerSideMenuDataItem = forwardRef<
   }
 >(({ isActive = true, forceHoverState, isPreview, isOpened = true, ...props }, ref) => {
   return (
-    <Link
+    <FrameworkLink
       ref={ref}
       {...props}
       aria-current={isActive}
@@ -142,7 +142,7 @@ const InnerSideMenuDataItem = forwardRef<
     >
       {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
       {props.children}
-    </Link>
+    </FrameworkLink>
   )
 })
 

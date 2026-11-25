@@ -17,7 +17,7 @@ export const Footer = ({ className }: FooterProps) => {
               href={cell.url}
               target="_blank"
               rel="noreferrer noopener"
-              className="group flex min-h-16 w-full items-center justify-center px-4 py-6 focus-ring sm:h-13.75 sm:min-h-0 sm:px-8 sm:py-0"
+              className="group flex min-h-16 w-full items-center justify-center px-4 py-6 focus-inset sm:h-13.75 sm:min-h-0 sm:px-8 sm:py-0"
             >
               <span className="flex items-center gap-2">
                 <span className="flex size-3.75 shrink-0 items-center justify-center text-foreground-lighter transition-colors duration-150 group-hover:text-foreground group-focus-visible:text-foreground">
@@ -35,7 +35,7 @@ export const Footer = ({ className }: FooterProps) => {
           </li>
         ))}
       </ul>
-      <div className="p-6">
+      <div className="px-6 py-5">
         <FooterBottomRow />
       </div>
     </footer>
@@ -48,7 +48,7 @@ export const FooterBottomRow = () => (
       <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">
         &copy; Supabase Inc
       </Link>
-      <span className="text-xs text-foreground-lighter">—</span>
+      <span aria-hidden className="size-1 shrink-0 bg-foreground-muted" />
       <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
         <PrivacySettingsLabel />
       </PrivacySettings>

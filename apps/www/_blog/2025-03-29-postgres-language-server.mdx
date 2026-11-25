@@ -97,7 +97,7 @@ As laid out in a [previous blog post](https://supabase.com/blog/postgres-languag
 
 This is why we decided not to create a custom parser. Instead, we leverage the existing [libpg_query](https://github.com/pganalyze/libpg_query) library to parse SQL code reliably. The pganalyze team has published a great blog post on [why this approach is preferred](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby).
 
-However, `libpg_query` is designed to parse *executable* SQL — not to provide language intelligence. This limitation posed several challenges, requiring us to find pragmatic solutions along the way. The biggest challenge of this project has been (and continues to be) resisting the urge to chase perfection, avoiding unnecessary complexity, and prioritizing practical solutions instead.
+However, `libpg_query` is designed to parse _executable_ SQL — not to provide language intelligence. This limitation posed several challenges, requiring us to find pragmatic solutions along the way. The biggest challenge of this project has been (and continues to be) resisting the urge to chase perfection, avoiding unnecessary complexity, and prioritizing practical solutions instead.
 
 Let’s explore some of these solutions by walking through the document lifecycle.
 
@@ -327,7 +327,7 @@ However, our vision for this project is larger: We want to create a home for all
 - behind a HTTP API
 - (hopefully soon) from Wasm right in your browser.
 
-This approach is *heavily* inspired by (and borrows a lot from) [Biome](https://github.com/biomejs/biome). Without their sophisticated and well-structured codebase, we wouldn’t have been able to implement an entire toolchain infrastructure this quickly over the past months. Cheers to Open Source!
+This approach is _heavily_ inspired by (and borrows a lot from) [Biome](https://github.com/biomejs/biome). Without their sophisticated and well-structured codebase, we wouldn’t have been able to implement an entire toolchain infrastructure this quickly over the past months. Cheers to Open Source!
 
 ## What’s Next
 
