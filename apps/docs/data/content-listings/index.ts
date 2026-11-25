@@ -1,6 +1,13 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
+import {
+  buildIntegrationApiBuild,
+  buildIntegrationCatalogPath,
+  buildIntegrationIntegrationPath,
+  buildIntegrationLandingPageBuild,
+  buildIntegrationOauthBuild,
+} from './build-a-supabase-integration.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
 import { contributingDetails } from './contributing.data'
 import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
@@ -61,6 +68,11 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   supabaseWayStorageBuild,
   supabaseWayFunctionsBuild,
   supabaseWayProductionBuild,
+  buildIntegrationCatalogPath,
+  buildIntegrationIntegrationPath,
+  buildIntegrationLandingPageBuild,
+  buildIntegrationOauthBuild,
+  buildIntegrationApiBuild,
   contributingDetails,
   authGetStarted,
   authPricing,

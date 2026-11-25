@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 118" width="360" height="118" role="img" aria-label="Partner Catalog listing page with an Add integration button" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif">
+<rect x="0.5" y="0.5" width="359" height="117" rx="8" fill="#fbfbfa" stroke="#dde2e0"/>
+<path d="M0.5 24 V8.5 a8 8 0 0 1 8 -8 H351.5 a8 8 0 0 1 8 8 V24 Z" fill="#f2f4f3"/><line x1="0" y1="24.5" x2="360" y2="24.5" stroke="#dde2e0"/>
+<circle cx="12" cy="12.5" r="3" fill="#dde2e0"/>
+<circle cx="22" cy="12.5" r="3" fill="#dde2e0"/>
+<circle cx="32" cy="12.5" r="3" fill="#dde2e0"/>
+<rect x="46" y="6" width="302" height="13" rx="3" fill="#fbfbfa" stroke="#dde2e0"/><text x="52" y="15.5" font-size="7" fill="#5c6764" font-family="ui-monospace, SF Mono, Menlo, monospace">supabase.com/partners/catalog/&lt;partner&gt;</text>
+<circle cx="22" cy="48" r="9" fill="#dde2e0"/><text x="38" y="52" font-size="11" font-weight="600" fill="#1c2321">Partner name</text>
+<rect x="248" y="38" width="100" height="20" rx="5" fill="#1f8f63"/><text x="298.0" y="51.5" font-size="9" font-weight="600" text-anchor="middle" fill="#fbfbfa">Add integration ↗</text>
+<rect x="12" y="78" width="268.8" height="6" rx="3" fill="#dde2e0"/>
+<rect x="12" y="92" width="319.2" height="6" rx="3" fill="#dde2e0"/>
+<rect x="12" y="106" width="201.6" height="6" rx="3" fill="#dde2e0"/>
+</svg>

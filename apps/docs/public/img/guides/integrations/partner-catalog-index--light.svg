@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 196" width="360" height="196" role="img" aria-label="Partner Catalog index page on supabase.com, outside the Dashboard" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif">
+<rect x="0.5" y="0.5" width="359" height="195" rx="8" fill="#fbfbfa" stroke="#dde2e0"/>
+<path d="M0.5 24 V8.5 a8 8 0 0 1 8 -8 H351.5 a8 8 0 0 1 8 8 V24 Z" fill="#f2f4f3"/><line x1="0" y1="24.5" x2="360" y2="24.5" stroke="#dde2e0"/>
+<circle cx="12" cy="12.5" r="3" fill="#dde2e0"/>
+<circle cx="22" cy="12.5" r="3" fill="#dde2e0"/>
+<circle cx="32" cy="12.5" r="3" fill="#dde2e0"/>
+<rect x="46" y="6" width="302" height="13" rx="3" fill="#fbfbfa" stroke="#dde2e0"/><text x="52" y="15.5" font-size="7" fill="#5c6764" font-family="ui-monospace, SF Mono, Menlo, monospace">supabase.com/partners/catalog</text>
+<text x="12" y="48" font-size="10.5" font-weight="600" fill="#1c2321">Partners building with Supabase</text>
+<rect x="262" y="36" width="86" height="18" rx="5" fill="none" stroke="#dde2e0"/><text x="305" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="#1c2321">Apply as a Partner</text>
+<rect x="12" y="66" width="58" height="7" rx="3" fill="#dde2e0"/>
+<rect x="12" y="78" width="40.599999999999994" height="7" rx="3" fill="#dde2e0"/>
+<rect x="12" y="90" width="49.3" height="7" rx="3" fill="#dde2e0"/>
+<rect x="12" y="102" width="34.8" height="7" rx="3" fill="#dde2e0"/>
+<rect x="12" y="114" width="43.5" height="7" rx="3" fill="#dde2e0"/>
+<rect x="82" y="60" width="130" height="58" rx="6" fill="#f2f4f3" stroke="#dde2e0"/>
+<circle cx="95" cy="73" r="6" fill="#dde2e0"/>
+<rect x="90" y="85" width="79.8" height="5" rx="2.5" fill="#dde2e0"/><rect x="90" y="94" width="102.60000000000001" height="5" rx="2.5" fill="#dde2e0"/>
+<rect x="90" y="103" width="42" height="11" rx="3" fill="none" stroke="#dde2e0"/><text x="94" y="111.5" font-size="7" fill="#5c6764">Category</text>
+<rect x="218" y="60" width="130" height="58" rx="6" fill="#f2f4f3" stroke="#dde2e0"/>
+<circle cx="231" cy="73" r="6" fill="#dde2e0"/>
+<rect x="226" y="85" width="79.8" height="5" rx="2.5" fill="#dde2e0"/><rect x="226" y="94" width="102.60000000000001" height="5" rx="2.5" fill="#dde2e0"/>
+<rect x="226" y="103" width="42" height="11" rx="3" fill="none" stroke="#dde2e0"/><text x="230" y="111.5" font-size="7" fill="#5c6764">Category</text>
+<rect x="82" y="124" width="130" height="58" rx="6" fill="#f2f4f3" stroke="#dde2e0"/>
+<circle cx="95" cy="137" r="6" fill="#dde2e0"/>
+<rect x="90" y="149" width="79.8" height="5" rx="2.5" fill="#dde2e0"/><rect x="90" y="158" width="102.60000000000001" height="5" rx="2.5" fill="#dde2e0"/>
+<rect x="90" y="167" width="42" height="11" rx="3" fill="none" stroke="#dde2e0"/><text x="94" y="175.5" font-size="7" fill="#5c6764">Category</text>
+<rect x="218" y="124" width="130" height="58" rx="6" fill="#f2f4f3" stroke="#dde2e0"/>
+<circle cx="231" cy="137" r="6" fill="#dde2e0"/>
+<rect x="226" y="149" width="79.8" height="5" rx="2.5" fill="#dde2e0"/><rect x="226" y="158" width="102.60000000000001" height="5" rx="2.5" fill="#dde2e0"/>
+<rect x="226" y="167" width="42" height="11" rx="3" fill="none" stroke="#dde2e0"/><text x="230" y="175.5" font-size="7" fill="#5c6764">Category</text>
+</svg>
