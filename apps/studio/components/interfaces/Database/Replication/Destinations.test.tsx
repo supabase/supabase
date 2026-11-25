@@ -656,8 +656,16 @@ describe('regions', () => {
     ).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     fireEvent.click(screen.getByText('View affected regions'))
-    expect(screen.getByText(/Singapore: Cluster unavailable/)).toBeInTheDocument()
-    expect(screen.getByText(/Frankfurt: Cluster unavailable/)).toBeInTheDocument()
+    expect(
+      screen
+        .getAllByRole('listitem')
+        .some((item) => item.textContent === 'Singapore: Cluster unavailable')
+    ).toBe(true)
+    expect(
+      screen
+        .getAllByRole('listitem')
+        .some((item) => item.textContent === 'Frankfurt: Cluster unavailable')
+    ).toBe(true)
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
   })
 
