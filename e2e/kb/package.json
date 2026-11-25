@@ -7,7 +7,7 @@
     "e2e:kb": "playwright test"
   },
   "dependencies": {
-    "@playwright/test": "^1.59.1"
+    "@playwright/test": "^1.65.1"
   },
   "devDependencies": {
     "@types/node": "catalog:"

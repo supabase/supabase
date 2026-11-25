@@ -47,6 +47,10 @@ describe('isChunkLoadError', () => {
       ),
     ],
     ['Safari / WebKit', new TypeError('Importing a module script failed.')],
+    [
+      'Safari / WebKit CORS-denied module',
+      new TypeError('Cross-origin script load denied by Cross-Origin Resource Sharing policy.'),
+    ],
     ['Vite CSS preload', new Error('Unable to preload CSS for /dashboard/assets/a.css')],
     ['webpack JS chunk', new Error('Loading chunk 1234 failed.\n(error: https://x/1234.js)')],
     ['webpack CSS chunk', new Error('Loading CSS chunk 5678 failed.\n(/_next/a.css)')],
@@ -59,6 +63,10 @@ describe('isChunkLoadError', () => {
   test.each([
     ['generic error', new Error('Cannot read properties of undefined')],
     ['network fetch', new TypeError('Failed to fetch')],
+    [
+      'CORS-denied fetch',
+      new TypeError('Origin https://example.com is not allowed by Access-Control-Allow-Origin.'),
+    ],
     ['DOM error', new Error("Failed to execute 'removeChild' on 'Node'")],
     ['string', 'Importing a module script failed.'],
     ['null', null],

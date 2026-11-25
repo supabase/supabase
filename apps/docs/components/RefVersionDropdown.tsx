@@ -1,6 +1,6 @@
 'use client'
 
-import { REFERENCES } from '~/content/navigation.references'
+import { getPrereleaseStage, REFERENCES } from '~/content/navigation.references'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 
@@ -26,11 +27,16 @@ const RevVersionDropdown = ({
 
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
-  const isPrerelease = (version: string) => !!libraryMeta?.meta?.[version]?.prerelease
 
   if (!versions || versions.length <= 1) {
     return null
   }
+
+  const prereleaseVersions = versions.flatMap((version) => {
+    const stage = getPrereleaseStage(library, version)
+    return stage ? [{ version, stage }] : []
+  })
+  const stableVersions = versions.filter((version) => !getPrereleaseStage(library, version))
 
   const onSelectVersion = (version: string) => {
     if (hrefs?.[version]) {
@@ -60,25 +66,45 @@ const RevVersionDropdown = ({
           "
         >
           <span className="text-foreground text-sm layout-v2:text-xs group-hover:text-foreground transition">
-            {currentVersion}.0{isPrerelease(currentVersion) ? ' (prerelease)' : ''}
+            {currentVersion}.0
           </span>
           <ChevronDown size={14} strokeWidth={2} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">
         <DropdownMenuLabel className="text-xs">Stable releases</DropdownMenuLabel>
-        {versions.map((version, index) => (
+        {stableVersions.map((version) => (
           <DropdownMenuItem
             key={version}
             onClick={() => onSelectVersion(version)}
             className="justify-between flex"
           >
             <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
-              Version {version}.0{isPrerelease(version) ? ' (prerelease)' : ''}
+              Version {version}.0
             </span>
-            {index === 0 && <Badge>Latest</Badge>}
+            {version === versions[0] && <Badge>Latest</Badge>}
           </DropdownMenuItem>
         ))}
+        {prereleaseVersions.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Prereleases</DropdownMenuLabel>
+            {prereleaseVersions.map(({ version, stage }) => (
+              <DropdownMenuItem
+                key={version}
+                onClick={() => onSelectVersion(version)}
+                className="justify-between flex"
+              >
+                <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
+                  Version {version}.0
+                </span>
+                <Badge variant="warning" className="capitalize">
+                  {stage}
+                </Badge>
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

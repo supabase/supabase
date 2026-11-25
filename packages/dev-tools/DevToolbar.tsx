@@ -2,7 +2,6 @@
 
 import { useFeatureFlags } from 'common'
 import { Copy, Search, X } from 'lucide-react'
-import Image from 'next/image'
 import {
   useCallback,
   useEffect,
@@ -35,6 +34,7 @@ import {
 } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
+import { DevToolbarLogo } from './DevToolbarLogo'
 import type { DevTelemetryEvent, ExtraTab } from './types'
 import {
   CC_ORIGINALS_KEY,
@@ -391,18 +391,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
               View telemetry events and feature flags for local development
             </SheetDescription>
             <div className="flex items-center px-6">
-              <Image
-                src="/img/logo-pixel-small-light.png"
-                alt="Dev Toolbar"
-                width={16}
-                height={16}
-                style={{
-                  filter:
-                    'brightness(0) saturate(100%) invert(72%) sepia(57%) saturate(431%) hue-rotate(108deg) brightness(95%) contrast(91%)',
-                }}
-                aria-hidden="true"
-                className="shrink-0 mr-4"
-              />
+              <DevToolbarLogo className="shrink-0 mr-4" />
               <TabsList className="flex gap-x-4 rounded-none border-none! h-auto">
                 <TabsTrigger value="events" className="text-xs py-3 border-b font-mono uppercase">
                   Events ({filteredEvents.length})

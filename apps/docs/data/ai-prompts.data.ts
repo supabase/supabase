@@ -149,7 +149,7 @@ database.new. Then:
 2. Install Laravel Breeze with \`composer require laravel/breeze --dev &&
    php artisan breeze:install\`.
 3. Copy the Session Pooler connection string from the Supabase Connect panel
-   and set \`DB_URL\` in \`.env\`.
+   and set \`DB_URL\` in \`.env\`. Also set \`DB_SSLMODE=require\`.
 4. Set \`search_path\` to a custom schema (e.g. \`laravel\`) in
    \`config/database.php\`.
 5. Run \`php artisan migrate\` to apply database migrations.

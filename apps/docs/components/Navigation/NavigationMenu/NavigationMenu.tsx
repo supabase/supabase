@@ -39,6 +39,7 @@ enum MenuId {
   RefPythonV2 = 'reference_python_v2',
   RefSwiftV1 = 'reference_swift_v1',
   RefSwiftV2 = 'reference_swift_v2',
+  RefSwiftV3 = 'reference_swift_v3',
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
   RefKotlinV3 = 'reference_kotlin_v3',
@@ -209,6 +210,11 @@ const menus: Menu[] = [
     id: MenuId.RefSwiftV2,
     type: 'reference',
     path: '/reference/swift',
+  },
+  {
+    id: MenuId.RefSwiftV3,
+    type: 'reference',
+    path: '/reference/swift/v3',
   },
   {
     id: MenuId.RefKotlinV1,

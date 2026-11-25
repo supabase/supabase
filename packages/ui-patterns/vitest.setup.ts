@@ -30,8 +30,6 @@ global.ResizeObserver = vi.fn().mockImplementation(function () {
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = vi.fn()
 
-vi.mock('next/navigation', () => require('next-router-mock'))
-
 afterEach(() => {
   cleanup()
 })

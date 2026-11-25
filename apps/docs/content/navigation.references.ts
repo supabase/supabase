@@ -120,12 +120,19 @@ export const REFERENCES = {
     name: 'Swift',
     library: 'supabase-swift',
     libPath: 'swift',
-    versions: ['v2', 'v1'],
+    // `versions[0]` is the default. A prerelease version goes after it, so the
+    // stable version keeps the `/reference/swift` URL.
+    versions: ['v2', 'v3', 'v1'],
     icon: 'reference-swift',
     meta: {
       v2: {
         libId: 'reference_swift_v2',
         specFile: 'supabase_swift_v2',
+      },
+      v3: {
+        libId: 'reference_swift_v3',
+        specFile: 'supabase_swift_v3',
+        prerelease: 'alpha',
       },
       v1: {
         libId: 'reference_swift_v1',
@@ -242,6 +249,15 @@ export const REFERENCES = {
 export const clientSdkIds = Object.keys(REFERENCES).filter(
   (reference) => REFERENCES[reference].type === 'sdk' && REFERENCES[reference].enabled !== false
 )
+
+/**
+ * Returns the prerelease stage (for example `alpha`) of an SDK version, or
+ * `undefined` for a stable version.
+ */
+export function getPrereleaseStage(sdkId: string, version: string): string | undefined {
+  const versionMeta = REFERENCES[sdkId]?.meta?.[version]
+  return versionMeta && 'prerelease' in versionMeta ? versionMeta.prerelease : undefined
+}
 
 export const selfHostingServices = Object.keys(REFERENCES).filter(
   (reference) => REFERENCES[reference].type === 'self-hosting'

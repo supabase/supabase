@@ -174,7 +174,7 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
               variant={isRail ? 'text' : 'outline'}
               rounded={!isRail}
               className={cn(
-                isRail ? 'size-8 p-0' : 'px-1 w-7 h-7',
+                isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
                 'text-foreground-light',
                 '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
                 'motion-reduce:[transition-duration:150ms,1ms,300ms]',
@@ -206,7 +206,7 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
               variant={isRail ? 'text' : 'outline'}
               rounded={!isRail}
               className={cn(
-                isRail ? 'size-8 p-0' : 'px-1 w-7 h-7',
+                isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
                 'text-foreground-light',
                 '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
                 'motion-reduce:[transition-duration:150ms,1ms,300ms]',
@@ -238,7 +238,8 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
                 asChild
                 variant="text"
                 className={cn(
-                  'size-8 p-0 text-foreground-light transition-opacity',
+                  'size-8 p-0 text-foreground-light transition-opacity hover:bg-transparent',
+                  'hover:text-foreground focus-visible:text-foreground',
                   state.type === StateType.Followup && 'opacity-0 invisible'
                 )}
               >

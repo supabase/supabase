@@ -345,6 +345,31 @@ describe('buildPropertyItems', () => {
     expect(groupItem?.value).toBe('__new_group__')
   })
 
+  it('places "New filter group" after the freeform item and before the properties when positioned at the top', () => {
+    const freeformDefaultProperty = properties[0]
+    const values = (newGroupPosition: 'top' | 'bottom') =>
+      buildPropertyItems({
+        filterProperties: properties,
+        inputValue: 'x',
+        supportsOperators: true,
+        newGroupPosition,
+        freeformDefaultProperty,
+      }).map((item) => item.value)
+
+    const top = values('top')
+    expect(top.slice(0, 2)).toEqual(['__freeform_search__', '__new_group__'])
+    expect(values('bottom').at(-1)).toBe('__new_group__')
+  })
+
+  it('defaults "New filter group" to the bottom of the menu', () => {
+    const items = buildPropertyItems({
+      filterProperties: properties,
+      inputValue: '',
+      supportsOperators: true,
+    })
+    expect(items.at(-1)?.value).toBe('__new_group__')
+  })
+
   it('does not include "New filter group" when supportsOperators is false', () => {
     const items = buildPropertyItems({
       filterProperties: properties,

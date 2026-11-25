@@ -2,13 +2,16 @@ import { DownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -48,16 +51,19 @@ export const SecurityQuestionnaire = () => {
   }
 
   return (
-    <ScaffoldSection className="py-12">
-      <ScaffoldSectionDetail>
-        <h4 className="mb-5">Standard Security Questionnaire</h4>
-        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
-          <p>
-            Organizations on Team Plan or above have access to our standard security questionnaire.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+    <PageSection orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Standard Security Questionnaire</PageSectionTitle>
+          <PageSectionDescription className="space-y-2">
+            <p>
+              Organizations on Team Plan or above have access to our standard security
+              questionnaire.
+            </p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         {isLoadingPermissions || isLoadingEntitlement ? (
           <div className="@lg:flex items-center justify-center h-full">
             <ShimmeringLoader className="w-24" />
@@ -81,7 +87,7 @@ export const SecurityQuestionnaire = () => {
             </Button>
           </div>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }

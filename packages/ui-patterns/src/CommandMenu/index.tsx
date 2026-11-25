@@ -15,7 +15,6 @@ export * from './api/hooks/commandsHooks'
 export * from './api/hooks/pagesHooks'
 export * from './api/hooks/queryHooks'
 export { useCommandFilterState } from './api/hooks/useCommandFilterState'
-export { useCrossCompatRouter } from './api/hooks/useCrossCompatRouter'
 export {
   useCommandMenuOpenedTelemetry,
   useCommandMenuTelemetry,
