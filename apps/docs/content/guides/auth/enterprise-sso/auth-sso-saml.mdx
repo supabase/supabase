@@ -94,9 +94,9 @@ You can use information about the SSO identity provider in Row Level Security po
 Here are some commonly used statements to extract SSO related information from the user's JWT:
 
 - `auth.jwt()#>>'{amr,0,method}'`
-  Returns the name of the last method used to verify the identity of this user. With SAML SSO this is `sso/saml`.
-- `auth.jwt()#>>'{amr,0,provider}'`
-  Returns the UUID of the SSO identity provider used by the user to sign in.
+  Returns the name of the most recent method used to verify the identity of this user. After a SAML SSO sign-in this is `sso/saml`. After an MFA step it is the MFA method, such as `totp`.
+- `auth.jwt()->'amr'`
+  Returns the authentication methods for the session. Find the entry whose `method` is `sso/saml` and read its `provider` to get the UUID of the SSO identity provider used to sign in. The policy example below shows the full lookup.
 - `auth.jwt()#>>'{user_metadata,iss}'`
   Returns the identity provider's SAML 2.0 `EntityID`
 
@@ -121,16 +121,29 @@ create table organization_settings (
   -- billing plan (paid, Free, Enterprise)
   billing_plan text
 );
+
+alter table organization_settings enable row level security;
 ```
 
-You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management:
+You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management. Restrictive policies only filter rows that a permissive policy allows, so the example adds a permissive `SELECT` policy and keeps the restrictive policy to limit rows to the user's SSO identity provider:
 
 ```sql
+CREATE POLICY "Authenticated can view organization settings."
+  ON organization_settings
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
 CREATE POLICY "View organization settings."
   ON organization_settings
   AS RESTRICTIVE
   USING (
-    sso_provider_id = (select auth.jwt()#>>'{amr,0,provider}')
+    sso_provider_id = (
+      select (entry->>'provider')::uuid
+      from jsonb_array_elements(coalesce(auth.jwt()->'amr', '[]'::jsonb)) as entry
+      where entry->>'method' = 'sso/saml'
+      limit 1
+    )
   );
 ```
 

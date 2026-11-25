@@ -9,9 +9,10 @@ import {
   SEARCH_PARAMS_PARSER,
 } from './UnifiedLogs.constants'
 import {
+  isLogsFilterGroupValue,
+  type LogsFilter,
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
-  type LogsFilter,
 } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
 import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
@@ -66,6 +67,23 @@ export function getLogTypeVisibility(
 
 export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
   !offeredFilters || offeredFilters.includes(name)
+
+/**
+ * Whether a table column filter belongs in the URL for a view that only offers some filters.
+ * Built-in filter fields must be offered; anything else (log attributes) always is. A group is
+ * offered only when every column in it is, since dropping one condition would narrow its OR.
+ */
+export const isOfferedColumnFilter = (
+  { id, value }: { id: string; value: unknown },
+  builtInFilterNames: readonly string[],
+  offeredFilters?: readonly string[]
+): boolean => {
+  const isOfferedColumn = (column: string) =>
+    !builtInFilterNames.includes(column) || isOfferedFilter(column, offeredFilters)
+  if (isLogsFilterGroupValue(value))
+    return value.filters.every(({ column }) => isOfferedColumn(column))
+  return isOfferedColumn(id)
+}
 
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 

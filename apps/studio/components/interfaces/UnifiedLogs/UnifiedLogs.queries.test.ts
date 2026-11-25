@@ -175,6 +175,46 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
+    describe('filter groups', () => {
+      const GROUP = 'group:or:status:neq:200,pathname:neq:%2Fhealth'
+
+      it('joins group conditions with OR inside one parenthesized clause', () => {
+        const sql = getUnifiedLogsQuery(withFilters(GROUP))
+        expect(sql).toMatch(
+          /END\) NOT IN \('200'\) OR \(multiIf\([\s\S]*?\)\) NOT IN \('\/health'\)\)/
+        )
+      })
+
+      it('ANDs the group with flat filters instead of folding it into them', () => {
+        const sql = getUnifiedLogsQuery(withFilters('method:eq:GET', GROUP))
+        const methodIndex = sql.indexOf(`) IN ('GET')`)
+        const groupIndex = sql.indexOf(`NOT IN ('200')`)
+        expect(methodIndex).toBeGreaterThan(-1)
+        expect(groupIndex).toBeGreaterThan(methodIndex)
+        expect(sql.slice(methodIndex, groupIndex)).toContain(' AND ')
+      })
+
+      it('applies groups to the count, chart and facet queries', () => {
+        const search = withFilters(GROUP)
+        expect(getLogsCountQuery(search)).toContain(`NOT IN ('200')`)
+        expect(getLogsChartQuery(search)).toContain(`NOT IN ('200')`)
+        expect(getFacetCountQuery({ search, facet: 'level' })).toContain(`NOT IN ('200')`)
+      })
+
+      it('drops a group that has a top-level-only column rather than narrowing it', () => {
+        const sql = getUnifiedLogsQuery(withFilters('group:or:log_type:eq:auth,status:neq:200'))
+        expect(sql).not.toContain(`NOT IN ('200')`)
+      })
+
+      it('escapes values so they cannot break out of the string literal', () => {
+        const sql = getUnifiedLogsQuery(
+          withFilters(`group:or:status:eq:${encodeURIComponent(`' OR 1=1 --`)}`)
+        )
+        // The quote is doubled, so the payload stays inside the string literal.
+        expect(sql).toContain(`IN (''' OR 1=1 --')`)
+      })
+    })
+
     const pathExpr = `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
 
     it.each([

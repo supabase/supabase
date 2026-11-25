@@ -62,6 +62,7 @@ import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
+  countLogsFilterUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import {
@@ -81,6 +82,7 @@ import {
   getLogRowClassName,
   getLogTypeVisibility,
   getUniqueLogRows,
+  isOfferedColumnFilter,
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
@@ -524,7 +526,7 @@ export const UnifiedLogs = ({
     [...PRESET_VIEWS, ...savedViews].find((view) => view.id === activeViewId) ?? null
   const isActiveViewPreset = isPresetViewId(activeViewId)
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
-  const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
+  const activeFilterCount = countLogsFilterUrlParams(search.filter)
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
   const filterCombinationKey = getFilterCombinationKey(search.filter)
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
@@ -659,10 +661,9 @@ export const UnifiedLogs = ({
   }
 
   const applyFilterSearch = () => {
-    const offeredColumnFilters = columnFilters.filter(
-      ({ id }) =>
-        !defaultFilterFields.some((field) => field.value === id) ||
-        isOfferedFilter(id, offeredFilters)
+    const builtInFilterNames = defaultFilterFields.map((field) => field.value)
+    const offeredColumnFilters = columnFilters.filter((columnFilter) =>
+      isOfferedColumnFilter(columnFilter, builtInFilterNames, offeredFilters)
     )
     const update = buildFilterSearchUpdate(offeredColumnFilters, filterFields)
     if (Array.isArray(update.filter)) {

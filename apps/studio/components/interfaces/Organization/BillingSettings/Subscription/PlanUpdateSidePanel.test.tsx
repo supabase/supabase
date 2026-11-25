@@ -10,6 +10,8 @@ import { customRender } from '@/tests/lib/custom-render'
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 const mockFlags = vi.hoisted(() => ({}) as Record<string, boolean>)
+const mockTrack = vi.hoisted(() => vi.fn())
+const mockSubscriptionPlan = vi.hoisted(() => ({ id: 'free', name: 'Free' }))
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -60,7 +62,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({
-  useTrack: () => vi.fn(),
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
@@ -82,7 +84,7 @@ vi.mock('@/data/organizations/organization-query', () => ({
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
+    data: { plan: { ...mockSubscriptionPlan }, billing_via_partner: false },
     isSuccess: true,
   }),
 }))
@@ -131,7 +133,31 @@ vi.mock('./MembersExceedLimitModal', () => ({
 }))
 
 vi.mock('./SubscriptionPlanUpdateView', () => ({
-  SubscriptionPlanUpdateView: () => <div data-testid="plan-update-view" />,
+  SubscriptionPlanUpdateView: ({
+    onSuccess,
+  }: {
+    onSuccess: (result: { changeType: 'upgrade' }) => void
+  }) => (
+    <div data-testid="plan-update-view">
+      <button tabIndex={0} onClick={() => onSuccess({ changeType: 'upgrade' })}>
+        Complete upgrade
+      </button>
+    </div>
+  ),
+}))
+
+vi.mock('./PlanUpgradeSuccessView', () => ({
+  PlanUpgradeSuccessView: ({
+    planId,
+    previousPlanId,
+  }: {
+    planId: string
+    previousPlanId?: string
+  }) => (
+    <div data-testid="plan-upgrade-success">
+      {previousPlanId} to {planId}
+    </div>
+  ),
 }))
 
 vi.mock('./SubscriptionPlanUpdateDialog', () => ({
@@ -141,6 +167,8 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
     for (const key of Object.keys(mockFlags)) delete mockFlags[key]
+    mockTrack.mockClear()
+    Object.assign(mockSubscriptionPlan, { id: 'free', name: 'Free' })
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -262,6 +290,24 @@ describe('PlanUpdateSidePanel', () => {
     })
   })
 
+  it('sends the panel opened event once, after the organization has loaded', () => {
+    mockSelectedOrganization.mockReturnValue(undefined)
+    const { rerender } = render(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({ slug: 'test-org', billing_partner: null })
+    )
+    rerender(<PlanUpdateSidePanel />)
+    rerender(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('studio_pricing_side_panel_opened', {
+      currentPlan: 'Free',
+    })
+  })
+
   describe('plan change surface', () => {
     beforeEach(() => {
       mockSelectedOrganization.mockReturnValue(
@@ -288,6 +334,28 @@ describe('PlanUpdateSidePanel', () => {
 
       expect(screen.getByTestId('plan-update-view')).toBeInTheDocument()
       expect(screen.queryByTestId('plan-update-dialog')).not.toBeInTheDocument()
+    })
+
+    it('remembers the plan from before the upgrade after the subscription refetches', async () => {
+      mockFlags.billingPlanUpdateRedesign = true
+      const { rerender } = render(<PlanUpdateSidePanel />)
+      await userEvent.click(screen.getByRole('button', { name: 'Upgrade to Pro' }))
+
+      // The upgrade refetches the subscription before the success screen opens.
+      Object.assign(mockSubscriptionPlan, { id: 'pro', name: 'Pro' })
+      rerender(<PlanUpdateSidePanel />)
+      await userEvent.click(screen.getByRole('button', { name: 'Complete upgrade' }))
+
+      expect(await screen.findByTestId('plan-upgrade-success')).toHaveTextContent('free to pro')
+    })
+
+    it('reads the previous plan from the URL when the success screen loads fresh', async () => {
+      Object.assign(mockSubscriptionPlan, { id: 'team', name: 'Team' })
+      customRender(<PlanUpdateSidePanel />, {
+        nuqs: { searchParams: '?panel=planUpgraded&upgradedFrom=free' },
+      })
+
+      expect(await screen.findByTestId('plan-upgrade-success')).toHaveTextContent('free to team')
     })
   })
 })

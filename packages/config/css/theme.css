@@ -31,6 +31,7 @@
   --color-control-raised: var(--control-raised);
   /* --control aliases --control-raised. Do not add --color-control — it would
      collide with border-control and the legacy bg-control (accent) utility. */
+  --color-success: var(--color-green-1100);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);

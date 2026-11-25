@@ -224,6 +224,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      icon: 'reference',
       menuItems: [
         [
           {

@@ -1,7 +1,6 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -14,11 +13,11 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 import { PlanChangeBill } from './PlanChangeBill'
 import { PlanChangeNotes } from './PlanChangeNotes'
 import {
-  formatRoundedCurrency,
   getDueTodayBreakdown,
   getPausedProjects,
   getPlanChangeSummary,
 } from './PlanChangeSummary.utils'
+import { PlanMinusIcon } from './PlanIcons'
 import { FullScreenPanel } from './PlanUpdatePanelShell'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -26,6 +25,7 @@ import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Pa
 import {
   billingPartnerLabel,
   getPlanChangeType,
+  type PlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
@@ -37,6 +37,8 @@ import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subsc
 import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -44,7 +46,7 @@ interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
   /** Called after the subscription update succeeds, in addition to onClose. */
-  onSuccess?: () => void
+  onSuccess?: (result: { changeType: PlanChangeType }) => void
   planMeta?: OrgPlan | null
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
@@ -56,6 +58,8 @@ interface Props {
   isBillingPreviewPending?: boolean
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
+  /** The `source` query param the pricing panel was opened with, sent on telemetry events. */
+  origin?: string
 }
 
 export const SubscriptionPlanUpdateView = ({
@@ -71,7 +75,9 @@ export const SubscriptionPlanUpdateView = ({
   isBillingPreviewPending = false,
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
+  origin,
 }: Props) => {
+  const track = useTrack()
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -133,13 +139,27 @@ export const SubscriptionPlanUpdateView = ({
     [selectedTier]
   )
 
+  const pausedProjects = useMemo(() => getPausedProjects(projects), [projects])
+
+  const planChangeProperties = {
+    selectedPlan: subscriptionPlanMeta?.name,
+    currentPlan: subscription?.plan?.name,
+    origin,
+    pausedProjectCount: pausedProjects.length,
+  }
+
+  const trackDocsLinkClick = (docsLink: 'compute' | 'project_transfer') =>
+    track('studio_pricing_plan_change_docs_link_clicked', { ...planChangeProperties, docsLink })
+
   const onSuccessfulPlanChange = () => {
+    track('studio_pricing_plan_change_completed', planChangeProperties)
     setPaymentConfirmationLoading(false)
-    toast.success(
-      `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
-    )
+    // Upgrades land on the post-upgrade screen, which confirms the change itself.
+    if (changeType !== 'upgrade') {
+      toast.success(`Successfully downgraded subscription to ${subscriptionPlanMeta?.name}!`)
+    }
     onClose()
-    onSuccess?.()
+    onSuccess?.({ changeType })
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
@@ -177,10 +197,21 @@ export const SubscriptionPlanUpdateView = ({
     setPaymentIntentSecret('')
 
     if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
-      await confirmPendingSubscriptionChange({
-        slug: selectedOrganization?.slug,
-        payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-      })
+      await confirmPendingSubscriptionChange(
+        {
+          slug: selectedOrganization?.slug,
+          payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
+        },
+        {
+          // A 202 means the payment went through and the plan is still syncing. The mutation skips
+          // its onSuccess for that response, so the completion is tracked here.
+          onSuccess: (data) => {
+            if (data && 'message' in data) {
+              track('studio_pricing_plan_change_completed', planChangeProperties)
+            }
+          },
+        }
+      )
     } else {
       setSubmittedState(undefined)
       setPaymentConfirmationLoading(false)
@@ -194,6 +225,7 @@ export const SubscriptionPlanUpdateView = ({
     if (!selectedTier) return console.error('Selected plan is required')
     if (!subscriptionPreviewInitialized) return console.error('Plan preview is required')
 
+    track('studio_pricing_plan_change_confirm_clicked', planChangeProperties)
     setPaymentConfirmationLoading(true)
 
     if (paymentMethodSelectionRef.current) {
@@ -255,11 +287,12 @@ export const SubscriptionPlanUpdateView = ({
   )
 
   const dueToday = useMemo(
-    () => getDueTodayBreakdown(subscriptionPreview, { planAmount: summary.planAmount }),
+    () =>
+      getDueTodayBreakdown(subscriptionPreview, {
+        planAmount: summary.planAmount,
+      }),
     [subscriptionPreview, summary.planAmount]
   )
-
-  const pausedProjects = useMemo(() => getPausedProjects(projects), [projects])
 
   // Features the org gives up, shown in place of the new plan's benefits on a downgrade.
   const featuresToLose = useMemo(() => {
@@ -288,7 +321,7 @@ export const SubscriptionPlanUpdateView = ({
   const hasPaymentDueToday = subscriptionPreviewInitialized && !isDowngrade && dueToday.dueToday > 0
   const confirmLabel = isDowngrade
     ? `Downgrade to ${newPlanName}`
-    : `Upgrade to ${newPlanName}${hasPaymentDueToday ? ` · pay ${formatRoundedCurrency(dueToday.dueToday)} today` : ''}`
+    : `Upgrade to ${newPlanName}${hasPaymentDueToday ? ` · pay ${formatCurrency(dueToday.dueToday)} today` : ''}`
 
   return (
     <FullScreenPanel
@@ -337,15 +370,25 @@ export const SubscriptionPlanUpdateView = ({
                   isCondensed={isCondensed}
                   currentPlan={
                     isCondensed && currentPlanName
-                      ? { name: currentPlanName, price: currentPlanMeta?.price ?? 0 }
+                      ? {
+                          name: currentPlanName,
+                          price: currentPlanMeta?.price ?? 0,
+                        }
                       : undefined
                   }
+                  onHourlyBillingOpen={() =>
+                    track('studio_pricing_compute_billing_explainer_opened', planChangeProperties)
+                  }
+                  onDocsLinkClick={trackDocsLinkClick}
                 />
               </div>
             )}
 
             {!isCondensed && subscriptionPreviewInitialized && (
-              <PlanChangeNotes exampleProjectRef={exampleProjectRef} />
+              <PlanChangeNotes
+                exampleProjectRef={exampleProjectRef}
+                onProjectTransferDocsClick={() => trackDocsLinkClick('project_transfer')}
+              />
             )}
 
             {billingViaPartner && (
@@ -393,17 +436,12 @@ export const SubscriptionPlanUpdateView = ({
                   {featuresToLose.map((feature) => (
                     <li
                       key={typeof feature === 'string' ? feature : feature[0]}
-                      className="flex items-start gap-3"
+                      className="flex items-start text-sm text-foreground-light"
                     >
-                      <InfoIcon
-                        size={14}
-                        strokeWidth={3}
-                        className="mt-1 shrink-0 text-warning-600"
-                        aria-hidden="true"
-                      />
-                      <p className="text-sm text-foreground-light">
-                        {typeof feature === 'string' ? feature : feature[0]}
-                      </p>
+                      <div className="flex h-lh w-6 shrink-0 items-center">
+                        <PlanMinusIcon className="size-5 -ml-0.5" />
+                      </div>
+                      <span>{typeof feature === 'string' ? feature : feature[0]}</span>
                     </li>
                   ))}
                 </ul>

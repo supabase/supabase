@@ -7,10 +7,6 @@ import { CommandMenuList } from './CommandMenuList'
 import { CommandProvider } from './CommandProvider'
 import { useRegisterCommands } from './hooks/commandsHooks'
 
-vi.mock('next/compat/router', () => ({
-  useRouter: () => null,
-}))
-
 const SECTION = 'Related resources'
 const FORCE_MOUNTED_SECTION = 'Tables'
 

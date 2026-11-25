@@ -568,24 +568,6 @@ export interface OnboardingSurveySubmitFailedEvent {
 }
 
 /**
- * Signed-in user was shown the new organization form in either arm of the
- * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
- * profile loads and the flags for that user have resolved.
- *
- * @group Events
- * @source studio
- * @page new
- */
-export interface OnboardingSurveyPlacementExperimentExposedEvent {
-  action: 'onboarding_survey_placement_experiment_exposed'
-  properties: {
-    experiment_id: 'onboarding_survey_placement'
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'org_form'
-  }
-}
-
-/**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
  * after the org and create-project permission have resolved, so it tracks the form
@@ -2059,6 +2041,14 @@ export interface StudioPricingPlanCtaClickedEvent {
      * The plan type the org is currently on.
      */
     currentPlan?: string
+    /**
+     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
+     */
+    planUpdateRedesignEnabled: boolean
+    /**
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+     */
+    origin?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -2079,6 +2069,82 @@ export interface StudioPricingSidePanelOpenedEvent {
      */
     origin?: string
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Properties shared by the events on the plan change screen that follows a plan CTA click.
+ */
+export interface StudioPricingPlanChangeProperties {
+  /**
+   * The plan type being changed to, same values as studio_pricing_plan_cta_clicked.
+   */
+  selectedPlan?: string
+  /**
+   * The plan type the org is currently on.
+   */
+  currentPlan?: string
+  /**
+   * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+   */
+  origin?: string
+  /**
+   * Paused projects listed on the plan change bill. Counts the first page of org projects only.
+   */
+  pausedProjectCount: number
+}
+
+/**
+ * User expanded the "Billed every hour, even when idle" explainer on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingComputeBillingExplainerOpenedEvent {
+  action: 'studio_pricing_compute_billing_explainer_opened'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked a docs link on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeDocsLinkClickedEvent {
+  action: 'studio_pricing_plan_change_docs_link_clicked'
+  properties: StudioPricingPlanChangeProperties & {
+    docsLink: 'compute' | 'project_transfer'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the confirm button on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeConfirmClickedEvent {
+  action: 'studio_pricing_plan_change_confirm_clicked'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * The plan change submitted from the plan change screen in studio succeeded, including any payment confirmation step.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeCompletedEvent {
+  action: 'studio_pricing_plan_change_completed'
+  properties: StudioPricingPlanChangeProperties
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -4246,6 +4312,25 @@ export interface FreeMicroUpgradeBannerCtaClickedEvent {
 }
 
 /**
+ * User confirmed moving a Nano project to Micro on the screen shown after upgrading the
+ * organization to a paid plan. Starts the compute change, which restarts the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /org/{slug}/billing?panel=planUpgraded
+ */
+export interface PlanUpgradedMicroComputeUpgradeSubmittedEvent {
+  action: 'plan_upgraded_micro_compute_upgrade_submitted'
+  properties: {
+    /** The paid plan the organization just upgraded to. */
+    planId: 'pro' | 'team'
+    /** Projects on the screen that can still move to Micro, including the confirmed one. */
+    nanoProjectCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -4866,6 +4951,109 @@ export interface RecoveryCodesDownloadClickedEvent {
 }
 
 /**
+ * Kind of database schema, without the schema name.
+ * `public` is the public schema, `protected` is a schema managed by Supabase
+ * (internal or used by a foreign data wrapper), `custom` is any other schema.
+ */
+export type DatabaseSchemaType = 'public' | 'protected' | 'custom'
+
+/**
+ * User selected a schema in a database schema selector.
+ *
+ * @group Events
+ * @source Studio schema selector (SchemaSelector), when the user picks a schema
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaSelectorUpdatedEvent {
+  action: 'database_schema_selector_updated'
+  properties: {
+    /** Kind of the selected schema */
+    schemaType: DatabaseSchemaType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table in the Find table selector of the schema visualizer.
+ * Fires for selections opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar, Find table result
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerFindTableClickedEvent {
+  action: 'database_schema_visualizer_find_table_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied something from the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar (Copy as SQL, Copy as Markdown, or their keyboard shortcuts), or a table or column menu on the graph (Copy name, Copy as SQL, Copy as Markdown)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerCopiedEvent {
+  action: 'database_schema_visualizer_copied'
+  properties: {
+    /** What was copied: the whole schema, one table, or a name */
+    content:
+      | 'schema_sql'
+      | 'schema_markdown'
+      | 'table_name'
+      | 'table_sql'
+      | 'table_markdown'
+      | 'column_name'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started a download of the schema visualizer graph as an image.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar export menu (Download as PNG or SVG), or their keyboard shortcuts
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerImageDownloadClickedEvent {
+  action: 'database_schema_visualizer_image_download_clicked'
+  properties: {
+    /** Image format of the download */
+    format: 'png' | 'svg'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed Auto layout in the schema visualizer.
+ * Fires for dialogs opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer Auto layout dialog, Apply button
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerAutoLayoutAppliedEvent {
+  action: 'database_schema_visualizer_auto_layout_applied'
+  groups: TelemetryGroups
+}
+
+/**
+ * User chose an edit action in a table or column menu of the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer table menu (Edit table) or column menu (Edit column)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
+  action: 'database_schema_visualizer_node_menu_clicked'
+  properties: {
+    /** Which edit action the user chose */
+    action: 'edit_table' | 'edit_column'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -4875,6 +5063,12 @@ export type TelemetryEvent =
   | AccountRecoveryReminderClosedEvent
   | RecoveryCodesCopiedEvent
   | RecoveryCodesDownloadClickedEvent
+  | DatabaseSchemaSelectorUpdatedEvent
+  | DatabaseSchemaVisualizerFindTableClickedEvent
+  | DatabaseSchemaVisualizerCopiedEvent
+  | DatabaseSchemaVisualizerImageDownloadClickedEvent
+  | DatabaseSchemaVisualizerAutoLayoutAppliedEvent
+  | DatabaseSchemaVisualizerNodeMenuClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4907,7 +5101,6 @@ export type TelemetryEvent =
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent
-  | OnboardingSurveyPlacementExperimentExposedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
@@ -5000,6 +5193,10 @@ export type TelemetryEvent =
   | StudioBillingDowngradeBlockedModalOpenedEvent
   | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
+  | StudioPricingComputeBillingExplainerOpenedEvent
+  | StudioPricingPlanChangeDocsLinkClickedEvent
+  | StudioPricingPlanChangeConfirmClickedEvent
+  | StudioPricingPlanChangeCompletedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
@@ -5105,6 +5302,7 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | PlanUpgradedMicroComputeUpgradeSubmittedEvent
   | UpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent

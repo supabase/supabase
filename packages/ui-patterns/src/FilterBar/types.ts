@@ -82,6 +82,8 @@ export function isGroup(condition: FilterCondition | FilterGroup): condition is 
   return 'logicalOperator' in condition
 }
 
+export type NewGroupPosition = 'top' | 'bottom'
+
 export type ConditionPath = number[]
 
 export type FilterBarAction = {
