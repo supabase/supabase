@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import { useQueries, type UseQueryResult } from '@tanstack/react-query'
 import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
@@ -15,7 +17,6 @@ import {
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
-import '@xyflow/react/dist/style.css'
 
 export const ReplicationDiagram = () => {
   return (

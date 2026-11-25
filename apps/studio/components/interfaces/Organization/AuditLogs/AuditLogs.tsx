@@ -20,6 +20,8 @@ import {
   WarningIcon,
 } from 'ui'
 import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
@@ -44,7 +46,6 @@ import {
   parseTimeRange,
   serializeTimeRange,
 } from '@/components/interfaces/Settings/Logs/Logs.timeRange'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -250,8 +251,8 @@ export const AuditLogs = () => {
 
   if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainer className="px-6 xl:px-10">
-        <ScaffoldSection isFullWidth>
+      <PageContainer>
+        <PageSection>
           <UpgradeToPro
             plan="Team"
             source="organizationAuditLogs"
@@ -259,14 +260,14 @@ export const AuditLogs = () => {
             secondaryText="Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your organization."
             featureProposition="enable audit logs"
           />
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection>
+      </PageContainer>
     )
   }
 
   return (
-    <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
-      <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
+    <PageContainer size="full" className="px-0 xl:px-0 h-full flex flex-col">
+      <PageSection className="pt-6 last:pb-0 flex-1 min-h-0">
         <div className="flex flex-col h-full min-h-0">
           {shouldShowLoadingState && (
             <div className={cn(CONTENT_PADDING, 'space-y-2')}>
@@ -374,7 +375,7 @@ export const AuditLogs = () => {
             </>
           )}
         </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

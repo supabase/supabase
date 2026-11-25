@@ -21,7 +21,6 @@ import {
   withTopicParam,
   type GuideSummary,
 } from '../lib/guides'
-import { bindRevealOnce, REVEAL_GROUP_CLASS, REVEAL_ITEM_CLASS, revealStyle } from '../lib/reveal'
 import { FORMAT_TOPICS, isKnownTopic, TOPICS, type Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
 
@@ -292,19 +291,17 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
   }
 
   return (
-    <ul ref={bindRevealOnce} className={cn('m-0 flex list-none flex-col p-0', REVEAL_GROUP_CLASS)}>
-      {guides.map((guide, index) => {
+    <ul className="m-0 flex list-none flex-col p-0">
+      {guides.map((guide) => {
         const externalHost = getExternalHost(guide.href)
         return (
           <li
             // guide and troubleshooting slugs can be the same. hrefs are unique
             key={guide.href}
-            style={revealStyle(index % PAGE_SIZE)}
             className={cn(
               'border-b border-dashed border-muted last:border-b-0 transition-colors',
               'hover:border-transparent has-[+li:hover]:border-transparent',
-              'has-[:focus-visible]:border-transparent has-[+li_:focus-visible]:border-transparent',
-              REVEAL_ITEM_CLASS
+              'has-[:focus-visible]:border-transparent has-[+li_:focus-visible]:border-transparent'
             )}
           >
             <a

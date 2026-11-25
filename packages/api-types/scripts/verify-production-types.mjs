@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process'
 import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
@@ -121,7 +121,7 @@ export async function reportTypeDifferences(
 }
 
 // Fetches the given OpenAPI specifications and generates types for them into
-// `generatedTypesDirectory`, formatted with the repository's Prettier config. Shared by
+// `generatedTypesDirectory`, formatted with the repository's oxfmt config. Shared by
 // `verifyProductionTypes` (which generates into a throwaway directory to diff against the
 // committed types) and `generate-production-types.mjs` (which generates directly into the
 // committed types directory).
@@ -168,23 +168,18 @@ export async function generateTypes(
     { cwd: packageDirectory }
   )
 
-  // Prettier resolves its config from the formatted file's location. The generated files live
+  // oxfmt resolves its config from the formatted file's location. The generated files live
   // in a temporary directory outside the repository, so pass the repository config explicitly
-  // or they are formatted with Prettier's defaults and never match the committed files.
-  const { stdout: prettierConfigPath } = await runImpl(
-    'pnpm',
-    ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
-    { cwd: packageDirectory }
-  )
+  // or they are formatted with oxfmt's defaults and never match the committed files.
+  const oxfmtConfigPath = resolve(packageDirectory, '../../.oxfmtrc.jsonc')
 
   await runImpl(
     'pnpm',
     [
       'exec',
-      'prettier',
+      'oxfmt',
       '--config',
-      prettierConfigPath.trim(),
-      '--write',
+      oxfmtConfigPath,
       ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
       join(generatedTypesDirectory, FGA_REQUIREMENTS_FILENAME),
     ],
