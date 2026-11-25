@@ -1,27 +1,32 @@
+import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Route } from '@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid'
+import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
-vi.mock('@/lib/constants/api', () => ({
-  PROJECT_ANALYTICS_URL: 'http://logflare:4000/',
-}))
-
 describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
-  beforeEach(() => {
+  let Route: typeof import('@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid').Route
+
+  beforeEach(async () => {
+    vi.resetModules()
     vi.stubEnv('LOGFLARE_PRIVATE_ACCESS_TOKEN', 'test-token')
     vi.stubEnv('LOGFLARE_URL', 'http://logflare:4000')
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    ;({ Route } = await import('@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid'))
   })
 
   afterEach(() => {
-    vi.unstubAllGlobals()
     vi.unstubAllEnvs()
     vi.restoreAllMocks()
   })
 
   it('returns 204 with an empty body on DELETE success', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 204 })))
+    mswServer.use(
+      http.delete(
+        'http://logflare:4000/api/backends/1',
+        () => new HttpResponse(null, { status: 204 })
+      )
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -42,7 +47,12 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
   })
 
   it('returns 500 on DELETE when Logflare rejects the request', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('fail', { status: 422 })))
+    mswServer.use(
+      http.delete(
+        'http://logflare:4000/api/backends/1',
+        () => new HttpResponse('fail', { status: 422 })
+      )
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -62,8 +72,16 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
   })
 
   it('strips metadata and returns 200 on PUT success', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: 1, name: 'updated' }))
-    vi.stubGlobal('fetch', fetchMock)
+    let forwardedBody: unknown
+    let forwardedAuth: string | null = null
+
+    mswServer.use(
+      http.put('http://logflare:4000/api/backends/1', async ({ request }) => {
+        forwardedAuth = request.headers.get('authorization')
+        forwardedBody = await request.json()
+        return HttpResponse.json({ id: 1, name: 'updated' })
+      })
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -82,11 +100,17 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
 
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({ id: 1, name: 'updated' })
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ name: 'updated' })
+    expect(forwardedAuth).toBe('Bearer test-token')
+    expect(forwardedBody).toEqual({ name: 'updated' })
   })
 
   it('returns 500 on PUT when Logflare rejects the request', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('bad', { status: 400 })))
+    mswServer.use(
+      http.put(
+        'http://logflare:4000/api/backends/1',
+        () => new HttpResponse('bad', { status: 400 })
+      )
+    )
 
     const response = await getRouteHandler(
       Route,

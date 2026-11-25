@@ -57,6 +57,18 @@ export const FolderSchema = z.object({
   project_id: z.number().default(1),
 })
 
+export const folderQueryParamsSchema = z.object({
+  name: z.string().optional(),
+  cursor: z.string().optional(),
+  limit: z
+    .string()
+    .transform((val) => Number(val))
+    .pipe(z.number().int().positive())
+    .optional(),
+  sort_by: z.enum(['name', 'inserted_at']).optional(),
+  sort_order: z.enum(['asc', 'desc']).optional(),
+})
+
 export type Snippet = z.infer<typeof SnippetSchema>
 export type Folder = z.infer<typeof FolderSchema>
 

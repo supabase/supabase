@@ -3,10 +3,14 @@ import { paths } from 'api-types'
 
 import { parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers } from '@/lib/api/apiWrapper'
-import { createFolder, deleteFolder, getFolders, getSnippets } from '@/lib/api/snippets.utils'
+import {
+  createFolder,
+  deleteFolder,
+  folderQueryParamsSchema,
+  getFolders,
+  getSnippets,
+} from '@/lib/api/snippets.utils'
 
-type GetRequestData =
-  paths['/platform/projects/{ref}/content/folders']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
 type PostRequestData =
@@ -16,19 +20,26 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/folder
   server: {
     handlers: createApiHandlers({
       GET: async ({ request }) => {
-        const params = Object.fromEntries(
-          new URL(request.url).searchParams.entries()
-        ) as GetRequestData
+        const query = Object.fromEntries(new URL(request.url).searchParams.entries())
+        const result = folderQueryParamsSchema.safeParse(query)
+
+        if (!result.success) {
+          return Response.json({ data: { folders: [], contents: [] } } satisfies GetResponseData, {
+            status: 400,
+          })
+        }
+
+        const params = result.data
 
         const folders = await getFolders()
         // Folder listings return metadata only (no SQL body) to match the Management API contract; the
         // editor loads each snippet's content on demand via the item endpoint.
         const { cursor, snippets } = await getSnippets({
-          searchTerm: params?.name,
-          limit: params?.limit ? Number(params.limit) : undefined,
-          cursor: params?.cursor,
-          sort: params?.sort_by,
-          sortOrder: params?.sort_order,
+          searchTerm: params.name,
+          limit: params.limit,
+          cursor: params.cursor,
+          sort: params.sort_by,
+          sortOrder: params.sort_order,
           includeContent: false,
         })
 
@@ -45,12 +56,12 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/folder
         return Response.json(folder, { status: 201 })
       },
       DELETE: async ({ request }) => {
-        const ids = new URL(request.url).searchParams.get('ids')
+        const idsValues = new URL(request.url).searchParams.getAll('ids')
 
-        if (!ids) {
+        if (idsValues.length !== 1 || !idsValues[0]) {
           return Response.json({ error: 'Folder IDs are required' }, { status: 400 })
         }
-        const folderIds = ids.split(',').map((id) => id.trim())
+        const folderIds = idsValues[0].split(',').map((id) => id.trim())
 
         await Promise.all(folderIds.map((id) => deleteFolder(id)))
 

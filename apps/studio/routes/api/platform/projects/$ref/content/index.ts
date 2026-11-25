@@ -96,9 +96,12 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
         }
       },
       DELETE: async ({ request }) => {
-        const ids = new URL(request.url).searchParams.get('ids') ?? undefined
+        const idsValues = new URL(request.url).searchParams.getAll('ids')
+        if (idsValues.length > 1) {
+          return Response.json({ error: 'Snippet IDs are required' }, { status: 400 })
+        }
 
-        const result = snippetIdsSchema.safeParse(ids)
+        const result = snippetIdsSchema.safeParse(idsValues[0])
         if (!result.success) {
           return Response.json({ error: 'Snippet IDs are required' }, { status: 400 })
         }
