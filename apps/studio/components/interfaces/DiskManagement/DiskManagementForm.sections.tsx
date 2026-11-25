@@ -31,6 +31,7 @@ import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSectionProps {
@@ -238,6 +239,8 @@ export function AdvancedSection({
   disableDiskSizeInput,
   suggestedDiskSizeForCustomIops,
 }: AdvancedSectionProps) {
+  const isHighAvailability = useIsHighAvailability()
+
   return (
     <PageSection>
       <PageSectionMeta>
@@ -258,7 +261,7 @@ export function AdvancedSection({
       <PageSectionContent className="flex flex-col gap-4">
         <Card ref={autoscaleSettingsRef} className="scroll-mt-24">
           <CardContent className="flex flex-col gap-y-8">
-            <AutoScaleFields form={form} disableInput={disableDiskInputs && disableDiskSizeInput} />
+            <AutoScaleFields form={form} disableInput={isHighAvailability} />
           </CardContent>
         </Card>
 

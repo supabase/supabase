@@ -10,6 +10,7 @@ import { customRender } from '@/tests/lib/custom-render'
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 const mockFlags = vi.hoisted(() => ({}) as Record<string, boolean>)
+const mockTrack = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -60,7 +61,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({
-  useTrack: () => vi.fn(),
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
@@ -141,6 +142,7 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
     for (const key of Object.keys(mockFlags)) delete mockFlags[key]
+    mockTrack.mockClear()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -259,6 +261,24 @@ describe('PlanUpdateSidePanel', () => {
 
       expect(screen.queryByText('Not included')).not.toBeInTheDocument()
       expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
+    })
+  })
+
+  it('sends the panel opened event once, after the organization has loaded', () => {
+    mockSelectedOrganization.mockReturnValue(undefined)
+    const { rerender } = render(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({ slug: 'test-org', billing_partner: null })
+    )
+    rerender(<PlanUpdateSidePanel />)
+    rerender(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('studio_pricing_side_panel_opened', {
+      currentPlan: 'Free',
     })
   })
 

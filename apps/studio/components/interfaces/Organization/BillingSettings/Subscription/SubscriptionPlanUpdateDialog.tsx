@@ -1,7 +1,7 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { CheckIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -14,6 +14,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InvoiceEstimateTooltip } from './InvoiceEstimateTooltip'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { PlanCheckIcon, PlanMinusIcon } from './PlanIcons'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
@@ -575,45 +576,45 @@ export const SubscriptionPlanUpdateDialog = ({
                     <p className="text-xs text-foreground-light mb-4">
                       Please review carefully before downgrading.
                     </p>
-                    <div className="space-y-2 mb-4 text-foreground-light">
+                    <ul className="mb-4 text-sm text-foreground-light">
                       {featuresToLose.map((feature) => (
-                        <div
+                        <li
                           key={typeof feature === 'string' ? feature : feature[0]}
-                          className="flex items-center gap-2"
+                          className="flex items-start py-1.5"
                         >
-                          <div className="w-4">
-                            <InfoIcon className="h-3 w-3 text-amber-900" strokeWidth={3} />
+                          <div className="flex h-lh w-6 shrink-0 items-center">
+                            <PlanMinusIcon className="size-5 -ml-0.5" />
                           </div>
-                          <p className="text-sm">
-                            {typeof feature === 'string' ? feature : feature[0]}
-                          </p>
-                        </div>
+                          <span>{typeof feature === 'string' ? feature : feature[0]}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )
               : topFeatures.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm mb-4">Upgrade features</h3>
 
-                    <div className="space-y-2 mb-4 text-foreground-light">
+                    <ul className="mb-4 text-sm">
                       {topFeatures.map((feature: string | string[]) => (
-                        <div
+                        <li
                           key={typeof feature === 'string' ? feature : feature[0]}
-                          className="flex items-center gap-2"
+                          className="flex items-start py-1.5"
                         >
-                          <div className="w-4">
-                            <CheckIcon className="h-3 w-3 text-primary" strokeWidth={3} />
+                          <div className="flex h-lh w-6 shrink-0 items-center">
+                            <PlanCheckIcon className="size-5 -ml-0.5" />
                           </div>
-                          <div className="text-sm">
-                            <p>{typeof feature === 'string' ? feature : feature[0]}</p>
+                          <div>
+                            <p className="text-foreground">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
                             {Array.isArray(feature) && feature.length > 1 && (
                               <p className="text-foreground-lighter text-xs">{feature[1]}</p>
                             )}
                           </div>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
           </div>

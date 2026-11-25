@@ -25,7 +25,6 @@ export const bindRevealOnce = (element: HTMLElement | null) => {
       isFirstCheck = false
       if (!entry?.isIntersecting) return
       // groups already in view on load wait for the hero instead of beating it in
-      // the offset lets the hero canvas start drawing before on-screen groups reveal
       // a reload keeps the scroll position, so the hero is out of view and there is nothing to wait for
       if (isOnScreenAtLoad && window.scrollY === 0) {
         element.style.setProperty('--reveal-offset', '300ms')
