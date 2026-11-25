@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
   Tabs,
   TabsContent,
-  TabsIndicator,
+  TabsFolderIndicator,
   TabsList,
   TabsTrigger,
 } from 'ui'
@@ -124,7 +124,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
       <Tabs
         value={toTabValue(activeTopic)}
         onValueChange={handleTabChange}
-        className="group/topic-tabs tab-flares flex flex-col"
+        className="flex flex-col"
       >
         <div className="relative flex items-end">
           <TopicTabs
@@ -137,10 +137,9 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
         <span aria-hidden className="relative z-1 block h-0">
           <span
             className={cn(
-              'absolute left-0 top-0 size-2 border-l border-default bg-200 opacity-0',
-              'transition-opacity duration-150 ease-move motion-reduce:transition-none',
-              'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:opacity-100',
-              'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:duration-400'
+              'absolute left-0 top-0 size-2 border-l border-default bg-200',
+              'transition-opacity ease-move motion-reduce:transition-none',
+              activeTopic ? 'opacity-0 duration-150' : 'opacity-100 duration-400'
             )}
           />
         </span>
@@ -236,17 +235,7 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
           </DropdownMenuContent>
         </DropdownMenu>
       ) : null}
-      <TabsIndicator
-        className={cn(
-          'top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
-          'before:absolute before:bottom-0 before:-left-2 before:size-2',
-          'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
-          'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:before:opacity-0',
-          'before:bg-(image:--tab-flare-left)',
-          'after:absolute after:bottom-0 after:-right-2 after:size-2',
-          'after:bg-(image:--tab-flare-right)'
-        )}
-      />
+      <TabsFolderIndicator />
     </TabsList>
   )
 }

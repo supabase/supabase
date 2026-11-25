@@ -281,6 +281,19 @@
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='--value(--color-*)'><path d='M0 .5H31.5V32'/></svg>");
 }
 
+@utility tab-flares {
+  --tab-flare-ring:
+    transparent 6.75px, var(--border-color-default) 7.25px, var(--border-color-default) 7.75px,
+    transparent 8.25px;
+  --tab-flare-fill: transparent 6.75px, var(--background-color-200) 7.25px;
+  --tab-flare-left:
+    radial-gradient(circle at 0 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 0 0, var(--tab-flare-fill));
+  --tab-flare-right:
+    radial-gradient(circle at 100% 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 100% 0, var(--tab-flare-fill));
+}
+
 @utility no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */

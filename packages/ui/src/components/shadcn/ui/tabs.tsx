@@ -60,6 +60,22 @@ const TabsIndicator = ({ className, ...props }: ComponentPropsWithRef<'span'>) =
   />
 )
 
+const TabsFolderIndicator = ({ className, ...props }: ComponentPropsWithRef<'span'>) => (
+  <TabsIndicator
+    className={cn(
+      'tab-flares top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
+      'before:absolute before:bottom-0 before:-left-2 before:size-2',
+      'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
+      'group-has-[[role=tab]:first-child[data-state=active]]/list:before:opacity-0',
+      'before:bg-(image:--tab-flare-left)',
+      'after:absolute after:bottom-0 after:-right-2 after:size-2',
+      'after:bg-(image:--tab-flare-right)',
+      className
+    )}
+    {...props}
+  />
+)
+
 const TabsTrigger = ({
   className,
   ...props
@@ -84,4 +100,4 @@ const TabsContent = ({
   <TabsPrimitive.Content className={cn('mt-4 focus-ring', className)} {...props} />
 )
 
-export { Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger }
+export { Tabs, TabsContent, TabsFolderIndicator, TabsIndicator, TabsList, TabsTrigger }
