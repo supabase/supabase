@@ -171,21 +171,12 @@ export const MicroComputeUpgradeCard = ({
 
   const projectNoun = rows.length === 1 ? 'project' : 'projects'
 
-  const handleUpgradeClick = (project: OrgProject) => {
-    track(
-      'plan_upgraded_micro_compute_upgrade_clicked',
-      { planId, nanoProjectCount },
-      // The screen sits on an org page, so name the project being upgraded.
-      { project: project.ref }
-    )
-    setProjectToUpgrade(project)
-  }
-
   const handleConfirmUpgrade = () => {
     if (!projectToUpgrade) return
     track(
       'plan_upgraded_micro_compute_upgrade_submitted',
       { planId, nanoProjectCount },
+      // The screen sits on an org page, so name the project being upgraded.
       { project: projectToUpgrade.ref }
     )
     updateAddon({ projectRef: projectToUpgrade.ref, type: 'compute_instance', variant: 'ci_micro' })
@@ -227,7 +218,7 @@ export const MicroComputeUpgradeCard = ({
               project={project}
               organizationSlug={organizationSlug}
               isUpgrading={isUpgrading}
-              onUpgrade={() => handleUpgradeClick(project)}
+              onUpgrade={() => setProjectToUpgrade(project)}
             />
           ))}
         </ul>
