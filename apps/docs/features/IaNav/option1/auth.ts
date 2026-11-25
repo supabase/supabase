@@ -95,18 +95,17 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
-      name: 'Social sign-in (OAuth)',
+      name: 'Sign-in options',
       enabled: allAuthProvidersEnabled && authFlowsEnabled,
       items: [
-        { name: 'Overview', url: '/guides/auth/social-sign-in' },
-        ...[...SocialSignInItems].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
-        { name: 'Custom OAuth/OIDC providers', url: '/guides/auth/custom-oauth-providers' },
-      ],
-    },
-    {
-      name: 'Other sign-in methods',
-      enabled: allAuthProvidersEnabled && authFlowsEnabled,
-      items: [
+        {
+          name: 'Social sign-in (OAuth)',
+          items: [
+            { name: 'Overview', url: '/guides/auth/social-sign-in' },
+            ...[...SocialSignInItems].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
+            { name: 'Custom OAuth/OIDC providers', url: '/guides/auth/custom-oauth-providers' },
+          ],
+        },
         { name: 'Password-based', url: '/guides/auth/passwords' },
         { name: 'Email (magic link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         { name: 'Phone sign-in', url: '/guides/auth/phone-login' },
