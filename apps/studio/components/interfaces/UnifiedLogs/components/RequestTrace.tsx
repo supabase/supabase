@@ -19,7 +19,7 @@ import { useFormatDateTime } from '@/lib/datetime'
  * so this shares its cache entry rather than making a request of its own.
  */
 function useRequestTraceId(row: ColumnSchema, projectRef: string | undefined) {
-  const { data, isLoading } = useQuery(
+  const { data, isLoading, isError, error } = useQuery(
     unifiedLogRequestTimelineQueryOptions({
       projectRef,
       logId: row.id,
@@ -45,13 +45,16 @@ function useRequestTraceId(row: ColumnSchema, projectRef: string | undefined) {
 
   const traceId = ownTraceId ?? (relatedTraceIds.length === 1 ? relatedTraceIds[0] : undefined)
 
-  return { traceId, isResolving: isLoading }
+  return { traceId, isResolving: isLoading, isResolvingError: isError, resolvingError: error }
 }
 
 export function RequestTrace({ row }: { row: ColumnSchema }) {
   const { ref: projectRef } = useParams()
   const formatDateTime = useFormatDateTime()
-  const { traceId, isResolving } = useRequestTraceId(row, projectRef)
+  const { traceId, isResolving, isResolvingError, resolvingError } = useRequestTraceId(
+    row,
+    projectRef
+  )
   const { data, error, isLoading, isError } = useQuery(
     unifiedLogTraceSpansQueryOptions({ projectRef, traceId })
   )
@@ -63,6 +66,17 @@ export function RequestTrace({ row }: { row: ColumnSchema }) {
           <Skeleton key={i} className="h-9 w-full" />
         ))}
       </div>
+    )
+  }
+
+  if (isResolvingError) {
+    return (
+      <AlertError
+        error={resolvingError}
+        subject="Couldn't load the trace"
+        projectRef={projectRef}
+        className="m-4"
+      />
     )
   }
 
