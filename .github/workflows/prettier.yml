@@ -1,4 +1,4 @@
-name: Check Code with Prettier
+name: Check Code Formatting
 
 on:
   pull_request:
@@ -24,7 +24,6 @@ jobs:
           sparse-checkout: |
             apps
             blocks
-            examples
             i18n
             packages
             patches
@@ -40,6 +39,6 @@ jobs:
       - name: Download dependencies
         run: |
           pnpm install --frozen-lockfile
-      - name: Run prettier
+      - name: Run oxfmt
         run: |-
-          pnpm run test:prettier
+          pnpm run format:check

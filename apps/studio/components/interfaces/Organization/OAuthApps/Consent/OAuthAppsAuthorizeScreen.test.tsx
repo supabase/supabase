@@ -918,7 +918,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText(/northwind-storefront/)).not.toBeInTheDocument()
   })
 
-  test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
+  test('reconsent groups added, removed, and unchanged permissions by access level', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -964,20 +964,15 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    await screen.findByText('Already granted (2)')
-    const findSpanWithText = (text: string) =>
-      screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
-    await findSpanWithText('Environment (New)')
-    expect(screen.getByRole('button', { name: 'Environment' })).toBeInTheDocument()
-    await findSpanWithText('Analytics (Upgraded from Read only)')
-    await findSpanWithText('Secrets (Demoted from Read and write)')
-    await findSpanWithText('Edge Functions (New)')
-    await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read only)')
-
-    expect(screen.queryByText('Database')).toBeNull()
-    fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database management')
+    const readWrite = await screen.findByRole('list', { name: 'Read and write' })
+    const read = screen.getByRole('list', { name: 'Read only' })
+    expect(readWrite).toHaveTextContent('EnvironmentAdded')
+    expect(readWrite).toHaveTextContent('AnalyticsAdded')
+    expect(read).toHaveTextContent('AnalyticsRemoved')
+    expect(readWrite).toHaveTextContent('SecretsRemoved')
+    expect(read).toHaveTextContent('SecretsAdded')
+    expect(read).toHaveTextContent('RestRemoved')
+    expect(readWrite).toHaveTextContent('Database managementUnchanged')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {

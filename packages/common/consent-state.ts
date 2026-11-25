@@ -24,7 +24,7 @@ const SERVER_RESET_WAIT_MS = 1000
  * `user_id`), which JavaScript can't remove. Resolves once the request settles or after a short
  * cap, so a slow API never holds up the caller; keepalive lets a capped request finish anyway.
  */
-function resetServerTelemetryCookies(): Promise<void> {
+export function resetServerTelemetryCookies(): Promise<void> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '')
   if (!IS_PLATFORM || !apiUrl) return Promise.resolve()
 

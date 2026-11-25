@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
@@ -8,12 +9,15 @@ import { customRender } from '@/tests/lib/custom-render'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
+const mockFlags = vi.hoisted(() => ({}) as Record<string, boolean>)
+const mockTrack = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
+    useFlag: (name: string) => mockFlags[name] ?? false,
   }
 })
 
@@ -57,7 +61,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({
-  useTrack: () => vi.fn(),
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
@@ -127,12 +131,18 @@ vi.mock('./MembersExceedLimitModal', () => ({
   MembersExceedLimitModal: () => null,
 }))
 
+vi.mock('./SubscriptionPlanUpdateView', () => ({
+  SubscriptionPlanUpdateView: () => <div data-testid="plan-update-view" />,
+}))
+
 vi.mock('./SubscriptionPlanUpdateDialog', () => ({
-  SubscriptionPlanUpdateDialog: () => null,
+  SubscriptionPlanUpdateDialog: () => <div data-testid="plan-update-dialog" />,
 }))
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
+    for (const key of Object.keys(mockFlags)) delete mockFlags[key]
+    mockTrack.mockClear()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -251,6 +261,53 @@ describe('PlanUpdateSidePanel', () => {
 
       expect(screen.queryByText('Not included')).not.toBeInTheDocument()
       expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
+    })
+  })
+
+  it('sends the panel opened event once, after the organization has loaded', () => {
+    mockSelectedOrganization.mockReturnValue(undefined)
+    const { rerender } = render(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({ slug: 'test-org', billing_partner: null })
+    )
+    rerender(<PlanUpdateSidePanel />)
+    rerender(<PlanUpdateSidePanel />)
+
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('studio_pricing_side_panel_opened', {
+      currentPlan: 'Free',
+    })
+  })
+
+  describe('plan change surface', () => {
+    beforeEach(() => {
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    const selectPro = async () => {
+      render(<PlanUpdateSidePanel />)
+      await userEvent.click(screen.getByRole('button', { name: 'Upgrade to Pro' }))
+    }
+
+    it('keeps the dialog while the redesign flag is off', async () => {
+      await selectPro()
+
+      expect(screen.getByTestId('plan-update-dialog')).toBeInTheDocument()
+      expect(screen.queryByTestId('plan-update-view')).not.toBeInTheDocument()
+    })
+
+    it('shows the redesigned full-screen view when the flag is on', async () => {
+      mockFlags.billingPlanUpdateRedesign = true
+
+      await selectPro()
+
+      expect(screen.getByTestId('plan-update-view')).toBeInTheDocument()
+      expect(screen.queryByTestId('plan-update-dialog')).not.toBeInTheDocument()
     })
   })
 })

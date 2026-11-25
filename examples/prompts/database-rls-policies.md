@@ -130,14 +130,22 @@ Returns the JWT of the user making the request. Anything that you store in the u
 - `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
 - `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
 
-The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. This example assumes `team_id` is a `uuid` and that `app_metadata.teams` is an array of UUID strings, for example `{"app_metadata": {"teams": ["22222222-2222-2222-2222-222222222222"]}}`. Each element is cast to `uuid`, so an array of objects needs a different expression. If your IDs use another type, cast the element to that type instead.
 
 ```sql
 create policy "User is in team"
 on my_table
 to authenticated
-using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+using (
+  team_id = any (
+    array(
+      select (jsonb_array_elements_text((select auth.jwt()) -> 'app_metadata' -> 'teams'))::uuid
+    )
+  )
+);
 ```
+
+Comparing the values as `uuid` normalizes case and lets Postgres use an index on `team_id`.
 
 ### MFA
 
