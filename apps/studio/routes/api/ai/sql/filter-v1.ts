@@ -1,12 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import {
   filterGroupSchemaForAI,
   requestSchema,
@@ -15,24 +14,13 @@ import {
   validateFilterGroup,
 } from '@/lib/api/filterHelpers'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const parseResult = requestSchema.safeParse(req.body)
+async function handlePost(request: Request): Promise<Response> {
+  const body = await parseJsonBody(request)
+  const parseResult = requestSchema.safeParse(body)
 
   if (!parseResult.success) {
     const errorMessage = parseResult.error.errors.map((e) => e.message).join(', ')
-    return res.status(400).json({ error: errorMessage })
+    return Response.json({ error: errorMessage }, { status: 400 })
   }
 
   const { prompt, filterProperties } = parseResult.data
@@ -44,7 +32,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const normalizedFilterProperties = filterProperties.map((property) => ({
@@ -84,37 +72,44 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const generatedFilters = result.output
 
     if (!validateFilterGroup(generatedFilters, normalizedFilterProperties)) {
-      return res.status(400).json({
-        error: 'Generated filters referenced invalid columns or operators.',
-      })
+      return Response.json(
+        { error: 'Generated filters referenced invalid columns or operators.' },
+        { status: 400 }
+      )
     }
 
-    return res.json(generatedFilters)
+    return Response.json(generatedFilters)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI filter generation failed: ${error.message}`)
 
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error:
-            'Your filter prompt is too large for Supabase Assistant to ingest. Try splitting it into smaller prompts.',
-        })
+        return Response.json(
+          {
+            error:
+              'Your filter prompt is too large for Supabase Assistant to ingest. Try splitting it into smaller prompts.',
+          },
+          { status: 400 }
+        )
       }
     } else {
       console.error(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error generating filters. Please try again.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error generating filters. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/filter-v1')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

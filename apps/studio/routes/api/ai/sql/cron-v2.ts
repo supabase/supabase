@@ -1,39 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const cronSchema = z.object({
   cron_expression: z.string().describe('The generated cron expression.'),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    body: { prompt },
-  } = req
+async function handlePost(request: Request): Promise<Response> {
+  const { prompt } = await parseJsonBody<{ prompt?: string }>(request)
 
   if (!prompt) {
-    return res.status(400).json({
-      error: 'Prompt is required',
-    })
+    return Response.json({ error: 'Prompt is required' }, { status: 400 })
   }
 
   try {
@@ -43,7 +26,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const result = await generateText({
@@ -87,33 +70,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.output.cron_expression)
+    return Response.json(result.output.cron_expression)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI cron generation failed: ${error.message}`)
 
       // Check for context length error
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error:
-            'Your cron prompt is too large for Supabase Assistant to ingest. Try splitting it into smaller prompts.',
-        })
+        return Response.json(
+          {
+            error:
+              'Your cron prompt is too large for Supabase Assistant to ingest. Try splitting it into smaller prompts.',
+          },
+          { status: 400 }
+        )
       }
     } else {
       console.error(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error generating the cron syntax. Please try again.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error generating the cron syntax. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/cron-v2')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

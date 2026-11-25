@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const codeSchema = z.object({
   sql: z
@@ -19,24 +18,10 @@ const codeSchema = z.object({
   valid: z.boolean().describe('Whether the provided client library code is valid.'),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
+async function handlePost(request: Request): Promise<Response> {
+  const { code } = await parseJsonBody<{ code?: string }>(request)
 
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    body: { code },
-  } = req
-
-  if (!code) return res.status(400).json({ error: 'Code is required' })
+  if (!code) return Response.json({ error: 'Code is required' }, { status: 400 })
 
   try {
     const { modelParams, error: modelError } = await getModel({
@@ -45,7 +30,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const result = await generateText({
@@ -59,33 +44,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.output)
+    return Response.json(result.output)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Code parsing to SQL failed: ${error.message}`)
 
       // Check for context length error
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error:
-            'The provided code snippet is too large for Supabase Assistant to ingest. Try splitting it into smaller queries.',
-        })
+        return Response.json(
+          {
+            error:
+              'The provided code snippet is too large for Supabase Assistant to ingest. Try splitting it into smaller queries.',
+          },
+          { status: 400 }
+        )
       }
     } else {
       console.log(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error parsing the client library code. Please try again.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error parsing the client library code. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/parse-client-code')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

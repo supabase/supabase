@@ -3,10 +3,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { generateText, isStepCount, ModelMessage, tool } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -25,7 +23,8 @@ import {
   SECURITY_PROMPT,
   SQL_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/prompts'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { InvalidJsonError, parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 const pgMetaSchemasList = pgMeta.schemas.list()
@@ -163,22 +162,24 @@ const requestBodySchema = z.object({
   intent: z.enum(['edit', 'rewrite']).optional(),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: `Method ${req.method} Not Allowed` })
-  }
-
+async function handlePost(request: Request): Promise<Response> {
   try {
     let body: unknown
     try {
-      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
-    } catch {
-      return res.status(400).json({ error: 'Malformed JSON' })
+      body = await parseJsonBody(request)
+    } catch (error) {
+      if (error instanceof InvalidJsonError) {
+        return Response.json({ error: 'Malformed JSON' }, { status: 400 })
+      }
+      throw error
     }
     const { data, error: parseError } = requestBodySchema.safeParse(body)
 
     if (parseError) {
-      return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
+      return Response.json(
+        { error: 'Invalid request body', issues: parseError.issues },
+        { status: 400 }
+      )
     }
 
     const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect, intent } =
@@ -187,7 +188,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       completionMetadata
     const isClickhouse = dialect === 'clickhouse'
 
-    const authorization = req.headers.authorization
+    const authorization = request.headers.get('authorization') ?? undefined
     let aiOptInLevel: AiOptInLevel = IS_PLATFORM ? 'disabled' : 'schema'
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
@@ -205,7 +206,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const headers = {
@@ -347,18 +348,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           : undefined,
     })
 
-    return res.status(200).json(text)
+    return Response.json(text, { status: 200 })
   } catch (error) {
     console.error('Completion error:', error)
-    return res.status(500).json({ error: 'Failed to generate completion' })
+    return Response.json({ error: 'Failed to generate completion' }, { status: 500 })
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/code/complete')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

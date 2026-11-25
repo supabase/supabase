@@ -1,34 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    body: { prompt },
-  } = req
+async function handlePost(request: Request): Promise<Response> {
+  const { prompt } = await parseJsonBody<{ prompt?: string }>(request)
 
   if (!prompt) {
-    return res.status(400).json({
-      error: 'Prompt is required',
-    })
+    return Response.json({ error: 'Prompt is required' }, { status: 400 })
   }
 
   try {
@@ -38,7 +21,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const { output } = await generateText({
@@ -98,32 +81,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   `,
     })
 
-    return res.json({ feedback_category: output.feedback_category })
+    return Response.json({ feedback_category: output.feedback_category })
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Classifying this feedback failed`)
 
       // Check for context length error
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error: 'This prompt is too large to ingest',
-        })
+        return Response.json({ error: 'This prompt is too large to ingest' }, { status: 400 })
       }
     } else {
       console.error(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error generating the feedback category.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error generating the feedback category.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/feedback/classify')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

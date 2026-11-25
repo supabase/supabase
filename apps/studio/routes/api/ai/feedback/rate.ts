@@ -2,10 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
 import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
@@ -13,19 +11,8 @@ import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
-import { apiWrapper } from '@/lib/api/apiWrapper'
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const requestBodySchema = z.object({
   rating: z.enum(['positive', 'negative']),
@@ -37,19 +24,22 @@ const requestBodySchema = z.object({
   spanId: z.string().optional(),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const authorization = req.headers.authorization
+async function handlePost(request: Request): Promise<Response> {
+  const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
-    return res.status(401).json({ error: 'Authorization token is required' })
+    return Response.json({ error: 'Authorization token is required' }, { status: 401 })
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const body = await parseJsonBody(request)
   const { data, error: parseError } = requestBodySchema.safeParse(body)
 
   if (parseError) {
-    return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
+    return Response.json(
+      { error: 'Invalid request body', issues: parseError.issues },
+      { status: 400 }
+    )
   }
 
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
@@ -67,10 +57,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       aiOptInLevel = aiDetails.aiOptInLevel
       orgId = aiDetails.orgId
-    } catch (error) {
-      return res.status(400).json({
-        error: 'There was an error fetching your organization details',
-      })
+    } catch {
+      return Response.json(
+        { error: 'There was an error fetching your organization details' },
+        { status: 400 }
+      )
     }
   }
 
@@ -98,7 +89,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const { output } = await generateText({
@@ -145,7 +136,7 @@ Instructions:
       }
     }
 
-    return res.json({
+    return Response.json({
       category: output.category,
     })
   } catch (error) {
@@ -154,25 +145,26 @@ Instructions:
 
       // Check for context length error
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error: 'The conversation is too large to analyze',
-        })
+        return Response.json({ error: 'The conversation is too large to analyze' }, { status: 400 })
       }
     } else {
       console.error(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error analyzing the feedback.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error analyzing the feedback.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/feedback/rate')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

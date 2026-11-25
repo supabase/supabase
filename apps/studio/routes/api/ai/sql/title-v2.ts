@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const titleSchema = z.object({
   title: z
@@ -18,27 +17,11 @@ const titleSchema = z.object({
   description: z.string().describe('The generated description for the SQL snippet.'),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    body: { sql },
-  } = req
+async function handlePost(request: Request): Promise<Response> {
+  const { sql } = await parseJsonBody<{ sql?: string }>(request)
 
   if (!sql) {
-    return res.status(400).json({
-      error: 'SQL query is required',
-    })
+    return Response.json({ error: 'SQL query is required' }, { status: 400 })
   }
 
   try {
@@ -48,7 +31,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     const result = await generateText({
@@ -63,33 +46,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.output)
+    return Response.json(result.output)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI title generation failed: ${error.message}`)
 
       // Check for context length error
       if (error.message.includes('context_length') || error.message.includes('too long')) {
-        return res.status(400).json({
-          error:
-            'Your SQL query is too large for Supabase Assistant to ingest. Try splitting it into smaller queries.',
-        })
+        return Response.json(
+          {
+            error:
+              'Your SQL query is too large for Supabase Assistant to ingest. Try splitting it into smaller queries.',
+          },
+          { status: 400 }
+        )
       }
     } else {
       console.log(`Unknown error: ${error}`)
     }
 
-    return res.status(500).json({
-      error: 'There was an unknown error generating the snippet title. Please try again.',
-    })
+    return Response.json(
+      { error: 'There was an unknown error generating the snippet title. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/title-v2')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })

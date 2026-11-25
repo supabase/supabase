@@ -1,13 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { pipeUIMessageStreamToResponse, streamText, tool, toUIMessageStream } from 'ai'
+import {
+  createUIMessageStreamResponse,
+  type ModelMessage,
+  streamText,
+  tool,
+  toUIMessageStream,
+} from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const ServiceSchema = z.object({
   name: z.enum(['Auth', 'Storage', 'Database', 'Edge Function', 'Cron', 'Queues', 'Vector']),
@@ -47,32 +52,17 @@ const getTools = () => {
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(request: Request): Promise<Response> {
   const { modelParams, error: modelError } = await getModel({
     provider: 'openai',
     modelEntry: DEFAULT_COMPLETION_MODEL,
   })
 
   if (modelError) {
-    return res.status(500).json({ error: modelError.message })
+    return Response.json({ error: modelError.message }, { status: 500 })
   }
 
-  const { messages } = req.body
+  const { messages } = await parseJsonBody<{ messages: ModelMessage[] }>(request)
 
   const result = streamText({
     ...modelParams,
@@ -102,15 +92,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   const stream = toUIMessageStream({ stream: result.stream })
-  pipeUIMessageStreamToResponse({
-    response: res,
+  return createUIMessageStreamResponse({
     stream,
     headers: { 'Content-Encoding': 'none' },
   })
 }
 
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/onboarding/design')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: ({ request }) => handlePost(request),
+      },
+      { withAuth: true }
+    ),
+  },
 })
