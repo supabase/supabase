@@ -379,16 +379,30 @@ describe('regions', () => {
     config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
   })
 
-  const mockRegionResources = () => {
+  const mockRegionResources = ({
+    failingClusters = new Set<string>(),
+    pendingFrankfurt,
+    hasDestinations = true,
+  }: {
+    failingClusters?: Set<string>
+    pendingFrankfurt?: Promise<void>
+    hasDestinations?: boolean
+  } = {}) => {
     const statusRequests: string[] = []
     isEnabled = true
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/destinations',
-      response: ({ request }) => {
+      response: async ({ request }) => {
         const cluster = clusterOf(request)
+        if (cluster === '2') await pendingFrankfurt
+        if (failingClusters.has(cluster))
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Cluster unavailable' },
+            { status: 503 }
+          )
         return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
-          destinations: [regionDestination(cluster)],
+          destinations: hasDestinations ? [regionDestination(cluster)] : [],
         })
       },
     })
@@ -528,6 +542,62 @@ describe('regions', () => {
     expect(screen.queryByRole('row', { name: /Singapore sync/ })).not.toBeInTheDocument()
   })
 
+  test('shows loaded pipelines while another region is loading', async () => {
+    mockRegions()
+    let finishFrankfurt = () => {}
+    const pendingFrankfurt = new Promise<void>((resolve) => {
+      finishFrankfurt = resolve
+    })
+    mockRegionResources({ pendingFrankfurt })
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(screen.getByText('Loading pipelines in Frankfurt')).toBeInTheDocument()
+    finishFrankfurt()
+    expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
+    expect(screen.queryByText('Loading pipelines in Frankfurt')).not.toBeInTheDocument()
+  })
+
+  test('keeps loading when an empty region finishes before another region', async () => {
+    mockRegions()
+    let finishRegion = () => {}
+    const pendingRegion = new Promise<void>((resolve) => {
+      finishRegion = resolve
+    })
+    mockRegionResources({ pendingFrankfurt: pendingRegion, hasDestinations: false })
+    renderRegions()
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add pipeline' })).toBeEnabled())
+    expect(screen.getByRole('status')).toHaveTextContent('Loading pipelines')
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+    finishRegion()
+    expect(await screen.findByRole('heading', { name: 'Add a pipeline' })).toBeInTheDocument()
+  })
+
+  test('keeps other regions visible and retries a failed region', async () => {
+    mockRegions()
+    const failingClusters = new Set(['2'])
+    mockRegionResources({ failingClusters })
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(await screen.findByText('Failed to retrieve pipelines in Frankfurt')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+    failingClusters.clear()
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
+  })
+
+  test('shows regional errors instead of the empty state when all regions fail', async () => {
+    mockRegions()
+    mockRegionResources({ failingClusters: new Set(['omitted', '2']) })
+    renderRegions()
+
+    expect(await screen.findByText('Failed to retrieve pipelines in Singapore')).toBeInTheDocument()
+    expect(await screen.findByText('Failed to retrieve pipelines in Frankfurt')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+  })
+
   test('keeps multi-region disablement unavailable', async () => {
     mockRegions()
     isEnabled = true
@@ -542,6 +612,7 @@ describe('regions', () => {
       'true'
     )
   })
+
   test('blocks an open disable dialog when a pipeline appears', async () => {
     mockRegions([SINGAPORE])
     isEnabled = true

@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableHeadSort,
@@ -22,7 +23,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -101,7 +102,9 @@ export const Destinations = () => {
     isLoading: isDiscoveringRegions,
     isSuccess: isRegionsSuccess,
     isError: isRegionsError,
+    isFetching: isRetryingDiscovery,
     error: regionsError,
+    refetch: refetchRegions,
   } = useQuery(replicationClustersQueryOptions())
   const [sort, setSort] = useState<DestinationSort>('name:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
@@ -129,8 +132,24 @@ export const Destinations = () => {
     ({ visibleDestinations }) => visibleDestinations.length > 0
   )
   const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
-  const shouldShowTable = !isDestinationsLoading && !hasClusterErrors && hasDestinations
+  const shouldShowTable = hasDestinations || (hasMultipleRegions && hasClusterErrors)
   const tableColumnCount = 6
+
+  const retryRegion = ({
+    destinationsResult,
+    pipelinesResult,
+    sourcesResult,
+  }: (typeof clusterResults)[number]) => {
+    if (destinationsResult.isError) void destinationsResult.refetch()
+    if (pipelinesResult.isError) void pipelinesResult.refetch()
+    if (sourcesResult.isError) void sourcesResult.refetch()
+  }
+  const isRetryingRegion = ({
+    destinationsResult,
+    pipelinesResult,
+    sourcesResult,
+  }: (typeof clusterResults)[number]) =>
+    destinationsResult.isFetching || pipelinesResult.isFetching || sourcesResult.isFetching
 
   const {
     data: defaultSources,
@@ -337,6 +356,11 @@ export const Destinations = () => {
             error={regionsError}
             projectRef={projectRef}
             subject="Failed to retrieve pipeline regions"
+            additionalActions={
+              <Button loading={isRetryingDiscovery} onClick={() => void refetchRegions()}>
+                Retry
+              </Button>
+            }
           />
         )}
 
@@ -356,10 +380,19 @@ export const Destinations = () => {
           />
         )}
 
-        {hasClusterErrors && (
+        {!hasMultipleRegions && clusterResults[0].error && (
           <AlertError
-            error={clusterResults.find(({ error }) => error)?.error}
+            error={clusterResults[0].error}
+            projectRef={projectRef}
             subject="Failed to retrieve pipelines"
+            additionalActions={
+              <Button
+                loading={isRetryingRegion(clusterResults[0])}
+                onClick={() => retryRegion(clusterResults[0])}
+              >
+                Retry
+              </Button>
+            }
           />
         )}
 
@@ -411,6 +444,44 @@ export const Destinations = () => {
                       />
                     </ReplicationClusterProvider>
                   ))}
+                  {hasMultipleRegions &&
+                    clusterResults.map((result) => {
+                      const { group, error, isPending, sourcesResult } = result
+                      const regionName = group.region?.region_name
+                      if (!isPending && !error) return null
+
+                      return (
+                        <TableRow key={group.clusterId ?? 'default'}>
+                          <TableCell colSpan={tableColumnCount}>
+                            {error ? (
+                              <AlertError
+                                error={error}
+                                projectRef={projectRef}
+                                subject={
+                                  error === sourcesResult.error
+                                    ? `Failed to retrieve pipeline enablement status in ${regionName}`
+                                    : `Failed to retrieve pipelines in ${regionName}`
+                                }
+                                additionalActions={
+                                  <Button
+                                    loading={isRetryingRegion(result)}
+                                    onClick={() => retryRegion(result)}
+                                  >
+                                    Retry
+                                  </Button>
+                                }
+                              />
+                            ) : (
+                              <>
+                                <span className="sr-only">Loading pipelines in {regionName}</span>
+                                <ShimmeringLoader />
+                              </>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+
                   {!isDestinationsLoading &&
                     !hasClusterErrors &&
                     sortedDestinations.length === 0 &&
