@@ -2,7 +2,6 @@ import { RadioGroupStacked } from 'ui'
 
 import type { FieldOption, ResolvedField } from './Connect.types'
 import { ConnectRadioOption } from './ConnectRadioOption'
-import { ConnectRadioOptionWithControl } from './ConnectRadioOptionWithControl'
 
 interface ConnectRadioListFieldProps {
   field: ResolvedField
@@ -36,20 +35,20 @@ export function ConnectRadioListField({
       {options.map((option, index) => {
         const inlineField = inlineFields.find((f) => f.inlineWithOption?.value === option.value)
 
-        if (!inlineField) {
-          return <ConnectRadioOption key={option.value} fieldId={field.id} option={option} />
-        }
-
         return (
-          <ConnectRadioOptionWithControl
+          <ConnectRadioOption
             key={option.value}
             fieldId={field.id}
             option={option}
             isFirst={index === 0}
             isLast={index === options.length - 1}
-            inlineField={inlineField}
-            checked={Boolean(state[inlineField.id])}
-            onCheckedChange={(checked) => onFieldChange(inlineField.id, checked)}
+            inlineControl={
+              inlineField && {
+                field: inlineField,
+                checked: Boolean(state[inlineField.id]),
+                onCheckedChange: (checked) => onFieldChange(inlineField.id, checked),
+              }
+            }
           />
         )
       })}
