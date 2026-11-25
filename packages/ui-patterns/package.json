@@ -54,25 +54,9 @@
       "import": "./src/AuthenticatedDropdownMenu/index.tsx",
       "types": "./src/AuthenticatedDropdownMenu/index.tsx"
     },
-    "./Banners/Announcement": {
-      "import": "./src/Banners/Announcement.tsx",
-      "types": "./src/Banners/Announcement.tsx"
-    },
-    "./Banners/AnnouncementBanner": {
-      "import": "./src/Banners/AnnouncementBanner.tsx",
-      "types": "./src/Banners/AnnouncementBanner.tsx"
-    },
     "./Banners/Countdown": {
       "import": "./src/Banners/Countdown.tsx",
       "types": "./src/Banners/Countdown.tsx"
-    },
-    "./Banners/LW15Banner": {
-      "import": "./src/Banners/LW15Banner.tsx",
-      "types": "./src/Banners/LW15Banner.tsx"
-    },
-    "./Banners": {
-      "import": "./src/Banners/index.ts",
-      "types": "./src/Banners/index.ts"
     },
     "./Chart/charts/chart-bar": {
       "import": "./src/Chart/charts/chart-bar.tsx",
@@ -647,23 +631,6 @@
     "./PrivacySettings": {
       "import": "./src/PrivacySettings/index.tsx",
       "types": "./src/PrivacySettings/index.tsx"
-    },
-    "./PromoToast/PromoBg": {
-      "import": "./src/PromoToast/PromoBg.tsx",
-      "types": "./src/PromoToast/PromoBg.tsx"
-    },
-    "./PromoToast/PromoToast": {
-      "import": "./src/PromoToast/PromoToast.tsx",
-      "types": "./src/PromoToast/PromoToast.tsx"
-    },
-    "./PromoToast": {
-      "import": "./src/PromoToast/index.ts",
-      "types": "./src/PromoToast/index.ts"
-    },
-    "./PromoToast/styles.css": {
-      "style": "./src/PromoToast/styles.css",
-      "import": "./src/PromoToast/styles.css",
-      "types": "./src/PromoToast/styles.css"
     },
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
