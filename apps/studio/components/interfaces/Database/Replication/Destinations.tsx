@@ -406,7 +406,8 @@ export const Destinations = () => {
               <ul className="mt-2 space-y-1">
                 {failedRegions.map(({ group, error }) => (
                   <li key={group.clusterId ?? 'default'}>
-                    {group.region?.region_name ?? 'Default region'}: {error?.message}
+                    <span>{group.region?.region_name ?? 'Default region'}</span>:{' '}
+                    <span>{error?.message}</span>
                   </li>
                 ))}
               </ul>
