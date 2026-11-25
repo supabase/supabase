@@ -164,6 +164,10 @@ const smsProviderBaseSchema = z.object({
   SMS_AUTOCONFIRM: z.boolean().optional(),
 })
 
+/**
+ * Normalizes SMS template strings by converting literal escaped newlines (`\n`, `\r\n`)
+ * into actual line breaks while preserving escape sequences inside Go template actions.
+ */
 export const normalizeSmsTemplate = (value: unknown) => {
   if (typeof value !== 'string') {
     return value
