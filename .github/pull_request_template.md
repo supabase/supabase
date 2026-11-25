@@ -41,7 +41,7 @@ Optionally add any other context or screenshots.
 ## Review category (docs PRs only)
 
 <!--
-If this PR changes docs and you're on the Supabase team, check one category. It sets the review deadline, counted in business days from when the PR is marked ready for review.
+If this PR changes docs and you're on the Supabase team, select one category. It sets the review deadline, counted in business days from when the PR is marked ready for review.
 PRs from forks are always reviewed as Low, so you can skip this section.
 -->
 
