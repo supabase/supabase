@@ -3,7 +3,7 @@ id: usage-examples
 title: Usage examples
 ---
 
-Each example is a Fetch handler. Deno, Bun, and Supabase Edge Functions run the `export default { fetch }` shape as is. Cloudflare Workers also need the `nodejs_compat` flag or the `env` option, so `withSupabase` can read your project's URL and keys. On Node, use a framework bridge or the primitives with your framework.
+Each example is a Fetch handler. Deno, Bun, and Supabase Edge Functions run the `export default { fetch }` shape as is. Cloudflare Workers also need the `nodejs_compat` flag or the `env` option, so `withSupabase` can read your project's URL and keys. On Node, use a framework bridge or compose the primitives yourself.
 
 ### Protect an endpoint with a user JWT
 

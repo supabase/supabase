@@ -365,9 +365,9 @@ At this stage you have a fully functional application!
 
 So far the app authenticates the user on the client. For protected API endpoints or server-rendered data, you need a server route that verifies the session.
 
-[`@supabase/server`](https://supabase.github.io/server/) handles the full flow: it validates the JWT locally (using your project's asymmetric signing keys, no round-trip to the Auth server), builds an RLS-scoped Supabase client and the caller's claims, and rejects unauthenticated requests with a 401 before any query runs.
+[`@supabase/server`](/docs/reference/server) verifies the JWT against your project's asymmetric signing keys, builds a Supabase client scoped by Row Level Security, and rejects unauthenticated requests with a 401 before any query runs. Verification is local, so there is no round-trip to the Auth server.
 
-Nuxt server routes get this through `createSupabaseContext`, which takes the request, verifies the credentials, and hands back a ready-to-use context. There is no file to copy and no Nuxt configuration to add: `h3`'s `toWebRequest` turns the event into the `Request` it expects.
+Nuxt server routes get that context from `createSupabaseContext`, which takes the request, verifies the credentials, and returns the context. `h3`'s `toWebRequest` turns the event into the `Request` it expects.
 
 ```bash
 npm install @supabase/server
@@ -414,4 +414,12 @@ export default defineEventHandler(async (event) => {
 
 </$CodeTabs>
 
-To let anonymous callers through, widen the mode to `auth: ['user', 'none']`. A valid token still produces a signed-in context; a request with no credentials falls through to `'none'` with `userClaims: null`, so the handler has to check for null before reading `userClaims.id`. A malformed or expired token is still rejected with a 401 rather than silently downgraded. Do not widen a route that is meant to be signed-in only: it turns a 401 into a 200. For app-wide auth, do the same check once in a Nuxt server middleware at `server/middleware/supabase.ts` and put the context on `event.context`. See the [server reference](/docs/reference/server) for the full API.
+To let anonymous callers through, widen the mode to `auth: ['user', 'none']`. A valid token still produces a signed-in context. A request with no credentials falls through to `'none'` with `userClaims: null`, so the handler has to check for null before reading `userClaims.id`. A malformed or expired token is still rejected with a 401 rather than silently downgraded.
+
+<Admonition type="caution">
+
+Widening a signed-in-only route to `auth: ['user', 'none']` turns a 401 into a 200. Only widen a route that is meant to serve anonymous callers.
+
+</Admonition>
+
+For app-wide auth, do the same check once in a Nuxt server middleware at `server/middleware/supabase.ts` and put the context on `event.context`. For the full API, see the [server reference](/docs/reference/server).
