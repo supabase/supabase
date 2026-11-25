@@ -1,6 +1,6 @@
 # Content-type gate
 
-Before drafting anything, classify the request against `apps/docs`'s real content types. This is grounded in `ask-the-docs`'s `app-map.md` "Content types" table — re-check that table if this note and the live app-map ever disagree, since the app-map is the source of truth.
+Before drafting anything, classify the request against the real content types. `ask-the-docs`'s `app-map.md` "Content types" table covers `apps/docs`; for `/kb`, see `apps/kb/AGENTS.md`.
 
 | Type | Location | Hand-authored by this skill? |
 |---|---|---|

@@ -32,7 +32,7 @@ _Skills:_ `/ask-the-docs` for how the docs surface works today; `/pm-the-docs` f
 
 ### 2. Shape
 
-_Skill:_ `/ask-the-docs` for IA placement, architecture, and where content lives.
+_Skills:_ `/pm-the-docs` for content type and placement decisions; `/ask-the-docs` for docs-app architecture and where content lives.
 
 - [ ] P: Pick the content type(s): tutorial (learning), how-to (a task), reference (lookup), explanation (the why). Do not mix types on one page (refer to [Diátaxis](https://diataxis.fr/))
 - [ ] P: Decide where the page lives in the existing IA and what links in and out (avoid orphan pages)
@@ -41,7 +41,7 @@ _Skill:_ `/ask-the-docs` for IA placement, architecture, and where content lives
 
 ### 3. Draft
 
-_Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the code (`/pm-the-docs` → universe when accessible, else public search / named product repos).
+_Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the code.
 
 - [ ] P: Lead with the why and the outcome, then the how/what (product story first)
 - [ ] P: Include at least one runnable, copy-pasteable example that you have actually run (or will run in Self-review via `/test-the-docs`)
