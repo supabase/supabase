@@ -23,12 +23,15 @@ import { AccountDeletion } from '@/components/interfaces/Account/Preferences/Acc
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
+import { LanguageSettings } from '@/components/interfaces/Account/Preferences/LanguageSettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
 import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
 import { AlertError } from '@/components/ui/AlertError'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { MessageKey } from '@/lib/i18n/messages/en'
+import { TranslatedText } from '@/lib/i18n/TranslatedText'
 import { useProfile } from '@/lib/profile'
 
 export const Route = createFileRoute('/_app/account/me')({
@@ -43,12 +46,16 @@ function AccountMePage() {
   return IS_PLATFORM ? <PlatformPreferences /> : <SelfHostedPreferences />
 }
 
-const PreferencesPageHeader = ({ description }: { description: string }) => (
+const PreferencesPageHeader = ({ description }: { description: MessageKey }) => (
   <PageHeader size="small">
     <PageHeaderMeta>
       <PageHeaderSummary>
-        <PageHeaderTitle>Preferences</PageHeaderTitle>
-        <PageHeaderDescription>{description}</PageHeaderDescription>
+        <PageHeaderTitle>
+          <TranslatedText messageKey="account.preferences.title" />
+        </PageHeaderTitle>
+        <PageHeaderDescription>
+          <TranslatedText messageKey={description} />
+        </PageHeaderDescription>
       </PageHeaderSummary>
     </PageHeaderMeta>
   </PageHeader>
@@ -74,7 +81,7 @@ const PlatformPreferences = () => {
 
   return (
     <>
-      <PreferencesPageHeader description="Manage your account profile, connections, and dashboard experience." />
+      <PreferencesPageHeader description="account.preferences.description.platform" />
       <PageContainer size="small">
         {isError && (
           <Card>
@@ -93,6 +100,8 @@ const PlatformPreferences = () => {
             <AccountConnections />
 
             <ThemeSettings />
+
+            <LanguageSettings />
 
             <TimezoneSettings />
 
@@ -162,9 +171,11 @@ const ProfileFieldLoadingRow = ({
 const SelfHostedPreferences = () => {
   return (
     <>
-      <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
+      <PreferencesPageHeader description="account.preferences.description.selfHosted" />
       <PageContainer size="small">
         <ThemeSettings />
+
+        <LanguageSettings />
 
         <TimezoneSettings />
 
