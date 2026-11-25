@@ -31,13 +31,26 @@ interface BreadcrumbCrumbProps {
 
 export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrumbsProps) => {
   const pathname = useDocsPathname()
-  const crumbs = resolveBreadcrumbs(pathname, useNavItems())
+  // a group with an overview page links to it, so on that page the group is the current crumb
+  const linkedCrumbs = resolveBreadcrumbs(pathname, useNavItems()).reduce<Crumb[]>(
+    (chain, crumb) => {
+      const firstItem = crumb.items?.[0]
+      const url =
+        crumb.url ??
+        (firstItem && getCrumbName(firstItem) === 'Overview' ? firstItem.url : undefined)
+      if (url && url === chain.at(-1)?.url) return chain
+      return [...chain, url === crumb.url ? crumb : { ...crumb, url }]
+    },
+    []
+  )
+  // the sidebar top row names the section, so the header keeps only the parent and the page
+  const crumbs = (linkedCrumbs.length > 1 ? linkedCrumbs.slice(1) : linkedCrumbs).slice(-2)
 
   if (crumbs.length === 0) return null
 
   return (
     <Breadcrumb aria-label="Breadcrumb" className={cn('min-w-0 flex-1', className)}>
-      <BreadcrumbList className="flex-nowrap gap-2 overflow-hidden whitespace-nowrap no-scrollbar mask-fadeout-right font-medium leading-4.5 sm:gap-2 hover:overflow-x-auto focus-within:overflow-x-auto">
+      <BreadcrumbList className="-m-1.5 flex-nowrap gap-2 overflow-hidden whitespace-nowrap no-scrollbar mask-fadeout-right p-1.5 font-medium leading-4.5 sm:gap-2 hover:overflow-x-auto focus-within:overflow-x-auto">
         {crumbs.map((crumb, index) => (
           <Fragment key={`${crumb.url}-${getCrumbName(crumb)}`}>
             {index > 0 ? (
@@ -48,7 +61,7 @@ export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrum
             <BreadcrumbCrumb
               crumb={crumb}
               isCurrent={index === crumbs.length - 1 && crumb.url === pathname}
-              hasIcon={index > 0}
+              hasIcon={crumb !== linkedCrumbs[0]}
             />
             {crumb.version ? (
               <BreadcrumbItem className="shrink-0">
@@ -83,7 +96,10 @@ const BreadcrumbCrumb = ({ crumb, isCurrent, hasIcon }: BreadcrumbCrumbProps) =>
       {isCurrent ? (
         <BreadcrumbPage className="flex items-center gap-2">{label}</BreadcrumbPage>
       ) : crumb.url ? (
-        <BreadcrumbLink asChild className="flex items-center gap-2 no-underline">
+        <BreadcrumbLink
+          asChild
+          className="-m-1.5 flex items-center gap-2 rounded-md p-1.5 no-underline focus-inset"
+        >
           <Link href={crumb.url}>{label}</Link>
         </BreadcrumbLink>
       ) : (
