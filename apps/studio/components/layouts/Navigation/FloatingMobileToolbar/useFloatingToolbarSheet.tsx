@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import { useCallback } from 'react'
 
 import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
@@ -6,8 +6,7 @@ import { isMenuContent, shouldShowMenuButton } from './FloatingMobileToolbar.uti
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export function useFloatingToolbarSheet(hideMobileMenu?: boolean) {
-  const router = useRouter()
-  const pathname = router.asPath?.split('?')[0] ?? router.pathname
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { content: sheetContent, setContent: setSheetContent, openMenu } = useMobileSheet()
   const { clearActiveSidebar, closeActive, activeSidebar } = useSidebarManagerSnapshot()
 

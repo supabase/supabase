@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const HomeIcon = ({ className }: { className?: string }) => {
@@ -16,7 +15,6 @@ export const HomeIcon = ({ className }: { className?: string }) => {
 
   const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
-  const router = useRouter()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const getDefaultOrgRedirect = () => {
@@ -39,7 +37,7 @@ export const HomeIcon = ({ className }: { className?: string }) => {
         >
           <img
             alt="Supabase"
-            src={`${router.basePath}/img/supabase-logo.svg`}
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
             className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
           />
           <span className="sr-only">Back to organization home</span>

@@ -1,9 +1,17 @@
-import { fireEvent, screen } from '@testing-library/react'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import type { MouseEventHandler, ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectNeedsSecuring } from './ProjectNeedsSecuring'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { render } from '@/tests/helpers'
 
 const {
@@ -14,8 +22,6 @@ const {
   mockUseProjectPostgrestConfigQuery,
   mockUseTablePrivilegesQuery,
   mockUseLocalStorageQuery,
-  mockUseRouter,
-  mockRouterPush,
 } = vi.hoisted(() => ({
   mockUseFlag: vi.fn(),
   mockUseProjectLintsQuery: vi.fn(),
@@ -24,9 +30,31 @@ const {
   mockUseProjectPostgrestConfigQuery: vi.fn(),
   mockUseTablePrivilegesQuery: vi.fn(),
   mockUseLocalStorageQuery: vi.fn(),
-  mockUseRouter: vi.fn(),
-  mockRouterPush: vi.fn(),
 }))
+
+const createTestRouter = async (initialUrl: string) => {
+  const rootRoute = createRootRoute()
+  const projectHomeRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/project/$ref',
+  })
+  const tablesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/project/$ref/database/tables',
+  })
+  const policiesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/project/$ref/database/policies',
+  })
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([projectHomeRoute, tablesRoute, policiesRoute]),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
+  await router.load()
+  return router
+}
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<typeof import('common')>('common')
@@ -37,10 +65,6 @@ vi.mock('common', async () => {
     useParams: () => ({ ref: 'project-ref' }),
   }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => mockUseRouter(),
-}))
 
 vi.mock('next/link', () => ({
   default: ({
@@ -139,10 +163,12 @@ const tablePrivileges = [
 ]
 
 describe('ProjectNeedsSecuring', () => {
+  let initialUrl = '/project/project-ref'
+
   beforeEach(() => {
     mockAnimationsApi()
+    initialUrl = '/project/project-ref'
     mockUseFlag.mockReturnValue(true)
-    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]', push: mockRouterPush })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { connectionString: 'postgresql://example' },
     })
@@ -173,11 +199,15 @@ describe('ProjectNeedsSecuring', () => {
     window.localStorage.clear()
   })
 
-  it('renders the security gate when an exposed table has RLS disabled and the project has not been dismissed', () => {
+  it('renders the security gate when an exposed table has RLS disabled and the project has not been dismissed', async () => {
+    const router = await createTestRouter(initialUrl)
+
     render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
+      <RouterContextProvider router={router}>
+        <ProjectNeedsSecuring>
+          <div data-testid="project-children">Project content</div>
+        </ProjectNeedsSecuring>
+      </RouterContextProvider>
     )
 
     expect(screen.getByText('Your project needs securing')).toBeInTheDocument()
@@ -194,18 +224,24 @@ describe('ProjectNeedsSecuring', () => {
     expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
   })
 
-  it('navigates to the table policies page when a table row is clicked', () => {
+  it('navigates to the table policies page when a table row is clicked', async () => {
+    const router = await createTestRouter(initialUrl)
+
     render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
+      <RouterContextProvider router={router}>
+        <ProjectNeedsSecuring>
+          <div data-testid="project-children">Project content</div>
+        </ProjectNeedsSecuring>
+      </RouterContextProvider>
     )
 
     fireEvent.click(screen.getByText('invoices'))
 
-    expect(mockRouterPush).toHaveBeenCalledWith(
-      '/project/project-ref/database/policies?schema=public&search=invoices'
-    )
+    await waitFor(() => {
+      expect(router.state.location.href).toBe(
+        '/project/project-ref/database/policies?schema=public&search=invoices'
+      )
+    })
   })
 
   it.each([
@@ -225,16 +261,21 @@ describe('ProjectNeedsSecuring', () => {
     ],
     [
       'on non-home project routes',
-      () => mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' }),
+      () => {
+        initialUrl = '/project/project-ref/database/tables'
+      },
     ],
     ['the feature flag is disabled', () => mockUseFlag.mockReturnValue(false)],
-  ])('renders the project content when %s', (_, arrange) => {
+  ])('renders the project content when %s', async (_, arrange) => {
     arrange()
+    const router = await createTestRouter(initialUrl)
 
     render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
+      <RouterContextProvider router={router}>
+        <ProjectNeedsSecuring>
+          <div data-testid="project-children">Project content</div>
+        </ProjectNeedsSecuring>
+      </RouterContextProvider>
     )
 
     expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()

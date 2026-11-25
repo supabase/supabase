@@ -1,3 +1,9 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useState, type ReactNode } from 'react'
@@ -8,13 +14,11 @@ import { ProjectLayout } from './index'
 import type { MobileMenuContentProps } from './LayoutHeader/MobileMenuContent'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
-const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
+const { mockRoute, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
   () => ({
-    mockRouter: {
-      pathname: '/project/[ref]/observability/query-performance',
-      asPath: '/project/default/observability/query-performance',
-      push: vi.fn(),
-      replace: vi.fn(),
+    mockRoute: {
+      pattern: '/project/$ref/observability/query-performance',
+      url: '/project/default/observability/query-performance',
     },
     mockSetSelectedDatabaseId: vi.fn(),
     mockSetMobileMenuOpen: vi.fn(),
@@ -49,8 +53,8 @@ const {
   mockUseLocalStorageQuery: vi.fn(),
 }))
 
-vi.mock('next/router', () => ({
-  useRouter: () => mockRouter,
+vi.mock('@/hooks/misc/useRoutePattern', () => ({
+  useRoutePattern: () => mockRoute.pattern,
 }))
 
 vi.mock('common', () => ({
@@ -268,8 +272,16 @@ const ResourceMenuHarness = () => {
   )
 }
 
+const renderWithRouter = (ui: ReactNode) => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [mockRoute.url] }),
+  })
+  return render(<RouterContextProvider router={router}>{ui}</RouterContextProvider>)
+}
+
 const renderLayout = () =>
-  render(
+  renderWithRouter(
     <MobileSheetProvider>
       <ProjectLayout product="Database" isBlocking={false}>
         <div />
@@ -280,8 +292,8 @@ const renderLayout = () =>
 describe('ProjectLayout title', () => {
   beforeEach(() => {
     mockViewport.isMobile = false
-    mockRouter.pathname = '/project/[ref]/observability/query-performance'
-    mockRouter.asPath = '/project/default/observability/query-performance'
+    mockRoute.pattern = '/project/$ref/observability/query-performance'
+    mockRoute.url = '/project/default/observability/query-performance'
     document.title = ''
     mockProjectState.current = {
       ref: 'default',
@@ -305,7 +317,7 @@ describe('ProjectLayout title', () => {
 
   it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
     mockViewport.isMobile = true
-    render(
+    renderWithRouter(
       <MobileSheetProvider>
         <ResourceMenuHarness />
         <MobileSheetHarness />
@@ -326,7 +338,7 @@ describe('ProjectLayout title', () => {
   it.each([false, true])(
     'keeps sidebar navigation enabled with resizableSidebar=%s and preserves handle availability',
     (resizableSidebar) => {
-      render(
+      renderWithRouter(
         <MobileSheetProvider>
           <ProjectLayout
             product="Database"
@@ -356,7 +368,7 @@ describe('ProjectLayout title', () => {
   )
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
-    render(
+    renderWithRouter(
       <MobileSheetProvider>
         <ProjectLayout browserTitle={{ section: 'Settings' }} product="Settings" isBlocking={false}>
           <div>Page Content</div>
@@ -372,7 +384,7 @@ describe('ProjectLayout title', () => {
   })
 
   it('prefers entity-first browserTitle metadata when provided', async () => {
-    render(
+    renderWithRouter(
       <MobileSheetProvider>
         <ProjectLayout
           product="Database"
@@ -422,8 +434,8 @@ describe('ProjectLayout title', () => {
 
   it('renders the branches page instead of the paused state for a paused project', () => {
     mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
-    mockRouter.pathname = '/project/[ref]/branches'
-    mockRouter.asPath = '/project/default/branches'
+    mockRoute.pattern = '/project/$ref/branches'
+    mockRoute.url = '/project/default/branches'
 
     renderLayout()
 
@@ -433,8 +445,8 @@ describe('ProjectLayout title', () => {
 
 describe('FREE_MICRO_UPGRADE banner', () => {
   beforeEach(() => {
-    mockRouter.pathname = '/project/[ref]'
-    mockRouter.asPath = '/project/default'
+    mockRoute.pattern = '/project/$ref'
+    mockRoute.url = '/project/default'
     mockProjectState.current = {
       ref: 'default',
       name: 'Project 1',
@@ -447,8 +459,8 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   afterEach(() => {
-    mockRouter.pathname = '/project/[ref]/observability/query-performance'
-    mockRouter.asPath = '/project/default/observability/query-performance'
+    mockRoute.pattern = '/project/$ref/observability/query-performance'
+    mockRoute.url = '/project/default/observability/query-performance'
     mockProjectState.current = {
       ref: 'default',
       name: 'Project 1',

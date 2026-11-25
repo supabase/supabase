@@ -1,9 +1,9 @@
+import { useLocation } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { toPng } from 'html-to-image'
 import { CameraIcon, CircleCheckIcon, ImageIcon, UploadIcon, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -67,7 +67,7 @@ const ThanksMessageView = ({
 )
 
 export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidgetProps) => {
-  const router = useRouter()
+  const href = useLocation({ select: (location) => location.href })
   const { profile } = useProfile()
   const { ref, slug } = useParams()
   const track = useTrack()
@@ -184,7 +184,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
         projectRef: ref,
         organizationSlug: slug,
         message: formattedFeedback,
-        pathname: router.asPath,
+        pathname: href,
       })
     }
   }

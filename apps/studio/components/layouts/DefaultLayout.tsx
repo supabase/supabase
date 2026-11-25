@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useBreakpoint, useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
@@ -50,7 +50,7 @@ export const DefaultLayout = ({
   useCheckLatestDeploy()
 
   const { ref } = useParams()
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const panelRef = usePanelRef()
   const isMobile = useBreakpoint('md')
   const isSidebarOverlay = useBreakpoint('xl')
@@ -65,7 +65,7 @@ export const DefaultLayout = ({
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
-  const backToDashboardURL = router.pathname.startsWith('/account')
+  const backToDashboardURL = pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
       : IS_PLATFORM && !!lastVisitedOrganization
@@ -119,7 +119,7 @@ export const DefaultLayout = ({
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">
                 {/* Sidebar - Only show for project pages, not account pages */}
-                {!router.pathname.startsWith('/account') && <Sidebar />}
+                {!pathname.startsWith('/account') && <Sidebar />}
                 {/* Main Content with Layout Sidebar */}
                 <ResizablePanelGroup
                   orientation="horizontal"
@@ -151,7 +151,7 @@ export const DefaultLayout = ({
             <BannerStack />
             {IS_PLATFORM && <OnboardingSurveyFollowUpCard />}
             <StudioMobileSheetNav
-              shouldCloseOnQueryChange={getPathSegment(router.pathname, 3) !== 'issues'}
+              shouldCloseOnQueryChange={getPathSegment(pathname, 3) !== 'issues'}
             />
           </MobileSheetProvider>
         </ProjectContextProvider>

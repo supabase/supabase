@@ -1,11 +1,12 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { navigateToUrl } from '@/lib/navigation'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -18,7 +19,7 @@ export const DeleteSnippetsModal = ({
   snippets: Snippet[]
   onClose: () => void
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, id } = useParams()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -34,9 +35,9 @@ export const DeleteSnippetsModal = ({
       if (openedSQLTabs.length > 0) {
         // [Joshen] For simplicity, just opening the first tab for now
         const firstTabId = openedSQLTabs[0].split('sql-')[1]
-        router.push(`/project/${projectRef}/sql/${firstTabId}`)
+        void navigateToUrl(navigate, `/project/${projectRef}/sql/${firstTabId}`)
       } else {
-        router.push(`/project/${projectRef}/sql/new`)
+        void navigateToUrl(navigate, `/project/${projectRef}/sql/new`)
       }
     }
 

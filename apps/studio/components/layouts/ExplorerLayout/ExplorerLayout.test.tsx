@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -7,6 +8,7 @@ import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerLayout } from './ExplorerLayout'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -64,18 +66,25 @@ describe('Explorer Home tab navigation', () => {
         metadata: { queryId: 'query-1' },
         isPreview: false,
       })
+      const router = createRouter({
+        routeTree: createRootRoute(),
+        history: createMemoryHistory({
+          initialEntries: ['/project/default/explorer/query/query-1'],
+        }),
+        parseSearch,
+        stringifySearch,
+      })
       let historyAtNavigation: unknown
-      const push = vi.spyOn(mockRouter, 'push')
-      push.mockImplementationOnce(async () => {
+      const navigate = vi.spyOn(router, 'navigate')
+      navigate.mockImplementationOnce(async () => {
         historyAtNavigation = queryClient.getQueryData(historyKey)
-        return true
       })
 
       customRender(
         <TabsStateContext.Provider value={tabs}>
           <ExplorerLayout>Explorer content</ExplorerLayout>
         </TabsStateContext.Provider>,
-        { queryClient, initialUrl: '/project/default/explorer/query/query-1' }
+        { queryClient, router }
       )
 
       if (input === 'mouse') {
@@ -86,7 +95,9 @@ describe('Explorer Home tab navigation', () => {
         await user.keyboard('{ArrowLeft}')
       }
 
-      expect(push).toHaveBeenCalledWith('/project/default/explorer')
+      expect(navigate).toHaveBeenCalledWith(
+        expect.objectContaining({ to: '/project/default/explorer' })
+      )
       expect(historyAtNavigation).toEqual(otherHistory)
       expect(queryClient.getQueryData(historyKey)).toEqual(otherHistory)
       expect(screen.getByRole('tab', { name: 'Open Explorer home' })).toHaveAttribute(

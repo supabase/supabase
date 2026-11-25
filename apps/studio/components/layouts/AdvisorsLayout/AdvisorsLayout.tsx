@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -12,8 +12,8 @@ export interface AdvisorsLayoutProps {
 }
 
 const AdvisorsLayoutContent = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const page = pathname.split('/')[4]
   const menu = useGenerateAdvisorsMenu()
 
   return (

@@ -1,5 +1,5 @@
+import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
@@ -10,7 +10,8 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const setIsOpen = useSetCommandMenuOpen()
   let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
@@ -167,14 +168,10 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         id: 'nav-project-settings-connection-string',
         name: 'Connection string',
         action: () => {
-          router.push(
-            {
-              pathname: router.pathname,
-              query: { ...router.query, showConnect: 'true' },
-            },
-            undefined,
-            { shallow: true }
-          )
+          void navigate<AnyRouter, string>({
+            to: pathname,
+            search: (prev: Record<string, unknown>) => ({ ...prev, showConnect: 'true' }),
+          })
           setIsOpen(false)
         },
         defaultHidden: true,

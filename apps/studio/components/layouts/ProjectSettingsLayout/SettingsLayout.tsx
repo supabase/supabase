@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -13,11 +13,9 @@ import { withAuth } from '@/hooks/misc/withAuth'
  * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
  */
 export const SettingsProductMenu = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
 
-  const page = router.pathname.includes('billing')
-    ? router.pathname.split('/')[5]
-    : router.pathname.split('/')[4]
+  const page = pathname.includes('billing') ? pathname.split('/')[5] : pathname.split('/')[4]
 
   const menu = useGenerateSettingsMenu()
 

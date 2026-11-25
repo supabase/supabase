@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -14,9 +14,10 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
+import { navigateToUrl } from '@/lib/navigation'
 
 export function MobileProjectSwitcher() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
@@ -53,7 +54,7 @@ export function MobileProjectSwitcher() {
 
   const goToOrganization = () => {
     setOpen(false)
-    router.push(organizationHref)
+    void navigateToUrl(navigate, organizationHref)
   }
 
   if (isLoadingProject || !displayProject)

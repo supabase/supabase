@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocation } from '@tanstack/react-router'
 import { useIsMFAEnabled, useParams } from 'common'
 import {
   BlocksIcon,
@@ -10,7 +11,6 @@ import {
   SettingsIcon,
   UsersIcon,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -27,7 +27,6 @@ import { orgItemHasSubmenu, useOrgMenuNavigation } from './useOrgMenuNavigation'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface OrgMenuContentProps {
@@ -35,16 +34,20 @@ export interface OrgMenuContentProps {
 }
 
 export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
-  const router = useRouter()
+  const { pathname, orgSlug } = useLocation({
+    select: (location) => ({
+      pathname: location.pathname,
+      orgSlug: (location.search as Record<string, string | string[] | undefined>).orgSlug,
+    }),
+  })
   const { slug } = useParams()
-  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+  const organizationSlug: string = slug ?? (typeof orgSlug === 'string' ? orgSlug : '')
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   const showBilling = useIsFeatureEnabled('billing:all')
 
-  const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const activeRoute = getOrgActiveRoute(pathname)
   const initialSectionKey = getOrgSectionKeyFromPathname(activeRoute)
 

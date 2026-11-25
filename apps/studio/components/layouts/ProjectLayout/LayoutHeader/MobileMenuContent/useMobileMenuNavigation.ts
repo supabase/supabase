@@ -1,10 +1,11 @@
 'use client'
 
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useState } from 'react'
 
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import type { Route } from '@/components/ui/ui.types'
+import { navigateToUrl } from '@/lib/navigation'
 
 const TOP_LEVEL_DIRECT_LINK_KEYS = ['editor', 'sql', 'issues'] as const
 
@@ -30,7 +31,7 @@ export function useMobileMenuNavigation({
   hasCurrentProductMenu,
   onCloseSheet,
 }: UseMobileMenuNavigationParams) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const [viewLevel, setViewLevel] = useState<'top' | 'section'>(
     hasCurrentProductMenu && currentSectionKey ? 'section' : 'top'
@@ -42,7 +43,7 @@ export function useMobileMenuNavigation({
       if (route.disabled) return
 
       if (isDirectLinkAtTopLevel(route) && route.link) {
-        router.push(route.link)
+        void navigateToUrl(navigate, route.link)
         onCloseSheet?.()
         return
       }
@@ -54,11 +55,11 @@ export function useMobileMenuNavigation({
       }
 
       if (route.link) {
-        router.push(route.link)
+        void navigateToUrl(navigate, route.link)
         onCloseSheet?.()
       }
     },
-    [router, onCloseSheet]
+    [navigate, onCloseSheet]
   )
 
   const handleBackToTop = useCallback(() => {

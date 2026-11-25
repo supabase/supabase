@@ -7,10 +7,10 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PlusIcon, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
 import {
   Checkbox,
@@ -34,6 +34,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import {
   editorEntityTypes,
+  useTabRouter,
   useTabsStateSnapshot,
   type Tab,
   type TabCloseConfirmation,
@@ -55,7 +56,8 @@ export const EditorTabs = ({
   onTabChange,
 }: EditorTabsProps) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const router = useTabRouter()
+  const hasNewTab = useLocation({ select: (location) => location.href.includes('/new') })
   const { setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab } =
     useDashboardHistory()
 
@@ -75,8 +77,6 @@ export const EditorTabs = ({
   const openTabs = tabs.openTabs
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
-
-  const hasNewTab = router.asPath.includes('/new')
 
   // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
   const editorTabs = !!editor

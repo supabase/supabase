@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'motion/react'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useMemo } from 'react'
 
 import type {
@@ -14,15 +13,16 @@ import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isApiAccessRole, isApiPrivilegeType } from '@/lib/data-api-types'
 import { useTrack } from '@/lib/telemetry/track'
 
 const PROJECT_SECURITY_FEATURE_FLAG = 'projectNeedsSecuring'
-const PROJECT_HOME_PATHNAME = '/project/[ref]'
+const PROJECT_HOME_PATHNAME = '/project/$ref'
 
 const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -35,7 +35,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
       null
     )
 
-  const isProjectHomeRoute = router.pathname === PROJECT_HOME_PATHNAME
+  const isProjectHomeRoute = routePattern === PROJECT_HOME_PATHNAME
 
   const { data: lints = [] } = useProjectLintsQuery(
     { projectRef },

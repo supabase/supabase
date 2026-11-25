@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ExternalLinkIcon, XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
@@ -83,7 +83,7 @@ const OrganizationLayoutContent = ({
   children,
   title,
 }: PropsWithChildren<OrganizationLayoutProps>) => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { appTitle } = useCustomContent(['app:title'])
   const [isBannerDismissed, setIsBannerDismissed] = useLocalStorageQuery<boolean>(
@@ -95,7 +95,7 @@ const OrganizationLayoutContent = ({
   )
 
   // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
-  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => router.pathname.endsWith(x))
+  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => pathname.endsWith(x))
   const pageTitle = buildStudioPageTitle({
     section: title,
     surface: isSettingsSurface ? 'Organization Settings' : undefined,

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { getAccessToken } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { cn } from 'ui'
@@ -23,6 +23,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { navigateToUrl } from '@/lib/navigation'
 
 type Quote = {
   text: string
@@ -68,7 +69,8 @@ export const SignInLayout = ({
   hasStatusBanner = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const queryClient = useQueryClient()
   const statusBanner = useStatusBanner({ signedOut: true })
   const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
@@ -115,22 +117,22 @@ export const SignInLayout = ({
 
           if (data) {
             // we're already where we need to be
-            if (router.pathname === '/sign-in-recovery-code') {
+            if (pathname === '/sign-in-recovery-code') {
               return
             }
             // we're already where we need to be
-            if (router.pathname === '/sign-in-mfa') {
+            if (pathname === '/sign-in-mfa') {
               return
             }
             if (data.currentLevel !== data.nextLevel) {
               const redirectTo = buildPathWithParams('/sign-in-mfa')
-              router.replace(redirectTo)
+              void navigateToUrl(navigate, redirectTo, { replace: true })
               return
             }
           }
 
           await queryClient.resetQueries()
-          if (!isUnmounted) router.push(getReturnToPath())
+          if (!isUnmounted) void navigateToUrl(navigate, getReturnToPath())
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods

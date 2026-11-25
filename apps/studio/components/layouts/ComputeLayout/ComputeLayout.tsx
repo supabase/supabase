@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo, type PropsWithChildren } from 'react'
 import { Badge } from 'ui'
 
@@ -8,6 +8,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 
@@ -21,7 +22,7 @@ const useGenerateComputeMenu = (): ProductMenuGroup[] => {
           {
             name: PRODUCT_NAME,
             key: 'main',
-            pages: ['', '[name]'],
+            pages: ['', '$name'],
             url: `/project/${projectRef}/compute`,
             items: [],
           },
@@ -39,8 +40,8 @@ const useGenerateComputeMenu = (): ProductMenuGroup[] => {
 }
 
 export const ComputeProductMenu = () => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const routePattern = useRoutePattern()
+  const page = routePattern.split('/')[4]
   const menu = useGenerateComputeMenu()
   return <ProductMenu page={page} menu={menu} />
 }
@@ -50,7 +51,7 @@ interface ComputeLayoutProps {
 }
 
 const ComputeLayoutContent = ({ children, title }: PropsWithChildren<ComputeLayoutProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const computeEnabled = useFlag('compute')
@@ -61,10 +62,10 @@ const ComputeLayoutContent = ({ children, title }: PropsWithChildren<ComputeLayo
   )
 
   useEffect(() => {
-    if (hasLoaded && !computeEnabled) {
-      router.replace(`/project/${projectRef}`)
+    if (hasLoaded && !computeEnabled && projectRef) {
+      void navigate({ to: '/project/$ref', params: { ref: projectRef }, replace: true })
     }
-  }, [router, hasLoaded, computeEnabled, projectRef])
+  }, [navigate, hasLoaded, computeEnabled, projectRef])
 
   if (!computeEnabled) return null
 

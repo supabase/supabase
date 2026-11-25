@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { AlertTriangleIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -13,7 +13,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const UnhealthyState = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { setProjectStatus } = useSetProjectStatus()
@@ -38,7 +38,7 @@ export const UnhealthyState = () => {
     onSuccess: () => {
       setProjectStatus({ ref: project?.ref ?? '', status: PROJECT_STATUS.RESTARTING })
       toast.success('Restarting project...')
-      router.push(`/project/${ref}`)
+      void navigate({ to: '/project/$ref', params: { ref: ref ?? '' } })
     },
     onError: (error) => {
       toast.error(`Failed to restart project: ${error.message}`)

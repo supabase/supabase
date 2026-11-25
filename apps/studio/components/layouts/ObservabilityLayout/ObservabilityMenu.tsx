@@ -1,6 +1,6 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -30,9 +30,10 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ObservabilityMenu = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref, id } = useParams()
-  const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
+  const pageKey = (id || pathname.split('/')[4] || 'observability') as string
 
   const menuItems = useGenerateObservabilityMenu()
   const { data: customReportItems, isLoading } = useGenerateCustomReportsMenu()
@@ -74,7 +75,8 @@ export const ObservabilityMenu = () => {
     // succeeds so a failed delete (which rolls the cache back) doesn't strand the route.
     deletion
       .then(() => {
-        if (isViewingDeletedReport) router.push(`/project/${ref}/observability`)
+        if (isViewingDeletedReport)
+          void navigate({ to: '/project/$ref/observability', params: { ref } })
       })
       .catch(() => {
         // Error is already surfaced by toast.promise; keep the user on the current route.

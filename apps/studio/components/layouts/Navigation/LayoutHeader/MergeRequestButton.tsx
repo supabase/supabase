@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { GitMergeIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -14,7 +14,7 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: projectDetails } = useSelectedProjectQuery()
   const track = useTrack()
 
@@ -55,7 +55,7 @@ export const MergeRequestButton = () => {
   const handleClick = () => {
     track('header_merge_request_button_clicked', { hasReviewRequested })
     if (hasReviewRequested) {
-      router.push(`/project/${selectedBranch.project_ref}/merge`)
+      void navigate({ to: '/project/$ref/merge', params: { ref: selectedBranch.project_ref } })
     } else {
       if (updateBranchGrant.status !== 'granted') return
       updateBranch(
@@ -68,7 +68,10 @@ export const MergeRequestButton = () => {
         {
           onSuccess: () => {
             toast.success('Merge request created')
-            router.push(`/project/${selectedBranch.project_ref}/merge`)
+            void navigate({
+              to: '/project/$ref/merge',
+              params: { ref: selectedBranch.project_ref },
+            })
             track('branch_create_merge_request_button_clicked', {
               branchType: selectedBranch.persistent ? 'persistent' : 'preview',
               origin: 'header',

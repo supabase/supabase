@@ -1,4 +1,5 @@
 import { keepPreviousData } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import {
@@ -14,7 +15,6 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
 import {
   Button,
@@ -39,6 +39,7 @@ import {
 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import {
   isFolderEditing,
@@ -104,7 +105,7 @@ export const SQLEditorTreeViewItem = ({
   onFolderContentsChange,
   ...props
 }: SQLEditorTreeViewItemProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -236,7 +237,7 @@ export const SQLEditorTreeViewItem = ({
 
     snapV2.addSnippet({ projectRef, snippet: snippetCopy })
     snapV2.addNeedsSaving(snippetCopy.id!)
-    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
+    void navigateToUrl(navigate, `/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
   return (
@@ -266,11 +267,11 @@ export const SQLEditorTreeViewItem = ({
             onClick={(e) => {
               if (!isBranch) {
                 if (!e.shiftKey) {
-                  router.push(`/project/${projectRef}/sql/${element.id}`)
+                  void navigateToUrl(navigate, `/project/${projectRef}/sql/${element.id}`)
                 } else if (id !== 'new') {
                   onMultiSelect?.(element.id)
                 } else {
-                  router.push(`/project/${projectRef}/sql/${element.id}`)
+                  void navigateToUrl(navigate, `/project/${projectRef}/sql/${element.id}`)
                 }
               } else {
                 // Prevent expanding folder while editing text

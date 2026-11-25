@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
 
 import {
   generateOrganizationSettingsSections,
@@ -8,18 +8,21 @@ import {
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SubMenu } from '@/components/ui/ProductMenu/SubMenu'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 
 export interface OrganizationSettingsMenuProps {
   onCloseSheet?: () => void
 }
 
 export function OrganizationSettingsMenu({ onCloseSheet }: OrganizationSettingsMenuProps) {
-  const router = useRouter()
+  const { pathname, orgSlug } = useLocation({
+    select: (location) => ({
+      pathname: location.pathname,
+      orgSlug: (location.search as Record<string, string | string[] | undefined>).orgSlug,
+    }),
+  })
   const { slug } = useParams()
-  const organizationSlug = slug ?? (router.query.orgSlug as string) ?? ''
+  const organizationSlug = slug ?? (typeof orgSlug === 'string' ? orgSlug : '')
 
-  const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const currentPath = normalizeOrganizationSettingsPath(pathname)
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const showPrivateApps = useFlag('privateApps')

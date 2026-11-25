@@ -1,6 +1,5 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { LightbulbIcon, TriangleAlertIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 
@@ -17,7 +16,7 @@ import { helpPanelState } from '@/state/help-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
-  const router = useRouter()
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
@@ -26,12 +25,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
   const track = useTrack()
 
-  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
-  const supportLinkQueryParams = getSupportLinkQueryParams(
-    project,
-    org,
-    router.query.ref as string | undefined
-  )
+  const projectRef = project?.parent_project_ref ?? ref
+  const supportLinkQueryParams = getSupportLinkQueryParams(project, org, ref)
 
   return (
     <Popover

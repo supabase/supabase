@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
@@ -7,6 +7,7 @@ import { useContentQuery, type Content, type ContentBase } from '@/data/content/
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { SearchRecord } from '@/lib/router-search-params'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { type Dashboards } from '@/types'
 
@@ -24,11 +25,11 @@ export interface ObservabilityMenuSection {
 }
 
 const usePreservedQueryParams = () => {
-  const router = useRouter()
+  const search = useLocation({ select: (location) => location.search }) as SearchRecord
 
   // Preserve date range query parameters when navigating
   const preservedQueryParams = useMemo(() => {
-    const { its, ite, isHelper, helperText } = router.query
+    const { its, ite, isHelper, helperText } = search
     const params = new URLSearchParams()
 
     if (its && typeof its === 'string') params.set('its', its)
@@ -38,7 +39,7 @@ const usePreservedQueryParams = () => {
 
     const queryString = params.toString()
     return queryString ? `?${queryString}` : ''
-  }, [router.query])
+  }, [search])
 
   return preservedQueryParams
 }
