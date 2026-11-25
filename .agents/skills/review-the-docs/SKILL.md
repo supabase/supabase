@@ -68,7 +68,7 @@ pnpm build:reference-markdown   # when reference pipeline changed
 4. Spot-check frontmatter, internal links, and nav wiring for content changes.
    For content and tutorial changes, also run the [Content review](#content-review)
    and the [Fact check](#fact-check).
-5. **Run [`test-the-docs`](../test-the-docs/SKILL.md)** — for content/tutorial PRs with new or changed procedural fenced blocks. When a person reviews with you, ask first. When no one can answer, run it whenever the environment meets its prerequisites. Prerequisites are class-specific (Docker Compose stack profile for DB/API; examples profile for `example-app`). If it runs, include the verification report; if declined or a required prerequisite for that class is missing, record credible `deferred` reasons for those artifacts only. Do not reimplement sandbox execution here.
+5. **Offer runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, ask whether to run [`test-the-docs`](../test-the-docs/SKILL.md). Prerequisites are class-specific (Docker Compose stack profile for DB/API; examples profile for `example-app`). If accepted, include the verification report; if declined or a required prerequisite for that class is missing, record credible `deferred` reasons for those artifacts only. Do not reimplement sandbox execution here.
 6. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
 
 Then open the PR and continue with open-PR review if a second pass is needed.
@@ -308,7 +308,7 @@ Checklist:
 - [ ] `$CodeSample` paths match existing example directories
 - [ ] Admonitions, tabs, and partial includes render sensibly in PR preview
 - [ ] No accidental whitespace-only or empty sections where components were removed
-- [ ] [`test-the-docs`](../test-the-docs/SKILL.md) ran on new and changed procedural snippets, or each has a credible `deferred` reason
+- [ ] Offered [`test-the-docs`](../test-the-docs/SKILL.md) for new/changed procedural snippets; verification report present or credible `deferred` reasons recorded
 
 Compare PR preview URL (from Vercel/deployment comment) against production for visual regressions when layout components are involved.
 
@@ -323,9 +323,9 @@ SQL run through `psql` and through the Data API is two claims.
    sentence that makes two claims. A claim on a line that the change didn't touch is
    out of scope, unless the change contradicts it.
 2. Give each claim one verdict:
-   - **Ran:** you ran it, and the result matches the claim. Give the command and the
-     result. Run snippets with [`test-the-docs`](../test-the-docs/SKILL.md). Run SQL on
-     Postgres with the extensions that the page uses.
+   - **Ran:** it ran, and the result matches the claim. Give the command and the
+     result. For a snippet, cite the `test-the-docs` verification report when one
+     exists. Run SQL on Postgres with the extensions that the page uses.
    - **Traced:** you found it in the source, at the version that ships. Give
      `repo@version:path:line`. Find the version first: for a self-hosted service, the
      image tag in `docker/docker-compose.yml`. For a Postgres extension, the versions
@@ -372,7 +372,7 @@ Checklist:
 - [ ] MDX steps match example code after `pnpm codegen:examples` (if `$CodeSample` used)
 - [ ] Env var names and Supabase client setup match current `@supabase/ssr` patterns
 - [ ] Example pins catalog versions — no `"latest"` for in-repo packages
-- [ ] [`test-the-docs`](../test-the-docs/SKILL.md) ran on procedural tutorial steps, or each has a `deferred` reason
+- [ ] Offered [`test-the-docs`](../test-the-docs/SKILL.md) for procedural tutorial steps (or `deferred` with reason)
 - [ ] **Platform E2E** (when auth involved): SQL migration applied, auth flow walked, profiles verified — see `work-linear-issue` Phase 3
 
 ---
