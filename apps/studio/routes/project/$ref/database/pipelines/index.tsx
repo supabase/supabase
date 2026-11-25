@@ -102,9 +102,7 @@ function DatabasePipelinesPage() {
                       <ShimmeringLoader className="h-8 w-32 py-0" />
                     </div>
                   </div>
-                  <GenericTableLoader
-                    headers={[null, 'Name', 'Status', 'Region', 'Lag', null]}
-                  />
+                  <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
                 </div>
               </>
             ) : (
