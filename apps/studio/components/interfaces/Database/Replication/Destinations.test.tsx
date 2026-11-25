@@ -837,7 +837,7 @@ describe('regions', () => {
     renderRegions()
 
     expect(
-      await screen.findByText('Pipelines could not be loaded from Frankfurt')
+      await screen.findByText('Could not load results from Frankfurt')
     ).toBeInTheDocument()
 
     canReadSource = true
