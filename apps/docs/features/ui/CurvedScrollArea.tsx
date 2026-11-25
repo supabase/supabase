@@ -1,6 +1,5 @@
 'use client'
 
-import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui'
 import {
   useCallback,
   useId,
@@ -11,7 +10,7 @@ import {
   type Ref,
   type UIEvent,
 } from 'react'
-import { cn } from 'ui'
+import { cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 
 interface CurvedScrollAreaProps {
   children: ReactNode
@@ -88,24 +87,19 @@ export function CurvedScrollArea({
   }
 
   return (
-    <ScrollAreaPrimitive.Root
+    <ScrollRoot
       ref={measure}
       style={{ '--curved-scroll-filter': `url(#${filterId})` } as CSSProperties}
       className="curved-scroll-area relative"
     >
-      <ScrollAreaPrimitive.Viewport
+      <ScrollViewport
         ref={viewportRef}
         onScroll={handleScroll}
-        className={cn('w-full', className)}
+        className={cn('w-full *:data-[slot=scroll-area-content]:min-w-0!', className)}
       >
         {children}
-      </ScrollAreaPrimitive.Viewport>
-      <ScrollAreaPrimitive.Scrollbar
-        orientation="vertical"
-        className="z-10 flex w-2.5 touch-none py-1.5 pr-1.5 select-none before:absolute before:inset-y-1.5 before:right-1.5 before:w-1 before:rounded-full before:bg-surface-300"
-      >
-        <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-foreground-muted/40 transition-colors hover:bg-foreground-muted/60" />
-      </ScrollAreaPrimitive.Scrollbar>
+      </ScrollViewport>
+      <ScrollBar className="z-10 before:bg-surface-300" />
       <svg aria-hidden width="0" height="0" className="absolute">
         <filter id={filterId} primitiveUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
           <feFlood className="curved-scroll-area-neutral" result="neutral" />
@@ -139,6 +133,6 @@ export function CurvedScrollArea({
           <feComposite in="blurredTop" in2="curved" operator="over" />
         </filter>
       </svg>
-    </ScrollAreaPrimitive.Root>
+    </ScrollRoot>
   )
 }
