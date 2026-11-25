@@ -134,6 +134,28 @@ test('generateV4 calls the tool sanitizer and aborts MCP tools on client disconn
   await response.body?.cancel()
 })
 
+test('generateV4 aborts MCP tools when the response stream is canceled', async () => {
+  vi.mocked(getTools).mockClear()
+  // Keep the stream open so only canceling the response body can release the request.
+  vi.mocked(streamText).mockImplementationOnce(
+    () =>
+      ({
+        stream: new ReadableStream({
+          start() {},
+        }),
+      }) as unknown as ReturnType<typeof streamText>
+  )
+  const { callGenerateV4 } = createRequest()
+
+  const response = await callGenerateV4()
+  expect(response.status).toBe(200)
+
+  const { signal } = vi.mocked(getTools).mock.calls[0][0]
+  expect(signal?.aborted).toBe(false)
+  await response.body?.cancel()
+  await vi.waitFor(() => expect(signal?.aborted).toBe(true))
+})
+
 test('generateV4 streams a tool result that continues the previous assistant message', async () => {
   vi.mocked(streamText).mockClear()
   // After an approval, streamText runs the approved tool first and streams its result into the
