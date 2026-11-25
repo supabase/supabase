@@ -214,19 +214,9 @@ In your functions, the [supported synchronous Deno file APIs](/docs/guides/funct
 
 ## Worker lifecycle
 
-Each function runs in a worker that serves many requests. The `functions` service uses Edge Runtime's default `per_worker` policy, which sends a request to a running worker for its function. A new worker starts only when the function has no running worker.
+The functions service reuses workers. A request goes to a running worker for its function, and a new worker starts only when the function has none. Code at the top level of the function's `index.ts` runs once per worker, not once per request, so put heavy setup there, such as creating clients or loading schemas. State created at the top level belongs to one worker and lasts only as long as that worker.
 
-After a function has a running worker, later and concurrent requests go to it. Concurrent requests that arrive before any worker is running might each start a worker, up to the number of CPUs available to the container. Later requests rotate across those workers. Code at the top level of the function's `index.ts` runs once per worker, not once per request. Put heavy setup, such as creating clients, loading schemas, or filling caches, at the top level, outside the request handler. State created at the top level belongs to one worker and lasts only as long as that worker.
-
-Each of these events stops a worker from taking new requests. When the function has no running worker left, the next request starts a new one, with a cold start and a new run of top-level code:
-
-- The worker reaches half of its maximum lifetime, set by `workerTimeoutMs`, and stops taking new requests. See [Timeout errors](#timeout-errors).
-- The worker gets no requests for the time set by `requestAbsentTimeoutMs` and has no pending tasks. See [Timeout errors](#timeout-errors).
-- [Idle-worker cleanup](#idle-worker-cleanup) retires the worker under memory pressure.
-- The worker exits on an error or a resource limit, such as the [per-worker memory limit](#per-worker-memory-limit).
-- The functions service restarts or is recreated.
-
-To keep workers alive longer, raise `requestAbsentTimeoutMs` and `workerTimeoutMs` in `volumes/functions/main/index.ts`, then restart the functions service. Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
+A worker stops taking new requests when it reaches half of `workerTimeoutMs`, goes `requestAbsentTimeoutMs` without requests, is retired by [idle-worker cleanup](#idle-worker-cleanup), or exits on an error or a resource limit. The next request then starts a new worker and runs the top-level code again. To keep workers alive longer, raise the values described in [Timeout errors](#timeout-errors). Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
 
 ## Memory management
 
