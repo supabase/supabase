@@ -71,7 +71,7 @@ function resolveHref(href: string | UrlObject): string {
 // treats a same-origin absolute URL as external and falls back to native
 // browser navigation — which the user sees as a full page reload. Splitting
 // (plus origin/basePath normalisation) lives in `splitInternalUrl`
-// (@/lib/internal-url), shared with the next/router shim.
+// (@/lib/internal-url), shared with `navigateToUrl`.
 
 // Next: prefetch=true|"auto" → eagerly preload; false → never; default
 // in production = true. TanStack's preload values are "intent" (on hover/

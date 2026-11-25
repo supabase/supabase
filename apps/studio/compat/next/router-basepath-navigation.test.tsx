@@ -5,12 +5,14 @@ import {
   createRouter,
   Outlet,
   RouterProvider,
+  useNavigate,
+  type UseNavigateResult,
 } from '@tanstack/react-router'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import Link from './link'
-import { useRouter } from './router'
+import { navigateToUrl } from '@/lib/navigation'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 // The shims read NEXT_PUBLIC_BASE_PATH at module load, so it has to be set
@@ -19,13 +21,13 @@ vi.hoisted(() => {
   process.env.NEXT_PUBLIC_BASE_PATH = '/dashboard'
 })
 
-type ShimRouter = ReturnType<typeof useRouter>
-
-async function renderWithRouter(ui: (shim: { current?: ShimRouter }) => React.ReactNode) {
-  const shim: { current?: ShimRouter } = {}
+async function renderWithRouter(
+  ui: (nav: { current?: UseNavigateResult<string> }) => React.ReactNode
+) {
+  const nav: { current?: UseNavigateResult<string> } = {}
   function Page() {
-    shim.current = useRouter()
-    return <>{ui(shim)}</>
+    nav.current = useNavigate()
+    return <>{ui(nav)}</>
   }
   const rootRoute = createRootRoute({ component: Outlet })
   const page = createRoute({
@@ -43,12 +45,12 @@ async function renderWithRouter(ui: (shim: { current?: ShimRouter }) => React.Re
   })
   await router.load()
   const view = render(<RouterProvider router={router} />)
-  return { router, shim, view }
+  return { router, nav, view }
 }
 
 const origin = window.location.origin
 
-describe('next/link + next/router shims with a configured basePath', () => {
+describe('next/link shim + navigateToUrl with a configured basePath', () => {
   it('renders a same-origin URL outside the basePath as a plain anchor to the full URL', async () => {
     const href = `${origin}/docs/guides/platform/manage-your-usage/compute`
     const { router, view } = await renderWithRouter(() => <Link href={href}>Compute Costs</Link>)
@@ -87,30 +89,37 @@ describe('next/link + next/router shims with a configured basePath', () => {
   it.each([
     ['same-origin outside the basePath', `${origin}/docs/guides`],
     ['cross-origin', 'https://example.com/docs#install'],
-  ])('push() of a %s URL does a document navigation to the original URL', async (_, url) => {
-    const { router, shim, view } = await renderWithRouter(() => null)
-    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(undefined)
-    try {
-      await act(async () => {
-        await shim.current!.push(url)
-      })
-      expect(navigate).toHaveBeenCalledWith({ href: url, reloadDocument: true, replace: undefined })
-      await act(async () => {
-        await shim.current!.replace(url)
-      })
-      expect(navigate).toHaveBeenLastCalledWith({ href: url, reloadDocument: true, replace: true })
-    } finally {
-      view.unmount()
+  ])(
+    'navigateToUrl() of a %s URL does a document navigation to the original URL',
+    async (_, url) => {
+      const { router, nav, view } = await renderWithRouter(() => null)
+      const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(undefined)
+      try {
+        await act(async () => {
+          await navigateToUrl(nav.current!, url)
+        })
+        expect(navigate).toHaveBeenCalledWith({ href: url, reloadDocument: true })
+        await act(async () => {
+          await navigateToUrl(nav.current!, url, { replace: true })
+        })
+        expect(navigate).toHaveBeenLastCalledWith({
+          href: url,
+          reloadDocument: true,
+          replace: true,
+        })
+      } finally {
+        view.unmount()
+      }
     }
-  })
+  )
 
-  it('push() of an external URL leaves the client-side location alone', async () => {
+  it('navigateToUrl() of an external URL leaves the client-side location alone', async () => {
     // Unmocked: TanStack hands it to `window.location` (a no-op in jsdom)
     // instead of resolving it as a path segment (`/project/default/https:/...`).
-    const { router, shim, view } = await renderWithRouter(() => null)
+    const { router, nav, view } = await renderWithRouter(() => null)
     try {
       await act(async () => {
-        await shim.current!.push(`${origin}/docs/guides`)
+        await navigateToUrl(nav.current!, `${origin}/docs/guides`)
       })
       expect(router.state.location.href).toBe('/project/default')
     } finally {
@@ -118,12 +127,12 @@ describe('next/link + next/router shims with a configured basePath', () => {
     }
   })
 
-  it('push() of an internal path stays a client-side navigation', async () => {
-    const { router, shim, view } = await renderWithRouter(() => null)
+  it('navigateToUrl() of an internal path stays a client-side navigation', async () => {
+    const { router, nav, view } = await renderWithRouter(() => null)
     const navigate = vi.spyOn(router, 'navigate')
     try {
       await act(async () => {
-        await shim.current!.push(`${origin}/dashboard/project/other?tab=1`)
+        await navigateToUrl(nav.current!, `${origin}/dashboard/project/other?tab=1`)
       })
       expect(navigate).toHaveBeenCalledWith(
         expect.objectContaining({ to: '/project/other', search: { tab: '1' } })
@@ -134,17 +143,16 @@ describe('next/link + next/router shims with a configured basePath', () => {
     }
   })
 
-  it('push() resolves a protocol-relative URL so TanStack does not block it', async () => {
-    const { router, shim, view } = await renderWithRouter(() => null)
+  it('navigateToUrl() resolves a protocol-relative URL so TanStack does not block it', async () => {
+    const { router, nav, view } = await renderWithRouter(() => null)
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(undefined)
     try {
       await act(async () => {
-        await shim.current!.push('//example.com/docs')
+        await navigateToUrl(nav.current!, '//example.com/docs')
       })
       expect(navigate).toHaveBeenCalledWith({
         href: `${window.location.protocol}//example.com/docs`,
         reloadDocument: true,
-        replace: undefined,
       })
     } finally {
       view.unmount()

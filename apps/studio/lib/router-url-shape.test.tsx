@@ -7,18 +7,13 @@ import {
 } from '@tanstack/react-router'
 import { describe, expect, it } from 'vitest'
 
-import {
-  resolveSearchOrHashOnlyTarget,
-  resolveUrl,
-  withDefaultPathname,
-} from '../compat/next/router'
 import { splitInternalUrl } from './internal-url'
 import { buildSearchUpdateArgs } from './nuqs-tanstack-adapter'
 import { parseSearch, stringifySearch, type SearchRecord } from './router-search-params'
 
-// The `<AnyRouter, string>` type arguments mirror the compat shims: the
-// producers under test emit free-form runtime strings that can't satisfy
-// the route-path union at compile time.
+// The `<AnyRouter, string>` type arguments mirror `navigateToUrl` and the
+// Link shim: producers emit free-form runtime strings that can't satisfy the
+// route-path union at compile time.
 interface LooseNavigateArgs {
   to: string
   search?: SearchRecord
@@ -28,7 +23,7 @@ interface LooseNavigateArgs {
 
 // Integration guard for the family of URL-shape regressions from the
 // TanStack migration: drives a real router (with the app's custom search
-// codec) through the navigation shapes the compat shims and the nuqs
+// codec) through the navigation shapes `splitInternalUrl` and the nuqs
 // adapter produce, and asserts the built hrefs are Next-shaped — no JSON
 // coercion/quoting, no dropped repeated keys, no injected trailing slash,
 // no doubled `#`, and no control characters stripped from query values.
@@ -63,18 +58,16 @@ describe('URL shape end-to-end against a real router', () => {
       filter: ['a:eq:1', 'b:eq:2'],
     })
 
-    // Compat router push({ query }) resolves to a ?-only target, split into
-    // { to, search }; must stay on the exact current pathname (no
+    // Splitting a path+query URL must stay on the exact pathname (no
     // `/advisors/security/?...`).
-    const target = resolveSearchOrHashOnlyTarget('?preset=WARN', router.state.location.pathname)
-    const split = splitInternalUrl(target)
+    const split = splitInternalUrl(`${router.state.location.pathname}?preset=WARN`)
     expect(build({ to: split.to, search: split.search ?? {}, hash: split.hash ?? '' })).toBe(
       '/project/abc/advisors/security?preset=WARN'
     )
 
     // nuqs write over the whole page query — same guarantee. (The codec
-    // percent-encodes `:` as `%3A` — URLSearchParams semantics, matching the
-    // compat router's own serialisation — and it re-parses losslessly.)
+    // percent-encodes `:` as `%3A` — URLSearchParams semantics — and it
+    // re-parses losslessly.)
     const params = new URLSearchParams(router.state.location.searchStr)
     params.set('preset', 'perf')
     const nuqsHref = build({
@@ -138,24 +131,12 @@ describe('URL shape end-to-end against a real router', () => {
     expect((router.state.location.search as { s: string }).s).toContain('desc\nlimit 5')
   })
 
-  it('round-trips newlines in query values through the compat router producer shape', async () => {
+  it('round-trips newlines in query values through splitInternalUrl', async () => {
     const router = makeRouter('/project/abc/logs/explorer')
     await router.load()
 
-    // Shape produced by the compat useRouter().push pipeline:
-    // withDefaultPathname → resolveUrl → (toRelativeSameOrigin) →
-    // resolveSearchOrHashOnlyTarget → splitInternalUrl → navigate.
-    const target = resolveSearchOrHashOnlyTarget(
-      resolveUrl(
-        withDefaultPathname(
-          { query: { ref: 'abc', s: sql, its: 'PREVIOUS' } },
-          '/project/[ref]/logs/explorer',
-          { ref: 'abc' }
-        )
-      ),
-      router.state.location.pathname
-    )
-    const { to, search, hash } = splitInternalUrl(target)
+    const params = new URLSearchParams({ s: sql, its: 'PREVIOUS' })
+    const { to, search, hash } = splitInternalUrl(`/project/abc/logs/explorer?${params.toString()}`)
     await router.navigate<AnyRouter, string>({
       to,
       search: search ?? {},
@@ -167,11 +148,11 @@ describe('URL shape end-to-end against a real router', () => {
     expect((router.state.location.search as { s: string }).s).toContain('desc\nlimit 5')
   })
 
-  it('clears the previous query when the compat producer navigates without one', async () => {
+  it('clears the previous query when navigating without one', async () => {
     const router = makeRouter('/project/abc/logs/explorer?s=stale')
     await router.load()
 
-    // Next's push('/path') drops the current query entirely — `search: {}`
+    // Navigating to a plain path drops the current query entirely — `search: {}`
     // (not undefined) is what encodes that under TanStack.
     const { to, search, hash } = splitInternalUrl('/project/abc/auth/providers')
     await router.navigate<AnyRouter, string>({

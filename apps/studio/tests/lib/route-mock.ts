@@ -7,7 +7,7 @@ export const routerMock = _routerMock
 
 const routesRoot = join(process.cwd(), 'routes')
 
-// `_app/org/$slug/general.tsx` → `/org/[slug]/general`, so `next/router` mocks parse
+// `_app/org/$slug/general.tsx` → `/org/[slug]/general`, so `next-router-mock` parses
 // dynamic segments the way the app's routes define them.
 const toNextRoutePattern = (file: string) =>
   `/${relative(routesRoot, file)

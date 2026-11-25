@@ -1,4 +1,4 @@
-// Shared URL-splitting for the Next compat shims (next/link, next/router).
+// Shared URL-splitting for the next/link compat shim and navigateToUrl.
 //
 // TanStack's `to` is a route-pattern *path*; query params and hash must be
 // passed separately via `search` / `hash`. Embedding `?query` (or `#hash`)

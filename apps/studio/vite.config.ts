@@ -30,9 +30,7 @@ const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-
 // Add an entry here + a file under compat/next/ when a new Next surface is
 // needed by app source.
 const nextShims: Record<string, string> = {
-  'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
   'next/link': path.join(compatRoot, 'link.tsx'),
-  'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
 }
 
@@ -719,7 +717,7 @@ export default defineConfig(({ command, mode }) => {
 
       // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
-      // SSR externalizer leaves `next/router` as a runtime package import and
+      // SSR externalizer leaves `next/*` as a runtime package import and
       // Node resolves it to Next's real module.
       // `tslib`'s Node ESM entry (`modules/index.js`) destructures from a
       // default-imported CJS wrapper (`tslib.js`). When consumers like
