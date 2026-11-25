@@ -362,7 +362,9 @@ statement that writes.
    example with jq, so credentials in a response never reach your context.
 3. Check each item with read-only access:
    - Database: use the Supabase MCP server scoped to the project, with
-     read_only=true. Run get_issues for security issues. Get db_schema
+     read_only=true. Check tool discovery and run get_issues for security issues
+     when available; otherwise use get_advisors with its advertised inputs and
+     response format. Get db_schema
      from the project's PostgREST config in the Management API, and use
      execute_sql to list tables without RLS in each of those schemas. If you
      can't read db_schema, check public and report the rest as can't check.
