@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
@@ -42,6 +42,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -67,6 +68,10 @@ export const Destinations = () => {
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
   const clusterId = useReplicationClusterId()
+  const { data: clusters } = useQuery(replicationClustersQueryOptions())
+  const pipelineRegion = clusters?.regions.find(
+    (region) => region.cluster_id === (clusterId ?? clusters.default_cluster_id)
+  )?.region_name
   const { data: organization } = useSelectedOrganizationQuery()
 
   useRedirectLegacyReadReplicaDestination()
@@ -331,7 +336,7 @@ export const Destinations = () => {
         )}
 
         {isDestinationsLoading && (
-          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
         )}
 
         {!isDestinationsLoading && hasDestinations && (
@@ -359,16 +364,20 @@ export const Destinations = () => {
                         Status
                       </TableHeadSort>
                     </TableHead>
+                    <TableHead key="region">Region</TableHead>
                     <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
-                    <TableHead key="publication">Publication</TableHead>
                     <TableHead key="actions" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {sortedDestinations.map(({ destination }) => (
-                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                    <DestinationRow
+                      key={destination.id}
+                      destinationId={destination.id}
+                      pipelineRegion={pipelineRegion}
+                    />
                   ))}
 
                   {!isDestinationsLoading && sortedDestinations.length === 0 && hasDestinations && (

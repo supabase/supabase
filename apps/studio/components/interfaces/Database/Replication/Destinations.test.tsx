@@ -5,17 +5,18 @@ import {
   createRouter,
   RouterContextProvider,
 } from '@tanstack/react-router'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { useQueryState } from 'nuqs'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -40,6 +41,7 @@ vi.mock('common', async (importOriginal) => ({
   useFeatureFlags: () => ({ hasLoaded: options.flagsLoaded }),
 }))
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useUnifiedLogsPreview: () => ({ isEnabled: false }),
   usePipelineCreationPreview: () => ({
     isEnabled: options.wizard,
     isLoading: options.previewLoading,
@@ -60,6 +62,35 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
     return type ? <h2>Creation sheet: {type}</h2> : null
   },
 }))
+const SINGAPORE = { cluster_id: '1', region_code: 'ap-southeast-1', region_name: 'Singapore' }
+const FRANKFURT = { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' }
+const regionsResponse = (regions: (typeof SINGAPORE)[]) =>
+  HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+    default_cluster_id: '1',
+    regions,
+  })
+
+const mockRegions = (regions = [SINGAPORE, FRANKFURT]) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/regions',
+    response: () => regionsResponse(regions),
+  })
+
+const sourcesResponse = (enabled: boolean) =>
+  HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+    sources: enabled
+      ? [
+          {
+            id: 42,
+            name: 'default',
+            tenant_id: 'tenant',
+            config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
+          },
+        ]
+      : [],
+  })
+
 let isEnabled = false
 let enableGate: Promise<void> | undefined
 beforeEach(() => {
@@ -78,6 +109,7 @@ beforeEach(() => {
       HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
     )
   )
+  mockRegions([SINGAPORE])
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
@@ -104,23 +136,7 @@ beforeEach(() => {
             { message: 'replication API URL is not configured' },
             { status: 503 }
           )
-        : HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
-            sources: isEnabled
-              ? [
-                  {
-                    id: 42,
-                    name: 'default',
-                    tenant_id: 'tenant',
-                    config: {
-                      host: 'localhost',
-                      port: 5432,
-                      name: 'postgres',
-                      username: 'postgres',
-                    },
-                  },
-                ]
-              : [],
-          }),
+        : sourcesResponse(isEnabled),
   })
   addAPIMock({
     method: 'post',
@@ -140,32 +156,42 @@ beforeEach(() => {
   })
 })
 const listPath = '/project/default/database/pipelines'
-const renderList = async (waitForSources = true, clusterId?: string) => {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const router = createRouter({
+const createListRouter = () =>
+  createRouter({
     routeTree: createRootRoute(),
     history: createMemoryHistory({ initialEntries: [listPath] }),
     parseSearch,
     stringifySearch,
   })
-  await router.load()
+const mountList = (router: ReturnType<typeof createListRouter>, clusterId?: string) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, retryDelay: 0 } },
+  })
   const view = customRender(<Destinations />, {
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient} nuqs={{ hasMemory: true }}>
         <RouterContextProvider router={router}>
-          <ReplicationClusterProvider clusterId={clusterId}>{children}</ReplicationClusterProvider>
+          <ReplicationClusterProvider clusterId={clusterId}>
+            <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
+          </ReplicationClusterProvider>
         </RouterContextProvider>
       </CustomWrapper>
     ),
   })
+  return { ...view, router, queryClient }
+}
+const renderList = async (waitForSources = true, clusterId?: string) => {
+  const router = createListRouter()
+  await router.load()
+  const view = mountList(router, clusterId)
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status).toBe(
-        'success'
-      )
+      expect(
+        view.queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status
+      ).toBe('success')
     )
-  return { ...view, router }
+  return view
 }
 const addPipeline = () =>
   fireEvent.click(screen.getAllByRole('button', { name: 'Add pipeline' })[0])
@@ -253,7 +279,7 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
           { status: 503 }
         )
       }
-      return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources: [] })
+      return sourcesResponse(false)
     },
   })
   await renderList(false)
@@ -343,4 +369,106 @@ test('keeps request-access creation in the sheet when no wizard destination is a
     await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
   ).toBeInTheDocument()
   expect(router.history.location.href).toBe(listPath)
+})
+
+describe('regions', () => {
+  const clusterOf = (request: Request) =>
+    new URL(request.url).searchParams.get('cluster_id') ?? 'omitted'
+  const regionName = (cluster: string) => (cluster === '2' ? 'Frankfurt' : 'Singapore')
+
+  const regionDestination = (cluster: string) => ({
+    id: 1,
+    name: `${regionName(cluster)} sync`,
+    tenant_id: 'tenant',
+    config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
+  })
+
+  const mockRegionResources = () => {
+    const statusRequests: string[] = []
+    isEnabled = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: ({ request }) => {
+        const cluster = clusterOf(request)
+        return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+          destinations: [regionDestination(cluster)],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations/:destination_id',
+      response: ({ request }) =>
+        HttpResponse.json<components['schemas']['DestinationResponse_Output']>(
+          regionDestination(clusterOf(request))
+        ),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines',
+      response: ({ request }) => {
+        const cluster = clusterOf(request)
+        return HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+          pipelines: [
+            {
+              id: cluster === '2' ? 'frankfurtpipeline' : '42',
+              cluster_id: cluster === '2' ? '2' : '1',
+              tenant_id: 'tenant',
+              source_id: 42,
+              source_name: 'default',
+              destination_id: 1,
+              destination_name: `${regionName(cluster)} sync`,
+              replicator_id: 1,
+              config: { publication_name: 'publication' },
+            },
+          ],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: ({ request, params }) => {
+        statusRequests.push(`${params.pipeline_id}:${clusterOf(request)}`)
+        return HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          status: { name: clusterOf(request) === '2' ? 'started' : 'failed' },
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['PipelineReplicationStatusResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          table_statuses: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['PipelineVersionResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          version: { id: 1, name: 'v1' },
+        }),
+    })
+    return { statusRequests }
+  }
+
+  const renderRegions = () => mountList(createListRouter())
+
+  test('shows the pipeline region for a single region without cluster_id', async () => {
+    const { statusRequests } = mockRegionResources()
+    renderRegions()
+
+    const row = (await screen.findByText('Singapore sync')).closest('tr')
+    expect(within(row!).getByRole('cell', { name: 'Singapore' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Region' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Publication' })).not.toBeInTheDocument()
+    await waitFor(() => expect(statusRequests).toContain('42:omitted'))
+    expect(statusRequests.every((request) => request.endsWith(':omitted'))).toBe(true)
+  })
 })

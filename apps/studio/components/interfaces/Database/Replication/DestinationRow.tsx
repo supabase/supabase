@@ -35,9 +35,10 @@ import {
 
 interface DestinationRowProps {
   destinationId: number
+  pipelineRegion?: string
 }
 
-export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRowProps) => {
   const clusterId = useReplicationClusterId()
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -191,8 +192,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                 </p>
                 {pipeline && (
                   <DetailSubtext className="flex items-center gap-x-1.5">
-                    <span>#{pipeline.id}</span>
-                    <span aria-hidden>&middot;</span>
                     <span>{type}</span>
                     {hasTableErrors && (
                       <>
@@ -225,19 +224,15 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             )}
           </TableCell>
 
+          <TableCell className="text-foreground-light whitespace-nowrap">
+            {pipelineRegion ?? 'Region unavailable'}
+          </TableCell>
+
           <TableCell>
             <div aria-live="polite" aria-atomic="true">
               {isReplicationStatusLoading && <span className="sr-only">Loading lag</span>}
               {renderLag()}
             </div>
-          </TableCell>
-
-          <TableCell>
-            {isPipelineLoading || !pipeline ? (
-              <ShimmeringLoader />
-            ) : (
-              pipeline.config.publication_name
-            )}
           </TableCell>
 
           <TableCell>
