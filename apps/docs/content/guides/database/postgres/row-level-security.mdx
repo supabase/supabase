@@ -640,7 +640,7 @@ Returns the ID of the user making the request.
 
 `auth.uid()` returns `null` for any request whose JWT has no `sub` claim. That includes every `anon` request. For such a request, `auth.uid() = user_id` is never true, so a policy that compares the column alone returns no rows.
 
-<Admonition type="danger" title="An `auth.uid() is null` branch exposes every row">
+<Admonition type="danger">
 
 A policy condition with an `or auth.uid() is null` branch returns every row to any request without a user ID. Don't add the branch to let these requests through:
 
