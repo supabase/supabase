@@ -88,6 +88,7 @@ export const WrappersTab = () => {
         <SheetContent size="lg">
           {wrapperMeta && CreateWrapperSheetComponent && (
             <CreateWrapperSheetComponent
+              key={wrapperMeta.name}
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
               onClose={() => {

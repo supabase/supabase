@@ -166,7 +166,7 @@ export const MarketplaceDetail = () => {
           <OverviewTab integration={integration} isInstalled={isInstalled}>
             {OverviewComponent && (
               <Suspense fallback={<Loading />}>
-                <OverviewComponent />
+                <OverviewComponent key={integration.id} />
               </Suspense>
             )}
           </OverviewTab>
@@ -175,13 +175,13 @@ export const MarketplaceDetail = () => {
         layout === 'constrained' ? (
           <div className={centeredContentClass}>
             <Suspense fallback={<Loading />}>
-              <CustomPageComponent />
+              <CustomPageComponent key={integration.id} />
             </Suspense>
           </div>
         ) : (
           <div className="flex-1 min-h-0">
             <Suspense fallback={<Loading />}>
-              <CustomPageComponent />
+              <CustomPageComponent key={integration.id} />
             </Suspense>
           </div>
         )
