@@ -36,10 +36,10 @@ describe('getFirstTouchAttributionProps', () => {
 
   it('drops click ids with an empty value', () => {
     const props = getFirstTouchAttributionProps(
-      makeTelemetryData('https://supabase.com/dashboard?gclid=&oppref=abc')
+      makeTelemetryData('https://supabase.com/dashboard?gclid=&fbclid=abc')
     )
 
     expect(props).not.toHaveProperty('gclid')
-    expect(props).toHaveProperty('oppref', 'abc')
+    expect(props).toHaveProperty('fbclid', 'abc')
   })
 })

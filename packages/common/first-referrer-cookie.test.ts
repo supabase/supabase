@@ -142,12 +142,12 @@ describe('first-referrer-cookie', () => {
       const data = buildFirstReferrerData({
         referrer: 'https://www.google.com/',
         landingUrl:
-          'https://supabase.com/pricing?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=abc123&gbraid=xyz456',
+          'https://supabase.com/pricing?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=abc123&msclkid=xyz456',
       })
 
       expect(data.referrer).toBe('https://www.google.com/')
       expect(data.landing_url).toBe(
-        'https://supabase.com/pricing?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=abc123&gbraid=xyz456'
+        'https://supabase.com/pricing?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=abc123&msclkid=xyz456'
       )
 
       expect(data.utms).toEqual({
@@ -158,7 +158,7 @@ describe('first-referrer-cookie', () => {
 
       expect(data.click_ids).toEqual({
         gclid: 'abc123',
-        gbraid: 'xyz456',
+        msclkid: 'xyz456',
       })
     })
 
@@ -238,7 +238,7 @@ describe('first-referrer-cookie', () => {
           referrer: 'https://www.google.com/',
           landing_url: 'https://supabase.com/pricing',
           utms: { utm_source: 'google', utm_medium: 123 },
-          click_ids: { gclid: 'abc', gbraid: null },
+          click_ids: { gclid: 'abc', msclkid: null },
           ts: 123,
         })
       )
@@ -258,9 +258,15 @@ describe('first-referrer-cookie', () => {
   describe('hasPaidSignals', () => {
     it('detects click IDs', () => {
       expect(hasPaidSignals(new URL('https://supabase.com/?gclid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?fbclid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?msclkid=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?gbraid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?wbraid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?rdt_cid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?ttclid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?twclid=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?li_fat_id=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?oppref=abc'))).toBe(true)
-      expect(hasPaidSignals(new URL('https://supabase.com/?fbclid=abc'))).toBe(false)
     })
 
     it('detects paid utm_medium values', () => {
