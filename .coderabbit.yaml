@@ -130,3 +130,8 @@ knowledge_base:
       # Studio end-to-end (Playwright) test conventions
       - files: '.agents/skills/studio-e2e-tests/SKILL.md'
         applyTo: 'e2e/studio/**/*.spec.ts'
+      # Docs content: the style guide, and the review that applies it
+      - files: 'apps/docs/style-guide/{01-voice-and-tone,02-elements,03-page-structure,WORD_LIST}.md'
+        applyTo: 'apps/docs/content/**/*.mdx'
+      - files: '.agents/skills/review-the-docs/SKILL.md'
+        applyTo: 'apps/docs/content/**/*.mdx'
