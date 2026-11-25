@@ -148,13 +148,6 @@ const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'ut
 export const CLICK_ID_KEYS = [
   'gclid', // Google Ads
   'gbraid', // Google Ads (iOS)
-  'wbraid', // Google Ads (iOS)
-  'msclkid', // Microsoft Ads (Bing)
-  'fbclid', // Meta (Facebook/Instagram)
-  'rdt_cid', // Reddit Ads
-  'ttclid', // TikTok Ads
-  'twclid', // X Ads (Twitter)
-  'li_fat_id', // LinkedIn Ads
   'oppref', // ChatGPT Ads (OpenAI)
 ] as const
 
