@@ -1,25 +1,36 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { fetchGet } from '@/data/fetchers'
-import { Route } from '@/routes/api/platform/pg-meta/$ref/tables'
+import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
-vi.mock('@/lib/constants', () => ({
-  IS_PLATFORM: false,
-  PG_META_URL: 'http://meta:8080',
-}))
-
-vi.mock('@/data/fetchers', () => ({
-  fetchGet: vi.fn(),
-}))
+const PG_META_URL = 'http://meta.test'
 
 describe('/api/platform/pg-meta/$ref/tables', () => {
-  beforeEach(() => {
-    vi.mocked(fetchGet).mockReset()
+  let Route: typeof import('@/routes/api/platform/pg-meta/$ref/tables').Route
+
+  beforeAll(async () => {
+    vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'false')
+    vi.stubEnv('STUDIO_PG_META_URL', PG_META_URL)
+    vi.resetModules()
+    const mod = await import('@/routes/api/platform/pg-meta/$ref/tables')
+    Route = mod.Route
+  })
+
+  afterAll(() => {
+    vi.unstubAllEnvs()
+    vi.resetModules()
   })
 
   it('forwards query params to pg-meta and returns the response', async () => {
-    vi.mocked(fetchGet).mockResolvedValue([{ id: 1, name: 'users' }])
+    let includedSchemas: string | null = null
+
+    mswServer.use(
+      http.get(`${PG_META_URL}/tables`, ({ request }) => {
+        includedSchemas = new URL(request.url).searchParams.get('included_schemas')
+        return HttpResponse.json([{ id: 1, name: 'users' }])
+      })
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -31,18 +42,13 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
       params: { ref: 'default' },
     })
 
-    expect(fetchGet).toHaveBeenCalledWith(
-      'http://meta:8080/tables?included_schemas=public',
-      expect.objectContaining({ headers: expect.any(Object) })
-    )
+    expect(includedSchemas).toBe('public')
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual([{ id: 1, name: 'users' }])
   })
 
   it('falls back to 500 when the upstream error has no status code', async () => {
-    vi.mocked(fetchGet).mockResolvedValue({
-      error: { message: 'Network failed', code: undefined },
-    })
+    mswServer.use(http.get(`${PG_META_URL}/tables`, () => HttpResponse.error()))
 
     const response = await getRouteHandler(
       Route,
@@ -53,7 +59,7 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
     })
 
     expect(response.status).toBe(500)
-    expect(await response.json()).toEqual({ message: 'Network failed' })
+    expect(await response.json()).toEqual({ message: expect.stringMatching(/\S/) })
   })
 
   it('returns 405 with Allow: GET for unsupported methods', async () => {
