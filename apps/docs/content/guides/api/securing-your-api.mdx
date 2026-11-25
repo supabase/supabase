@@ -303,6 +303,7 @@ Before adding the check logic, review [Request information](#request-information
      returns void
      language plpgsql
      security definer
+     set search_path = ''
      as $$
    begin
      -- your logic here
@@ -366,6 +367,7 @@ create function public.check_request()
   returns void
   language plpgsql
   security definer
+  set search_path = ''
   as $$
 declare
   req_method text := current_setting('request.method', true);
@@ -443,6 +445,7 @@ create function public.check_request()
   returns void
   language plpgsql
   security definer
+  set search_path = ''
   as $$
 declare
   req_app_api_key text := current_setting('request.headers', true)::json->>'x-app-api-key';
