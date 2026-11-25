@@ -1,22 +1,14 @@
 // @vitest-environment jsdom
-import { renderHook, waitFor } from '@testing-library/react'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
+import { waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
+import { customRenderHook } from '@/tests/lib/custom-render'
 
-const mockReplace = vi.fn()
-const mockQuery = vi.fn(() => ({}) as Record<string, string | string[] | undefined>)
-const mockIsReady = vi.fn(() => true)
 const mockProjectRef = vi.fn(() => 'abc123')
 const mockInfrastructureReadReplicas = vi.fn(() => true)
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    isReady: mockIsReady(),
-    query: mockQuery(),
-    replace: mockReplace,
-  }),
-}))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -32,41 +24,54 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   }),
 }))
 
+const createTestRouter = (initialUrl: string) =>
+  createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
+
 describe('useRedirectLegacyReadReplicaDestination', () => {
   beforeEach(() => {
-    mockReplace.mockClear()
-    mockQuery.mockReturnValue({})
-    mockIsReady.mockReturnValue(true)
     mockProjectRef.mockReturnValue('abc123')
     mockInfrastructureReadReplicas.mockReturnValue(true)
   })
 
   test('redirects legacy Read Replica destinationType to Infrastructure', async () => {
-    mockQuery.mockReturnValue({ destinationType: 'Read Replica' })
+    const router = createTestRouter(
+      '/project/abc123/database/pipelines?destinationType=Read+Replica'
+    )
+    const navigateSpy = vi.spyOn(router, 'navigate')
 
-    renderHook(() => useRedirectLegacyReadReplicaDestination())
+    customRenderHook(() => useRedirectLegacyReadReplicaDestination(), { router })
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(
+      expect(router.state.location.href).toBe(
         '/project/abc123/settings/infrastructure?addReplica=true'
       )
     })
+    expect(navigateSpy).toHaveBeenCalledWith(expect.objectContaining({ replace: true }))
   })
 
   test('does not redirect for other destination types', () => {
-    mockQuery.mockReturnValue({ destinationType: 'BigQuery' })
+    const router = createTestRouter('/project/abc123/database/pipelines?destinationType=BigQuery')
+    const navigateSpy = vi.spyOn(router, 'navigate')
 
-    renderHook(() => useRedirectLegacyReadReplicaDestination())
+    customRenderHook(() => useRedirectLegacyReadReplicaDestination(), { router })
 
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
   })
 
   test('does not redirect when Infrastructure read replicas are disabled', () => {
     mockInfrastructureReadReplicas.mockReturnValue(false)
-    mockQuery.mockReturnValue({ destinationType: 'Read Replica' })
+    const router = createTestRouter(
+      '/project/abc123/database/pipelines?destinationType=Read+Replica'
+    )
+    const navigateSpy = vi.spyOn(router, 'navigate')
 
-    renderHook(() => useRedirectLegacyReadReplicaDestination())
+    customRenderHook(() => useRedirectLegacyReadReplicaDestination(), { router })
 
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
   })
 })

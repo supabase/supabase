@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 import { GithubIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -77,8 +77,8 @@ export const BranchRow = ({
   external = false,
   rowActions,
 }: BranchRowProps) => {
-  const router = useRouter()
-  const page = router.pathname.split('/').pop()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const page = pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const willBeDeletedIn = branch.deletion_scheduled_at

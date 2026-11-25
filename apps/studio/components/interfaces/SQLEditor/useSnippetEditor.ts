@@ -1,10 +1,11 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 
 import { parseSqlSnippetSource } from './querySource'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
@@ -24,7 +25,10 @@ import { useTabsStateSnapshot } from '@/state/tabs'
  * Extracted from `MonacoEditor` so that component stays a thin editor shell.
  */
 export function useSnippetEditor({ id, snippetName }: { id: string; snippetName: string }) {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const hasContentQueryParam = useLocation({
+    select: (location) => (location.search as Record<string, unknown>).content !== undefined,
+  })
   const { profile } = useProfile()
   const { ref, content, source } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -55,11 +59,9 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
       // than push. The caller navigated to `/sql/new?content=...` (a long,
       // one-shot URL); replacing collapses it out of history so Back returns to
       // the originating page instead of a wasted step that re-seeds the snippet.
-      if (router.query.content !== undefined) {
-        router.replace(`/project/${ref}/sql/${newSnippet.id}`, undefined, { shallow: true })
-      } else {
-        router.push(`/project/${ref}/sql/${newSnippet.id}`, undefined, { shallow: true })
-      }
+      void navigateToUrl(navigate, `/project/${ref}/sql/${newSnippet.id}`, {
+        replace: hasContentQueryParam,
+      })
     }
 
     // A snippet that has never been persisted needs the snippet/folder lists

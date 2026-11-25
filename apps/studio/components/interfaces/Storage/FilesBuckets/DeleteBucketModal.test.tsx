@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
@@ -7,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -116,7 +118,13 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />)
+    const router = createRouter({
+      routeTree: createRootRoute(),
+      history: createMemoryHistory({ initialEntries: [`/project/default/storage/files`] }),
+      parseSearch,
+      stringifySearch,
+    })
+    customRender(<Page onClose={onClose} />, { router })
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
@@ -129,13 +137,20 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
+    expect(router.state.location.href).toStrictEqual(`/project/default/storage/files`)
   })
 
   it(`navigates from the deleted bucket's page to the buckets list`, async () => {
-    routerMock.setCurrentUrl(`/project/default/storage/files/buckets/${bucket.id}?action=delete`)
+    const bucketUrl = `/project/default/storage/files/buckets/${bucket.id}?action=delete`
+    routerMock.setCurrentUrl(bucketUrl)
+    const router = createRouter({
+      routeTree: createRootRoute(),
+      history: createMemoryHistory({ initialEntries: [bucketUrl] }),
+      parseSearch,
+      stringifySearch,
+    })
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />, { router })
 
     await userEvent.click(screen.getByRole(`button`, { name: `Open` }))
     await screen.findByRole(`dialog`)
@@ -143,7 +158,9 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.type(screen.getByPlaceholderText(`Type bucket name`), bucket.id)
     fireEvent.click(screen.getByRole(`button`, { name: `Delete bucket` }))
 
-    await waitFor(() => expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`))
+    await waitFor(() =>
+      expect(router.state.location.href).toStrictEqual(`/project/default/storage/files`)
+    )
     expect(onClose).not.toHaveBeenCalled()
   })
 })

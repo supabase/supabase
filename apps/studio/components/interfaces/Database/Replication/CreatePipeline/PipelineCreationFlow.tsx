@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -38,6 +38,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 
 const getDocsUrl = (step: string, destination: DestinationType) => {
   if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
@@ -57,7 +58,7 @@ export const PipelineCreationFlow = ({
   availableDestinations: DestinationType[]
   onClose: () => void
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
 
@@ -148,7 +149,7 @@ export const PipelineCreationFlow = ({
       <PipelineCreationHeader
         onClose={handleClose}
         onNavigate={(href) => {
-          if (!isSubmitting) requestNavigation(() => void router.push(href))
+          if (!isSubmitting) requestNavigation(() => void navigateToUrl(navigate, href))
         }}
       />
       <main className="flex-1">

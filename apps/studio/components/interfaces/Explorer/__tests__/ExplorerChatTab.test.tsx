@@ -11,7 +11,6 @@ const mocks = vi.hoisted(() => ({
   handleTabClose: vi.fn(),
   makeTabPermanent: vi.fn(),
   openChat: vi.fn(),
-  push: vi.fn(),
   useParams: vi.fn(),
   assistantSnapshot: vi.fn(),
 }))
@@ -20,10 +19,6 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return { ...actual, useParams: () => mocks.useParams() }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({ query: { ref: 'default' }, push: mocks.push }),
-}))
 
 vi.mock('@/components/interfaces/Explorer/hooks', () => ({
   useCreateChat: () => ({ createChat: mocks.createChat, openChat: mocks.openChat }),

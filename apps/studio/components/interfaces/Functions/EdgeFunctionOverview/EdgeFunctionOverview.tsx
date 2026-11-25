@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
@@ -32,9 +32,10 @@ import {
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { navigateToUrl } from '@/lib/navigation'
 
 export const EdgeFunctionOverview = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, functionSlug } = useParams()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -157,7 +158,8 @@ export const EdgeFunctionOverview = () => {
       combinedStatsResults.refetch()
     },
     onOpenLogs: () => {
-      router.push(
+      void navigateToUrl(
+        navigate,
         `/project/${projectRef}/functions/${functionSlug}/${
           isUnifiedLogsEnabled ? 'logs' : 'invocations'
         }`
@@ -171,9 +173,13 @@ export const EdgeFunctionOverview = () => {
 
   useEffect(() => {
     if (!IS_PLATFORM && projectRef && functionSlug) {
-      router.replace(`/project/${projectRef}/functions/${functionSlug}/details`)
+      void navigate({
+        to: '/project/$ref/functions/$functionSlug/details',
+        params: { ref: projectRef, functionSlug },
+        replace: true,
+      })
     }
-  }, [functionSlug, projectRef, router])
+  }, [functionSlug, navigate, projectRef])
 
   if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
@@ -207,7 +213,8 @@ export const EdgeFunctionOverview = () => {
           onChartClick={(timestamp) => {
             if (!projectRef || !functionSlug) return
 
-            router.push(
+            void navigateToUrl(
+              navigate,
               getInvocationChartNavigationUrl({
                 projectRef,
                 functionSlug,

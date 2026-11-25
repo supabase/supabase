@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { CheckIcon, CodeIcon, PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -42,6 +42,7 @@ import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
+import { navigateToUrl } from '@/lib/navigation'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -63,7 +64,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
@@ -177,7 +178,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               const tabId = createTabId('sql', { id: snippet.id })
               if (tabsSnap.hasTab(tabId)) {
                 tabsSnap.removeTab(tabId)
-                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+                await navigateToUrl(navigate, `/project/${ref}/sql/${movedSnippet.id}`)
               }
             }
           }

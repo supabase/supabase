@@ -29,10 +29,6 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => routeParams,
 }))
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}))
-
 vi.mock('next/link', () => ({
   default: ({
     href,

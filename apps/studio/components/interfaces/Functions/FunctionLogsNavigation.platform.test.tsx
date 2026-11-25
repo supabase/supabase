@@ -1,16 +1,26 @@
 import { QueryClient } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router'
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
+import routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
-import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 import { afterAll, afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 import { useFunctionLogsMigration } from './useFunctionLogsMigration'
 import { useFunctionsDetailShortcuts } from './useFunctionsDetailShortcuts'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
+import { navigateToUrl } from '@/lib/navigation'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { Route as FunctionInvocationsRoute } from '@/routes/project/$ref/functions/$functionSlug/invocations'
 import { Route as FunctionLogsRoute } from '@/routes/project/$ref/functions/$functionSlug/logs'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
@@ -23,8 +33,6 @@ vi.mock('@/components/interfaces/UnifiedLogs/UnifiedLogs', () => ({
   UnifiedLogs: () => <div>Unified logs</div>,
 }))
 
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
 const removeRouteParser = routerMock.useParser(
   createDynamicRouteParser([
     '/project/[ref]/functions/[functionSlug]',
@@ -33,6 +41,14 @@ const removeRouteParser = routerMock.useParser(
   ])
 )
 afterAll(removeRouteParser)
+
+const createTestRouter = (initialUrl: string) =>
+  createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
 
 const featureFlags = {
   configcat: {
@@ -115,10 +131,15 @@ it('forwards an invocation bookmark with its selected log, message, and time ran
 })
 
 function FunctionLogNavigation({ isEnabled = true, isLoading = false }) {
-  const router = useRouter()
+  const asPath = useLocation({ select: (location) => location.href })
+  const navigate = useNavigate()
+  const onReplace = useCallback(
+    (url: string) => void navigateToUrl(navigate, url, { replace: true }),
+    [navigate]
+  )
   const state = useFunctionLogsMigration({
-    asPath: router.asPath,
-    onReplace: router.replace,
+    asPath,
+    onReplace,
     projectRef: 'default',
     functionSlug: 'send-email',
     isEnabled,
@@ -129,31 +150,41 @@ function FunctionLogNavigation({ isEnabled = true, isLoading = false }) {
 
 it('waits for preview initialization and leaves preview opt-outs on their original bookmark', async () => {
   const bookmark = '/project/default/functions/send-email/logs?log=legacy-log'
-  routerMock.setCurrentUrl(bookmark)
-  const { rerender } = customRender(<FunctionLogNavigation isLoading />)
-  expect(routerMock.asPath).toBe(bookmark)
+  const router = createTestRouter(bookmark)
+  const { rerender } = customRender(<FunctionLogNavigation isLoading />, { router })
+  expect(router.state.location.href).toBe(bookmark)
   rerender(<FunctionLogNavigation isEnabled={false} />)
-  expect(routerMock.asPath).toBe(bookmark)
+  expect(router.state.location.href).toBe(bookmark)
   rerender(<FunctionLogNavigation />)
-  await waitFor(() => expect(routerMock.query.id).toBe('legacy-log'))
+  await waitFor(() =>
+    expect((router.state.location.search as Record<string, unknown>).id).toBe('legacy-log')
+  )
 })
 
 it('migrates a new legacy Logs bookmark during client-side navigation', async () => {
-  routerMock.setCurrentUrl('/project/default/functions/send-email/logs')
-  customRender(<FunctionLogNavigation />)
-  await act(() => routerMock.push('/project/default/functions/send-email/logs?log=first'))
-  await waitFor(() => expect(routerMock.query.id).toBe('first'))
-  await act(() => routerMock.push('/project/default/functions/send-email/logs?log=second'))
-  await waitFor(() => expect(routerMock.query.id).toBe('second'))
+  const router = createTestRouter('/project/default/functions/send-email/logs')
+  customRender(<FunctionLogNavigation />, { router })
+  await act(async () => {
+    await navigateToUrl(router.navigate, '/project/default/functions/send-email/logs?log=first')
+  })
+  await waitFor(() =>
+    expect((router.state.location.search as Record<string, unknown>).id).toBe('first')
+  )
+  await act(async () => {
+    await navigateToUrl(router.navigate, '/project/default/functions/send-email/logs?log=second')
+  })
+  await waitFor(() =>
+    expect((router.state.location.search as Record<string, unknown>).id).toBe('second')
+  )
 })
 
 it('retains the old function log filters when their meaning cannot migrate to unified filters', () => {
   const filter = encodeURIComponent(JSON.stringify({ severity: { error: true } }))
   const bookmark = `/project/default/functions/send-email/logs?f=${filter}`
-  routerMock.setCurrentUrl(bookmark)
-  customRender(<FunctionLogNavigation />)
+  const router = createTestRouter(bookmark)
+  customRender(<FunctionLogNavigation />, { router })
   expect(screen.getByText('Legacy logs')).toBeVisible()
-  expect(routerMock.asPath).toBe(bookmark)
+  expect(router.state.location.href).toBe(bookmark)
 })
 
 function FunctionDetailNavigation({ hasInvocationsTab }: { hasInvocationsTab: boolean }) {
@@ -172,15 +203,21 @@ function FunctionDetailNavigation({ hasInvocationsTab }: { hasInvocationsTab: bo
 
 it('disables the hidden Invocations shortcut while preserving Logs navigation', async () => {
   const user = userEvent.setup()
-  routerMock.setCurrentUrl('/project/default/functions/send-email')
-  const { rerender } = customRender(<FunctionDetailNavigation hasInvocationsTab={false} />)
+  const router = createTestRouter('/project/default/functions/send-email')
+  const { rerender } = customRender(<FunctionDetailNavigation hasInvocationsTab={false} />, {
+    router,
+  })
   await user.keyboard('2')
-  expect(routerMock.asPath).toBe('/project/default/functions/send-email')
+  expect(router.state.location.href).toBe('/project/default/functions/send-email')
   await user.keyboard('3')
-  expect(routerMock.asPath).toBe('/project/default/functions/send-email/logs')
+  await waitFor(() =>
+    expect(router.state.location.href).toBe('/project/default/functions/send-email/logs')
+  )
   rerender(<FunctionDetailNavigation hasInvocationsTab />)
   await user.keyboard('2')
-  expect(routerMock.asPath).toBe('/project/default/functions/send-email/invocations')
+  await waitFor(() =>
+    expect(router.state.location.href).toBe('/project/default/functions/send-email/invocations')
+  )
 })
 
 it('opens a selected log from an old Logs bookmark using the unified time range', async () => {

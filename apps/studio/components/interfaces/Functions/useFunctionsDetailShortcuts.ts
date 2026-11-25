@@ -1,5 +1,6 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -33,33 +34,45 @@ export function useFunctionsDetailShortcuts({
   onOpenDownload,
   onCopyUrl,
 }: UseFunctionsDetailShortcutsParams) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const ready = Boolean(projectRef && functionSlug)
   const shortcutsEnabled = ready && canReadFunctions
   const base = `/project/${projectRef}/functions/${functionSlug}`
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, () => router.push(base), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, () => void navigateToUrl(navigate, base), {
     enabled: shortcutsEnabled && isPlatform,
   })
 
   useShortcut(
     SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS,
-    () => router.push(`${base}/invocations`),
+    () => void navigateToUrl(navigate, `${base}/invocations`),
     { enabled: shortcutsEnabled && isPlatform && hasInvocationsTab }
   )
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, () => router.push(`${base}/logs`), {
-    enabled: shortcutsEnabled && isPlatform,
-  })
+  useShortcut(
+    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS,
+    () => void navigateToUrl(navigate, `${base}/logs`),
+    {
+      enabled: shortcutsEnabled && isPlatform,
+    }
+  )
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE, () => router.push(`${base}/code`), {
-    enabled: shortcutsEnabled,
-  })
+  useShortcut(
+    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE,
+    () => void navigateToUrl(navigate, `${base}/code`),
+    {
+      enabled: shortcutsEnabled,
+    }
+  )
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS, () => router.push(`${base}/details`), {
-    enabled: shortcutsEnabled,
-  })
+  useShortcut(
+    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS,
+    () => void navigateToUrl(navigate, `${base}/details`),
+    {
+      enabled: shortcutsEnabled,
+    }
+  )
 
   useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST, onOpenTest, {
     enabled: shortcutsEnabled,

@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Badge, Menu } from 'ui'
 
 import { BUCKET_TYPES } from './Storage.constants'
@@ -12,6 +12,7 @@ import {
 } from '@/data/config/project-storage-config-query'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -22,7 +23,7 @@ const BUCKET_TYPE_SHORTCUTS: Record<keyof typeof BUCKET_TYPES, ShortcutId> = {
 }
 
 export const StorageMenuV2 = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const page = useStorageV2Page()
 
@@ -39,23 +40,30 @@ export const StorageMenuV2 = () => {
   const showAnalytics = isPlatform && storageAnalytics
   const showVectors = (isPlatform && storageVectors) || isCli
 
-  useShortcut(SHORTCUT_IDS.NAV_STORAGE_FILES, () => router.push(`/project/${ref}/storage/files`))
+  useShortcut(
+    SHORTCUT_IDS.NAV_STORAGE_FILES,
+    () => void navigateToUrl(navigate, `/project/${ref}/storage/files`)
+  )
   useShortcut(
     SHORTCUT_IDS.NAV_STORAGE_ANALYTICS,
-    () => router.push(`/project/${ref}/storage/analytics`),
+    () => void navigateToUrl(navigate, `/project/${ref}/storage/analytics`),
     { enabled: showAnalytics }
   )
   useShortcut(
     SHORTCUT_IDS.NAV_STORAGE_VECTORS,
-    () => router.push(`/project/${ref}/storage/vectors`),
+    () => void navigateToUrl(navigate, `/project/${ref}/storage/vectors`),
     { enabled: showVectors }
   )
-  useShortcut(SHORTCUT_IDS.NAV_STORAGE_S3, () => router.push(`/project/${ref}/storage/s3`), {
-    enabled: isPlatform,
-  })
+  useShortcut(
+    SHORTCUT_IDS.NAV_STORAGE_S3,
+    () => void navigateToUrl(navigate, `/project/${ref}/storage/s3`),
+    {
+      enabled: isPlatform,
+    }
+  )
   useShortcut(
     SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS,
-    () => router.push(`/project/${ref}/storage/signing-keys`),
+    () => void navigateToUrl(navigate, `/project/${ref}/storage/signing-keys`),
     { enabled: isPlatform }
   )
 

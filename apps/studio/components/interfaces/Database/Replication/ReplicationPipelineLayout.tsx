@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import {
   ArrowRightIcon,
@@ -10,7 +11,6 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -89,7 +89,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-  const router = useRouter()
+  const navigate = useNavigate()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -214,7 +214,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(`/project/${projectRef}/database/pipelines`)
+      void navigate({ to: '/project/$ref/database/pipelines', params: { ref: projectRef } })
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {

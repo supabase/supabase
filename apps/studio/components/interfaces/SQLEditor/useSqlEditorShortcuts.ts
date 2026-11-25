@@ -1,10 +1,11 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
 
 import { resolveDiffKeyAction } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { detectOS } from '@/lib/helpers'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -31,7 +32,7 @@ export function useSqlEditorShortcuts({
   resetPrompt,
 }: UseSqlEditorShortcutsArgs) {
   const os = detectOS()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { editor, refocusEditor } = useSQLEditorContext()
 
@@ -40,8 +41,8 @@ export function useSqlEditorShortcuts({
     // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
     // Without it, the effect in routes/project/$ref/sql/$id.tsx bounces back
     // to the previous snippet.
-    router.push(`/project/${ref}/sql/new?skip=true`)
-  }, [ref, router])
+    void navigateToUrl(navigate, `/project/${ref}/sql/new?skip=true`)
+  }, [navigate, ref])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
     registerInCommandMenu: true,

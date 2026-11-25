@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { CodeIcon, ServerIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -21,7 +21,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { isCli, isSelfHosted } = useDeploymentMode()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -63,7 +63,7 @@ export const FunctionsEmptyState = () => {
                 </p>
                 <Button
                   onClick={() => {
-                    router.push(`/project/${ref}/functions/new`)
+                    if (ref) void navigate({ to: '/project/$ref/functions/new', params: { ref } })
                     track('edge_function_via_editor_button_clicked', {
                       origin: 'no_functions_block',
                     })

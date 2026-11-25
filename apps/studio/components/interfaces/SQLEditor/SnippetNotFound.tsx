@@ -1,11 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { useTabsStateSnapshot } from '@/state/tabs'
+import { useTabRouter, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SnippetNotFoundProps {
   id?: string
@@ -14,8 +13,7 @@ interface SnippetNotFoundProps {
 }
 
 export const SnippetNotFound = ({ id, projectRef, tabId }: SnippetNotFoundProps) => {
-  // `tabs.handleTabClose` still takes a Next-shaped router
-  const router = useRouter()
+  const router = useTabRouter()
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedSnippet } = useDashboardHistory()

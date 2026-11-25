@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -8,6 +9,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -16,9 +18,6 @@ const options = vi.hoisted(() => ({
   wizard: false,
   previewLoading: false,
   flagsLoaded: true,
-  tanStack: false,
-  navigate: vi.fn(),
-  push: vi.fn(),
   bigQueryEnabled: true,
   hasAccess: true,
   isLoading: false,
@@ -33,13 +32,6 @@ vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
   useParams: () => ({ ref: 'default' }),
   useFeatureFlags: () => ({ hasLoaded: options.flagsLoaded }),
-}))
-vi.mock('@tanstack/react-router', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  useRouter: () => (options.tanStack ? { navigate: options.navigate } : undefined),
-}))
-vi.mock('next/compat/router', () => ({
-  useRouter: () => ({ push: options.push, events: { on: vi.fn(), off: vi.fn() } }),
 }))
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   usePipelineCreationPreview: () => ({
@@ -64,13 +56,11 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
 }))
 let isEnabled = false
 let enableGate: Promise<void> | undefined
+let navigateSpy: ReturnType<typeof vi.spyOn>
 beforeEach(() => {
   options.wizard = false
   options.previewLoading = false
   options.flagsLoaded = true
-  options.tanStack = false
-  options.navigate.mockClear()
-  options.push.mockClear()
   isEnabled = false
   enableGate = undefined
   options.bigQueryEnabled = true
@@ -146,7 +136,14 @@ beforeEach(() => {
 })
 const renderList = async (waitForSources = true) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const view = customRender(<Destinations />, { queryClient, nuqs: { hasMemory: true } })
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines'] }),
+    parseSearch,
+    stringifySearch,
+  })
+  navigateSpy = vi.spyOn(router, 'navigate')
+  const view = customRender(<Destinations />, { queryClient, router, nuqs: { hasMemory: true } })
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
@@ -280,30 +277,33 @@ test('renders both wizard entry controls as links', async () => {
     expect(link).toHaveAttribute('href', '/project/default/database/pipelines/new')
   )
   fireEvent.click(links[0], { ctrlKey: true })
-  expect(options.push).not.toHaveBeenCalled()
-  expect(options.navigate).not.toHaveBeenCalled()
+  expect(navigateSpy).not.toHaveBeenCalled()
 })
-test.each([false, true])('opens the wizard with the shortcut (TanStack: %s)', async (tanStack) => {
+test('opens the wizard with the shortcut', async () => {
   options.wizard = true
-  options.tanStack = tanStack
   isEnabled = true
   await renderList()
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-  if (tanStack)
-    expect(options.navigate).toHaveBeenCalledWith({
+  expect(navigateSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
       to: '/project/$ref/database/pipelines/new',
       params: { ref: 'default' },
     })
-  else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+  )
 })
 test('enables Pipelines before opening the wizard', async () => {
   options.wizard = true
   await renderList()
   addPipeline()
-  expect(options.push).not.toHaveBeenCalled()
+  expect(navigateSpy).not.toHaveBeenCalled()
   fireEvent.click(await screen.findByRole('button', { name: 'Enable' }))
   await waitFor(() =>
-    expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/database/pipelines/new',
+        params: { ref: 'default' },
+      })
+    )
   )
 })
 test.each(['previewLoading', 'flagsLoaded'] as const)(
@@ -316,14 +316,19 @@ test.each(['previewLoading', 'flagsLoaded'] as const)(
     expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).toBeDisabled()
     addPipeline()
     fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-    expect(options.push).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
     expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
     options.previewLoading = false
     options.flagsLoaded = true
     options.wizard = true
     view.rerender(<Destinations />)
     fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-    expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/database/pipelines/new',
+        params: { ref: 'default' },
+      })
+    )
   }
 )
 
@@ -336,6 +341,5 @@ test('keeps request-access creation in the sheet when no wizard destination is a
   expect(
     await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
   ).toBeInTheDocument()
-  expect(options.push).not.toHaveBeenCalled()
-  expect(options.navigate).not.toHaveBeenCalled()
+  expect(navigateSpy).not.toHaveBeenCalled()
 })

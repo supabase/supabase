@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { Loader2Icon, MessageSquareIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 import { Button } from 'ui'
 
@@ -11,11 +10,11 @@ import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { createTabId, useTabRouter, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerChatTab = () => {
   const { id, ref } = useParams()
-  const router = useRouter()
+  const router = useTabRouter()
   const tabs = useTabsStateSnapshot()
   const aiAssistant = useAiAssistantStateSnapshot()
   const aiAssistantState = useAiAssistantState()

@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { Button, GithubIcon } from 'ui'
 
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
@@ -7,10 +7,11 @@ import { useGitHubConnectionsQuery } from '@/data/integrations/github-connection
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from '@/lib/github'
+import { navigateToUrl } from '@/lib/navigation'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ConnectToGitHub = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
@@ -35,7 +36,7 @@ export const ConnectToGitHub = () => {
       openInstallGitHubIntegrationWindow('authorize')
     } else {
       if (showCreateBranchModal) setShowCreateBranchModal(false)
-      router.push(`/project/${projectRef}/settings/integrations`)
+      void navigateToUrl(navigate, `/project/${projectRef}/settings/integrations`)
     }
   }
 

@@ -1,4 +1,5 @@
 import { type Hotkey } from '@tanstack/react-hotkeys'
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   AlignLeftIcon,
@@ -8,7 +9,6 @@ import {
   MoreVerticalIcon,
   SquareCodeIcon,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -34,7 +34,7 @@ import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
 export const ExplorerQueryTab = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { id, ref } = useParams()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
@@ -106,7 +106,12 @@ export const ExplorerQueryTab = () => {
             This local draft may have been closed or cleared from this browser.
           </p>
         </div>
-        <Button variant="primary" onClick={() => router.push(`/project/${ref}/explorer`)}>
+        <Button
+          variant="primary"
+          onClick={() =>
+            void navigate({ to: '/project/$ref/explorer', params: { ref: ref ?? '' } })
+          }
+        >
           Back to Explorer
         </Button>
       </div>

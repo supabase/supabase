@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useEffectEvent, useState } from 'react'
 
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
@@ -86,7 +86,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
 }
 
 export const useCreateNotebook = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const notebooksSnap = useNotebooksStateSnapshot()
@@ -119,14 +119,17 @@ export const useCreateNotebook = () => {
     notebooksSnap.addNotebook({ projectRef: project.ref, notebook })
     notebooksSnap.addNeedsSaving(notebook.id)
 
-    router.push(`/project/${project.ref}/explorer/notebook/${notebook.id}`)
+    void navigate({
+      to: '/project/$ref/explorer/notebook/$id',
+      params: { ref: project.ref, id: notebook.id },
+    })
   }
 
   return { createNotebook }
 }
 
 export const useCreateChat = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const aiAssistantState = useAiAssistantState()
@@ -139,7 +142,10 @@ export const useCreateChat = () => {
       return undefined
     }
 
-    router.push(`/project/${project.ref}/explorer/chat/${id}`)
+    void navigate({
+      to: '/project/$ref/explorer/chat/$id',
+      params: { ref: project.ref, id },
+    })
   }
 
   const createChat = async ({
@@ -172,7 +178,10 @@ export const useCreateChat = () => {
 
       const id = aiAssistantState.createChat({ name, initialMessage })
 
-      router.push(`/project/${project.ref}/explorer/chat/${id}`)
+      void navigate({
+        to: '/project/$ref/explorer/chat/$id',
+        params: { ref: project.ref, id },
+      })
       return id
     } finally {
       setIsCreating(false)
@@ -196,7 +205,7 @@ export const useAnalyzeNotebook = () => {
 }
 
 export const useCreateQuery = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const querySnap = useExplorerQueryStateSnapshot()
 
@@ -211,9 +220,11 @@ export const useCreateQuery = () => {
     const id = generateUuid()
     querySnap.createDraft({ id, projectRef: project.ref, sql, name, autoRun })
 
-    const url = `/project/${project.ref}/explorer/query/${id}`
-    if (replace) router.replace(url)
-    else router.push(url)
+    void navigate({
+      to: '/project/$ref/explorer/query/$id',
+      params: { ref: project.ref, id },
+      replace,
+    })
 
     return id
   }

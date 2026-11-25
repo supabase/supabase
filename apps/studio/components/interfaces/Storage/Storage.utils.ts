@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { difference } from 'lodash'
-import { useRouter } from 'next/router'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
@@ -315,8 +315,8 @@ export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: 
 }
 
 export const useStorageV2Page = () => {
-  const router = useRouter()
-  return router.pathname.split('/')[4] as
+  const pathname = useLocation({ select: (location) => location.pathname })
+  return pathname.split('/')[4] as
     | undefined
     | 'files'
     | 'analytics'

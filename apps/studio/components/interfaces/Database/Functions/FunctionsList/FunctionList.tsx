@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
@@ -10,7 +11,6 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import {
   Button,
@@ -39,6 +39,7 @@ import {
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -61,7 +62,7 @@ export const FunctionList = ({
   editFunction = noop,
   deleteFunction = noop,
 }: FunctionListProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema: schema } = useQuerySchemaState()
@@ -190,7 +191,8 @@ export const FunctionList = ({
                             <DropdownMenuItem
                               className="space-x-2"
                               onClick={() =>
-                                router.push(
+                                void navigateToUrl(
+                                  navigate,
                                   `/project/${projectRef}/api?rpc=${encodeURIComponent(x.name)}`
                                 )
                               }

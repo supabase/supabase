@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { GitBranchIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -27,6 +27,7 @@ import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeTitle = () => {
@@ -125,7 +126,7 @@ export const MergeActions = ({
   canMerge: boolean
   onSelectMerge: () => void
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
@@ -246,7 +247,7 @@ export const MergeActions = ({
                 {
                   onSuccess: () => {
                     toast.success('Successfully closed merge request')
-                    router.push(`/project/${project?.ref}/branches?tab=prs`)
+                    void navigateToUrl(navigate, `/project/${project?.ref}/branches?tab=prs`)
                     track('branch_close_merge_request_button_clicked', undefined, {
                       project: parentProjectRef,
                     })

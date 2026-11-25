@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CheckIcon, ChevronDownIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import {
   Button,
   DropdownMenu,
@@ -27,6 +27,7 @@ import {
 } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -57,7 +58,7 @@ type QuerySourceMenuProps = {
  */
 export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySourceMenuProps) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const databaseSelector = useDatabaseSelectorStateSnapshot()
@@ -89,7 +90,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   const switchSource = (target: SqlSnippetSource) => {
     const next = resolveSourceSwitch({ ref, target, currentSource, isBlankNewTab })
     if (next === null) return
-    router[next.method](next.url)
+    void navigateToUrl(navigate, next.url, { replace: next.method === 'replace' })
   }
 
   const updateDatabaseIdentifier = (identifier: string) => {

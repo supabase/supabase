@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -60,7 +60,7 @@ const FormSchema = z.object({
 })
 
 export const EdgeFunctionDetails = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, functionSlug } = useParams()
 
   const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
@@ -114,7 +114,7 @@ export const EdgeFunctionDetails = () => {
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
-      router.push(`/project/${projectRef}/functions`)
+      void navigate({ to: '/project/$ref/functions', params: { ref: projectRef ?? '' } })
     },
   })
 

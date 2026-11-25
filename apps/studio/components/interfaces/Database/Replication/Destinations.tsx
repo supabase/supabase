@@ -1,8 +1,7 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
-import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -99,8 +98,7 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
-  const router = useTanStackRouter({ warn: false })
-  const nextRouter = useNextRouter()
+  const navigate = useNavigate()
   const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
   const bigQuery = useIsPipelinesBigQueryEnabled()
   const duckLake = useIsPipelinesDuckLakeEnabled()
@@ -244,12 +242,10 @@ export const Destinations = () => {
 
   const openCreation = (type: DestinationType) => {
     if (isWizardEnabled && hasWizardDestination && projectRef) {
-      if (router)
-        void router.navigate({
-          to: '/project/$ref/database/pipelines/new',
-          params: { ref: projectRef },
-        })
-      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+      void navigate({
+        to: '/project/$ref/database/pipelines/new',
+        params: { ref: projectRef },
+      })
     } else {
       setDestinationType(type)
     }

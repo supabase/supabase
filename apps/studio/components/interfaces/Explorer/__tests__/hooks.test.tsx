@@ -1,29 +1,20 @@
-import { act, renderHook } from '@testing-library/react'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
+import { act } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateChat, useCreateQuery } from '../hooks'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
+import { customRenderHook } from '@/tests/lib/custom-render'
 
-const {
-  mockCreateChat,
-  mockCreateDraft,
-  mockPush,
-  mockReplace,
-  mockSelectChat,
-  mockSetContext,
-  mockWhenInitialized,
-} = vi.hoisted(() => ({
-  mockCreateChat: vi.fn(() => 'chat-2'),
-  mockCreateDraft: vi.fn(),
-  mockPush: vi.fn(),
-  mockReplace: vi.fn(),
-  mockSelectChat: vi.fn(),
-  mockSetContext: vi.fn(),
-  mockWhenInitialized: vi.fn(() => Promise.resolve()),
-}))
+const { mockCreateChat, mockCreateDraft, mockSelectChat, mockSetContext, mockWhenInitialized } =
+  vi.hoisted(() => ({
+    mockCreateChat: vi.fn(() => 'chat-2'),
+    mockCreateDraft: vi.fn(),
+    mockSelectChat: vi.fn(),
+    mockSetContext: vi.fn(),
+    mockWhenInitialized: vi.fn(() => Promise.resolve()),
+  }))
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({ push: mockPush, replace: mockReplace }),
-}))
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({
     data: { ref: 'default', connectionString: 'postgres://example' },
@@ -47,6 +38,14 @@ vi.mock('@/state/ai-assistant-state', () => ({
   whenAiAssistantInitialized: () => mockWhenInitialized(),
 }))
 
+const createTestRouter = () =>
+  createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/project/default/explorer'] }),
+    parseSearch,
+    stringifySearch,
+  })
+
 beforeEach(() => vi.clearAllMocks())
 
 describe('useCreateChat', () => {
@@ -55,7 +54,9 @@ describe('useCreateChat', () => {
   })
 
   it('creates and opens Explorer chats without changing the sidebar selection', async () => {
-    const { result } = renderHook(() => useCreateChat())
+    const router = createTestRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const { result } = customRenderHook(() => useCreateChat(), { router })
 
     await act(async () => {
       await result.current.createChat({
@@ -73,12 +74,22 @@ describe('useCreateChat', () => {
       name: 'Investigate errors',
       initialMessage: 'What happened?',
     })
-    expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/explorer/chat/$id',
+        params: { ref: 'default', id: 'chat-2' },
+      })
+    )
     expect(mockSelectChat).not.toHaveBeenCalled()
 
     act(() => result.current.openChat('chat-1'))
 
-    expect(mockPush).toHaveBeenLastCalledWith('/project/default/explorer/chat/chat-1')
+    expect(navigateSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/explorer/chat/$id',
+        params: { ref: 'default', id: 'chat-1' },
+      })
+    )
     expect(mockSelectChat).not.toHaveBeenCalled()
   })
 
@@ -93,7 +104,9 @@ describe('useCreateChat', () => {
         })
     )
 
-    const { result } = renderHook(() => useCreateChat())
+    const router = createTestRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const { result } = customRenderHook(() => useCreateChat(), { router })
 
     let created: Promise<string | undefined> | undefined
     await act(async () => {
@@ -101,7 +114,7 @@ describe('useCreateChat', () => {
     })
 
     expect(mockCreateChat).not.toHaveBeenCalled()
-    expect(mockPush).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
 
     await act(async () => {
       resolveHydration()
@@ -112,13 +125,20 @@ describe('useCreateChat', () => {
       name: 'Investigate errors',
       initialMessage: undefined,
     })
-    expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/chat/chat-2')
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/explorer/chat/$id',
+        params: { ref: 'default', id: 'chat-2' },
+      })
+    )
   })
 })
 
 describe('useCreateQuery', () => {
   it('replaces the start route when opening the preferred query on startup', () => {
-    const { result } = renderHook(() => useCreateQuery())
+    const router = createTestRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const { result } = customRenderHook(() => useCreateQuery(), { router })
 
     expect(result.current.createQuery({ replace: true })).toBe('query-new')
     expect(mockCreateDraft).toHaveBeenCalledExactlyOnceWith({
@@ -128,12 +148,19 @@ describe('useCreateQuery', () => {
       name: undefined,
       autoRun: undefined,
     })
-    expect(mockReplace).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
-    expect(mockPush).not.toHaveBeenCalled()
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/explorer/query/$id',
+        params: { ref: 'default', id: 'query-new' },
+        replace: true,
+      })
+    )
   })
 
   it('creates a draft and opens it as an Explorer query tab', () => {
-    const { result } = renderHook(() => useCreateQuery())
+    const router = createTestRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const { result } = customRenderHook(() => useCreateQuery(), { router })
 
     expect(result.current.createQuery({ sql: 'select 1', name: 'Untitled query' })).toBe(
       'query-new'
@@ -144,11 +171,18 @@ describe('useCreateQuery', () => {
       sql: 'select 1',
       name: 'Untitled query',
     })
-    expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
+    expect(navigateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/project/$ref/explorer/query/$id',
+        params: { ref: 'default', id: 'query-new' },
+        replace: false,
+      })
+    )
   })
 
   it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
-    const { result } = renderHook(() => useCreateQuery())
+    const router = createTestRouter()
+    const { result } = customRenderHook(() => useCreateQuery(), { router })
 
     result.current.createQuery({ sql: 'select 1', autoRun: true })
     expect(mockCreateDraft).toHaveBeenCalledWith({

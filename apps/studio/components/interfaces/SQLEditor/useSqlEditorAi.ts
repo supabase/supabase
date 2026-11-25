@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -27,6 +27,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -75,7 +76,7 @@ export function useSqlEditorAi({
 
   const { editor, diff: diffController, refocusEditor } = useSQLEditorContext()
 
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -115,12 +116,12 @@ export function useSqlEditorAi({
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
         snapV2.addNeedsSaving(snippet.id!)
-        router.push(`/project/${ref}/sql/${snippet.id}`)
+        void navigateToUrl(navigate, `/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [profile, project, ref, router, snapV2]
+    [navigate, profile, project, ref, snapV2]
   )
 
   const buildDebugPrompt = useCallback(() => {

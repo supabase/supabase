@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -14,7 +15,6 @@ import {
   XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -66,6 +66,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { navigateToUrl } from '@/lib/navigation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -83,7 +84,7 @@ export const TableList = ({
   onEditTable = noop,
   onDeleteTable = noop,
 }: TableListProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -536,7 +537,8 @@ export const TableList = ({
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
-                                      router.push(
+                                      void navigateToUrl(
+                                        navigate,
                                         buildTableEditorUrl({
                                           projectRef: project?.ref,
                                           tableId: x.id,

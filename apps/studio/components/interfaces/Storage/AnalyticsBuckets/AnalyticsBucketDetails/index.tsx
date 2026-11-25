@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { uniq } from 'lodash'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 import { Button, Card, CardContent } from 'ui'
@@ -32,9 +32,10 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 
 export const AnalyticBucketDetails = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { state: extensionState } = useIcebergWrapperExtension()
@@ -189,7 +190,7 @@ export const AnalyticBucketDetails = () => {
         visible={showDeleteModal}
         bucketId={bucket?.name}
         onClose={() => setShowDeleteModal(false)}
-        onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
+        onSuccess={() => void navigateToUrl(navigate, `/project/${projectRef}/storage/analytics`)}
       />
     </>
   )

@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CheckIcon, ExternalLinkIcon, EyeIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { Button, Card } from 'ui'
 import {
@@ -32,6 +32,7 @@ import {
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { navigateToUrl } from '@/lib/navigation'
 
 const ERROR_LOG_FILTERS = ['level:eq:error']
 
@@ -50,7 +51,7 @@ export const EdgeFunctionRecentErrors = ({
   projectRef,
   updatedAt,
 }: EdgeFunctionRecentErrorsProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const { isoTimestampStart, isoTimestampEnd } = useMemo(
     () => getSinceLastDeployLogRange(updatedAt),
@@ -102,9 +103,9 @@ export const EdgeFunctionRecentErrors = ({
     const tab = row?.log_type === 'edge function' ? 'invocations' : 'logs'
     return getLegacyEdgeFunctionLogsUrl({ ...target, tab })
   }
-  const handleOpenLogs = () => router.push(getLogsUrl())
+  const handleOpenLogs = () => void navigateToUrl(navigate, getLogsUrl())
   const handleOpenLog = (logId: string) => {
-    router.push(getLogsUrl(rows.find((row) => row.id === logId)))
+    void navigateToUrl(navigate, getLogsUrl(rows.find((row) => row.id === logId)))
   }
 
   const isLoading = !functionId || (isQueryEnabled && isPending)
