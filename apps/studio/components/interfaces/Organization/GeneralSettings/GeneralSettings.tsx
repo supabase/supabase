@@ -18,15 +18,14 @@ export const GeneralSettings = () => {
 
   return (
     <>
-      <NoProjectsOnPaidOrgInfo />
-
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Organization details</PageSectionTitle>
           </PageSectionSummary>
         </PageSectionMeta>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-2">
+          <NoProjectsOnPaidOrgInfo />
           <OrganizationDetailsForm />
         </PageSectionContent>
       </PageSection>

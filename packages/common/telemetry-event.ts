@@ -2,6 +2,7 @@ import type { components } from 'api-types'
 
 import { hasConsented } from './consent-state'
 import { ensurePlatformSuffix } from './helpers'
+import { posthogClient } from './posthog-client'
 import type { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData, getTelemetryPlatform } from './telemetry-utils'
 
@@ -16,7 +17,16 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_result_clicked',
   'kb_search_closed',
   'agent_setup_clicked',
+  'view_as_markdown_clicked',
 ])
+
+let featureFlagProperties: Record<string, unknown> = {}
+
+export function setTelemetryFeatureFlags(flags: Record<string, unknown>) {
+  featureFlagProperties = Object.fromEntries(
+    Object.entries(flags).map(([key, value]) => [`$feature/${key}`, value])
+  )
+}
 
 // no auth imports here: apps without a dashboard session (kb) send events through this
 export function buildTelemetryEventRequest(
@@ -27,10 +37,13 @@ export function buildTelemetryEventRequest(
   if (!hasConsented()) return null
 
   const platform = getTelemetryPlatform()
+  const liveSessionId = posthogClient.refreshSessionId()
   const body: EventBody = {
     ...getSharedTelemetryData(pathname),
+    ...(liveSessionId && { session_id: liveSessionId }),
     action: event.action,
     custom_properties: {
+      ...featureFlagProperties,
       ...('properties' in event ? event.properties : {}),
       ...(platform && { platform }),
     },

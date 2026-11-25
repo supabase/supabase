@@ -155,7 +155,7 @@ database.new. Then:
 2. Install Laravel Breeze with \`composer require laravel/breeze --dev &&
    php artisan breeze:install\`.
 3. Copy the Session Pooler connection string from the Supabase Connect panel
-   and set \`DB_URL\` in \`.env\`.
+   and set \`DB_URL\` in \`.env\`. Also set \`DB_SSLMODE=require\`.
 4. Set \`search_path\` to a custom schema (e.g. \`laravel\`) in
    \`config/database.php\`.
 5. Run \`php artisan migrate\` to apply database migrations.
@@ -319,6 +319,21 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/tanstack.md`,
+  unity: `Help me add Supabase to my Unity project. Create a Supabase project at
+database.new and run the instruments table SQL. Then:
+1. Create a new Unity project in Unity Hub.
+2. Install NuGetForUnity in the Package Manager from
+   https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity, then
+   install the \`Supabase\` package from NuGet > Manage NuGet Packages.
+3. Add a \`SupabaseManager\` MonoBehaviour singleton that creates the client from
+   your project URL and publishable key and exposes \`InitializationTask\`.
+4. Add an \`Instrument\` model class for the instruments table.
+5. Add an \`InstrumentList\` MonoBehaviour that awaits \`InitializationTask\`, then
+   queries the table and logs each name.
+6. Attach both scripts to GameObjects in the scene and click Play.
+
+REFERENCE
+https://supabase.com/docs/guides/getting-started/quickstarts/unity.md`,
   vue: `Help me add Supabase to my Vue project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
 1. Run \`npm init vue@latest my-app\` to scaffold the app.

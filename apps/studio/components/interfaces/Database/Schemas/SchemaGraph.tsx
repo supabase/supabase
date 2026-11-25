@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import type { PGSchema } from '@supabase/pg-meta'
 import {
   Background,
@@ -11,6 +13,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -23,10 +26,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import '@xyflow/react/dist/style.css'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,10 +42,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useTableActions } from '../../TableGridEditor/useTableActions'
 import { DefaultEdge } from './DefaultEdge'
 import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
@@ -73,9 +74,10 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { tablesToSQL } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -89,7 +91,10 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { editTable } = useTableActions()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
+  const track = useTrack()
+  const { data: protectedSchemas } = useProtectedSchemas()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -185,6 +190,7 @@ export const SchemaGraph = () => {
     )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
+    track('database_schema_visualizer_auto_layout_applied')
     await new Promise<void>((resolve) =>
       setTimeout(async () => {
         await reactFlowInstance.fitView({})
@@ -236,12 +242,14 @@ export const SchemaGraph = () => {
     if (!reactflowViewport) return
     if (!ref) return
     const { x, y, zoom } = reactFlowInstance.getViewport()
+    track('database_schema_visualizer_image_download_clicked', { format })
     exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
   const copyAsSQL = () => {
     if (!tables) return
     copyToClipboard(tablesToSQL(tables))
+    track('database_schema_visualizer_copied', { content: 'schema_sql' })
     setCopied(true)
     toast.success('Successfully copied as SQL')
   }
@@ -278,6 +286,7 @@ export const SchemaGraph = () => {
     if (policiesMarkdown) markdown += policiesMarkdown
 
     copyToClipboard(markdown)
+    track('database_schema_visualizer_copied', { content: 'schema_markdown' })
     setCopied(true)
     toast.success('Successfully copied as Markdown')
   }
@@ -289,6 +298,14 @@ export const SchemaGraph = () => {
   const handleSelectSchema = (name: string) => {
     setFindTableOpen(false)
     setSelectedSchema(name)
+    track('database_schema_selector_updated', {
+      schemaType:
+        name === 'public'
+          ? 'public'
+          : protectedSchemas.some((s) => s.name === name)
+            ? 'protected'
+            : 'custom',
+    })
   }
 
   const shortcutsEnabled = isSuccessSchemas && !hasNoTables
@@ -306,6 +323,9 @@ export const SchemaGraph = () => {
 
   const isFirstLoad = useRef(true)
   const fitViewOnNextLayout = useRef(false)
+  // Schema of the nodes currently on the canvas. Switching to a schema whose tables are cached
+  // keeps the graph mounted, so the view must be fitted again or the new nodes can sit off-screen.
+  const layoutSchemaRef = useRef<string | null>(null)
   const pendingFocusTableIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
@@ -314,7 +334,9 @@ export const SchemaGraph = () => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
         // Prevent resetting a view after first load to avoid layout changes after editing a column
-        if (isFirstLoad.current || fitViewOnNextLayout.current) {
+        const isNewSchema = layoutSchemaRef.current !== selectedSchema
+        layoutSchemaRef.current = selectedSchema
+        if (isFirstLoad.current || fitViewOnNextLayout.current || isNewSchema) {
           isFirstLoad.current = false
           fitViewOnNextLayout.current = false
           setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
@@ -335,6 +357,7 @@ export const SchemaGraph = () => {
   }, [isSuccessTables, isSuccessSchemas, tables, reactFlowInstance, ref, schemas, selectedSchema])
 
   const handleFindTableSelect = async (table: SafePostgresTable) => {
+    track('database_schema_visualizer_find_table_clicked')
     const targetId = String(table.id)
     if (reactFlowInstance.getNode(targetId)) {
       reactFlowInstance.fitView({
@@ -372,14 +395,10 @@ export const SchemaGraph = () => {
         snap.onEditColumn(column)
       },
       onEditTable: (tableId) => {
-        const table = tables.find((table) => table.id === tableId)
-        if (!table || table.columns == null) return
-
-        setSelectedTable(table)
-        snap.onEditTable()
+        void editTable(tableId)
       },
     }),
-    [tables, snap, isDownloading, selectedEdge]
+    [tables, snap, editTable, isDownloading, selectedEdge]
   )
 
   return (
@@ -402,6 +421,7 @@ export const SchemaGraph = () => {
                 tooltipOpen={schemaSelectorOpen ? false : undefined}
               >
                 <SchemaSelector
+                  data-attr="schema-selector"
                   className="w-[180px]"
                   size="tiny"
                   showError={false}
@@ -432,9 +452,9 @@ export const SchemaGraph = () => {
             </div>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
-                <div className="flex items-center gap-0">
+                <SplitButtonGroup className="items-center gap-0">
                   <ButtonTooltip
-                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+                    data-attr="schema-visualizer-copy-sql"
                     icon={copied ? <CheckIcon data-testid="copy-sql-ready" /> : <CopyIcon />}
                     onClick={copyAsSQL}
                     tooltip={{
@@ -459,12 +479,13 @@ export const SchemaGraph = () => {
                       <Button
                         size="tiny"
                         aria-label="Export options"
-                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                        className="shrink-0 px-1 py-1.25"
                         icon={<ChevronDownIcon size={12} />}
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
+                        data-attr="schema-visualizer-copy-markdown"
                         className="flex items-center space-x-2 whitespace-nowrap"
                         disabled={isMarkdownDataLoading}
                         onClick={(e) => {
@@ -480,6 +501,7 @@ export const SchemaGraph = () => {
                         <span>Copy as Markdown</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        data-attr="schema-visualizer-download-image"
                         className="flex items-center space-x-2 whitespace-nowrap"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -490,6 +512,7 @@ export const SchemaGraph = () => {
                         <span>Download as PNG</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        data-attr="schema-visualizer-download-image"
                         className="flex items-center space-x-2 whitespace-nowrap"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -501,7 +524,7 @@ export const SchemaGraph = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
+                </SplitButtonGroup>
                 <AlertDialog open={autoLayoutDialogOpen} onOpenChange={setAutoLayoutDialogOpen}>
                   <Shortcut
                     id={SHORTCUT_IDS.SCHEMA_VISUALIZER_AUTO_LAYOUT}
@@ -523,7 +546,12 @@ export const SchemaGraph = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={resetLayout}>Apply</AlertDialogAction>
+                      <AlertDialogAction
+                        data-attr="schema-visualizer-auto-layout"
+                        onClick={resetLayout}
+                      >
+                        Apply
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -561,7 +589,12 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2 w-min" icon={<PlusIcon />}>
+                  <Button
+                    asChild
+                    className="mt-2 w-min"
+                    icon={<PlusIcon />}
+                    data-attr="schema-visualizer-new-table"
+                  >
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}

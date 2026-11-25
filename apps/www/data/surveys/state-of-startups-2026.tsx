@@ -841,7 +841,7 @@ const stateOfStartupsData = {
           callout: {
             eyebrow: 'Supabase AI Tools',
             body: 'Learn more about Supabase MCP servers and Supabase Agent Skills and level up your AI-driven development.',
-            href: 'https://supabase.com/docs/guides/getting-started/mcp',
+            href: 'https://supabase.com/docs/guides/ai-tools/mcp',
             cta: 'Read the docs',
             external: true,
           },

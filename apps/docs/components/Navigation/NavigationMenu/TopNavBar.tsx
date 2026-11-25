@@ -1,30 +1,32 @@
 // End of third-party imports
 
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { DevToolbarTrigger } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import type { FC, Ref } from 'react'
+import type { Ref } from 'react'
 import { memo } from 'react'
 import { Button, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
-import GlobalNavigationMenu from './GlobalNavigationMenu'
-import useDropdownMenu from './useDropdownMenu'
-import { AskAiTrigger, SearchV2Trigger } from '@/features/SearchV2'
+import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
+import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
+import { PageActionButtons } from './PageActionButtons'
+import { AskAiTrigger } from '@/features/SearchV2'
+import { SearchV2IconTrigger } from '@/features/SearchV2/SearchV2Trigger'
 
-const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+interface DesktopTopNavBarProps {
+  headingSlotRef: Ref<HTMLLIElement>
+  updatedAtSlotRef: Ref<HTMLDivElement>
+}
 
-const largeLogo = isFeatureEnabled('branding:large_logo')
-
-interface TopNavBarProps {
+interface MobileTopNavBarProps {
   isMenuOpen?: boolean
   onMenuToggle?: () => void
   // the page title after it scrolls under the bar, null while the title is in view
@@ -32,69 +34,95 @@ interface TopNavBarProps {
   menuButtonRef?: Ref<HTMLButtonElement>
 }
 
-const TopNavBar: FC<TopNavBarProps> = ({
-  isMenuOpen = false,
-  onMenuToggle,
-  scrolledTitle,
-  menuButtonRef,
-}) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-  const user = useUser()
-  const menu = useDropdownMenu(user)
-  const { theme, setTheme } = useTheme()
+interface HeaderLogoProps {
+  hasDocsLabel?: boolean
+}
 
+const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const largeLogo = isFeatureEnabled('branding:large_logo')
+
+export const DesktopTopNavBar = ({ headingSlotRef, updatedAtSlotRef }: DesktopTopNavBarProps) => {
   return (
     <nav
       aria-label="top bar"
-      className="relative w-full z-40 flex flex-col max-lg:subhighlight-border bg-default lg:bg-default/75 lg:backdrop-blur-sm lg:backdrop-filter"
+      className="relative w-full z-40 flex flex-col bg-default/75 backdrop-blur-sm backdrop-filter"
     >
-      <div className="w-full px-6 lg:pl-10 lg:pr-5 flex justify-between h-(--header-height) gap-3">
-        <div className="hidden lg:flex h-full items-center justify-center gap-2">
-          <HeaderLogo />
-          <GlobalNavigationMenu />
+      <div className="w-full flex h-(--header-height) border-b">
+        <div
+          style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
+          className="docs-sections-cell relative flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
+        >
+          <a
+            href="https://supabase.com"
+            aria-label="Supabase.com"
+            className="flex shrink-0 items-center rounded-md focus-ring"
+          >
+            <HeaderLogoContent hasDocsLabel={false} />
+          </a>
+          <DocsSectionsMenu />
         </div>
-        <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
-          <div className="lg:hidden min-w-0">
-            <MobileHeaderLogo scrolledTitle={scrolledTitle} />
-          </div>
-
-          <div className="flex gap-3 items-center">
-            <DevToolbarTrigger />
-            {isMenuOpen ? (
-              <MobileNavThemeButton value={theme} onValueChange={setTheme} />
-            ) : (
-              <>
-                <SearchV2Trigger placeholder="Search" />
-                <AskAiTrigger />
-              </>
-            )}
-            <TopNavMenuToggle
-              ref={menuButtonRef}
-              isOpen={isMenuOpen}
-              onClick={onMenuToggle}
-              className="lg:hidden"
-            />
+        <div className="flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
+          <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            <div ref={updatedAtSlotRef} className="contents" />
+            <PageActionButtons />
           </div>
         </div>
-        <div className="hidden lg:flex items-center justify-end gap-3">
-          {!isUserLoading && !isLoggedIn ? (
-            <Button variant="primary" asChild>
-              <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
-                Sign up
-              </a>
-            </Button>
-          ) : null}
+        <div className="flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6 group-has-data-docs-right-rail/docs:border-l">
+          <DevToolbarTrigger />
+          <SearchV2IconTrigger />
+          <AskAiTrigger />
+          <SignedInSwitch
+            signedIn={null}
+            signedOut={
+              <Button variant="primary" asChild>
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+                  Sign up
+                </a>
+              </Button>
+            }
+          />
           {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
             <Button asChild>
               <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
             </Button>
           )}
-          {isLoggedIn ? (
-            <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
-          ) : (
-            <TopNavDropdown />
-          )}
+          <TopNavDropdown />
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export const MobileTopNavBar = ({
+  isMenuOpen = false,
+  onMenuToggle,
+  scrolledTitle,
+  menuButtonRef,
+}: MobileTopNavBarProps) => {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <nav aria-label="top bar" className="relative w-full z-40 flex flex-col bg-default">
+      <div className="w-full flex h-(--header-height) border-b">
+        <div className="flex w-full px-6 gap-3 justify-between items-center">
+          <div className="min-w-0">
+            <MobileHeaderLogo scrolledTitle={scrolledTitle} />
+          </div>
+          <div className="flex gap-3 items-center">
+            <PageActionButtons className="hidden md:flex" />
+            <DevToolbarTrigger />
+            {isMenuOpen ? (
+              <MobileNavThemeButton value={theme} onValueChange={setTheme} />
+            ) : (
+              <>
+                <SearchV2IconTrigger />
+                <AskAiTrigger />
+              </>
+            )}
+            <TopNavMenuToggle ref={menuButtonRef} isOpen={isMenuOpen} onClick={onMenuToggle} />
+          </div>
         </div>
       </div>
     </nav>
@@ -109,7 +137,7 @@ const HeaderLogo = memo(() => (
 
 HeaderLogo.displayName = 'HeaderLogo'
 
-const HeaderLogoContent = () => {
+const HeaderLogoContent = ({ hasDocsLabel = true }: HeaderLogoProps) => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
@@ -132,7 +160,9 @@ const HeaderLogoContent = () => {
         height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
-      <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+      {hasDocsLabel ? (
+        <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+      ) : null}
     </>
   )
 }
@@ -144,7 +174,7 @@ const MobileHeaderLogo = ({ scrolledTitle }: { scrolledTitle?: string | null }) 
   return (
     <Link
       href="/"
-      aria-label="Supabase docs"
+      aria-label={scrolledTitle ? `${scrolledTitle}, Supabase docs` : 'Supabase docs'}
       className="flex h-11 min-w-0 items-center text-sm font-medium text-foreground"
     >
       <HeadingReel id={scrolledTitle ?? 'logo'} index={scrolledTitle ? 1 : 0}>
@@ -157,7 +187,3 @@ const MobileHeaderLogo = ({ scrolledTitle }: { scrolledTitle?: string | null }) 
     </Link>
   )
 }
-
-TopNavBar.displayName = 'TopNavBar'
-
-export default TopNavBar

@@ -6,6 +6,7 @@ import {
   type ReportFilterItem,
   type ReportQuery,
 } from './Reports.types'
+import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
@@ -49,7 +50,8 @@ export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
   projectRef?: string,
   useOtel = false,
-  enabled = true
+  enabled = true,
+  initialParams: Partial<LogsEndpointParams> = {}
 ): PresetHooks => {
   const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
     if (query.queryType === 'db') {
@@ -61,7 +63,7 @@ export const queriesFactory = <T extends string>(
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery({ projectRef, enabled, options: { useOtel } }),
+        [k]: () => useLogsQuery({ projectRef, enabled, initialParams, options: { useOtel } }),
       }
     }
   }, {})

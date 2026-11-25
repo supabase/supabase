@@ -34,7 +34,7 @@ Supabase Auth implements the OAuth 2.1 authorization code flow with PKCE (Proof 
 5. The application exchanges the code for access and refresh tokens
 6. The application uses the access token to make authenticated API requests
 
-Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `client_id` claims. Your existing Row Level Security policies automatically apply to OAuth tokens, giving you fine-grained control over what each client can access.
+Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `client_id` claims. Your existing [Row Level Security](/docs/guides/database/postgres/row-level-security) policies automatically apply to OAuth tokens, giving you fine-grained control over what each client can access.
 
 ### Supported standards
 

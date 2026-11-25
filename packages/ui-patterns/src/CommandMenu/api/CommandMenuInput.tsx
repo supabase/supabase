@@ -1,6 +1,7 @@
 'use client'
 
 import { useBreakpoint, useDebounce } from 'common'
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { cn, CommandInput } from 'ui'
@@ -72,10 +73,12 @@ const CommandMenuInput = forwardRef<
   const inputTelemetryEvent = useCallback(
     (value: string) => {
       if (telemetryContext?.onTelemetry) {
+        const { query, ...queryShape } = describeSearchQuery(value)
         const event = {
           action: 'command_menu_search_submitted' as const,
           properties: {
-            value: value,
+            ...(query !== undefined && { value: query }),
+            ...queryShape,
             app: telemetryContext.app,
           },
           groups: {},
@@ -86,9 +89,13 @@ const CommandMenuInput = forwardRef<
     [telemetryContext]
   )
 
+  // A menu reset empties the input without a change event, so the pending send
+  // reads what the user last typed instead of the current value
+  const typedValueRef = useRef('')
+
   const debouncedTelemetry = useDebounce(
     useCallback(() => {
-      inputTelemetryEvent(currentValue)
+      if (typedValueRef.current.trim()) inputTelemetryEvent(typedValueRef.current)
       previousValueRef.current = currentValue
     }, [inputTelemetryEvent, currentValue]),
     INPUT_TYPED_EVENT_DEBOUNCE_TIME
@@ -98,6 +105,7 @@ const CommandMenuInput = forwardRef<
     (newValue: string) => {
       if (!isControlled) setInputValue(newValue)
       onValueChange?.(newValue)
+      typedValueRef.current = newValue
 
       // Only trigger telemetry if the user is adding characters (not removing with backspace)
       const isAddingCharacters = newValue.length > previousValueRef.current.length

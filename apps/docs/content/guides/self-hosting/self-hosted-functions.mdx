@@ -172,7 +172,7 @@ export default {
 
 This is a key distinction that affects how you build URLs in your functions:
 
-- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the [Supabase JS client](/docs/reference/javascript/introduction) should use inside functions.
 
 - **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance. Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 
@@ -207,6 +207,26 @@ For more details, see:
 
 - [Quick start - Download edge functions](/docs/guides/functions/quickstart-dashboard#download-edge-functions)
 - [CLI commands - Download a function](/docs/reference/cli/supabase-functions-download)
+
+## Synchronous file APIs
+
+In your functions, the [supported synchronous Deno file APIs](/docs/guides/functions/ephemeral-storage#using-synchronous-file-apis), such as `Deno.readFileSync`, work only during initial script evaluation. A call inside a request handler or a timer such as `setTimeout` throws a `PermissionDenied` error: `Deno.<name> is blocklisted on the current context`. The functions service runs each of your functions in its own user worker, where this rule applies. The main worker, which runs the router in `volumes/functions/main/index.ts`, isn't restricted.
+
+## Worker lifecycle
+
+Each function runs in a worker that serves many requests. The `functions` service uses Edge Runtime's default `per_worker` policy, which sends a request to a running worker for its function. A new worker starts only when the function has no running worker.
+
+After a function has a running worker, later and concurrent requests go to it. Concurrent requests that arrive before any worker is running might each start a worker, up to the number of CPUs available to the container. Later requests rotate across those workers. Code at the top level of the function's `index.ts` runs once per worker, not once per request. Put heavy setup, such as creating clients, loading schemas, or filling caches, at the top level, outside the request handler. State created at the top level belongs to one worker and lasts only as long as that worker.
+
+Each of these events stops a worker from taking new requests. When the function has no running worker left, the next request starts a new one, with a cold start and a new run of top-level code:
+
+- The worker reaches half of its maximum lifetime, set by `workerTimeoutMs`, and stops taking new requests. See [Timeout errors](#timeout-errors).
+- The worker gets no requests for the time set by `requestAbsentTimeoutMs` and has no pending tasks. See [Timeout errors](#timeout-errors).
+- [Idle-worker cleanup](#idle-worker-cleanup) retires the worker under memory pressure.
+- The worker exits on an error or a resource limit, such as the [per-worker memory limit](#per-worker-memory-limit).
+- The functions service restarts or is recreated.
+
+To keep workers alive longer, raise `requestAbsentTimeoutMs` and `workerTimeoutMs` in `volumes/functions/main/index.ts`, then restart the functions service. Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
 
 ## Memory management
 
@@ -297,6 +317,10 @@ When you call a function from a browser, the function must handle preflight requ
 
 A missing function, one that fails to start, or an unhandled error in your function also shows up in the browser as a CORS or network error: the preflight fails, or the error response has no CORS headers. Check the function name in the URL and run `docker compose logs functions`.
 
+### Scripts in HTML from a function don't run
+
+The API gateway adds a sandbox `Content-Security-Policy` to function responses, because Studio shares the gateway's origin. A page returned by a function still displays, but its scripts don't run, its forms can't be submitted, and it can't load images or stylesheets. See [Sandboxed responses](/docs/guides/self-hosting/self-hosted-envoy#sandboxed-responses).
+
 ### Changes to function code not reflected after editing
 
 Restart the functions service:
@@ -316,6 +340,10 @@ Use the following command to recreate the container:
 ```sh
 sh run.sh recreate functions
 ```
+
+### `PermissionDenied`: `Deno.<name> is blocklisted on the current context`
+
+Your function called a synchronous Deno file API, such as `Deno.readFileSync`, after initial script evaluation, for example inside the request handler. Move the call to the top level of `index.ts`, outside the request handler, or use the async version, such as `await Deno.readFile`. Code at the top level runs once when the worker starts, not on each request. See [Synchronous file APIs](#synchronous-file-apis).
 
 ### Timeout errors
 

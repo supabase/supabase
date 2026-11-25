@@ -7,7 +7,6 @@ import {
   Button,
   Card,
   CardContent,
-  cn,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -19,7 +18,6 @@ import { HomeCard } from './HomeCard'
 import {
   CATEGORY_ICONS,
   CATEGORY_LABELS,
-  SEVERITY_DOT_CLASSES,
   SEVERITY_LABELS,
 } from '@/components/interfaces/Issues/Issues.constants'
 import {
@@ -27,6 +25,7 @@ import {
   getIssueTelemetryProperties,
   summarizeAffected,
 } from '@/components/interfaces/Issues/Issues.utils'
+import { SeverityIndicator } from '@/components/interfaces/Issues/SeverityIndicator'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -140,7 +139,7 @@ const IssueCard = ({
       meta={
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="inline-flex items-center gap-1.5">
-            <span className={cn('size-1.5 rounded-full', SEVERITY_DOT_CLASSES[issue.severity])} />
+            <SeverityIndicator severity={issue.severity} aria-hidden />
             {SEVERITY_LABELS[issue.severity]}
           </span>
           {affectedSummary && <span className="truncate">· {affectedSummary}</span>}

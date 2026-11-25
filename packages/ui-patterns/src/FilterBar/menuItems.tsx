@@ -1,6 +1,13 @@
 import { ParenthesesIcon } from 'lucide-react'
 
-import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
+import {
+  ActiveInputState,
+  FilterBarAction,
+  FilterGroup,
+  FilterProperty,
+  MenuItem,
+  NewGroupPosition,
+} from './types'
 import {
   collectConditions,
   findConditionByPath,
@@ -73,6 +80,8 @@ export function buildPropertyItems(params: {
   filterProperties: FilterProperty[]
   inputValue: string
   supportsOperators?: boolean
+  /** Where "New filter group" sits relative to the properties. Defaults to 'bottom'. */
+  newGroupPosition?: NewGroupPosition
   actions?: FilterBarAction[]
   freeformDefaultProperty?: FilterProperty
   /** Whether the menu belongs to a nested group, which hides `topLevelOnly` properties */
@@ -82,6 +91,7 @@ export function buildPropertyItems(params: {
     filterProperties,
     inputValue,
     supportsOperators,
+    newGroupPosition = 'bottom',
     actions,
     freeformDefaultProperty,
     isNested = false,
@@ -106,6 +116,16 @@ export function buildPropertyItems(params: {
     })
   }
 
+  const newGroupItem: MenuItem = {
+    icon: <ParenthesesIcon size={14} />,
+    value: '__new_group__',
+    label: 'New filter group',
+  }
+
+  if (supportsOperators && newGroupPosition === 'top') {
+    items.push(newGroupItem)
+  }
+
   items.push(
     ...availableProperties
       .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
@@ -116,12 +136,8 @@ export function buildPropertyItems(params: {
       }))
   )
 
-  if (supportsOperators) {
-    items.push({
-      icon: <ParenthesesIcon size={14} />,
-      value: '__new_group__',
-      label: 'New filter group',
-    })
+  if (supportsOperators && newGroupPosition === 'bottom') {
+    items.push(newGroupItem)
   }
 
   if (actions && trimmedInput.length > 0) {

@@ -45,7 +45,6 @@
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "lucide-react": "catalog:",
-    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   }

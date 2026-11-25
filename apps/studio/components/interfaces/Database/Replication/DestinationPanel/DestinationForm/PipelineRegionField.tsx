@@ -14,7 +14,6 @@ export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
 
 const DESTINATION_REGION_HINT: Record<DestinationType, string> = {
   BigQuery: 'Choose a nearby BigQuery dataset where possible.',
-  'Analytics Bucket': 'Keep this bucket in the same region where possible.',
   DuckLake: 'Keep catalog and object storage close to this region where possible.',
   Snowflake: 'Choose a nearby Snowflake account region where possible.',
   ClickHouse: 'Choose a nearby ClickHouse cluster where possible.',

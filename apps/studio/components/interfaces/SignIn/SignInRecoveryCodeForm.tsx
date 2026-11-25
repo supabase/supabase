@@ -43,6 +43,8 @@ const formId = 'sign-in-recovery-code-form'
 
 export const SignInRecoveryCodeForm = () => {
   const router = useRouter()
+  const { context, ...query } = router.query
+  const isPasswordRecovery = context === 'forgot-password'
   const signOut = useSignOut()
   const isVerification = getReturnToPath().startsWith('/account/security?removeAuthenticator=')
   const [verificationError, setVerificationError] = useState<{ message: string } | null>(null)
@@ -82,14 +84,18 @@ export const SignInRecoveryCodeForm = () => {
       }
     },
     onSuccess: async () => {
-      if (!isVerification) {
+      if (!isVerification && !isPasswordRecovery) {
         track('sign_in', { category: 'account', method: 'recovery-code' })
         addLoginEvent({})
       }
 
       await queryClient.resetQueries()
 
-      router.push(getReturnToPath())
+      if (isPasswordRecovery) {
+        router.push({ pathname: '/reset-password', query })
+      } else {
+        router.push(getReturnToPath())
+      }
     },
   })
 

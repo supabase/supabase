@@ -16,9 +16,9 @@ Keycloak OAuth consists of five broad steps:
 
 - Create a new client in your specified Keycloak realm.
 - Obtain the `issuer` from the "OpenID Endpoint Configuration". This will be used as the `Keycloak URL`.
-- Ensure that the new client has the "Client Protocol" set to `openid-connect` and the "Access Type" is set to "confidential".
+- Ensure that the new client has the **Client type** set to **OpenID Connect**, and that under **Capability config**, **Client authentication** and **Standard flow** are on.
 - The `Client ID` of the client created will be used as the `client id`.
-- Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
+- Obtain the **Client Secret** from the **Credentials** tab which will be used as the `client secret`.
 - Add the callback URL of your application to your allowlist.
 
 ## Access your Keycloak admin console
@@ -31,31 +31,20 @@ Keycloak OAuth consists of five broad steps:
 - After you've added a new realm, you can retrieve the `issuer` from the "OpenID Endpoint Configuration" endpoint. The `issuer` will be used as the `Keycloak URL`.
 - You can find this endpoint from the realm settings under the "General Tab" or visit [`http://localhost:8080/realms/my_realm_name/.well-known/openid-configuration`](http://localhost:8080/realms/my_realm_name/.well-known/openid-configuration)
 
-![Add a Keycloak Realm.](/docs/img/guides/auth-keycloak/keycloak-create-realm.png)
-
 ## Create a Keycloak client
 
-The "Client ID" of the created client will serve as the `client_id` when you make API calls to authenticate the user.
+Create the client in your realm. Its **Client ID** serves as the `client_id` when you make API calls to authenticate the user.
 
-![Add a Keycloak client](/docs/img/guides/auth-keycloak/keycloak-add-client.png)
-
-## Client settings
-
-After you've created the client successfully, ensure that you set the following settings:
-
-1. The "Client Protocol" should be set to `openid-connect`.
-2. The "Access Type" should be set to "confidential".
-3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
-
-![Obtain the client id, set the client protocol and access type](/docs/img/guides/auth-keycloak/keycloak-client-id.png)
-![Set redirect uri](/docs/img/guides/auth-keycloak/keycloak-redirect-uri.png)
+1. In the realm's side panel, go to **Clients** > **Create client**.
+2. Set **Client type** to **OpenID Connect**.
+3. Set **Client ID**, for example `supabase`, then click **Next**.
+4. In **Capability config**, turn on **Client authentication** and leave **Standard flow** on, then click **Next**.
+5. In **Login settings**, add `https://<project-ref>.supabase.co/auth/v1/callback` to **Valid redirect URIs**.
+6. Click **Save**.
 
 ## Obtain the client secret
 
-This will serve as the `client_secret` when you make API calls to authenticate the user.
-Under the "Credentials" tab, the `Secret` value will be used as the `client secret`.
-
-![Obtain the client secret](/docs/img/guides/auth-keycloak/keycloak-client-secret.png)
+Open the client's **Credentials** tab and copy the **Client Secret**. It serves as the `client_secret` when you make API calls to authenticate the user.
 
 ## Add sign-in code to your client app
 
@@ -125,7 +114,7 @@ suspend fun signInWithKeycloak() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.KeyCloak` as the provider:
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/auth-signinwithoauth) with `Provider.KeyCloak` as the provider:
 
 ```c#
 var state = await supabase.Auth.SignIn(Provider.KeyCloak, new SignInOptions { Scopes = "openid" });
@@ -187,7 +176,7 @@ suspend fun signOut() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+When your user signs out, call [SignOut()](/docs/reference/csharp/auth-signout) to remove them from the browser session and any objects from local storage:
 
 ```c#
 await supabase.Auth.SignOut();
@@ -200,4 +189,3 @@ await supabase.Auth.SignOut();
 ## Resources
 
 - You can find the Keycloak OpenID endpoint configuration under the realm settings.
-  ![Keycloak OpenID Endpoint Configuration](/docs/img/guides/auth-keycloak/keycloak-openid-endpoint-config.png)

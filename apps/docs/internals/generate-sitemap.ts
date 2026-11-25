@@ -6,7 +6,8 @@
 import fs from 'fs'
 import { globby } from 'globby'
 import matter from 'gray-matter'
-import prettier from 'prettier'
+import { format } from 'oxfmt'
+import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 
 import { generateReferencePages } from './files/reference-lib'
 
@@ -28,9 +29,9 @@ async function generate() {
     })
   )
 
-  const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
-    referencePages
-  )
+  const allPages = (contentPages as Array<{ link: string; priority: number }>)
+    .filter(({ link }) => checkGuidePageEnabled(`/${link}`))
+    .concat(referencePages)
   // Keep the output order stable across builds
   allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
 
@@ -52,11 +53,14 @@ async function generate() {
     </urlset>
     `
 
-  const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
-  const formatted = await prettier.format(sitemap, {
-    ...prettierConfig,
-    parser: 'html',
+  const { code: formatted, errors } = await format('sitemap.html', sitemap, {
+    tabWidth: 2,
+    printWidth: 100,
+    endOfLine: 'lf',
   })
+  if (errors.length > 0) {
+    throw new Error(`Failed to format docs sitemap: ${errors.map((e) => e.message).join('; ')}`)
+  }
 
   const sitemapFilePath = `public/sitemap.xml`
   console.log(

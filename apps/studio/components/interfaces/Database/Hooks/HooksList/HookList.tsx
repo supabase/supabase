@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes } from 'lodash'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
@@ -11,18 +12,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 
-import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export interface HookListProps {
   schema: string
@@ -32,10 +34,23 @@ export interface HookListProps {
 export const HookList = ({ schema, filterString }: HookListProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: hooks } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const { data: hooks } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [, setSelectedHookIdToEdit] = useQueryState('edit', parseAsString.withDefault(''))
   const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
@@ -48,9 +63,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       x.schema === schema &&
       x.function_args.length >= 2
   )
-  const { can: canUpdateWebhook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
-  )
+  const canUpdateWebhook = writeGrant.status === 'granted'
 
   return (
     <>
@@ -59,8 +72,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
         const isEdgeFunction = isEdgeFunctionUrl(url, ref ?? '', restUrl)
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td>
+          <TableRow key={x.id}>
+            <TableCell>
               <div className="flex items-center space-x-4">
                 <div>
                   <Image
@@ -80,21 +93,21 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   {x.name}
                 </p>
               </div>
-            </Table.td>
-            <Table.td className="hidden space-x-2 lg:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-2 lg:table-cell">
               <p title={x.table}>{x.table}</p>
-            </Table.td>
-            <Table.td className="hidden space-x-1 xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-1 xl:table-cell">
               {x.events.map((event: string) => (
                 <Badge key={event}>{event}</Badge>
               ))}
-            </Table.td>
-            <Table.td className="hidden xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden xl:table-cell">
               <p className="truncate" title={url}>
                 <code>{method}</code>: {url}
               </p>
-            </Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
@@ -145,8 +158,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   />
                 )}
               </div>
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

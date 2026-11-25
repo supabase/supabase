@@ -1,4 +1,4 @@
-import type { IsoPoint } from '../iso-shapes'
+import type { IsoPoint } from 'ui-patterns/IsoShape/IsoShape.geometry'
 
 interface CanvasLayer {
   canvas: HTMLCanvasElement

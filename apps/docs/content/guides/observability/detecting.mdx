@@ -58,7 +58,7 @@ select
 from pg_stat_activity;
 ```
 
-**Signal:** report client connections at 80% of `max_connections`. This is an instance-wide pressure indicator. Reserved slots, role limits, and pooler limits can constrain a client sooner; this does not measure slots available to an application.
+**Signal:** report client connections at 80% of `max_connections`. This is an instance-wide pressure indicator. Reserved slots, role limits, and [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) limits can constrain a client sooner; this does not measure slots available to an application.
 
 **Next:** inspect [connection management](/docs/guides/database/connection-management) and [role counts](#collect-size-and-connection-measurements). Rerun after the workload or pooling change.
 

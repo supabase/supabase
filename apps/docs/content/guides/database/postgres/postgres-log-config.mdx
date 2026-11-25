@@ -75,17 +75,8 @@ There are two potential ways to change log settings:
 - [Supabase CLI](/docs/guides/local-development/cli/getting-started)
 - **SQL commands**
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configure with the CLI"
-      id="item-1"
-    >
+<details>
+<summary>Configure with the CLI</summary>
 
     Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started) then update the relevant setting:
 
@@ -103,13 +94,10 @@ postgres-config delete --config log_lock_waits,log_disconnections,... \
 --remote=<project-ref>
 ```
 
-    </AccordionItem>
+</details>
 
-
-    <AccordionItem
-      header="Configure with SQL"
-      id="item-2"
-    >
+<details>
+<summary>Configure with SQL</summary>
 
 <Admonition type="caution">
 
@@ -145,9 +133,7 @@ NOTIFY pgrst, 'reload config';
 
 </Admonition>
 
-    </AccordionItem>
-
-</Accordion>
+</details>
 
 ## Background activity
 
@@ -170,17 +156,8 @@ automatic vacuum of table "postgres.public.vac_test": index scans: 0
 automatic analyze of table "postgres.public.vac_test"
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -188,9 +165,7 @@ postgres-config update --config log_autovacuum_min_duration=10ms \
 --remote=<project-ref>
 ```
 
-</AccordionItem>
-
-</Accordion>
+</details>
 
 ### `log_checkpoints`
 
@@ -220,17 +195,8 @@ recovery restart point at 0/B837D6F0
 restartpoint complete: wrote 266 buffers (0.4%); 0 WAL file(s) added, 1 removed, 0 recycled; write=25.760 s, sync=0.004 s, total=25.773 s; sync files=20, longest=0.003 s, average=0.001 s; distance=19779 kB, estimate=565114 kB; lsn=0/B837D748, redo lsn=0/B837D6F0
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -238,9 +204,7 @@ postgres-config update --config log_checkpoints=true \
 --remote=<project-ref>
 ```
 
-</AccordionItem>
-
-</Accordion>
+</details>
 
 ### `log_lock_waits`
 
@@ -264,17 +228,8 @@ process 1017208 still waiting for "lock_type" on relation 75874 of database 5 af
 process 1007982 acquired "lock_type" on transaction 445264 after 2000.880 ms
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -286,9 +241,7 @@ postgres-config update --config log_lock_waits=true \
 alter role "postgres" set log_lock_waits to true;
 ```
 
-</AccordionItem>
-
-</Accordion>
+</details>
 
 ### `log_recovery_conflict_waits`
 
@@ -305,17 +258,8 @@ If a read-replica is acting on data that is being modified/discarded by the prim
 recovery still waiting after 1000.156 ms: recovery conflict on lock
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -323,8 +267,7 @@ postgres-config update --config log_recovery_conflict_waits=true \
 --remote=<project-ref>
 ```
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### `log_startup_progress_interval`
 
@@ -340,17 +283,8 @@ When a server is recovering from a crash, it has to go through several checks be
 syncing data directory (pre-fsync), elapsed time: 0.00 s, current path: ./base/4/13456
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -358,8 +292,7 @@ postgres-config update --config log_startup_progress_interval=1s \
 --remote=<project-ref>
 ```
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### `log_temp_files`
 
@@ -379,17 +312,8 @@ When temp files larger than the `log_temp_files` limit are created, Postgres log
 temporary file: path "base/pgsql_tmp/pgsql_tmp306918.0", size 8331264
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -401,9 +325,7 @@ postgres-config update --config log_temp_files=10MB \
 alter role "postgres" set "log_temp_files" to '10kB';
 ```
 
-    </AccordionItem>
-
-</Accordion>
+</details>
 
 ## Network monitoring
 
@@ -436,17 +358,8 @@ The logged IP address is from the device directly communicating with Postgres. I
 
 </Admonition>
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -454,8 +367,7 @@ postgres-config update --config log_connections=true \
 --remote=<project-ref>
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ### `log_disconnections`
 
@@ -476,17 +388,8 @@ disconnection: session time: 0:00:01.492 user=postgres database=postgres host=12
 The logged IP address is from the device directly communicating with Postgres. If you connect through the [shared pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler), the [dedicated pooler](/docs/guides/database/connecting-to-postgres#dedicated-pooler), or the [Data API](/docs/guides/database/connecting-to-postgres#data-apis-and-client-libraries), those service IPs will appear instead of the original client.
 
 </Admonition>
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sh name=CLI
 supabase --experimental \
@@ -494,8 +397,7 @@ postgres-config update --config log_disconnections=true \
 --remote=<project-ref>
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ## Query activity
 
@@ -527,17 +429,8 @@ Beyond logs, [pg_cron](/docs/guides/cron/install) also records all cron executio
 
 </Admonition>
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
     <Admonition type="caution">
 
@@ -553,8 +446,7 @@ postgres-config update --config cron.log_statement=false --no-restart \
 --remote=<project-ref>
 ```
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### `auto_explain.*`
 
@@ -581,24 +473,14 @@ Note, even though the query will not be logged, the primary command associated w
 command_tag: "SELECT"
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sql name=SQL
 alter role "postgres" set "log_duration" to true;
 ```
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### `log_min_duration_statement`
 
@@ -635,24 +517,14 @@ Note: `log` is considered more severe than `warning` and `error`.
 
 - Controlling what _query generated logs_ are recorded overall
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
+<details>
+<summary>Configuration examples</summary>
 
 ```sql name=SQL
 alter role "postgres" set "log_min_messages" to 'log';
 ```
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### `log_statement`
 
@@ -680,21 +552,14 @@ Logs queries that match the configured action type:
 statement: select * from testing WHERE id = 5 limit 100;
 ```
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem header="Configuration examples" id="item-1">
+<details>
+<summary>Configuration examples</summary>
 
 ```sql name=SQL
 alter role "postgres" set "log_statement" to 'ddl';
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ### `pgaudit.*`
 

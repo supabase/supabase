@@ -35,13 +35,11 @@ interface TreeNode {
 }
 
 const flattenChildren = (files: RegistryNode[]): TreeNode[] => {
-  return files.map(
-    (node): TreeNode => ({
-      name: node.name,
-      children: node.children ? flattenChildren(node.children) : [],
-      metadata: { path: node.path },
-    })
-  )
+  return files.map((node): TreeNode => ({
+    name: node.name,
+    children: node.children ? flattenChildren(node.children) : [],
+    metadata: { path: node.path },
+  }))
 }
 
 const LANGUAGES: Record<string, CodeBlockLang> = {

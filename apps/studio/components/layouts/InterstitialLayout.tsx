@@ -8,6 +8,9 @@ import { BASE_PATH } from '@/lib/constants'
 
 const MotionCard = motion.create(Card)
 
+/** Width of the interstitial card. Shared so previews of these screens match them. */
+export const INTERSTITIAL_WIDTH_CLASS = 'max-w-[400px]'
+
 interface InterstitialLayoutProps {
   logo?: ReactNode
   title?: ReactNode
@@ -16,7 +19,7 @@ interface InterstitialLayoutProps {
   footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
-  /** Shared max-width for the card and footer column. Defaults to `max-w-[400px]`. */
+  /** Shared max-width for the card and footer column. Defaults to `INTERSTITIAL_WIDTH_CLASS`. */
   widthClassName?: string
   titleClassName?: string
   descriptionClassName?: string
@@ -36,7 +39,7 @@ export const InterstitialLayout = ({
   footer,
   containerClassName,
   cardClassName,
-  widthClassName = 'max-w-[400px]',
+  widthClassName = INTERSTITIAL_WIDTH_CLASS,
   titleClassName,
   descriptionClassName,
   children,
@@ -47,10 +50,7 @@ export const InterstitialLayout = ({
 
   const titleElement = title ? (
     <TitleElement
-      className={cn(
-        'font-sans tracking-tight text-balance text-lg font-medium normal-case text-foreground',
-        titleClassName
-      )}
+      className={cn('tracking-tight text-balance text-lg text-foreground', titleClassName)}
     >
       {title}
     </TitleElement>
