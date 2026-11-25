@@ -98,8 +98,8 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
 
               {canShowRightSizingNote && (
                 <p>
-                  Disks don't shrink automatically. After you reduce your database size, a Postgres
-                  upgrade right-sizes your disk.{' '}
+                  Disk size doesn't shrink automatically. Reduce your database size, then upgrade
+                  Postgres to right-size your disk.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/platform/database-size#reducing-disk-size`}>
                     Learn more
                   </InlineLink>
