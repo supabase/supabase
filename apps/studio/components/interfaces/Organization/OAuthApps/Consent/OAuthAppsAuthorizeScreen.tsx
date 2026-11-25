@@ -349,7 +349,7 @@ export const OAuthAppsAuthorizeScreen = ({
   }
 
   if (
-    isPendingRequest ||
+    isPendingPreflight ||
     isPendingIdentity ||
     isPendingMemberOrg ||
     (isPendingInitialProjects && initialRefs.length > 0)
@@ -399,6 +399,8 @@ export const OAuthAppsAuthorizeScreen = ({
       ? preflightError
       : null
   const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
+  const cannotSubmit =
+    hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure
 
   const handleApprove = () => {
     if (hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure)
@@ -424,13 +426,16 @@ export const OAuthAppsAuthorizeScreen = ({
       description={
         preflightData?.existing_grant ? (
           <>
-            You authorized {request.name} for this organization on{' '}
-            <TimestampInfo
-              className="text-sm inline-block"
-              utcTimestamp={preflightData.existing_grant.approved_at}
-              labelFormat="D MMM YYYY"
-            />
-            . It’s now asking for different access.
+            You authorized this app on{' '}
+            <span className="inline-block whitespace-nowrap">
+              <TimestampInfo
+                className="text-sm inline-block"
+                utcTimestamp={preflightData.existing_grant.approved_at}
+                labelFormat="D MMM YYYY"
+              />
+              .
+            </span>{' '}
+            It’s now requesting different permissions.
           </>
         ) : (
           'This application wants to access your Supabase account.'
@@ -531,7 +536,7 @@ export const OAuthAppsAuthorizeScreen = ({
             block
             variant={primaryActionVariant}
             loading={isSubmitting || isPendingPreflight}
-            disabled={cannotGrantRequestedAccess}
+            disabled={cannotSubmit}
             aria-label={primaryActionLabel}
             onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
           >
