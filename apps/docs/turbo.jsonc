@@ -93,6 +93,19 @@
     "build:markdown": {
       "dependsOn": ["build:guides-markdown", "build:reference-markdown"],
     },
+    // Lists every file generated above in public/markdown/sitemap.md.
+    "build:markdown-sitemap": {
+      "dependsOn": ["build:markdown"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["public/markdown/**"] }],
+      "env": ["NEXT_PUBLIC_BASE_PATH", "VERCEL_ENV", "VERCEL_URL"],
+      "outputs": ["public/markdown/sitemap.md"],
+    },
+    // Concatenates every file listed in the sitemap into public/markdown/full.md.
+    "build:markdown-full": {
+      "dependsOn": ["build:markdown"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["public/markdown/**"] }],
+      "outputs": ["public/markdown/full.md"],
+    },
     "build:gz-archive": {
       "dependsOn": ["build:markdown"],
       "outputs": ["public/docs.tar.gz"],
@@ -158,6 +171,8 @@
         "codegen:examples",
         "codegen:references",
         "build:markdown",
+        "build:markdown-sitemap",
+        "build:markdown-full",
         "build:gz-archive",
         "build:sitemap",
         "redirects:generate",

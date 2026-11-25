@@ -11,7 +11,7 @@ async function main() {
     supabase: createSupabaseClient(),
     table: TABLE_NAME,
     contentRoot: path.resolve(process.cwd(), 'public/markdown'),
-    ignore: ['reference/**', 'guides/troubleshooting/**', '_partials/**'],
+    ignore: ['reference/**', 'guides/troubleshooting/**', '_partials/**', 'sitemap.md', 'full.md'],
   })
   // TEMPORARY until reference pages are markdown too; see ./reference-pages.ts to remove.
   await ingestReferencePages({ supabase: createSupabaseClient(), table: TABLE_NAME })

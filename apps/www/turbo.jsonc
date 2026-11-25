@@ -44,9 +44,7 @@
       ],
     },
     "build": {
-      // docs#build:guides-markdown fetches the federated guides itself (uncached) and writes the
-      // guide content and markdown that www reads, so it must run before the inputs are hashed.
-      "dependsOn": ["^build", "docs#build:guides-markdown", "content:build"],
+      "dependsOn": ["^build", "content:build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "!public/customers-rss.xml",
@@ -63,8 +61,6 @@
             "public/changelog.md",
             "public/changelog/**",
             "public/.well-known/agent-skills/index.json",
-            "$TURBO_ROOT$/apps/docs/content/guides/**",
-            "$TURBO_ROOT$/apps/docs/public/markdown/guides/**",
           ],
         },
       ],
