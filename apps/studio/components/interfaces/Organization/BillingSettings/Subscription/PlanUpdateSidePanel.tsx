@@ -1,8 +1,8 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
-import { useQueryState } from 'nuqs'
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
@@ -114,6 +114,11 @@ const useTrackPanelOpened = (isOpen: boolean, currentPlan: string | undefined) =
   }, [isReady])
 }
 
+const UPGRADED_FROM_PLAN_IDS = ['free', 'pro'] as const
+
+const parseUpgradedFromPlanId = (planId: string | undefined) =>
+  UPGRADED_FROM_PLAN_IDS.find((id) => id === planId) ?? null
+
 export const PlanUpdateSidePanel = () => {
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -123,10 +128,10 @@ export const PlanUpdateSidePanel = () => {
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
-  const originalPlanRef = useRef<string>(undefined)
-
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
+  /** The plan the organization was on when the user picked a new one. */
+  const [planIdBeforeChange, setPlanIdBeforeChange] = useState<string>()
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
   const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
@@ -179,8 +184,16 @@ export const PlanUpdateSidePanel = () => {
 
   const [source, setSource] = useQueryState('source')
 
+  // Carries the pre-upgrade plan to the success screen. Kept in the URL so it survives anything
+  // that remounts this panel after the subscription refetch, including a reload.
+  const [upgradedFromPlanId, setUpgradedFromPlanId] = useQueryState(
+    'upgradedFrom',
+    parseAsStringLiteral(UPGRADED_FROM_PLAN_IDS)
+  )
+
   const onClose = () => {
     setPanel(null)
+    setUpgradedFromPlanId(null)
     // A reopen from the billing page would otherwise report the previous entry point as its origin.
     setSource(null)
   }
@@ -213,11 +226,12 @@ export const PlanUpdateSidePanel = () => {
     }
   }, [visible])
 
-  useEffect(() => {
-    if (visible && isSuccessSubscription && subscription.plan.id) {
-      originalPlanRef.current = subscription.plan.id
-    }
-  }, [visible, isSuccessSubscription, subscription?.plan.id])
+  // Recorded on selection, while the subscription still reports the current plan. A successful
+  // change refetches it before the success screen opens.
+  const handleSelectTier = (tier: 'tier_free' | 'tier_pro' | 'tier_team') => {
+    setPlanIdBeforeChange(subscription?.plan.id)
+    setSelectedTier(tier)
+  }
 
   // tier_free goes through the cancellation flow instead of the plan update view
   const isConfirmingPlanChange = selectedTier !== undefined && selectedTier !== 'tier_free'
@@ -270,7 +284,7 @@ export const PlanUpdateSidePanel = () => {
       selectedOrganization={selectedOrganization}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
-      onSelectTier={setSelectedTier}
+      onSelectTier={handleSelectTier}
     />
   )
 
@@ -293,6 +307,7 @@ export const PlanUpdateSidePanel = () => {
   const handlePlanChangeSuccess = ({ changeType }: { changeType: PlanChangeType }) => {
     if (changeType === 'upgrade') {
       setPanel('planUpgraded')
+      setUpgradedFromPlanId(parseUpgradedFromPlanId(planIdBeforeChange))
     } else {
       onClose()
     }
@@ -309,11 +324,15 @@ export const PlanUpdateSidePanel = () => {
       {isUpgradeComplete && upgradedPlanId && slug && (
         <PlanUpgradeSuccessView
           planId={upgradedPlanId}
+          previousPlanId={upgradedFromPlanId ?? undefined}
           organizationName={selectedOrganization?.name}
           organizationSlug={slug}
           projects={orgProjects}
           isSpendCapEnabled={subscription?.usage_billing_enabled === false}
-          onManageSpendCap={() => setPanel('costControl')}
+          onManageSpendCap={() => {
+            setPanel('costControl')
+            setUpgradedFromPlanId(null)
+          }}
           onClose={onClose}
         />
       )}
@@ -338,14 +357,18 @@ export const PlanUpdateSidePanel = () => {
 
       {isConfirmingPlanChange &&
         (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView {...planChangeProps} onSuccess={handlePlanChangeSuccess} origin={source ?? undefined} />
+          <SubscriptionPlanUpdateView
+            {...planChangeProps}
+            onSuccess={handlePlanChangeSuccess}
+            origin={source ?? undefined}
+          />
         ) : (
           <SubscriptionPlanUpdateDialog {...planChangeProps} onSuccess={onClose} />
         ))}
 
       <UpgradeSurveyModal
         visible={showUpgradeSurvey}
-        originalPlan={originalPlanRef.current}
+        originalPlan={planIdBeforeChange}
         subscription={subscription}
         onClose={(success?: boolean) => {
           setShowUpgradeSurvey(false)

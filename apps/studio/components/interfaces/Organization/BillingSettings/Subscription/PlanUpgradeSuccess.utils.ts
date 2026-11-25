@@ -9,12 +9,34 @@ export const ANY_PROJECT_REF = '_'
 
 const isActive = (project: OrgProject) => project.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
+export interface MicroUpgradeRow {
+  project: OrgProject
+  /** The project is restarting onto its new compute size. */
+  isUpgrading: boolean
+}
+
 /**
- * Running projects still on Nano compute. Paid plans bill Nano at the Micro rate, so moving
- * them to Micro adds resources at no extra cost.
+ * Projects to list in the Micro upgrade card. Paid plans bill Nano at the Micro rate, so every
+ * running Nano project can move to Micro at no extra cost. A project stays listed while it
+ * resizes, and drops off once it is back up on Micro.
+ *
+ * @param upgradeRequestedRefs Projects upgraded from the card. They may already report Micro
+ * while still resizing, so the Nano check alone would drop them too early.
  */
-export const getNanoProjects = (projects: OrgProject[]) =>
-  projects.filter((project) => isActive(project) && getComputeSize(project) === 'nano')
+export const getMicroUpgradeRows = (
+  projects: OrgProject[],
+  upgradeRequestedRefs: ReadonlySet<string>
+): MicroUpgradeRow[] =>
+  projects.flatMap((project): MicroUpgradeRow[] => {
+    const isNano = getComputeSize(project) === 'nano'
+    const isResizing = project.status === PROJECT_STATUS.RESIZING
+
+    if (isResizing && (isNano || upgradeRequestedRefs.has(project.ref))) {
+      return [{ project, isUpgrading: true }]
+    }
+    if (isActive(project) && isNano) return [{ project, isUpgrading: false }]
+    return []
+  })
 
 /**
  * The project that project-scoped links should open. With exactly one running project the

@@ -41,7 +41,17 @@ const renderView = async (props: Partial<ViewProps> = {}) => {
 }
 
 describe('PlanUpgradeSuccessView', () => {
-  it('links each running Nano project to its Infrastructure settings', async () => {
+  it('upgrades a Nano project to Micro once the restart is confirmed', async () => {
+    const addonRequests: { ref: string; body: unknown }[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/billing/addons',
+      response: async ({ request, params }) => {
+        addonRequests.push({ ref: String(params.ref), body: await request.json() })
+        return new HttpResponse(null, { status: 201 })
+      },
+    })
+    const user = userEvent.setup()
     await renderView({
       projects: [
         createMockOrgProject({ ref: 'nano-one', name: 'Nano one', computeSize: 'nano' }),
@@ -50,13 +60,43 @@ describe('PlanUpgradeSuccessView', () => {
     })
 
     expect(
-      screen.getByRole('heading', { name: 'Upgrade to Micro compute at no extra cost' })
+      screen.getByRole('heading', { name: '1 project can move to Micro for no additional costs' })
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Upgrade to Micro for Nano one' })).toHaveAttribute(
-      'href',
-      '/project/nano-one/settings/infrastructure'
-    )
     expect(screen.queryByText('Micro one')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Upgrade Nano one to Micro' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Upgrade Nano one to Micro' })
+    expect(dialog).toHaveTextContent('restarts for ~1 minute')
+
+    await user.click(screen.getByRole('button', { name: 'Upgrade to Micro' }))
+
+    await waitFor(() =>
+      expect(addonRequests).toEqual([
+        {
+          ref: 'nano-one',
+          body: { addon_type: 'compute_instance', addon_variant: 'ci_micro' },
+        },
+      ])
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('blocks the upgrade while a project resizes and links to its progress', async () => {
+    await renderView({
+      projects: [
+        createMockOrgProject({
+          ref: 'nano-one',
+          name: 'Nano one',
+          computeSize: 'nano',
+          status: 'RESIZING',
+        }),
+      ],
+    })
+
+    expect(screen.getByRole('button', { name: 'Upgrading' })).toBeDisabled()
+    const progressLink = screen.getByRole('link', { name: 'View progress for Nano one' })
+    expect(progressLink).toHaveAttribute('href', '/project/nano-one')
+    expect(progressLink).toHaveAttribute('target', '_blank')
   })
 
   it('tracks Micro upgrade clicks against the clicked project', async () => {
@@ -83,7 +123,7 @@ describe('PlanUpgradeSuccessView', () => {
       ],
     })
 
-    await user.click(screen.getByRole('link', { name: 'Upgrade to Micro for Nano two' }))
+    await user.click(screen.getByRole('button', { name: 'Upgrade Nano two to Micro' }))
 
     await waitFor(() =>
       expect(telemetryEvents).toContainEqual(
@@ -99,49 +139,70 @@ describe('PlanUpgradeSuccessView', () => {
   it('hides the Micro upgrade when no project runs on Nano', async () => {
     await renderView({ projects: [createMockOrgProject({ computeSize: 'micro' })] })
 
-    expect(
-      screen.queryByRole('heading', { name: 'Upgrade to Micro compute at no extra cost' })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /can move to Micro/ })).not.toBeInTheDocument()
   })
 
   it('shows Pro benefits and offers to turn off the spend cap', async () => {
     const user = userEvent.setup()
     const { onManageSpendCap } = await renderView({ planId: 'pro', isSpendCapEnabled: true })
 
-    expect(screen.getByRole('heading', { name: 'Welcome to the Pro plan' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: "You're on Pro" })).toBeInTheDocument()
     expect(screen.getByText('Daily backups')).toBeInTheDocument()
-    expect(screen.getByText('Connect through the dedicated pooler')).toBeInTheDocument()
+    expect(screen.getByText('Switch to the dedicated pooler')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Manage spend cap' }))
+    await user.click(screen.getByRole('button', { name: 'Cost control' }))
     expect(onManageSpendCap).toHaveBeenCalled()
   })
 
   it('skips the spend cap step when the spend cap is already off', async () => {
     await renderView({ planId: 'pro', isSpendCapEnabled: false })
 
-    expect(screen.queryByRole('button', { name: 'Manage spend cap' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cost control' })).not.toBeInTheDocument()
   })
 
   it('shows Team benefits with links to org settings and onboarding', async () => {
     await renderView({ planId: 'team', isSpendCapEnabled: true })
 
-    expect(screen.getByRole('heading', { name: 'Welcome to the Team plan' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Set up SSO' })).toHaveAttribute(
-      'href',
-      '/org/acme/sso'
-    )
+    expect(screen.getByRole('heading', { name: "You're on Team" })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Configure' })).toHaveAttribute('href', '/org/acme/sso')
     expect(screen.getByRole('link', { name: /Book a call/ })).toHaveAttribute(
       'href',
       'https://forms.supabase.com/teamtier'
     )
-    expect(screen.queryByRole('button', { name: 'Manage spend cap' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cost control' })).not.toBeInTheDocument()
   })
 
-  it('returns to billing', async () => {
+  it('lists the Pro features too when upgrading from Free to Team', async () => {
+    await renderView({ planId: 'team', previousPlanId: 'free' })
+
+    expect(screen.getByRole('heading', { name: 'Now included' })).toBeInTheDocument()
+    expect(screen.getByText('Branching')).toBeInTheDocument()
+    expect(screen.getByText('Dedicated pooler')).toBeInTheDocument()
+    expect(screen.getByText('No project pausing')).toBeInTheDocument()
+    expect(screen.getByText('Dashboard SSO')).toBeInTheDocument()
+  })
+
+  it('recommends the Pro setup steps too when upgrading from Free to Team', async () => {
+    await renderView({ planId: 'team', previousPlanId: 'free', isSpendCapEnabled: true })
+
+    expect(screen.getByText('Switch to the dedicated pooler')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cost control' })).toBeInTheDocument()
+    expect(screen.getByText('Set up SSO')).toBeInTheDocument()
+  })
+
+  it('only lists what Team adds when upgrading from Pro', async () => {
+    await renderView({ planId: 'team', previousPlanId: 'pro' })
+
+    expect(screen.getByRole('heading', { name: 'Everything in Pro, plus' })).toBeInTheDocument()
+    expect(screen.queryByText('Branching')).not.toBeInTheDocument()
+    expect(screen.queryByText('Switch to the dedicated pooler')).not.toBeInTheDocument()
+  })
+
+  it('returns to the organization', async () => {
     const user = userEvent.setup()
     const { onClose } = await renderView()
 
-    await user.click(screen.getByRole('button', { name: 'Back to billing' }))
+    await user.click(screen.getByRole('button', { name: 'Back to your organization' }))
     expect(onClose).toHaveBeenCalled()
   })
 })
