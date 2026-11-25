@@ -1,0 +1,65 @@
+---
+title: 'Best authentication providers for React Native in 2026'
+description: 'Learn which authentication providers to consider for React Native and Expo apps in 2026, including Supabase Auth, Clerk, Auth0, WorkOS, and Better Auth.'
+topics: ['Rundowns']
+lastEdited: 2026-11-24
+---
+
+[React Native](https://reactnative.dev/) apps, including those built with [Expo](https://expo.dev/), run on the user's device instead of in a browser. There are no cookies to hold a session, so the provider's SDK has to store the session on the device and keep it fresh. Social sign-in also works differently on mobile: it either uses a native sign-in flow, such as Sign in with Apple, or opens a browser and returns to your app through a deep link.
+
+When you compare providers, check how well they handle:
+
+- **Sign-in flow on mobile:** whether Apple and Google sign-in use native flows or a browser redirect, and how the provider handles deep links for OAuth redirects and email links. Check that the provider keeps the session refreshed when the app returns to the foreground, so users are not signed out unexpectedly.
+- **Authorization close to your data:** whether you can check the user where data is read or written, instead of trusting the app on the device.
+
+## Supabase Auth
+
+[Supabase Auth](/docs/guides/auth) is a great choice if you are starting a new React Native project, if your React Native project already uses Supabase, or if you want your users and your app data in the same Postgres database.
+
+Supabase Auth supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks).
+
+Supabase Auth works natively with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions), as well as [Row Level Security](/docs/guides/database/postgres/row-level-security) policies.
+
+For social sign-in, you can use native flows for [Apple](/docs/guides/auth/social-sign-in/auth-apple) and [Google](/docs/guides/auth/social-sign-in/auth-google) and pass the resulting ID token to Supabase Auth, or use a browser-based OAuth flow for any provider, which returns to your app through [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=react-native). Deep linking also opens your app from email links, such as signup confirmation, magic links, and password reset.
+
+To get started, see the [React Native quickstart](/docs/guides/auth/quickstarts/react-native). For a complete app with Apple and Google sign-in and protected navigation, see how to [build a social sign-in app with Expo React Native](/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in).
+
+## Clerk
+
+Clerk is a user management platform for web and mobile apps.
+
+Choose Clerk if you do not need your users to live in your own database.
+
+If you want to use Clerk with the rest of the Supabase Platform, see the [Clerk integration with Supabase](/docs/guides/auth/third-party/clerk).
+
+## Auth0
+
+Auth0, owned by Okta, is an identity platform for consumer and enterprise apps.
+
+Choose Auth0 for a React Native app if you already use it, or if you need an established platform with a wide range of enterprise connections.
+
+If you want to use Auth0 with the rest of the Supabase Platform, see the [Auth0 integration with Supabase](/docs/guides/auth/third-party/auth0). To move to Supabase Auth, see the [Auth0 migration guide](/kb/guides/migrate-from-auth0).
+
+## WorkOS
+
+WorkOS provides single sign-on (SSO) and directory sync, so your customers' IT teams can connect their own identity provider, and its AuthKit product handles user authentication.
+
+Choose WorkOS for a React Native app if enterprise customers require SSO and directory sync before they will buy.
+
+If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
+
+## Better Auth
+
+Better Auth is an open source authentication framework for TypeScript apps. It runs inside your own backend instead of as a hosted service, and can store users and sessions in your own database.
+
+Choose Better Auth if you want authentication to run inside your own codebase instead of as a separate service. It needs a server to handle sessions, so your React Native app calls a backend that runs Better Auth, such as a separate server or Expo API Routes.
+
+Every Supabase project is a full Postgres database, so Better Auth can connect to it directly. To store Better Auth users and sessions in Supabase, see [Set up Better Auth with Supabase Declarative Schema](/kb/guides/setup-better-auth-with-declarative-schema).
+
+## When to choose which provider
+
+- **You are starting a new React Native project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and you can integrate with Row Level Security policies.
+- **You need an established platform with many enterprise connections, or already use it:** Auth0.
+- **Enterprise customers require SSO and directory sync:** WorkOS.
+- **You want authentication to run inside your own backend, instead of as a separate service:** Better Auth. You can use [Better Auth with a Supabase Postgres database](/kb/guides/setup-better-auth-with-declarative-schema).
+- **You already have users in another provider and want the rest of the Supabase Platform:** keep your provider and connect it through [third-party auth](/docs/guides/auth/third-party/overview), or migrate to Supabase Auth.
