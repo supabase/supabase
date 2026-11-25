@@ -403,18 +403,14 @@ export const Destinations = () => {
               </Button>
             }
           >
-            <details>
-              <summary className="cursor-pointer text-foreground-light">
-                View affected regions
-              </summary>
-              <ul className="list-disc pl-5 space-y-1">
-                {failedRegions.map(({ group, error }) => (
-                  <li key={group.clusterId ?? 'default'}>
-                    <span>{group.region?.region_name ?? 'Default region'}</span>:{' '}
-                    <span>{error?.message}</span>
-                  </li>
-                ))}
-              </ul>
+            <ul className="list-disc pl-5 space-y-1">
+              {failedRegions.map(({ group, error }) => (
+                <li key={group.clusterId ?? 'default'}>
+                  <span>{group.region?.region_name ?? 'Default region'}</span>:{' '}
+                  <span>{error?.message}</span>
+                </li>
+              ))}
+            </ul>
           </Admonition>
         )}
 
