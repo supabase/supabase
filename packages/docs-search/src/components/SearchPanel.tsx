@@ -155,7 +155,7 @@ export function SearchPanel({
         {getStatusMessage()}
       </div>
       <ScrollRoot className="mx-px flex flex-col">
-        <ScrollViewport className="max-h-[min(477px,70dvh)] outline-hidden inset-shadow-2xs inset-shadow-border scroll-fade-bottom">
+        <ScrollViewport className="max-h-[min(477px,70dvh)] inset-shadow-2xs inset-shadow-border scroll-fade-bottom">
           <CommandList
             label={copy.resultsLabel}
             className="h-(--cmdk-list-height) max-h-none overflow-visible transition-all duration-150 ease-enter motion-reduce:transition-none"

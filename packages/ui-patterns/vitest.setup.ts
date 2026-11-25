@@ -30,6 +30,9 @@ global.ResizeObserver = vi.fn().mockImplementation(function () {
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = vi.fn()
 
+// base ui scroll area calls getAnimations, which jsdom does not have
+Element.prototype.getAnimations ??= () => []
+
 afterEach(() => {
   cleanup()
 })

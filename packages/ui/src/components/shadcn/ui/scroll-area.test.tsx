@@ -1,14 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
-import type { ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('radix-ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('radix-ui')>()
-  const Root = ({ type }: ComponentProps<typeof actual.ScrollArea.Root>) => (
-    <div data-testid="scroll-root" data-type={type} />
-  )
-  return { ...actual, ScrollArea: { ...actual.ScrollArea, Root } }
-})
 
 const resizeCallbacks: Array<() => void> = []
 
@@ -29,7 +20,7 @@ const mockScrollBarWidth = (width: number) => {
 const renderScrollType = async () => {
   // the scroll type lives in module state, so each test needs a fresh module
   const { ScrollRoot } = await import('./scroll-area')
-  render(<ScrollRoot />)
+  render(<ScrollRoot data-testid="scroll-root" />)
   return screen.getByTestId('scroll-root')
 }
 
@@ -57,13 +48,13 @@ describe('ScrollRoot', () => {
   it('always shows the bar when the os uses classic scroll bars', async () => {
     mockScrollBarWidth(15)
 
-    expect(await renderScrollType()).toHaveAttribute('data-type', 'auto')
+    expect(await renderScrollType()).toHaveAttribute('data-scroll-type', 'classic')
   })
 
   it('shows the bar while scrolling when the os uses overlay scroll bars', async () => {
     mockScrollBarWidth(0)
 
-    expect(await renderScrollType()).toHaveAttribute('data-type', 'scroll')
+    expect(await renderScrollType()).toHaveAttribute('data-scroll-type', 'overlay')
   })
 
   it('measures again when the os scroll bar setting changes', async () => {
@@ -73,13 +64,13 @@ describe('ScrollRoot', () => {
     mockScrollBarWidth(15)
     act(() => resizeCallbacks.forEach((callback) => callback()))
 
-    expect(root).toHaveAttribute('data-type', 'auto')
+    expect(root).toHaveAttribute('data-scroll-type', 'classic')
   })
 
-  it('falls back to scroll without resizeobserver', async () => {
+  it('falls back to overlay without resizeobserver', async () => {
     vi.stubGlobal('ResizeObserver', undefined)
     mockScrollBarWidth(15)
 
-    expect(await renderScrollType()).toHaveAttribute('data-type', 'scroll')
+    expect(await renderScrollType()).toHaveAttribute('data-scroll-type', 'overlay')
   })
 })

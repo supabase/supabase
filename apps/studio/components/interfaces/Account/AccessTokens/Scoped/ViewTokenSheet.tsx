@@ -150,10 +150,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           </p>
           <TokenDocsButtons />
         </SheetHeader>
-        {/* Radix wraps viewport children in an inline-styled display:table div that grows to fit
-            the widest child, which would let one long endpoint path expand the sheet instead of
-            clipping — force it back to block so widths are bounded and rows can truncate. */}
-        <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
+        <ScrollArea className="flex-1 *:*:data-[slot=scroll-area-content]:min-w-0!">
           <div className="space-y-6 px-5 sm:px-6 py-6">
             {isTokenLoading && (
               <div className="flex items-center justify-center py-8">

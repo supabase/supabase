@@ -57,14 +57,14 @@ const resultsState: DocsSearchV2State = {
   query: 'auth',
 }
 
-// cmdk and Radix lean on browser APIs jsdom doesn't ship
+// cmdk and Base UI lean on browser APIs jsdom doesn't ship
 beforeEach(() => {
   globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}
     disconnect() {}
   }
-  Element.prototype.scrollIntoView ??= () => {}
+  Element.prototype.getAnimations ??= () => []
   searchState = { status: 'initial', key: 0 }
   aiMessages.length = 0
 })

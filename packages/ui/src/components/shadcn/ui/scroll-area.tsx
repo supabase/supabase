@@ -1,12 +1,23 @@
 'use client'
 
-import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui'
-import { useSyncExternalStore, type ComponentProps } from 'react'
+import { ScrollArea as ScrollAreaPrimitive } from '@base-ui/react/scroll-area'
+import { useSyncExternalStore } from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
-type ScrollType = NonNullable<ScrollAreaPrimitive.ScrollAreaProps['type']>
-type ScrollRootProps = Omit<ComponentProps<typeof ScrollAreaPrimitive.Root>, 'type'>
+type ScrollType = 'classic' | 'overlay'
+
+interface ScrollRootProps extends Omit<ScrollAreaPrimitive.Root.Props, 'className'> {
+  className?: string
+}
+
+interface ScrollViewportProps extends Omit<ScrollAreaPrimitive.Viewport.Props, 'className'> {
+  className?: string
+}
+
+interface ScrollBarProps extends Omit<ScrollAreaPrimitive.Scrollbar.Props, 'className'> {
+  className?: string
+}
 
 let scrollType: ScrollType | undefined
 let probe: HTMLDivElement | undefined
@@ -15,7 +26,7 @@ const listeners = new Set<() => void>()
 const getScrollType = (): ScrollType => {
   if (scrollType) return scrollType
   // jsdom has no resizeobserver. there is no cache here, so a test that adds a mock later still measures
-  if (typeof ResizeObserver === 'undefined') return 'scroll'
+  if (typeof ResizeObserver === 'undefined') return 'overlay'
 
   // the os sends no event for its scroll bar setting. a change resizes this probe's content box, so the observer sees it
   if (!probe) {
@@ -33,7 +44,7 @@ const getScrollType = (): ScrollType => {
   if (!probe.isConnected) document.body.append(probe)
 
   // classic scroll bars take layout width, overlay ones take none
-  scrollType = probe.offsetWidth > probe.clientWidth ? 'auto' : 'scroll'
+  scrollType = probe.offsetWidth > probe.clientWidth ? 'classic' : 'overlay'
   return scrollType
 }
 
@@ -46,12 +57,12 @@ const ScrollRoot = ({ className, ...props }: ScrollRootProps) => {
   const type = useSyncExternalStore<ScrollType>(
     subscribeToScrollType,
     getScrollType,
-    () => 'scroll'
+    () => 'overlay'
   )
 
   return (
     <ScrollAreaPrimitive.Root
-      type={type}
+      data-scroll-type={type}
       className={cn('group/scroll-area overflow-hidden', className)}
       {...props}
     />
@@ -66,27 +77,25 @@ const ScrollArea = ({ children, ...props }: ScrollRootProps) => (
   </ScrollRoot>
 )
 
-const ScrollViewport = ({
-  className,
-  children,
-  ...props
-}: ComponentProps<typeof ScrollAreaPrimitive.Viewport>) => (
-  <ScrollAreaPrimitive.Viewport className={cn('size-full rounded-[inherit]', className)} {...props}>
-    {children}
+const ScrollViewport = ({ className, children, ...props }: ScrollViewportProps) => (
+  <ScrollAreaPrimitive.Viewport
+    className={cn(
+      'size-full rounded-[inherit] focus-inset overflow-x-hidden! group-has-data-[orientation=horizontal]/scroll-area:overflow-x-scroll!',
+      className
+    )}
+    {...props}
+  >
+    <ScrollAreaPrimitive.Content data-slot="scroll-area-content">
+      {children}
+    </ScrollAreaPrimitive.Content>
   </ScrollAreaPrimitive.Viewport>
 )
 
-const ScrollBar = ({
-  className,
-  orientation = 'vertical',
-  ...props
-}: ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>) => (
-  // radix hover mode ignores scroll. forcemount keeps the bar mounted, so css shows it on hover and scroll mode shows it on scroll
-  <ScrollAreaPrimitive.ScrollAreaScrollbar
-    forceMount
+const ScrollBar = ({ className, orientation = 'vertical', ...props }: ScrollBarProps) => (
+  <ScrollAreaPrimitive.Scrollbar
     orientation={orientation}
     className={cn(
-      'flex touch-none select-none empty:hidden pointer-events-none opacity-0 transition-opacity data-[state=visible]:pointer-events-auto data-[state=visible]:opacity-100 group-hover/scroll-area:pointer-events-auto group-hover/scroll-area:opacity-100 group-has-[:focus-visible]/scroll-area:opacity-100 before:absolute before:rounded-full before:bg-tertiary-foreground/15',
+      'flex touch-none select-none pointer-events-none opacity-0 transition-opacity data-scrolling:pointer-events-auto data-scrolling:opacity-100 group-data-[scroll-type=classic]/scroll-area:pointer-events-auto group-data-[scroll-type=classic]/scroll-area:opacity-100 group-hover/scroll-area:pointer-events-auto group-hover/scroll-area:opacity-100 group-has-[:focus-visible]/scroll-area:opacity-100 before:absolute before:rounded-full before:bg-tertiary-foreground/15',
       orientation === 'vertical' &&
         'h-full w-2.5 py-1.5 pr-1.5 before:inset-y-1.5 before:right-1.5 before:w-1',
       orientation === 'horizontal' &&
@@ -95,8 +104,8 @@ const ScrollBar = ({
     )}
     {...props}
   >
-    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-tertiary-foreground/40 transition-colors hover:bg-tertiary-foreground/60 forced-color-adjust-none forced-colors:bg-[CanvasText]" />
-  </ScrollAreaPrimitive.ScrollAreaScrollbar>
+    <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-tertiary-foreground/40 transition-colors hover:bg-tertiary-foreground/60 forced-color-adjust-none forced-colors:bg-[CanvasText]" />
+  </ScrollAreaPrimitive.Scrollbar>
 )
 
 export { ScrollArea, ScrollBar, ScrollRoot, ScrollViewport }
