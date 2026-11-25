@@ -70,7 +70,7 @@ The core of edge functions' efficiency lies in their execution environment, whic
   3. At the edge, Supabase's **edge runtime** validates the request (e.g., checks authorization).
 
 - **Execution Environment**:
-  - The function runs in a **V8 isolate**. V8 is the JavaScript engine used by Chrome and Node.js, providing a lightweight, sandboxed environment. A new isolate starts when the function has none running. Otherwise, a running isolate handles the request.
+  - The function runs in a **V8 isolate**. V8 is the JavaScript engine used by Chrome and Node.js, providing a lightweight, sandboxed environment. A running isolate for the function handles the request when one is available. Otherwise, a new isolate starts.
   - Each isolate has its own memory heap and execution thread, so one function can't interfere with another. Requests handled by the same isolate share its memory, including state created at the top level of your function.
   - The ESZip bundle is loaded into the isolate when it starts. Top-level code runs once per isolate, and the request handler runs for each request.
   - After execution, the response (e.g., filtered image path) is sent back to the client.
