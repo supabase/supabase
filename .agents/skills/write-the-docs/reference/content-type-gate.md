@@ -12,7 +12,7 @@ Before drafting anything, classify the request against `apps/docs`'s real conten
 
 ## What goes in `/docs` and what goes in `/kb`
 
-`/docs` holds product facts: concepts, configuration, API and SDK usage, getting started. Supabase alone sets the answer. `/kb` holds content where the answer depends on the user's situation. Keep product facts (API signatures, config values, limits, pricing) in `/docs` only, and link to them from `/kb`. A launch can need both: a `/docs` guide for the feature, and a `/kb` comparison or migration guide.
+`/docs` holds product facts: concepts, configuration, API and SDK usage, getting started. Supabase alone sets the answer. `/kb` holds content where the answer depends on the user's situation. Keep product facts (API signatures, config values, limits, pricing) in `/docs` only, and link to them from `/kb`. A launch can need both: a `/docs` guide for the feature, and a `/kb` comparison or migration guide. Fixes for specific problems, such as what one error message means, are troubleshooting articles in `/kb`, and the `/docs` page links to them.
 
 ## What to do when the ask is actually Reference-type
 
