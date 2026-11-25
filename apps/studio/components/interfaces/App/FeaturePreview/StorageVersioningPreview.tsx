@@ -24,10 +24,6 @@ export const StorageVersioningPreview = () => {
         title="Object versioning is in Public Alpha"
         description="This feature may change during development and is not recommended for production workloads."
       />
-      <p className="text-sm text-foreground-light">
-        The Studio preview is on by default and can be disabled here. Versioning stays off until you
-        enable it for each bucket.
-      </p>
       <Image
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
