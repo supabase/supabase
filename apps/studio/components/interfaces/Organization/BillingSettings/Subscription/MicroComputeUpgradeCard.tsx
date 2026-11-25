@@ -78,7 +78,7 @@ const ProjectRow = ({
             <Button
               variant="default"
               disabled
-              icon={<SettingsIcon className="animate-spin" aria-hidden="true" />}
+              icon={<SettingsIcon className="motion-safe:animate-spin" aria-hidden="true" />}
             >
               Upgrading
             </Button>
@@ -171,15 +171,23 @@ export const MicroComputeUpgradeCard = ({
 
   const projectNoun = rows.length === 1 ? 'project' : 'projects'
 
+  // `projectToUpgrade` is a snapshot from when the row was clicked. Only confirm against the
+  // current rows, in case the project changed size or started upgrading from another session.
+  const selectedRow = rows.find((row) => row.project.ref === projectToUpgrade?.ref)
+  const projectToConfirm = selectedRow && !selectedRow.isUpgrading ? selectedRow.project : undefined
+
   const handleConfirmUpgrade = () => {
-    if (!projectToUpgrade) return
+    if (!projectToConfirm) {
+      setProjectToUpgrade(undefined)
+      return
+    }
     track(
       'plan_upgraded_micro_compute_upgrade_submitted',
       { planId, nanoProjectCount },
       // The screen sits on an org page, so name the project being upgraded.
-      { project: projectToUpgrade.ref }
+      { project: projectToConfirm.ref }
     )
-    updateAddon({ projectRef: projectToUpgrade.ref, type: 'compute_instance', variant: 'ci_micro' })
+    updateAddon({ projectRef: projectToConfirm.ref, type: 'compute_instance', variant: 'ci_micro' })
   }
 
   return (
@@ -239,8 +247,8 @@ export const MicroComputeUpgradeCard = ({
       </Card>
 
       <ConfirmationModal
-        visible={projectToUpgrade !== undefined}
-        title={`Upgrade ${projectToUpgrade?.name ?? 'project'} to Micro`}
+        visible={projectToConfirm !== undefined}
+        title={`Upgrade ${projectToConfirm?.name ?? 'project'} to Micro`}
         description="The project restarts for ~1 minute and is unavailable while it moves to Micro. There's no additional cost."
         confirmLabel="Upgrade to Micro"
         confirmLabelLoading="Upgrading"

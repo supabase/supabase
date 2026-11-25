@@ -44,4 +44,12 @@ describe('getMicroUpgradeRows', () => {
       { ref: 'nano-resizing', isUpgrading: true },
     ])
   })
+
+  it('keeps a requested project upgrading when a stale response still reports it active on Nano', () => {
+    const stale = createMockOrgProject({ ref: 'upgraded', computeSize: 'nano' })
+
+    expect(rowRefs(getMicroUpgradeRows([stale], new Set(['upgraded'])))).toEqual([
+      { ref: 'upgraded', isUpgrading: true },
+    ])
+  })
 })
