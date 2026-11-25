@@ -199,6 +199,9 @@ settings:
 
 catalogs:
   default:
+    '@base-ui/react':
+      specifier: ^1.9.0
+      version: 1.9.0
     '@monaco-editor/react':
       specifier: 4.8.0-rc.3
       version: 4.8.0-rc.3
@@ -3001,7 +3004,7 @@ importers:
   packages/ui:
     dependencies:
       '@base-ui/react':
-        specifier: ^1.9.0
+        specifier: 'catalog:'
         version: 1.9.0(@date-fns/tz@1.4.1)(@types/react@19.2.14)(date-fns@2.30.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tailwindcss/forms':
         specifier: ^0.5.11

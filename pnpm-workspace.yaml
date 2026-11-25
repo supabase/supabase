@@ -11,6 +11,7 @@ updateNotifier: false
 enableGlobalVirtualStore: false
 
 catalog:
+  '@base-ui/react': ^1.9.0
   '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.75.2
   '@sentry/node': ^10.75.2
