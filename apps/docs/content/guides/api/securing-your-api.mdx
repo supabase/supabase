@@ -311,6 +311,9 @@ Before adding the check logic, review [Request information](#request-information
    $$;
    ```
 
+Because the search path is empty, schema-qualify every custom table, view, and function referenced in your pre-request function (for example, `public.my_table`).
+PostgreSQL built-in functions, types, and operators continue to resolve through `pg_catalog`.
+
 2. Register the function to run on every Data API request:
 
    ```sql
