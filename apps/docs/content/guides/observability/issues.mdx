@@ -32,6 +32,8 @@ supabase issues --remote --output-format json
 
 Health checks require a remote project. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. Use `--remote=<project-ref>` or `--remote=<branch>` to select another hosted project, or `--remote=<postgresql-url>` for direct database checks. Supply the target with `=`, as in `--remote=your-project-ref`.
 
+Hosted CLI checks require **Advisors** read access (`advisors_read`). Selecting a project can also require `projects_read`; resolving a branch can require `branching_development_read` or `branching_production_read`. Use `supabase issues --help` to inspect conditional token permissions.
+
 The CLI defaults to JSON when it detects an agent. Use `--agent no --output-format text` to request human-readable output explicitly.
 
 Text output summarizes each issue and its affected-resource count, followed by check coverage. Use `--output-format json` or `--output-format stream-json` for structured results. The legacy `-o` / `--output` flag is unsupported.
