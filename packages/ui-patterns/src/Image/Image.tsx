@@ -2,9 +2,8 @@
 
 import 'react-medium-image-zoom/dist/styles.css'
 
-import { useBreakpoint } from 'common'
+import { FrameworkImage, useBreakpoint, type FrameworkImageProps, type StaticImport } from 'common'
 import { useTheme } from 'next-themes'
-import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import { useEffect, useState } from 'react'
 import Zoom from 'react-medium-image-zoom'
 import { cn } from 'ui'
@@ -12,19 +11,6 @@ import { cn } from 'ui'
 import ZoomContent from './ZoomContent'
 
 export type CaptionAlign = 'left' | 'center' | 'right'
-export interface StaticImageData {
-  src: string
-  height: number
-  width: number
-  blurDataURL?: string
-  blurWidth?: number
-  blurHeight?: number
-}
-
-export interface StaticRequire {
-  default: StaticImageData
-}
-export type StaticImport = StaticRequire | StaticImageData
 
 export type SourceType =
   | string
@@ -33,7 +19,7 @@ export type SourceType =
       light: string | StaticImport
     }
 
-export interface ImageProps extends Omit<NextImageProps, 'src'> {
+export interface ImageProps extends Omit<FrameworkImageProps, 'src'> {
   src: SourceType
   zoomable?: boolean
   caption?: string
@@ -42,14 +28,22 @@ export interface ImageProps extends Omit<NextImageProps, 'src'> {
 }
 
 /**
- * An advanced Image component that extends next/image with:
+ * An advanced Image component that extends FrameworkImage with:
  * - src: prop can either be a string or an object with theme alternatives {dark: string, light: string}
  * - zoomable: {boolean} (optional) to make the image zoomable on click
  * - caption: {string} (optional) to add a figcaption
  * - captionAlign: {'left' | 'center' | 'right'} (optional) to align the caption
  * - containerClassName: {string} (optional) to style the parent <figure> container
  */
-export const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
+export const Image = ({
+  src,
+  alt = '',
+  zoomable,
+  caption,
+  captionAlign,
+  containerClassName,
+  ...props
+}: ImageProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
   const isLessThanLgBreakpoint = useBreakpoint()
@@ -68,25 +62,15 @@ export const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   if (!mounted) return null
 
   return (
-    <figure className={cn('next-image--dynamic-fill', props.containerClassName)}>
+    <figure className={cn('next-image--dynamic-fill', containerClassName)}>
       <Component
         {...(zoomable
           ? { ZoomContent: ZoomContent, zoomMargin: isLessThanLgBreakpoint ? 20 : 80 }
           : undefined)}
       >
-        <NextImage
-          key={resolvedTheme}
-          alt={alt}
-          src={source}
-          sizes={sizes}
-          className={props.className}
-          style={props.style}
-          {...props}
-        />
+        <FrameworkImage key={resolvedTheme} alt={alt} src={source} sizes={sizes} {...props} />
       </Component>
-      {props.caption && (
-        <figcaption className={cn(getCaptionAlign(props.captionAlign))}>{props.caption}</figcaption>
-      )}
+      {caption && <figcaption className={cn(getCaptionAlign(captionAlign))}>{caption}</figcaption>}
     </figure>
   )
 }
