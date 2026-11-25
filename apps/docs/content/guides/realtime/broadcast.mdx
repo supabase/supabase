@@ -237,8 +237,8 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     ```kotlin
     val myChannel = supabase.channel("test-channel")
 
-    / Listen for broadcast messages
-    val broadcastFlow: Flow<JsonObject> = myChannel
+    // Listen for broadcast messages
+    myChannel
         .broadcastFlow<JsonObject>("shout") // Listen for "shout". Can be "*" to listen to all events
         .onEach { println(it) }
         .launchIn(yourCoroutineScope) // you can also use .collect { } here
@@ -452,9 +452,9 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
 
     // Sending a message after subscribing will use WebSockets
     myChannel.subscribe(blockUntilSubscribed = true)
-    channelB.broadcast(
+    myChannel.broadcast(
       event = "shout",
-      payload = YourMessage(message = "hello, world!")
+      message = YourMessage(message = "hello, world!")
     )
     ```
 
@@ -736,7 +736,7 @@ With self-send enabled, each message delivered back to the sender is billed as a
         }
     }
 
-    val broadcastFlow: Flow<JsonObject> = myChannel.broadcastFlow<JsonObject>("test-my-messages")
+    myChannel.broadcastFlow<JsonObject>("test-my-messages")
         .onEach {
             println(it)
         }
@@ -746,7 +746,7 @@ With self-send enabled, each message delivered back to the sender is billed as a
 
     myChannel.broadcast(
         event = "test-my-messages",
-        payload = YourMessage(
+        message = YourMessage(
             message = "talking to myself"
         )
     )
