@@ -5,6 +5,7 @@ on:
     branches: ['master']
     paths:
       - 'apps/docs/**/*.ts*'
+      - 'apps/docs/lib/redirects/**'
       - 'apps/docs/spec/**/*.json'
       - 'apps/docs/spec/Makefile'
       - 'apps/docs/spec/sections/generateAccessControlPartials.mts'
