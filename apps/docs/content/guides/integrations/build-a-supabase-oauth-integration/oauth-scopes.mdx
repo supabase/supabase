@@ -21,7 +21,7 @@ You can update scopes of your OAuth app at any time, but existing OAuth app user
 
 | Name             | Type    | Description |
 | ---------------- | ------- | ----------- |
-| `Analytics`      | `Read`  | Retrieve a project's logs and metrics |
+| `Analytics`      | `Read`  | Retrieve a project's log drain configurations |
 | `Auth`           | `Read`  | Retrieve a project's auth configuration<br/>Retrieve a project's SAML SSO providers |
 | `Auth`           | `Write` | Update a project's auth configuration<br/>Create, update, or delete a project's SAML SSO providers |
 | `Database`       | `Read`  | Retrieve the database configuration<br/>Retrieve the pooler configuration<br/>Retrieve SQL snippets<br/>Check if the database is in read-only mode<br/>Retrieve a database's SSL enforcement configuration<br/>Retrieve a database's schema typescript types |
@@ -33,7 +33,7 @@ You can update scopes of your OAuth app at any time, but existing OAuth app user
 | `Environment`    | `Read`  | Retrieve branches in a project |
 | `Environment`    | `Write` | Create, update, delete, push, merge, reset, or restore a database branch; retrieve branch diffs |
 | `Organizations`  | `Read`  | Retrieve an organization's metadata<br/>Retrieve organization members, roles, and maintenance windows |
-| `Organizations`  | `Write` | Create and delete organization invitations (Team and Enterprise plans)<br/>Assign or change organization-wide and project-scoped member roles (Team and Enterprise plans)<br/>Remove organization members, including their roles and project-scoped permissions |
+| `Organizations`  | `Write` | Create and delete organization invitations (available on all plans; read-only and no-access invitation roles require an Enterprise plan)<br/>Assign or change organization-wide member roles (read-only roles require Team or Enterprise plans)<br/>Create project-scoped member role assignments (Team and Enterprise plans)<br/>Remove organization members, including their roles and project-scoped permissions |
 | `Projects`       | `Read`  | Retrieve a project's metadata<br/>Check if a project's database is eligible for upgrade<br/>Retrieve a project's network restrictions<br/>Retrieve a project's network bans |
 | `Projects`       | `Write` | Create a project<br/>Upgrade a project's database<br/>Remove a project's network bans<br/>Update a project's network restrictions |
 | `Rest`           | `Read`  | Retrieve a project's PostgREST configuration |
