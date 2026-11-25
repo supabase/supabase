@@ -1,6 +1,6 @@
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 
-export const ORG_SETTINGS_PANEL_KEYS = ['subscriptionPlan', 'costControl'] as const
+export const ORG_SETTINGS_PANEL_KEYS = ['subscriptionPlan', 'planUpgraded', 'costControl'] as const
 export type OrgSettingsPanelKey = (typeof ORG_SETTINGS_PANEL_KEYS)[number]
 
 export const useOrgSettingsPanel = () => {

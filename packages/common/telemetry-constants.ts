@@ -4312,6 +4312,25 @@ export interface FreeMicroUpgradeBannerCtaClickedEvent {
 }
 
 /**
+ * User confirmed moving a Nano project to Micro on the screen shown after upgrading the
+ * organization to a paid plan. Starts the compute change, which restarts the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /org/{slug}/billing?panel=planUpgraded
+ */
+export interface PlanUpgradedMicroComputeUpgradeSubmittedEvent {
+  action: 'plan_upgraded_micro_compute_upgrade_submitted'
+  properties: {
+    /** The paid plan the organization just upgraded to. */
+    planId: 'pro' | 'team'
+    /** Projects on the screen that can still move to Micro, including the confirmed one. */
+    nanoProjectCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -5174,6 +5193,7 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | PlanUpgradedMicroComputeUpgradeSubmittedEvent
   | UpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
