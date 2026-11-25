@@ -655,7 +655,7 @@ describe('regions', () => {
       await screen.findByText('Pipelines could not be loaded from 2 regions')
     ).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
-    fireEvent.click(screen.getByText('View affected regions'))
+    expect(screen.getByText('Affected regions:')).toBeInTheDocument()
     expect(
       screen
         .getAllByRole('listitem')
