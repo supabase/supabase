@@ -29,11 +29,22 @@ describe('HeaderBreadcrumbs', () => {
     expect(getCurrentCrumbNames()).toEqual(['Password-based'])
   })
 
-  it('keeps the section crumb a link when its overview row has the same url', () => {
-    navigation.pathname = '/guides/auth'
+  it('links a group crumb to its overview page', () => {
+    navigation.pathname = '/guides/database/replication/pipelines'
 
     render(<HeaderBreadcrumbs />)
 
-    expect(getCurrentCrumbNames()).toEqual(['Overview'])
+    const groupLink = screen.getByRole('link', { name: 'Database replication' })
+    expect(groupLink.getAttribute('href')).toBe('/guides/database/replication')
+    expect(getCurrentCrumbNames()).toEqual(['Pipelines'])
+  })
+
+  it('shows the group as the current crumb on its overview page', () => {
+    navigation.pathname = '/guides/database/replication'
+
+    render(<HeaderBreadcrumbs />)
+
+    expect(getCurrentCrumbNames()).toEqual(['Database replication'])
+    expect(screen.queryByText('Overview')).toBeNull()
   })
 })
