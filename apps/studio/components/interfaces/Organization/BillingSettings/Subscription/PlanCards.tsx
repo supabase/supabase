@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
@@ -35,7 +35,12 @@ export function PlanCards({
   showAwsMarketplacePurchase = false,
   onSelectTier,
 }: PlanCardsProps) {
-  const router = useRouter()
+  const source = useLocation({
+    select: (location) => {
+      const rawSource = (location.search as Record<string, string | string[] | undefined>).source
+      return Array.isArray(rawSource) ? rawSource[0] : rawSource
+    },
+  })
   const track = useTrack()
 
   const currentPlanIndex = subscriptionsPlans.findIndex(
@@ -52,9 +57,6 @@ export function PlanCards({
         const isCurrentPlan = index === currentPlanIndex
         const liftedSide = getLiftedSide({ index, liftedIndex: currentPlanIndex })
 
-        const source = Array.isArray(router.query.source)
-          ? router.query.source[0]
-          : router.query.source
         const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_pro'
 
         if (plan.id === 'tier_enterprise') {

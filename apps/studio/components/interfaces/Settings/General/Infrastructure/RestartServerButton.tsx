@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useFlag } from 'common'
 import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -24,7 +24,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const RestartServerButton = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
 
@@ -91,7 +91,7 @@ export const RestartServerButton = () => {
   const onRestartSuccess = () => {
     setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTARTING })
     toast.success('Restarting server...')
-    router.push(`/project/${projectRef}`)
+    navigate({ to: '/project/$ref', params: { ref: projectRef } })
     setServiceToRestart(undefined)
   }
 

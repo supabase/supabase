@@ -1,5 +1,5 @@
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { Loader2Icon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -10,7 +10,7 @@ import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 export const SignInPartner = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const track = useTrack()
   const trackFunnelError = useTrackFunnelError()
 
@@ -41,10 +41,16 @@ export const SignInPartner = () => {
             trackFunnelError('signin', classifyApiError('signin', error), 'form')
           }
         } finally {
-          if (isMounted) router.replace({ pathname: '/sign-in-mfa', query: { method } })
+          if (isMounted) {
+            navigate<AnyRouter, string>({
+              to: '/sign-in-mfa',
+              search: { method },
+              replace: true,
+            })
+          }
         }
       } else {
-        router.replace({ pathname: '/sign-in' })
+        navigate({ to: '/sign-in', replace: true })
       }
     })()
 

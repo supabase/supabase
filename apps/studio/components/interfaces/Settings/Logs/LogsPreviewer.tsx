@@ -1,7 +1,7 @@
+import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RewindIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -29,6 +29,7 @@ import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import useSingleLog from '@/hooks/analytics/useSingleLog'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -63,7 +64,16 @@ export const LogsPreviewer = ({
   EmptyState,
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const routePattern = useRoutePattern()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const initialIsoTimestampStart = useLocation({
+    select: (location) =>
+      (location.search as Record<string, string | undefined>).iso_timestamp_start,
+  })
+  const initialIsoTimestampEnd = useLocation({
+    select: (location) => (location.search as Record<string, string | undefined>).iso_timestamp_end,
+  })
   const { db } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
@@ -93,8 +103,8 @@ export const LogsPreviewer = ({
 
   // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
   function getDefaultDatePickerValue() {
-    const iso_timestamp_start = router.query.iso_timestamp_start as string
-    const iso_timestamp_end = router.query.iso_timestamp_end as string
+    const iso_timestamp_start = initialIsoTimestampStart
+    const iso_timestamp_end = initialIsoTimestampEnd
 
     if (iso_timestamp_start && iso_timestamp_end) {
       return {
@@ -201,10 +211,13 @@ export const LogsPreviewer = ({
       const database = databases?.find((d) => d.identifier === db)
       if (database !== undefined) state.setSelectedDatabaseId(db)
     } else if (state.selectedDatabaseId !== undefined && state.selectedDatabaseId !== projectRef) {
-      if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
-        router.push({
-          pathname: router.pathname,
-          query: { ...router.query, db: state.selectedDatabaseId },
+      if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(routePattern)) {
+        navigate<AnyRouter, string>({
+          to: pathname,
+          search: (prev: Record<string, unknown>) => ({
+            ...prev,
+            db: state.selectedDatabaseId,
+          }),
         })
       } else {
         state.setSelectedDatabaseId(projectRef)
@@ -235,10 +248,12 @@ export const LogsPreviewer = ({
     onToggleEventChart: () => setShowChart(!showChart),
     onSelectedDatabaseChange: (id: string) => {
       setFilters({ ...filters, database: id !== projectRef ? id : undefined })
-      const { db, ...params } = router.query
-      router.push({
-        pathname: router.pathname,
-        query: id !== projectRef ? { ...router.query, db: id } : params,
+      navigate<AnyRouter, string>({
+        to: pathname,
+        search: (prev: Record<string, unknown>) => {
+          const { db: _db, ...params } = prev
+          return id !== projectRef ? { ...params, db: id } : params
+        },
       })
     },
     selectedDatePickerValue,

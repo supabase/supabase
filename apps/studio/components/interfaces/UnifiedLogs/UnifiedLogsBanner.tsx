@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CircleHelpIcon, Undo2Icon, XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { Badge, Button, cn } from 'ui'
 
 import {
@@ -10,13 +10,14 @@ import {
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface UnifiedLogsBannerProps {
   className?: string
 }
 
 export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBannerProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
 
   const { selectFeaturePreview } = useFeaturePreviewModal()
@@ -35,12 +36,12 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
 
   const onSwitchBack = () => {
     disable()
-    router.push(`/project/${ref}/logs/explorer`)
+    navigateToUrl(navigate, `/project/${ref}/logs/explorer`)
   }
 
   const onEnable = () => {
     enable()
-    router.push(`/project/${ref}/logs`)
+    navigateToUrl(navigate, `/project/${ref}/logs`)
   }
 
   if (isEnabled && !isDefaultOptIn) {

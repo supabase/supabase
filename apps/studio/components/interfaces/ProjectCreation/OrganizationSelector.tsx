@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -34,7 +34,7 @@ export const OrganizationSelector = ({
   form,
   disableOrganizationSelection,
 }: OrganizationSelectorProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: currentOrg } = useSelectedOrganizationQuery()
@@ -62,7 +62,7 @@ export const OrganizationSelector = ({
               <Select
                 onValueChange={(slug) => {
                   field.onChange(slug)
-                  router.push(`/new/${slug}`)
+                  navigate({ to: '/new/$slug', params: { slug } })
                 }}
                 value={field.value}
                 defaultValue={field.value}

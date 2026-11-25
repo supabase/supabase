@@ -1,8 +1,8 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocation } from '@tanstack/react-router'
 import { CalendarIcon, InfoIcon, PartyPopperIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
@@ -52,7 +52,13 @@ export const CreditCodeRedemption = ({
   modalVisible?: boolean
   onClose?: () => void
 }) => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const codeFromParams = useLocation({
+    select: (location) => {
+      const queryCode = (location.search as Record<string, string | string[] | undefined>).code
+      return Array.isArray(queryCode) ? queryCode[0] : queryCode
+    },
+  })
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
@@ -131,15 +137,10 @@ export const CreditCodeRedemption = ({
   }
 
   useEffect(() => {
-    if (!router.isReady) return
-
-    const queryCode = router.query.code
-    const codeFromParams = Array.isArray(queryCode) ? queryCode[0] : queryCode
-
     if (typeof codeFromParams === 'string' && codeFromParams.trim().length > 2) {
       form.setValue('code', codeFromParams)
     }
-  }, [router.isReady, router.query.code, form])
+  }, [codeFromParams, form])
 
   useEffect(() => {
     if (codeRedemptionModalVisible) {
@@ -254,7 +255,7 @@ export const CreditCodeRedemption = ({
               </div>
             )}
 
-            {(!router.pathname.includes('/org/') || org?.plan.id === 'free') && (
+            {(!pathname.includes('/org/') || org?.plan.id === 'free') && (
               <div className="mt-4 flex flex-col gap-y-4">
                 <Separator />
                 <div className="flex justify-center items-center gap-x-2">
@@ -264,7 +265,7 @@ export const CreditCodeRedemption = ({
                     </UpgradePlanButton>
                   )}
 
-                  {!router.pathname.includes('/org/') && (
+                  {!pathname.includes('/org/') && (
                     <Button asChild>
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>

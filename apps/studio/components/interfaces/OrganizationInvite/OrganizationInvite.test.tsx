@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { OrganizationInvite } from './OrganizationInvite'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
@@ -18,8 +18,6 @@ const mocks = vi.hoisted(() => ({
   useAcceptInvitationMutation: vi.fn(),
   acceptInvitation: vi.fn(),
   signOut: vi.fn(),
-  routerPush: vi.fn(),
-  routerReload: vi.fn(),
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -30,14 +28,6 @@ vi.mock('common', async (importOriginal) => {
     useParams: mocks.useParams,
   }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    isReady: true,
-    push: mocks.routerPush,
-    reload: mocks.routerReload,
-  }),
-}))
 
 vi.mock('@/lib/profile', () => ({
   useProfile: mocks.useProfile,
@@ -119,6 +109,10 @@ describe('OrganizationInvite', () => {
     setSignedInDefaults()
   })
 
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   test('renders sign-in actions for signed-out users', () => {
     mocks.isLoggedIn.mockReturnValue(false)
     mocks.useProfile.mockReturnValue({ profile: null, isLoading: true })
@@ -187,6 +181,8 @@ describe('OrganizationInvite', () => {
 
   test('renders a wrong-account warning and signs out', async () => {
     const user = userEvent.setup()
+    const reload = vi.fn()
+    vi.stubGlobal('location', { ...window.location, reload })
     mocks.useInvitationQuery.mockReturnValue({
       data: { ...READY_INVITE, email_match: false },
       error: null,
@@ -208,7 +204,7 @@ describe('OrganizationInvite', () => {
     await user.click(screen.getByRole('button', { name: 'Sign out' }))
 
     await waitFor(() => expect(mocks.signOut).toHaveBeenCalled())
-    expect(mocks.routerReload).toHaveBeenCalled()
+    expect(reload).toHaveBeenCalled()
   })
 
   test('renders no-longer-valid, invalid lookup, and generic error states', () => {

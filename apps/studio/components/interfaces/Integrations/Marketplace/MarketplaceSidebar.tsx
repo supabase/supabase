@@ -1,11 +1,12 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ArrowUpRightIcon, BookOpenIcon, LayoutGridIcon, PlusSquareIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { DOCS_URL } from '@/lib/constants'
 
 const sectionLabelCls =
@@ -54,15 +55,19 @@ const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> 
 ]
 
 export const MarketplaceProductMenu = () => {
-  const router = useRouter()
-  const { ref } = useParams()
+  const routePattern = useRoutePattern()
+  const hasFilter = useLocation({
+    select: (location) => {
+      const search = location.search as Record<string, unknown>
+      return Boolean(search.type) || Boolean(search.source)
+    },
+  })
+  const { ref, id: activeIntegrationId } = useParams()
 
   const { installedIntegrations, isLoading } = useInstalledIntegrations()
 
   const baseHref = `/project/${ref}/integrations`
-  const isDiscoverActive =
-    router.pathname === '/project/[ref]/integrations' && !router.query.type && !router.query.source
-  const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
+  const isDiscoverActive = routePattern === '/project/$ref/integrations' && !hasFilter
 
   return (
     <div className="flex flex-col gap-y-0.5 overflow-y-auto my-4 md:px-3 w-full">

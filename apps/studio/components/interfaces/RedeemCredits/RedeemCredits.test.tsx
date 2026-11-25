@@ -10,7 +10,6 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
@@ -62,24 +61,22 @@ const ORGANIZATION = createMockOrganizationResponse({
   plan: { id: 'pro', name: 'Pro' },
 })
 
-function renderScreen() {
+function renderScreen(initialUrl = '/redeem') {
   return customRender(
     <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: true }}>
       <RedeemCreditsScreen />
     </FeatureFlagContext.Provider>,
-    { profileContext: DEFAULT_PROFILE_CONTEXT }
+    { profileContext: DEFAULT_PROFILE_CONTEXT, initialUrl }
   )
 }
 
 describe('RedeemCreditsScreen', () => {
   beforeEach(() => {
     creditRedemptionQueryCode.current = undefined
-    routerMock.setCurrentUrl('/redeem')
   })
 
   test('renders ready state from organizations query and opens redemption for selected organization', async () => {
     const user = userEvent.setup()
-    routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123')
     creditRedemptionQueryCode.current = 'SUPA-CREDIT-123'
     addAPIMock({
       method: 'get',
@@ -87,7 +84,7 @@ describe('RedeemCreditsScreen', () => {
       response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
-    renderScreen()
+    renderScreen('/redeem?code=SUPA-CREDIT-123')
 
     await user.click(await screen.findByRole('button', { name: /Acme Production/ }))
     await user.click(screen.getByRole('button', { name: 'Redeem credits' }))
@@ -104,14 +101,13 @@ describe('RedeemCreditsScreen', () => {
   })
 
   test('routes new organization creation back to the current redeem URL', async () => {
-    routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123')
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
       response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
-    renderScreen()
+    renderScreen('/redeem?code=SUPA-CREDIT-123')
 
     const createOrganizationLink = await screen.findByRole('link', {
       name: /Create new organization/,
@@ -125,7 +121,6 @@ describe('RedeemCreditsScreen', () => {
 
   test('preselects an organization returned from new organization creation', async () => {
     const user = userEvent.setup()
-    routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123&selected_org=acme-production')
     creditRedemptionQueryCode.current = 'SUPA-CREDIT-123'
     addAPIMock({
       method: 'get',
@@ -133,7 +128,7 @@ describe('RedeemCreditsScreen', () => {
       response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
-    renderScreen()
+    renderScreen('/redeem?code=SUPA-CREDIT-123&selected_org=acme-production')
 
     const redeemButton = await screen.findByRole('button', { name: 'Redeem credits' })
 

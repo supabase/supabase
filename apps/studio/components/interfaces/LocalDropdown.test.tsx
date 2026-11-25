@@ -1,3 +1,9 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { MouseEventHandler, ReactElement, ReactNode } from 'react'
@@ -6,7 +12,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LocalDropdown } from './LocalDropdown'
 
 const {
-  mockRouter,
   mockSetTheme,
   mockSetLastRoute,
   mockToggleFeaturePreviewModal,
@@ -15,10 +20,6 @@ const {
   mockSetDevToolbarOpen,
   mockUseDevToolbar,
 } = vi.hoisted(() => ({
-  mockRouter: {
-    pathname: '/project/[ref]/editor',
-    asPath: '/project/default/editor',
-  },
   mockSetTheme: vi.fn(),
   mockSetLastRoute: vi.fn(),
   mockToggleFeaturePreviewModal: vi.fn(),
@@ -37,9 +38,17 @@ const {
   })),
 }))
 
-vi.mock('next/router', () => ({
-  useRouter: () => mockRouter,
-}))
+const renderLocalDropdown = (initialUrl = '/project/default/editor') => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+  })
+  return render(
+    <RouterContextProvider router={router}>
+      <LocalDropdown />
+    </RouterContextProvider>
+  )
+}
 
 vi.mock('next/link', () => ({
   default: ({
@@ -197,7 +206,7 @@ describe('LocalDropdown', () => {
   it('shows Preferences, removes Command menu, and keeps theme controls wired', async () => {
     const user = userEvent.setup()
 
-    render(<LocalDropdown />)
+    renderLocalDropdown()
 
     expect(screen.getByText('Preferences')).toBeInTheDocument()
     expect(screen.queryByText('Command menu')).not.toBeInTheDocument()
@@ -228,7 +237,7 @@ describe('LocalDropdown', () => {
 
     const user = userEvent.setup()
 
-    render(<LocalDropdown />)
+    renderLocalDropdown()
 
     expect(screen.getByText('Local tools')).toBeInTheDocument()
 
@@ -252,7 +261,7 @@ describe('LocalDropdown', () => {
 
     const user = userEvent.setup()
 
-    render(<LocalDropdown />)
+    renderLocalDropdown()
 
     await user.click(screen.getByRole('button', { name: 'Dev toolbar' }))
 

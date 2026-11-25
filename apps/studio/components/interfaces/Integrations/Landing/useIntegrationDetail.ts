@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 
 import { useProjectOAuthIntegrationData } from './Landing.utils'
@@ -8,6 +8,7 @@ import { useInstalledIntegrations } from './useInstalledIntegrations'
 import { getInstallActionType, type InstallActionType } from './useIntegrationDetail.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 
 export type IntegrationTab = {
   label: string
@@ -16,7 +17,7 @@ export type IntegrationTab = {
 }
 
 export const useIntegrationDetail = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
@@ -80,7 +81,7 @@ export const useIntegrationDetail = () => {
     [integration, isInstalled]
   )
 
-  const isReady = !!router?.isReady
+  const isReady = true
   const isWrapperBlocked = !integrationsWrappers && !!id?.endsWith('_wrapper')
 
   const pageTitle = integration?.name ?? 'Integration not found'
@@ -88,17 +89,10 @@ export const useIntegrationDetail = () => {
     integration?.description ?? 'If you think this is an error, please contact support'
 
   useEffect(() => {
-    if (
-      router?.isReady &&
-      !isAvailableLoading &&
-      !isInstalledLoading &&
-      !!integration &&
-      pageId &&
-      !isKnownRoute
-    ) {
-      router.replace(`/project/${ref}/integrations/${id}/overview`)
+    if (!isAvailableLoading && !isInstalledLoading && !!integration && pageId && !isKnownRoute) {
+      navigateToUrl(navigate, `/project/${ref}/integrations/${id}/overview`, { replace: true })
     }
-  }, [router, pageId, ref, id, integration, isKnownRoute, isAvailableLoading, isInstalledLoading])
+  }, [navigate, pageId, ref, id, integration, isKnownRoute, isAvailableLoading, isInstalledLoading])
 
   return {
     ref,

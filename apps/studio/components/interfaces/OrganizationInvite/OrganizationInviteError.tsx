@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -20,13 +19,12 @@ export const OrganizationInviteError = ({
   isError,
   isInvalidInvite,
 }: OrganizationInviteError) => {
-  const router = useRouter()
   const signOut = useSignOut()
   const { profile } = useProfile()
 
   const handleSignOut = async () => {
     await signOut()
-    router.reload()
+    window.location.reload()
   }
 
   if (isInvalidInvite) {

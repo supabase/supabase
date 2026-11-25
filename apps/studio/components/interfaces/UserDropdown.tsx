@@ -1,8 +1,8 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useDevToolbar } from 'dev-tools'
 import { FlaskConicalIcon, Loader2Icon, ScrollTextIcon, User2Icon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   cn,
@@ -38,7 +38,11 @@ export function UserDropdown({
   triggerClassName?: string
   contentClassName?: string
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const currentRoute = useLocation({
+    select: (location) => `${location.pathname}${location.searchStr}${location.hash}`,
+  })
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
@@ -52,8 +56,7 @@ export function UserDropdown({
   // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
   // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
   // also skips fetching organization data on routes where the CTA can't render.
-  const isOrgScopedRoute =
-    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const isOrgScopedRoute = pathname.startsWith('/project/') || pathname.startsWith('/org/')
   const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
 
   const [isOpen, setIsOpen] = useState(false)
@@ -113,8 +116,8 @@ export function UserDropdown({
                 <Link
                   href="/account/me"
                   onClick={() => {
-                    if (router.pathname !== '/account/me') {
-                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+                    if (pathname !== '/account/me') {
+                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(currentRoute)
                     }
                   }}
                 >
@@ -196,7 +199,7 @@ export function UserDropdown({
               <DropdownMenuItem
                 className="cursor-pointer"
                 onSelect={() => {
-                  router.push('/logout')
+                  navigate({ to: '/logout' })
                 }}
               >
                 Sign out

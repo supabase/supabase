@@ -1,4 +1,5 @@
 import { AuthApiError } from '@supabase/auth-js'
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
 import { renderToString } from 'react-dom/server'
@@ -6,22 +7,13 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { SignInRecoveryCodeForm } from './SignInRecoveryCodeForm'
 import { auth } from '@/lib/gotrue'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 
-const { push, replace } = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    push,
-    replace,
-    query: Object.fromEntries(new URLSearchParams(window.location.search)),
-  }),
-}))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
 beforeEach(() => {
   vi.restoreAllMocks()
-  push.mockReset()
-  replace.mockReset()
   window.history.replaceState(
     {},
     '',
@@ -34,13 +26,24 @@ beforeEach(() => {
 })
 
 const renderForm = () => {
-  return customRender(
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({
+      initialEntries: [`${window.location.pathname}${window.location.search}`],
+    }),
+    parseSearch,
+    stringifySearch,
+  })
+  const navigateSpy = vi.spyOn(router, 'navigate')
+  const rendered = customRender(
     <FeatureFlagContext.Provider
       value={{ configcat: { enableAuthRecoveryCodes: true }, posthog: {}, hasLoaded: true }}
     >
       <SignInRecoveryCodeForm />
-    </FeatureFlagContext.Provider>
+    </FeatureFlagContext.Provider>,
+    { router }
   )
+  return { ...rendered, router, navigateSpy }
 }
 
 test('verification returns to the selected authenticator without removing it', async () => {
@@ -61,22 +64,25 @@ test('verification returns to the selected authenticator without removing it', a
     error: null,
   })
   const remove = vi.spyOn(auth.mfa, 'unenroll')
-  renderForm()
+  const { router } = renderForm()
   fireEvent.change(await screen.findByLabelText('Recovery code'), {
     target: { value: 'sample-code' },
   })
   fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
   await waitFor(() =>
-    expect(push).toHaveBeenCalledWith('/account/security?removeAuthenticator=factor-a')
+    expect(router.state.location.href).toBe('/account/security?removeAuthenticator=factor-a')
   )
   expect(remove).not.toHaveBeenCalled()
 })
 
 test('cancelling action verification returns to Security without signing out', async () => {
   const signOut = vi.spyOn(auth, 'signOut')
-  renderForm()
+  const { router, navigateSpy } = renderForm()
   fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
-  expect(replace).toHaveBeenCalledWith('/account/security')
+  await waitFor(() => expect(router.state.location.href).toBe('/account/security'))
+  expect(navigateSpy).toHaveBeenCalledWith(
+    expect.objectContaining({ to: '/account/security', replace: true })
+  )
   expect(signOut).not.toHaveBeenCalled()
 })
 
@@ -102,16 +108,13 @@ test('password recovery continues to password reset and preserves the original d
     },
     error: null,
   })
-  renderForm()
+  const { router } = renderForm()
   fireEvent.change(await screen.findByLabelText('Recovery code'), {
     target: { value: 'sample-code' },
   })
   fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
   await waitFor(() =>
-    expect(push).toHaveBeenCalledWith({
-      pathname: '/reset-password',
-      query: { returnTo: '/project/example' },
-    })
+    expect(router.state.location.href).toBe('/reset-password?returnTo=%2Fproject%2Fexample')
   )
 })
 
@@ -120,7 +123,7 @@ test('an invalid recovery code stays on the form with an inline error', async ()
     data: null,
     error: new AuthApiError('Invalid recovery code', 422, 'mfa_verification_failed'),
   })
-  renderForm()
+  const { navigateSpy } = renderForm()
   fireEvent.change(await screen.findByLabelText('Recovery code'), { target: { value: 'invalid' } })
   fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
   expect(
@@ -130,7 +133,7 @@ test('an invalid recovery code stays on the form with an inline error', async ()
   ).toBeInTheDocument()
   expect(screen.getByLabelText('Recovery code')).toHaveAttribute('aria-invalid', 'true')
   expect(screen.queryByText('Unable to verify recovery code')).not.toBeInTheDocument()
-  expect(push).not.toHaveBeenCalled()
+  expect(navigateSpy).not.toHaveBeenCalled()
 })
 
 test('prerenders sign-out navigation without a TanStack router', () => {

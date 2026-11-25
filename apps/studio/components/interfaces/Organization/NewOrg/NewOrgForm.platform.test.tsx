@@ -1,17 +1,18 @@
+import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { NewOrgForm } from './NewOrgForm'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateOrganizationBody = components['schemas']['CreateOrganizationBody']
@@ -82,18 +83,27 @@ const FollowUpStatus = () => {
   return <p>{`Follow-up: ${state?.status ?? 'none'}`}</p>
 }
 
-const renderForm = () =>
-  customRender(
+const renderForm = () => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/new'] }),
+    parseSearch,
+    stringifySearch,
+  })
+  const rendered = customRender(
     <>
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
       <FollowUpStatus />
     </>,
     {
+      router,
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
       }),
     }
   )
+  return { ...rendered, router }
+}
 
 const user = userEvent.setup()
 
@@ -107,30 +117,26 @@ const chooseOption = async (currentValue: string, option: string) => {
   await user.click(within(await screen.findByRole('listbox')).getByRole('option', { name: option }))
 }
 
-const fillNameAndSubmit = async () => {
+const fillNameAndSubmit = async (router: ReturnType<typeof renderForm>['router']) => {
   await user.click(screen.getByPlaceholderText('Organization name'))
   await user.paste('Acme')
   fireEvent.click(screen.getByRole('button', { name: 'Create organization' }))
-  await waitFor(() => expect(routerMock.asPath).toContain(`/new/${NEW_ORG_SLUG}`))
+  await waitFor(() => expect(router.state.location.href).toContain(`/new/${NEW_ORG_SLUG}`))
 }
 
 describe('NewOrgForm onboarding survey', () => {
-  beforeEach(() => {
-    routerMock.setCurrentUrl('/new')
-  })
-
   afterEach(() => {
     safeLocalStorage.removeItem(followUpKey)
   })
 
   it('sends the answers to the survey, not to org creation', async () => {
     const { createRequests, surveyRequests } = mockApi()
-    renderForm()
+    const { router } = renderForm()
 
     await chooseOption('Personal', 'Company')
     await chooseOption('1 - 10', '50 - 99')
     await chooseOption('Select an option', 'B2B SaaS application')
-    await fillNameAndSubmit()
+    await fillNameAndSubmit(router)
 
     expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
     expect(surveyRequests).toEqual([
@@ -141,10 +147,10 @@ describe('NewOrgForm onboarding survey', () => {
 
   it('sends nothing for an untouched survey and leaves the org type for the follow-up', async () => {
     const { createRequests, surveyRequests } = mockApi()
-    renderForm()
+    const { router } = renderForm()
     expect(await screen.findByText('Follow-up: none')).toBeInTheDocument()
 
-    await fillNameAndSubmit()
+    await fillNameAndSubmit(router)
 
     expect(createRequests).toEqual([{ name: 'Acme', tier: 'tier_free' }])
     expect(surveyRequests).toEqual([])
@@ -154,10 +160,10 @@ describe('NewOrgForm onboarding survey', () => {
 
   it('counts a changed org type alone as an answer', async () => {
     const { surveyRequests } = mockApi()
-    renderForm()
+    const { router } = renderForm()
 
     await chooseOption('Personal', 'Agency')
-    await fillNameAndSubmit()
+    await fillNameAndSubmit(router)
 
     expect(surveyRequests).toEqual([{ slug: NEW_ORG_SLUG, kind: 'AGENCY' }])
     expect(readFollowUpState()).toBeNull()
@@ -165,7 +171,7 @@ describe('NewOrgForm onboarding survey', () => {
 
   it('sends a partly answered survey and asks for no follow-up', async () => {
     const { surveyRequests } = mockApi()
-    renderForm()
+    const { router } = renderForm()
 
     await chooseOption('Personal', 'Company')
     await chooseOption('1 - 10', '50 - 99')
@@ -176,7 +182,7 @@ describe('NewOrgForm onboarding survey', () => {
     await user.click(
       within(await screen.findByRole('listbox')).getByRole('option', { name: 'Yes' })
     )
-    await fillNameAndSubmit()
+    await fillNameAndSubmit(router)
 
     expect(surveyRequests).toEqual([
       { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', can_code: 'yes' },
@@ -186,11 +192,11 @@ describe('NewOrgForm onboarding survey', () => {
 
   it('keeps the answers for the follow-up when the survey request fails', async () => {
     const { surveyRequests } = mockApi({ surveyStatus: 500 })
-    renderForm()
+    const { router } = renderForm()
 
     await chooseOption('Personal', 'Company')
     await chooseOption('Select an option', 'Other')
-    await fillNameAndSubmit()
+    await fillNameAndSubmit(router)
 
     expect(surveyRequests).toHaveLength(1)
     expect(readFollowUpState()).toMatchObject({ status: 'pending', kind: 'COMPANY', size: '1' })

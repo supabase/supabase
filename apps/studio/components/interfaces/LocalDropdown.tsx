@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import { FlaskConicalIcon, SettingsIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   cn,
   DropdownMenu,
@@ -30,7 +30,10 @@ export const LocalDropdown = ({
   triggerClassName?: string
   contentClassName?: string
 }) => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const currentRoute = useLocation({
+    select: (location) => `${location.pathname}${location.searchStr}${location.hash}`,
+  })
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
@@ -56,8 +59,8 @@ export const LocalDropdown = ({
           <Link
             href="/account/me"
             onClick={() => {
-              if (router.pathname !== '/account/me') {
-                appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+              if (pathname !== '/account/me') {
+                appStateSnapshot.setLastRouteBeforeVisitingAccountPage(currentRoute)
               }
             }}
           >

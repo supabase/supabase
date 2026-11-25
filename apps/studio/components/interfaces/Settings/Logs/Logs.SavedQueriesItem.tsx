@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { EditIcon, TrashIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -27,7 +26,6 @@ interface SavedQueriesItemProps {
 }
 
 export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
-  const router = useRouter()
   const { ref, queryId } = useParams()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
@@ -81,7 +79,7 @@ export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     })
   }
 
-  const isActive = router.query.queryId === item.id
+  const isActive = queryId === item.id
 
   return (
     <>

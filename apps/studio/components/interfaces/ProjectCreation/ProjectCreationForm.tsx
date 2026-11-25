@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
+import { useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
@@ -116,7 +116,7 @@ export const ProjectCreationForm = ({
   onCreateSuccess,
 }: ProjectCreationFormProps) => {
   const track = useTrack()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { profile } = useProfile()
   const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
@@ -413,7 +413,7 @@ export const ProjectCreationForm = ({
         }
       )
       onCreateSuccess?.(res.ref)
-      if (surface === 'main') router.push(`/project/${res.ref}`)
+      if (surface === 'main') navigate({ to: '/project/$ref', params: { ref: res.ref } })
     },
     onError: (error) => {
       if (isVercelIntegrationFlow) {
@@ -684,9 +684,9 @@ export const ProjectCreationForm = ({
   useEffect(() => {
     // Handle no org: redirect to new org route
     if (isEmptyOrganizations && !isVercelIntegrationFlow) {
-      router.push(`/new`)
+      navigate({ to: '/new' })
     }
-  }, [isEmptyOrganizations, isVercelIntegrationFlow, router])
+  }, [isEmptyOrganizations, isVercelIntegrationFlow, navigate])
 
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
@@ -753,12 +753,12 @@ export const ProjectCreationForm = ({
     // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
     if (slug === 'last-visited-org') {
       if (lastVisitedOrganization) {
-        router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+        navigate({ to: '/new/$slug', params: { slug: lastVisitedOrganization }, replace: true })
       } else {
-        router.replace(`/new/_`, undefined, { shallow: true })
+        navigate({ to: '/new/$slug', params: { slug: '_' }, replace: true })
       }
     }
-  }, [slug, lastVisitedOrganization, router])
+  }, [slug, lastVisitedOrganization, navigate])
 
   return (
     <Form {...form}>

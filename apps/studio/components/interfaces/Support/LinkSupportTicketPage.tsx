@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { CheckIcon, MailIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, cn, DialogSectionSeparator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -16,14 +16,10 @@ export function LinkSupportTicketPage() {
 }
 
 function LinkSupportTicketPageContent() {
-  const router = useRouter()
-  const conversationId = router.query.conversationId as string | undefined
+  const conversationId = useLocation({
+    select: (location) => (location.search as Record<string, string | undefined>).conversationId,
+  })
   const [isSuccess, setIsSuccess] = useState(false)
-
-  // Wait for router to be ready before checking for conversationId
-  if (!router.isReady) {
-    return null
-  }
 
   if (!conversationId) {
     return (

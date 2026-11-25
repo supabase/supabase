@@ -1,6 +1,6 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
+import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
 import { MessageSquareMoreIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -55,7 +55,8 @@ const LintCountLabel = ({
 }
 
 const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
 
   return (
     <Tabs
@@ -64,8 +65,13 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
         const level = parseLinterLevel(value)
         if (!level) return
         setCurrentTab(level)
-        const { sort, search, ...rest } = router.query
-        router.push({ ...router, query: { ...rest, preset: value, id: null } })
+        navigate<AnyRouter, string>({
+          to: pathname,
+          search: (prev: Record<string, unknown>) => {
+            const { sort: _sort, search: _search, id: _id, ...rest } = prev
+            return { ...rest, preset: value }
+          },
+        })
       }}
     >
       <TabsList className={cn('flex gap-0 border-0 items-end z-10 relative')}>

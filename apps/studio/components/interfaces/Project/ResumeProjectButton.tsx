@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo, useRef, useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
@@ -54,7 +54,7 @@ export const ResumeProjectButton = ({
   size,
   variant = 'default',
 }: ResumeProjectButtonProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -96,7 +96,7 @@ export const ResumeProjectButton = ({
     onSuccess: async (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project, project will be ready in a few minutes')
-      await router.push(`/project/${variables.ref}`)
+      await navigate({ to: '/project/$ref', params: { ref: variables.ref } })
     },
     onError: (error) => {
       // 402s from restore (unpaid invoices, restrictions, Free Plan limits) are all resolved from billing

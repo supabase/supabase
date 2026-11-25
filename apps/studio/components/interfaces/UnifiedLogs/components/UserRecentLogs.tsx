@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
@@ -12,13 +12,14 @@ import {
 } from '../UnifiedLogs.utils'
 import { EmbeddedLogsTable } from './EmbeddedLogsTable'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { navigateToUrl } from '@/lib/navigation'
 
 const MAX_ROWS = 10
 const USER_LOGS_WINDOW_MS = 24 * 60 * 60 * 1000
 const COLUMN_PREFERENCES_KEY = 'auth-user'
 
 export function UserRecentLogs({ userId }: { userId: string }) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const [[start, end]] = useState<[Date, Date]>(() => {
     const now = Date.now()
@@ -44,9 +45,9 @@ export function UserRecentLogs({ userId }: { userId: string }) {
       logId: log?.id,
     })
   }
-  const handleOpenLogs = () => router.push(getLogsUrl())
+  const handleOpenLogs = () => navigateToUrl(navigate, getLogsUrl())
   const handleOpenLog = (logId: string) => {
-    router.push(getLogsUrl(rows.find((row) => row.id === logId)))
+    navigateToUrl(navigate, getLogsUrl(rows.find((row) => row.id === logId)))
   }
 
   if (!isPending && !isError && rows.length === 0) {

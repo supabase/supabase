@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -12,6 +12,7 @@ import { DocViewError } from '@/components/interfaces/Integrations/DataApi/DocVi
 import { DocViewLoading } from '@/components/interfaces/Integrations/DataApi/DocViewLoading'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface DocViewProps {
   selectedLang: 'js' | 'bash'
@@ -19,7 +20,7 @@ interface DocViewProps {
 }
 
 export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, page, resource, rpc } = useParams()
 
   const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
@@ -43,7 +44,9 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
     if (!isSchemaReady || !projectRef) return
     if (resourceMissing || rpcMissing) {
       toast.error(`${resourceMissing ? 'table/view' : 'function'} could not be found`)
-      router.replace(`/project/${projectRef}/integrations/data_api/docs`)
+      navigateToUrl(navigate, `/project/${projectRef}/integrations/data_api/docs`, {
+        replace: true,
+      })
     }
   }, [
     isLoading,
@@ -53,7 +56,7 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
     projectRef,
     resourceMissing,
     rpcMissing,
-    router,
+    navigate,
   ])
 
   if (settingsError || jsonSchemaError) {

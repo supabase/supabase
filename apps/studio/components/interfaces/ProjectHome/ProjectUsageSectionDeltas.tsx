@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -28,6 +28,7 @@ import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 // Services the homepage shows; matches the telemetry event types.
@@ -43,7 +44,7 @@ type ServiceEntry = {
 }
 
 export const ProjectUsageSectionDeltas = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const track = useTrack()
@@ -146,14 +147,15 @@ export const ProjectUsageSectionDeltas = () => {
     const { start, end } = getBucketLogRange(datum.timestamp, interval)
 
     if (isUnifiedLogsEnabled) {
-      router.push(
+      navigateToUrl(
+        navigate,
         buildUnifiedLogsUrl({ projectRef: projectRef!, logType: service.logType, start, end })
       )
     } else {
       // Logs explorer reads the range from `its`/`ite` (iso_timestamp_start/end
       // only set the label).
       const queryParams = new URLSearchParams({ its: start, ite: end })
-      router.push(`/project/${projectRef}${service.route}?${queryParams.toString()}`)
+      navigateToUrl(navigate, `/project/${projectRef}${service.route}?${queryParams.toString()}`)
     }
 
     track('home_project_usage_chart_clicked', {

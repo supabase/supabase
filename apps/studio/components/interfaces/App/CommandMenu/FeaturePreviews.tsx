@@ -1,6 +1,6 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { CheckIcon, ExternalLinkIcon, FlaskConicalIcon, SquareIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
@@ -23,11 +23,13 @@ import {
   useVisibleFeaturePreviewsByCategory,
 } from '@/components/interfaces/App/FeaturePreview/useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { navigateToUrl } from '@/lib/navigation'
 
 const FEATURE_PREVIEWS_PAGE_NAME = 'Feature previews'
 
 export function useFeaturePreviewCommands() {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
   const setPage = useSetPage()
@@ -51,7 +53,7 @@ export function useFeaturePreviewCommands() {
   // page was first registered would keep routing to whatever project was
   // current back then.
   const flagsRef = useLatest(flags)
-  const routeContextRef = useLatest({ ref, pathname: router.pathname })
+  const routeContextRef = useLatest({ ref, pathname })
 
   // Mirrors FeaturePreviewModal's toggleFeature: if the preview has a route to
   // try it out in, enabling it takes the user there instead of just flipping
@@ -71,12 +73,12 @@ export function useFeaturePreviewCommands() {
     // `ref` alone isn't enough, since it can retain a stale value after
     // client-side navigating to a route without a `ref` segment (e.g. the org
     // view).
-    const { ref: currentRef, pathname } = routeContextRef.current
-    const isProjectScopedRoute = pathname.startsWith('/project/')
+    const { ref: currentRef, pathname: currentPathname } = routeContextRef.current
+    const isProjectScopedRoute = currentPathname.startsWith('/project/')
     const route = isProjectScopedRoute ? preview.getRoute?.(currentRef) : undefined
     if (route !== undefined && currentRef !== undefined) {
       setIsOpen(false)
-      router.push(route)
+      navigateToUrl(navigate, route)
       toast.success(`${preview.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })

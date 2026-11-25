@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -24,6 +24,7 @@ import * as z from 'zod'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 
 export interface CreateReportModal {
@@ -40,30 +41,31 @@ const formSchema = z.object({
 type CustomReport = z.infer<typeof formSchema>
 
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const searchStr = useLocation({ select: (location) => location.searchStr })
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref ?? 'default'
 
   // Preserve date range query parameters when navigating to new report
   const preservedQueryParams = useMemo(() => {
-    const { its, ite, isHelper, helperText } = router.query
+    const currentParams = new URLSearchParams(searchStr)
     const params = new URLSearchParams()
 
-    if (its && typeof its === 'string') params.set('its', its)
-    if (ite && typeof ite === 'string') params.set('ite', ite)
-    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
-    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+    for (const key of ['its', 'ite', 'isHelper', 'helperText'] as const) {
+      const value = currentParams.get(key)
+      if (value) params.set(key, value)
+    }
 
     const queryString = params.toString()
     return queryString ? `?${queryString}` : ''
-  }, [router.query])
+  }, [searchStr])
 
   const { mutate: upsertContent, isPending: isCreating } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
       const newReportId = vars.payload.id
-      router.push(`/project/${ref}/observability/${newReportId}${preservedQueryParams}`)
+      navigateToUrl(navigate, `/project/${ref}/observability/${newReportId}${preservedQueryParams}`)
       afterSubmit()
     },
     onError: (error) => {

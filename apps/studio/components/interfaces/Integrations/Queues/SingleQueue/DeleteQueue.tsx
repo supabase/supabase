@@ -1,9 +1,10 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseQueueDeleteMutation } from '@/data/database-queues/database-queues-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface DeleteQueueProps {
   queueName: string
@@ -12,13 +13,13 @@ interface DeleteQueueProps {
 }
 
 export const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
 
   const { mutate: deleteDatabaseQueue, isPending } = useDatabaseQueueDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully removed queue ${queueName}`)
-      router.push(`/project/${project?.ref}/integrations/queues/queues`)
+      navigateToUrl(navigate, `/project/${project?.ref}/integrations/queues/queues`)
       onClose()
     },
   })

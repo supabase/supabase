@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { ChevronRightIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
@@ -8,11 +8,12 @@ import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectMod
 import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ConnectSection = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
@@ -46,7 +47,7 @@ export const ConnectSection = () => {
     }
 
     if (action.href && selectedProject?.ref) {
-      router.push(action.href.replace('[ref]', selectedProject.ref))
+      navigateToUrl(navigate, action.href.replace('[ref]', selectedProject.ref))
     }
   }
 

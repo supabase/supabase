@@ -1,6 +1,6 @@
+import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
@@ -76,7 +76,8 @@ export const LinterDataGrid = ({
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const track = useTrack()
 
   const columns = lintCols.map((col) => {
@@ -115,8 +116,13 @@ export const LinterDataGrid = ({
   })
 
   function handleSidepanelClose() {
-    const { id, ...otherParams } = router.query
-    router.push({ query: otherParams })
+    navigate<AnyRouter, string>({
+      to: pathname,
+      search: (prev: Record<string, unknown>) => {
+        const { id: _id, ...otherParams } = prev
+        return otherParams
+      },
+    })
   }
 
   return (
@@ -152,8 +158,13 @@ export const LinterDataGrid = ({
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                      const { id, ...rest } = router.query
-                      router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
+                      navigate<AnyRouter, string>({
+                        to: pathname,
+                        search: (prev: Record<string, unknown>) => ({
+                          ...prev,
+                          id: props.row.cache_key,
+                        }),
+                      })
 
                       track('advisor_detail_opened', {
                         origin: 'advisors_page',

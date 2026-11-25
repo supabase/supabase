@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ActivityIcon, BarChartIcon, Loader2Icon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, WarningIcon } from 'ui'
@@ -68,8 +68,7 @@ export const ChartBlock = ({
   maxHeight,
   onUpdateChartConfig,
 }: ChartBlockProps) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const state = useDatabaseSelectorStateSnapshot()
   const chartRef = useRef<HTMLDivElement>(null)

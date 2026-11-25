@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -26,6 +26,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -34,7 +35,7 @@ const REPORT_TITLE = 'Overview'
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 export const ObservabilityOverview = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
@@ -168,16 +169,17 @@ export const ObservabilityOverview = () => {
       const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
       if (isUnifiedLogsEnabled) {
-        router.push(
+        navigateToUrl(
+          navigate,
           buildUnifiedLogsUrl({ projectRef: projectRef!, logType: service.logType, start, end })
         )
       } else {
         const queryParams = new URLSearchParams({ its: start, ite: end })
         const separator = service.logsUrl.includes('?') ? '&' : '?'
-        router.push(`${service.logsUrl}${separator}${queryParams.toString()}`)
+        navigateToUrl(navigate, `${service.logsUrl}${separator}${queryParams.toString()}`)
       }
     },
-    [router, interval, isUnifiedLogsEnabled, projectRef]
+    [navigate, interval, isUnifiedLogsEnabled, projectRef]
   )
 
   return (

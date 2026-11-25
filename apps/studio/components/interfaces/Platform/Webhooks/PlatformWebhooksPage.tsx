@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVerticalIcon, PencilIcon, RotateCwIcon, SendIcon, Trash2Icon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -74,6 +74,7 @@ import { useWebhookEndpointUpdateMutation } from '@/data/platform-webhooks/platf
 import { useWebhookEndpointsQuery } from '@/data/platform-webhooks/platform-webhook-endpoints-query'
 import type { WebhookScopeParams } from '@/data/platform-webhooks/platform-webhooks-fetchers'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -85,7 +86,7 @@ interface PlatformWebhooksPageProps {
 }
 
 export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPageProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { slug, ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery({
     enabled: scope === 'project',
@@ -238,9 +239,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   useEffect(() => {
     if (shouldRedirect) {
-      router.replace(fallbackHref)
+      navigateToUrl(navigate, fallbackHref, { replace: true })
     }
-  }, [fallbackHref, shouldRedirect, router])
+  }, [fallbackHref, shouldRedirect, navigate])
 
   useEffect(() => {
     if (!isEndpointsLoaded) return
@@ -253,14 +254,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       })
     ) {
       toast('Endpoint not found')
-      router.replace(webhooksHref)
+      navigateToUrl(navigate, webhooksHref, { replace: true })
     }
   }, [
     endpointId,
     isEndpointsLoaded,
     pendingCreatedEndpointId,
     selectedEndpoint,
-    router,
+    navigate,
     webhooksHref,
   ])
 
@@ -322,7 +323,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       return
     }
     if (endpointPendingDelete.id === endpointId) {
-      router.push(webhooksHref)
+      navigateToUrl(navigate, webhooksHref)
     }
     setEndpointIdPendingDelete(null)
     toast.success('Endpoint deleted')
@@ -345,7 +346,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         endpointId: created.id,
         signingSecret: input.signingSecret,
       })
-      router.push(`${webhooksHref}/${encodeURIComponent(created.id)}`)
+      navigateToUrl(navigate, `${webhooksHref}/${encodeURIComponent(created.id)}`)
       setSigningSecretReveal({ signingSecret: input.signingSecret })
       setPanel(null)
       setEditEnabledOverride(null)
@@ -558,7 +559,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 onDeleteEndpoint={(id) => setEndpointIdPendingDelete(id)}
                 onSearchChange={setSearch}
                 onViewEndpoint={(id) => {
-                  router.push(`${webhooksHref}/${encodeURIComponent(id)}`)
+                  navigateToUrl(navigate, `${webhooksHref}/${encodeURIComponent(id)}`)
                   setPanel(null)
                 }}
               />

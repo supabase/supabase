@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -10,6 +10,7 @@ import { useProjectRestartServicesMutation } from '@/data/projects/project-resta
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface RestartProjectDialogProps {
   visible: boolean
@@ -23,7 +24,7 @@ export function RestartProjectDialog({
   onClose,
   restartType = 'database',
 }: RestartProjectDialogProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
@@ -37,7 +38,7 @@ export function RestartProjectDialog({
         setProjectStatus({ ref: project.ref, status: PROJECT_STATUS.RESTARTING })
       }
       toast.success('Restarting project')
-      router.push(`/project/${project?.ref}`)
+      navigateToUrl(navigate, `/project/${project?.ref}`)
       onClose()
     },
     onError: (error) => {
@@ -52,7 +53,7 @@ export function RestartProjectDialog({
           setProjectStatus({ ref: project.ref, status: PROJECT_STATUS.RESTARTING })
         }
         toast.success('Restarting database')
-        router.push(`/project/${project?.ref}`)
+        navigateToUrl(navigate, `/project/${project?.ref}`)
         onClose()
       },
       onError: (error) => {

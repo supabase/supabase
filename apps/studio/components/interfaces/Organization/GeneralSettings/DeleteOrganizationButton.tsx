@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -15,7 +15,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
 
 export const DeleteOrganizationButton = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
@@ -95,7 +95,7 @@ export const DeleteOrganizationButton = () => {
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
       setLastVisitedOrganization('')
-      router.push('/organizations')
+      navigate({ to: '/organizations' })
     },
   })
 

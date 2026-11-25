@@ -8,12 +8,6 @@ import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from '@/tests/helpers'
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
-}))
-
 vi.mock('react-inlinesvg', () => ({
   default: () => <div data-testid="inline-svg" />,
 }))

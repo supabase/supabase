@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon, RefreshCwIcon, SearchIcon, TerminalIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState, type RefObject } from 'react'
 import {
   Button,
@@ -28,6 +28,7 @@ import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -83,7 +84,8 @@ export const PreviewFilterPanel = ({
   setSelectedDatePickerValue,
   searchInputRef,
 }: PreviewFilterPanelProps) => {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
   const [search, setSearch] = useState('')
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
@@ -92,13 +94,12 @@ export const PreviewFilterPanel = ({
     setIsDatePickerOpen((prev) => !prev)
   )
 
-  const logName = router.pathname.split('/').pop()
+  const logName = pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
-  const showDatabaseSelector =
-    IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+  const showDatabaseSelector = IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(routePattern)
 
   const hasEdits = search !== defaultSearchValue
 

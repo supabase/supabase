@@ -3,12 +3,12 @@ import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircleIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -65,6 +65,7 @@ import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
 import { timeout } from '@/lib/helpers'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import {
   classifyApiError,
@@ -104,7 +105,7 @@ export const NewOrgForm = ({
   setupIntent,
   onPlanSelected,
 }: NewOrgFormProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const user = useProfile()
   const track = useTrack()
   const { resolvedTheme } = useTheme()
@@ -410,9 +411,12 @@ export const NewOrgForm = ({
         url.searchParams.set('token', searchParams.token)
       }
 
-      router.push(url.toString(), undefined, { shallow: false })
+      navigateToUrl(navigate, url.toString())
     } else {
-      router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
+      navigateToUrl(
+        navigate,
+        `/new/${org.slug}?projectName=${encodeURIComponent(prefilledProjectName)}`
+      )
     }
   }
 
@@ -505,8 +509,11 @@ export const NewOrgForm = ({
               <Button
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
-                  if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-                  else router.push('/organizations')
+                  if (!!lastVisitedOrganization) {
+                    navigate({ to: '/org/$slug', params: { slug: lastVisitedOrganization } })
+                  } else {
+                    navigate({ to: '/organizations' })
+                  }
                 }}
               >
                 Cancel

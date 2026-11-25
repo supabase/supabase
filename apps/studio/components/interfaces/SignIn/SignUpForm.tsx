@@ -1,8 +1,8 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocation } from '@tanstack/react-router'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -49,7 +49,10 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const router = useRouter()
+  const returnTo = useLocation({
+    select: (location) =>
+      (location.search as Record<string, string | string[] | undefined>).returnTo,
+  })
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
@@ -103,7 +106,6 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
       // Build the post-verification return path from returnTo and other query params.
-      const { returnTo } = router.query
       const fullPath = buildSignUpReturnPath(returnTo)
       const fullRedirectUrl = `${redirectUrlBase}${fullPath}`
       redirectTo = fullRedirectUrl

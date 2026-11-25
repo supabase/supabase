@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -23,7 +23,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useProfile, useProfileNameAndPicture } from '@/lib/profile'
 
 export const OrganizationInvite = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const isLoggedIn = useIsLoggedIn()
   const { slug, token } = useParams()
   const { profile, isLoading: isLoadingProfile } = useProfile()
@@ -52,7 +52,7 @@ export const OrganizationInvite = () => {
     isLoadingInvitation,
     isLoadingProfile,
     isLoggedIn,
-    isRouterReady: router.isReady,
+    isRouterReady: true,
     isSuccessInvitation,
     profileExists: !!profile,
   })
@@ -76,7 +76,7 @@ export const OrganizationInvite = () => {
     error: joinError,
   } = useOrganizationAcceptInvitationMutation({
     onSuccess: () => {
-      router.push('/organizations')
+      navigate({ to: '/organizations' })
     },
   })
 

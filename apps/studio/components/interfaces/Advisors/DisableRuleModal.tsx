@@ -1,5 +1,5 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,7 @@ import {
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { useLintRuleCreateMutation } from '@/data/lint/create-lint-rule-mutation'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface DisableRuleModalProps {
   lint: LintInfo
@@ -24,8 +25,9 @@ interface DisableRuleModalProps {
 
 export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
-  const routeCategory = router.pathname.split('/').pop()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const routeCategory = pathname.split('/').pop()
 
   const [open, setOpen] = useState(false)
 
@@ -37,7 +39,8 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
 
       if (ruleLintMeta) {
         if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
-          router.push(
+          navigateToUrl(
+            navigate,
             `/project/${ref}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
           )
         }

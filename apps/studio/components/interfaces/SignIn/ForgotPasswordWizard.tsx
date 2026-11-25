@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -35,7 +35,7 @@ export const ForgotPasswordWizard = () => {
 }
 
 const ConfirmResetCodeForm = ({ email }: { email: string }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
   const codeForm = useForm<CodeFormData>({
@@ -58,17 +58,10 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       setIsLoading(false)
       toast.error(`Failed to verify code: ${error.message}`)
     } else {
-      if (user?.factors?.length) {
-        await router.push({
-          pathname: '/forgot-password-mfa',
-          query: router.query,
-        })
-      } else {
-        await router.push({
-          pathname: '/reset-password',
-          query: router.query,
-        })
-      }
+      await navigate<AnyRouter, string>({
+        to: user?.factors?.length ? '/forgot-password-mfa' : '/reset-password',
+        search: (prev: Record<string, unknown>) => prev,
+      })
     }
   }
 

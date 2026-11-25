@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -24,9 +24,10 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const QueuePage = () => {
-  const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
-  const childLabel = router?.query?.['child-label'] as string
+  const childLabel = useLocation({
+    select: (location) => (location.search as Record<string, string | undefined>)['child-label'],
+  })
   const { data: project } = useSelectedProjectQuery()
 
   const { data: queues } = useQueuesQuery({

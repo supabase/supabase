@@ -2,10 +2,10 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useAuthError } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,6 +21,7 @@ import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authentica
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { navigateToUrl } from '@/lib/navigation'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
@@ -33,7 +34,7 @@ const schema = z.object({
 const formId = 'sign-in-form'
 
 export const SignInForm = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [_, setLastSignIn] = useLastSignIn()
 
@@ -91,7 +92,7 @@ export const SignInForm = () => {
           if (data.currentLevel !== data.nextLevel) {
             toast.success(`You need to provide your second factor authentication`, { id: toastId })
             const url = buildPathWithParams('/sign-in-mfa?method=email')
-            router.replace(url)
+            navigateToUrl(navigate, url, { replace: true })
             return
           }
         }
@@ -106,7 +107,7 @@ export const SignInForm = () => {
         if (returnTo && returnTo !== '/sign-in') {
           redirectPath = returnTo
         }
-        router.push(redirectPath)
+        navigateToUrl(navigate, redirectPath)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
         trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)

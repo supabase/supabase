@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { FeatureFlagContext } from 'common'
-import { useRouter } from 'next/router'
 import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -33,7 +33,15 @@ const RedeemCreditsInterstitial = ({
 )
 
 export const RedeemCreditsScreen = () => {
-  const router = useRouter()
+  const returnSelectedOrgSlug = useLocation({
+    select: (location) => {
+      const value = (location.search as Record<string, unknown>)[RETURN_TO_SELECTED_ORG_PARAM]
+      return typeof value === 'string' ? value : null
+    },
+  })
+  const currentRoute = useLocation({
+    select: (location) => `${location.pathname}${location.searchStr}${location.hash}`,
+  })
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { hasLoaded } = useContext(FeatureFlagContext)
 
@@ -47,11 +55,6 @@ export const RedeemCreditsScreen = () => {
     isLoading: isLoadingOrganizations,
     isError: isOrganizationsError,
   } = useOrganizationsQuery()
-
-  const returnSelectedOrgSlug =
-    router.isReady && typeof router.query[RETURN_TO_SELECTED_ORG_PARAM] === 'string'
-      ? router.query[RETURN_TO_SELECTED_ORG_PARAM]
-      : null
 
   const displayName = profile?.primary_email ?? profile?.username
 
@@ -108,7 +111,7 @@ export const RedeemCreditsScreen = () => {
   }
 
   const createOrganizationParams = {
-    returnTo: router.asPath || '/redeem',
+    returnTo: currentRoute || '/redeem',
     returnToOrgParam: RETURN_TO_SELECTED_ORG_PARAM,
   }
 

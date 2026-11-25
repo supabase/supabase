@@ -1,8 +1,8 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
+import { useLocation, useNavigate, useRouter } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
@@ -32,6 +32,7 @@ import { isUserFaultForStatsStatement } from '@/data/database/pg-stat-statements
 import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -106,6 +107,8 @@ export const QueryInsightsTable = ({
 
   const { ref } = useParams()
   const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -207,8 +210,8 @@ export const QueryInsightsTable = ({
   )
 
   const handleGoToLogs = useCallback(() => {
-    router.push(`/project/${ref}/logs/postgres-logs`)
-  }, [router, ref])
+    navigateToUrl(navigate, `/project/${ref}/logs/postgres-logs`)
+  }, [navigate, ref])
 
   const handleAiSuggestedFix = useCallback(
     (item: ClassifiedQuery) => {
@@ -230,17 +233,14 @@ export const QueryInsightsTable = ({
   }, [sheetView, activeSheetRow?.query])
 
   useEffect(() => {
-    const currentPath = router.asPath.split('?')[0]
-    const handleRouteChange = (url: string) => {
-      if (url.split('?')[0] !== currentPath) {
+    return router.subscribe('onBeforeLoad', ({ toLocation }) => {
+      if (toLocation.pathname !== pathname) {
         setQueryStates({ search: null })
         onCurrentSelectQuery?.(null)
       }
-    }
-    router.events.on('routeChangeStart', handleRouteChange)
-    return () => router.events.off('routeChangeStart', handleRouteChange)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [router, pathname])
 
   const timeConsumedWidth = useMemo(() => {
     if (!explorerItems.length) return 150
