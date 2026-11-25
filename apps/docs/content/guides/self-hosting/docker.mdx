@@ -339,7 +339,7 @@ Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart 
 sh run.sh restart functions
 ```
 
-The main worker loads each function from disk per request, so a restart is enough to pick up new or changed function code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
+A restart stops the running function workers, so the next request to each function starts a worker from the new or changed code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
 
 See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
