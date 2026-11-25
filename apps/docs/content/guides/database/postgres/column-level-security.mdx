@@ -143,6 +143,10 @@ supabase migration new create_posts_table
       posts enable row level security;
 
       -- Add row-level security
+      create policy "Allow read for owners" on posts for
+      select
+      using ((select auth.uid()) = user_id);
+
       create policy "Allow update for owners" on posts for
       update
       using ((select auth.uid()) = user_id);
