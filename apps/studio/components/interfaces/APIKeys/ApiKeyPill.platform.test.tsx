@@ -23,6 +23,9 @@ vi.mock('common', async () => {
 // assert the value handed to the clipboard without depending on jsdom's
 // document.hasFocus() / navigator.clipboard. Everything else in 'ui' stays real.
 const { mockCopyToClipboard } = vi.hoisted(() => ({ mockCopyToClipboard: vi.fn() }))
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
+
 vi.mock('ui', async (importOriginal) => ({
   ...(await importOriginal<typeof import('ui')>()),
   copyToClipboard: mockCopyToClipboard,
@@ -70,6 +73,7 @@ function mockRevealById(onRequest?: () => void) {
 describe('ApiKeyPill', () => {
   beforeEach(() => {
     mockCopyToClipboard.mockClear()
+    mockTrack.mockClear()
   })
 
   it('masks the secret key by default and does not expose the full key', () => {
@@ -91,6 +95,21 @@ describe('ApiKeyPill', () => {
     fireEvent.click(reveal)
 
     expect(await screen.findByText(FULL.slice(15))).toBeInTheDocument()
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('api_key_reveal_clicked', { keyType: 'secret' })
+  })
+
+  it('does not track a reveal when hiding the key again', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockRevealById()
+    customRender(<ApiKeyPill apiKey={secretKey} />, { profileContext: createMockProfileContext() })
+
+    const reveal = screen.getByRole('button', { name: 'Reveal API key' })
+    await waitFor(() => expect(reveal).toBeEnabled())
+    fireEvent.click(reveal)
+    fireEvent.click(await screen.findByRole('button', { name: 'Hide API key' }))
+
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('copies the full secret key to the clipboard', async () => {
@@ -104,6 +123,22 @@ describe('ApiKeyPill', () => {
 
     await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
+    await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
+    expect(mockTrack).toHaveBeenCalledWith('api_key_copied', { keyType: 'secret' })
+  })
+
+  it('tracks copying a publishable key', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    customRender(<ApiKeyPill apiKey={publishableKey} />, {
+      profileContext: createMockProfileContext(),
+    })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
+    expect(mockTrack).toHaveBeenCalledWith('api_key_copied', { keyType: 'publishable' })
   })
 
   it('disables reveal and copy without requesting the key when the grant is denied', async () => {
@@ -131,6 +166,7 @@ describe('ApiKeyPill', () => {
 
     fireEvent.click(reveal)
     expect(requests).not.toHaveBeenCalled()
+    expect(mockTrack).not.toHaveBeenCalled()
   })
 
   it('disables reveal and copy when permissions fail to load', async () => {

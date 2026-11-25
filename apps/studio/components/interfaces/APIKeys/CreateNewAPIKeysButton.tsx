@@ -17,9 +17,11 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -66,6 +68,7 @@ export const CreateNewAPIKeysButton = () => {
         throw error
       }
 
+      track('api_key_created', { keyType: 'initial_pair', source: 'initial_setup' })
       setCreateKeysDialogOpen(false)
       toast.success('Successfully created a new set of API keys!')
     } catch (error) {
@@ -108,7 +111,9 @@ export const CreateNewAPIKeysButton = () => {
         )}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCreateNewApiKeys}>Create keys</AlertDialogAction>
+          <AlertDialogAction data-attr="api-key-create-initial" onClick={handleCreateNewApiKeys}>
+            Create keys
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

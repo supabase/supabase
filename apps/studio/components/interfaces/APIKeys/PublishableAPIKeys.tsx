@@ -24,9 +24,11 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
 import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
   const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
 
@@ -66,6 +68,7 @@ export const PublishableAPIKeys = () => {
     isSuccess: isDeleteSuccess,
   } = useAPIKeyDeleteMutation({
     onSuccess: () => {
+      track('api_key_removed', { keyType: 'publishable' })
       toast.success('Successfully deleted publishable key')
       setDeleteId(null)
     },

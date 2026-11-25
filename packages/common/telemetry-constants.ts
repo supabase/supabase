@@ -5054,6 +5054,93 @@ export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
 }
 
 /**
+ * User copied an API key on the API keys pages: a publishable or secret key, or a legacy
+ * anon or service_role key. Not fired when the copy is blocked by missing permissions or fails.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyCopiedEvent {
+  action: 'api_key_copied'
+  properties: {
+    /** Which key was copied */
+    keyType: 'publishable' | 'secret' | 'legacy_anon' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to reveal a secret key (the new secret key or the legacy service_role key).
+ * Publishable and legacy anon keys are always visible and don't fire this event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyRevealClickedEvent {
+  action: 'api_key_reveal_clicked'
+  properties: {
+    /** Which key the user revealed */
+    keyType: 'secret' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully created, either from the create dialog or the first-time setup
+ * that creates a default publishable and secret key pair.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyCreatedEvent {
+  action: 'api_key_created'
+  properties: {
+    /** Which key was created. `initial_pair` is the default publishable and secret key pair. */
+    keyType: 'publishable' | 'secret' | 'initial_pair'
+    /** Where the user created the key */
+    source: 'create_dialog' | 'initial_setup'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully deleted after the user confirmed in the delete modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyRemovedEvent {
+  action: 'api_key_removed'
+  properties: {
+    /** Which key was deleted */
+    keyType: 'publishable' | 'secret'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Legacy JWT-based API keys (anon and service_role) were successfully disabled or re-enabled.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface LegacyApiKeysUpdatedEvent {
+  action: 'legacy_api_keys_updated'
+  properties: {
+    /** Whether the legacy keys are enabled after the update */
+    enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -5335,5 +5422,10 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | ApiKeyCopiedEvent
+  | ApiKeyRevealClickedEvent
+  | ApiKeyCreatedEvent
+  | ApiKeyRemovedEvent
+  | LegacyApiKeysUpdatedEvent
   | WarehouseEnabledEvent
   | WarehouseDisabledEvent

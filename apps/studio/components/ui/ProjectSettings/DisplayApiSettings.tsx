@@ -7,12 +7,13 @@ import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import { getLastUsedAPIKeys, getLegacyApiKeyType } from './DisplayApiSettings.utils'
 import Panel from '@/components/ui/Panel'
 import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -24,6 +25,7 @@ export const DisplayApiSettings = ({
   showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const {
     data: settings,
@@ -126,101 +128,113 @@ export const DisplayApiSettings = ({
           </p>
         </div>
       ) : (
-        apiKeys.map((x, i: number) => (
-          <Panel.Content
-            key={x.api_key}
-            className={
-              i >= 1 &&
-              'border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark'
-            }
-          >
-            <FormLayout
-              layout="horizontal"
-              label={
-                <div className="flex items-center space-x-1">
-                  {x.tags?.split(',').map((x, i: number) => (
-                    <code key={`${x}${i}`}>{x}</code>
-                  ))}
-                  {x.tags === 'service_role' && (
-                    <>
-                      <code className="bg-destructive! text-destructive-foreground! border-destructive!">
-                        secret
-                      </code>
-                    </>
-                  )}
-                  {x.tags === 'anon' && <code>public</code>}
-                </div>
-              }
-              description={
-                x.tags === 'service_role' ? (
-                  <>
-                    This key has the ability to bypass Row Level Security. Never share it publicly.
-                    If leaked, generate a new JWT secret immediately.{' '}
-                    {showLegacyText && (
-                      <span>
-                        Prefer using{' '}
-                        <Link
-                          href={`/project/${projectRef}/settings/api-keys/new`}
-                          className="text-link underline"
-                        >
-                          Secret API keys
-                        </Link>{' '}
-                        instead.
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    This key is safe to use in a browser if you have enabled Row Level Security for
-                    your tables and configured policies.{' '}
-                    {showLegacyText && (
-                      <span>
-                        Prefer using{' '}
-                        <Link
-                          href={`/project/${projectRef}/settings/api-keys/new`}
-                          className="text-link underline"
-                        >
-                          Publishable API keys
-                        </Link>{' '}
-                        instead.
-                      </span>
-                    )}
-                  </>
-                )
+        apiKeys.map((x, i: number) => {
+          const legacyKeyType = getLegacyApiKeyType(x.tags)
+
+          return (
+            <Panel.Content
+              key={x.api_key}
+              className={
+                i >= 1 &&
+                'border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark'
               }
             >
-              <Input
-                readOnly
-                className="font-mono"
-                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-                reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
-                value={
-                  !canReadAPIKeys
-                    ? 'You need additional permissions to view API keys'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                      ? 'JWT secret update failed, new API key may have issues'
-                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                        ? 'Updating JWT secret...'
-                        : (x?.api_key ?? 'You need additional permissions to view API keys')
+              <FormLayout
+                layout="horizontal"
+                label={
+                  <div className="flex items-center space-x-1">
+                    {x.tags?.split(',').map((x, i: number) => (
+                      <code key={`${x}${i}`}>{x}</code>
+                    ))}
+                    {x.tags === 'service_role' && (
+                      <>
+                        <code className="bg-destructive! text-destructive-foreground! border-destructive!">
+                          secret
+                        </code>
+                      </>
+                    )}
+                    {x.tags === 'anon' && <code>public</code>}
+                  </div>
                 }
-                onChange={() => {}}
-              />
-            </FormLayout>
-
-            {IS_PLATFORM && showApiKeysLastUsed && (
-              <div
-                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-                data-invisible={isLoadingLastUsed}
+                description={
+                  x.tags === 'service_role' ? (
+                    <>
+                      This key has the ability to bypass Row Level Security. Never share it
+                      publicly. If leaked, generate a new JWT secret immediately.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <Link
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Secret API keys
+                          </Link>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      This key is safe to use in a browser if you have enabled Row Level Security
+                      for your tables and configured policies.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <Link
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Publishable API keys
+                          </Link>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  )
+                }
               >
-                {isLastUsedError
-                  ? 'Unable to load requests from the past 24 hours.'
-                  : lastUsedAPIKeys[x.api_key]
-                    ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                    : 'No requests in the past 24 hours.'}
-              </div>
-            )}
-          </Panel.Content>
-        ))
+                <Input
+                  readOnly
+                  className="font-mono"
+                  copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+                  reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+                  value={
+                    !canReadAPIKeys
+                      ? 'You need additional permissions to view API keys'
+                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                        ? 'JWT secret update failed, new API key may have issues'
+                        : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                          ? 'Updating JWT secret...'
+                          : (x?.api_key ?? 'You need additional permissions to view API keys')
+                  }
+                  onChange={() => {}}
+                  onCopy={() => {
+                    if (legacyKeyType) track('api_key_copied', { keyType: legacyKeyType })
+                  }}
+                  onReveal={() => {
+                    if (legacyKeyType === 'legacy_service_role') {
+                      track('api_key_reveal_clicked', { keyType: legacyKeyType })
+                    }
+                  }}
+                />
+              </FormLayout>
+
+              {IS_PLATFORM && showApiKeysLastUsed && (
+                <div
+                  className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                  data-invisible={isLoadingLastUsed}
+                >
+                  {isLastUsedError
+                    ? 'Unable to load requests from the past 24 hours.'
+                    : lastUsedAPIKeys[x.api_key]
+                      ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                      : 'No requests in the past 24 hours.'}
+                </div>
+              )}
+            </Panel.Content>
+          )
+        })
       )}
       {showNotice ? (
         <Panel.Notice

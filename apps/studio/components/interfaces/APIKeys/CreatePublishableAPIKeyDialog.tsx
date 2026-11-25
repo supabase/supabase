@@ -27,6 +27,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
@@ -64,6 +65,7 @@ export const CreatePublishableAPIKeyDialog = () => {
     },
   })
 
+  const track = useTrack()
   const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
   const canCreateAPIKeys = createGrant.status === 'granted'
 
@@ -84,6 +86,7 @@ export const CreatePublishableAPIKeyDialog = () => {
       },
       {
         onSuccess: () => {
+          track('api_key_created', { keyType: 'publishable', source: 'create_dialog' })
           form.reset(defaultValues)
           onOpenChange(false)
         },
@@ -176,6 +179,7 @@ export const CreatePublishableAPIKeyDialog = () => {
               variant="primary"
               form={FORM_ID}
               type="submit"
+              data-attr="api-key-create"
               loading={isCreatingAPIKey}
               disabled={!canCreateAPIKeys}
             >

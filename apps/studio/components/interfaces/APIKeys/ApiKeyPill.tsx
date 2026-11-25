@@ -7,6 +7,7 @@ import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } fr
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export function ApiKeyPill({
   apiKey,
@@ -14,6 +15,7 @@ export function ApiKeyPill({
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const [show, setShow] = useState(false)
 
   const isSecret = apiKey.type === 'secret'
@@ -53,6 +55,7 @@ export function ApiKeyPill({
       setShow(false)
       clear()
     } else {
+      track('api_key_reveal_clicked', { keyType: 'secret' })
       setShow(true)
       try {
         await reveal()
@@ -64,12 +67,19 @@ export function ApiKeyPill({
   }
 
   async function onCopy() {
-    if (!isSecret) return apiKey.api_key
-    if (revealedKey) return revealedKey
+    if (!isSecret) {
+      track('api_key_copied', { keyType: 'publishable' })
+      return apiKey.api_key
+    }
+    if (revealedKey) {
+      track('api_key_copied', { keyType: 'secret' })
+      return revealedKey
+    }
 
     try {
       const key = await reveal()
       clear()
+      if (key) track('api_key_copied', { keyType: 'secret' })
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
@@ -114,6 +124,7 @@ export function ApiKeyPill({
             <Button
               variant="outline"
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
+              data-attr={show ? undefined : 'api-key-reveal'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
               icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
@@ -138,6 +149,7 @@ export function ApiKeyPill({
           <CopyButton
             variant="default"
             aria-label="Copy API key"
+            data-attr="api-key-copy"
             asyncText={onCopy}
             iconOnly
             className="rounded-full px-2 pointer-events-auto"

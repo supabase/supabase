@@ -31,6 +31,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const NAME_SCHEMA = z
@@ -69,6 +70,7 @@ export const CreateSecretAPIKeyDialog = () => {
     defaultValues,
   })
 
+  const track = useTrack()
   const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
   const canCreateAPIKeys = createGrant.status === 'granted'
 
@@ -89,6 +91,7 @@ export const CreateSecretAPIKeyDialog = () => {
       },
       {
         onSuccess: (data) => {
+          track('api_key_created', { keyType: 'secret', source: 'create_dialog' })
           toast.success(`Your secret API key ${data.prefix}... is ready.`)
           form.reset(defaultValues)
           onOpenChange(false)
@@ -205,6 +208,7 @@ export const CreateSecretAPIKeyDialog = () => {
               variant="primary"
               form={FORM_ID}
               type="submit"
+              data-attr="api-key-create"
               loading={isCreatingAPIKey}
               disabled={!canCreateAPIKeys}
             >

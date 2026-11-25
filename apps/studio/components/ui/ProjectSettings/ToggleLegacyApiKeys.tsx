@@ -29,6 +29,7 @@ import {
   useGrant,
   type GrantResult,
 } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
@@ -203,6 +204,7 @@ const ToggleApiKeysModal = ({
   toggleGrant: GrantResult<'PUT /v1/projects/{ref}/api-keys/legacy'>
 }) => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
@@ -221,6 +223,7 @@ const ToggleApiKeysModal = ({
       { projectRef, grant: toggleGrant.grant, enabled },
       {
         onSuccess: () => {
+          track('legacy_api_keys_updated', { enabled })
           toast.success(
             enabled
               ? 'Your anon and service_role keys have been re-enabled!'
