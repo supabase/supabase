@@ -59,7 +59,7 @@ const { data: todos, error } = await supabase.schema('myschema').from('todos').s
 
 <Admonition type="note">
 
-With generated `Database` types that include `public`, `createClient<Database>(...)` type-checks `db.schema` against `public` only, unless the schema name is also passed as the second generic: `createClient<Database, 'myschema'>(...)`. `supabase.schema('myschema').from(...)` infers its schema per call and needs no second generic. In both cases `myschema` has to be present in the generated `Database` type. To include it, pass every schema you query to `--schema` when [generating types](/docs/guides/api/rest/generating-types):
+With generated `Database` types that include `public`, `createClient<Database>(...)` type-checks `db.schema` against `public` only, unless the schema name is also passed as the second generic: `createClient<Database, 'myschema'>(...)`. `supabase.schema('myschema').from(...)` infers its schema per call and needs no second generic. In both cases `myschema` has to be present in the generated `Database` type. To include it, pass every schema you query to `--schema` when [generating types](/docs/guides/api/rest/generating-types). Set `PROJECT_REF` to the Project ID from your project's [General settings](/dashboard/project/_/settings/general) first:
 
 ```bash
 npx supabase gen types typescript --remote="$PROJECT_REF" --schema public,myschema > database.types.ts
