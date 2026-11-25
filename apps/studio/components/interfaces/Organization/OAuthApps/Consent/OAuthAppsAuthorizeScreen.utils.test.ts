@@ -7,7 +7,6 @@ import {
   getPreselectedProjectRefs,
   groupScopesByLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
-import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 describe('OAuthAppsAuthorizeScreen', () => {
@@ -105,67 +104,36 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ...project,
   })
 
-  const grant = (refs: string[]): OAuthAppsPreflightValidationData['existing_grant'] => ({
-    grant_id: '',
-    approved_scopes: ['projects:read'],
-    project_refs: refs,
-    approved_at: '2026-08-14T09:12:00.000Z',
-  })
-
   describe('getPreselectedProjectRefs', () => {
     const live = ['alpha', 'bravo', 'charlie', 'delta'].map((ref) =>
       createMockOrganizationProject({ ref })
     )
     test('preselects the project_ref query param when it resolves against live projects', () => {
-      expect(
-        getPreselectedProjectRefs({ existingGrant: null, projectRef: 'alpha', liveProjects: live })
-      ).toEqual(['alpha'])
+      expect(getPreselectedProjectRefs({ projectRefs: ['alpha'], liveProjects: live })).toEqual([
+        'alpha',
+      ])
     })
 
     test('drops a project_ref that does not resolve against live projects', () => {
-      expect(
-        getPreselectedProjectRefs({ existingGrant: null, projectRef: 'ghost', liveProjects: live })
-      ).toEqual([])
+      expect(getPreselectedProjectRefs({ projectRefs: ['ghost'], liveProjects: live })).toEqual([])
     })
 
     test('returns nothing when there is neither a grant nor a project_ref', () => {
       expect(
         getPreselectedProjectRefs({
-          existingGrant: null,
-          projectRef: undefined,
+          projectRefs: [],
           liveProjects: live,
         })
       ).toEqual([])
     })
 
-    test('existing-grant refs win over the project_ref query param', () => {
-      expect(
-        getPreselectedProjectRefs({
-          existingGrant: grant(['charlie', 'delta']),
-          projectRef: 'alpha',
-          liveProjects: live,
-        })
-      ).toEqual(['charlie', 'delta'])
-    })
-
     test('filters stale refs out of the existing grant', () => {
       expect(
         getPreselectedProjectRefs({
-          existingGrant: grant(['alpha', 'ghost']),
-          projectRef: undefined,
+          projectRefs: ['alpha', 'ghost'],
           liveProjects: live,
         })
       ).toEqual(['alpha'])
-    })
-
-    test('falls back to the project_ref when the existing grant carries no refs', () => {
-      expect(
-        getPreselectedProjectRefs({
-          existingGrant: grant([]),
-          projectRef: 'bravo',
-          liveProjects: live,
-        })
-      ).toEqual(['bravo'])
     })
 
     test('does not cap the number of preselected refs', () => {
@@ -176,8 +144,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
       expect(
         getPreselectedProjectRefs({
-          existingGrant: grant(manyRefs),
-          projectRef: undefined,
+          projectRefs: manyRefs,
           liveProjects: manyProjects,
         })
       ).toEqual(manyRefs)
@@ -186,8 +153,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     test('returns nothing when there are no live projects', () => {
       expect(
         getPreselectedProjectRefs({
-          existingGrant: grant(['alpha']),
-          projectRef: 'alpha',
+          projectRefs: ['alpha'],
           liveProjects: [],
         })
       ).toEqual([])
