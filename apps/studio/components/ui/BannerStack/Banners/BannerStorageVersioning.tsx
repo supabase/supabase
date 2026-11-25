@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CircleHelpIcon, FileIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useRouter } from 'next/router'
@@ -20,8 +20,8 @@ export const BannerStorageVersioningManager = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { isInitialized } = useFeaturePreviewContext()
-  const isStorageVersioningAvailable = useFlag('storageVersioningPrivateAlpha')
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
   const [isDismissed, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.STORAGE_VERSIONING_PREVIEW_BANNER_DISMISSED(ref ?? '_'),
     false
@@ -35,11 +35,7 @@ export const BannerStorageVersioningManager = () => {
 
   const isStorageFilesPage = router.pathname.startsWith('/project/[ref]/storage/files')
   const canShowBanner =
-    isStorageFilesPage &&
-    isInitialized &&
-    isStorageVersioningAvailable &&
-    !!data?.capabilities?.object_versioning &&
-    !isDismissed
+    isStorageFilesPage && isInitialized && isObjectVersioningAvailable && !isDismissed
 
   useEffect(() => {
     if (!canShowBanner) {
