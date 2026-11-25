@@ -103,7 +103,7 @@ function DatabasePipelinesPage() {
                     </div>
                   </div>
                   <GenericTableLoader
-                    headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]}
+                    headers={[null, 'Name', 'Status', 'Region', 'Lag', null]}
                   />
                 </div>
               </>
