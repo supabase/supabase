@@ -75,14 +75,20 @@ const READABLE_URL_PARAMS = new Set<string>([
 ])
 
 const URL_HASH_PATTERN = /^((?:https?:\/\/|\/)[^#]*)#[\s\S]*$/
-const URL_PARAM_PATTERN = /([?&#])([^=&#\s]*)=[^&#]*/g
+const URL_PARAM_PATTERN = /([?&#])([^&#]*)/g
+
+function redactUrlParam(param: string, separator: string, nameAndValue: string) {
+  const nameEnd = nameAndValue.indexOf('=')
+  if (nameEnd === -1) return param
+
+  const name = nameAndValue.slice(0, nameEnd)
+  if (/\s/.test(name) || READABLE_URL_PARAMS.has(name)) return param
+
+  return `${separator}${name}=redacted`
+}
 
 export function redactUrlKeywords(url: string) {
-  return url
-    .replace(URL_HASH_PATTERN, '$1')
-    .replace(URL_PARAM_PATTERN, (param, separator, name) =>
-      READABLE_URL_PARAMS.has(name) ? param : `${separator}${name}=redacted`
-    )
+  return url.replace(URL_HASH_PATTERN, '$1').replace(URL_PARAM_PATTERN, redactUrlParam)
 }
 
 type EventProperties = Record<string, unknown>
