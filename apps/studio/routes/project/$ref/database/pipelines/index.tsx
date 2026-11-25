@@ -18,6 +18,7 @@ import { ReplicationDiagram } from '@/components/interfaces/Database/Replication
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
@@ -29,6 +30,7 @@ export const Route = createFileRoute('/project/$ref/database/pipelines/')({
 
 function DatabasePipelinesPage() {
   const { ref: projectRef } = useParams()
+  const { hasMultipleRegions } = useReplicationClusterGroups()
   const { isHighAvailability, isPending } = useHighAvailability()
   const showPipelines = useIsFeatureEnabled('database:replication')
 
@@ -108,7 +110,15 @@ function DatabasePipelinesPage() {
               </>
             ) : (
               <ReplicationClusterProvider clusterId={undefined}>
-                <ReplicationDiagram />
+                <div className="space-y-2">
+                  {hasMultipleRegions && (
+                    <p className="text-xs text-foreground-light">
+                      The diagram shows pipelines in the default region. The list includes all
+                      regions.
+                    </p>
+                  )}
+                  <ReplicationDiagram />
+                </div>
                 <Destinations />
               </ReplicationClusterProvider>
             )}
