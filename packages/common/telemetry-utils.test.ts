@@ -41,9 +41,10 @@ describe('url redaction', () => {
     ['/sign-in?returnTo=/join?token=secret', '/sign-in?returnTo=redacted'],
     [`${LEAKING_URL}#access_token=secret&refresh_token=secret`, REDACTED_URL],
     [`${PROJECT}#secret`, PROJECT],
+    ['/project/abc#access_token=secret&refresh_token=secret', '/project/abc'],
     [
-      '/project/abc#access_token=secret&refresh_token=secret',
-      '/project/abc#access_token=redacted&refresh_token=redacted',
+      `${PRICING_PAGE}?q?utm_source=secret&=secret`,
+      `${PRICING_PAGE}?q?utm_source=redacted&=redacted`,
     ],
     [
       `${PRICING_PAGE}?utm_source=docs&utm_campaign=launch&gclid=abc&dub_id=xyz`,
@@ -65,8 +66,9 @@ describe('url redaction', () => {
       properties: {
         $session_entry_url: LEAKING_URL,
         viewport_width: 1280,
+        ph_keyword: 'person',
         $set: { last_page: LEAKING_URL },
-        $set_once: { $initial_referrer: LEAKING_URL },
+        $set_once: { $initial_referrer: LEAKING_URL, $initial_ph_keyword: 'person' },
       },
       $set: { last_page: LEAKING_URL },
       $set_once: { $initial_current_url: LEAKING_URL },

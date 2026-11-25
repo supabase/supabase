@@ -106,6 +106,8 @@ class PostHogClient {
       capture_dead_clicks: false,
       capture_heatmaps: false,
       capture_performance: { web_vitals: false },
+      // Feature flag requests send the first URL the SDK stored, and skip before_send.
+      disable_capture_url_hashes: true,
       opt_out_persistence_by_default: true,
       // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
       // load on init, identify and group changes.

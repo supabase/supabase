@@ -74,18 +74,21 @@ const READABLE_URL_PARAMS = new Set<string>([
   'promo_code',
 ])
 
-const ABSOLUTE_URL_HASH_PATTERN = /^(https?:\/\/[^#]*)#[\s\S]*$/
-const URL_PARAM_PATTERN = /([?&#])([^=&#?]+)=[^&#]*/g
+const URL_HASH_PATTERN = /^((?:https?:\/\/|\/)[^#]*)#[\s\S]*$/
+const URL_PARAM_PATTERN = /([?&#])([^=&#\s]*)=[^&#]*/g
 
 export function redactUrlKeywords(url: string) {
   return url
-    .replace(ABSOLUTE_URL_HASH_PATTERN, '$1')
+    .replace(URL_HASH_PATTERN, '$1')
     .replace(URL_PARAM_PATTERN, (param, separator, name) =>
       READABLE_URL_PARAMS.has(name) ? param : `${separator}${name}=redacted`
     )
 }
 
 type EventProperties = Record<string, unknown>
+
+// posthog-js copies a search-engine referrer's query value into these, outside any URL.
+const REFERRER_QUERY_PROPERTIES = ['ph_keyword', '$initial_ph_keyword']
 
 // posthog-js fills its own URL properties (session entry URL, initial URL, referrers) from the
 // browser, so the outgoing event is cleaned by value instead of by a list of property names.
@@ -105,6 +108,8 @@ export function redactEventUrlKeywords(event: {
 
   for (const bag of propertyBags) {
     if (!bag || typeof bag !== 'object') continue
+
+    for (const key of REFERRER_QUERY_PROPERTIES) delete (bag as EventProperties)[key]
 
     for (const [key, value] of Object.entries(bag)) {
       if (typeof value === 'string') (bag as EventProperties)[key] = redactUrlKeywords(value)
