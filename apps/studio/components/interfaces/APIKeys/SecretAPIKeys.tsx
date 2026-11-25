@@ -50,8 +50,9 @@ export const SecretAPIKeys = () => {
     isPending: isDeletingAPIKey,
     isSuccess: isDeleteSuccess,
   } = useAPIKeyDeleteMutation({
-    onSuccess: () => {
-      track('api_key_removed', { keyType: 'secret' })
+    onSuccess: (_data, variables) => {
+      // Attribute to the project the key was deleted from, not whichever project the route is on now
+      track('api_key_removed', { keyType: 'secret' }, { project: variables.projectRef })
       toast.success('Successfully deleted secret key')
       setDeleteId(null)
     },

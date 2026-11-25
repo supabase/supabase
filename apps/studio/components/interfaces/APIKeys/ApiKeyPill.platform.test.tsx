@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiKeyPill } from './ApiKeyPill'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { ALL_FGA_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -72,7 +72,14 @@ function mockRevealById(onRequest?: () => void) {
 
 describe('ApiKeyPill', () => {
   beforeEach(() => {
-    mockCopyToClipboard.mockClear()
+    mockCopyToClipboard.mockReset()
+    // Mirror the real helper: the callback runs once the text resolves and the write succeeds
+    mockCopyToClipboard.mockImplementation(
+      async (text: string | Promise<string>, onSuccess?: () => void) => {
+        await text
+        onSuccess?.()
+      }
+    )
     mockTrack.mockClear()
   })
 
@@ -107,8 +114,11 @@ describe('ApiKeyPill', () => {
     const reveal = screen.getByRole('button', { name: 'Reveal API key' })
     await waitFor(() => expect(reveal).toBeEnabled())
     fireEvent.click(reveal)
-    fireEvent.click(await screen.findByRole('button', { name: 'Hide API key' }))
+    const hide = await screen.findByRole('button', { name: 'Hide API key' })
+    await waitFor(() => expect(hide).toBeEnabled())
+    fireEvent.click(hide)
 
+    expect(await screen.findByRole('button', { name: 'Reveal API key' })).toBeInTheDocument()
     expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
@@ -125,6 +135,39 @@ describe('ApiKeyPill', () => {
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
     await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
     expect(mockTrack).toHaveBeenCalledWith('api_key_copied', { keyType: 'secret' })
+  })
+
+  it('does not track a copy when the clipboard write fails', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockCopyToClipboard.mockImplementation(() => {})
+    customRender(<ApiKeyPill apiKey={publishableKey} />, {
+      profileContext: createMockProfileContext(),
+    })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
+    expect(mockTrack).not.toHaveBeenCalled()
+  })
+
+  it('does not track a copy when revealing the secret key fails', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/api-keys/:id',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Internal error' }, { status: 500 }),
+    })
+    customRender(<ApiKeyPill apiKey={secretKey} />, { profileContext: createMockProfileContext() })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
+    expect(mockTrack).not.toHaveBeenCalled()
   })
 
   it('tracks copying a publishable key', async () => {

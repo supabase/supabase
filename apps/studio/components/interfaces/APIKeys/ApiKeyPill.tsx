@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -17,6 +17,8 @@ export function ApiKeyPill({
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const [show, setShow] = useState(false)
+  // Set when onCopy resolved a key, so a failed reveal isn't tracked as a copy
+  const hasKeyToCopy = useRef(false)
 
   const isSecret = apiKey.type === 'secret'
 
@@ -67,24 +69,31 @@ export function ApiKeyPill({
   }
 
   async function onCopy() {
+    hasKeyToCopy.current = false
+
     if (!isSecret) {
-      track('api_key_copied', { keyType: 'publishable' })
+      hasKeyToCopy.current = true
       return apiKey.api_key
     }
     if (revealedKey) {
-      track('api_key_copied', { keyType: 'secret' })
+      hasKeyToCopy.current = true
       return revealedKey
     }
 
     try {
       const key = await reveal()
       clear()
-      if (key) track('api_key_copied', { keyType: 'secret' })
+      hasKeyToCopy.current = !!key
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
       return ''
     }
+  }
+
+  // Fires after the clipboard write succeeds, so failed writes aren't recorded
+  function onCopied() {
+    if (hasKeyToCopy.current) track('api_key_copied', { keyType: apiKey.type })
   }
 
   const isRestricted = isSecret && !isLoadingPermission && !canManageSecretKeys
@@ -151,6 +160,7 @@ export function ApiKeyPill({
             aria-label="Copy API key"
             data-attr="api-key-copy"
             asyncText={onCopy}
+            onCopied={onCopied}
             iconOnly
             className="rounded-full px-2 pointer-events-auto"
             disabled={isRestricted || isLoadingPermission}

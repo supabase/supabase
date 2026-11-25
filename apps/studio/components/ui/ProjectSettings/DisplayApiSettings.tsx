@@ -47,6 +47,8 @@ export const DisplayApiSettings = ({
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+  // The input shows a placeholder instead of the key outside this state
+  const canCopyKey = canReadAPIKeys && isNotUpdatingJwtSecret
 
   const apiKeys = useMemo(() => settings?.service_api_keys ?? [], [settings])
   // api keys should not be empty. However it can be populated with a delay on project creation
@@ -197,7 +199,7 @@ export const DisplayApiSettings = ({
                 <Input
                   readOnly
                   className="font-mono"
-                  copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+                  copy={canCopyKey}
                   reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
                   value={
                     !canReadAPIKeys
@@ -210,7 +212,8 @@ export const DisplayApiSettings = ({
                   }
                   onChange={() => {}}
                   onCopy={() => {
-                    if (legacyKeyType) track('api_key_copied', { keyType: legacyKeyType })
+                    if (canCopyKey && legacyKeyType)
+                      track('api_key_copied', { keyType: legacyKeyType })
                   }}
                   onReveal={() => {
                     if (legacyKeyType === 'legacy_service_role') {

@@ -67,8 +67,9 @@ export const PublishableAPIKeys = () => {
     isPending: isDeletingAPIKey,
     isSuccess: isDeleteSuccess,
   } = useAPIKeyDeleteMutation({
-    onSuccess: () => {
-      track('api_key_removed', { keyType: 'publishable' })
+    onSuccess: (_data, variables) => {
+      // Attribute to the project the key was deleted from, not whichever project the route is on now
+      track('api_key_removed', { keyType: 'publishable' }, { project: variables.projectRef })
       toast.success('Successfully deleted publishable key')
       setDeleteId(null)
     },
