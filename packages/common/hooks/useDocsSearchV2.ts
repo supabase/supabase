@@ -7,6 +7,8 @@ import { useMountEffect } from './useMountEffect'
 
 interface DocsSearchV2Result {
   path: string
+  anchor?: string
+  headingLevel?: number
   title: string
   heading: string
   excerpt: string
