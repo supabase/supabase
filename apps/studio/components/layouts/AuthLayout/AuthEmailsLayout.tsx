@@ -1,6 +1,5 @@
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -25,10 +24,12 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const navItems = [
     {
       label: 'Templates',
+      to: '/project/$ref/auth/templates' as const,
       href: `/project/${ref}/auth/templates`,
     },
     {
       label: 'SMTP Settings',
+      to: '/project/$ref/auth/smtp' as const,
       href: `/project/${ref}/auth/smtp`,
     },
   ]
@@ -51,7 +52,9 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
             <NavMenu>
               {navItems.map((item) => (
                 <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link to={item.to} params={{ ref: ref ?? '' }}>
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>

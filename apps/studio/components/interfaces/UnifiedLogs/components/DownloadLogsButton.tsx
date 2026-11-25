@@ -1,8 +1,7 @@
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
 import { DownloadIcon, SettingsIcon } from 'lucide-react'
-import Link from 'next/link'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -113,7 +112,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
-              <Link href={`/project/${ref}/settings/log-drains`}>
+              <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '' }}>
                 <SettingsIcon size={14} />
                 <p>Add a Log Drain</p>
               </Link>

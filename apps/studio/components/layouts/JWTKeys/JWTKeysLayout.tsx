@@ -1,6 +1,5 @@
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -20,11 +19,13 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const navigationItems = [
     {
       label: 'JWT Signing Keys',
+      to: '/project/$ref/settings/jwt' as const,
       href: `/project/${projectRef}/settings/jwt`,
       id: 'signing-keys',
     },
     {
       label: 'Legacy JWT Secret',
+      to: '/project/$ref/settings/jwt/legacy' as const,
       href: `/project/${projectRef}/settings/jwt/legacy`,
       id: 'legacy-jwt-keys',
     },
@@ -46,7 +47,9 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
         <NavMenu>
           {navigationItems.map((item) => (
             <NavMenuItem key={item.id} active={pathname === item.href}>
-              <Link href={item.href}>{item.label}</Link>
+              <Link to={item.to} params={{ ref: projectRef ?? '' }}>
+                {item.label}
+              </Link>
             </NavMenuItem>
           ))}
         </NavMenu>

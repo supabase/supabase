@@ -1,6 +1,5 @@
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -27,12 +26,14 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const navItems = [
     {
       label: 'Supabase Auth',
+      to: '/project/$ref/auth/providers' as const,
       href: `/project/${ref}/auth/providers`,
     },
     ...(authenticationThirdPartyAuth
       ? [
           {
             label: 'Third-Party Auth',
+            to: '/project/$ref/auth/third-party' as const,
             href: `/project/${ref}/auth/third-party`,
           },
         ]
@@ -57,7 +58,9 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
             <NavMenu>
               {navItems.map((item) => (
                 <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link to={item.to} params={{ ref: ref ?? '' }}>
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>

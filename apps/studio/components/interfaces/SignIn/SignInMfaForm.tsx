@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
 import { useAuthError, useFlag, useParams } from 'common'
 import { LockIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { Button, Form, FormControl, FormField, Input } from 'ui'
@@ -25,6 +23,8 @@ import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useSignOut } from '@/lib/auth'
 import { getReturnToPath } from '@/lib/gotrue'
+import { splitInternalUrl } from '@/lib/internal-url'
+import { searchParamsToRecord } from '@/lib/router-search-params'
 import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
@@ -38,7 +38,7 @@ interface SignInMfaFormProps {
 }
 
 export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
   const searchStr = useLocation({ select: (location) => location.searchStr })
@@ -46,6 +46,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   if (context === 'forgot-password') {
     recoveryCodeSearchParams.set('context', 'forgot-password')
   }
+  const recoveryCodeSearch = searchParamsToRecord(recoveryCodeSearchParams)
   const { method: signInMethod = 'unknown' } = useParams()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
@@ -84,19 +85,20 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       await queryClient.resetQueries()
 
       if (context === 'forgot-password') {
-        router.push({
-          pathname: '/reset-password',
-          query: router.query,
+        void navigate({
+          to: '/reset-password',
+          search: true,
         })
       } else {
-        router.push(getReturnToPath())
+        const { to, search, hash } = splitInternalUrl(getReturnToPath())
+        void navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
       }
     },
   })
 
   const onClickLogout = async () => {
     await signOut()
-    await router.replace('/sign-in')
+    await navigate({ to: '/sign-in', replace: true })
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code }) => {
@@ -109,13 +111,16 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
       if (factors.totp.length === 0) {
-        queryClient.resetQueries().then(() => router.push(getReturnToPath()))
+        queryClient.resetQueries().then(() => {
+          const { to, search, hash } = splitInternalUrl(getReturnToPath())
+          void navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
+        })
       }
       if (factors.totp.length > 0) {
         setSelectedFactor(factors.totp[0])
       }
     }
-  }, [factors?.totp, isSuccessFactors, router, queryClient])
+  }, [factors?.totp, isSuccessFactors, navigate, queryClient])
 
   useEffect(() => {
     if (code.length === 6) form.handleSubmit(onSubmit)()
@@ -133,7 +138,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         additionalActions={
           <>
             <Button asChild>
-              <Link href="/sign-in">Back to sign in</Link>
+              <Link to="/sign-in">Back to sign in</Link>
             </Button>
             <Button asChild>
               <a href={MFA_SUPPORT_EMAIL_HREF}>Email support</a>
@@ -259,7 +264,8 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
           {enableAuthRecoveryCodes && recoveryCodesStatus?.status === 'available' && (
             <li>
               <Link
-                href={`/sign-in-recovery-code?${recoveryCodeSearchParams}`}
+                to="/sign-in-recovery-code"
+                search={recoveryCodeSearch}
                 className="text-sm transition text-foreground-light hover:text-foreground"
               >
                 Authenticate using a recovery code
@@ -268,7 +274,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
           )}
           <li>
             <Link
-              href="/logout"
+              to="/logout"
               className="text-sm transition text-foreground-light hover:text-foreground"
             >
               Force sign out and clear cookies

@@ -1,6 +1,5 @@
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -39,18 +38,21 @@ export const StorageBucketsLayout = ({
       ? [
           {
             label: 'Buckets',
+            to: '/project/$ref/storage/files' as const,
             href: `/project/${ref}/storage/files`,
           },
           ...(IS_PLATFORM
             ? [
                 {
                   label: 'Settings',
+                  to: '/project/$ref/storage/files/settings' as const,
                   href: `/project/${ref}/storage/files/settings`,
                 },
               ]
             : []),
           {
             label: 'Policies',
+            to: '/project/$ref/storage/files/policies' as const,
             href: `/project/${ref}/storage/files/policies`,
           },
         ]
@@ -79,7 +81,9 @@ export const StorageBucketsLayout = ({
             <NavMenu>
               {navigationItems.map((item) => (
                 <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link to={item.to} params={{ ref: ref ?? '' }}>
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>
