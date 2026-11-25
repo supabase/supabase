@@ -62,10 +62,11 @@ export function useCommonSections(
 
   useEffect(() => {
     async function fetchCommonSections() {
+      // turbopack ignores webpackInclude, so the static prefix and suffix limit which spec files get bundled
+      const [, name] = commonSectionsFile.match(/^common-(.+)\.json$/) ?? []
       const commonSections = await import(
-        /* webpackInclude: /common-.*\.json$/ */
         /* webpackMode: "lazy" */
-        `~/spec/${commonSectionsFile}`
+        `~/spec/common-${name}.json`
       )
       setCommonSections(commonSections.default)
     }
@@ -95,10 +96,11 @@ export function useSpec(specFile?: string) {
       return
     }
     async function fetchSpec() {
+      // turbopack ignores webpackInclude, so the static prefix and suffix limit which spec files get bundled
+      const [, name] = specFile?.match(/^supabase_(.+)\.yml$/) ?? []
       const spec = await import(
-        /* webpackInclude: /supabase_.*\.ya?ml$/ */
         /* webpackMode: "lazy" */
-        `~/spec/${specFile}`
+        `~/spec/supabase_${name}.yml`
       )
       setSpec(spec.default)
     }

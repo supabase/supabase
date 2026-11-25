@@ -49,14 +49,14 @@ Supabase és una combinació d’eines de codi obert. Estem construint les funci
 
 **Arquitectura actual**
 
-Supabase és una [plataforma allotjada](https://supabase.com/dashboard). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
+Supabase és una [plataforma allotjada](https://supabase.com/dashboard). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/self-hosting) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) és un sistema de base de dades objecte–relacional amb més de 30 anys de desenvolupament actiu que s’ha guanyat la seva forta reputació per ser de confiança, robust i d’alt rendiment.
 - [Temps real](https://github.com/supabase/realtime) és un server construït en Elixir que permet escoltar els _inserts_, _updates_ i _deletes_ de PostgreSQL utilitzant WebSockets. Supabase escolta a la funcionalitat de replicació integrada de PostgreSQL, converteix el byte de replicació en un JSON i després transmet el JSON a través de WebSockets.
 - [PostgREST](http://postgrest.org/) és un servidor web que converteix la base de dades PostgreSQL directament en una API RESTful.
-- [Emmagatzematge](https://github.com/supabase/storage-api) proporciona una interfície RESTful per a manipular els arxius allotjats en S3, utilitzant Postgres per a gestionar els permisos.
+- [Emmagatzematge](https://github.com/supabase/storage) proporciona una interfície RESTful per a manipular els arxius allotjats en S3, utilitzant Postgres per a gestionar els permisos.
 - [postgres-meta](https://github.com/supabase/postgres-meta) és una API RESTful per a gestionar Postgres, permet obtenir informació de taules, agregar rols, executar consultes, etc.
 - [GoTrue](https://github.com/netlify/gotrue) és una API basada en SWT per a administrar usuaris i distribuir tokens SWT.
 - [Kong](https://github.com/kong/kong) és un API gateway nadiu allotjat en el núvol.
@@ -70,12 +70,12 @@ La nostra llibreria de client és modular. Cada subllibreria és una implementac
   - `realtime-{lang}`: Llibreria de client per a treballar amb [Realtime](https://github.com/supabase/realtime)
   - `gotrue-{lang}`: Llibreria de client per a treballar amb [GoTrue](https://github.com/netlify/gotrue)
 
-| Repositori            | Oficial                                                                                | Comunitat                                                                                                                                                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)                                        | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-Flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                          |
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js)      | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
+| Repositori            | Oficial                                                                                | Comunitat                                                                                                                                                                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)                                        | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-Flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                    |
+| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase-community/postgrest-rs) |
+| `realtime-{lang}`     | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                          |
+| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js)      | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                                |
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->

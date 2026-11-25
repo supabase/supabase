@@ -18,7 +18,7 @@ Pipelines provides at-least-once delivery. How repeated changes affect stored da
 
 ## Before you start
 
-Check the [plan and access requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) and [check supported destinations](/docs/guides/database/replication#supported-destinations).
+Check the [plan and project requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) and [supported destinations](/docs/guides/database/replication#supported-destinations).
 
 ### Region
 
@@ -30,7 +30,7 @@ Pipelines charges for configured pipeline hours, initial sync data, and ongoing 
 
 ## Setup overview
 
-Prepare your destination, then enable and configure Pipelines in the Dashboard. A Postgres publication selects the data to replicate; you can create one during setup.
+The Dashboard is the supported way to enable Pipelines and create a managed pipeline. Prepare your destination before setup. To select the data to replicate, create a Postgres publication in the Dashboard during setup or [create it with SQL](#creating-a-publication-with-sql) ahead of time.
 
 ### Step 1: Prepare your destination [#step-1-create-a-postgres-publication]
 
@@ -49,19 +49,27 @@ Pipelines installs an `etl` schema and a database event trigger to track replica
 
 </Admonition>
 
-1. Navigate to the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard
-2. Click **Add pipeline** to begin setup
-3. Select a destination available to your organization
-4. If Pipelines is not yet enabled, click **Enable Pipelines**, review the dialog, and confirm **Enable Pipelines**.
+1. In the Dashboard, go to [**Database > Pipelines**](/dashboard/project/_/database/pipelines).
+2. Click **Add pipeline**.
+3. If Pipelines is disabled for the project, review the **Enable Pipelines** dialog and click **Enable**. The destination selection opens after you enable Pipelines.
 
 ### Step 3: Configure a destination
 
-1. Enter a **Pipeline name** and select a **Publication**. Use an existing publication, or click **New publication**, name it, and select at least one table. For schema-wide replication or advanced options, [create the publication with SQL](#creating-a-publication-with-sql).
-2. Under **Initial sync**, keep **All tables** to copy existing rows, or [choose which tables to copy](#choosing-which-tables-to-copy) if you only need future changes for some tables.
-3. Enter the credentials and destination-specific settings prepared in Step 1.
-4. Optionally expand **Advanced settings** to change [batching, initial sync concurrency, or slot recovery](#advanced-settings).
-5. Complete validation. Fix any required issues and review warnings before continuing.
-6. Review the estimated initial sync cost and ongoing charges, then confirm creation.
+For **Publication**, choose an existing publication or select **New publication**, name it, and add at least one table. For schema-wide replication or advanced publication options, [create the publication with SQL](#creating-a-publication-with-sql). Under **Initial sync**, keep **All tables** to copy existing rows from every published table, or [choose which tables to copy](#choosing-which-tables-to-copy).
+
+#### Destination form
+
+1. Select your destination. Enter a **Pipeline name**, set **Publication** and **Initial sync**, and enter the destination connection details from Step 1.
+2. If needed, use **Advanced settings** to change [batching, initial sync concurrency, or slot recovery](#advanced-settings).
+3. Click **Start pipeline** to validate the configuration. Fix any blocking issues and run validation again. If only warnings remain, review them, click **Start pipeline anyway**, and confirm the warnings with **Create and start pipeline anyway**.
+4. Review the cost estimates and click **Create and start pipeline** in the cost dialog.
+
+#### Pipeline creation wizard
+
+1. On **Destination**, select your destination and click **Continue**.
+2. On **Connection**, name the pipeline and enter the destination connection details from Step 1. Click **Continue** to validate the connection. If warnings appear, review them and click **Continue** again.
+3. On **Data**, set **Publication** and **Initial sync**. If needed, adjust [advanced replication settings](#advanced-settings). Click **Continue**.
+4. On **Review**, check the configuration, estimated initial sync cost, and ongoing charges. Click **Start pipeline** to run final validation. Fix any blocking issues and run validation again. If only warnings remain, review them and click **Start pipeline anyway**.
 
 The pipeline copies the selected tables' existing rows and begins ongoing replication for every published table.
 
@@ -95,7 +103,7 @@ Review initial sync choices and creation checks before tuning advanced settings.
 
 Selection changes affect unfinished initial syncs. To copy a completed table again, include it here, apply the settings, and [reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Skipping initial sync does not preserve or attach to previously loaded destination data. A table reset erases destination data even when initial sync is skipped.
+Skipping initial sync does not preserve or attach to previously loaded destination data. After a table reset, tables excluded from initial sync receive only new changes in the destination.
 
 ### Creation checks
 
@@ -231,7 +239,7 @@ create publication pub_users_subset
 for table users (id, email, created_at);
 ```
 
-For updates and deletes, the column list must include all replica-identity columns. With `REPLICA IDENTITY FULL`, that means all columns, so you cannot publish a subset. Also check your destination's source table requirements.
+For updates and deletes, a column list must include all replica identity columns. With `REPLICA IDENTITY FULL`, omit the list entirely. Postgres rejects source updates and deletes if a publication that sends those operations specifies a column list for the table, even if it names every column. Review the columns before removing a list because the publication can then replicate previously excluded columns. Also check your destination's source table requirements.
 
 ### Filtering rows with a predicate
 
@@ -337,19 +345,17 @@ Wait for initial sync to finish before changing its filter; changing a filter do
 
 ## Schema change support
 
-Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support) before altering replicated tables.
+Pipelines applies supported schema changes as replication progresses. Before altering a replicated table, check the schema change support for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support).
 
 Run schema migrations one at a time in short, fresh `READ COMMITTED` transactions. Avoid concurrent schema changes to related tables, types, or publications.
 
-Unsupported changes have different outcomes:
-
-- **Data type changes do not migrate existing destination columns.** BigQuery, DuckLake, and Snowflake generally skip type changes with a warning. ClickHouse rejects changes that alter its mapped type or timestamp semantics; see its [type-change rules](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support). Keeping the old destination type can cause later values to be rejected or interpreted differently.
+- **Column type changes depend on the destination.** Replication can continue when the change is compatible with the existing destination column type. An incompatible change can stop the entire pipeline. If replication continues with the previous column type, later writes can fail or store values differently from Postgres. If Postgres rewrites values during the change, previously replicated rows can become stale.
 - **Unsupported defaults and tightening `NOT NULL` are skipped with a warning.** Replication can continue with a different default or a more permissive destination column. Each destination guide describes these differences; skipping a default does not skip the values Postgres supplies in row changes.
 - **Incompatible schema changes are rejected with an error**, such as changing the primary-key definition used by BigQuery or ClickHouse's `ReplacingMergeTree`. Failed or interrupted schema changes can require manual recovery.
 
 Check [replication logs](/docs/guides/database/replication/pipelines-monitoring#viewing-logs) for warnings and errors after changing a replicated table.
 
-Some schema and publication changes require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). A reset rebuilds the destination schema and **deletes existing destination data**. Resolve any source incompatibility before resetting. To copy current source rows again, select the tables for [**Initial sync**](#choosing-which-tables-to-copy) and apply the settings before resetting. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
+For schema and publication changes that require a rebuild, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected tables. A reset rebuilds the destination schema and **replaces the replicated data**. Resolve any source incompatibility before resetting. To copy current source rows again, select the tables for [**Initial sync**](#choosing-which-tables-to-copy) and apply the settings before resetting. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
 
 ## Limitations
 
@@ -359,6 +365,7 @@ Pipelines has the following limitations:
 - **Transformations**: Pipelines maps names and types for the destination but does not run user-defined transformations.
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Arrays**: Only one-dimensional arrays are supported. Non-default lower bounds are not preserved. Check the destination guide for additional array restrictions.
+- **JSON nesting**: Source `json` and `jsonb` values can have up to 127 levels of nested objects and arrays, including the outermost object or array. The limit also applies to each JSON value in a Postgres array. Pipelines rejects deeper values while reading from the source.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
 
 Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.

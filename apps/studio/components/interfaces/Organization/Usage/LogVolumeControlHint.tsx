@@ -16,9 +16,9 @@ export const LogVolumeControlHint = ({ projectRef }: LogVolumeControlHintProps) 
           project settings
         </Link>
       ) : (
-        'project settings'
+        <span>project settings</span>
       )}
-      .
+      <span>.</span>
     </p>
   )
 }

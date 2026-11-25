@@ -1,9 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection } from 'ui-patterns/PageSection'
 
 import { PublicationsList } from '@/components/interfaces/Database/Publications/PublicationsList'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
@@ -24,12 +29,19 @@ function DatabasePublications() {
   }
 
   return (
-    <PageLayout title="Database Publications" size="large">
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Publications</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <PageContainer size="large">
         <PageSection className="gap-y-4">
           <PublicationsList />
         </PageSection>
       </PageContainer>
-    </PageLayout>
+    </>
   )
 }

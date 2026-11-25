@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useFilterBarState, useOptionsCache } from './hooks'
+import { useFilterBarState, useHighlightNavigation, useOptionsCache } from './hooks'
 import { FilterProperty } from './types'
 
 describe('FilterBar Hooks', () => {
@@ -79,6 +79,59 @@ describe('FilterBar Hooks', () => {
 
       // Should not update loading state for array options
       expect(result.current.loadingOptions).toEqual({})
+    })
+  })
+
+  describe('useHighlightNavigation', () => {
+    const keyEvent = (key: string) =>
+      ({ key, preventDefault: vi.fn() }) as unknown as React.KeyboardEvent<HTMLInputElement>
+
+    it('highlights the first item by default', () => {
+      const { result } = renderHook(() => useHighlightNavigation(3, vi.fn()))
+      expect(result.current.highlightedIndex).toBe(0)
+    })
+
+    it('follows a changing default index until the user navigates', () => {
+      const { result, rerender } = renderHook(
+        ({ defaultIndex }) => useHighlightNavigation(3, vi.fn(), undefined, { defaultIndex }),
+        { initialProps: { defaultIndex: 1 } }
+      )
+      expect(result.current.highlightedIndex).toBe(1)
+
+      rerender({ defaultIndex: 0 })
+      expect(result.current.highlightedIndex).toBe(0)
+
+      act(() => result.current.handleKeyDown(keyEvent('ArrowDown')))
+      rerender({ defaultIndex: 1 })
+      expect(result.current.highlightedIndex).toBe(1)
+      act(() => result.current.handleKeyDown(keyEvent('ArrowDown')))
+      rerender({ defaultIndex: 0 })
+      expect(result.current.highlightedIndex).toBe(2)
+    })
+
+    it('selects the default item on Enter and returns to it on reset', () => {
+      const onEnter = vi.fn()
+      const { result } = renderHook(() =>
+        useHighlightNavigation(3, onEnter, undefined, { defaultIndex: 1 })
+      )
+
+      act(() => result.current.handleKeyDown(keyEvent('Enter')))
+      expect(onEnter).toHaveBeenCalledWith(1)
+
+      act(() => result.current.handleKeyDown(keyEvent('ArrowDown')))
+      expect(result.current.highlightedIndex).toBe(2)
+      act(() => result.current.reset())
+      expect(result.current.highlightedIndex).toBe(1)
+    })
+
+    it('keeps the highlight within the items when the list shrinks', () => {
+      const { result, rerender } = renderHook(
+        ({ length }) => useHighlightNavigation(length, vi.fn(), undefined, { defaultIndex: 4 }),
+        { initialProps: { length: 6 } }
+      )
+      expect(result.current.highlightedIndex).toBe(4)
+      rerender({ length: 2 })
+      expect(result.current.highlightedIndex).toBe(1)
     })
   })
 })

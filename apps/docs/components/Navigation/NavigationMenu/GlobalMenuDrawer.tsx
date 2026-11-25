@@ -1,7 +1,8 @@
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
+import { MobileNavAccountActions } from 'ui-patterns/MobileNav/MobileNavAccountActions'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
 
 import type { DropdownMenuItem } from '../Navigation.types'
@@ -46,28 +47,6 @@ const SectionMenuItems = ({
         )}
     </Fragment>
   ))
-
-const GlobalMenuAccountActions = () => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-
-  if (isUserLoading) return null
-
-  return isLoggedIn ? (
-    <Button block className="h-8 text-sm" asChild>
-      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
-    </Button>
-  ) : (
-    <>
-      <Button block className="h-8 text-sm" asChild>
-        <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
-      </Button>
-      <Button variant="primary" block className="h-8 text-sm" asChild>
-        <Link href="https://supabase.com/dashboard/sign-up">Start your project</Link>
-      </Button>
-    </>
-  )
-}
 
 // the header has one burger, so the sidebar drawer also holds the top nav groups
 export const GlobalMenuDrawerSection = ({
@@ -120,8 +99,13 @@ export const GlobalMenuDrawerSection = ({
   )
 }
 
-export const GlobalMenuDrawerFooter = ({ className }: { className?: string }) => (
-  <div className={cn('flex items-stretch gap-4', className)}>
-    <GlobalMenuAccountActions />
-  </div>
-)
+export const GlobalMenuDrawerFooter = ({ className }: { className?: string }) => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
+
+  return isUserLoading ? (
+    <div className={className} />
+  ) : (
+    <MobileNavAccountActions isLoggedIn={isLoggedIn} className={className} />
+  )
+}

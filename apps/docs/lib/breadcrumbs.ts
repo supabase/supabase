@@ -8,6 +8,7 @@ export interface BreadcrumbItem {
   url?: string
   icon?: string
   version?: ReferenceVersion
+  items?: BreadcrumbItem[]
 }
 
 interface ReferenceVersion {

@@ -135,9 +135,29 @@ Resetting a table drops and recreates its table and, for `ReplacingMergeTree`, i
 
 `REPLICA IDENTITY NOTHING` cannot support updates or deletes.
 
-Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Changing replica identity affects only new WAL; incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
 Array elements can be `NULL`. A whole-array SQL `NULL` is stored as an empty array, so these two source values become indistinguishable.
+
+### Recover from partial updates
+
+Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row.
+
+Before setting `REPLICA IDENTITY FULL`, check the [column lists](/docs/guides/database/replication/pipelines#selecting-specific-columns) in every publication that sends updates or deletes for this table. Full replica identity requires omitting the list entirely. Remove a list only if all columns can be replicated to the publication's subscribers.
+
+Run the following SQL using the source project's [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+For a partitioned table, run the statement on the parent and each partition. Postgres applies replica identity per table.
+
+If replication has already failed on a partial update, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected table. Changing replica identity applies only to new write-ahead log (WAL) records. The reset lets the table resume from a new replication position past the incompatible update.
+
+<Admonition type="danger">
+
+Resetting a table deletes its existing ClickHouse data when replication resumes, including any append-only history in a `MergeTree` table. Include the table in **Initial sync** before resetting if you want to copy its current source rows again.
+
+</Admonition>
 
 ## Type mapping
 
@@ -177,9 +197,7 @@ With `ReplacingMergeTree`, renaming or dropping a primary-key column or changing
 
 New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Adding `NOT NULL` keeps an existing destination column nullable. Defaults that cannot be translated are skipped; Postgres still supplies the source values through replication.
 
-Source type changes that alter the mapped ClickHouse type are rejected, such as `integer` to `bigint`. Switching between `timestamp` and `timestamptz` is also rejected because it can change existing values. Changes that keep the mapped type, such as increasing a `varchar` length, continue without changing the destination type. [Reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the schema after a rejected change.
-
-For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+A change that requires a different ClickHouse type or switches between `timestamp` and `timestamptz` stops replication for the whole pipeline. Other changes that keep the same ClickHouse column type can continue. Use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the affected table.
 
 ## Troubleshooting
 
@@ -195,5 +213,5 @@ Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring
 ## Additional resources
 
 - [ClickHouse documentation](https://clickhouse.com/docs)
-- [ReplacingMergeTree](https://clickhouse.com/docs/engines/table-engines/mergetree-family/replacingmergetree)
+- [ReplacingMergeTree](https://clickhouse.com/docs/reference/engines/table-engines/mergetree-family/replacingmergetree)
 - [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)

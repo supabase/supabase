@@ -1187,6 +1187,12 @@ export const examples: Registry = [
     files: ['example/tooltip-demo.tsx'],
   },
   {
+    name: 'tooltip-inline-demo',
+    type: 'components:example',
+    registryDependencies: ['tooltip'],
+    files: ['example/tooltip-inline-demo.tsx'],
+  },
+  {
     name: 'typography-blockquote',
     type: 'components:example',
     files: ['example/typography-blockquote.tsx'],

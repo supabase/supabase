@@ -13,7 +13,7 @@ import {
   useSaveLogsViewMutation,
 } from './logs-views-query'
 import { getSqlSnippets } from './sql-snippets-query'
-import { SaveViewDialog } from '@/components/interfaces/UnifiedLogs/components/SaveViewDialog'
+import { LogsViewsPanel } from '@/components/interfaces/UnifiedLogs/components/LogsViewsPanel'
 import { useLogsViews } from '@/components/interfaces/UnifiedLogs/useLogsViews'
 import type { components } from '@/data/api'
 import { createMockProject } from '@/tests/helpers'
@@ -238,21 +238,31 @@ describe('saved log views persistence', () => {
               last_updated_by: 1,
             }),
     })
-    const onCancel = vi.fn()
+    const onCancelSave = vi.fn()
     const onSuccess = vi.fn()
     function SaveForm() {
       const save = useSaveLogsViewMutation()
       return (
-        <SaveViewDialog
-          visible
-          onCancel={onCancel}
-          onSave={async (input) => {
-            await save.mutateAsync({ projectRef: 'project-a', id: viewRow.id, input })
+        <LogsViewsPanel
+          views={[]}
+          isLoading={false}
+          isError={false}
+          activeViewId={null}
+          isSaving
+          onApply={vi.fn()}
+          onReviewChanges={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRename={vi.fn()}
+          onDelete={vi.fn()}
+          onCancelSave={onCancelSave}
+          onSubmitSave={async (name) => {
+            await save.mutateAsync({
+              projectRef: 'project-a',
+              id: viewRow.id,
+              input: { ...draft, name },
+            })
             onSuccess()
           }}
-          {...draft}
-          existingNames={[]}
-          columnLabels={{}}
         />
       )
     }
@@ -266,12 +276,11 @@ describe('saved log views persistence', () => {
       expect(screen.getByRole('button', { name: 'Save view' })).not.toBeDisabled()
     )
     expect(onSuccess).not.toHaveBeenCalled()
-    expect(onCancel).not.toHaveBeenCalled()
+    expect(onCancelSave).not.toHaveBeenCalled()
     expect(screen.getByPlaceholderText('Enter a name for this view')).toHaveValue('Retry me')
     shouldFail = false
     fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
     await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
-    expect(onCancel).toHaveBeenCalledOnce()
   })
 
   it('recovers from a failed read and retains loaded views after a failed delete', async () => {
