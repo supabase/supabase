@@ -5,16 +5,17 @@ import type {
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { API_URL } from '@/lib/constants'
+import { toRoutePattern } from '@/lib/internal-url'
 
 export function useStudioCommandMenuTelemetry() {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const router = useRouter()
+  const pathname = toRoutePattern(useRoutePattern())
 
   const onTelemetry = useCallback(
     (
@@ -34,10 +35,10 @@ export function useStudioCommandMenuTelemetry() {
             ...(organization?.slug && { organization: organization.slug }),
           },
         },
-        router.pathname
+        pathname
       )
     },
-    [projectRef, organization?.slug, router.pathname]
+    [projectRef, organization?.slug, pathname]
   )
 
   return { onTelemetry }

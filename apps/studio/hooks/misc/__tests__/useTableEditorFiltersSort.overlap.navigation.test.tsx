@@ -7,12 +7,10 @@ import {
   RouterProvider,
 } from '@tanstack/react-router'
 import { act, render, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { useTableEditorFiltersSort } from '../useTableEditorFiltersSort'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-
-vi.mock('next/router', () => import('@/compat/next/router'))
 
 type SetParams = ReturnType<typeof useTableEditorFiltersSort>['setParams']
 const hooks: { sort?: SetParams; filter?: SetParams } = {}

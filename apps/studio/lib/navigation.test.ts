@@ -2,7 +2,7 @@
 import type { UseNavigateResult } from '@tanstack/react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createNavigationHandler } from './navigation'
+import { createNavigationHandler, navigateToUrl } from './navigation'
 
 type NavigationEvent = Parameters<ReturnType<typeof createNavigationHandler>>[0]
 type Outcome = 'push' | 'new-tab' | 'none'
@@ -103,5 +103,41 @@ describe('createNavigationHandler', () => {
 
     expect(preventDefault).toHaveBeenCalled()
     expectOutcome('push', true)
+  })
+})
+
+describe('navigateToUrl', () => {
+  it('splits internal paths into to, search, and hash and preserves newlines in query values', () => {
+    const navigate = vi.fn()
+    navigateToUrl(
+      navigate as unknown as UseNavigateResult<string>,
+      '/project/123/logs/explorer?s=select%0A1&tag=a&tag=b#results',
+      { replace: true }
+    )
+
+    expect(navigate).toHaveBeenCalledWith({
+      to: '/project/123/logs/explorer',
+      search: { s: 'select\n1', tag: ['a', 'b'] },
+      hash: 'results',
+      replace: true,
+    })
+  })
+
+  it('uses reloadDocument for cross-origin and protocol-relative URLs', () => {
+    const navigate = vi.fn()
+    navigateToUrl(navigate as unknown as UseNavigateResult<string>, 'https://supabase.com/docs')
+    expect(navigate).toHaveBeenCalledWith({
+      href: 'https://supabase.com/docs',
+      reloadDocument: true,
+    })
+
+    navigateToUrl(navigate as unknown as UseNavigateResult<string>, '//example.com/docs', {
+      replace: true,
+    })
+    expect(navigate).toHaveBeenLastCalledWith({
+      href: `${window.location.protocol}//example.com/docs`,
+      reloadDocument: true,
+      replace: true,
+    })
   })
 })

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useRouter } from '@tanstack/react-router'
 import { PropsWithChildren, useCallback } from 'react'
 
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
@@ -12,7 +12,11 @@ export function usePrefetchProjectIndexPage() {
   return useCallback(
     ({ projectRef }: { projectRef?: string }) => {
       // Prefetch code
-      router.prefetch(`/project/${projectRef}`)
+      if (projectRef) {
+        void router
+          .preloadRoute({ to: '/project/$ref', params: { ref: projectRef } })
+          .catch(() => {})
+      }
 
       // Prefetch data
       prefetchProjectDetail(queryClient, {

@@ -1,4 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import type React from 'react'
@@ -8,6 +14,7 @@ import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import type { Organization } from '@/types'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
@@ -167,6 +174,14 @@ export const createMockOrgProject = ({
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
 const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [router] = useState(() =>
+    createRouter({
+      routeTree: createRootRoute(),
+      history: createMemoryHistory({ initialEntries: ['/'] }),
+      parseSearch,
+      stringifySearch,
+    })
+  )
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -179,11 +194,13 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
   )
 
   return (
-    <TooltipProvider>
-      <QueryClientProvider client={queryClient}>
-        <CommandProvider openKey="">{children}</CommandProvider>
-      </QueryClientProvider>
-    </TooltipProvider>
+    <RouterContextProvider router={router}>
+      <TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <CommandProvider openKey="">{children}</CommandProvider>
+        </QueryClientProvider>
+      </TooltipProvider>
+    </RouterContextProvider>
   )
 }
 type renderParams = Parameters<typeof originalRender>

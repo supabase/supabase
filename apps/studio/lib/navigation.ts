@@ -2,16 +2,40 @@ import type { AnyRouter, UseNavigateResult } from '@tanstack/react-router'
 import type { NextRouter } from 'next/router'
 
 import { BASE_PATH } from './constants'
-import { splitInternalUrl } from './internal-url'
+import { isAbsoluteUrl, splitInternalUrl } from './internal-url'
 
 type Router = NextRouter | UseNavigateResult<string>
 
 const MIDDLE_MOUSE_BUTTON = 1
 
-const navigateToUrl = (url: string, router: Router) => {
+export const navigateToUrl = (
+  navigate: UseNavigateResult<string>,
+  url: string,
+  options?: { replace?: boolean }
+) => {
+  const { to, search, hash } = splitInternalUrl(url)
+  if (isAbsoluteUrl(to)) {
+    const href =
+      to.startsWith('//') && typeof window !== 'undefined'
+        ? new URL(to, window.location.href).href
+        : to
+    return navigate({
+      href,
+      reloadDocument: true,
+      ...(options?.replace !== undefined && { replace: options.replace }),
+    })
+  }
+  return navigate<AnyRouter, string>({
+    to,
+    search: search ?? {},
+    hash: hash ?? '',
+    ...(options?.replace !== undefined && { replace: options.replace }),
+  })
+}
+
+const navigateWithRouter = (url: string, router: Router) => {
   if (typeof router === 'function') {
-    const { to, search, hash } = splitInternalUrl(url)
-    void router<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
+    void navigateToUrl(router, url)
   } else {
     router.push(url)
   }
@@ -54,7 +78,7 @@ export const createNavigationHandler = (url: string, router: Router) => {
         if (isModifierKey) {
           window.open(`${BASE_PATH}${url}`, '_blank')
         } else {
-          navigateToUrl(url, router)
+          navigateWithRouter(url, router)
         }
       }
       return
@@ -80,6 +104,6 @@ export const createNavigationHandler = (url: string, router: Router) => {
     // Regular left click only. Other aux buttons (e.g. right-click) must not navigate.
     if ('button' in event && event.button !== 0) return
 
-    navigateToUrl(url, router)
+    navigateWithRouter(url, router)
   }
 }

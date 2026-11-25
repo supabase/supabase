@@ -1,5 +1,5 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useRouter } from '@tanstack/react-router'
 import { PropsWithChildren, useCallback } from 'react'
 
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
@@ -76,7 +76,12 @@ export function usePrefetchEditorTablePage() {
       if (!project || !id || isNaN(id)) return
 
       // Prefetch the code
-      router.prefetch(`/project/${project.ref}/editor/${id}`)
+      void router
+        .preloadRoute({
+          to: '/project/$ref/editor/$id',
+          params: { ref: project.ref, id: String(id) },
+        })
+        .catch(() => {})
 
       // Prefetch the data
       prefetchEditorTablePage({

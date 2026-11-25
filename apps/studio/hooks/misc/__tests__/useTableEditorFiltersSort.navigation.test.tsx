@@ -21,8 +21,6 @@ import {
   TableEditorTableStateContext,
 } from '@/state/table-editor-table'
 
-vi.mock('next/router', () => import('@/compat/next/router'))
-
 function FilterSync() {
   useSyncFiltersToUrl()
   return null
