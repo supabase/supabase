@@ -159,6 +159,7 @@ Testing covers procedural content only. Claims that nothing executes, such as li
 Once it's scoped:
 
 - Crawl reader feedback for candidate gaps. Linear is an internal Supabase tool, preferred when available and not required for open-source contributors.
+- Before you add content, check the [content-type gate](../write-the-docs/reference/content-type-gate.md#what-goes-in-docs-and-what-goes-in-kb). Put situation-specific content and fixes for specific problems in `/kb`, and link to them from the page.
 - Ground additions the same way as PR 3. Read the code before making a behavior claim, and flag what you inferred.
 - **Run every new runnable snippet through [`test-the-docs`](../test-the-docs/SKILL.md) before it ships.** New content is where an untested snippet is likeliest to be wrong, because nothing has ever executed it.
 - Strip internal business context before the draft ships: PRD intent, roadmap speculation, and ticket discussion. It belongs in the PR description, not in the MDX.
