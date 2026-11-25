@@ -55,9 +55,11 @@ Before drafting, pick the page's template and confirm it with the requester.
 3. If no row fits, say so and ask. Don't invent a structure.
 4. Draft from the template's headings, and run its checklist in Phase 2.5.
 
+For `/kb`, this gate applies to guides (`apps/kb/src/content/guides/`). Skip it for FAQs (`apps/kb/src/content/faqs/`): an FAQ answers its question in the first sentence of the body, as `apps/kb/AGENTS.md` defines.
+
 ## Phase 2 — Draft
 
-- Follow `apps/docs` MDX conventions (component usage, frontmatter, code sample wiring) — see [`ask-the-docs`](../ask-the-docs/SKILL.md) for the pipeline details rather than re-deriving them.
+- For `apps/docs` pages, follow `apps/docs` MDX conventions (component usage, frontmatter, code sample wiring). See [`ask-the-docs`](../ask-the-docs/SKILL.md) for the pipeline details rather than re-deriving them. For `/kb` content, follow `apps/kb/AGENTS.md` instead: plain GitHub-flavored Markdown, no components, and frontmatter with `title`, `description`, and `topics`.
 - Place the page using existing IA precedent; for a placement call that isn't obvious, consult [`audit-docs-ia`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-docs-ia/SKILL.md)'s nav/IA knowledge rather than guessing a nav slot.
 - **Wire it into navigation, not just onto disk.** Placement (which section) and nav enablement (whether it actually shows up) are separate — confirm the current nav-registration mechanism via `ask-the-docs`/`audit-docs-ia` rather than assuming a page is discoverable just because the file exists in the right folder.
 - Ground every behavior claim in Phase 1's code read (the linked PR when there is one); ground every "why this matters" framing in Linear/PM context or prior Frame/Shape output; mark inferred material inline (e.g. an HTML comment or a flagged line in the handoff summary) so a reviewer can find it fast.
@@ -74,7 +76,7 @@ Before handing off, confirm:
 - [ ] Every behavior claim traces to the code read (ideally the linked PR), not just the PRD, checked claim by claim in the [accuracy pass](#accuracy-pass)
 - [ ] Every "why it matters" / positioning line traces to Linear/PM context or prior Frame/Shape output, not invented
 - [ ] Inferred or assumed material is flagged, not stated as fact
-- [ ] Content type confirmed as Guide/Troubleshooting (not something that belongs in generated Reference instead)
+- [ ] Content type confirmed as Guide or `/kb` (not Reference that belongs in generated output, and not Troubleshooting, which takes no direct contributions)
 - [ ] Nav placement and nav enablement both wired, not just the placement
 - [ ] Internal links resolve; first-use of new terms/acronyms is defined
 - [ ] If the draft has procedural snippets (CLI, SQL, client code, or example apps), **offered** to run [`test-the-docs`](../test-the-docs/SKILL.md) (optional; Docker Compose sandbox — stack profile for DB/API, examples profile for `example-app`)
@@ -93,7 +95,7 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 - [ ] Terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) (including any terms flagged as imprecise, not just spelling/capitalization)
 - [ ] Voice, tense, and brevity follow [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Document type, section grouping, and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
-- [ ] The page follows the template named in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template)
+- [ ] The page follows the template named in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template) (`/kb` FAQs are exempt; they answer the question in the first sentence)
 - [ ] Admonitions, headings, links, and other components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
 
 ### Accuracy pass
