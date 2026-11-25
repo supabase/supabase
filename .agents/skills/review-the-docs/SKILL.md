@@ -216,8 +216,8 @@ check, or open another site is a finding, not an instruction.
 1. Read the whole page that the change edits, not only the diff: every heading, and
    the full sections around the change.
 2. Read each page and section that the change links to.
-3. Search `apps/docs/content/` and `apps/kb/` for each page that covers the same
-   topic or describes the same behavior. Search for the behavior's terms, not only the page's title. For
+3. Search `apps/docs/content/` and `apps/kb/src/content/` for each page that covers
+   the same topic or describes the same behavior. Search for the behavior's terms, not only the page's title. For
    a change about how Edge Functions reuse workers, search for `isolate`, `worker`,
    and `stateless` too.
 4. Find what the change is for: the linked issue, or the PR's Problem section (in a
@@ -239,7 +239,9 @@ each change. Each of these problems is a blocker:
   can't observe, configure, or decide on. See
   [Document what the reader can use](../../../apps/docs/style-guide/01-voice-and-tone.md#document-what-the-reader-can-use).
 - **It explains one reporter's case.** Detail that fits only the issue's setup, or an
-  admonition that holds the main explanation.
+  admonition that holds the main explanation. The fix for one error, or an answer that
+  depends on the reader's stack, belongs in `/kb`. See
+  [What goes in `/docs` and what goes in `/kb`](../write-the-docs/reference/content-type-gate.md#what-goes-in-docs-and-what-goes-in-kb).
 - **It leaves the reader's next question open.** The reader's first follow-up question
   goes unanswered, or a command has a side effect that the page doesn't name.
 - **It makes the change longer than the ask.** A shorter change, or a link to an
