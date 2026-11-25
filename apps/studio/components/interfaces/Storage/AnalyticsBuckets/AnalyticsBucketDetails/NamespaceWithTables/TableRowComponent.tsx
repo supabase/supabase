@@ -102,6 +102,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                 loading={isDeletingNamespaceTable}
                 className="w-7"
                 icon={<MoreVerticalIcon />}
+                aria-label={`Actions for ${table.name}`}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
@@ -140,7 +141,11 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <InsertDataDialog table={table.name} fdwTable={x} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-7" icon={<MoreVerticalIcon />} />
+                <Button
+                  className="w-7"
+                  icon={<MoreVerticalIcon />}
+                  aria-label={`Actions for ${x.schema}.${x.name}`}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-fit min-w-[180px]" align="end">
                 <DropdownMenuItem asChild className="flex items-center gap-x-2">

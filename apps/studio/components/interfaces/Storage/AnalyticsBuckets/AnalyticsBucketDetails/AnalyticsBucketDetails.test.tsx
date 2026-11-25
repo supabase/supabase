@@ -204,7 +204,7 @@ describe('Analytics Buckets after Pipelines retirement', () => {
     )
     expect(await screen.findByText('analytics.events')).toBeInTheDocument()
     expect(screen.queryByText('Replication Status')).not.toBeInTheDocument()
-    const tableRow = screen.getByRole('row', { name: 'events' })
+    const tableRow = screen.getByRole('row', { name: /^events/ })
     await userEvent.click(within(tableRow).getByRole('button'))
     expect(screen.queryByRole('menuitem', { name: /replication/i })).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete table' }))
@@ -217,5 +217,21 @@ describe('Analytics Buckets after Pipelines retirement', () => {
       'DELETE /platform/storage/default/analytics-buckets/bucket/namespaces/public/tables/events'
     )
     expect(requests.filter((request) => request.includes('/replication/'))).toEqual([])
+  })
+
+  it('names the icon-only action buttons after the namespace and table they act on', async () => {
+    customRender(
+      <NamespaceWithTables
+        namespace="public"
+        schema="analytics"
+        tables={[]}
+        wrapperValues={{ warehouse: 'bucket' }}
+      />
+    )
+    expect(await screen.findByText('analytics.events')).toBeInTheDocument()
+
+    expect(screen.getByRole('button', { name: 'Actions for namespace public' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Actions for events' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Actions for analytics.events' })).toBeInTheDocument()
   })
 })

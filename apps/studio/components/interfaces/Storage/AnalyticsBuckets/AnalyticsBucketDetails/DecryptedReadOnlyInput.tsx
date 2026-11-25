@@ -56,6 +56,7 @@ export const DecryptedReadOnlyInput = ({
                   <Link
                     target="_blank"
                     rel="noreferrer noopener"
+                    aria-label={`Open ${label} in Vault`}
                     href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
                   >
                     <ExternalLinkIcon
@@ -82,7 +83,12 @@ export const DecryptedReadOnlyInput = ({
             secureEntry ? (
               isLoading ? (
                 <div className="flex items-center justify-center">
-                  <Button disabled className="w-7" icon={<LoaderIcon className="animate-spin" />} />
+                  <Button
+                    disabled
+                    className="w-7"
+                    icon={<LoaderIcon className="animate-spin" />}
+                    aria-label={`Fetching ${label}`}
+                  />
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
@@ -90,6 +96,7 @@ export const DecryptedReadOnlyInput = ({
                     className="w-7"
                     loading={showHidden && isDecryptedValueLoading}
                     icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
+                    aria-label={`${showHidden ? 'Hide' : 'Show'} ${label}`}
                     onClick={() => setShowHidden(!showHidden)}
                   />
                 </div>
