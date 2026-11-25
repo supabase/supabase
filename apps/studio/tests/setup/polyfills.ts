@@ -67,6 +67,13 @@ if (typeof window.localStorage?.getItem !== 'function') {
 }
 
 window.HTMLElement.prototype.hasPointerCapture = vi.fn()
+window.HTMLElement.prototype.scrollIntoView = () => {}
+
+window.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
 
 // base ui scroll area calls getAnimations, which jsdom does not have
 window.Element.prototype.getAnimations ??= () => []

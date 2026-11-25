@@ -109,7 +109,7 @@ Choose the appropriate environment and avoid unnecessary work in interactions.
   use `.test.tsx` rather than adding an environment directive.
 - `.platform.test.tsx` files run with `NEXT_PUBLIC_IS_PLATFORM=true`.
 
-DOM setup files (`tests/setup/dom.ts`, `tests/setup/radix.js`) no-op in node.
+The DOM setup file (`tests/setup/dom.ts`) no-ops in node.
 
 ### Never wait on real time
 
