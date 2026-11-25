@@ -229,3 +229,67 @@ export const formatWarehouseDuration = (seconds: number): string => {
 }
 
 export const formatWarehousePaused = (value: number) => (value > 0 ? 'Paused' : 'Not paused')
+
+const HEX_PART = /^(?:[0-9a-f]{2})+$/i
+
+const decodeHexPart = (hex: string) => {
+  if (!HEX_PART.test(hex)) return undefined
+  try {
+    return decodeURIComponent(hex.replace(/../g, '%$&'))
+  } catch {
+    return undefined
+  }
+}
+
+// Keys come from ETL's `DuckLakeTableName::id()`: `v2:<namespace>:<schema>:<table>`, hex-encoded.
+export const decodeWarehouseTableKey = (key: string): { namespace?: string; name: string } => {
+  const parts = key.split(':')
+  if (parts.length === 4 && parts[0] === 'v2') {
+    const [namespace, schema, table] = parts.slice(1).map(decodeHexPart)
+    if (namespace !== undefined && schema !== undefined && table !== undefined) {
+      return { namespace, name: `${schema}.${table}` }
+    }
+  }
+  return { name: key }
+}
+
+export type WarehouseInlinedTableRow = {
+  key: string
+  name: string
+  latest: number
+  peak: number
+}
+
+export const getWarehouseInlinedTableRows = (
+  metric?: WarehouseMetric
+): WarehouseInlinedTableRow[] => {
+  const measured = (metric?.series ?? []).flatMap((series, index) => {
+    const points = series.points.filter(
+      (point): point is { timestamp: number; value: number } =>
+        point.value !== null && Number.isFinite(point.value)
+    )
+    if (points.length === 0) return []
+    const latest = points.reduce((a, b) => (b.timestamp > a.timestamp ? b : a)).value
+    const peak = Math.max(...points.map((point) => point.value))
+    const tableKey = series.labels.table
+    const decoded =
+      tableKey === undefined ? { name: 'Unknown table' } : decodeWarehouseTableKey(tableKey)
+    return [{ key: String(index), decoded, pipelineId: series.labels.pipeline_id, latest, peak }]
+  })
+
+  const hasManyNamespaces = new Set(measured.map((row) => row.decoded.namespace)).size > 1
+  const hasManyPipelines = new Set(measured.map((row) => row.pipelineId)).size > 1
+
+  return measured
+    .map(({ key, decoded, pipelineId, latest, peak }) => ({
+      key,
+      name: [
+        hasManyNamespaces && decoded.namespace !== undefined ? `${decoded.namespace} · ` : '',
+        decoded.name,
+        hasManyPipelines && pipelineId !== undefined ? ` · Pipeline ${pipelineId}` : '',
+      ].join(''),
+      latest,
+      peak,
+    }))
+    .sort((a, b) => b.latest - a.latest || b.peak - a.peak || a.name.localeCompare(b.name))
+}

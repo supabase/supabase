@@ -240,10 +240,11 @@ test('keeps section errors recoverable', async () => {
   expect(screen.getByRole('status')).toHaveTextContent('Could not load replication metrics')
 })
 
-test('keeps the largest tables when more than twelve tables report inlined data', async () => {
+test('lists the largest inlined tables with decoded names', async () => {
+  const hex = (value: string) => Buffer.from(value).toString('hex')
   const tables = Array.from({ length: 13 }, (_, index) => ({
     pipeline_id: '1',
-    table: `public.table_${index.toString().padStart(2, '0')}`,
+    table: `v2:${hex('lake')}:${hex('public')}:${hex(`table_${index.toString().padStart(2, '0')}`)}`,
   }))
   addWarehouseMetricsMock(() =>
     HttpResponse.json<WarehouseMetricsResponse>({
@@ -262,10 +263,17 @@ test('keeps the largest tables when more than twelve tables report inlined data'
   )
   renderWithClient(<WarehouseInlinedDataSection range={range} />)
 
-  const chart = await screen.findByRole('region', { name: 'Inlined data by table' })
-  expect(await within(chart).findByText('Showing 12 of 13 series')).toBeInTheDocument()
-  expect(within(chart).queryByText('Inlined data by table · public.table_00')).toBeNull()
-  expect(within(chart).getByText('Inlined data by table · public.table_01')).toBeInTheDocument()
+  const region = await screen.findByRole('region', { name: 'Inlined data by table' })
+  expect(await within(region).findByText('Showing 10 of 13 tables')).toBeInTheDocument()
+
+  // The header row is a row too.
+  const rows = within(region).getAllByRole('row')
+  expect(rows).toHaveLength(11)
+  expect(within(rows[1]).getByText('public.table_01')).toBeInTheDocument()
+  expect(within(rows[1]).getAllByText('99 KB')).toHaveLength(2)
+  expect(within(rows[10]).getByText('public.table_10')).toBeInTheDocument()
+  expect(within(region).queryByText('public.table_00')).toBeNull()
+  expect(within(region).queryByText(/v2:/)).toBeNull()
 })
 
 test('requests section metrics only after the section scrolls into view', async () => {

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import {
+  decodeWarehouseTableKey,
   expandWarehouseChartSeries,
   formatWarehouseBytes,
   formatWarehouseBytesPerSecond,
@@ -13,6 +14,7 @@ import {
   formatWarehousePerSecond,
   formatWarehouseRatio,
   formatWarehouseUnitValue,
+  getWarehouseInlinedTableRows,
   WAREHOUSE_ETL_LABEL_PROPS,
 } from './WarehouseMetricChart.utils'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
@@ -272,5 +274,152 @@ describe('warehouse number formatting', () => {
     } finally {
       spy.mockRestore()
     }
+  })
+})
+
+const hex = (value: string) => Buffer.from(value).toString('hex')
+
+describe('decodeWarehouseTableKey', () => {
+  test('decodes a namespaced key, including non-ASCII names', () => {
+    expect(
+      decodeWarehouseTableKey(`v2:${hex('lake')}:${hex('public')}:${hex('tâble_é 表')}`)
+    ).toEqual({ namespace: 'lake', name: 'public.tâble_é 表' })
+  })
+
+  test('keeps legacy schema.table keys', () => {
+    expect(decodeWarehouseTableKey('public.orders')).toEqual({ name: 'public.orders' })
+  })
+
+  test.each([
+    ['malformed hex', `v2:${hex('a')}:zz:${hex('c')}`],
+    ['odd-length hex', `v2:${hex('a')}:abc:${hex('c')}`],
+    ['empty part', `v2:${hex('a')}::${hex('c')}`],
+    ['invalid UTF-8', `v2:${hex('a')}:ff:${hex('c')}`],
+    ['too few parts', `v2:${hex('a')}:${hex('b')}`],
+    ['too many parts', `v2:${hex('a')}:${hex('b')}:${hex('c')}:${hex('d')}`],
+    ['unknown version', `v3:${hex('a')}:${hex('b')}:${hex('c')}`],
+  ])('falls back to the raw key for %s', (_, key) => {
+    expect(decodeWarehouseTableKey(key)).toEqual({ name: key })
+  })
+})
+
+describe('getWarehouseInlinedTableRows', () => {
+  const inlinedMetric = (
+    series: {
+      labels: Record<string, string>
+      points: { timestamp: number; value: number | null }[]
+    }[]
+  ): WarehouseMetric => ({
+    ...metricWithSeries([]),
+    series: series.map((item) => ({
+      ...item,
+      coverage: { returned_points: item.points.length, expected_points: item.points.length },
+    })),
+  })
+
+  test('returns no rows without a metric', () => {
+    expect(getWarehouseInlinedTableRows(undefined)).toEqual([])
+  })
+
+  test('uses the latest timestamp for latest, even when points are out of order', () => {
+    const [row] = getWarehouseInlinedTableRows(
+      inlinedMetric([
+        {
+          labels: { table: 'public.a' },
+          points: [
+            { timestamp: 300, value: 5 },
+            { timestamp: 100, value: 50 },
+            { timestamp: 200, value: 20 },
+          ],
+        },
+      ])
+    )
+    expect(row).toMatchObject({ name: 'public.a', latest: 5, peak: 50 })
+  })
+
+  test('skips null and non-finite values and drops series without values', () => {
+    const rows = getWarehouseInlinedTableRows(
+      inlinedMetric([
+        {
+          labels: { table: 'public.a' },
+          points: [
+            { timestamp: 100, value: 7 },
+            { timestamp: 200, value: null },
+            { timestamp: 300, value: Number.NaN },
+            { timestamp: 400, value: Number.POSITIVE_INFINITY },
+          ],
+        },
+        { labels: { table: 'public.empty' }, points: [] },
+        { labels: { table: 'public.nulls' }, points: [{ timestamp: 100, value: null }] },
+      ])
+    )
+    expect(rows).toEqual([{ key: '0', name: 'public.a', latest: 7, peak: 7 }])
+  })
+
+  test('sorts by latest, then peak, then name', () => {
+    const point = (value: number) => [{ timestamp: 100, value }]
+    const rows = getWarehouseInlinedTableRows(
+      inlinedMetric([
+        { labels: { table: 'public.small' }, points: point(1) },
+        { labels: { table: 'public.b' }, points: point(10) },
+        { labels: { table: 'public.a' }, points: point(10) },
+        {
+          labels: { table: 'public.peaky' },
+          points: [
+            { timestamp: 100, value: 99 },
+            { timestamp: 200, value: 10 },
+          ],
+        },
+        { labels: { table: 'public.big' }, points: point(500) },
+      ])
+    )
+    expect(rows.map((row) => row.name)).toEqual([
+      'public.big',
+      'public.peaky',
+      'public.a',
+      'public.b',
+      'public.small',
+    ])
+    expect(new Set(rows.map((row) => row.key)).size).toBe(5)
+  })
+
+  test('uses a fallback name for series without a table label', () => {
+    const [row] = getWarehouseInlinedTableRows(
+      inlinedMetric([{ labels: {}, points: [{ timestamp: 100, value: 1 }] }])
+    )
+    expect(row.name).toBe('Unknown table')
+  })
+
+  test('shows namespace and pipeline only when they differ between rows', () => {
+    const points = [{ timestamp: 100, value: 1 }]
+    const key = (namespace: string) => `v2:${hex(namespace)}:${hex('public')}:${hex('t')}`
+
+    expect(
+      getWarehouseInlinedTableRows(
+        inlinedMetric([
+          { labels: { pipeline_id: '1', table: key('lake') }, points },
+          { labels: { pipeline_id: '1', table: key('lake') }, points },
+        ])
+      ).map((row) => row.name)
+    ).toEqual(['public.t', 'public.t'])
+
+    expect(
+      getWarehouseInlinedTableRows(
+        inlinedMetric([
+          { labels: { pipeline_id: '1', table: key('one') }, points },
+          { labels: { pipeline_id: '2', table: key('one') }, points },
+        ])
+      ).map((row) => row.name)
+    ).toEqual(['public.t · Pipeline 1', 'public.t · Pipeline 2'])
+
+    expect(
+      getWarehouseInlinedTableRows(
+        inlinedMetric([
+          { labels: { pipeline_id: '1', table: key('one') }, points },
+          { labels: { pipeline_id: '1', table: key('two') }, points },
+          { labels: { pipeline_id: '1', table: 'public.legacy' }, points },
+        ])
+      ).map((row) => row.name)
+    ).toEqual(['one · public.t', 'public.legacy', 'two · public.t'])
   })
 })

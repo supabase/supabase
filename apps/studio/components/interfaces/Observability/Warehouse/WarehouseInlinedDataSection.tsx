@@ -1,6 +1,6 @@
+import { WarehouseInlinedDataTable } from './WarehouseInlinedDataTable'
 import { WarehouseMetricChart } from './WarehouseMetricChart'
 import {
-  formatWarehouseBytes,
   formatWarehouseCount,
   formatWarehouseDuration,
   formatWarehousePerMinute,
@@ -31,13 +31,13 @@ export const WarehouseInlinedDataSection = ({
   >
     {(getMetric) => (
       <div className="grid gap-4 md:grid-cols-2">
-        <WarehouseMetricChart
-          {...WAREHOUSE_ETL_LABEL_PROPS}
-          title="Inlined data by table"
-          description="Inlined data not yet flushed to data files, for the largest tables at the end of the period. Values come from periodic samples."
-          metric={getMetric('table_inlined_data_bytes')}
-          formatValue={formatWarehouseBytes}
-        />
+        <div className="min-w-0 md:col-span-2">
+          <WarehouseInlinedDataTable
+            title="Inlined data by table"
+            description="Inlined data not yet flushed to data files, for the largest tables at the end of the period. Latest and peak sizes come from periodic samples."
+            metric={getMetric('table_inlined_data_bytes')}
+          />
+        </div>
         <WarehouseMetricChart
           {...WAREHOUSE_ETL_LABEL_PROPS}
           title="Rows flushed"
