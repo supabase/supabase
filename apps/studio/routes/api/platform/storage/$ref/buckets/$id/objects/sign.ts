@@ -1,46 +1,35 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-  const { path, expiresIn = 60 * 60 * 24 } = req.body
-
-  const { data, error } = await supabase.storage.from(id as string).createSignedUrl(path, expiresIn)
-  if (error) {
-    return res.status(400).json({ error: { message: error.message } })
-  }
-
-  // change the domain name to the SUPABASE_PUBLIC_URL since SUPABASE_URL is not accessible from the client
-  const signedUrl = new URL(data.signedUrl)
-  const parsed = new URL(process.env.SUPABASE_PUBLIC_URL!)
-  signedUrl.protocol = parsed.protocol
-  signedUrl.host = parsed.host
-  signedUrl.port = parsed.port
-  data.signedUrl = signedUrl.href
-
-  return res.status(200).json(data)
-}
-
-const webHandler = toWebHandler(nextHandler)
-
 export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/objects/sign')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: async ({ request, params }) => {
+        const { path, expiresIn = 60 * 60 * 24 } = await parseJsonBody<{
+          path: string
+          expiresIn?: number
+        }>(request)
+
+        const { data, error } = await supabase.storage
+          .from(params.id as string)
+          .createSignedUrl(path, expiresIn)
+        if (error) {
+          return Response.json({ error: { message: error.message } }, { status: 400 })
+        }
+
+        // change the domain name to the SUPABASE_PUBLIC_URL since SUPABASE_URL is not accessible from the client
+        const signedUrl = new URL(data.signedUrl)
+        const parsed = new URL(process.env.SUPABASE_PUBLIC_URL!)
+        signedUrl.protocol = parsed.protocol
+        signedUrl.host = parsed.host
+        signedUrl.port = parsed.port
+        data.signedUrl = signedUrl.href
+
+        return Response.json(data, { status: 200 })
+      },
+    }),
+  },
 })

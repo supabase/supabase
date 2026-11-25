@@ -1,72 +1,52 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    case 'PATCH':
-      return handlePatch(req, res)
-    case 'DELETE':
-      return handleDelete(req, res)
-    default:
-      res.setHeader('Allow', ['GET', 'PATCH', 'DELETE'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
+interface UpdateBucketBody {
+  public: boolean
+  allowed_mime_types?: string[] | null
+  file_size_limit?: number | string | null
 }
-
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-
-  const { data, error } = await supabase.storage.getBucket(id as string)
-  if (error) {
-    return res.status(400).json({ error: { message: error.message } })
-  }
-
-  return res.status(200).json(data)
-}
-
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-  const {
-    public: isPublicBucket,
-    allowed_mime_types: allowedMimeTypes,
-    file_size_limit: fileSizeLimit,
-  } = req.body
-
-  const { data, error } = await supabase.storage.updateBucket(id as string, {
-    public: isPublicBucket,
-    allowedMimeTypes,
-    fileSizeLimit,
-  })
-  if (error) {
-    return res.status(400).json({ error: { message: error.message } })
-  }
-
-  return res.status(200).json(data)
-}
-
-const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-
-  const { data, error } = await supabase.storage.deleteBucket(id as string)
-  if (error) {
-    return res.status(400).json({ error: { message: error.message } })
-  }
-
-  return res.status(200).json(data)
-}
-
-const webHandler = toWebHandler(nextHandler)
 
 export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/')({
-  server: { handlers: { GET: webHandler, PATCH: webHandler, DELETE: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async ({ params }) => {
+        const { data, error } = await supabase.storage.getBucket(params.id as string)
+        if (error) {
+          return Response.json({ error: { message: error.message } }, { status: 400 })
+        }
+
+        return Response.json(data, { status: 200 })
+      },
+      PATCH: async ({ request, params }) => {
+        const {
+          public: isPublicBucket,
+          allowed_mime_types: allowedMimeTypes,
+          file_size_limit: fileSizeLimit,
+        } = await parseJsonBody<UpdateBucketBody>(request)
+
+        const { data, error } = await supabase.storage.updateBucket(params.id as string, {
+          public: isPublicBucket,
+          allowedMimeTypes,
+          fileSizeLimit,
+        })
+        if (error) {
+          return Response.json({ error: { message: error.message } }, { status: 400 })
+        }
+
+        return Response.json(data, { status: 200 })
+      },
+      DELETE: async ({ params }) => {
+        const { data, error } = await supabase.storage.deleteBucket(params.id as string)
+        if (error) {
+          return Response.json({ error: { message: error.message } }, { status: 400 })
+        }
+
+        return Response.json(data, { status: 200 })
+      },
+    }),
+  },
 })

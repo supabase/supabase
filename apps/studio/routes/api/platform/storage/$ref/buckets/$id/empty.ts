@@ -1,37 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-
-  const { data, error } = await supabase.storage.emptyBucket(id as string)
-  if (error) {
-    return res.status(400).json({ error: { message: error.message } })
-  }
-
-  return res.status(200).json(data)
-}
-
-const webHandler = toWebHandler(nextHandler)
-
 export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/empty')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: async ({ params }) => {
+        const { data, error } = await supabase.storage.emptyBucket(params.id as string)
+        if (error) {
+          return Response.json({ error: { message: error.message } }, { status: 400 })
+        }
+
+        return Response.json(data, { status: 200 })
+      },
+    }),
+  },
 })

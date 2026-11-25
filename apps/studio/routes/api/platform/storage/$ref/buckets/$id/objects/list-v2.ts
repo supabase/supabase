@@ -1,40 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-function listV2Route(req: NextApiRequest, res: NextApiResponse) {
-  return apiWrapper(req, res, handler)
-}
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-
-  const { data, error } = await supabase.storage.from(id as string).listV2(req.body)
-  if (error) {
-    return res.status(500).json({ error: error.message })
-  }
-
-  return res.status(200).json(data)
-}
-
-const webHandler = toWebHandler(listV2Route)
+type ListV2Options = Parameters<ReturnType<typeof supabase.storage.from>['listV2']>[0]
 
 export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/objects/list-v2')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: async ({ request, params }) => {
+        const body = await parseJsonBody<ListV2Options>(request)
+
+        const { data, error } = await supabase.storage.from(params.id as string).listV2(body)
+        if (error) {
+          return Response.json({ error: error.message }, { status: 500 })
+        }
+
+        return Response.json(data, { status: 200 })
+      },
+    }),
+  },
 })
