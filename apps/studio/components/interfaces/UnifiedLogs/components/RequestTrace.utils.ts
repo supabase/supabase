@@ -16,12 +16,24 @@ function toSpanStatus(statusCode: string): SpanStatus {
 }
 
 /**
+ * `Date.parse` only resolves to whole milliseconds, so two spans a sub-millisecond apart would
+ * otherwise round to the same instant and render stacked on top of each other. This adds back
+ * whatever precision the ISO string carries past the 3rd decimal place as a fractional ms.
+ */
+function parseStartMs(startTime: string): number {
+  const ms = Date.parse(startTime)
+  if (Number.isNaN(ms)) return ms
+  const subMsDigits = startTime.match(/\.\d{3}(\d+)/)?.[1]
+  return subMsDigits ? ms + Number(`0.${subMsDigits}`) : ms
+}
+
+/**
  * A span the waterfall can place. Returns null when `start_time` is unparseable: there is no
  * honest position for it, and a NaN start would poison the trace's time bounds.
  */
 function toSpan(span: TraceSpan, traceId: string): Span | null {
   const { attributes } = span
-  const startMs = Date.parse(attributes.start_time)
+  const startMs = parseStartMs(attributes.start_time)
   if (Number.isNaN(startMs)) return null
 
   // `endMs: null` means "still running" to the Trace primitives, which would extend the bar to

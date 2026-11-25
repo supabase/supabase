@@ -70,6 +70,21 @@ describe('toTraceData', () => {
     expect(trace.spans[0].endMs).toBe(trace.spans[0].startMs)
   })
 
+  test('keeps sub-millisecond precision so two close spans do not collapse onto the same start', () => {
+    const { trace } = toTraceData(
+      't',
+      response([
+        span({ id: 'a', start_time: '2026-01-01T10:00:00.1230000Z' }),
+        span({ id: 'b', start_time: '2026-01-01T10:00:00.1238000Z' }),
+      ])
+    )
+    const [a, b] = trace.spans
+    expect(a.startMs).not.toBe(b.startMs)
+    // float64 can't hold a full ms-scale epoch plus a sub-ms fraction to more than ~4 decimal
+    // digits of precision — close enough to preserve ordering, which is the point here.
+    expect(b.startMs - a.startMs).toBeCloseTo(0.8, 2)
+  })
+
   test('passes a parent through untouched so the index can promote orphans itself', () => {
     const { trace } = toTraceData(
       't',
