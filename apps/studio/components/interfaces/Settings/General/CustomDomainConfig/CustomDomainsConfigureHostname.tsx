@@ -23,6 +23,7 @@ import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-m
 import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),
@@ -30,6 +31,7 @@ const schema = z.object({
 
 export const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
+  const track = useTrack()
 
   const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
@@ -52,6 +54,7 @@ export const CustomDomainsConfigureHostname = () => {
   const onCreateCustomDomain = async (values: z.infer<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
 
+    track('custom_domain_step_submitted', { step: 'configure' })
     checkCNAMERecord(
       { domain: values.domain.trim() },
       {
@@ -147,6 +150,7 @@ export const CustomDomainsConfigureHostname = () => {
             <Button
               variant="primary"
               type="submit"
+              data-attr="custom-domain-step"
               loading={isSubmitting}
               disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
             >

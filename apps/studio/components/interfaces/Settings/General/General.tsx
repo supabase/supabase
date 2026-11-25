@@ -28,9 +28,11 @@ import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const General = () => {
   const { ref } = useParams()
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const isBranch = Boolean(project?.parent_project_ref)
   const entityLabel = isBranch ? 'Branch' : 'Project'
@@ -78,6 +80,7 @@ export const General = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
 
+    track('project_name_updated')
     updateProject(
       { ref: project.ref, name: values.name.trim() },
       {
@@ -227,7 +230,16 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <PasswordInput copy readOnly size="small" value={project.ref} />
+                        <PasswordInput
+                          copy
+                          readOnly
+                          size="small"
+                          value={project.ref}
+                          data-attr="project-settings-copy"
+                          onCopy={() =>
+                            track('project_settings_value_copied', { field: 'projectRef' })
+                          }
+                        />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
@@ -240,7 +252,14 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <PasswordInput copy readOnly size="small" value={project.region} />
+                        <PasswordInput
+                          copy
+                          readOnly
+                          size="small"
+                          value={project.region}
+                          data-attr="project-settings-copy"
+                          onCopy={() => track('project_settings_value_copied', { field: 'region' })}
+                        />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
@@ -258,6 +277,7 @@ export const General = () => {
                     <Button
                       variant="primary"
                       type="submit"
+                      data-attr="project-name-save"
                       disabled={
                         !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
                       }

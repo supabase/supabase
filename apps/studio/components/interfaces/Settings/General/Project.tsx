@@ -81,7 +81,7 @@ export const Project = () => {
                       <Link href={`/project/${project?.ref}`}>View project dashboard</Link>
                     </Button>
                   ) : (
-                    <ResumeProjectButton />
+                    <ResumeProjectButton source="settings_general" />
                   )
                 ) : (
                   <RestartServerButton />

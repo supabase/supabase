@@ -12,6 +12,7 @@ import { useCustomDomainActivateMutation } from '@/data/custom-domains/custom-do
 import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -19,6 +20,7 @@ export type CustomDomainActivateProps = {
 }
 
 export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
+  const track = useTrack()
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -43,6 +45,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
+    track('custom_domain_step_submitted', { step: 'activate' })
     checkCNAMERecord(
       { domain: customDomain.hostname },
       { onSuccess: () => activateCustomDomain({ projectRef }) }
@@ -98,6 +101,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
               </Button>
               <Button
                 variant="primary"
+                data-attr="custom-domain-step"
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"

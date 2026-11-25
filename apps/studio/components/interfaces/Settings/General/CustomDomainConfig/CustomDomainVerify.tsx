@@ -15,9 +15,11 @@ import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-doma
 import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyQuery } from '@/data/custom-domains/custom-domains-reverify-query'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -64,6 +66,7 @@ export const CustomDomainVerify = () => {
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
+    track('custom_domain_step_submitted', { step: 'verify' })
     refetchReverify()
   }
 
@@ -179,6 +182,7 @@ export const CustomDomainVerify = () => {
             <Button
               variant="primary"
               icon={<RefreshCwIcon />}
+              data-attr="custom-domain-step"
               onClick={onReverifyCustomDomain}
               loading={!isValidating && isReverifyLoading}
               disabled={isDeleting || isReverifyLoading || isValidating}

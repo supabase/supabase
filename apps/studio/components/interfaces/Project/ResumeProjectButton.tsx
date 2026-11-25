@@ -36,6 +36,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z.object({
   postgresVersionSelection: z.string(),
@@ -46,6 +47,8 @@ type ResumeProjectButtonProps = Pick<
   'className' | 'size' | 'variant'
 > & {
   label?: string
+  /** Where the button is rendered, sent with the resume telemetry event */
+  source: 'settings_general' | 'project_home'
 }
 
 export const ResumeProjectButton = ({
@@ -53,8 +56,10 @@ export const ResumeProjectButton = ({
   label = 'Resume project',
   size,
   variant = 'default',
+  source,
 }: ResumeProjectButtonProps) => {
   const router = useRouter()
+  const track = useTrack()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -140,6 +145,8 @@ export const ResumeProjectButton = ({
       return toast.error('Unable to restore: project is required')
     }
 
+    track('project_lifecycle_action_submitted', { action: 'resume', source })
+
     if (!newProjectInternalOnlyConfiguration) {
       return restoreProject({ ref: project.ref })
     }
@@ -177,6 +184,7 @@ export const ResumeProjectButton = ({
         className={className}
         size={size}
         variant={variant}
+        data-attr="project-resume"
         disabled={buttonDisabled}
         loading={isRestoring}
         onClick={onSelectRestore}

@@ -2868,6 +2868,96 @@ export interface BranchDeleteButtonClickedEvent {
 }
 
 /**
+ * Triggered when a user saves a new project name in project settings.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectNameUpdatedEvent {
+  action: 'project_name_updated'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user copies the project ID or region from project settings.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectSettingsValueCopiedEvent {
+  action: 'project_settings_value_copied'
+  properties: {
+    /**
+     * The field that was copied
+     */
+    field: 'projectRef' | 'region'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user confirms a project lifecycle action: a full project restart, a fast
+ * database reboot, a pause, a resume, or a transfer to another organization.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general or /dashboard/project/{ref} (resume from the paused project state)
+ */
+export interface ProjectLifecycleActionSubmittedEvent {
+  action: 'project_lifecycle_action_submitted'
+  properties: {
+    /**
+     * The lifecycle action the user confirmed
+     */
+    action: 'restart_project' | 'restart_database' | 'pause' | 'resume' | 'transfer'
+    /**
+     * Where the action was confirmed from
+     */
+    source: 'settings_general' | 'project_home'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user toggles the high compliance (sensitive data) mode of a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectComplianceModeUpdatedEvent {
+  action: 'project_compliance_mode_updated'
+  properties: {
+    /**
+     * Whether the project is marked as storing sensitive data after the toggle
+     */
+    isSensitive: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user submits a step of the custom domain flow: adding the hostname,
+ * verifying its DNS records, activating it, or deleting the active custom domain.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface CustomDomainStepSubmittedEvent {
+  action: 'custom_domain_step_submitted'
+  properties: {
+    /**
+     * The step of the custom domain flow that was submitted
+     */
+    step: 'configure' | 'verify' | 'activate' | 'remove'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Triggered when a create merge request is clicked for a branch.
  *
  * @group Events
@@ -5342,6 +5432,11 @@ export type TelemetryEvent =
   | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
+  | ProjectNameUpdatedEvent
+  | ProjectSettingsValueCopiedEvent
+  | ProjectLifecycleActionSubmittedEvent
+  | ProjectComplianceModeUpdatedEvent
+  | CustomDomainStepSubmittedEvent
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent

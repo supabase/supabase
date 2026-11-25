@@ -142,7 +142,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       {isPauseStatusSuccess && !isRestoreDisabled && (
         <>
           <CardFooter className="flex flex-wrap justify-end items-center gap-2">
-            <ResumeProjectButton size="tiny" variant="default" />
+            <ResumeProjectButton size="tiny" variant="default" source="project_home" />
 
             {isFreePlan ? (
               <UpgradePlanButton source="projectPausedStateRestore" />
