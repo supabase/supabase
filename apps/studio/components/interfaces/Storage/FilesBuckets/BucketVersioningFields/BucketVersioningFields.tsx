@@ -78,7 +78,7 @@ export const BucketVersioningFields = ({
               label={
                 <span className="flex items-center gap-x-2">
                   Object versioning
-                  <Badge variant="warning">Private Alpha</Badge>
+                  <Badge variant="warning">Public Alpha</Badge>
                 </span>
               }
               description="Retains previous versions of an object when it is overwritten or deleted"

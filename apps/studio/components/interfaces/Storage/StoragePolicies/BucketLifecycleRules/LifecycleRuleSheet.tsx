@@ -250,7 +250,7 @@ export const LifecycleRuleSheet = ({
                   layout="vertical"
                   label="Scope"
                   labelOptional={<code className="text-xs">filter</code>}
-                  description="Rules apply to every object in the bucket. Prefix filters aren't supported in private alpha."
+                  description="Rules apply to every object in the bucket. Prefix filters aren't supported yet."
                 >
                   <Input readOnly disabled value="Whole bucket" aria-label="Scope" />
                 </FormItemLayout>

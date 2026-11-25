@@ -46,7 +46,7 @@ export const StorageVersioningPreview = () => {
       </div>
 
       <p className="text-sm text-foreground-light mt-4!">
-        Object versioning is in <em>Private Alpha</em>. It stays off for every bucket until you turn
+        Object versioning is in <em>Public Alpha</em>. It stays off for every bucket until you turn
         it on, and turning it off later suspends it without removing the versions you already have.
       </p>
     </div>
