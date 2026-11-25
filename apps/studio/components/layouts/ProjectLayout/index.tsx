@@ -1,7 +1,6 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
   forwardRef,
@@ -302,10 +301,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     return (
       <>
-        <Head>
-          <title>{pageTitle}</title>
-          <meta name="description" content="Supabase Studio" />
-        </Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
         <div className="flex flex-row h-full w-full">
           <ResizablePanelGroup orientation="horizontal">
             {productMenu && sideBarIsOpen && (
