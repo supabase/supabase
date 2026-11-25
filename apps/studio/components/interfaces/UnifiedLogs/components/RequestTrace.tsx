@@ -28,14 +28,22 @@ function useRequestTraceId(row: ColumnSchema, projectRef: string | undefined) {
     })
   )
 
-  const traceId = data
+  // The selected log's own trace ID wins; a related log's trace ID is only used as a fallback,
+  // and only when there's exactly one candidate — picking among several would be a guess.
+  const ownTraceId = getRequestCorrelationIds([
+    { source: getLogTypeSource(row.log_type) ?? '', attributes: row.metadata },
+  ]).traceIds[0]
+
+  const relatedTraceIds = data
     ? getRequestCorrelationIds(
         data.logs.map((log) => ({
           source: getLogTypeSource(log.log_type) ?? '',
           attributes: log.metadata,
         }))
-      ).traceIds[0]
-    : undefined
+      ).traceIds
+    : []
+
+  const traceId = ownTraceId ?? (relatedTraceIds.length === 1 ? relatedTraceIds[0] : undefined)
 
   return { traceId, isResolving: isLoading }
 }
