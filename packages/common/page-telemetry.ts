@@ -2,21 +2,7 @@ import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
 import { isExternalReferrer, isOAuthRedirectReferrer } from './first-referrer-cookie'
 import { posthogClient } from './posthog-client'
 import type { SharedTelemetryData } from './telemetry-first-touch-store'
-import { getSharedTelemetryData } from './telemetry-utils'
-
-export const FIRST_TOUCH_CLICK_ID_KEYS = [
-  'gclid', // Google Ads
-  'gbraid', // Google Ads (iOS)
-  'wbraid', // Google Ads (iOS)
-  'msclkid', // Microsoft Ads (Bing)
-  'fbclid', // Meta (Facebook/Instagram)
-  'rdt_cid', // Reddit Ads
-  'ttclid', // TikTok Ads
-  'twclid', // X Ads (Twitter)
-  'li_fat_id', // LinkedIn Ads
-  'bfcid', // Freebuff Ads
-  'oppref', // ChatGPT Ads (OpenAI)
-] as const
+import { FIRST_TOUCH_CLICK_ID_KEYS, getSharedTelemetryData } from './telemetry-utils'
 
 export function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url

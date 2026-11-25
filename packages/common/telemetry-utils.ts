@@ -45,13 +45,44 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
-const KEYWORDS_PARAM_PATTERN = /([?&](?:keywords|schema)=)[^&#]*/g
+export const FIRST_TOUCH_CLICK_ID_KEYS = [
+  'gclid', // Google Ads
+  'gbraid', // Google Ads (iOS)
+  'wbraid', // Google Ads (iOS)
+  'msclkid', // Microsoft Ads (Bing)
+  'fbclid', // Meta (Facebook/Instagram)
+  'rdt_cid', // Reddit Ads
+  'ttclid', // TikTok Ads
+  'twclid', // X Ads (Twitter)
+  'li_fat_id', // LinkedIn Ads
+  'bfcid', // Freebuff Ads
+  'oppref', // ChatGPT Ads (OpenAI)
+] as const
 
-// URL params whose values are customer data:
-// - `keywords`: Studio's Auth users page keeps its search term, often an end user's email, here.
-// - `schema`: Studio's database pages keep the selected schema name here, which a customer names.
+// Attribution reads these values out of the URL downstream. Every other query value can hold
+// customer data or a credential (row filters, search text, invite tokens, OAuth codes).
+const READABLE_URL_PARAMS = new Set<string>([
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+  ...FIRST_TOUCH_CLICK_ID_KEYS,
+  'dub_id',
+  'campaign_id',
+  'cid',
+  'promo_code',
+])
+
+const ABSOLUTE_URL_HASH_PATTERN = /^(https?:\/\/[^#]*)#[\s\S]*$/
+const URL_PARAM_PATTERN = /([?&#])([^=&#?]+)=[^&#]*/g
+
 export function redactUrlKeywords(url: string) {
-  return url.replace(KEYWORDS_PARAM_PATTERN, '$1redacted')
+  return url
+    .replace(ABSOLUTE_URL_HASH_PATTERN, '$1')
+    .replace(URL_PARAM_PATTERN, (param, separator, name) =>
+      READABLE_URL_PARAMS.has(name) ? param : `${separator}${name}=redacted`
+    )
 }
 
 type EventProperties = Record<string, unknown>
@@ -84,13 +115,21 @@ export function redactEventUrlKeywords(event: {
 function getPageLocation() {
   if (!isBrowser) return { pageUrl: '', search: '' }
 
-  try {
-    const url = new URL(window.location.href)
-    url.hash = ''
-    return { pageUrl: redactUrlKeywords(url.href), search: redactUrlKeywords(url.search) }
-  } catch {
-    return { pageUrl: window.location.href.split('#')[0], search: window.location.search }
+  return {
+    pageUrl: redactUrlKeywords(window.location.href),
+    search: redactUrlKeywords(window.location.search),
   }
+}
+
+let telemetryPageTitleResolver: ((documentTitle: string) => string) | undefined
+
+export function setTelemetryPageTitleResolver(resolver: (documentTitle: string) => string) {
+  telemetryPageTitleResolver = resolver
+}
+
+export function getTelemetryPageTitle() {
+  if (!isBrowser) return ''
+  return telemetryPageTitleResolver ? telemetryPageTitleResolver(document.title) : document.title
 }
 
 export function getSharedTelemetryData(pathname?: string) {
@@ -99,8 +138,8 @@ export function getSharedTelemetryData(pathname?: string) {
 
   return {
     page_url: pageUrl,
-    page_title: isBrowser ? document?.title : '',
-    pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
+    page_title: getTelemetryPageTitle(),
+    pathname: redactUrlKeywords(pathname ? pathname : isBrowser ? window.location.pathname : ''),
     session_id: sessionId,
     ph: {
       referrer: isBrowser ? redactUrlKeywords(document?.referrer ?? '') : '',
