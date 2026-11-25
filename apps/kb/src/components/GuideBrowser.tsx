@@ -244,7 +244,7 @@ const TopicTab = ({ topic }: TopicTabProps) => (
   <TabsTrigger
     value={toTabValue(topic)}
     className={cn(
-      'shrink-0 whitespace-nowrap rounded-md py-2 text-sm tracking-body transition-colors focus-inset',
+      'shrink-0 whitespace-nowrap rounded-md py-2 text-sm tracking-body transition-[color] focus-inset',
       'relative z-1 data-[state=active]:shadow-none',
       // indicator set before hydration
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:rounded-b-none',
@@ -255,7 +255,12 @@ const TopicTab = ({ topic }: TopicTabProps) => (
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:rounded-t-lg',
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border',
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-b-0',
-      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-default'
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-default',
+      'tab-flares group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:absolute',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:bottom-0',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:-right-1.75',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:size-2',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:bg-(image:--tab-flare-right)'
     )}
   >
     <span className="block px-3">{topic ?? 'All'}</span>
