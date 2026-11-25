@@ -3,9 +3,40 @@ import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { IS_PLATFORM } from '../constants'
-import { apiAuthenticate } from './apiAuthenticate'
+import { apiAuthenticate, authenticateRequest } from './apiAuthenticate'
+import { InvalidJsonError, methodNotAllowed } from './apiHelpers'
 import { isStudioError } from '@/lib/errors/studio-errors'
 import type { ResponseFailure } from '@/types'
+
+export type ApiMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS'
+
+export interface ApiHandlerContext<TParams = Record<string, string>> {
+  request: Request
+  params: TParams
+  claims?: JwtPayload
+}
+
+export type ApiHandler<TParams = Record<string, string>> = (
+  ctx: ApiHandlerContext<TParams>
+) => Response | Promise<Response>
+
+export type ApiMethodHandlers<TParams = Record<string, string>> = Partial<
+  Record<ApiMethod, ApiHandler<TParams>>
+>
+
+type ServerRouteHandler<TParams = Record<string, string>> = (ctx: {
+  request: Request
+  params?: TParams
+}) => Promise<Response>
+
+export type WrappedApiHandlers<
+  THandlers extends ApiMethodHandlers<TParams>,
+  TParams = Record<string, string>,
+> = {
+  [K in keyof THandlers & ApiMethod]: ServerRouteHandler<TParams>
+} & {
+  ANY: ServerRouteHandler<TParams>
+}
 
 export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
   if (response === undefined || response === null) {
@@ -21,6 +52,54 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
   }
 
   return true
+}
+
+/**
+ * Wrap native TanStack Start API route handlers with optional platform JWT authentication,
+ * malformed-JSON 400 handling, Sentry error reporting, and an `ANY` fallback that returns
+ * 405 Method Not Allowed with an `Allow` header derived from the registered methods.
+ */
+export function createApiHandlers<
+  TParams extends Record<string, string> = Record<string, string>,
+  THandlers extends ApiMethodHandlers<TParams> = ApiMethodHandlers<TParams>,
+>(handlers: THandlers, options?: { withAuth?: boolean }): WrappedApiHandlers<THandlers, TParams> {
+  const allowedMethods = (Object.keys(handlers) as ApiMethod[]).filter(
+    (method) => handlers[method] !== undefined
+  )
+
+  const wrapped: Partial<Record<ApiMethod | 'ANY', ServerRouteHandler<TParams>>> = {}
+
+  for (const method of allowedMethods) {
+    const handler = handlers[method]!
+    wrapped[method] = async ({ request, params = {} as TParams }) => {
+      try {
+        let claims: JwtPayload | undefined
+
+        if (IS_PLATFORM && options?.withAuth) {
+          const authResult = await authenticateRequest(request)
+          if (!isResponseOk(authResult)) {
+            return Response.json(
+              { error: { message: `Unauthorized: ${authResult.error.message}` } },
+              { status: 401 }
+            )
+          }
+          claims = authResult
+        }
+
+        return await handler({ request, params, claims })
+      } catch (error) {
+        if (error instanceof InvalidJsonError) {
+          return new Response('Invalid JSON', { status: 400, statusText: 'Invalid JSON' })
+        }
+        Sentry.captureException(error)
+        return Response.json({ error: { message: 'Internal Server Error' } }, { status: 500 })
+      }
+    }
+  }
+
+  wrapped.ANY = async ({ request }) => methodNotAllowed(request, allowedMethods)
+
+  return wrapped as WrappedApiHandlers<THandlers, TParams>
 }
 
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors

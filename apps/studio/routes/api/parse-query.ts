@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { parse } from 'libpg-query'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const getOperation = (stmt: Record<string, unknown>) => {
   if ('SelectStmt' in stmt) return 'SELECT'
@@ -98,17 +98,12 @@ const getWhereClauseText = (sql: string, stmtType: string, stmt: Record<string, 
   return sql.slice(start, end).trim()
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST'])
-    return res.status(405).json({ error: `Method ${req.method} Not Allowed` })
-  }
+async function handlePost(request: Request): Promise<Response> {
+  const { sql } = await parseJsonBody<{ sql?: unknown }>(request)
 
   try {
-    const { sql } = req.body
-
     if (typeof sql !== 'string' || sql.trim().length === 0) {
-      return res.status(400).json({ error: 'Missing or invalid "sql" in request body' })
+      return Response.json({ error: 'Missing or invalid "sql" in request body' }, { status: 400 })
     }
 
     const ast = await parse(sql)
@@ -123,17 +118,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         ? getWhereClauseText(sql, stmtType, stmtNode as Record<string, unknown>)
         : null
 
-    return res.status(200).json({ tables, operation, whereClause, statementCount })
+    return Response.json({ tables, operation, whereClause, statementCount }, { status: 200 })
   } catch (error) {
     const message =
       (error as { sqlDetails?: { message?: string } })?.sqlDetails?.message ??
       (error instanceof Error ? error.message : 'Failed to parse SQL')
-    return res.status(400).json({ error: message })
+    return Response.json({ error: message }, { status: 400 })
   }
 }
 
-const webHandler = toWebHandler(handler)
-
 export const Route = createFileRoute('/api/parse-query')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: ({ request }) => handlePost(request),
+    }),
+  },
 })

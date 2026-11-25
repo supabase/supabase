@@ -4,6 +4,20 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getUserClaims } from '@/lib/gotrue'
 
 /**
+ * Authenticate an incoming Web Request using its Authorization header.
+ * This method can only be used from the server side.
+ */
+export async function authenticateRequest(
+  request: Request
+): Promise<JwtPayload | { error: Error }> {
+  try {
+    return await fetchUserClaimsFromHeader(request.headers.get('authorization'))
+  } catch (error) {
+    return { error: error as Error }
+  }
+}
+
+/**
  * Use this method on api routes to check if user is authenticated and having required permissions.
  * This method can only be used from the server side.
  * Member permission is mandatory whenever orgSlug/projectRef query param exists
@@ -29,12 +43,10 @@ export async function apiAuthenticate(
   }
 }
 
-/**
- * @returns
- *  user with only id prop or detail object. It depends on requireUserDetail config
- */
-export async function fetchUserClaims(req: NextApiRequest): Promise<JwtPayload> {
-  const token = req.headers.authorization?.replace(/bearer /i, '')
+async function fetchUserClaimsFromHeader(
+  authorization: string | null | undefined
+): Promise<JwtPayload> {
+  const token = authorization?.replace(/bearer /i, '')
   if (!token) {
     throw new Error('missing access token')
   }
@@ -48,4 +60,12 @@ export async function fetchUserClaims(req: NextApiRequest): Promise<JwtPayload> 
   }
 
   return claims
+}
+
+/**
+ * @returns
+ *  user with only id prop or detail object. It depends on requireUserDetail config
+ */
+export async function fetchUserClaims(req: NextApiRequest): Promise<JwtPayload> {
+  return fetchUserClaimsFromHeader(req.headers.authorization)
 }

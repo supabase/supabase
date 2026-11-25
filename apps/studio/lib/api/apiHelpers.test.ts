@@ -6,6 +6,9 @@ import {
   constructHeaders,
   fromNodeHeaders,
   getBearerToken,
+  InvalidJsonError,
+  methodNotAllowed,
+  parseJsonBody,
   toSnakeCase,
   zBooleanString,
 } from './apiHelpers'
@@ -62,6 +65,28 @@ describe('apiHelpers', () => {
       expect(result).toEqual({
         Authorization: 'Bearer token',
         'Content-Type': 'application/json',
+        apiKey: 'test-service-key',
+      })
+    })
+
+    it('should clean and include only allowed headers from a Web Headers instance', () => {
+      const inputHeaders = new Headers({
+        accept: 'application/json',
+        authorization: 'Bearer token',
+        'content-type': 'application/json',
+        'x-connection-encrypted': 'true',
+        cookie: 'test-cookie',
+        'user-agent': 'test-agent',
+        referer: 'test-referer',
+      })
+
+      const result = constructHeaders(inputHeaders)
+      expect(result).toEqual({
+        Accept: 'application/json',
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+        'x-connection-encrypted': 'true',
+        cookie: 'test-cookie',
         apiKey: 'test-service-key',
       })
     })
@@ -287,6 +312,68 @@ describe('apiHelpers', () => {
 
       expect(token).toBeNull()
       expect(elapsed).toBeLessThan(100)
+    })
+  })
+
+  describe('parseJsonBody', () => {
+    it.each<[string | undefined, unknown]>([
+      ['{"query":"select 1"}', { query: 'select 1' }],
+      ['[1,"two",null]', [1, 'two', null]],
+      ['"hello"', 'hello'],
+      ['42', 42],
+      ['null', null],
+      ['', {}],
+      [undefined, {}],
+    ])('parses valid JSON body %s', async (body, expected) => {
+      const request = new Request('http://localhost/api/test', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body,
+      })
+      expect(await parseJsonBody(request)).toEqual(expected)
+    })
+
+    it('parses JSON sent with a text/plain content type', async () => {
+      const request = new Request('http://localhost/api/test', {
+        method: 'POST',
+        headers: { 'content-type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify({ filenames: ['a/b.png'] }),
+      })
+      expect(await parseJsonBody(request)).toEqual({ filenames: ['a/b.png'] })
+    })
+
+    it.each(['{', '[1,', 'undefined', '   ', '{"trailing":1,}'])(
+      'throws InvalidJsonError for malformed JSON: %s',
+      async (body) => {
+        const request = new Request('http://localhost/api/test', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body,
+        })
+        await expect(parseJsonBody(request)).rejects.toBeInstanceOf(InvalidJsonError)
+      }
+    )
+
+    it('rethrows body-read failures instead of masking them as InvalidJsonError', async () => {
+      const request = new Request('http://localhost/api/test', { method: 'POST', body: '{}' })
+      const readError = new Error('Stream aborted')
+      vi.spyOn(request, 'text').mockRejectedValue(readError)
+
+      await expect(parseJsonBody(request)).rejects.toBe(readError)
+    })
+  })
+
+  describe('methodNotAllowed', () => {
+    it('returns 405 JSON with an Allow header listing the allowed methods', async () => {
+      const request = new Request('http://localhost/api/test', { method: 'PUT' })
+      const response = methodNotAllowed(request, ['GET', 'POST'])
+
+      expect(response.status).toBe(405)
+      expect(response.headers.get('Allow')).toBe('GET, POST')
+      expect(await response.json()).toEqual({
+        data: null,
+        error: { message: 'Method PUT Not Allowed' },
+      })
     })
   })
 })

@@ -2,11 +2,10 @@ import { VERSION } from '@stripe/sync-engine'
 import { install, uninstall } from '@stripe/sync-engine/supabase'
 import { createFileRoute } from '@tanstack/react-router'
 import { waitUntil } from '@vercel/functions'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
-import { getBearerToken } from '@/lib/api/apiHelpers'
+import { getBearerToken, parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
@@ -25,38 +24,26 @@ async function isStripeSyncEnabled() {
   return true
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Hide endpoint if the integration is disabled.
+async function handleDeleteStripeSyncInstall(request: Request): Promise<Response> {
   if (!(await isStripeSyncEnabled())) {
-    return res.status(404).json({ data: null, error: { message: 'Not Found' } })
+    return Response.json({ data: null, error: { message: 'Not Found' } }, { status: 404 })
   }
 
-  const { method } = req
-  switch (method) {
-    case 'POST':
-      return handleSetupStripeSyncInstall(req, res)
-    case 'DELETE':
-      return handleDeleteStripeSyncInstall(req, res)
-    default:
-      return res
-        .status(405)
-        .json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req.headers.authorization)
+  const supabaseToken = getBearerToken(request.headers.get('authorization'))
   if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
+    return Response.json(
+      { data: null, error: { message: 'Unauthorized: Invalid Authorization header' } },
+      { status: 401 }
+    )
   }
 
-  const parsed = UninstallBodySchema.safeParse(req.body)
+  const body = await parseJsonBody(request)
+  const parsed = UninstallBodySchema.safeParse(body)
   if (!parsed.success) {
-    return res
-      .status(400)
-      .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
+    return Response.json(
+      { data: null, error: { message: 'Bad Request: Invalid request body' } },
+      { status: 400 }
+    )
   }
   const { projectRef, startTime } = parsed.data
 
@@ -73,24 +60,32 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
     })
   )
 
-  return res
-    .status(200)
-    .json({ data: { message: 'Stripe Sync uninstallation initiated' }, error: null })
+  return Response.json(
+    { data: { message: 'Stripe Sync uninstallation initiated' }, error: null },
+    { status: 200 }
+  )
 }
 
-async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req.headers.authorization)
-  if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
+async function handleSetupStripeSyncInstall(request: Request): Promise<Response> {
+  if (!(await isStripeSyncEnabled())) {
+    return Response.json({ data: null, error: { message: 'Not Found' } }, { status: 404 })
   }
 
-  const parsed = InstallBodySchema.safeParse(req.body)
+  const supabaseToken = getBearerToken(request.headers.get('authorization'))
+  if (!supabaseToken) {
+    return Response.json(
+      { data: null, error: { message: 'Unauthorized: Invalid Authorization header' } },
+      { status: 401 }
+    )
+  }
+
+  const body = await parseJsonBody(request)
+  const parsed = InstallBodySchema.safeParse(body)
   if (!parsed.success) {
-    return res
-      .status(400)
-      .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
+    return Response.json(
+      { data: null, error: { message: 'Bad Request: Invalid request body' } },
+      { status: 400 }
+    )
   }
   const { projectRef, stripeSecretKey, startTime } = parsed.data
 
@@ -108,18 +103,24 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       const errorData = await stripeResponse.json()
       const errorMessage =
         errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
-      return res.status(400).json({
-        data: null,
-        error: { message: errorMessage },
-      })
+      return Response.json(
+        {
+          data: null,
+          error: { message: errorMessage },
+        },
+        { status: 400 }
+      )
     }
   } catch (error) {
     const normalizedErrorMessage = error instanceof Error ? error.message : String(error)
 
-    return res.status(400).json({
-      data: null,
-      error: { message: `Failed to validate Stripe API key: ${normalizedErrorMessage}` },
-    })
+    return Response.json(
+      {
+        data: null,
+        error: { message: `Failed to validate Stripe API key: ${normalizedErrorMessage}` },
+      },
+      { status: 400 }
+    )
   }
   waitUntil(
     install({
@@ -136,13 +137,17 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
     })
   )
 
-  return res
-    .status(200)
-    .json({ data: { message: 'Stripe Sync setup initiated', version: VERSION }, error: null })
+  return Response.json(
+    { data: { message: 'Stripe Sync setup initiated', version: VERSION }, error: null },
+    { status: 200 }
+  )
 }
 
-const webHandler = toWebHandler(handler)
-
 export const Route = createFileRoute('/api/integrations/stripe-sync')({
-  server: { handlers: { POST: webHandler, DELETE: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: ({ request }) => handleSetupStripeSyncInstall(request),
+      DELETE: ({ request }) => handleDeleteStripeSyncInstall(request),
+    }),
+  },
 })

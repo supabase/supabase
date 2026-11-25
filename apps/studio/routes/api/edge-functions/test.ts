@@ -1,31 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { IS_PLATFORM } from 'common'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { getEdgeFunctionTestUrl } from '@/lib/api/edgeFunctions'
 import { DEFAULT_SUPABASE_PUBLIC_URL } from '@/lib/constants/api'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
-        {
-          status: 405,
-          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
-        }
-      )
-  }
+interface EdgeFunctionTestBody {
+  url: string
+  method: string
+  body?: unknown
+  headers?: Record<string, string | null | undefined>
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(request: Request): Promise<Response> {
+  const parsedBody = await parseJsonBody<EdgeFunctionTestBody>(request)
+
   try {
-    const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
+    const { url: requestUrl, method, body: requestBody, headers: customHeaders } = parsedBody
     const url = getEdgeFunctionTestUrl(requestUrl, {
       isPlatform: IS_PLATFORM,
       nimbusProjectsUrl: process.env.NIMBUS_PROD_PROJECTS_URL,
@@ -34,10 +26,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (url === undefined) {
-      return res.status(400).json({
-        status: 400,
-        error: { message: 'Provided URL is not a valid Supabase edge function URL' },
-      })
+      return Response.json(
+        {
+          status: 400,
+          error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+        },
+        { status: 400 }
+      )
     }
 
     // Forward the supplied headers as given, dropping empty values. Header names are case
@@ -50,7 +45,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     Object.entries(customHeaders || {}).forEach(([key, value]) => {
       const name = key.trim()
       if (name.length === 0 || value === undefined || value === null || value === '') return
-      suppliedHeaders.set(name.toLowerCase(), { name, value: value as string })
+      suppliedHeaders.set(name.toLowerCase(), { name, value })
     })
 
     const requestHeaders: Record<string, string> = Object.fromEntries(
@@ -58,12 +53,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     )
 
     // Prepare the request body based on method and Content-Type
-    let finalBody = undefined
+    let finalBody: BodyInit | undefined = undefined
     if (method !== 'GET' && method !== 'HEAD') {
       if (suppliedHeaders.get('content-type')?.value === 'application/json') {
         finalBody = typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody)
       } else {
-        finalBody = requestBody
+        finalBody = requestBody as BodyInit | undefined
       }
     }
 
@@ -88,23 +83,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }
     })
 
-    return res.status(200).json({
-      status: response.status,
-      headers: responseHeaders,
-      body: responseBody,
-    })
-  } catch (error: any) {
-    return res.status(500).json({
-      status: 500,
-      error: {
-        message: error.message || 'Failed to test edge function',
+    return Response.json(
+      {
+        status: response.status,
+        headers: responseHeaders,
+        body: responseBody,
       },
-    })
+      { status: 200 }
+    )
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ''
+    return Response.json(
+      {
+        status: 500,
+        error: {
+          message: message || 'Failed to test edge function',
+        },
+      },
+      { status: 500 }
+    )
   }
 }
 
-const webHandler = toWebHandler(handler)
-
 export const Route = createFileRoute('/api/edge-functions/test')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      POST: ({ request }) => handlePost(request),
+    }),
+  },
 })
