@@ -1,44 +1,78 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/generate-attachment-url'
+import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
-const mocks = vi.hoisted(() => ({
-  getUserClaims: vi.fn(),
-  createSignedUrls: vi.fn(),
-}))
+const { GOTRUE_URL } = vi.hoisted(() => {
+  const url = 'https://auth.example.test'
+  vi.stubEnv('NEXT_PUBLIC_GOTRUE_URL', url)
+  return { GOTRUE_URL: url }
+})
 
-vi.mock('@/lib/constants', () => ({
-  IS_PLATFORM: false,
-  API_URL: 'https://api.example.com',
-}))
+const SUPPORT_API_URL = 'https://support.example.test'
+const SUPPORT_SECRET_KEY = 'sb_secret_test_key'
 
-vi.mock('@/lib/gotrue', () => ({
-  getUserClaims: mocks.getUserClaims,
-}))
+function createJwt(sub: string): string {
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
+  const payload = Buffer.from(
+    JSON.stringify({
+      sub,
+      aud: 'authenticated',
+      role: 'authenticated',
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    })
+  ).toString('base64url')
+  const signature = Buffer.from('test-signature').toString('base64url')
+  return `${header}.${payload}.${signature}`
+}
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn(() => ({
-    storage: {
-      from: vi.fn(() => ({
-        createSignedUrls: mocks.createSignedUrls,
-      })),
-    },
-  })),
-}))
+function mockGoTrueUser(token: string, userId: string) {
+  mswServer.use(
+    http.get(`${GOTRUE_URL}/user`, ({ request }) => {
+      if (request.headers.get('authorization') !== `Bearer ${token}`) {
+        return HttpResponse.json({ msg: 'Invalid JWT' }, { status: 401 })
+      }
+      return HttpResponse.json({ id: userId, aud: 'authenticated' })
+    })
+  )
+}
 
 describe('/api/generate-attachment-url', () => {
   beforeEach(() => {
-    mocks.getUserClaims.mockReset()
-    mocks.createSignedUrls.mockReset()
+    vi.stubEnv('NEXT_PUBLIC_SUPPORT_API_URL', SUPPORT_API_URL)
+    vi.stubEnv('SUPPORT_SUPABASE_SECRET_KEY', SUPPORT_SECRET_KEY)
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.restoreAllMocks()
   })
 
   it('parses text/plain JSON payloads and returns signed URLs for the user prefix', async () => {
-    mocks.getUserClaims.mockResolvedValue({ claims: { sub: 'user-1' }, error: null })
-    mocks.createSignedUrls.mockResolvedValue({
-      data: [{ signedUrl: 'https://signed.example/a' }],
-      error: null,
-    })
+    const token = createJwt('user-1')
+    mockGoTrueUser(token, 'user-1')
+
+    let capturedSignRequest: { apikey: string | null; body: unknown } | undefined
+    mswServer.use(
+      http.post(
+        `${SUPPORT_API_URL}/storage/v1/object/sign/support-attachments`,
+        async ({ request }) => {
+          capturedSignRequest = {
+            apikey: request.headers.get('apikey'),
+            body: await request.json(),
+          }
+          return HttpResponse.json([
+            {
+              error: null,
+              path: 'user-1/screenshot.png',
+              signedURL: '/object/sign/support-attachments/user-1/screenshot.png?token=abc',
+            },
+          ])
+        }
+      )
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -47,7 +81,7 @@ describe('/api/generate-attachment-url', () => {
       request: new Request('http://localhost/api/generate-attachment-url', {
         method: 'POST',
         headers: {
-          Authorization: 'Bearer tok',
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'text/plain;charset=UTF-8',
         },
         body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
@@ -55,11 +89,26 @@ describe('/api/generate-attachment-url', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual(['https://signed.example/a'])
+    expect(await response.json()).toEqual([
+      `${SUPPORT_API_URL}/storage/v1/object/sign/support-attachments/user-1/screenshot.png?token=abc`,
+    ])
+    expect(capturedSignRequest).toEqual({
+      apikey: SUPPORT_SECRET_KEY,
+      body: {
+        paths: ['user-1/screenshot.png'],
+        expiresIn: 10 * 365 * 24 * 60 * 60,
+      },
+    })
   })
 
-  it('returns 403 when a requested filename belongs to another user', async () => {
-    mocks.getUserClaims.mockResolvedValue({ claims: { sub: 'user-1' }, error: null })
+  it('returns 401 when auth fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const token = createJwt('user-1')
+    mswServer.use(
+      http.get(`${GOTRUE_URL}/user`, () =>
+        HttpResponse.json({ msg: 'Invalid JWT' }, { status: 401 })
+      )
+    )
 
     const response = await getRouteHandler(
       Route,
@@ -67,7 +116,28 @@ describe('/api/generate-attachment-url', () => {
     )({
       request: new Request('http://localhost/api/generate-attachment-url', {
         method: 'POST',
-        headers: { Authorization: 'Bearer tok' },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
+      }),
+    })
+
+    expect(response.status).toBe(401)
+  })
+
+  it('returns 403 when a requested filename belongs to another user', async () => {
+    const token = createJwt('user-1')
+    mockGoTrueUser(token, 'user-1')
+
+    const response = await getRouteHandler(
+      Route,
+      'POST'
+    )({
+      request: new Request('http://localhost/api/generate-attachment-url', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({ filenames: ['user-2/secret.png'] }),
       }),
     })
@@ -76,7 +146,8 @@ describe('/api/generate-attachment-url', () => {
   })
 
   it('returns 400 on malformed JSON body', async () => {
-    mocks.getUserClaims.mockResolvedValue({ claims: { sub: 'user-1' }, error: null })
+    const token = createJwt('user-1')
+    mockGoTrueUser(token, 'user-1')
 
     const response = await getRouteHandler(
       Route,
@@ -84,7 +155,7 @@ describe('/api/generate-attachment-url', () => {
     )({
       request: new Request('http://localhost/api/generate-attachment-url', {
         method: 'POST',
-        headers: { Authorization: 'Bearer tok', 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: '{invalid',
       }),
     })

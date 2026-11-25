@@ -41,6 +41,22 @@ describe('/api/parse-query', () => {
     expect(await response.json()).toEqual({ error: 'Missing or invalid "sql" in request body' })
   })
 
+  it('returns 400 when body is JSON null', async () => {
+    const response = await getRouteHandler(
+      Route,
+      'POST'
+    )({
+      request: new Request('http://localhost/api/parse-query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: 'null',
+      }),
+    })
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ error: 'Missing or invalid "sql" in request body' })
+  })
+
   it('returns 400 on malformed JSON', async () => {
     const response = await getRouteHandler(
       Route,

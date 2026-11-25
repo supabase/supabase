@@ -99,7 +99,8 @@ const getWhereClauseText = (sql: string, stmtType: string, stmt: Record<string, 
 }
 
 async function handlePost(request: Request): Promise<Response> {
-  const { sql } = await parseJsonBody<{ sql?: unknown }>(request)
+  const body = await parseJsonBody<{ sql?: unknown } | null>(request)
+  const sql = body?.sql
 
   try {
     if (typeof sql !== 'string' || sql.trim().length === 0) {

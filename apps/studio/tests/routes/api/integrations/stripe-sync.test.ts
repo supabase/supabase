@@ -1,3 +1,4 @@
+import { uninstall } from '@stripe/sync-engine/supabase'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/integrations/stripe-sync'
@@ -14,6 +15,7 @@ vi.mock('@stripe/sync-engine/supabase', () => ({
 
 describe('/api/integrations/stripe-sync', () => {
   afterEach(() => {
+    vi.clearAllMocks()
     vi.unstubAllGlobals()
   })
 
@@ -52,6 +54,12 @@ describe('/api/integrations/stripe-sync', () => {
       data: { message: 'Stripe Sync uninstallation initiated' },
       error: null,
     })
+    expect(uninstall).toHaveBeenCalledWith(
+      expect.objectContaining({
+        supabaseAccessToken: 'supa-token',
+        supabaseProjectRef: 'ref',
+      })
+    )
   })
 
   it('returns 405 with Allow: POST, DELETE for unsupported methods', async () => {
