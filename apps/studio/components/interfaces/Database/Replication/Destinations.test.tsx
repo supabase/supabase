@@ -589,9 +589,12 @@ describe('regions', () => {
     renderRegions()
 
     expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(await screen.findByText('Could not load results from Frankfurt')).toBeInTheDocument()
     expect(
-      await screen.findByText('Pipelines could not be loaded from Frankfurt')
+      screen.getByText('Any pipelines in this region are missing from this view. Please try again.')
     ).toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
     failingClusters.clear()
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
@@ -632,16 +635,14 @@ describe('regions', () => {
     } finally {
       pending.resolve()
     }
-    await screen.findByText('Pipelines could not be loaded from 3 regions')
+    await screen.findByText('Could not load results from some regions')
     expect(screen.queryByText('Loading pipelines from remaining regions')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     const defaultRequests = requests.filter((cluster) => cluster === 'omitted').length
     unavailable = false
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
     await waitFor(() =>
-      expect(
-        screen.queryByText('Pipelines could not be loaded from 3 regions')
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText('Could not load results from some regions')).not.toBeInTheDocument()
     )
     expect(requests.filter((cluster) => cluster === 'omitted')).toHaveLength(defaultRequests)
   })
@@ -651,21 +652,17 @@ describe('regions', () => {
     mockRegionResources({ failingClusters: new Set(['omitted', '2']) })
     renderRegions()
 
-    expect(
-      await screen.findByText('Pipelines could not be loaded from 2 regions')
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Could not load results from some regions')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
-    expect(screen.getByText('Affected regions:')).toBeInTheDocument()
     expect(
-      screen
-        .getAllByRole('listitem')
-        .some((item) => item.textContent === 'Singapore: Cluster unavailable')
-    ).toBe(true)
-    expect(
-      screen
-        .getAllByRole('listitem')
-        .some((item) => item.textContent === 'Frankfurt: Cluster unavailable')
-    ).toBe(true)
+      screen.getByText('Any pipelines in these regions are missing from this view:')
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem').some((item) => item.textContent === 'Singapore')).toBe(
+      true
+    )
+    expect(screen.getAllByRole('listitem').some((item) => item.textContent === 'Frankfurt')).toBe(
+      true
+    )
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
   })
 
@@ -681,7 +678,7 @@ describe('regions', () => {
         HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
       )
     }
-    await screen.findByText('Pipelines could not be loaded from Frankfurt')
+    await screen.findByText('Could not load results from Frankfurt')
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
   })
 
@@ -826,7 +823,7 @@ describe('regions', () => {
     renderRegions()
 
     expect(
-      await screen.findByText('Pipelines could not be loaded from Frankfurt')
+      await screen.findByText('Could not load results from Frankfurt')
     ).toBeInTheDocument()
 
     canReadSource = true

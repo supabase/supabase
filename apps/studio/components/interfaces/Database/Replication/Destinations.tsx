@@ -156,8 +156,8 @@ export const Destinations = () => {
   const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
   const failedRegionTitle =
     failedRegions.length === 1
-      ? `Pipelines could not be loaded from ${failedRegions[0].group.region?.region_name ?? 'one region'}`
-      : `Pipelines could not be loaded from ${failedRegions.length} regions`
+      ? `Could not load results from ${failedRegions[0].group.region?.region_name ?? 'one region'}`
+      : 'Could not load results from some regions'
 
   const {
     isSuccess: isSourcesSuccess,
@@ -388,7 +388,11 @@ export const Destinations = () => {
             type="warning"
             layout="responsive"
             title={failedRegionTitle}
-            description="Affected regions:"
+            description={
+              failedRegions.length === 1
+                ? 'Any pipelines in this region are missing from this view. Please try again.'
+                : 'Any pipelines in these regions are missing from this view:'
+            }
             actions={
               <Button
                 loading={failedRegions.some(isRetryingRegion)}
@@ -398,14 +402,15 @@ export const Destinations = () => {
               </Button>
             }
           >
-            <ul className="list-disc pl-5 space-y-1">
-              {failedRegions.map(({ group, error }) => (
-                <li key={group.clusterId ?? 'default'}>
-                  <span>{group.region?.region_name ?? 'Default region'}</span>:{' '}
-                  <span>{error?.message}</span>
-                </li>
-              ))}
-            </ul>
+            {failedRegions.length > 1 && (
+              <ul className="list-disc pl-5 space-y-1">
+                {failedRegions.map(({ group }) => (
+                  <li key={group.clusterId ?? 'default'}>
+                    {group.region?.region_name ?? 'Default region'}
+                  </li>
+                ))}
+              </ul>
+            )}
           </Admonition>
         )}
 
