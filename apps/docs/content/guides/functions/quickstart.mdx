@@ -102,7 +102,7 @@ Your function is now running at [`http://localhost:54321/functions/v1/hello-worl
 
 <Admonition type="note">
 
-The container might not be able to access your project files on Linux systems with Security-Enhanced Linux (SELinux) enabled, such as Fedora. From your project root, run `sudo chcon -Rt container_file_t $(pwd)` to grant the container access.
+The container might not be able to access your project files on Linux systems with Security-Enhanced Linux (SELinux) enabled, such as Fedora. From your project root, run `sudo chcon -Rt container_file_t .` to grant the container access.
 
 </Admonition>
 
