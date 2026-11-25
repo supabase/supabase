@@ -6,7 +6,7 @@ let serverClient: ReturnType<typeof getClient>
 export type TrustedUserEmail = string & { readonly __trustedUserEmailBrand: never }
 
 // Promotes an email to TrustedUserEmail. Only call this with an email whose origin is already
-// verified — e.g. `claims.email` from a JWT that apiAuthenticate has confirmed — never with a
+// verified — e.g. `claims.email` from a JWT that authenticateRequest has confirmed — never with a
 // raw request body/query param.
 export function trustedUserEmail(email: string | undefined): TrustedUserEmail | undefined {
   return email as TrustedUserEmail | undefined
