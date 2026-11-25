@@ -377,7 +377,7 @@ npm install @supabase/server
 
 ```typescript name=server/api/profile.get.ts
 import { createSupabaseContext } from '@supabase/server'
-import { toWebRequest } from 'h3'
+import { createError, defineEventHandler, toWebRequest } from 'h3'
 
 export default defineEventHandler(async (event) => {
   // Verifies the JWT locally against your project's signing keys and builds an

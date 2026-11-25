@@ -26,7 +26,7 @@ An entry does three jobs. How many of them survive depends on the framework.
 | Framework      | Framework version | Context | Short-circuit | Response phase | Pattern           |
 | -------------- | ----------------- | ------- | ------------- | -------------- | ----------------- |
 | Hono           | `^4`              | Yes     | Yes           | Yes            | middleware slot   |
-| H3 / Nuxt      | h3 `^2`           | Yes     | Yes           | Yes            | middleware slot   |
+| H3             | h3 `^2`           | Yes     | Yes           | Yes            | middleware slot   |
 | Elysia         | `^1.4`            | Yes     | Yes           | Yes            | wrap `app.handle` |
 | NestJS         | `^10` or `^11`    | Yes     | Yes           | No             | guard             |
 | TanStack Start | `^1.168`          | Yes     | Yes           | Yes            | middleware slot   |
@@ -40,7 +40,7 @@ A gated group of routes takes `withRequiredClaims()` and a public group takes `w
 | Framework      | One array per route group                                                                                     |
 | -------------- | ------------------------------------------------------------------------------------------------------------- |
 | Hono           | One sub-app per array, mounted with `app.route()`. A second `app.use()` statement is not enough.              |
-| H3 / Nuxt      | `app.use('/path', toH3(entries))` before the routes under that path                                           |
+| H3             | `app.use('/path', toH3(entries))` before the routes under that path                                           |
 | Elysia         | One Elysia instance per array, each wrapped with `wrapElysia`, behind a fetch handler that dispatches by path |
 | NestJS         | `@UseGuards()` on the controller or the handler                                                               |
 | TanStack Start | `.middleware([...])` on each server function or server route                                                  |
