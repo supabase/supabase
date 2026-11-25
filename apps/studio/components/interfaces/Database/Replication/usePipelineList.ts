@@ -1,13 +1,10 @@
-import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useQueries } from '@tanstack/react-query'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import { replicationDestinationsQueryOptions } from '@/data/replication/destinations-query'
-import { replicationKeys } from '@/data/replication/keys'
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
-import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { replicationPipelinesQueryOptions } from '@/data/replication/pipelines-query'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 
@@ -51,9 +48,6 @@ export function usePipelineList({
   sortColumn: 'name' | 'status'
   sortDirection: 'asc' | 'desc'
 }) {
-  const queryClient = useQueryClient()
-  const prefetchedClustersRef = useRef(new Set<string>())
-
   const destinationResults = useQueries({
     queries: groups.map(({ clusterId }) =>
       replicationDestinationsQueryOptions({ projectRef, clusterId })
@@ -124,26 +118,6 @@ export function usePipelineList({
       if (sortColumn === 'name') return nameComparison
       return compareStatusNames(a.status, b.status, sortDirection) || nameComparison
     })
-
-  useEffect(() => {
-    if (!projectRef) return
-    clusterResults.forEach(({ group: { clusterId }, pipelinesResult, pipelines }) => {
-      const prefetchKey = JSON.stringify([projectRef, clusterId])
-      if (!pipelinesResult.isSuccess || pipelines.length === 0) return
-      if (prefetchedClustersRef.current.has(prefetchKey)) return
-
-      prefetchedClustersRef.current.add(prefetchKey)
-      pipelines.forEach(({ id: pipelineId }) => {
-        if (!pipelineId) return
-        void queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId, clusterId),
-          queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion({ projectRef, pipelineId, clusterId }, signal),
-          staleTime: Infinity,
-        })
-      })
-    })
-  }, [clusterResults, projectRef, queryClient])
 
   return { clusterResults, sortedDestinations }
 }

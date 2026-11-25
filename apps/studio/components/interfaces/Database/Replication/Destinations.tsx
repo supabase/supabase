@@ -3,7 +3,7 @@ import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -43,6 +43,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { replicationKeys } from '@/data/replication/keys'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -71,6 +72,7 @@ export const Destinations = () => {
 
   useRedirectLegacyReadReplicaDestination()
 
+  const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
@@ -119,7 +121,7 @@ export const Destinations = () => {
     isSuccess: isDestinationsSuccess,
   } = destinationsResult
   const hasDestinations = isDestinationsSuccess && destinations.length > 0
-  const { isSuccess: isPipelinesSuccess } = pipelinesResult
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = pipelinesResult
   const {
     data: sourcesData,
     isSuccess: isSourcesSuccess,
@@ -202,6 +204,27 @@ export const Destinations = () => {
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+
+  useEffect(() => {
+    if (
+      projectRef &&
+      !prefetchedRef.current &&
+      pipelinesData?.pipelines &&
+      pipelinesData.pipelines.length > 0 &&
+      isPipelinesSuccess
+    ) {
+      prefetchedRef.current = true
+      pipelinesData.pipelines.forEach((p) => {
+        if (!p?.id) return
+        queryClient.prefetchQuery({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, clusterId),
+          queryFn: ({ signal }) =>
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id, clusterId }, signal),
+          staleTime: Infinity,
+        })
+      })
+    }
+  }, [projectRef, clusterId, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
     <div className="w-full space-y-4">
