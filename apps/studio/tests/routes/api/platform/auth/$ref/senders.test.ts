@@ -1,15 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { fetchPost } from '@/data/fetchers'
 import { Route as InviteRoute } from '@/routes/api/platform/auth/$ref/invite'
 import { Route as MagicLinkRoute } from '@/routes/api/platform/auth/$ref/magiclink'
 import { Route as OtpRoute } from '@/routes/api/platform/auth/$ref/otp'
 import { Route as RecoverRoute } from '@/routes/api/platform/auth/$ref/recover'
+import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
-vi.mock('@/data/fetchers', () => ({
-  fetchPost: vi.fn(),
-}))
+const SUPABASE_URL = 'http://supabase.test'
 
 const routes = [
   { name: 'invite', route: InviteRoute, body: { email: 'user@example.com' } },
@@ -19,22 +18,25 @@ const routes = [
 ] as const
 
 describe('self-hosted auth sender routes', () => {
-  beforeEach(() => {
-    vi.mocked(fetchPost).mockReset()
+  beforeAll(() => {
+    vi.stubEnv('SUPABASE_URL', SUPABASE_URL)
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'test-service-role-key')
+  })
+
+  afterAll(() => {
+    vi.unstubAllEnvs()
   })
 
   it.each(routes)(
-    '$name falls back to 500 when upstream error has no code',
-    async ({ route, body }) => {
-      vi.mocked(fetchPost).mockResolvedValue({
-        error: { message: 'Network error', code: undefined },
-      })
+    '$name falls back to 500 when upstream fails with a network error',
+    async ({ name, route, body }) => {
+      mswServer.use(http.post(`${SUPABASE_URL}/auth/v1/${name}`, () => HttpResponse.error()))
 
       const response = await getRouteHandler(
         route,
         'POST'
       )({
-        request: new Request('http://localhost/api/platform/auth/default/sender', {
+        request: new Request(`http://localhost/api/platform/auth/default/${name}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -43,22 +45,26 @@ describe('self-hosted auth sender routes', () => {
       })
 
       expect(response.status).toBe(500)
-      expect(await response.json()).toEqual({ message: 'Network error' })
+      expect(await response.json()).toEqual({ message: expect.any(String) })
     }
   )
 
   it.each(routes)(
     '$name preserves explicit upstream error status codes',
-    async ({ route, body }) => {
-      vi.mocked(fetchPost).mockResolvedValue({
-        error: { message: 'Rate limited', code: 429 },
-      })
+    async ({ name, route, body }) => {
+      const receivedBodies: unknown[] = []
+      mswServer.use(
+        http.post(`${SUPABASE_URL}/auth/v1/${name}`, async ({ request }) => {
+          receivedBodies.push(await request.json())
+          return HttpResponse.json({ message: 'Rate limited' }, { status: 429 })
+        })
+      )
 
       const response = await getRouteHandler(
         route,
         'POST'
       )({
-        request: new Request('http://localhost/api/platform/auth/default/sender', {
+        request: new Request(`http://localhost/api/platform/auth/default/${name}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -66,17 +72,18 @@ describe('self-hosted auth sender routes', () => {
         params: { ref: 'default' },
       })
 
+      expect(receivedBodies).toEqual([body])
       expect(response.status).toBe(429)
       expect(await response.json()).toEqual({ message: 'Rate limited' })
     }
   )
 
-  it.each(routes)('$name returns 405 with Allow: POST for GET', async ({ route }) => {
+  it.each(routes)('$name returns 405 with Allow: POST for GET', async ({ name, route }) => {
     const response = await getRouteHandler(
       route,
       'GET'
     )({
-      request: new Request('http://localhost/api/platform/auth/default/sender', { method: 'GET' }),
+      request: new Request(`http://localhost/api/platform/auth/default/${name}`, { method: 'GET' }),
       params: { ref: 'default' },
     })
 

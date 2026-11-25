@@ -1,64 +1,69 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/platform/auth/$ref/users/$id/index'
+import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
-const mocks = vi.hoisted(() => ({
-  updateUserById: vi.fn(),
-  deleteUser: vi.fn(),
-}))
-
-vi.mock('@/lib/api/self-hosted-admin', () => ({
-  selfHostedSupabaseAdmin: {
-    auth: {
-      admin: {
-        updateUserById: mocks.updateUserById,
-        deleteUser: mocks.deleteUser,
-      },
-    },
-  },
-}))
+const SUPABASE_URL = 'http://supabase.test'
+const USER_ID = '11111111-1111-4111-8111-111111111111'
 
 describe('/api/platform/auth/$ref/users/$id', () => {
-  beforeEach(() => {
-    mocks.updateUserById.mockReset()
-    mocks.deleteUser.mockReset()
+  beforeAll(() => {
+    vi.stubEnv('SUPABASE_URL', SUPABASE_URL)
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'test-service-role-key')
+  })
+
+  afterAll(() => {
+    vi.unstubAllEnvs()
   })
 
   it('updates ban_duration on PATCH', async () => {
-    mocks.updateUserById.mockResolvedValue({ data: { user: { id: 'u-1' } }, error: null })
+    const receivedBodies: unknown[] = []
+    mswServer.use(
+      http.put(`${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}`, async ({ request }) => {
+        receivedBodies.push(await request.json())
+        return HttpResponse.json({ id: USER_ID })
+      })
+    )
 
     const response = await getRouteHandler(
       Route,
       'PATCH'
     )({
-      request: new Request('http://localhost/api/platform/auth/default/users/u-1', {
+      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ban_duration: '24h' }),
       }),
-      params: { ref: 'default', id: 'u-1' },
+      params: { ref: 'default', id: USER_ID },
     })
 
-    expect(mocks.updateUserById).toHaveBeenCalledWith('u-1', { ban_duration: '24h' })
+    expect(receivedBodies).toEqual([{ ban_duration: '24h' }])
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ id: 'u-1' })
+    expect(await response.json()).toEqual({ id: USER_ID })
   })
 
   it('deletes the user on DELETE', async () => {
-    mocks.deleteUser.mockResolvedValue({ data: { user: null }, error: null })
+    const deletedUserIds: string[] = []
+    mswServer.use(
+      http.delete(`${SUPABASE_URL}/auth/v1/admin/users/:id`, ({ params }) => {
+        deletedUserIds.push(String(params.id))
+        return HttpResponse.json({})
+      })
+    )
 
     const response = await getRouteHandler(
       Route,
       'DELETE'
     )({
-      request: new Request('http://localhost/api/platform/auth/default/users/u-1', {
+      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
         method: 'DELETE',
       }),
-      params: { ref: 'default', id: 'u-1' },
+      params: { ref: 'default', id: USER_ID },
     })
 
-    expect(mocks.deleteUser).toHaveBeenCalledWith('u-1')
+    expect(deletedUserIds).toEqual([USER_ID])
     expect(response.status).toBe(200)
   })
 
@@ -67,10 +72,10 @@ describe('/api/platform/auth/$ref/users/$id', () => {
       Route,
       'GET'
     )({
-      request: new Request('http://localhost/api/platform/auth/default/users/u-1', {
+      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
         method: 'GET',
       }),
-      params: { ref: 'default', id: 'u-1' },
+      params: { ref: 'default', id: USER_ID },
     })
 
     expect(response.status).toBe(405)
