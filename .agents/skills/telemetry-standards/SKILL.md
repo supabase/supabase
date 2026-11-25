@@ -75,10 +75,11 @@ Event properties must also never contain anything a user chose or typed for thei
 - Any other user-defined name or label (index, trigger, role, extension setting, edge function, secret key, and so on)
 - SQL text, filters, search terms, file or object paths, and other free-text input
 - Row, object or record IDs, and any ID or ref not already attached by `useTrack`
+- Raw error messages or stack traces, which often quote schema, table or column names. Send an error code or category instead
 
-`useTrack` already attaches `groups.project` (project ref) and `groups.organization` (org slug) to every event. Don't add these, or other IDs, as properties.
+`useTrack` attaches `groups.project` (project ref) and `groups.organization` (org slug) whenever a project or org is selected. Don't add these, or other IDs, as properties. To attribute an event to a different project or org (one that was just created, for example), pass it as the third argument to `track()`.
 
-**Send a count, enum, boolean or action category instead of the raw value.** Type new properties as string-literal unions or `boolean`/`number`, never plain `string`, so a raw name can't compile in.
+**Send a count, enum, boolean or action category instead of the raw value.** Type new properties as string-literal unions or `boolean`/`number` rather than plain `string`, so a raw name is harder to pass by accident. Feature flag values are a separate case and follow the feature flag section below.
 
 ```typescript
 // Don't (illustrative): raw names identify the customer's data model
@@ -91,6 +92,8 @@ track('policy_created', { operation: 'select', hasCheckExpression: true })
 ```
 
 If you need to tell values apart, derive a category (`public` / `protected` / `custom`), a count (`tableCount`), or a boolean (`isDefaultSchema`). If a raw name seems essential, stop and ask before adding it.
+
+This section takes precedence over "match similar events" guidance elsewhere in this skill: if a similar event carries a user-defined name, don't copy that property.
 
 `data-attr` attributes are not tracked while PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`). Keep their values static strings, and never build them from user-defined names, in case autocapture is enabled later.
 
@@ -173,7 +176,7 @@ When reviewing a PR, flag these as **required changes:**
 3. **Unnecessary view tracking** — events that fire on page load without user interaction
 4. **Inaccurate docs** — `@source`/`@page` descriptions that don't match the actual implementation
 5. **Unmeasured feature flags** — a PostHog flag gates new behavior but its value is not captured in any `track()` call, or there is no outcome tracking for the gated behavior
-6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one. Required even when the value looks harmless; ask for a count, enum, boolean or category instead
+6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, raw error messages, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one (feature flag values excepted). Required even when the value looks harmless; ask for a count, enum, boolean or category instead
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
@@ -227,6 +230,6 @@ To add tracking for a user action:
 - [ ] Using the `useTrack` hook
 - [ ] Not tracking passive views/appearances
 - [ ] No PII in event properties (emails, names, IPs, etc.)
-- [ ] No user-defined names or identifiers in properties (schema, table, column, function, bucket, policy, project, branch), and no free text or extra IDs
-- [ ] New properties are typed as string-literal unions, booleans or numbers, not plain `string`
+- [ ] No user-defined names or identifiers in properties (schema, table, column, function, bucket, policy, project, branch), and no free text, raw error messages or extra IDs
+- [ ] New properties are typed as string-literal unions, booleans or numbers, not plain `string` (feature flag values excepted)
 - [ ] Property names consistent with similar events
