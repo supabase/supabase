@@ -44,6 +44,7 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { isEligibleForFreeMicroUpgrade } from '@/components/interfaces/Support/FreeMicroUpgradeSuggestion.utils'
 import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
 import { isFreeMicroUpgradeBannerSnoozed } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade.utils'
@@ -147,10 +148,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
 
-    const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    // The free Micro upgrade is only included on paid plans
-    const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
-    const showUpgradeBanner = isPaidPlan && isNanoCompute
+    const showUpgradeBanner = isEligibleForFreeMicroUpgrade({
+      planId: selectedOrganization?.plan?.id,
+      computeSize: selectedProject?.infra_compute_size,
+    })
 
     const isExplorerEnabled = useFlag('explorer')
 

@@ -51,7 +51,7 @@ const event = (value) => fs.appendFileSync(path.join(root, '.checks/events'), va
 
 // Run the real pnpm scripts, maybe-turbo and Turbo binary/config. Only remote generators
 // and Next compilation are fixture stand-ins.
-json('package.json', { name: 'fixture', private: true, packageManager: 'pnpm@11.13.1' })
+json('package.json', { name: 'fixture', private: true, packageManager: 'pnpm@12.21.0' })
 write('pnpm-workspace.yaml', 'packages:\n  - apps/*\n  - packages/*\n')
 write(
   '.gitignore',

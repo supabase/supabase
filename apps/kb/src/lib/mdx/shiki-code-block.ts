@@ -17,9 +17,10 @@ export const sharedCodeBlock: ShikiTransformer = {
   name: 'kb-shared-code-block',
   root() {
     const lines = this.tokens.map((line) =>
-      line.map(
-        ({ content, color, fontStyle }): CodeToken => [content, getTokenClassName(color, fontStyle)]
-      )
+      line.map(({ content, color, fontStyle }): CodeToken => [
+        content,
+        getTokenClassName(color, fontStyle),
+      ])
     )
     // astro highlights these fences as plain text. the frame labels them by line count only
     const lang = ['plaintext', 'text', 'txt', 'plain'].includes(this.options.lang)

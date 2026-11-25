@@ -272,7 +272,7 @@ async def query(client: AsyncClient):
 
 <TabPanel id="csharp" label="C#">
 
-Requires `supabase-csharp` `8.13.0` or later. The Auth, Database, Storage, and Edge Functions clients propagate trace context. Realtime does not.
+Requires `supabase-csharp` `8.15.0` or later. The Auth, Database, Storage, and Edge Functions clients propagate trace context. Realtime does not.
 
 The C# SDK has no dependency on OpenTelemetry. It reads `Activity.Current` from `System.Diagnostics`, so any OpenTelemetry setup, or a plain `ActivityListener`, can supply the trace.
 
@@ -329,10 +329,10 @@ Each client exposes one `ActivitySource` and one `Meter` that share a name. Regi
 
 | Client    | Constant                          | Name                 |
 | --------- | --------------------------------- | -------------------- |
-| Auth      | `GotrueDiagnostics.SourceName`    | `Supabase.Gotrue`    |
-| Database  | `PostgrestDiagnostics.SourceName` | `Supabase.Postgrest` |
-| Storage   | `StorageDiagnostics.SourceName`   | `Supabase.Storage`   |
-| Functions | `FunctionsDiagnostics.SourceName` | `Supabase.Functions` |
+| Auth      | `GotrueDiagnostics.SourceName`    | `supabase.gotrue`    |
+| Database  | `PostgrestDiagnostics.SourceName` | `supabase.postgrest` |
+| Storage   | `StorageDiagnostics.SourceName`   | `supabase.storage`   |
+| Functions | `FunctionsDiagnostics.SourceName` | `supabase.functions` |
 
 To export metrics as well as traces, add the meters to the provider from step 2:
 
@@ -355,13 +355,19 @@ Every HTTP request the SDK sends produces a client span named `{METHOD} {path}`,
 | `http.request.method`       | The HTTP method                                                                |
 | `server.address`            | The host                                                                       |
 | `server.port`               | The port, only when it is not the default for the scheme                       |
-| `url.full`                  | `scheme://host[:port]/path`, without the query string, fragment, or user info  |
+| `url.full`                  | `scheme://host[:port]/path`, never with the fragment or user info              |
 | `http.response.status_code` | The response status code                                                       |
 | `error.type`                | The status code for a 4xx or 5xx response, or the exception type for a failure |
 
 Each client adds its own tags and spans:
 
-- **Database:** the `db.operation` tag holds the logical operation (`select`, `insert`, `update`, `upsert`, `delete`, `count`, or `rpc`). Several operations share an HTTP method, so use this tag to tell them apart.
+- **Database:** spans carry these tags:
+  - `supabase.postgrest.operation` holds the logical operation (`select`, `insert`, `update`, `upsert`, `delete`, or `rpc`). Several operations share an HTTP method, so use this tag to tell them apart. A count is reported as `select`.
+  - `supabase.postgrest.table` holds the table name, on table calls.
+  - `supabase.postgrest.function` holds the function name, on RPC calls.
+
+  The `url.full` tag includes the query string with its values redacted. Keys are kept and every value becomes `REDACTED`, except the values of `select`, `order`, `limit`, and `offset`. For example, `?select=id,email&email=eq.john@doe.com&order=created_at.desc&limit=10` is recorded as `?select=id,email&email=REDACTED&order=created_at.desc&limit=10`. The client percent-encodes the query it sends, so a comma appears as `%2c`. For Auth, Storage, and Functions, the query string is not yet recorded.
+
 - **Storage:** upload and download spans carry `storage.transfer.direction` (`upload` or `download`). A resumable (TUS) upload is one span for the whole transfer, not one per chunk.
 - **Functions:** the `faas.invoked_name` tag holds the name of the invoked function. A relay error is a failed span even when the HTTP status is a success.
 - **Auth:** each public operation produces a span of its own, named `gotrue.*` (for example `gotrue.sign_in`, `gotrue.refresh_session`, or `gotrue.verify_otp`), with the HTTP span as its child. These spans can carry `gotrue.provider`, `gotrue.otp.channel`, `gotrue.sign_out.scope`, and similar tags. Each value is a category such as a provider name, never a credential or a user identifier.
@@ -370,16 +376,18 @@ Each client adds its own tags and spans:
 
 All metrics are histograms.
 
-| Metric                                     | Unit | Measures                                               |
-| ------------------------------------------ | ---- | ------------------------------------------------------ |
-| `supabase.gotrue.http.request.duration`    | `s`  | Duration of Auth HTTP requests                         |
-| `supabase.postgrest.http.request.duration` | `s`  | Duration of Database HTTP requests                     |
-| `supabase.storage.http.request.duration`   | `s`  | Duration of Storage requests other than file transfers |
-| `supabase.storage.transfer.duration`       | `s`  | Duration of file uploads and downloads                 |
-| `supabase.storage.transfer.size`           | `By` | Bytes moved by file uploads and downloads              |
-| `supabase.functions.invoke.duration`       | `s`  | Duration of function invocations                       |
+| Metric                                   | Unit | Measures                                               |
+| ---------------------------------------- | ---- | ------------------------------------------------------ |
+| `supabase.gotrue.http.request.duration`  | `s`  | Duration of Auth HTTP requests                         |
+| `http.client.request.duration`           | `s`  | Duration of Database HTTP requests                     |
+| `supabase.storage.http.request.duration` | `s`  | Duration of Storage requests other than file transfers |
+| `supabase.storage.transfer.duration`     | `s`  | Duration of file uploads and downloads                 |
+| `supabase.storage.transfer.size`         | `By` | Bytes moved by file uploads and downloads              |
+| `supabase.functions.invoke.duration`     | `s`  | Duration of function invocations                       |
 
-Every measurement carries `http.request.method`, `server.address`, and `url.path`. It also carries `http.response.status_code` when the request got a response, and `error.type` when it failed. Database measurements add `db.operation`, Storage transfers add `storage.transfer.direction`, and Functions measurements add `faas.invoked_name`.
+The Database metric `http.client.request.duration` is on the `supabase.postgrest` meter. Its attributes are `http.request.method`, `server.address`, `server.port`, `url.scheme`, `supabase.postgrest.operation`, and `supabase.postgrest.table` or `supabase.postgrest.function`. It also carries `http.response.status_code` when the request got a response, and `error.type` when it failed. It has no `url.path` and never carries a URL.
+
+Every measurement from the other clients carries `http.request.method`, `server.address`, and `url.path`. It also carries `http.response.status_code` when the request got a response, and `error.type` when it failed. Storage transfers add `storage.transfer.direction`, and Functions measurements add `faas.invoked_name`.
 
 ### Without the OpenTelemetry SDK
 
@@ -406,8 +414,8 @@ Use a `MeterListener` the same way for metrics. The duration histograms record `
 
 ### Privacy
 
-- URLs are recorded as `scheme://host[:port]/path`. The query string and fragment are never recorded, because query strings can hold column filters and their values, grant types, API keys, and signed URL tokens.
-- No tag holds an access token, refresh token, API key, request body, response body, row data, or file contents.
+- URLs are recorded as `scheme://host[:port]/path`. The fragment and user info are never recorded. For Database, the query string is redacted: keys are kept and values are replaced with `REDACTED`, except for `select`, `order`, `limit`, and `offset`. For Auth, Storage, and Functions, the query string is never recorded, because query strings can hold grant types, API keys, and signed URL tokens.
+- No tag ever holds an access token, refresh token, API key, request body, response body, row data, or file contents.
 - Function names and Storage object paths are recorded because they are part of the URL path. Payloads and file contents are not.
 - The SDK doesn't send telemetry anywhere. It goes only to the listeners and exporters that you register.
 

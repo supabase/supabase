@@ -432,7 +432,3 @@ export const mapAddOnVariantIdToComputeSize = (
 export const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US')
 }
-
-export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
-  return plan !== 'free' && infraComputeSize === 'nano'
-}
