@@ -390,6 +390,7 @@ export const Destinations = () => {
             type="warning"
             layout="responsive"
             title={failedRegionTitle}
+            description="Affected regions:"
             actions={
               <Button
                 loading={failedRegions.some(isRetryingRegion)}
@@ -403,7 +404,7 @@ export const Destinations = () => {
               <summary className="cursor-pointer text-foreground-light">
                 View affected regions
               </summary>
-              <ul className="mt-2 space-y-1">
+              <ul className="list-disc pl-5 space-y-1">
                 {failedRegions.map(({ group, error }) => (
                   <li key={group.clusterId ?? 'default'}>
                     <span>{group.region?.region_name ?? 'Default region'}</span>:{' '}
@@ -411,7 +412,6 @@ export const Destinations = () => {
                   </li>
                 ))}
               </ul>
-            </details>
           </Admonition>
         )}
 
