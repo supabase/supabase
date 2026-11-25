@@ -102,7 +102,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                 loading={isDeletingNamespaceTable}
                 className="w-7"
                 icon={<MoreVerticalIcon />}
-                aria-label={`Actions for ${table.name}`}
+                aria-label={`Actions for ${namespace}.${table.name}`}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-fit min-w-[180px]">

@@ -231,7 +231,7 @@ describe('Analytics Buckets after Pipelines retirement', () => {
     expect(await screen.findByText('analytics.events')).toBeInTheDocument()
 
     expect(screen.getByRole('button', { name: 'Actions for namespace public' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Actions for events' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Actions for public.events' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions for analytics.events' })).toBeInTheDocument()
   })
 })
