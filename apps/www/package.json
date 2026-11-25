@@ -58,7 +58,6 @@
     "icons": "workspace:*",
     "js-yaml": "^3.15.1",
     "lucide-react": "catalog:",
-    "markdown-toc": "^1.2.0",
     "marketing": "workspace:*",
     "mdast-util-from-markdown": "^2.0.2",
     "mdast-util-gfm": "^2.0.2",

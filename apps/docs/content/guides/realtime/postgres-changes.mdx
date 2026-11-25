@@ -1488,7 +1488,7 @@ for await change in changes {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "messages"
@@ -1501,8 +1501,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>

@@ -157,8 +157,8 @@ describe('SSLConfiguration', () => {
     await userEvent.click(sslSwitch)
 
     const dialog = await screen.findByRole('alertdialog')
-    expect(dialog).toHaveTextContent('Updating SSL enforcement involves a brief downtime')
-    expect(screen.getByRole('button', { name: 'Enable SSL' })).toBeInTheDocument()
+    expect(dialog).toHaveTextContent('Enforce SSL on connections?')
+    expect(screen.getByRole('button', { name: 'Enforce SSL' })).toBeInTheDocument()
     // Controlled switch must not flip while the dialog is open
     expect(sslSwitch).not.toBeChecked()
 
@@ -166,5 +166,31 @@ describe('SSLConfiguration', () => {
 
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
     expect(sslSwitch).not.toBeChecked()
+  })
+
+  it('disables SSL enforcement without a confirm dialog', async () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+    mockSSLEnforcement({ appliedSuccessfully: true, currentConfig: { database: true } })
+    const updateRequests: unknown[] = []
+    addAPIMock({
+      method: 'put',
+      path: '/v1/projects/:ref/ssl-enforcement',
+      response: async ({ request }) => {
+        updateRequests.push(await request.json())
+        return HttpResponse.json<SslEnforcementResponse>({
+          appliedSuccessfully: true,
+          currentConfig: { database: false },
+        })
+      },
+    })
+
+    customRender(<SSLConfiguration />)
+
+    const sslSwitch = await screen.findByRole('switch')
+    expect(sslSwitch).toBeChecked()
+    await userEvent.click(sslSwitch)
+
+    await waitFor(() => expect(updateRequests).toEqual([{ requestedConfig: { database: false } }]))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 })
