@@ -650,9 +650,9 @@ create policy "rls_test_select" on rls_test
 using ( auth.uid() is null or auth.uid() = user_id );
 ```
 
-For such a request, the `is null` branch is true for every row, so the policy returns every row the role's grants reach. This policy has no `to` clause, so it applies to `anon` too, as [Specify roles in your policies](#specify-roles-in-your-policies) explains. Every unauthenticated visitor reads the whole table.
+For such a request, the `is null` branch is true for every row, so the policy returns every row the role's grants reach. This policy has no `to` clause, so it also applies to `anon`, and every unauthenticated visitor reads the whole table.
 
-Adding `to authenticated` keeps `anon` requests out. But an `authenticated` request whose JWT has no `sub` still gets every row, such as one with a token your own server signs without a `sub`. Drop the branch instead:
+Adding `to authenticated` keeps `anon` requests out. A request with an `authenticated` JWT that has no `sub`, such as one your own server signs, still gets every row. Drop the branch instead:
 
 ```sql
 create policy "rls_test_select" on rls_test
