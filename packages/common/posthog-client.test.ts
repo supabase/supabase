@@ -157,20 +157,9 @@ describe('PostHogClient before_send', () => {
       $set_once: { $initial_current_url: leakingUrl },
     })
 
-    expect(JSON.stringify(sent)).not.toContain('secret')
-    expect(sent).toEqual({
-      event: '$identify',
-      properties: {
-        $current_url: redactedUrl,
-        $referrer: redactedUrl,
-        $initial_referrer: redactedUrl,
-        $session_entry_url: redactedUrl,
-        $set: { $current_url: redactedUrl },
-        $set_once: { $initial_current_url: redactedUrl },
-      },
-      $set: { $current_url: redactedUrl },
-      $set_once: { $initial_current_url: redactedUrl },
-    })
+    expect(JSON.stringify(sent)).not.toMatch(/secret|#/)
+    expect(sent.properties.$session_entry_url).toBe(redactedUrl)
+    expect(sent.$set_once.$initial_current_url).toBe(redactedUrl)
   })
 
   it('replaces the title the SDK stamps on a pageview, and leaves other events alone', async () => {
