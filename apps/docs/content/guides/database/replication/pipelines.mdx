@@ -103,7 +103,7 @@ Review initial sync choices and creation checks before tuning advanced settings.
 
 Selection changes affect unfinished initial syncs. To copy a completed table again, include it here, apply the settings, and [reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Skipping initial sync does not preserve or attach to previously loaded destination data. A table reset erases destination data even when initial sync is skipped.
+Skipping initial sync does not preserve or attach to previously loaded destination data. After a table reset, tables excluded from initial sync receive only new changes in the destination.
 
 ### Creation checks
 
@@ -345,19 +345,17 @@ Wait for initial sync to finish before changing its filter; changing a filter do
 
 ## Schema change support
 
-Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support) before altering replicated tables.
+Pipelines applies supported schema changes as replication progresses. Before altering a replicated table, check the schema change support for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support).
 
 Run schema migrations one at a time in short, fresh `READ COMMITTED` transactions. Avoid concurrent schema changes to related tables, types, or publications.
 
-Unsupported changes have different outcomes:
-
-- **Data type changes do not migrate existing destination columns.** BigQuery, DuckLake, and Snowflake generally skip type changes with a warning. ClickHouse rejects changes that alter its mapped type or timestamp semantics; see its [type-change rules](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support). Keeping the old destination type can cause later values to be rejected or interpreted differently.
+- **Column type changes depend on the destination.** Replication can continue when the change is compatible with the existing destination column type. An incompatible change can stop the entire pipeline. If replication continues with the previous column type, later writes can fail or store values differently from Postgres. If Postgres rewrites values during the change, previously replicated rows can become stale.
 - **Unsupported defaults and tightening `NOT NULL` are skipped with a warning.** Replication can continue with a different default or a more permissive destination column. Each destination guide describes these differences; skipping a default does not skip the values Postgres supplies in row changes.
 - **Incompatible schema changes are rejected with an error**, such as changing the primary-key definition used by BigQuery or ClickHouse's `ReplacingMergeTree`. Failed or interrupted schema changes can require manual recovery.
 
 Check [replication logs](/docs/guides/database/replication/pipelines-monitoring#viewing-logs) for warnings and errors after changing a replicated table.
 
-Some schema and publication changes require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). A reset rebuilds the destination schema and **deletes existing destination data**. Resolve any source incompatibility before resetting. To copy current source rows again, select the tables for [**Initial sync**](#choosing-which-tables-to-copy) and apply the settings before resetting. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
+For schema and publication changes that require a rebuild, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected tables. A reset rebuilds the destination schema and **replaces the replicated data**. Resolve any source incompatibility before resetting. To copy current source rows again, select the tables for [**Initial sync**](#choosing-which-tables-to-copy) and apply the settings before resetting. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
 
 ## Limitations
 

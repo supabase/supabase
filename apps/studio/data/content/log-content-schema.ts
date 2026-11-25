@@ -8,6 +8,13 @@ export const logsViewFilterConditionSchema = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]),
 })
 
+// An OR of conditions inside the root AND. Older Studio versions can't read views that
+// contain one and skip them in the views list.
+export const logsViewFilterGroupSchema = z.object({
+  logicalOperator: z.literal('OR'),
+  conditions: z.array(logsViewFilterConditionSchema),
+})
+
 export const logsViewSortSchema = z.object({ id: z.string(), desc: z.boolean() })
 
 export const logsViewOptionsSchema = z.object({
@@ -33,7 +40,7 @@ export const logsViewContentSchema = z.object({
   logSource: z.string(),
   filters: z.object({
     logicalOperator: z.literal('AND'),
-    conditions: z.array(logsViewFilterConditionSchema),
+    conditions: z.array(z.union([logsViewFilterConditionSchema, logsViewFilterGroupSchema])),
   }),
   viewOptions: logsViewOptionsSchema.passthrough(),
 })

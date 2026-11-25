@@ -119,8 +119,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     billingAddress !== debouncedAddress ||
     billingTaxId !== debouncedTaxId
 
-  const handleAddressChange = useCallback((address: CustomerAddress) => {
-    setLatestAddress(address)
+  const handleAddressChange = useCallback((address: CustomerAddress | null) => {
+    setLatestAddress(address ?? undefined)
   }, [])
 
   const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => {

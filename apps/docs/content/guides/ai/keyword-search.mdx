@@ -1,28 +1,47 @@
 ---
 id: 'ai-keyword-search'
 title: 'Keyword search'
-description: 'Learn how to search by words or phrases.'
-subtitle: 'Learn how to search by words or phrases.'
+description: 'Learn how keyword search finds records by exact words or phrases, how it differs from semantic search, and when to choose it over semantic or hybrid search.'
 sidebar_label: 'Keyword search'
 ---
 
-Keyword search involves locating documents or records that contain specific words or phrases, primarily based on the exact match between the search terms and the text within the data. It differs from [semantic search](/docs/guides/ai/semantic-search), which interprets the meaning behind the query to provide results that are contextually related, even if the exact words aren't present in the text. Semantic search considers synonyms, intent, and natural language nuances to provide a more nuanced approach to information retrieval.
+Knowing when keyword search beats semantic search tells you which one to build for your app. For how to set up keyword search in Postgres, see [Full text search](/docs/guides/database/full-text-search).
 
-In Postgres, keyword search is implemented using [full-text search](/docs/guides/database/full-text-search). It supports indexing and text analysis for data retrieval, focusing on records that match the search criteria. Postgres' full-text search extends beyond keyword matching to address linguistic nuances, making it effective for applications that require precise text queries.
+## Keyword search vs semantic search
 
-## When and why to use keyword search
+Keyword search finds documents or records that contain specific words or phrases. The following table compares it with [semantic search](/docs/guides/ai/semantic-search):
 
-Keyword search is particularly useful in scenarios where precision and specificity matter. It's more effective than semantic search when users are looking for information using exact terminology or specific identifiers. It ensures that results directly contain those terms, reducing the chance of retrieving irrelevant information that might be semantically related but not what the user seeks.
+|           | Keyword search                                                                               | Semantic search                                                          |
+| --------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Matches   | Mainly an exact match between the search terms and the text                                  | The meaning behind the query, even if the exact words aren't in the text |
+| Considers | The specific words or phrases in the query                                                   | Synonyms, intent, and natural language nuances                           |
+| Returns   | Results that contain the search terms, or normalized forms of them, such as `egg` for `eggs` | Results that are contextually related to the query                       |
 
-For example in technical or academic research databases, researchers often search for specific studies, compounds, or concepts identified by certain terms or codes. Searching for a specific chemical compound using its exact molecular formula or a unique identifier will yield more focused and relevant results compared to a semantic search, which could return a wide range of documents discussing the compound in different contexts. Keyword search ensures documents that explicitly mention the exact term are found, allowing users to access the precise data they need efficiently.
+## How keyword search works
 
-It's also possible to combine keyword search with semantic search to get the best of both worlds. See [Hybrid search](/docs/guides/ai/hybrid-search) for more details.
+In Postgres, keyword search is implemented using full-text search. It supports indexing and text analysis for data retrieval, focusing on records that match the search criteria. Postgres' full-text search extends beyond keyword matching to address linguistic nuances, making it effective for applications that require precise text queries.
 
-## Using full-text search
+A full-text search works in three steps:
 
-For an in-depth guide to Postgres' full-text search, including how to store, index, and query records, see [Full text search](/docs/guides/database/full-text-search).
+1. `to_tsvector()` converts your data into searchable tokens. Together, these tokens are called a _document_.
+2. `to_tsquery()` converts the search query into tokens to match, so a search for `eggs` can still match a value of `egg`.
+3. The `@@` operator tests whether the document matches the query and returns a boolean. A `where` clause uses that result to select matching rows.
 
-## See also
+For each function and its options, see [Full text search](/docs/guides/database/full-text-search#usage).
 
-- [Semantic search](/docs/guides/ai/semantic-search)
-- [Hybrid search](/docs/guides/ai/hybrid-search)
+## When to use keyword search
+
+Keyword search is useful where precision and specificity matter. It's more effective than semantic search in the following cases:
+
+- Users search with exact terminology or specific identifiers.
+- Results must contain those terms, or their normalized forms, so that information that's semantically related but not what the user seeks stays out.
+
+For example, in technical or academic research databases, researchers often search for specific studies, compounds, or concepts identified by certain terms or codes. Searching for a specific chemical compound using its exact molecular formula or a unique identifier will yield more focused and relevant results compared to a semantic search, which could return a wide range of documents discussing the compound in different contexts.
+
+You can also combine keyword search with semantic search, which is called hybrid search.
+
+## Related resources
+
+- [Full text search](/docs/guides/database/full-text-search): store, index, and query records with Postgres full-text search.
+- [Semantic search](/docs/guides/ai/semantic-search): search by meaning instead of exact terms.
+- [Hybrid search](/docs/guides/ai/hybrid-search): combine keyword and semantic search.

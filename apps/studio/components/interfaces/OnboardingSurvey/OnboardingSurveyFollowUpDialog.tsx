@@ -22,11 +22,12 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { ORG_SIZE_DEFAULT, ORG_SIZE_TYPES } from '../Organization/NewOrg/OrganizationDetailsFields'
 import {
   BUILDING_OPTIONS,
   CAN_CODE_OPTIONS,
   SURVEY_ORG_KIND_OPTIONS,
+  ORG_SIZE_DEFAULT,
+  ORG_SIZE_TYPES,
 } from './OnboardingSurvey.constants'
 import { OnboardingSurveySelect } from './OnboardingSurveySelect'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'

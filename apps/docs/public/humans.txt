@@ -59,16 +59,16 @@ Brad Gyger
 Brendan Stephens
 Brent Graveland
 Brent Newson
-Brian Cullen
 Brent Schroeter
+Brian Cullen
 Bruno Kilian
 Burhan A
 Caleb Boylan
+Cameron Blackwood
+Cameron Michie
 Carel de Waal
 Carlos Robles
 Carson Adam
-Cameron Blackwood
-Cameron Michie
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
@@ -97,6 +97,7 @@ Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
+Danny Kulchinsky
 Danny White
 Dave Wilson
 David A. Ventimiglia
@@ -136,8 +137,10 @@ Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
 Ferhat Elmas
+Fernando Crespo Grávalos
 Filipe Cabaco
 Firas El Rachidi
+Firdaws Farukh
 Francesco Sansalvadore
 Francisco Ulate
 Franek Richardson
@@ -153,8 +156,8 @@ Greg Kress
 Greg P
 Greg Richardson
 Gregor Vand
-Guillaume Faas
 Guilherme Souza
+Guillaume Faas
 Hanefi Önaldı
 Hannah Bowers
 Hardik Maheshwari
@@ -170,9 +173,10 @@ Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jack Secord
 Jagpreet Singh
-Jamie Boyd
 Jake Ng
+Jamie Boyd
 Jared Patterson
 Jason Farber
 Jason Harley
@@ -192,14 +196,14 @@ Joanna Lisiewicz
 Joanna Michniewicz
 Joaquim Moreno
 Joel Low
+Joel Martin
 Joey Freeland
 Joey Lei
+Johan Bergström
 John Fitzgerald
 John Jarvis
 John Kerry
 John Murret
-Joel Martin
-Johan Bergström
 John Pena
 Jon M
 Jonathan Eng
@@ -215,15 +219,15 @@ Julien Goux
 Kacper Mentel
 Kai M
 Kalleby Santos
-Kanad Gupta
-Kanishk Dudeja
 Kamil Ogórek
+Kanad Gupta
 Kang Ming Tay
+Kanishk Dudeja
 Karan S
 Karlo Ison
 Katerina Skroumpelou
-Keith Resar
 Keith Fiske
+Keith Resar
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
@@ -248,24 +252,26 @@ Lukas Bernert
 Lukas Klingsbo
 Łukasz Korbasiewicz
 Łukasz Niemier
+Lyric Hartley
 Maksym Ionutsa
-Manuel Mendez
 Manan Gupta
+Mandy Raff
+Manuel Mendez
 Marcus Weiner
 Marija Milicevic
 Mario Karuza
 Mark Burggraf
 Márton Boros
 Masha Koltsova
-Matthew Hambright
+Mats Kindahl
 Matt Hudson
 Matt Johnston
 Matt McGill
 Matt Robinson
 Matt Rossman
 Matt Smiley
+Matthew Hambright
 Matthias Luft
-Mats Kindahl
 Meg Corren
 Mert Yerekapan
 Michael Zalimeni
@@ -330,9 +336,9 @@ Roman Hernandez
 Ronan Lehane
 Rory Hunter
 Rory Wilding
+Ruan Maia
 Ryan Goulet
 Ryan Senior
-Ruan Maia
 Saba Pochkhua
 Safa Orhan
 Sagar Shedge
@@ -342,8 +348,8 @@ Sam Rose
 Samir Ketema
 Sana Cordeaux
 Santos Flores de Leon
-Sasi Kanumuri
 Sara Read
+Sasi Kanumuri
 Satya Rohith Gannamanedi
 Satyanarayana Uppada
 Sean Geoghegan
@@ -353,8 +359,8 @@ Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shaun Newman
 Shardul Borhade
+Shaun Newman
 Shreekar Shetty
 Simon Tomlinson
 Sreyas Udayavarman
@@ -365,10 +371,10 @@ Steve Abrams
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
-Szymon Mentel
 Sugat Mahanti
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Szymon Mentel
 Taha Le Bras
 Tanun Chalermsinsuwan
 Tarun Khandelwal
@@ -388,8 +394,8 @@ Tom G
 Tomás Pozo
 Tomás Torgal
 Tomohiro Mitani
-Tyler Hillery
 Tyler Fontaine
+Tyler Hillery
 Tyler Shukert
 TzeYiing L
 Utkarash Singh

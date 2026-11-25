@@ -1,11 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useParams } from 'common'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PublicationsTables } from '@/components/interfaces/Database/Publications/PublicationsTables'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -19,7 +25,7 @@ export const Route = createFileRoute('/project/$ref/database/publications/$id')(
 })
 
 function DatabasePublications() {
-  const { ref, id } = useParams()
+  const { ref, id } = Route.useParams()
   const { data: project } = useSelectedProjectQuery()
   const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_READ
@@ -36,16 +42,31 @@ function DatabasePublications() {
   }
 
   return (
-    <PageLayout
-      title={isPending ? <ShimmeringLoader className="w-40" /> : (selectedPublication?.name ?? '')}
-      breadcrumbs={[
-        {
-          label: 'Publications',
-          href: `/project/${ref}/database/publications`,
-        },
-      ]}
-      size="large"
-    >
+    <>
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/project/$ref/database/publications" params={{ ref }}>
+                Publications
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>
+              {isPending ? (
+                <ShimmeringLoader className="w-40" />
+              ) : (
+                (selectedPublication?.name ?? '')
+              )}
+            </PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
@@ -53,6 +74,6 @@ function DatabasePublications() {
           </PageSectionContent>
         </PageSection>
       </PageContainer>
-    </PageLayout>
+    </>
   )
 }

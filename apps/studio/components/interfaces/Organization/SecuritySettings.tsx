@@ -7,10 +7,11 @@ import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -101,8 +102,8 @@ export const SecuritySettings = () => {
   }
 
   return (
-    <ScaffoldContainer size="small" className="px-6 xl:px-10">
-      <ScaffoldSection isFullWidth>
+    <PageContainer size="small">
+      <PageSection>
         {!hasAccessToEnforceMfa && !isLoadingEntitlement ? (
           <UpgradeToPro
             source="organizationMfa"
@@ -196,7 +197,7 @@ export const SecuritySettings = () => {
             )}
           </>
         )}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

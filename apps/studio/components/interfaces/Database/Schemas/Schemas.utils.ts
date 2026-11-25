@@ -1,11 +1,10 @@
+import '@xyflow/react/dist/style.css'
+
 import dagre from '@dagrejs/dagre'
 import type { PGSchema, PGTable } from '@supabase/pg-meta'
 import { Edge, Node, Position } from '@xyflow/react'
-import { uniqBy } from 'lodash'
-
-import '@xyflow/react/dist/style.css'
-
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { uniqBy } from 'lodash'
 
 import { TableNodeData } from './Schemas.constants'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'

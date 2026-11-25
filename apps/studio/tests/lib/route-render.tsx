@@ -11,6 +11,7 @@ import { act, render, type RenderOptions } from '@testing-library/react'
 
 import { CustomWrapper } from './custom-render'
 import { RenderedRouteContext } from './route-aware-hooks'
+import { StudioFrameworkProvider } from '@/components/interfaces/App/StudioFrameworkProvider'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 type RouteNode = { id: string } | { path: string }
@@ -23,7 +24,9 @@ type RenderRouteOptions = Omit<Parameters<typeof CustomWrapper>[0], 'children'> 
 
 const RenderedRouteRoot = () => (
   <RenderedRouteContext.Provider value={true}>
-    <Outlet />
+    <StudioFrameworkProvider>
+      <Outlet />
+    </StudioFrameworkProvider>
   </RenderedRouteContext.Provider>
 )
 

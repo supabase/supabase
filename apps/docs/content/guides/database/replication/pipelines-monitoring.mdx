@@ -50,7 +50,7 @@ Click a pipeline in the list to inspect its metrics and table states.
 | **Copied**        | Copy finished; changes made during the copy still need to be applied |
 | **Live**          | Following WAL changes, including catch-up after copying              |
 | **Error**         | Replication encountered an error                                     |
-| **Restarting**    | Restarting replication for the table from scratch                    |
+| **Resetting**     | A table reset request is in progress                                 |
 | **Not Available** | State is temporarily unavailable during a pipeline state change      |
 | **Unknown**       | The Dashboard does not recognize the reported state                  |
 
@@ -172,7 +172,7 @@ Restarting during initial sync also repeats the copy when its rows finished copy
 
 When you reset tables:
 
-- **All existing data in the affected destination tables is deleted when replication resumes.** Source tables and their rows are unchanged. Append-only destination history is also erased.
+- **Replication replaces the affected tables' replicated data when it resumes.** This clears any append-only history from the replica. Source tables and their rows are unchanged.
 - Tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy) copy their current published source rows again, then resume ongoing replication. Excluded tables receive new changes only.
 - Saved progress is reset only for the selected tables.
 - Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).

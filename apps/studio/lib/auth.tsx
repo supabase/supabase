@@ -4,6 +4,7 @@ import {
   clearLocalStorage,
   gotrueClient,
   posthogClient,
+  resetServerTelemetryCookies,
   useAuthError,
 } from 'common'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
@@ -45,7 +46,12 @@ export function useSignOut() {
   const { clearStorage: clearAssistantStorage } = useAiAssistantStateSnapshot()
 
   return useCallback(async () => {
+    const { data, error } = await gotrueClient.getSession()
+    const wasSignedIn = data.session !== null || error !== null
     const result = await gotrueClient.signOut()
+    // withAuth also calls this for visitors with no session, whose anonymous id cookie must
+    // survive until sign-in links it to their account
+    if (wasSignedIn) await resetServerTelemetryCookies()
     posthogClient.reset()
     clearLocalStorage()
     // Clear Assistant IndexedDB

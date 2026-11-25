@@ -231,6 +231,16 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/logs/explorer/recent',
+    destination: '/project/:ref/logs/explorer',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/logs/explorer/saved',
+    destination: '/project/:ref/logs/explorer',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/sql/quickstarts',
     destination: '/project/:ref/sql/examples',
     permanent: true,

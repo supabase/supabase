@@ -25,7 +25,7 @@ type HasProperties<A extends keyof EventMap> = EventMap[A] extends { properties:
  *
  * @example
  * const track = useTrack()
- * track('table_created', { method: 'sql_editor', schema_name: 'public' })
+ * track('table_created', { method: 'sql_editor' })
  * track('help_button_clicked')
  */
 export const useTrack = () => {
