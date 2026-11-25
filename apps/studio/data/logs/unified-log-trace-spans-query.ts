@@ -13,15 +13,20 @@ import type { StudioError } from '@/lib/errors/studio-errors'
 const spanSchema = z.object({
   type: z.literal('span'),
   id: z.string(),
-  attributes: z.object({
-    parent_span_id: z.string().nullable(),
-    service_name: z.string(),
-    span_name: z.string(),
-    span_kind: z.string(),
-    status_code: z.string(),
-    start_time: z.string(),
-    duration_ns: z.number(),
-  }),
+  // `.passthrough()`: the endpoint can carry attributes beyond this known set (HTTP/DB tags,
+  // resource attributes, etc.) — keep them so Trace.Inspector can still show them, instead of
+  // zod's default of silently stripping any key not declared here.
+  attributes: z
+    .object({
+      parent_span_id: z.string().nullable(),
+      service_name: z.string(),
+      span_name: z.string(),
+      span_kind: z.string(),
+      status_code: z.string(),
+      start_time: z.string(),
+      duration_ns: z.number(),
+    })
+    .passthrough(),
 })
 
 const traceSpansResponseSchema = z.object({

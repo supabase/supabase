@@ -35,11 +35,9 @@ function toSpan(span: TraceSpan, traceId: string): Span | null {
     startMs,
     endMs: startMs + Math.max(0, durationMs),
     status: toSpanStatus(attributes.status_code),
-    attributes: {
-      service_name: attributes.service_name,
-      span_kind: attributes.span_kind,
-      status_code: attributes.status_code,
-    },
+    // Forwarded as-is (including anything beyond the known fields, now that the query's schema
+    // passes it through) so Trace.Inspector can show the full set, not a hand-picked subset.
+    attributes,
     events: [],
   }
 }
