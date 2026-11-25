@@ -26,6 +26,7 @@ export const ConfirmDeleteModal = () => {
   const visible = selectedItemsToDelete.length > 0
   const multipleFiles = selectedItemsToDelete.length > 1
   const [firstItem] = selectedItemsToDelete
+  const isSingleFolder = !multipleFiles && firstItem?.type === STORAGE_ROW_TYPES.FOLDER
 
   const getTitle = () => {
     if (multipleFiles) {
@@ -60,7 +61,9 @@ export const ConfirmDeleteModal = () => {
     return {
       base: { variant: 'destructive' as const },
       title: 'This action cannot be undone',
-      description: `Are you sure you want to delete ${getSubject()}?`,
+      description: isSingleFolder
+        ? 'Deleting the selected folder will permanently delete it and every file inside it.'
+        : `Are you sure you want to delete ${getSubject()}?`,
     }
   }
 
