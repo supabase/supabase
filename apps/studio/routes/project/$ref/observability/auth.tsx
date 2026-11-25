@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
@@ -31,6 +32,7 @@ import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { reportKeys } from '@/data/reports/keys'
 import {
   createErrorsReportConfig,
   createLatencyReportConfig,
@@ -59,6 +61,7 @@ const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = Route.useParams()
+  const queryClient = useQueryClient()
   const useOtel = useFlag('otelReports')
   const chartSyncId = `auth-report`
   const queryGroup = useOtel ? 'auth-otel' : 'auth-bigquery'
@@ -169,8 +172,14 @@ const AuthUsage = () => {
       if (!selectedDateRange) return
 
       setIsRefreshing(true)
-      refetch()
-      setTimeout(() => setIsRefreshing(false), 1000)
+      try {
+        await Promise.all([
+          refetch(),
+          queryClient.invalidateQueries({ queryKey: reportKeys.charts(ref) }),
+        ])
+      } finally {
+        setIsRefreshing(false)
+      }
     }
   )
 

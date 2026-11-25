@@ -5,16 +5,19 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Alert, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { SpendCapSidePanel } from './SpendCapSidePanel'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -56,34 +59,31 @@ export const CostControl = () => {
 
   return (
     <>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-12">
-            <div className="space-y-2">
-              <p className="text-foreground text-base m-0">Cost Control</p>
-              <p className="text-sm text-foreground-light m-0">
+      <PageSection orientation="horizontal">
+        <PageSectionMeta>
+          <PageSectionSummary className="gap-6">
+            <div className="flex flex-col gap-1">
+              <PageSectionTitle>Cost Control</PageSectionTitle>
+              <PageSectionDescription>
                 Allow scaling beyond your plan's{' '}
                 <InlineLink href={`/org/${slug}/usage`}>included quota</InlineLink>.
-              </p>
+              </PageSectionDescription>
             </div>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
-              <div>
-                <Link
-                  href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                    <p className="text-sm m-0">Spend cap</p>
-                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
-                  </div>
-                </Link>
-              </div>
+              <Link
+                href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition"
+              >
+                <span className="text-sm">Spend cap</span>
+                <ExternalLinkIcon size={16} strokeWidth={1.5} />
+              </Link>
             </div>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="flex flex-col gap-6">
           {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="update this organization's cost control" />
           ) : (
@@ -198,8 +198,8 @@ export const CostControl = () => {
               )}
             </>
           )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
       <SpendCapSidePanel />
     </>
   )

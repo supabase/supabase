@@ -23,7 +23,7 @@ interface PaintSettleParams {
 }
 
 interface CreateInfallParams {
-  getAnchor: () => HTMLElement | null
+  anchor: HTMLElement
 }
 
 interface InfallMeasureParams {
@@ -39,7 +39,6 @@ interface InfallFrameParams {
 }
 
 interface Infall {
-  getLift: () => number
   measure: (params: InfallMeasureParams) => void
   advance: (dt: number) => void
   paint: (params: InfallFrameParams) => boolean
@@ -142,7 +141,7 @@ const paintSettle = ({ glyphs, at }: PaintSettleParams) => {
   }
 }
 
-export const createInfall = ({ getAnchor }: CreateInfallParams): Infall => {
+export const createInfall = ({ anchor }: CreateInfallParams): Infall => {
   let glyphs: InfallGlyph[] = []
   let frameKey = ''
   let isConsumed = false
@@ -150,15 +149,12 @@ export const createInfall = ({ getAnchor }: CreateInfallParams): Infall => {
   let fallAt = 0
   let fallTarget = 0
   let settleAt = 1
-  const getSearch = () => getAnchor()?.querySelector<HTMLElement>('[data-warp-throat]') ?? null
+  const getSearch = () => anchor.querySelector<HTMLElement>('[data-warp-throat]')
 
   return {
-    // a risen search must not move the throat, so the canvas adds the lift back when it measures
-    getLift: () => (isConsumed ? lift : 0),
     measure: ({ origin, throat }) => {
-      const anchor = getAnchor()
-      glyphs = anchor ? measureInfall({ container: anchor, origin, throat }) : []
-      const copy = [...(anchor?.children ?? [])]
+      glyphs = measureInfall({ container: anchor, origin, throat })
+      const copy = [...anchor.children]
         .filter((child) => !child.matches('[data-warp-throat]'))
         .map((child) => child.getBoundingClientRect())
       // the search rises 60% of the way to the copy's center

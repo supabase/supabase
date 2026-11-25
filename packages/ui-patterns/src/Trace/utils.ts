@@ -326,7 +326,7 @@ export function computeMinimapRects(
 
   const rects: MinimapRect[] = []
   cells.forEach((lane, laneIndex) => {
-    for (let column = 0; column < columns; ) {
+    for (let column = 0; column < columns;) {
       if (lane[column] === 0) {
         column++
         continue
