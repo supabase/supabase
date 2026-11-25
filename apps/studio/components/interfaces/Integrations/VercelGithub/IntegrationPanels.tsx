@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
 import { ArrowRightIcon, ExternalLinkIcon } from 'lucide-react'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
 import { Badge, Button, cn, GithubIcon } from 'ui'
@@ -60,14 +59,7 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
 const Avatar = ({ src }: { src: string | undefined }) => {
   return (
     <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
-      <Image
-        src={src || ''}
-        width={30}
-        height={30}
-        layout="fill"
-        alt="avatar"
-        className="relative"
-      />
+      <img src={src || ''} alt="avatar" className="absolute inset-0 h-full w-full" />
     </div>
   )
 }

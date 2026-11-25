@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import { BASE_PATH } from '@/lib/constants'
@@ -13,7 +12,7 @@ export const UnifiedLogsPreview = () => {
         Experience our enhanced Logs interface with improved filtering, real-time updates, and a
         unified view across all your services. Built for better performance and easier debugging.
       </p>
-      <Image
+      <img
         alt="new-logs-preview"
         src={`${BASE_PATH}/img/previews/new-logs-preview.png`}
         width={1296}

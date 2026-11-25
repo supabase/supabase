@@ -2,7 +2,6 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { LockIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import {
   Alert,
   AlertDescription,
@@ -260,7 +259,7 @@ export const Addons = () => {
                 className={resourceItemClassName}
                 onClick={canOpenIPv4 ? () => setPanel('ipv4') : undefined}
                 media={
-                  <Image
+                  <img
                     className="bg rounded-lg border"
                     alt="IPv4"
                     width={160}
@@ -310,7 +309,7 @@ export const Addons = () => {
               className={resourceItemClassName}
               onClick={canOpenPITR ? () => setPanel('pitr') : undefined}
               media={
-                <Image
+                <img
                   className="bg rounded-lg border"
                   alt="PITR"
                   width={160}
@@ -362,7 +361,7 @@ export const Addons = () => {
                 className={resourceItemClassName}
                 onClick={canOpenCustomDomain ? () => setPanel('customDomain') : undefined}
                 media={
-                  <Image
+                  <img
                     className="bg rounded-lg border"
                     alt="Custom Domain"
                     width={160}

@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 
 import { useIsExplorerEnabled } from './FeaturePreviewContext'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -22,7 +21,7 @@ export const ExplorerPreview = () => {
         is an evolution of the SQL Editor and will replace it when the flag is enabled.
       </p>
 
-      <Image
+      <img
         src={`${BASE_PATH}/img/previews/explorer-preview.png`}
         width={1296}
         height={900}

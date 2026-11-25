@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes } from 'lodash'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
-import Image from 'next/legacy/image'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
   Badge,
@@ -76,16 +75,15 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
             <TableCell>
               <div className="flex items-center space-x-4">
                 <div>
-                  <Image
+                  <img
                     src={
                       isEdgeFunction
                         ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
                         : `${BASE_PATH}/img/function-providers/http-request.png`
                     }
                     alt="hook-type"
-                    layout="fixed"
-                    width="20"
-                    height="20"
+                    width={20}
+                    height={20}
                     title={isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'}
                   />
                 </div>

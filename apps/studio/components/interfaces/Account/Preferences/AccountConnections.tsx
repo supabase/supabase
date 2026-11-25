@@ -1,5 +1,4 @@
 import { ChevronDownIcon, RefreshCwIcon, UnlinkIcon } from 'lucide-react'
-import Image from 'next/image'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -90,7 +89,7 @@ export const AccountConnections = () => {
           {isSuccess && (
             <CardContent className="flex justify-between items-center">
               <div className="flex gap-x-4 items-center">
-                <Image
+                <img
                   className={cn('dark:invert')}
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={30}

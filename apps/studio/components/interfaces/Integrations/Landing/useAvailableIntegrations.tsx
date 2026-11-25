@@ -8,7 +8,6 @@ import {
 import { fullImageUrl } from 'common/marketplace-client'
 import { BoxesIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -25,11 +24,10 @@ const renderMarketplaceLogo = (listingLogo?: string | null) => {
   const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
     <div className="relative w-full h-full">
       {listingLogo ? (
-        <Image
-          fill
+        <img
           src={fullImageUrl(listingLogo)}
           alt=""
-          className={cn('p-2', className)}
+          className={cn('w-full h-full p-2', className)}
           {...props}
         />
       ) : (

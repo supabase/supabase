@@ -1,5 +1,4 @@
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { cn } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
@@ -37,7 +36,7 @@ export const ConnectionIcon = ({
       }${imageExtension}.svg`
 
   return (
-    <Image
+    <img
       className={cn('transition-all group-hover:scale-110', className)}
       src={iconImgSrc}
       alt={`${icon} logo`}

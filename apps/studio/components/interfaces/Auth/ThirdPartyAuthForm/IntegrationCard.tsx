@@ -1,5 +1,4 @@
 import { CheckIcon } from 'lucide-react'
-import Image from 'next/image'
 import { Badge } from 'ui'
 
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
@@ -206,7 +205,7 @@ export const IntegrationCard = ({
     <>
       <div className="bg-surface-100 border overflow-hidden shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
         <div className="py-1">
-          <Image src={getIntegrationTypeIcon(type)} width={21} height={21} alt={`${type} icon`} />
+          <img src={getIntegrationTypeIcon(type)} width={21} height={21} alt={`${type} icon`} />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-y-4 overflow-y-auto">
           <div className="text-sm flex flex-col">

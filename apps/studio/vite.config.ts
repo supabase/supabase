@@ -33,8 +33,6 @@ const nextShims: Record<string, string> = {
   'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
   'next/dynamic': path.join(compatRoot, 'dynamic.tsx'),
   'next/head': path.join(compatRoot, 'head.tsx'),
-  'next/image': path.join(compatRoot, 'image.tsx'),
-  'next/legacy/image': path.join(compatRoot, 'legacy/image.tsx'),
   'next/link': path.join(compatRoot, 'link.tsx'),
   'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),

@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 import { Alert, AlertDescription, AlertTitle, WarningIcon } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -36,7 +35,7 @@ export const CLSPreview = () => {
           </AlertDescription>
         </Alert>
       </div>
-      <Image
+      <img
         src={`${BASE_PATH}/img/previews/cls-preview.png`}
         width={1860}
         height={970}

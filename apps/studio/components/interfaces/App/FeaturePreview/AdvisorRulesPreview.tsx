@@ -1,5 +1,4 @@
 import { useFlag, useParams } from 'common'
-import Image from 'next/image'
 
 import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -21,7 +20,7 @@ export const AdvisorRulesPreview = () => {
           ? 'Turn off specific checks or categories to stop them showing up in Issues or email notifications. This could be useful for checks that might not apply to your project.'
           : 'Disable specific Advisor categories or rules to prevent them from showing up in Advisor reports or email notifications. This could be useful for rules that might not be applicable to your project.'}
       </p>
-      <Image
+      <img
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
         width={1296}
         height={900}
