@@ -117,14 +117,13 @@ Get the Project URL and key from [the project's **Connect** dialog](/dashboard/p
 
     ```python
     import asyncio
+    from realtime import RealtimeSubscribeStates
     from supabase import acreate_client
 
     URL = "https://<project>.supabase.co"
     KEY = "<sb_publishable_... key>"
 
-    async def create_supabase():
-      supabase = await acreate_client(URL, KEY)
-      return supabase
+    supabase = await acreate_client(URL, KEY)
     ```
 
   </TabPanel>
@@ -266,9 +265,11 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
       print(f"Broadcast received: {payload}")
 
     # Subscribe to the Channel
-    await my_channel
+    await (
+      my_channel
       .on_broadcast('shout', message_received) # Listen for "shout". Can be "*" to listen to all events
       .subscribe()
+    )
     ```
 
   </TabPanel>
@@ -779,12 +780,12 @@ With self-send enabled, each message delivered back to the sender is billed as a
         return
 
       # Send a message once the client is subscribed
-      asyncio.create_task(channel_b.send_broadcast(
+      asyncio.create_task(my_channel.send_broadcast(
         'test-my-messages',
         { "message": 'talking to myself' },
       ))
 
-    my_channel.subscribe(on_subscribe)
+    await my_channel.subscribe(on_subscribe)
     ```
 
   </TabPanel>
@@ -1296,7 +1297,7 @@ Messages are stored in daily partitions, and partitions older than 72 hours are 
     </Admonition>
     ```python
     # Configure broadcast with replay
-    channel = client.channel('my-channel', {
+    channel = supabase.channel('my-channel', {
         'config': {
             "private": True,
             'broadcast': {
@@ -1315,7 +1316,7 @@ Messages are stored in daily partitions, and partitions older than 72 hours are 
         if payload.get('meta', {}).get('replayed'):
             print(f"Replayed message: {payload['meta']['id']}")
 
-    await channel.on_broadcast('position', on_broadcast)
+    channel.on_broadcast('position', on_broadcast)
     await channel.subscribe()
     ```
 

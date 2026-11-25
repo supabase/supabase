@@ -118,12 +118,15 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 <TabPanel id="python" label="Python">
 
 ```python
-from supabase import create_client
+import asyncio
+import datetime
+from realtime import RealtimeSubscribeStates
+from supabase import acreate_client
 
 SUPABASE_URL = 'https://<project>.supabase.co'
 SUPABASE_KEY = '<sb_publishable_... key>'
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = await acreate_client(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
@@ -246,11 +249,13 @@ Listen to the `sync`, `join`, and `leave` events triggered whenever any client j
 ```python
 room_one = supabase.channel('room_01')
 
-room_one
-  .on_presence_sync(lambda: print('sync', room_one.presenceState()))
+await (
+  room_one
+  .on_presence_sync(lambda: print('sync', room_one.presence_state()))
   .on_presence_join(lambda key, curr_presences, joined_presences: print('join', key, curr_presences, joined_presences))
   .on_presence_leave(lambda key, curr_presences, left_presences: print('leave', key, curr_presences, left_presences))
   .subscribe()
+)
 ```
 
 </TabPanel>
@@ -403,9 +408,9 @@ def on_subscribe(status, err):
   if status != RealtimeSubscribeStates.SUBSCRIBED:
     return
 
-  room_one.track(user_status)
+  asyncio.create_task(room_one.track(user_status))
 
-room_one.subscribe(on_subscribe)
+await room_one.subscribe(on_subscribe)
 ```
 
 </TabPanel>
@@ -503,7 +508,7 @@ untrackPresence()
 <TabPanel id="python" label="Python">
 
 ```python
-room_one.untrack()
+await room_one.untrack()
 ```
 
 </TabPanel>
