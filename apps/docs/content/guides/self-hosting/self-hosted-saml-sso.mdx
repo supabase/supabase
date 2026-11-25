@@ -88,7 +88,7 @@ SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
 # Optional: how long relay state tokens remain valid (default: 2m0s)
 # SAML_RELAY_STATE_VALIDITY_PERIOD=2m0s
 
-# Optional: rate limit on the ACS endpoint (requests per second, default: 15)
+# Optional: rate limit on the ACS endpoint (requests per 5 minutes, default: 15)
 # SAML_RATE_LIMIT_ASSERTION=15
 ```
 
@@ -226,9 +226,16 @@ The response includes the provider `id` (UUID) - save this for use in your appli
 | `metadata_xml`      | One of these | Raw IdP metadata XML string                                                                   |
 | `domains`           | No           | Array of email domains to associate (e.g., `["acme.com"]`). Used for domain-based SSO lookup. |
 | `attribute_mapping` | No           | Map SAML attributes to user claims (see [Attribute mapping](#attribute-mapping))              |
-| `name_id_format`    | No           | Request a specific NameID format: `persistent`, `emailAddress`, `transient`, or `unspecified` |
+| `name_id_format`    | No           | Request a specific NameID format. Must be one of the supported URNs                           |
 | `resource_id`       | No           | A custom external identifier for the provider                                                 |
 | `disabled`          | No           | Set to `true` to register but disable the provider                                            |
+
+`name_id_format` supports these values:
+
+- `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
+- `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`
+- `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`
+- `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`
 
 ## Step 8: Configure your identity provider
 
@@ -359,7 +366,7 @@ Each mapping key supports:
 | `default` | Default value if the attribute is not present in the assertion                                             |
 | `array`   | Set to `true` to collect all values (for multi-valued attributes like groups)                              |
 
-Mapped attributes are stored in the user's `raw_user_meta_data` and are available via `user.user_metadata` in your application.
+Mapped attributes are stored in the user's `raw_user_meta_data` and are available via `user.user_metadata` in your application. Standard claims, such as `email` and `name`, are at the top level. Other attributes, such as `department`, are in `user.user_metadata.custom_claims`.
 
 ## Managing providers
 
@@ -502,7 +509,7 @@ curl 'http://<your-domain>/auth/v1/user' \
   -H 'apikey: your-supabase-publishable-key'
 ```
 
-The response should include `app_metadata.provider: "sso:saml"` and any mapped attributes in `user_metadata`.
+The response should include `app_metadata.provider` set to `sso:<provider-id>` and any mapped attributes in `user_metadata`.
 
 ## Environment variable reference
 
@@ -512,7 +519,7 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 | `SAML_PRIVATE_KEY`                 | -       | Base64-encoded PKCS#1 RSA private key (min 2048-bit). Used to sign SAML requests and optionally decrypt assertions. |
 | `SAML_ALLOW_ENCRYPTED_ASSERTIONS`  | `false` | Accept encrypted SAML assertions from IdPs                                                                          |
 | `SAML_RELAY_STATE_VALIDITY_PERIOD` | `2m0s`  | How long relay state tokens remain valid. Increase if users on slow networks time out during the IdP redirect.      |
-| `SAML_RATE_LIMIT_ASSERTION`        | `15`    | Maximum ACS requests per second. Protects against assertion replay floods.                                          |
+| `SAML_RATE_LIMIT_ASSERTION`        | `15`    | ACS requests allowed per 5 minutes after a burst of 30. Applies only when `GOTRUE_RATE_LIMIT_HEADER` is set.        |
 
 ## Troubleshooting
 
@@ -561,7 +568,7 @@ base64 -w 0 -i pk_rsa1.der
 
 - Check your `attribute_mapping` configuration. Use the IdP's SAML assertion viewer (most IdPs have one) to see the exact attribute names being sent.
 - Attribute names are matched case-insensitively against both the `Name` and `FriendlyName` fields in the assertion.
-- Mapped attributes appear in `user.user_metadata`.
+- Mapped attributes appear in `user.user_metadata`. Attributes that aren't standard claims appear in `user.user_metadata.custom_claims`.
 
 ### Relay state expired
 
