@@ -225,7 +225,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
           </TableCell>
 
           <TableCell className="text-foreground-light whitespace-nowrap">
-            {pipelineRegion ?? 'Region unavailable'}
+            {pipelineRegion ?? 'Unavailable'}
           </TableCell>
 
           <TableCell>
