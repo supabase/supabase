@@ -1,4 +1,4 @@
-import { MoreVerticalIcon } from 'lucide-react'
+import { LockIcon, MoreVerticalIcon, XIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -16,14 +17,20 @@ import {
 } from 'ui'
 
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
-import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
+import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
+import { OAuthApproval, OAuthApprovalTarget } from '@/data/oauth-apps/oauth-apps-approvals-query'
 
 export interface OAuthAppsAuthorizedRowProps {
-  approval: OAuthApprovalItem
+  approval: OAuthApproval
   className?: string
+  canRevoke: boolean
 }
 
-export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthorizedRowProps) => {
+export const OAuthAppsAuthorizedRow = ({
+  approval,
+  className,
+  canRevoke,
+}: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
@@ -33,20 +40,24 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
       <TableCell className="pr-2">
         <div
           className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-control bg-cover bg-center bg-no-repeat text-xs"
-          style={{ backgroundImage: approval.app.icon ? `url('${approval.app.icon}')` : 'none' }}
+          style={{
+            backgroundImage: approval.attributes.app.icon
+              ? `url('${approval.attributes.app.icon}')`
+              : 'none',
+          }}
         >
-          {!!approval.app.icon ? '' : approval.app.name[0]}
+          {!!approval.attributes.app.icon ? '' : approval.attributes.app.name[0]}
         </div>
       </TableCell>
       <TableCell className="pl-0">
         <div>
-          <p className="min-w-0 truncate" title={approval.app.name}>
-            {approval.app.name}
+          <p className="min-w-0 truncate" title={approval.attributes.app.name}>
+            {approval.attributes.app.name}
           </p>
-          <p className="min-w-0 text-foreground-lighter font-mono">{approval.app.id}</p>
+          <p className="min-w-0 text-foreground-lighter font-mono">{approval.id}</p>
         </div>
       </TableCell>
-      <TableCell>{getGrantTargetLabel(approval.grant_target)}</TableCell>
+      <TableCell>{getGrantTargetLabel(approval.attributes.target)}</TableCell>
       <TableCell className="text-right">
         <Dialog
           open={isDialogOpen}
@@ -74,28 +85,47 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Manage app</TooltipContent>
+              <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               <DialogTrigger asChild>
-                <DropdownMenuItem onClick={() => setDialogContent('grants')}>
+                <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
+                  <LockIcon size={14} />
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
+              <DropdownMenuSeparator />
+              {canRevoke && (
+                <DialogTrigger asChild>
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
+                    <XIcon size={14} />
+                    Revoke grants
+                  </DropdownMenuItem>
+                </DialogTrigger>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           {dialogContent === 'grants' && (
             <OAuthAppsMemberGrantsDialogContent
               approval={approval}
-              onCloseAutoFocus={(event) => {
-                event.preventDefault()
-              }}
+              onCloseAutoFocus={preventDefault}
+            />
+          )}
+          {dialogContent === 'revoke' && (
+            <OAuthAppsRevokeDialogContent
+              approval={approval}
+              onClose={() => setDialogContent(null)}
+              onCloseAutoFocus={preventDefault}
             />
           )}
         </Dialog>
       </TableCell>
     </TableRow>
   )
+}
+
+const preventDefault = (event: Event) => {
+  event.preventDefault()
 }
 
 const getGrantTargetLabel = (target: OAuthApprovalTarget) => {

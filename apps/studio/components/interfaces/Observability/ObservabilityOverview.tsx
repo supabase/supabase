@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -13,7 +13,7 @@ import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import {
   buildUnifiedLogsUrl,
@@ -201,7 +201,7 @@ export const ObservabilityOverview = () => {
             label="Refresh report"
             side="bottom"
           >
-            <Button variant="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
+            <Button variant="outline" icon={<RefreshCwIcon size={14} />} onClick={handleRefresh}>
               Refresh
             </Button>
           </ShortcutTooltip>

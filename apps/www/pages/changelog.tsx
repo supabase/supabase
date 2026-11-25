@@ -37,13 +37,19 @@ import {
   itemMatchesChangelogSelectedStages,
   itemMatchesChangelogSelectedTags,
   itemMatchesChangelogSelectedTypes,
+  stripTitleMarkdown,
   toChangelogTimelineIndexItem,
   type ChangelogTimelineIndexItem,
 } from '@/lib/changelog.utils'
+import { breadcrumbListSchema, collectionPageSchema, serializeJsonLd } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
 const FEATURED_COUNT = 3
+
+const TITLE = 'Changelog'
+const DESCRIPTION = 'New updates and improvements to Supabase'
+const CHANGELOG_URL = 'https://supabase.com/changelog'
 
 type FeaturedEntry = {
   slug: string
@@ -67,16 +73,14 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
 
   // Serialized independently so one entry's MDX failure doesn't drop the others.
   const featuredResults = await Promise.allSettled(
-    firstEntries.map(
-      async (entry): Promise<FeaturedEntry> => ({
-        slug: entry.slug,
-        title: entry.frontmatter.title,
-        created_at: entry.sortDate,
-        source: await mdxSerialize(entry.bodySection),
-        changeType: entry.frontmatter.change_type,
-        affectedProducts: entry.frontmatter.affected_products ?? [],
-      })
-    )
+    firstEntries.map(async (entry): Promise<FeaturedEntry> => ({
+      slug: entry.slug,
+      title: entry.frontmatter.title,
+      created_at: entry.sortDate,
+      source: await mdxSerialize(entry.bodySection),
+      changeType: entry.frontmatter.change_type,
+      affectedProducts: entry.frontmatter.affected_products ?? [],
+    }))
   )
   const featured = featuredResults.flatMap((result) => {
     if (result.status === 'rejected') {
@@ -96,10 +100,33 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
 }
 
 export default function ChangelogPage(props: PageProps) {
+  const collectionJsonLd = collectionPageSchema({
+    url: CHANGELOG_URL,
+    name: TITLE,
+    description: DESCRIPTION,
+    items: props.allIndex.map((item) => ({
+      url: `https://supabase.com/changelog/${item.slug}`,
+      name: stripTitleMarkdown(item.title),
+    })),
+  })
+  const breadcrumbJsonLd = breadcrumbListSchema([
+    { name: 'Home', url: 'https://supabase.com' },
+    { name: TITLE, url: CHANGELOG_URL },
+  ])
   return (
-    <NuqsAdapter>
-      <ChangelogIndex {...props} />
-    </NuqsAdapter>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+      />
+      <NuqsAdapter>
+        <ChangelogIndex {...props} />
+      </NuqsAdapter>
+    </>
   )
 }
 
@@ -232,13 +259,16 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
 
   const singleSelectedTag = selectedTags.size === 1 ? [...selectedTags][0] : null
 
-  const TITLE = 'Changelog'
-  const DESCRIPTION = 'New updates and improvements to Supabase'
-
   return (
     <>
       <Head>
         <link rel="alternate" type="text/markdown" href="/changelog.md" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="RSS feed for the Supabase changelog"
+          href="/changelog-rss.xml"
+        />
       </Head>
       <NextSeo
         title={TITLE}

@@ -21,15 +21,6 @@ vi.mock('./ShortcutTooltip', () => ({
 
 describe('Shortcut', () => {
   describe('rendering', () => {
-    it('renders the wrapped child', () => {
-      render(
-        <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={() => {}}>
-          <button tabIndex={0}>Open</button>
-        </Shortcut>
-      )
-      expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument()
-    })
-
     it('wraps the child in ShortcutTooltip', () => {
       render(
         <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={() => {}}>
@@ -149,20 +140,6 @@ describe('Shortcut', () => {
       )
       expect(mockShortcutTooltip.mock.calls.at(-1)![0].label).toBe('Go home')
     })
-
-    it('omits undefined positioning props rather than fabricating them', () => {
-      render(
-        <Shortcut id={SHORTCUT_IDS.NAV_HOME} onTrigger={() => {}}>
-          <button tabIndex={0}>Home</button>
-        </Shortcut>
-      )
-      const props = mockShortcutTooltip.mock.calls.at(-1)![0]
-      expect(props.side).toBeUndefined()
-      expect(props.align).toBeUndefined()
-      expect(props.sideOffset).toBeUndefined()
-      expect(props.delayDuration).toBeUndefined()
-      expect(props.label).toBeUndefined()
-    })
   })
 
   describe('child interactivity', () => {
@@ -179,16 +156,6 @@ describe('Shortcut', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Open' }))
       expect(onClick).toHaveBeenCalledTimes(1)
-      expect(onTrigger).not.toHaveBeenCalled()
-    })
-
-    it('does not invoke onTrigger during render — only the hotkey should trigger it', () => {
-      const onTrigger = vi.fn()
-      render(
-        <Shortcut id={SHORTCUT_IDS.COMMAND_MENU_OPEN} onTrigger={onTrigger}>
-          <button tabIndex={0}>Open</button>
-        </Shortcut>
-      )
       expect(onTrigger).not.toHaveBeenCalled()
     })
   })

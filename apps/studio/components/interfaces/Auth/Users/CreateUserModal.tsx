@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Lock, Mail } from 'lucide-react'
+import { LockIcon, MailIcon } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -23,7 +22,7 @@ import {
 import * as z from 'zod'
 
 import { useUserCreateMutation } from '@/data/auth/user-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -38,9 +37,8 @@ const CreateUserFormSchema = z.object({
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
+  const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const { mutate: createUser, isPending: isCreatingUser } = useUserCreateMutation({
@@ -82,7 +80,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                   <FormLabel>Email address</FormLabel>
                   <FormControl>
                     <div className="items-center relative">
-                      <Mail
+                      <MailIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
@@ -112,7 +110,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                   <FormLabel>User Password</FormLabel>
                   <FormControl>
                     <div className="items-center relative">
-                      <Lock
+                      <LockIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}

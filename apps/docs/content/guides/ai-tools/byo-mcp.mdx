@@ -16,8 +16,8 @@ This is the MCP server your app exposes to its users. The [Supabase MCP server](
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) or a compatible runtime, running (for local development)
-- [Deno](https://deno.land/)
+- [Docker](https://docs.docker.com/get-started/get-docker/) or a compatible runtime, running (for local development)
+- [Deno](https://deno.com/)
 - [Supabase CLI](/docs/guides/local-development) 2.117.0 or later, installed and authenticated
 - [Node.js 20 or later](https://nodejs.org/) (required by the Supabase CLI)
 
@@ -67,7 +67,7 @@ Deno.serve((req) => handler.fetch(req))
 
 The gateway verifies a JWT on every request by default. A public server has no JWT, so turn that off for this function:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [functions.mcp]
 verify_jwt = false
 ```
@@ -113,7 +113,7 @@ Your MCP server is at `https://<your-project-ref>.supabase.co/functions/v1/mcp`.
 
 ## Add authentication
 
-Most servers act on user data, and then the question is who the caller is. With Supabase Auth as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
+Most servers act on user data, and then the question is who the caller is. With [Supabase Auth](/docs/guides/auth) as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
 
 ### How it works
 
@@ -126,7 +126,7 @@ pipeline([...], handler)
   handler                         MCP transport and your tools
 ```
 
-`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a Supabase client scoped to that user. Anything the tools read or write goes through RLS.
+`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a [Supabase client](/docs/reference/javascript/introduction) scoped to that user. Anything the tools read or write goes through RLS.
 
 Two things must be in place beyond the prerequisites above:
 
@@ -141,9 +141,9 @@ MCP clients authenticate through OAuth 2.1, with Supabase Auth as the authorizat
 2. **Enable dynamic client registration.** MCP clients register themselves before starting an OAuth flow. Enable it under **Authentication** > **OAuth Server** in the dashboard. It lets any compatible client register, so review registered clients and let users revoke grants.
 3. **Host a consent screen.** Auth redirects users to your frontend to approve the client. The [OAuth Consent block](/library/docs/nextjs/oauth-consent) in the Supabase Library installs a ready-made `/oauth/consent` route for Next.js, React, React Router, and TanStack Start. Set the Auth **Site URL** to the origin that serves it.
 
-For local development, the same settings live in `supabase/config.toml`:
+For local development, the same settings live in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth]
 site_url = "http://localhost:3000"
 
@@ -186,7 +186,7 @@ The function imports a `Database` type so the Supabase client inside the tools k
 
 ```bash
 supabase start
-supabase gen types typescript --local > supabase/functions/mcp/database.types.ts
+supabase gen types typescript > supabase/functions/mcp/database.types.ts
 ```
 
 Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the public server, the handler moves inside a `pipeline` so it receives the caller's Supabase client, and the tools query a table instead of adding numbers:
@@ -295,7 +295,7 @@ curl -s 'http://127.0.0.1:54321/functions/v1/mcp/oauth-protected-resource'
 }
 ```
 
-Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. Supabase CLI 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
+Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. [Supabase CLI](/docs/guides/local-development/cli/getting-started) 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
 
 #### Test with MCP Inspector
 
@@ -309,7 +309,7 @@ In the Inspector, choose the Streamable HTTP transport, enter `http://127.0.0.1:
 
 #### Test with Claude Code
 
-Add the server to [Claude Code](https://docs.anthropic.com/en/docs/claude-code/mcp):
+Add the server to [Claude Code](https://code.claude.com/docs/en/mcp):
 
 ```bash
 claude mcp add --transport http todos http://127.0.0.1:54321/functions/v1/mcp
@@ -319,7 +319,7 @@ Run `/mcp` in Claude Code and authenticate. The same sign-in and consent flow ru
 
 ### Step 4: Deploy
 
-Link your project, push the Auth settings from `config.toml`, and deploy the function:
+Link your project, push the Auth settings from your config file, and deploy the function:
 
 ```bash
 supabase link --project-ref <your-project-ref>

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
+import { LOG_TYPES } from './UnifiedLogs.constants'
 import { columnSchema } from './UnifiedLogs.schema'
 import { getRawLogData } from './UnifiedLogs.utils'
 import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
@@ -28,7 +29,7 @@ const selectedLogsSchema = z
   .array(
     columnSchema
       .pick({ id: true, log_type: true, event_message: true, metadata: true })
-      .extend({ timestamp: z.union([z.string(), z.number()]) })
+      .extend({ log_type: z.enum(LOG_TYPES), timestamp: z.union([z.string(), z.number()]) })
       .passthrough()
   )
   .transform((rows) =>

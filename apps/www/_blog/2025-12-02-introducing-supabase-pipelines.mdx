@@ -109,7 +109,7 @@ After changing your publication, restart the pipeline from the Dashboard actions
 
 Read replicas and Pipelines solve different problems.
 
-Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
+[Read replicas](/docs/guides/platform/read-replicas) help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
 Pipelines moves your data to systems built for analytics, keeping heavy analytical queries away from your production database. Query performance, storage format, compression, and destination costs depend on the destination you choose.
 
@@ -126,15 +126,13 @@ Replication with Pipelines has a few constraints to be aware of:
 - Data is replicated as-is, without transformation
 - During the initial sync, changes continue accumulating in the WAL and are applied as each table catches up
 
-BigQuery is currently available. You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations) while we expand destination support.
-
 ## Pricing
 
 Pipelines is billed for configured pipeline hours and Postgres row data processed during initial sync and ongoing replication. See [Pipelines pricing](/docs/guides/platform/manage-your-usage/pipelines) for the measurement definition, current rates, and billing examples. Destination-provider charges, such as BigQuery charges from Google Cloud, are separate.
 
 ## Get started
 
-**Supabase Pipelines is currently in public alpha.** Features and behavior may change as we continue developing the product. If Pipelines isn't available for your organization yet, request access in the Dashboard or contact your account manager.
+**Supabase Pipelines is currently in public alpha.** Follow the [setup guide](/docs/guides/database/replication/pipelines) to create a pipeline in the Dashboard.
 
 If you want to dive into the code, **the underlying Supabase ETL engine is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](https://github.com/supabase/etl).
 

@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { Wrench } from 'lucide-react'
+import { WrenchIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -17,7 +17,7 @@ export const AdminStudioButton = () => {
     <ButtonTooltip
       asChild
       className="rounded-full w-[26px] h-[26px]"
-      icon={<Wrench size={16} strokeWidth={1.5} />}
+      icon={<WrenchIcon size={16} strokeWidth={1.5} />}
       tooltip={{
         content: {
           text: 'Open in Admin Studio',

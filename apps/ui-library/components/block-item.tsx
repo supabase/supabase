@@ -1,11 +1,7 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-
+import { Command } from './command'
 import type { ShadcnFramework } from '@/lib/install-command'
-
-//The dynamic import is to prevent the command component from being rendered on the server and cause hydration errors
-const Command = dynamic(() => import('./command').then((mod) => mod.Command), { ssr: false })
 
 interface BlockItemProps {
   name: string

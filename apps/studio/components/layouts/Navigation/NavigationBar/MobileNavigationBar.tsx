@@ -1,14 +1,14 @@
 import { useParams } from 'common'
-import { ChevronLeft, Menu } from 'lucide-react'
+import { ChevronLeftIcon, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
+import { MobileProjectSwitcher } from './MobileProjectSwitcher'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
-import { ProjectBranchSelector } from './ProjectBranchSelector'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
 import { SidebarContent } from '@/components/interfaces/Sidebar'
@@ -53,14 +53,14 @@ export const MobileNavigationBar = ({
                 href={backToDashboardURL}
                 className="flex items-center justify-center bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] border text-foreground-lighter hover:text-foreground transition-colors"
               >
-                <ChevronLeft strokeWidth={1.5} size={16} />
+                <ChevronLeftIcon strokeWidth={1.5} size={16} />
               </Link>
             </div>
           )}
           {!IS_PLATFORM && <HomeIcon />}
           {isProjectScope ? (
             <>
-              <ProjectBranchSelector />
+              <MobileProjectSwitcher />
               <ConnectButton iconOnly className="w-8 h-8" />
             </>
           ) : IS_PLATFORM && showOrgSelection ? (
@@ -76,7 +76,7 @@ export const MobileNavigationBar = ({
               aria-label="Open menu"
               title="Menu dropdown button"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30"
-              icon={<Menu />}
+              icon={<MenuIcon />}
               onClick={() => openMenu()}
             />
           )}

@@ -26,11 +26,11 @@ values
   ('Mexico', 'MX');
 ```
 
-If you want to manage multiple seed files or organize them across different folders, you can configure additional paths or glob patterns in your `config.toml` (see the [next section](#splitting-up-your-seed-file) for details).
+If you want to manage multiple seed files or organize them across different folders, you can configure additional paths or glob patterns in your config file (see the [next section](#splitting-up-your-seed-file) for details).
 
 ### Splitting up your seed file
 
-For better modularity and maintainability, you can split your seed data into multiple files. For example, you can organize your seeds by table and include files such as `countries.sql` and `cities.sql`. Configure them in `config.toml` like so:
+For better modularity and maintainability, you can split your seed data into multiple files. For example, you can organize your seeds by table and include files such as `countries.sql` and `cities.sql`. Configure them in your config file like so:
 
 ```toml supabase/config.toml
 [db.seed]
@@ -192,7 +192,7 @@ npx @snaplet/seed sync
 
 You can further enhance your seed script by using Large Language Models to generate more realistic data. To enable this feature, set one of the following environment variables in your `.env` file:
 
-```plaintext
+```dotenv
 OPENAI_API_KEY=<your_openai_api_key>
 GROQ_API_KEY=<your_groq_api_key>
 ```

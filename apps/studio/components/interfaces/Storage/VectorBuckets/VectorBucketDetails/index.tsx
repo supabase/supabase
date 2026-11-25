@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { SqlEditor, TableEditor } from 'icons'
-import { MoreVertical, Search, Trash2 } from 'lucide-react'
+import { MoreVerticalIcon, SearchIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -131,7 +131,7 @@ export const VectorBucketDetails = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search />}
+                icon={<SearchIcon />}
                 className="w-48"
               />
               <div className="flex items-center gap-x-2">
@@ -223,7 +223,7 @@ export const VectorBucketDetails = () => {
                                     <Button
                                       aria-label="More options"
                                       className="w-7"
-                                      icon={<MoreVertical />}
+                                      icon={<MoreVerticalIcon />}
                                       onClick={(e) => e.stopPropagation()}
                                     />
                                   </DropdownMenuTrigger>
@@ -270,7 +270,7 @@ export const VectorBucketDetails = () => {
                                         setSelectedTableIdToDelete(index.indexName)
                                       }}
                                     >
-                                      <Trash2 size={12} className="text-foreground-lighter" />
+                                      <Trash2Icon size={12} className="text-foreground-lighter" />
                                       <p>Delete table</p>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>

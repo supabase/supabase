@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
+import { RewindIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -14,7 +14,7 @@ import {
 } from './Logs.constants'
 import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { isStartOutsideRetention } from './Logs.utils'
 import { calculateBarClickTimeRange } from './LogsBarChart.utils'
 import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
@@ -173,10 +173,7 @@ export const LogsPreviewer = ({
       setSelectedLogId(null)
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
-        from || '',
-        entitledToAuditLogDays
-      )
+      const shouldShowUpgradePrompt = isStartOutsideRetention(from || '', entitledToAuditLogDays)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
@@ -189,7 +186,7 @@ export const LogsPreviewer = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      const shouldShowUpgradePrompt = isStartOutsideRetention(
         timestampStart,
         entitledToAuditLogDays
       )
@@ -327,7 +324,7 @@ export const LogsPreviewer = ({
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_LOAD_OLDER} side="top">
             <Button
               onClick={loadOlder}
-              icon={<Rewind />}
+              icon={<RewindIcon />}
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
             >

@@ -1,17 +1,12 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import React, { isValidElement, type HTMLAttributes } from 'react'
+import React, { isValidElement, lazy, Suspense, type HTMLAttributes } from 'react'
 import { cn } from 'ui'
 import { type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-const DynamicCodeBlock = dynamic(() =>
-  import('../CodeBlock').then((m) => ({ default: m.CodeBlock }))
-)
+const LazyCodeBlock = lazy(() => import('../CodeBlock').then((m) => ({ default: m.CodeBlock })))
 
-export const InlineCode = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
-  <code className={cn('text-code-inline', className)} {...props} />
-)
+export const InlineCode = (props: HTMLAttributes<HTMLElement>) => <code {...props} />
 
 export const Blockquote = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
   <blockquote
@@ -25,7 +20,6 @@ export const Img = ({
   alt = '',
   ...props
 }: HTMLAttributes<HTMLImageElement> & { alt?: string }) => (
-  // eslint-disable-next-line @next/next/no-img-element
   <img className={cn('rounded-md border', className)} alt={alt} {...props} />
 )
 
@@ -60,7 +54,8 @@ export const DefaultPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement
 export const CodeBlockPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement>) => {
   // Find the code element inside pre
   const codeElement = React.Children.toArray(children).find(
-    (child) => isValidElement(child) && child.type === 'code'
+    // react-markdown passes the mapped Code component, not a plain code element
+    (child) => isValidElement(child) && (child.type === 'code' || child.type === Code)
   )
 
   if (!isValidElement(codeElement)) {
@@ -79,12 +74,9 @@ export const CodeBlockPre = ({ children, ...props }: HTMLAttributes<HTMLPreEleme
   }
 
   return (
-    <DynamicCodeBlock
-      value={content}
-      language={language}
-      hideLineNumbers={false}
-      className="my-4"
-    />
+    <Suspense fallback={<SimplePre {...props}>{children}</SimplePre>}>
+      <LazyCodeBlock value={content} language={language} hideLineNumbers={false} className="my-4" />
+    </Suspense>
   )
 }
 

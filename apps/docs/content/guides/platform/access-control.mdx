@@ -9,7 +9,7 @@ For each organization and project, a member can have one of the following roles:
 
 - **Owner**: full access to everything in organization and project resources.
 - **Administrator**: full access to everything in organization and project resources **except** updating organization settings, transferring projects outside of the organization, and adding new owners.
-- **Developer**: read-only access to organization resources and content access to project resources but cannot change any project settings.
+- **Developer**: read-only access to organization resources, full content access to project resources but cannot change any project settings.
 - **Read-Only**: read-only access to organization and project resources.
 - **No-access**: no access to any organization or project resources by default. Use this for members who should only see the specific projects they're granted a [project-scoped role](#organization-scoped-roles-vs-project-scoped-roles) on.
 
@@ -266,6 +266,7 @@ The table below shows the actions each role can take on the resources belonging 
 | <a href="#branching-permissions" id="branching-permissions">**Branching**</a>                          |                        |                                         |                                         |                                         |                                                                 |
 | Production Branch                                                                                      | Read                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Write                  | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
+|                                                                                                        | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | Development Branches                                                                                   | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Create[^8]             | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 |                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |

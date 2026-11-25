@@ -1,31 +1,38 @@
 import { useMutation } from '@tanstack/react-query'
+import { components } from 'api-types/types/platform'
 import { toast } from 'sonner'
 
-import { getMockOAuthAppsAuthorizeApproveResult, USE_MOCKS } from './mocks'
-import type { OAuthAppsAuthorizeApproveResult, OAuthAuthorizeApproveRequest } from './types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { isOAuthRoleValidationError } from './types'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
+type OAuthAuthorizeApproveRequest = components['schemas']['ApproveAuthorizationBody']
 export type OAuthAppsAuthorizeApproveVariables = {
-  slug: string
-  auth_id: string
+  slug?: string
+  auth_id?: string
   body: OAuthAuthorizeApproveRequest
 }
-
-export type OAuthAppsAuthorizeApproveResponse = OAuthAppsAuthorizeApproveResult
 
 export async function approveOAuthAppsAuthorize({
   slug,
   auth_id,
   body,
-}: OAuthAppsAuthorizeApproveVariables): Promise<OAuthAppsAuthorizeApproveResult> {
+}: OAuthAppsAuthorizeApproveVariables) {
   if (!auth_id) throw new Error('Authorization request id is required')
   if (!slug) throw new Error('Organization slug is required')
-  if (!USE_MOCKS) throw new Error('OAuth app authorization approval is not yet implemented')
-
-  return getMockOAuthAppsAuthorizeApproveResult(auth_id, { slug, projectRefs: body.project_refs })
+  const { data, error } = await post('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    params: { path: { slug, id: auth_id } },
+    body,
+  })
+  if (error && isOAuthRoleValidationError(error)) {
+    throw error
+  }
+  if (error) handleError(error)
+  return data
 }
 
-type OAuthAppsAuthorizeApproveData = Awaited<ReturnType<typeof approveOAuthAppsAuthorize>>
+export type OAuthAppsAuthorizeApproveData = Awaited<ReturnType<typeof approveOAuthAppsAuthorize>>
 
 export const useOAuthAppsAuthorizeApproveMutation = ({
   onError,
@@ -33,14 +40,14 @@ export const useOAuthAppsAuthorizeApproveMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthAppsAuthorizeApproveData,
-    ResponseError,
+    StudioError,
     OAuthAppsAuthorizeApproveVariables
   >,
   'mutationFn'
 > = {}) => {
   return useMutation<
     OAuthAppsAuthorizeApproveData,
-    ResponseError,
+    StudioError,
     OAuthAppsAuthorizeApproveVariables
   >({
     mutationFn: (vars) => approveOAuthAppsAuthorize(vars),

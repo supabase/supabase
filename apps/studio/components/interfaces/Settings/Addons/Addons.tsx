@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import {
@@ -282,7 +282,7 @@ export const Addons = () => {
                     {!canOpenIPv4 && ipv4DisabledReason && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                         </TooltipTrigger>
                         <TooltipContent>{ipv4DisabledReason}</TooltipContent>
                       </Tooltip>
@@ -332,7 +332,7 @@ export const Addons = () => {
                   {!canOpenPITR && pitrDisabledReason && (
                     <Tooltip>
                       <TooltipTrigger>
-                        <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                       </TooltipTrigger>
                       <TooltipContent>{pitrDisabledReason}</TooltipContent>
                     </Tooltip>
@@ -388,7 +388,7 @@ export const Addons = () => {
                     {!canOpenCustomDomain && customDomainDisabledReason && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                         </TooltipTrigger>
                         <TooltipContent>{customDomainDisabledReason}</TooltipContent>
                       </Tooltip>

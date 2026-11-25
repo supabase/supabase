@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessRevokeVariables = {
   projectRef: string
@@ -16,6 +17,7 @@ async function revokeJitDbAccess({ projectRef, userId }: JitDbAccessRevokeVariab
 
   const { data, error } = await del('/v1/projects/{ref}/database/jit/{user_id}', {
     params: { path: { ref: projectRef, user_id: userId } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -29,12 +31,12 @@ export const useJitDbAccessRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JitDbAccessRevokeData, ResponseError, JitDbAccessRevokeVariables>,
+  UseCustomMutationOptions<JitDbAccessRevokeData, StudioError, JitDbAccessRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JitDbAccessRevokeData, ResponseError, JitDbAccessRevokeVariables>({
+  return useMutation<JitDbAccessRevokeData, StudioError, JitDbAccessRevokeVariables>({
     mutationFn: (vars) => revokeJitDbAccess(vars),
 
     async onSuccess(data, variables, context) {

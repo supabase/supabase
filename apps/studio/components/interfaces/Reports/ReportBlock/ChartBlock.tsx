@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
+import { ActivityIcon, BarChartIcon, Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
@@ -10,7 +10,7 @@ import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { PortalChartTooltip } from '@/components/ui/Charts/PortalChartTooltip'
 import {
   checkHasNonPositiveValues,
@@ -228,7 +228,7 @@ export const ChartBlock = ({
             size="tiny"
             disabled={loading}
             className="w-7 h-7"
-            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
             onClick={() => {
               const style = chartStyle === 'bar' ? 'line' : 'bar'
               if (onUpdateChartConfig) onUpdateChartConfig({ chart: { chart_type: style } })
@@ -266,7 +266,7 @@ export const ChartBlock = ({
     >
       {loading ? (
         <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
-          <Loader2 size={18} className="animate-spin text-border-strong" />
+          <Loader2Icon size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (

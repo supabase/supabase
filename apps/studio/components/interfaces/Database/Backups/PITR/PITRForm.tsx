@@ -1,20 +1,22 @@
 import dayjs from 'dayjs'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Calendar, cn } from 'ui'
 
-import { type Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
   getClientTimezone,
   getDatesBetweenRange,
+  getRestoreDate,
+  updateRestoreDate,
 } from './PITR.utils'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import InformationBox from '@/components/ui/InformationBox'
+import type { Timezone } from '@/lib/constants/timezones'
 
 type Props = {
   onSubmit: (data: {
@@ -35,20 +37,37 @@ export function PITRForm({
   disabled = false,
 }: Props) {
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
-  const earliestAvailableBackup = dayjs
-    .unix(earliestAvailableBackupUnix ?? 0)
-    .tz(selectedTimezone.utc[0])
-  const latestAvailableBackup = dayjs
-    .unix(latestAvailableBackupUnix ?? 0)
-    .tz(selectedTimezone.utc[0])
-  const earliestAvailableBackupAsDate = earliestAvailableBackup.toDate()
-  const latestAvailableBackupAsDate = latestAvailableBackup.toDate()
+  const earliestAvailableBackup = getRestoreDate(
+    earliestAvailableBackupUnix ?? 0,
+    selectedTimezone.utc[0]
+  )
+  const latestAvailableBackup = getRestoreDate(
+    latestAvailableBackupUnix ?? 0,
+    selectedTimezone.utc[0]
+  )
+  const earliestAvailableBackupAsDate = new Date(
+    earliestAvailableBackup.year(),
+    earliestAvailableBackup.month(),
+    earliestAvailableBackup.date()
+  )
+  const latestAvailableBackupAsDate = new Date(
+    latestAvailableBackup.year(),
+    latestAvailableBackup.month(),
+    latestAvailableBackup.date()
+  )
 
-  const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
+  const [selectedUnix, setSelectedUnix] = useState(latestAvailableBackupUnix)
 
-  const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true)
-  const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
-  const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
+  const selectedDate = getRestoreDate(selectedUnix, selectedTimezone.utc[0])
+  const selectedCalendarDate = new Date(
+    selectedDate.year(),
+    selectedDate.month(),
+    selectedDate.date()
+  )
+  const isSelectedOnEarliestDay =
+    selectedDate.format('YYYY-MM-DD') === earliestAvailableBackup.format('YYYY-MM-DD')
+  const isSelectedOnLatestDay =
+    selectedDate.format('YYYY-MM-DD') === latestAvailableBackup.format('YYYY-MM-DD')
   const availableDates = getDatesBetweenRange(earliestAvailableBackup, latestAvailableBackup)
 
   const selectedTime = {
@@ -83,12 +102,17 @@ export function PITRForm({
   )
 
   const onUpdateDate = (date: Date) => {
-    setSelectedDateRaw(
+    setSelectedUnix(
       constrainDateToRange(
-        dayjs(date).tz(selectedTimezone.utc[0], true),
+        updateRestoreDate(
+          selectedDate,
+          dayjs(date).format('YYYY-MM-DD'),
+          selectedTime,
+          selectedTimezone.utc[0]
+        ),
         earliestAvailableBackup,
         latestAvailableBackup
-      ).toDate()
+      ).unix()
     )
   }
 
@@ -131,7 +155,7 @@ export function PITRForm({
             <Calendar
               mode="single"
               required={true}
-              selected={selectedDateRaw}
+              selected={selectedCalendarDate}
               onSelect={onUpdateDate}
               defaultMonth={latestAvailableBackupAsDate}
               startMonth={earliestAvailableBackupAsDate}
@@ -165,7 +189,7 @@ export function PITRForm({
                   <InformationBox
                     defaultVisibility
                     hideCollapse
-                    icon={<HelpCircle size={14} strokeWidth={2} />}
+                    icon={<HelpCircleIcon size={14} strokeWidth={2} />}
                     title="Select a date which you'd like to restore your database to"
                   />
                 </div>
@@ -179,6 +203,7 @@ export function PITRForm({
                     <div className="w-[350px]">
                       <TimezoneSelection
                         selectedTimezone={selectedTimezone}
+                        date={selectedDate}
                         onSelectTimezone={setSelectedTimezone}
                       />
                     </div>
@@ -205,12 +230,14 @@ export function PITRForm({
                         }
                         maximumTime={isSelectedOnLatestDay ? latestAvailableBackupTime : undefined}
                         onChange={({ h, m, s }) => {
-                          const newDate = dayjs(selectedDateRaw)
-                            .set('hour', h)
-                            .set('minute', m)
-                            .set('second', s)
-
-                          setSelectedDateRaw(newDate.toDate())
+                          setSelectedUnix(
+                            updateRestoreDate(
+                              selectedDate,
+                              selectedDate.format('YYYY-MM-DD'),
+                              { h, m, s },
+                              selectedTimezone.utc[0]
+                            ).unix()
+                          )
                         }}
                       />
                     </div>

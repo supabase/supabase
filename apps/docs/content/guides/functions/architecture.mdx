@@ -3,7 +3,7 @@ id: 'architecture'
 title: 'Edge Functions Architecture'
 description: 'Guide to Supabase Edge Functions: Architecture and How They Work'
 subtitle: 'Understanding the Architecture of Supabase Edge Functions'
-tocVideo: 'za_loEtS4gs'
+tocVideo: 'EQ5h3NSWMbk'
 ---
 
 This guide explains the architecture and inner workings of Supabase Edge Functions, based on the concepts demonstrated in the video "Supabase Edge Functions Explained". Edge functions are serverless compute resources that run at the edge of the network, close to users, enabling low-latency execution for tasks like API endpoints, webhooks, and real-time data processing. This guide breaks down Edge Functions into key sections: an example use case, deployment process, global distribution, and execution mechanics.
@@ -13,10 +13,10 @@ This guide explains the architecture and inner workings of Supabase Edge Functio
 To illustrate how edge functions operate, consider a photo-sharing app where users upload images and apply filters (e.g., grayscale or sepia) before saving them.
 
 - **Workflow Overview**:
-  - A user uploads an original image to Supabase Storage.
+  - A user uploads an original image to [Supabase Storage](/docs/guides/storage/quickstart).
   - When the user selects a filter, the client-side app (using the Supabase JavaScript SDK) invokes an edge function named something like "apply-filter."
   - The edge function:
-    1. Downloads the original image from Supabase Storage.
+    1. Downloads the original image from [Supabase Storage](/docs/guides/storage).
     2. Applies the filter using a library like ImageMagick.
     3. Uploads the processed image back to Storage.
     4. Returns the path to the filtered image to the client.
@@ -34,7 +34,7 @@ Deploying an edge function is straightforward and automated, requiring no manual
 
 - **Steps to Deploy**:
   1. Write the function code in your local Supabase project (e.g., in `supabase/functions/apply-filter/index.ts`).
-  2. Run the command `supabase functions deploy apply-filter` via the Supabase CLI.
+  2. Run the command `supabase functions deploy apply-filter` via the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
   3. The CLI bundles the function and its dependencies into an **ESZip file**—a compact format created by Deno that includes a complete module graph for quick loading and execution.
   4. The bundled file is uploaded to Supabase's backend.
   5. Supabase generates a unique URL for the function, making it accessible globally.

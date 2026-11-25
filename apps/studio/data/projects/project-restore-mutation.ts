@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { PostgresEngine, ReleaseChannel } from './new-project.constants'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectRestoreVariables = {
   ref: string
@@ -34,10 +35,10 @@ export const useProjectRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectRestoreData, ResponseError, ProjectRestoreVariables>,
+  UseCustomMutationOptions<ProjectRestoreData, StudioError, ProjectRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestoreData, ResponseError, ProjectRestoreVariables>({
+  return useMutation<ProjectRestoreData, StudioError, ProjectRestoreVariables>({
     mutationFn: (vars) => restoreProject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

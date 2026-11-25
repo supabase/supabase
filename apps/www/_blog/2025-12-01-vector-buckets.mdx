@@ -17,19 +17,19 @@ Vector search is becoming a core primitive for modern apps: semantic search, rec
 
 Supabase already gives you powerful tools for vectors, such as `pgvector` in Postgres. With Vector Buckets, you now have more options for how you store vectors:
 
-- Use pgvector for smaller, latency-sensitive datasets that belong tightly in your database.
+- Use [pgvector](/docs/guides/database/extensions/pgvector) for smaller, latency-sensitive datasets that belong tightly in your database.
 - Use Vector Buckets when you need to store a large amount of vectors—up to tens of millions—on a durable storage layer with similarity search built in.
 
 ## What are Vector Buckets?
 
-**Vector Buckets** are a new bucket type in Supabase Storage.
+**Vector Buckets** are a new bucket type in [Supabase Storage](/docs/guides/storage).
 
 Conceptually:
 
 - A **Vector Bucket** is where your vector indexes live.
 - Inside each bucket, you define one or more **vector indexes** (for example: `documents-openai`).
 - Each index stores high-dimensional vectors plus optional metadata.
-- You query those indexes using Supabase clients or directly from Postgres via a foreign data wrapper.
+- You query those indexes using Supabase clients or directly from Postgres via a [foreign data wrapper](/docs/guides/database/extensions/wrappers/overview).
 
 ## What do Vector Buckets bring to the table?
 
@@ -153,7 +153,7 @@ await supabase.storage.vectors.from('embeddings').createIndex('documents-openai'
 
 **3. Store vectors**
 
-You can store vectors directly from the SDK, an Edge Function, or Postgres.
+You can store vectors directly from the SDK, an [Edge Function](/docs/guides/functions), or Postgres.
 
 ```jsx
 // Postgres

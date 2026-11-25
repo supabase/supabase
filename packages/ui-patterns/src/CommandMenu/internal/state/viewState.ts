@@ -14,7 +14,11 @@ const initViewState = () => {
       handleTouchEnd: () => {},
     },
     setOpen: (open) => {
-      state.init()
+      // init mounts the lazy menu, so only an open should do it
+      if (open) {
+        state.init()
+      }
+
       state.open = open
     },
     toggleOpen: () => {

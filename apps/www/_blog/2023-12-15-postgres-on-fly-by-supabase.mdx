@@ -22,13 +22,13 @@ Fly Postgres has been deprecated. See [deprecation announcement](https://github.
 
 We're launching Fly Postgres, a managed Postgres offering by Supabase and [Fly.io](http://Fly.io).
 
-Fly Postgres databases launch on Fly.io's edge computing platform from any of their 37+ locations. You get everything you expect from a Supabase managed database:
+Fly Postgres databases launch on Fly.io's edge computing platform from any of their 37+ locations. You get everything you expect from a Supabase [managed database](/solutions/hosted-postgres):
 
 - a full-featured Postgres database with [over 40+ extensions](https://github.com/supabase/postgres)
 - [pgvector](https://github.com/pgvector/pgvector/) support for [Vector/AI workloads](/docs/guides/ai)
 - [Supavisor](/blog/supavisor-postgres-connection-pooler), our Postgres connection pooler
 - Daily backups and point-in-time recovery
-- [Branching](/docs/guides/platform/branching), [observability](https://github.com/supabase/supabase-grafana), and migrations
+- [Branching](/docs/guides/deployment/branching), [observability](https://github.com/supabase/supabase-grafana), and migrations
 - A [dashboard](/blog/studio-introducing-assistant) for managing your database
 - Auto-generated Data APIs:
   - [REST](/docs/guides/api) (using [PostgREST](https://postgrest.org))
@@ -50,7 +50,7 @@ We're excited about what this partnership means for 2024. Namely, distributing P
 
 Fly's current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you're responsible for handling scaling, point-in-time backups, replication, major version upgrades, etc. We'll run Fly's _managed_ Postgres, which means that we do all that for you, and you can concentrate on building.
 
-The managed service is built with the [Fly extension API](https://fly.io/docs/reference/extensions_api/) (also used by [Fly Redis](https://fly.io/docs/reference/redis/)).
+The managed service is built with the [Fly extension API](https://docs.fly.io/reference/extensions_api) (also used by [Fly Redis](https://fly.io/docs/reference/redis/)).
 
 Testers can launch a Postgres database using the `fly extensions` command:
 
@@ -72,7 +72,7 @@ Let's dig into the implementation.
 
 ### **Working with Fly machines**
 
-Fly Postgres is built on top of [Fly machines](https://fly.io/docs/machines/). Machines are light-weight Firecracker VMs. The Machines API offers substantial control over an application's lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives.
+Fly Postgres is built on top of [Fly machines](https://docs.fly.io/machines). Machines are light-weight Firecracker VMs. The Machines API offers substantial control over an application's lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives.
 
 We built [fly-admin](https://github.com/supabase/fly-admin), a Typescript wrapper to simplify our interaction with the Fly API. Supabase bundles a few extra services into Postgres, so we prepared a single Docker image which we can pass to the Fly Machines API. Our current build process outputs an AMI for AWS using [Packer](https://www.packer.io/). We re-use parts of that pipeline to build an [All In One Image](https://github.com/supabase/postgres/tree/develop/docker/all-in-one). This image has all the services to run a Supabase project within a single Docker container.
 
@@ -90,9 +90,9 @@ In addition to publishing images in AWS's container registry, we publish the All
 
 ### **Building the Fly extension**
 
-Fly has an [excellent approach](https://fly.io/docs/reference/extensions_api/) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way.
+Fly has an [excellent approach](https://docs.fly.io/reference/extensions_api) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way.
 
-Fly users can access the Supabase dashboard using their existing Fly credentials. The Supabase API initiates an OAuth flow with Fly to authenticate the user. Our Auth team created a [Fly OAuth provider](https://github.com/supabase/gotrue/pull/1261) to make the integration with our API easier.
+Fly users can access the Supabase dashboard using their existing Fly credentials. The Supabase API initiates an OAuth flow with Fly to authenticate the user. Our Auth team created a [Fly OAuth provider](https://github.com/supabase/auth/pull/1261) to make the integration with our API easier.
 
 ## Challenges
 
@@ -108,6 +108,6 @@ Fly projects are backed up to AWS S3 as Fly doesn't provide managed Blob storage
 
 ## Getting started
 
-Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org, and get started with the [Quickstart](https://supabase.com/docs/guides/platform/fly-postgres#quickstart) in our docs.
+Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org, and get started with the [Quickstart](https://supabase.com/docs/guides/database/connecting-to-postgres#direct-connection) in our docs.
 
 Fly organizations will get one free project. We're still working through some of the finer details on billing, but the pricing will remain relatively unchanged from our current [pricing](https://supabase.com/pricing).

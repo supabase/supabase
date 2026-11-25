@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Globe } from 'lucide-react'
+import { GlobeIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
@@ -22,7 +21,7 @@ import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvail
 import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -52,11 +51,9 @@ export const BannedIPs = () => {
   const hasProjectError = !project && !!projectError
   const ipListLoading = isLoadingIPList || isFetchingIPList
 
-  const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUnbanNetworks } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE
+  )
 
   const isSectionDisabled = isHighAvailability || isAwsK8s || !canUnbanNetworks
 
@@ -146,7 +143,7 @@ export const BannedIPs = () => {
                     ipList.banned_ipv4_addresses.map((ip) => (
                       <CardContent key={ip} className="flex items-center justify-between">
                         <div className="flex items-center space-x-5">
-                          <Globe size={16} className="text-foreground-lighter" />
+                          <GlobeIcon size={16} className="text-foreground-lighter" />
                           <p className="text-sm font-mono">{ip}</p>
                           {ip === userIPAddress && <Badge>Your IP address</Badge>}
                         </div>

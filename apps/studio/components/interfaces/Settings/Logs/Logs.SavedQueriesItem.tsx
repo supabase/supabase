@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
-import { Edit, Trash } from 'lucide-react'
+import { EditIcon, TrashIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
@@ -93,7 +93,7 @@ export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         dropdownItems={
           <>
             <DropdownMenuItem onClick={() => setShowUpdateModal(true)}>
-              <Edit size={14} className="mr-2" />
+              <EditIcon size={14} className="mr-2" />
               Edit query
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -102,7 +102,7 @@ export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
                 setShowConfirmModal(true)
               }}
             >
-              <Trash size={14} className="mr-2" />
+              <TrashIcon size={14} className="mr-2" />
               Delete query
             </DropdownMenuItem>
           </>

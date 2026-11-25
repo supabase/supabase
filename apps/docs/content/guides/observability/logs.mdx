@@ -6,6 +6,8 @@ description: 'Filter, inspect, and export project events in the Logs view'
 
 Use [Logs](/dashboard/project/_/logs) to inspect events across your hosted project's services. For SQL queries through [Explorer](/dashboard/project/_/explorer), MCP, or the API, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
 
+For terminal workflows with Supabase CLI v3, see [Logs in the CLI](/docs/guides/observability/cli-logs).
+
 ## Find events [#product-logs]
 
 1. Open [Logs](/dashboard/project/_/logs).
@@ -18,15 +20,15 @@ Without a log type selection, Logs queries **Postgres** and **API Gateway**. Sel
 
 ## Filter events
 
-| Filter        | Behavior                                                                                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Log Type      | Select API Gateway, Postgres, Auth, Storage, PostgREST, Edge Function, Realtime, or pooler events.                                                            |
-| Level         | Match success, warning, or error.                                                                                                                             |
-| Status        | Match an HTTP status or Postgres SQLSTATE.                                                                                                                    |
-| Method        | Match an HTTP method.                                                                                                                                         |
-| Pathname      | Match a request path.                                                                                                                                         |
-| Event message | Use **iLike** or **Not iLike** for case-insensitive text matching or exclusion. Plain text matches anywhere in the message; `%` specifies a wildcard pattern. |
-| User          | Match the user's ID in Auth actor IDs or API Gateway JWT subjects. Other log types cannot match this filter.                                                  |
+| Filter        | Behavior                                                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Log Type      | Select API Gateway, Postgres, Auth, Storage, PostgREST, Edge Function, Realtime, or [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) events. |
+| Level         | Match success, warning, or error.                                                                                                                                     |
+| Status        | Match an HTTP status or Postgres SQLSTATE.                                                                                                                            |
+| Method        | Match an HTTP method.                                                                                                                                                 |
+| Pathname      | Match a request path.                                                                                                                                                 |
+| Event message | Use **iLike** or **Not iLike** for case-insensitive text matching or exclusion. Plain text matches anywhere in the message; `%` specifies a wildcard pattern.         |
+| User          | Match the user's ID in Auth actor IDs or API Gateway JWT subjects. Other log types cannot match this filter.                                                          |
 
 Filters other than **Event message** and **User** support **Equals** and **Not equal**. **User** supports **Equals**. Included values within a field match any selected value; exclusions remove every selected value. Filters on different fields must all match.
 
@@ -62,4 +64,13 @@ Check the time range, selected log types, and exclusions first. **User** combine
 
 Events must be recorded before they can appear in Logs. See [Configure logging](/docs/guides/observability/configure-logging) and the [source limitations](/docs/guides/observability/log-field-reference#capture-limits).
 
-Retention depends on your [pricing plan](/pricing). See [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs) for billing details.
+Retention for API and database logs depends on your [pricing plan](/pricing):
+
+| Plan       | Log retention |
+| ---------- | ------------- |
+| Free       | 1 day         |
+| Pro        | 7 days        |
+| Team       | 28 days       |
+| Enterprise | 90 days       |
+
+See [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs) for billing details.

@@ -1,4 +1,4 @@
-import { Minus, Plus, Search } from 'lucide-react'
+import { MinusIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { Checkbox, cn, Label, Skeleton } from 'ui'
@@ -69,7 +69,7 @@ export function DataTableFilterCheckbox<TData>({
       {options && options.length > 4 ? (
         <InputWithAddons
           placeholder="Search"
-          leading={<Search size={14} className="text-foreground-lighter" />}
+          leading={<SearchIcon size={14} className="text-foreground-lighter" />}
           containerClassName="h-8 rounded-sm"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -136,7 +136,7 @@ export function DataTableFilterCheckbox<TData>({
                           'absolute top-2 right-10'
                         )}
                       >
-                        {isExpanded ? <Minus size={12} /> : <Plus size={12} />}
+                        {isExpanded ? <MinusIcon size={12} /> : <PlusIcon size={12} />}
                       </button>
                     )}
                     <span className="shrink-0 flex items-center justify-center font-mono text-xs pr-2 group-hover:opacity-0">

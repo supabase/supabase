@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tracing',
+          href: '/docs/ui-patterns/tracing',
+          items: [],
+        },
+        {
           title: 'Connect Interstitials',
           href: '/docs/ui-patterns/connect-interstitials',
           items: [],
@@ -128,8 +133,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Collapsible Alert',
-          href: '/docs/fragments/collapsible-alert',
+          title: 'Code Block',
+          href: '/docs/fragments/code-block',
           items: [],
         },
         {
@@ -220,6 +225,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Metric Card',
           href: '/docs/fragments/metric-card',
+          items: [],
+        },
+        {
+          title: 'AI Tools',
+          href: '/docs/fragments/ai-tools',
           items: [],
         },
         {

@@ -11,6 +11,7 @@
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 import { uniqBy } from 'lodash-es'
+
 import { flattenSections } from '../lib/helpers'
 import Example from './legacy/components/Example'
 import Page from './legacy/components/Page'

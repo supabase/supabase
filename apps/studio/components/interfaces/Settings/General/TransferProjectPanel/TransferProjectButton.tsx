@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import { Loader, Shield, Wrench } from 'lucide-react'
+import { LoaderIcon, ShieldIcon, WrenchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,11 +31,13 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { projectKeys } from '@/data/projects/keys'
 import { useProjectTransferMutation } from '@/data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from '@/data/projects/project-transfer-preview-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const TransferProjectButton = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -71,6 +72,21 @@ export const TransferProjectButton = () => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
+    if (transferPreviewData === undefined) return
+    const membersExceedingLimitCount =
+      transferPreviewData.members_exceeding_free_project_limit.length
+    const isBlockedNoticeShown =
+      transferPreviewData.errors.length > 0 && membersExceedingLimitCount > 0
+    if (!isBlockedNoticeShown) return
+
+    track('project_transfer_preview_failed', {
+      sourcePlan: transferPreviewData.source_subscription_plan,
+      targetPlan: transferPreviewData.target_subscription_plan,
+      membersExceedingLimitCount,
+    })
+  }, [transferPreviewData, track])
+
+  useEffect(() => {
     if (isOpen) {
       // reset state
       setSelectedOrg(undefined)
@@ -83,10 +99,10 @@ export const TransferProjectButton = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  const { can: canTransferProject } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
-  )
+  const { can: canTransferProject } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE,
+  ])
 
   async function handleTransferProject() {
     if (project === undefined) return
@@ -127,7 +143,7 @@ export const TransferProjectButton = () => {
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Loader />
+                <LoaderIcon />
               </span>
               <div>
                 <p className="font-bold">Possible downtime</p>
@@ -140,7 +156,7 @@ export const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Shield />
+                <ShieldIcon />
               </span>
               <div>
                 <p className="font-bold">Permissions</p>
@@ -153,7 +169,7 @@ export const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={24} className="shrink-0" />
+                <WrenchIcon size={24} className="shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>

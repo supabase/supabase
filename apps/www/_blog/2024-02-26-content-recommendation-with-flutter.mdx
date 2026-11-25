@@ -40,7 +40,7 @@ We will be building a movie listing app. Think Netflix except the users will not
 
 ## Creating the app
 
-We first need to populate the database with some data about movies and its embeddings. For that, we will use the [Supabase edge functions](https://supabase.com/docs/guides/functions) to call the TMDB API and the Open AI API to get the movie data and generate the embeddings. Once we have the data, we will store them in Supabase database, and query them from our Flutter application.
+We first need to populate the database with some data about movies and its embeddings. For that, we will use the [Supabase edge functions](https://supabase.com/docs/guides/functions) to call the TMDB API and the Open AI API to get the movie data and generate the embeddings. Once we have the data, we will store them in [Supabase database](/database), and query them from our Flutter application.
 
 ![System overview](/images/blog/2024-02-26-content-recommendation-with-flutter/diagram.png)
 
@@ -116,7 +116,7 @@ const films = tmdbJson.results
 
 ### Step 3: Generate embeddings
 
-We can take the movie data from the previous step and generate embedding for each of them. Here, we are calling the [Open AI Embeddings API](https://platform.openai.com/docs/guides/embeddings) to convert the `overview` of each movie into embeddings. `overview` contains the summary of each movie, and is a good source to create embedding representing each of the movies.
+We can take the movie data from the previous step and generate embedding for each of them. Here, we are calling the [Open AI Embeddings API](https://developers.openai.com/api/docs/guides/embeddings) to convert the `overview` of each movie into embeddings. `overview` contains the summary of each movie, and is a good source to create embedding representing each of the movies.
 
 ```tsx
 const response = await fetch('https://api.openai.com/v1/embeddings', {

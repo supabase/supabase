@@ -8,7 +8,6 @@ import {
 } from '@/data/projects/org-projects-infinite-query'
 import { normalizeRegion, type UserRegionContext } from '@/lib/status-page/status-page.utils'
 
-const PROJECTS_PAGE_LIMIT = 100
 const PROJECTS_STALE_TIME_MS = 5 * 60 * 1000
 
 const LOADING: UserProjectRegionsState = { status: 'loading' }
@@ -54,7 +53,7 @@ export function useUserProjectRegions({ enabled }: { enabled: boolean }): UserPr
     queries: (organizations ?? []).map((org) => ({
       queryKey: projectKeys.bannerProjectsByOrg(org.slug),
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        getOrganizationProjects({ slug: org.slug, limit: PROJECTS_PAGE_LIMIT }, signal),
+        getOrganizationProjects({ slug: org.slug }, signal),
       staleTime: PROJECTS_STALE_TIME_MS,
       enabled,
     })),

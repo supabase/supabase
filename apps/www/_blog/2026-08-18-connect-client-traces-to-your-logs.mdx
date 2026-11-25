@@ -13,7 +13,7 @@ imgThumb: 'connect-client-traces-to-your-logs/thumb.png'
 toc_depth: 2
 ---
 
-`supabase-js` now propagates W3C Trace Context to Supabase. Turn it on and the `trace_id` from your client flows through Supabase's API Gateway and Edge Function logs, so you can follow one request from the browser into your backend logs.
+`supabase-js` now propagates W3C Trace Context to Supabase. Turn it on and the `trace_id` from your client flows through Supabase's API Gateway and [Edge Function](/docs/guides/functions) logs, so you can follow one request from the browser into your backend logs.
 
 Say a frontend trace shows a slow request leaving the browser, and a Supabase log shows the matching request on the server. Up to now nothing connected the two: the SDK made the call, Supabase logged it, and the two records lived in separate systems with no shared identifier. Debugging across that boundary meant lining up timestamps by hand.
 
@@ -67,7 +67,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 ## Get more value from your Log Drains
 
-Log Drains forward your Supabase logs to an external backend. With trace propagation on, every drained log carries the same `trace_id` as your client and server traces, so you can join them in the tracing UI you already run.
+[Log Drains](/docs/guides/observability/log-drains) forward your Supabase logs to an external backend. With trace propagation on, every drained log carries the same `trace_id` as your client and server traces, so you can join them in the tracing UI you already run.
 
 When you do so, the browser span in Sentry and the matching API Gateway log forwarded to Datadog line up under one `trace_id`. For self-hosted setups running an OpenTelemetry collector, it's the same join on infrastructure you control.
 

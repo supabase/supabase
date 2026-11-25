@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent } from 'react'
 import { Button, cn } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
+import { DevToolbarLogo } from './DevToolbarLogo'
 import { getEventCountBadge } from './utils'
 
 // Duplicated for tree-shaking — bundler must see literal process.env reference.
@@ -226,18 +226,7 @@ export function DevToolbarTrigger() {
         onPointerCancel={handlePointerCancel}
         title="Dev Toolbar"
       >
-        <Image
-          src="/img/logo-pixel-small-light.png"
-          alt="Dev Toolbar"
-          width={16}
-          height={16}
-          style={{
-            filter:
-              'brightness(0) saturate(100%) invert(72%) sepia(57%) saturate(431%) hue-rotate(108deg) brightness(95%) contrast(91%)',
-          }}
-          aria-hidden="true"
-          className="pointer-events-none"
-        />
+        <DevToolbarLogo className="pointer-events-none" />
         {eventCountBadge && (
           <span
             className={cn(

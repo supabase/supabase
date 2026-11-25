@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthError } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -187,7 +187,7 @@ export const SignInForm = () => {
                     title={passwordHidden ? `Show password` : `Hide password`}
                     aria-label={passwordHidden ? `Show password` : `Hide password`}
                     className="absolute right-1 top-1 px-1.5"
-                    icon={passwordHidden ? <Eye /> : <EyeOff />}
+                    icon={passwordHidden ? <EyeIcon /> : <EyeOffIcon />}
                     disabled={isSubmitting}
                     onClick={() => setPasswordHidden((prev) => !prev)}
                   />

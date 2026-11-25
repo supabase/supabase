@@ -22,21 +22,21 @@ Wildcard redirects are especially useful for Jamstack platforms with preview dep
 
 ## Supabase Edge functions with Webhooks
 
-Now you can deploy functions with optional JWT verification. This makes it easier to trigger Edge Functions with webhooks. Use the -no-verify-jwt flag when deploying your functions via the CLI to enable this mode. You can test this out with our [Edge Functions Telegram Bot example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot).
+Now you can deploy functions with optional JWT verification. This makes it easier to trigger [Edge Functions](/edge-functions) with webhooks. Use the -no-verify-jwt flag when deploying your functions via the CLI to enable this mode. You can test this out with our [Edge Functions Telegram Bot example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot).
 
 [![graphql](/images/blog/2022-may/stripe-webhook.jpg)](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot)
 
 ## Metrics for everybody
 
-We are making another enterprise feature available for all of our users. Our Prometheus-compatible metrics endpoint gives you granular insights on the health and status of your projects, allowing for real-time monitoring, debugging, and alerting for all. [Read the docs](https://supabase.com/docs/guides/platform/metrics).
+We are making another enterprise feature available for all of our users. Our Prometheus-compatible metrics endpoint gives you granular insights on the health and status of your projects, allowing for real-time monitoring, debugging, and alerting for all. [Read the docs](https://supabase.com/docs/guides/observability/metrics).
 
-[![realtime](/images/blog/2022-may/prometheus.png)](https://supabase.com/docs/guides/platform/metrics)
+[![realtime](/images/blog/2022-may/prometheus.png)](https://supabase.com/docs/guides/observability/metrics)
 
 ## Improved Policy Editor
 
-The Policy editor now includes a “Target roles” field. We now have a strong recommendation to use this over the auth.role() = 'authenticated' technique. In one customer’s database, this reduced a query from 46 seconds to 7 milliseconds. Sometimes even we get it wrong - luckily you can trust that Postgres has it right. [Check it out](https://supabase.com/dashboard/project/_/auth/policies).
+The Policy editor now includes a “Target roles” field. We now have a strong recommendation to use this over the auth.role() = 'authenticated' technique. In one customer’s database, this reduced a query from 46 seconds to 7 milliseconds. Sometimes even we get it wrong - luckily you can trust that Postgres has it right. [Check it out](https://supabase.com/dashboard/project/_/database/policies).
 
-[![enterprise](/images/blog/2022-may/policy.jpg)](https://supabase.com/dashboard/project/_/auth/policies)
+[![enterprise](/images/blog/2022-may/policy.jpg)](https://supabase.com/dashboard/project/_/database/policies)
 
 ## State of DB 2022
 
@@ -54,9 +54,9 @@ For the fifth edition of our Happy Hour streaming, we had a chat with our CEO an
 
 ## Supabase on Software Engineering Radio
 
-I chatted with SE Radio host Jeremy Jung about all things Supabase: building an API layer with postgREST, authentication using GoTrue, row-level security, forking open source projects, using the write ahead log to implement real time updates, provisioning and monitoring databases, user support, incidents, and open source licenses. [Listen to the podcast](https://www.se-radio.net/2022/05/episode-511-ant-wilson-on-supabase-postgres-as-a-service/).
+I chatted with SE Radio host Jeremy Jung about all things Supabase: building an API layer with postgREST, authentication using GoTrue, [row-level security](/docs/guides/database/postgres/row-level-security), forking open source projects, using the write ahead log to implement real time updates, provisioning and monitoring databases, user support, incidents, and open source licenses. [Listen to the podcast](https://se-radio.net/2022/05/episode-511-ant-wilson-on-supabase-postgres-as-a-service/).
 
-[![open source](/images/blog/2022-may/se_radio_image.jpg)](https://www.se-radio.net/2022/05/episode-511-ant-wilson-on-supabase-postgres-as-a-service/)
+[![open source](/images/blog/2022-may/se_radio_image.jpg)](https://se-radio.net/2022/05/episode-511-ant-wilson-on-supabase-postgres-as-a-service/)
 
 ## Supabase is Hiring for Sales Assist
 
@@ -70,9 +70,9 @@ There is an opportunity to work inside the growth team at Supabase. It's still a
 
 Deepnote is a data notebook that’s built for collaboration — Jupyter compatible, works magically in the cloud, and sharing is as easy as sending a link.
 
-You can connect your Supabase Postgres Database to your Deepnote notebooks to quickly analyze data and share your findings with others. [Check out the guide](https://docs.deepnote.com/integrations/supabase).
+You can connect your Supabase Postgres Database to your Deepnote notebooks to quickly analyze data and share your findings with others. [Check out the guide](https://deepnote.com/docs/supabase).
 
-[![supabrew](/images/blog/2022-may/graph.jpg)](https://docs.deepnote.com/integrations/supabase)
+[![supabrew](/images/blog/2022-may/graph.jpg)](https://deepnote.com/docs/supabase)
 
 ## Made with Supabase
 
@@ -96,7 +96,7 @@ Discover other projects: Made with Supabase
 
 ## Quick Product Updates
 
-- Fix: [Added reuse interval for token refresh](https://github.com/supabase/gotrue/pull/466)
+- Fix: [Added reuse interval for token refresh](https://github.com/supabase/auth/pull/466)
 
 ## Community Highlights
 
@@ -128,4 +128,4 @@ If you made it this far in the blog post you deserve a treat. [Follow us on Twit
 - Follow us **[on Twitter](https://twitter.com/supabase)**
 - Subscribe to our **[YouTube channel](https://www.youtube.com/c/supabase)**
 - Become a **[sponsor](https://github.com/sponsors/supabase)**
-- Join the **[team](https://about.supabase.com/careers)**
+- Join the **[team](https://supabase.com/careers)**

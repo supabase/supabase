@@ -1,11 +1,10 @@
-// Shared redirect tables consumed by both `next.config.ts` (the Next.js
-// build) and `vercel.ts` (the TanStack/Vercel deploy). Defined once here
-// so the two configs don't drift.
+// Redirect tables consumed by `vercel.ts` (the Vercel edge) and
+// `routes/__root.tsx` (`matchRedirect`, for the Node server and client-side
+// navigation). Defined once here so the two don't drift.
 //
-// Shape mirrors Next's `redirects()` entry and Vercel's `Redirect` type
-// (they're identical — `source`, `destination`, `permanent`, optional
-// `has`). Basepath handling differs between the two: Next auto-prefixes,
-// Vercel doesn't — each consumer is responsible for that.
+// Shape mirrors Vercel's `Redirect` type (`source`, `destination`,
+// `permanent`, optional `has`). Vercel doesn't apply the basePath, so
+// `vercel.ts` prefixes it.
 
 export interface StudioRedirect {
   source: string
@@ -232,6 +231,16 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/logs/explorer/recent',
+    destination: '/project/:ref/logs/explorer',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/logs/explorer/saved',
+    destination: '/project/:ref/logs/explorer',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/sql/quickstarts',
     destination: '/project/:ref/sql/examples',
     permanent: true,
@@ -283,6 +292,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/advisors',
+    destination: '/project/:ref/advisors/security',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/advisors/query-performance',
     destination: '/project/:ref/observability/query-performance',
     permanent: true,
@@ -299,7 +313,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/linter',
-    destination: '/project/:ref/database/security-advisor',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {
@@ -314,6 +328,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/webhooks',
+    destination: '/project/:ref/integrations/webhooks/overview',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/hooks',
     destination: '/project/:ref/integrations/webhooks/overview',
     permanent: true,
   },
@@ -376,11 +395,45 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
 ]
 
+// Top-level path segments (below the base path) that stay reachable in
+// maintenance mode: the maintenance page itself plus every static file it may
+// need to render. Page routes, `/api` and `/_serverFn` are still redirected —
+// maintenance takes the dashboard's backend offline too, and the maintenance
+// page doesn't depend on either.
+export const MAINTENANCE_PASSTHROUGH_SEGMENTS = [
+  'maintenance',
+  // Build output. Next chunks are under `/_next` (which Next also never
+  // redirects itself). Vite's chunks are under `/assets`, or
+  // `/_vercel/immutable/<salt>/nitro` on Vercel.
+  '_next',
+  '_vercel',
+  'assets',
+  // Top-level entries of `public/` (kept in sync by a unit test).
+  'archive',
+  'deno',
+  'favicon',
+  'fonts',
+  'img',
+  'json',
+  'monaco-editor',
+  'supabase-logo.svg',
+]
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 // The two maintenance-mode rules are mutually exclusive; pick by env at
-// build time. Same shape for Next and Vercel.
+// build time. Same shape for Next and Vercel. The lookahead matches whole
+// segments only, so `/maintenance-foo` or `/images` still redirect.
 export function getMaintenanceRedirects(maintenanceMode: boolean): StudioRedirect[] {
+  const passthrough = MAINTENANCE_PASSTHROUGH_SEGMENTS.map(escapeRegex).join('|')
   return maintenanceMode
-    ? [{ source: '/((?!maintenance|img).*)', destination: '/maintenance', permanent: false }]
+    ? [
+        {
+          source: `/((?!(?:${passthrough})(?:/|$)).*)`,
+          destination: '/maintenance',
+          permanent: false,
+        },
+      ]
     : [{ source: '/maintenance', destination: '/', permanent: false }]
 }
 
@@ -443,7 +496,7 @@ function hasQueryMatches(
 // win; params consumed by the matched rule (its `has` query keys) are
 // dropped; a hash on the destination wins over the incoming one. `hash` is
 // the bare fragment without the leading `#`. Runtime-agnostic (also usable
-// from next.config / Vercel edge). Exported for unit tests.
+// from the Vercel edge). Exported for unit tests.
 export function preserveQueryAndHash(
   destination: string,
   search: URLSearchParams | Record<string, string | string[] | undefined>,
@@ -491,9 +544,10 @@ export function matchRedirect(input: {
 
   // Maintenance mode handled inline — the maintenance-on rule uses a
   // negative-lookahead regex source that the segment matcher above can't
-  // parse. Cheap to special-case here.
+  // parse. Checks the same segment list the regex is built from.
   if (maintenanceMode) {
-    if (!pathname.startsWith('/maintenance') && !pathname.startsWith('/img')) {
+    const firstSegment = pathname.split('/')[1] ?? ''
+    if (!MAINTENANCE_PASSTHROUGH_SEGMENTS.includes(firstSegment)) {
       return {
         destination: preserveQueryAndHash('/maintenance', search, { hash }),
         permanent: false,

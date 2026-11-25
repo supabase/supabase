@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Container, Package } from 'lucide-react'
+import { ContainerIcon, PackageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -28,6 +28,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ComputeInstanceStatePill } from '../ComputeInstanceStatePill'
 import { RuntimeBadge } from '../RuntimeBadge'
+import {
+  ComputeInstanceDetailSkeleton,
+  ComputeInstanceOverviewTabSkeleton,
+} from './ComputeInstanceDetailSkeleton'
 import { ComputeInstanceLogsTab } from './ComputeInstanceLogsTab'
 import { ComputeInstanceOverviewTab } from './ComputeInstanceOverviewTab'
 import { AlertError } from '@/components/ui/AlertError'
@@ -69,7 +73,14 @@ export const ComputeInstanceDetail = () => {
   } = useQuery(computeInstanceQueryOptions({ projectRef, name: instanceName }))
 
   if (!projectRef) return null
-  if (isPending) return <GenericSkeletonLoader className="p-6" />
+  if (isPending) {
+    return (
+      <ComputeInstanceDetailSkeleton>
+        {tab === 'overview' && <ComputeInstanceOverviewTabSkeleton />}
+        {tab !== 'overview' && <GenericSkeletonLoader className="p-4" />}
+      </ComputeInstanceDetailSkeleton>
+    )
+  }
   if (isError) return <AlertError error={error} subject="Failed to retrieve instance" />
 
   if (!instance) {
@@ -107,7 +118,7 @@ export const ComputeInstanceDetail = () => {
         <PageHeaderMeta className="px-0 xl:px-0">
           <PageHeaderIcon>
             <Card className="flex h-14 w-14 shrink-0 items-center justify-center">
-              <Container className="h-5 w-5" />
+              <ContainerIcon className="h-5 w-5" />
             </Card>
           </PageHeaderIcon>
           <PageHeaderSummary>
@@ -117,7 +128,7 @@ export const ComputeInstanceDetail = () => {
               <RuntimeBadge runtime={instance.runtime} />
               {instance.imageVersion !== undefined && (
                 <span className="flex items-center gap-2 text-foreground-light">
-                  <Package size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <PackageIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Version {instance.imageVersion}
                 </span>
               )}

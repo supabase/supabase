@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { PlusCircle } from 'lucide-react'
+import { PlusCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
@@ -88,7 +88,7 @@ export const RealtimeFilterPopover = ({
   const filterPopoverTrigger = (
     <PopoverTrigger asChild>
       <Button
-        icon={<PlusCircle size="16" />}
+        icon={<PlusCircleIcon size="16" />}
         variant={isFiltered ? 'primary' : 'dashed'}
         className={cn('rounded-full px-1 text-xs h-[26px]')}
         size="small"

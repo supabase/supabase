@@ -1,5 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
+import {
+  HomeIcon,
+  MessageCirclePlusIcon,
+  NotebookTextIcon,
+  PlusIcon,
+  SquareCodeIcon,
+} from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,
@@ -135,7 +141,7 @@ const HomeTabButton = () => {
         'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100'
       )}
     >
-      <Home
+      <HomeIcon
         size={14}
         strokeWidth={1.5}
         className="text-foreground-lighter transition-colors group-hover:text-foreground-light group-data-[state=active]:text-foreground"
@@ -161,7 +167,7 @@ const NewTabButton = () => {
           animate={{ opacity: 1, scale: 1, x: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Plus
+          <PlusIcon
             size={16}
             strokeWidth={1.5}
             className="text-foreground-lighter hover:text-foreground-light"
@@ -170,15 +176,15 @@ const NewTabButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
-          <SquareCode size={14} />
+          <SquareCodeIcon size={14} />
           <span>Run SQL</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
-          <NotebookText size={14} />
+          <NotebookTextIcon size={14} />
           <span>New notebook</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createChat()}>
-          <MessageCirclePlus size={14} />
+          <MessageCirclePlusIcon size={14} />
           <span>New chat</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

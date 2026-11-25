@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { orgSSOKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrgSSOConfigVariables = {
   orgSlug?: string
@@ -32,7 +33,7 @@ export async function getOrgSSOConfig({ orgSlug }: OrgSSOConfigVariables, signal
 }
 
 export type OrgSSOConfigData = Awaited<ReturnType<typeof getOrgSSOConfig>>
-export type OrgSSOConfigError = ResponseError
+export type OrgSSOConfigError = StudioError
 
 export const useOrgSSOConfigQuery = <TData = OrgSSOConfigData>(
   { orgSlug }: OrgSSOConfigVariables,

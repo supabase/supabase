@@ -544,18 +544,31 @@ export interface paths {
      * Gets all project's logs in a single log stream
      * @description Executes an SQL or LQL query on the project's unified logs stream.
      *
-     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
-     *     If both are not provided, only the last 1 minute of logs will be queried.
-     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *       Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
+     *       If both are not provided, only the last 1 minute of logs will be queried.
+     *       The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
      *
-     *     Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
+     *       Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
      *
-     *     Note: SQL must be written in **ClickHouse SQL dialect**.
+     *       Note: SQL must be written in **ClickHouse SQL dialect**.
      *
      */
     get: operations['v1-get-project-logs']
     put?: never
-    post?: never
+    /**
+     * Gets all project's logs in a single log stream
+     * @description Executes an SQL or LQL query on the project's unified logs stream.
+     *
+     *       Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
+     *       If both are not provided, only the last 1 minute of logs will be queried.
+     *       The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *       Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
+     *
+     *       Note: SQL must be written in **ClickHouse SQL dialect**.
+     *
+     */
+    post: operations['v1-post-project-logs']
     delete?: never
     options?: never
     head?: never
@@ -1027,7 +1040,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Partially updates project's Postgres config */
+    patch: operations['v1-patch-postgres-config']
     trace?: never
   }
   '/v1/projects/{ref}/config/disk': {
@@ -1648,7 +1662,8 @@ export interface paths {
      * @description This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.
      */
     post: operations['v1-create-a-function']
-    delete?: never
+    /** Deletes all Edge Functions from a project */
+    delete: operations['v1-delete-all-functions']
     options?: never
     head?: never
     patch?: never
@@ -1877,6 +1892,28 @@ export interface paths {
      *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-update-network-restrictions']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/network-restrictions/review': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Applies or rejects the change in review in a project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v1-review-network-restrictions']
     delete?: never
     options?: never
     head?: never
@@ -2498,6 +2535,7 @@ export interface components {
       external_discord_enabled: boolean | null
       external_discord_secret: string | null
       external_email_enabled: boolean | null
+      external_email_magic_link_disabled: boolean | null
       external_facebook_client_id: string | null
       external_facebook_email_optional: boolean | null
       external_facebook_enabled: boolean | null
@@ -2766,6 +2804,8 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     BranchResponse_Output: {
       /** Format: date-time */
@@ -2805,6 +2845,8 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
+        | 'RIGHTSIZING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -2992,6 +3034,8 @@ export interface components {
           }
         }
       }
+      /** @description When `true`, the provider's SAML ACS URL and entity ID are scoped to its own provider ID instead of the ones shared by all SAML providers in the project. The same signing key is still used. This cannot be changed once the provider is created. */
+      dedicated_scope?: boolean
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
@@ -3026,6 +3070,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3207,6 +3252,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3391,6 +3437,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3708,6 +3755,7 @@ export interface components {
               }
             }
           }
+          dedicated_scope?: boolean | null
           entity_id: string
           metadata_url?: string
           metadata_xml?: string
@@ -3800,10 +3848,46 @@ export interface components {
         dbAllowedCidrs?: string[]
         dbAllowedCidrsV6?: string[]
       }
+      /**
+       * @description Present when a change that was never applied is waiting for review. `config` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it.
+       * @example {
+       *       "dbAllowedCidrs": [
+       *         "203.0.113.0/24"
+       *       ],
+       *       "dbAllowedCidrsV6": [
+       *         "2001:db8::/32"
+       *       ]
+       *     }
+       */
+      pending_config?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      /**
+       * Format: date-time
+       * @description When the change in `pending_config` was requested. Send it as `requested_at` to the review endpoint.
+       */
+      pending_requested_at?: string
       /** @enum {string} */
       status: 'stored' | 'applied'
       /** Format: date-time */
       updated_at?: string
+    }
+    /** @example {
+     *       "action": "apply",
+     *       "requested_at": "2026-10-21T20:31:51.116+00:00"
+     *     } */
+    NetworkRestrictionsReviewRequest: {
+      /**
+       * @description `apply` replaces the enforced list with the pending one and applies it. `reject` discards the pending one and keeps the enforced list.
+       * @enum {string}
+       */
+      action: 'apply' | 'reject'
+      /**
+       * Format: date-time
+       * @description The `pending_requested_at` of the change being reviewed. Only that change is resolved: if another one has replaced it, the request gets a 409.
+       */
+      requested_at: string
     }
     NetworkRestrictionsV2Response_Output: {
       /** Format: date-time */
@@ -3876,8 +3960,15 @@ export interface components {
     OAuthTokenResponse_Output: {
       access_token: string
       expires_in: number
+      /** @description Project refs the token is limited to. `null` means all projects. */
+      project_refs: string[] | null
       /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
       refresh_token?: string
+      /**
+       * @description Space-delimited scopes granted to the token. Omitted when no scopes were granted.
+       * @example projects:read projects:write
+       */
+      scope?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -3995,6 +4086,8 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
+          | 'RIGHTSIZING'
       }[]
     }
     OrganizationResponseV1_Output: {
@@ -4034,6 +4127,8 @@ export interface components {
       message: string
     }
     PostgresConfigResponse_Output: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4067,6 +4162,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -4085,6 +4182,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -4183,6 +4284,14 @@ export interface components {
             type: 'active_replication_slot'
           }
         | {
+            column_name: string
+            schema_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'table_using_reg_type'
+            type_name: string
+          }
+        | {
             /** @enum {string} */
             type: 'x86_architecture'
           }
@@ -4207,6 +4316,10 @@ export interface components {
         | {
             /** @enum {string} */
             type: 'btree_gist_nan_reindex'
+          }
+        | {
+            /** @enum {string} */
+            type: 'collation_reindex_required'
           }
       )[]
     }
@@ -4249,7 +4362,7 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
-    RegionsInfo_Output: {
+    RegionsInfoV1_Output: {
       all: {
         smartGroup: {
           /** @enum {string} */
@@ -4601,6 +4714,7 @@ export interface components {
       external_discord_enabled?: boolean | null
       external_discord_secret?: string | null
       external_email_enabled?: boolean | null
+      external_email_magic_link_disabled?: boolean
       external_facebook_client_id?: string | null
       external_facebook_email_optional?: boolean | null
       external_facebook_enabled?: boolean | null
@@ -4950,6 +5064,8 @@ export interface components {
      *       "statement_timeout": "60000ms"
      *     } */
     UpdatePostgresConfigBody: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4983,6 +5099,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
@@ -5240,8 +5358,21 @@ export interface components {
      *       "region": "us-east-1"
      *     } */
     V1CreateProjectBody: {
+      /**
+       * Format: uri
+       * @description URL of the authentication site.
+       */
+      auth_site_url?: string
+      /** @description Schemas exposed by the data API. */
+      data_api_exposed_schemas?: string[]
+      /** @description Force revoke default privileges for the data API. This flag will be ignored if the organization enforces `true` by default, and cannot be overridden. */
+      data_api_revoke_default_privileges?: boolean
+      /** @description Whether to use the API schema for the data API. */
+      data_api_use_api_schema?: boolean
       /** @description Database password */
       db_pass: string
+      /** @description Initial SQL to run on the database. Limited to 1024 characters (1 KiB). For complex database changes, please use migrations https://supabase.com/docs/guides/deployment/database-migrations */
+      db_sql?: string
       /**
        * @description Desired instance size. Omit this field to always default to the smallest possible size.
        * @enum {string}
@@ -5266,6 +5397,10 @@ export interface components {
         | '48xlarge_optimized_memory'
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+      /** @description GitHub installation ID for linkage. Must first grant access to the repository on the Dashboard. */
+      github_installation_id?: number
+      /** @description GitHub repository ID for linkage. Must first grant access to the repository on the Dashboard. */
+      github_repository_id?: number
       /** @description [Experimental] Whether to enable high availability for the project. */
       high_availability?: boolean
       /**
@@ -5387,7 +5522,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -5555,8 +5689,42 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
+    }
+    /**
+     * @description Request body for searching project logs with POST body
+     * @example {
+     *       "sql": "select event_message from edge_logs limit 10",
+     *       "iso_timestamp_start": "2025-03-01T00:00:00Z",
+     *       "iso_timestamp_end": "2025-03-01T23:59:59Z"
+     *     }
+     */
+    V1PostProjectLogsBody: {
+      /**
+       * Format: date-time
+       * @example 2025-03-01T23:59:59Z
+       */
+      iso_timestamp_end?: string
+      /**
+       * Format: date-time
+       * @example 2025-03-01T00:00:00Z
+       */
+      iso_timestamp_start?: string
+      /**
+       * @description Custom LQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.
+       * @example s:event_message
+       */
+      lql?: string
+      /**
+       * @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.
+       * @example select event_message from edge_logs limit 10
+       */
+      sql?: string
     }
     V1ProfileResponse_Output: {
       gotrue_id: string
@@ -5633,6 +5801,9 @@ export interface components {
           | 'log_auth_error_rate_high'
           | 'log_storage_error_rate_high'
           | 'log_edge_function_error_rate_high'
+          | 'realtime_authorization_timeouts'
+          | 'realtime_postgres_changes_spike'
+          | 'realtime_concurrent_users_near_limit'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
@@ -5690,6 +5861,8 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
@@ -5745,11 +5918,20 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     /** @example {
-     *       "query": "select * from pg_stat_activity limit 1;"
+     *       "query": "select * from pg_stat_activity limit 1;",
+     *       "disable_statement_timeout": false
      *     } */
     V1ReadOnlyQueryBody: {
+      /**
+       * @description Disable statement timeout for the query. Role-based or global timeout
+       *             still apply https://supabase.com/docs/guides/database/postgres/timeouts
+       * @default true
+       */
+      disable_statement_timeout?: boolean
       parameters?: unknown[]
       query: string
     }
@@ -5781,9 +5963,16 @@ export interface components {
     }
     /** @example {
      *       "query": "select * from pg_stat_activity limit 1;",
-     *       "read_only": true
+     *       "read_only": true,
+     *       "disable_statement_timeout": false
      *     } */
     V1RunQueryBody: {
+      /**
+       * @description Disable statement timeout for the query. Role-based or global timeout
+       *             still apply https://supabase.com/docs/guides/database/postgres/timeouts
+       * @default true
+       */
+      disable_statement_timeout?: boolean
       parameters?: unknown[]
       query: string
       read_only?: boolean
@@ -5852,12 +6041,44 @@ export interface components {
        */
       schedule_for: string
     }
+    /**
+     * Format: binary
+     * @description Raw Brotli-compressed ESZIP binary file.
+     *
+     *     **Validation requirements** - The file must start with the four magic bytes `EZBR` (hex: `45 5A 42 52`).
+     *     - The `ezbr_sha256` query parameter must contain the SHA-256 hash of the uploaded ESZIP payload.
+     *
+     *     **Example**
+     *     ```javascript
+     *     import { readFile } from 'node:fs/promises';
+     *     import { brotliCompress } from 'node:zlib';
+     *     import { promisify } from 'node:util';
+     *     import { createHash } from 'node:crypto';
+     *
+     *     const compress = promisify(brotliCompress);
+     *     const marker = Buffer.from('EZBR', 'ascii');
+     *
+     *     const file = await readFile('./function.eszip');
+     *     const compressed = await compress(file);
+     *
+     *     const payload = Buffer.concat([marker, compressed]);
+     *
+     *     const ezbr_sha256 = createHash('sha256')
+     *       .update(payload)
+     *       .digest('hex');
+     *
+     *     console.log(ezbr_sha256);
+     *     ```
+     *
+     *
+     */
+    V1UpdateFunctionBodyEszip: string
     /** @example {
      *       "name": "Hello World",
      *       "body": "Deno.serve(() => new Response('Hello again!'))",
      *       "verify_jwt": true
      *     } */
-    V1UpdateFunctionBody: {
+    V1UpdateFunctionBodyJson: {
       body?: string
       name?: string
       verify_jwt?: boolean
@@ -5880,6 +6101,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -6052,6 +6275,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -6355,6 +6587,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string
@@ -6610,6 +6844,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description User not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -6995,6 +7236,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The instance size is not available on the organization plan, or the organization has overdue invoices */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -7568,6 +7818,8 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        /** @description Custom LQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
+        lql?: string
         /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
@@ -7579,6 +7831,60 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage exceeded. Enable additional usage to continue querying */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-post-project-logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1PostProjectLogsBody']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -7909,6 +8215,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -7967,6 +8282,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description API key not found for project */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -8012,6 +8334,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8065,8 +8394,24 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8428,6 +8773,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Branching or persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -8863,6 +9217,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description An auth setting in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -9279,6 +9642,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -9384,6 +9756,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -9895,6 +10276,60 @@ export interface operations {
       }
     }
   }
+  'v1-patch-postgres-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePostgresConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-database-disk': {
     parameters: {
       query?: never
@@ -9973,6 +10408,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Disk modifications are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -10313,6 +10757,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description A storage feature or file size limit in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12115,7 +12568,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12185,7 +12640,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12202,6 +12659,54 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create project's function */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-all-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete project's functions */
       500: {
         headers: {
           [name: string]: unknown
@@ -12334,8 +12839,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': string
+        'application/json': components['schemas']['V1UpdateFunctionBodyJson']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBodyEszip']
       }
     }
     responses: {
@@ -12468,7 +12973,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12994,6 +13501,60 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-review-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsReviewRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to resolve the network restrictions review */
       500: {
         headers: {
           [name: string]: unknown
@@ -13570,6 +14131,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The restore is not available on the organization plan, or the organization has overdue invoices or a service restriction */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -14417,7 +14987,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoV1_Output']
         }
       }
     }

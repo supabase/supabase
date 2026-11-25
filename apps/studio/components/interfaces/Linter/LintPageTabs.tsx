@@ -1,10 +1,11 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import { MessageSquareMore } from 'lucide-react'
+import { MessageSquareMoreIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { Lint } from '@/data/lint/lint-query'
 
@@ -14,49 +15,55 @@ interface LintPageTabsProps {
   isLoading: boolean
   activeLints: Lint[]
 }
+const LintCountLabel = ({
+  tab,
+  activeLints,
+  isLoading,
+}: {
+  tab: (typeof LINT_TABS)[number]
+  activeLints: Lint[]
+  isLoading: boolean
+}) => {
+  let count = 0
+  let label = ''
+  if (tab.id === LINTER_LEVELS.ERROR) {
+    count = activeLints.filter((lint) => lint.level === 'ERROR').length
+    label = 'errors'
+  }
+
+  if (tab.id === LINTER_LEVELS.WARN) {
+    count = activeLints.filter((lint) => lint.level === 'WARN').length
+    label = 'warnings'
+  }
+
+  if (tab.id === LINTER_LEVELS.INFO) {
+    count = activeLints.filter((lint) => lint.level === 'INFO').length
+    label = 'suggestions'
+  }
+
+  return (
+    <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+      {isLoading ? (
+        <ShimmeringLoader className="w-20 pt-1" />
+      ) : (
+        <>
+          {count} {label}
+        </>
+      )}
+    </span>
+  )
+}
+
 const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
   const router = useRouter()
-
-  const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
-  const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
-  const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
-
-  const LintCountLabel = ({ tab }: { tab: (typeof LINT_TABS)[number] }) => {
-    let count = 0
-    let label = ''
-    if (tab.id === LINTER_LEVELS.ERROR) {
-      count = errorLintsCount
-      label = 'errors'
-    }
-
-    if (tab.id === LINTER_LEVELS.WARN) {
-      count = warnLintsCount
-      label = 'warnings'
-    }
-
-    if (tab.id === LINTER_LEVELS.INFO) {
-      count = infoLintsCount
-      label = 'suggestions'
-    }
-
-    return (
-      <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-        {isLoading ? (
-          <ShimmeringLoader className="w-20 pt-1" />
-        ) : (
-          <>
-            {count} {label}
-          </>
-        )}
-      </span>
-    )
-  }
 
   return (
     <Tabs
       value={currentTab}
       onValueChange={(value) => {
-        setCurrentTab(value as LINTER_LEVELS)
+        const level = parseLinterLevel(value)
+        if (!level) return
+        setCurrentTab(level)
         const { sort, search, ...rest } = router.query
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
@@ -96,7 +103,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
                         : 'text-brand-500'
                   }
                 >
-                  <MessageSquareMore size={14} fill="currentColor" strokeWidth={0} />
+                  <MessageSquareMoreIcon size={14} fill="currentColor" strokeWidth={0} />
                 </span>
 
                 <span className="">{tab.label}</span>
@@ -107,7 +114,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
                   <TooltipContent side="top">{tab.description}</TooltipContent>
                 </Tooltip>
               </div>
-              <LintCountLabel tab={tab} />
+              <LintCountLabel tab={tab} activeLints={activeLints} isLoading={isLoading} />
             </TabsTrigger>
           </ShortcutTooltip>
         ))}
@@ -116,4 +123,4 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
   )
 }
 
-export default LintPageTabs
+export { LintPageTabs }

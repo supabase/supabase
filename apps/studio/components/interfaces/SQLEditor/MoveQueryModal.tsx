@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useParams } from 'common'
-import { Check, Code, Plus } from 'lucide-react'
+import { CheckIcon, CodeIcon, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -213,11 +213,18 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
-                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`}{' '}
-                snippet{snippets.length > 1 ? 's' : ''} to a folder
+                Move{' '}
+                {snippets.length === 1 ? (
+                  <span>{`"${snippets[0].name}"`}</span>
+                ) : (
+                  <span>{`${snippets.length}`}</span>
+                )}{' '}
+                <span>snippet</span>
+                {snippets.length > 1 ? <span>s</span> : ''} <span>to a folder</span>
               </DialogTitle>
               <DialogDescription>
-                Select which folder to move your quer{snippets.length > 1 ? 'ies' : 'y'} to
+                Select which folder to move your quer
+                {snippets.length > 1 ? <span>ies</span> : <span>y</span>} <span>to</span>
               </DialogDescription>
             </DialogHeader>
 
@@ -233,7 +240,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       size="small"
                       className="pr-2 justify-between"
                       iconRight={
-                        <Code
+                        <CodeIcon
                           className="text-foreground-light rotate-90"
                           strokeWidth={2}
                           size={12}
@@ -242,7 +249,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                     >
                       <div className="flex items-center space-x-2">
                         {selectedFolder}
-                        {isCurrentFolder && ` (Current)`}
+                        {isCurrentFolder && <span>{` (Current)`}</span>}
                       </div>
                     </Button>
                   </PopoverTrigger>
@@ -268,11 +275,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                             >
                               <span>
                                 Root of the editor
-                                {snippets.length === 1 &&
-                                  snippets[0].folder_id === null &&
-                                  ` (Current)`}
+                                {snippets.length === 1 && snippets[0].folder_id === null && (
+                                  <span>{` (Current)`}</span>
+                                )}
                               </span>
-                              {selectedId === 'root' && <Check size={14} />}
+                              {selectedId === 'root' && <CheckIcon size={14} />}
                             </CommandItem>
                             {folders?.map((folder) => (
                               <CommandItem
@@ -290,11 +297,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                               >
                                 <span>
                                   {folder.name}
-                                  {snippets.length === 1 &&
-                                    snippets[0].folder_id === folder.id &&
-                                    ` (Current)`}
+                                  {snippets.length === 1 && snippets[0].folder_id === folder.id && (
+                                    <span>{` (Current)`}</span>
+                                  )}
                                 </span>
-                                {folder.id === selectedId && <Check size={14} />}
+                                {folder.id === selectedId && <CheckIcon size={14} />}
                               </CommandItem>
                             ))}
                           </ScrollArea>
@@ -312,7 +319,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                               setSelectedId('new-folder')
                             }}
                           >
-                            <Plus size={14} strokeWidth={1.5} />
+                            <PlusIcon size={14} strokeWidth={1.5} />
                             <p>New folder</p>
                           </CommandItem>
                         </CommandGroup>

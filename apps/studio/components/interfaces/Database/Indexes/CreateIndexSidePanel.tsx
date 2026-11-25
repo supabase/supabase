@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -213,7 +213,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             size={'medium'}
                             className={`w-full [&>span]:w-full text-left`}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="text-foreground-muted"
                                 strokeWidth={2}
                                 size={14}
@@ -257,7 +257,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                     setSearchTerm('')
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'text-primary',
                                       schema.name === field.value ? 'opacity-100' : 'opacity-0'
@@ -311,7 +311,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                               selectedEntity === '' && 'text-foreground-lighter'
                             )}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="text-foreground-muted"
                                 strokeWidth={2}
                                 size={14}
@@ -349,7 +349,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             <CommandEmpty>
                               {isLoadingEntities ? (
                                 <div className="flex items-center gap-2 text-center justify-center">
-                                  <Loader2 size={12} className="animate-spin" />
+                                  <Loader2Icon size={12} className="animate-spin" />
                                   Loading...
                                 </div>
                               ) : (
@@ -368,7 +368,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                     form.setValue('type', INDEX_TYPES[0].value)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'text-primary',
                                       entity.name === field.value ? 'opacity-100' : 'opacity-0'

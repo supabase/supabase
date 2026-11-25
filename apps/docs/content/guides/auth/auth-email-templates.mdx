@@ -1,10 +1,10 @@
 ---
-title: 'Email Templates'
-description: 'Learn how to manage the email templates in Supabase.'
-subtitle: 'Learn how to manage the email templates in Supabase.'
+title: 'Email templates'
+description: 'Customize the authentication and security notification emails Supabase Auth sends.'
+subtitle: 'Customize the authentication and security notification emails Supabase Auth sends.'
 ---
 
-Email templates in Supabase fall into two categories: authentication and security notifications.
+Supabase Auth sends two kinds of email: authentication emails and security notifications.
 
 Authentication emails:
 
@@ -25,27 +25,29 @@ Security notification emails:
 - Verification method added
 - Verification method removed
 
-Security emails are only sent to users if the respective security notifications have been enabled at a project-level.
+Supabase Auth sends a security notification only when that notification is turned on for the project.
 
-## Terminology
+The confirmation email is sent only when email confirmations are on. In a hosted project, turn on **Confirm email** on the [Auth Providers page](/dashboard/project/_/auth/providers), or set `mailer_autoconfirm` to `false` with the [Management API](/docs/reference/api/v1-update-auth-service-config). In local development, set [`auth.email.enable_confirmations`](/docs/guides/local-development/cli/config#auth.email.enable_confirmations) to `true` in your config file, then restart the local stack. With confirmations off, users are confirmed on sign-up and no email is sent, so a customized confirmation template never reaches them.
 
-The templating system provides the following variables for use:
+## Template variables [#terminology]
 
-| Name                     | Description                                                                                                                                                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path`.                                                                       |
-| `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}`.                                                                                                                                                                                  |
-| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                                                                                           |
-| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
-| `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
-| `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
-| `{{ .Email }}`           | Contains the original email address of the user. Empty when trying to [link an email address to an anonymous user](/docs/guides/auth/auth-anonymous#link-an-email--phone-identity).                                                                                                   |
-| `{{ .NewEmail }}`        | Contains the new email address of the user. This variable is only supported in the "Change email address" template.                                                                                                                                                                   |
-| `{{ .OldEmail }}`        | Contains the old email address of the user. This variable is only supported in the "Email address changed notification" template.                                                                                                                                                     |
-| `{{ .Phone }}`           | Contains the new phone number of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                       |
-| `{{ .OldPhone }}`        | Contains the old phone address of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                      |
-| `{{ .Provider }}`        | Contains the provider of the linked or removed sign-in method. This variable is only supported in the "Sign-in method linked" and "Sign-in method removed" notification templates.                                                                                                    |
-| `{{ .FactorType }}`      | Contains the type of verification method that was added or removed. This variable is only supported in the "Verification method added" and "Verification method removed" notification templates.                                                                                      |
+Templates can use the following variables:
+
+| Name                     | Description                                                                                                                                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a sign-up confirmation URL looks like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path`.                                                                    |
+| `{{ .Token }}`           | Contains a 6-digit one-time password (OTP) to use instead of the `{{ .ConfirmationURL }}`.                                                                                                                                                                                     |
+| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. Use it to build your own link in the email template.                                                                                                                                                                          |
+| `{{ .SiteURL }}`         | Contains your application's Site URL. Configure it in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                   |
+| `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail`, or `inviteUserByEmail` is called. Configure the redirect URL allow list in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
+| `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                  |
+| `{{ .Email }}`           | Contains the original email address of the user. Empty when you [link an email address to an anonymous user](/docs/guides/auth/auth-anonymous#link-an-email--phone-identity).                                                                                                  |
+| `{{ .NewEmail }}`        | Contains the new email address of the user. This variable is only supported in the "Change email address" template.                                                                                                                                                            |
+| `{{ .OldEmail }}`        | Contains the old email address of the user. This variable is only supported in the "Email address changed notification" template.                                                                                                                                              |
+| `{{ .Phone }}`           | Contains the new phone number of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                |
+| `{{ .OldPhone }}`        | Contains the old phone number of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                |
+| `{{ .Provider }}`        | Contains the provider of the linked or removed sign-in method. This variable is only supported in the "Sign-in method linked" and "Sign-in method removed" notification templates.                                                                                             |
+| `{{ .FactorType }}`      | Contains the type of verification method that was added or removed. This variable is only supported in the "Verification method added" and "Verification method removed" notification templates.                                                                               |
 
 ## Editing email templates
 
@@ -53,23 +55,7 @@ Where you edit templates depends on how you run Supabase.
 
 ### Hosted projects
 
-Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [terminology](#terminology) and variables documented on this page.
-
-### Local development and self-hosted
-
-The dashboard template builder **does not apply** when running [local development with CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in `supabase/config.toml` and local HTML files instead.
-
-<Admonition type="note" title="Customizing templates locally">
-
-See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
-
-- [`config.toml` keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
-- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables) — the same placeholders as the [terminology](#terminology) table above
-- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
-
-For self-hosted deployments, refer to [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
-
-</Admonition>
+Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [template variables](#terminology).
 
 You can also manage email templates using the Management API:
 
@@ -124,88 +110,31 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Mobile deep linking
+### Local development and self-hosted
 
-For mobile applications, you might need to link or redirect to a specific page within your app. See the [Mobile Deep Linking guide](/docs/guides/auth/native-mobile-deep-linking) to set this up.
+The dashboard template builder doesn't apply to [local development with the CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). With the CLI, customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and in local HTML files. Self-hosted Supabase uses environment variables instead.
 
-## Limitations
+For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
 
-### Email prefetching
+<Admonition type="note" title="Customizing templates locally">
 
-Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
-In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
-To guard against this there are the options below:
+See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
 
-**Option 1**
+- [Config file keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
+- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables), which match the [template variables](#terminology) on this page
+- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
 
-- Use an email OTP instead by including `{{ .Token }}` in the email template
-- Create your own custom email link to redirect the user to a page where they can enter their email and token to sign in
+For self-hosted deployments, see [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
 
-```html
-<a href="{{ .SiteURL }}/confirm-signup">Confirm email address</a>
-```
-
-- Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
-
-```ts
-const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
-```
-
-**Option 2**
-
-- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action
-
-```html
-<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}">
-  Confirm email address
-</a>
-```
-
-- The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
-
-### Email tracking
-
-If you are using an external email provider that enables "email tracking", the links inside the Supabase email templates will be overwritten and won't perform as expected. We recommend disabling email tracking to ensure email links are not overwritten.
-
-### Redirecting the user to a server-side endpoint
-
-If you intend to use [Server-side rendering](/docs/guides/auth/server-side/advanced-guide), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
-
-You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
-
-```html
-<a
-  href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite&redirect_to={{ .RedirectTo }}"
->
-  Accept the invite
-</a>
-```
-
-When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash`, `type` and `redirect_to` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
-
-```ts
-import { createClient, type EmailOtpType } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
-
-// ---cut---
-const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
-const {
-  data: { session },
-  error,
-} = await supabase.auth.verifyOtp({ token_hash, type: type as EmailOtpType })
-
-// subsequently redirect the user back to the client using the redirect_to param
-// ...
-```
+</Admonition>
 
 ## Customization
 
-Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.
+Supabase Auth uses [Go templates](https://pkg.go.dev/text/template), so you can render content conditionally based on template variables.
 
 ### Send different email to early access users
 
-Send a different email to users who signed up via an early access domain (`https://www.earlyaccess.trial.com`).
+Send a different email to users who signed up through an early access domain (`https://www.earlyaccess.trial.com`).
 
 ```
 {{ if eq .Data.Domain "https://www.example.com" }}
@@ -223,3 +152,86 @@ Billy Team</p>
 Billy Team</p>
 {{ end }}
 ```
+
+## Limitations
+
+### Email prefetching
+
+Some email providers scan incoming email for spam or other threats and open the links in it, for example [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about?view=o365-worldwide). The scan uses up the `{{ .ConfirmationURL }}` link, so the user gets a "[Token has expired or is invalid](/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0)" error when they open it.
+
+To avoid this, use one of the following approaches.
+
+**Send an OTP instead of a link**
+
+1. Include `{{ .Token }}` in the email template.
+2. Link to a page in your app where the user enters their email address and the OTP:
+
+   ```html
+   <a href="{{ .SiteURL }}/confirm-signup">Confirm email address</a>
+   ```
+
+3. Sign the user in by verifying the OTP with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp):
+
+   ```ts
+   import { createClient } from '@supabase/supabase-js'
+
+   const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+   declare const email: string
+   declare const token: string
+
+   // ---cut---
+   const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+   ```
+
+**Confirm with a button on your own page**
+
+1. Link to a page in your app and pass the confirmation URL as a query parameter:
+
+   ```html
+   <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}">
+     Confirm email address
+   </a>
+   ```
+
+2. On that page, read the `confirmation_url` query parameter and use it as the target of a button. The user confirms by clicking the button.
+
+### Email tracking
+
+Email tracking in an external email provider rewrites the links in Supabase email templates, and the rewritten links don't work. Turn off email tracking in your provider.
+
+### Redirecting the user to a server-side endpoint
+
+With [server-side rendering](/docs/guides/auth/server-side/advanced-guide), you might want the email link to go to a server-side endpoint that checks whether the user is authenticated before it returns the page. The default email link redirects the user after verification with the session in the URL fragment. The server never receives the fragment, so it can't read the session.
+
+Instead, point the link in the email template at your server-side endpoint. For example:
+
+```html
+<a
+  href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite&redirect_to={{ .RedirectTo }}"
+>
+  Accept the invite
+</a>
+```
+
+When the user clicks the link, the request goes to `https://api.example.com/v1/authenticate`. Read the `token_hash`, `type`, and `redirect_to` query parameters from the URL, then call [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) to get a session. `verifyOtp` sends a `POST` request to Supabase Auth, so the session comes back in the response body, where the server can read it. Then redirect the user to `redirect_to`. For example:
+
+```ts
+import { createClient, type EmailOtpType } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+declare const request: Request
+
+// ---cut---
+const { token_hash, type } = Object.fromEntries(new URL(request.url).searchParams)
+const {
+  data: { session },
+  error,
+} = await supabase.auth.verifyOtp({ token_hash, type: type as EmailOtpType })
+
+// subsequently redirect the user back to the client using the redirect_to param
+// ...
+```
+
+## Mobile deep linking
+
+To send users from an email link to a specific page in a mobile app, see [Native mobile deep linking](/docs/guides/auth/native-mobile-deep-linking).

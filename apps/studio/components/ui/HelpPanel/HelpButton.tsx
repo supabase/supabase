@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -26,7 +26,7 @@ export const HelpButton = () => {
       }}
       tooltip={{ content: { text: 'Help' } }}
     >
-      <HelpCircle
+      <HelpCircleIcon
         size={16}
         strokeWidth={1.5}
         className={cn(

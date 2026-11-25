@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -33,14 +33,22 @@ export const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const {
-    data,
-    isError,
-    isPending: isLoading,
-    isSuccess,
-    error,
-  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
+  const { data, isError, isPending, isFetching, isSuccess, error, hasNextPage, fetchNextPage } =
+    useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
+  const shouldFindSelectedProject =
+    currentBillingCycleSelected &&
+    !!projectRef &&
+    !projects.some((project) => project.ref === projectRef) &&
+    hasNextPage &&
+    !isError
+  const isLoading = isPending || shouldFindSelectedProject
+
+  useEffect(() => {
+    if (shouldFindSelectedProject && !isFetching) {
+      void fetchNextPage()
+    }
+  }, [shouldFindSelectedProject, isFetching, fetchNextPage])
 
   const relevantProjects = useMemo(() => {
     return isSuccess
@@ -50,12 +58,16 @@ export const DiskUsage = ({
             const isBranchExceedingFreeQuota =
               project.is_branch && project.databases.some((db) => (db.disk_volume_size_gb ?? 8) > 8)
 
+            const isFilteredBranch = project.is_branch && project.ref === projectRef
+
             const isActiveProject = project.status !== PROJECT_STATUS.INACTIVE
 
             const isHostedOnAws = project.databases.every((db) => db.cloud_provider === 'AWS')
 
             return (
-              (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject && isHostedOnAws
+              (!project.is_branch || isBranchExceedingFreeQuota || isFilteredBranch) &&
+              isActiveProject &&
+              isHostedOnAws
             )
           })
           .filter((it) => it.ref === projectRef || !projectRef)
@@ -91,7 +103,7 @@ export const DiskUsage = ({
           </div>
         )}
         {isError && <AlertError subject="Failed to retrieve usage data" error={error} />}
-        {isSuccess && (
+        {isSuccess && !isLoading && (
           <div className="space-y-4">
             {currentBillingCycleSelected &&
               subscription?.usage_billing_enabled === false &&
@@ -140,9 +152,11 @@ export const DiskUsage = ({
                 <p className="text-xs text-foreground-light">Overage in period</p>
                 <p className="text-xs">
                   {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
-                  {io2UsageInPeriod?.usage
-                    ? ` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`
-                    : ``}
+                  {io2UsageInPeriod?.usage ? (
+                    <span>{` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`}</span>
+                  ) : (
+                    <span>{``}</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -205,7 +219,11 @@ export const DiskUsage = ({
                                 <>
                                   <p>
                                     {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
-                                    {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
+                                    {replicaDbs.length === 1 ? (
+                                      <span>Replica</span>
+                                    ) : (
+                                      <span>Replicas</span>
+                                    )}
                                   </p>
                                   <p className="mt-1">
                                     Read replicas have their own disk and use 25% more disk to

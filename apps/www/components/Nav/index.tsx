@@ -1,13 +1,11 @@
 'use client'
 
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import { usePathname } from 'next/navigation'
-import React, { useState } from 'react'
-import { useWindowSize } from 'react-use'
+import React, { useRef, useState } from 'react'
 import {
   Button,
   buttonVariants,
@@ -21,14 +19,15 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
+import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
+import { AccountMenu } from './AccountMenu'
 import GitHubButton from './GitHubButton'
-import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import useDropdownMenu from './useDropdownMenu'
+import { DASHBOARD_SIGN_IN_URL, DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 
 interface Props {
   hideNavbar: boolean
@@ -37,8 +36,8 @@ interface Props {
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
-  const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [activeDropdown, setActiveDropdown] = useState('')
   const [visibleDropdown, setVisibleDropdown] = useState('')
   const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
@@ -51,9 +50,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     setVisibleDropdown(value)
     if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
   }
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-  const user = useUser()
   const menu = getMenu()
   const dropdownTitles: string[] = menu.primaryNav
     .filter((menuItem) => menuItem.hasDropdown)
@@ -63,7 +59,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
   }
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const userMenu = useDropdownMenu(user)
 
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
@@ -80,19 +75,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   const isTransparent = isStateOfStartupsPage && !scrolled && !open
 
-  React.useEffect(() => {
-    if (open) {
-      // Prevent scrolling on mount
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-  }, [open])
-
-  // Close mobile menu when desktop
-  React.useEffect(() => {
-    if (width >= 1024) setOpen(false)
-  }, [width])
+  const handleMenuToggle = () => setOpen(!open)
+  const handleMenuClose = () => setOpen(false)
 
   if (hideNavbar) {
     return null
@@ -206,15 +190,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </NavigationMenu>
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
-                <div
-                  className={cn(
-                    'flex items-center gap-2 transition-opacity',
-                    isUserLoading ? 'opacity-0' : 'opacity-100'
-                  )}
-                >
-                  <DevToolbarTrigger />
-                  <GitHubButton />
-                  {isLoggedIn ? (
+                <DevToolbarTrigger />
+                <GitHubButton />
+                <SignedInSwitch
+                  signedIn={
                     <>
                       {isStateOfStartupsPage ? (
                         <FloatingPlate rounded="md" className="hidden lg:inline-flex">
@@ -227,15 +206,16 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <a href="/dashboard/projects">Dashboard</a>
                         </Button>
                       )}
-                      <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                      <AccountMenu />
                     </>
-                  ) : (
+                  }
+                  signedOut={
                     <>
                       {isStateOfStartupsPage ? (
                         <FloatingPlate rounded="md" className="hidden lg:inline-flex">
                           <Button asChild>
                             <a
-                              href="https://supabase.com/dashboard"
+                              href={DASHBOARD_SIGN_IN_URL}
                               onClick={() =>
                                 sendTelemetryEvent({
                                   action: 'sign_in_button_clicked',
@@ -250,7 +230,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       ) : (
                         <Button className="hidden lg:inline-flex" asChild>
                           <a
-                            href="https://supabase.com/dashboard"
+                            href={DASHBOARD_SIGN_IN_URL}
                             onClick={() =>
                               sendTelemetryEvent({
                                 action: 'sign_in_button_clicked',
@@ -264,7 +244,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       )}
                       <Button variant="primary" className="hidden lg:inline-flex" asChild>
                         <a
-                          href="https://supabase.com/dashboard/sign-up"
+                          href={DASHBOARD_SIGN_UP_URL}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',
@@ -276,20 +256,28 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         </a>
                       </Button>
                     </>
-                  )}
-                </div>
+                  }
+                />
               </div>
             </div>
-            <HamburgerButton
-              toggleFlyOut={() => setOpen(true)}
-              showLaunchWeekNavMode={showLaunchWeekNavMode}
+            <TopNavMenuToggle
+              ref={menuButtonRef}
+              isOpen={open}
+              onClick={handleMenuToggle}
+              className="self-center lg:hidden"
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />
       </div>
+      <MobileMenu
+        open={open}
+        menu={menu}
+        toggleRef={menuButtonRef}
+        onLinkClick={handleMenuClose}
+        className="lg:hidden [--header-height:--spacing(16)]"
+      />
     </>
   )
 }

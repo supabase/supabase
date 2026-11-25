@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -48,17 +47,18 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { unguarded } from '@/data/fetchers'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { noop } from '@/lib/void'
-import type { ResponseError } from '@/types'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
@@ -164,7 +164,7 @@ export const PostgrestConfig = () => {
   const formId = 'project-postgres-config'
 
   const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE)
   // PostgREST config (exposed schemas, extra search path, max rows, pool size) is persisted via
   // the platform API, which isn't available self-hosted (the values come from env vars there).
   const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
@@ -274,7 +274,7 @@ export const PostgrestConfig = () => {
         functionNamesToRemove: [],
       })
     } catch (error) {
-      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+      toast.error('Failed to save settings: ' + (error as StudioError).message || 'Unknown error')
     } finally {
       setIsUpdating(false)
     }
@@ -367,14 +367,14 @@ export const PostgrestConfig = () => {
                       {protectedSchemasExposed.length > 0 ? (
                         <p className="mt-1 text-sm text-warning">
                           {protectedSchemasExposed.length} protected schema
-                          {protectedSchemasExposed.length > 1 ? 's' : ''} is currently exposed and
-                          should be removed
+                          {protectedSchemasExposed.length > 1 ? <span>s</span> : ''}{' '}
+                          <span>is currently exposed and should be removed</span>
                         </p>
                       ) : missingExposedSchema.length > 0 ? (
                         <p className="mt-1 text-sm text-foreground-lighter">
                           {missingExposedSchema.length} exposed schema
-                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
-                          remove
+                          {missingExposedSchema.length > 1 ? <span>s</span> : ''}{' '}
+                          <span>does not exist — safe to remove</span>
                         </p>
                       ) : null}
                     </FormItemLayout>
@@ -389,7 +389,7 @@ export const PostgrestConfig = () => {
                             set to{' '}
                             {authenticatorDbSchemasOverride?.map((schema, i) => (
                               <span key={schema}>
-                                {i > 0 && ', '}
+                                {i > 0 && <span>{', '}</span>}
                                 <code>{schema}</code>
                               </span>
                             ))}
@@ -512,14 +512,12 @@ export const PostgrestConfig = () => {
                               description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
                             >
                               <FormControl>
-                                <div>
-                                  <Switch
-                                    size="large"
-                                    disabled={!canUpdateExposedEntities}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </div>
+                                <Switch
+                                  size="large"
+                                  disabled={!canUpdateExposedEntities}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
                               </FormControl>
                             </FormItemLayout>
                           </FormItem>
@@ -680,7 +678,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button icon={<LockIcon />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>
@@ -704,7 +702,10 @@ export const PostgrestConfig = () => {
           resetAuthenticatorOverride({
             projectRef,
             connectionString: project?.connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'authenticator-role-override-reset',
             sql: resetAuthenticatorDbSchemasSql,
+            grant: unguarded.migrating,
           })
         }}
       >

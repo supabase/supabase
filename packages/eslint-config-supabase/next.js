@@ -1,10 +1,10 @@
 const { defineConfig } = require('eslint/config')
-const { plugin: shadcn } = require('@shadcn/lint')
 const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
 const tanstackQuery = require('@tanstack/eslint-plugin-query')
 const tsparser = require('@typescript-eslint/parser')
 const nextCoreWebVitals = require('eslint-config-next/core-web-vitals')
+const shadcnConfig = require('./shadcn')
 
 const NEXT_PLUGIN_FILES = ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}']
 
@@ -66,25 +66,16 @@ module.exports = defineConfig([
   { ignores: ['**/*.mts', '**/*.cts'] },
   turboConfig,
   prettierConfig,
-  {
-    name: 'supabase/shadcn',
-    files: NEXT_PLUGIN_FILES,
-    plugins: { shadcn },
-    settings: {
-      shadcn: {
-        componentImports: ['^ui(/|$)', '^ui-patterns(/|$)'],
-      },
-    },
-    rules: {
-      'shadcn/no-unknown-classes': ['warn', { allow: ['not-prose'] }],
-      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout'] }],
-      'shadcn/no-raw-colors': 'warn',
-    },
-  },
+  shadcnConfig,
   tanstackQuery.configs['flat/recommended'],
   {
     rules: {
-      '@tanstack/query/exhaustive-deps': 'warn',
+      // Grants (FGA permission tokens) and connection strings don't change the returned data,
+      // so keeping them out of query keys avoids splitting the cache.
+      '@tanstack/query/exhaustive-deps': [
+        'warn',
+        { allowlist: { variables: ['grant', 'connectionString'] } },
+      ],
     },
   },
   typescriptConfig,

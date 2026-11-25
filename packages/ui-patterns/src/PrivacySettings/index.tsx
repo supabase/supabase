@@ -1,10 +1,11 @@
 'use client'
 
-import { useConsentState } from 'common'
-import Link from 'next/link'
-import { PropsWithChildren, useState } from 'react'
+import { useConsentState } from 'common/consent-state'
+import { getPrivacyLinkLabel, readVisitorCountry } from 'common/visitor-country'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -19,12 +20,28 @@ import {
 
 import { Admonition } from '../Admonition'
 
+export const PrivacySettingsLabel = () => {
+  const [country, setCountry] = useState<string>()
+  const [hasReadCountry, setHasReadCountry] = useState(false)
+
+  useEffect(() => {
+    setCountry(readVisitorCountry(document.cookie))
+    setHasReadCountry(true)
+  }, [])
+
+  // Hidden until the country cookie is read, so non-US visitors never see the US label flash.
+  return (
+    <span className={hasReadCountry ? undefined : 'invisible'}>{getPrivacyLinkLabel(country)}</span>
+  )
+}
+
 interface PrivacySettingsProps {
   className?: string
 }
 
 export const PrivacySettings = ({
   children,
+  className,
   ...props
 }: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -53,7 +70,11 @@ export const PrivacySettings = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild>
-        <button {...props} onClick={() => setIsOpen(true)}>
+        <button
+          {...props}
+          className={cn('cursor-pointer', className)}
+          onClick={() => setIsOpen(true)}
+        >
           {children}
         </button>
       </DialogTrigger>
@@ -72,9 +93,9 @@ export const PrivacySettings = ({
                   <>
                     We couldn't load the privacy settings due to an ad blocker or network error.
                     Please disable any ad blockers and try again. If the problem persists, please{' '}
-                    <Link href="https://supabase.com/dashboard/support/new" className="underline">
+                    <a href="https://supabase.com/dashboard/support/new" className="underline">
                       contact support
-                    </Link>
+                    </a>
                     .
                   </>
                 }
@@ -145,12 +166,12 @@ function Category({
         <div className="text-sm text-foreground-light" id={`${category.slug}-description`}>
           {category.description}
           <br />
-          <Link
+          <a
             href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
             className="underline"
           >
             Learn more
-          </Link>
+          </a>
         </div>
       </div>
       <Switch

@@ -1,4 +1,5 @@
 import {
+  asWriteSql,
   getDatabaseTriggerUpdateSQL,
   type PGTrigger,
   type PGTriggerCreate,
@@ -8,8 +9,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -17,6 +19,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   originalTrigger: PGTrigger
   updatedTrigger: Omit<PGTriggerCreate, 'events'> &
@@ -25,6 +28,7 @@ export type DatabaseTriggerUpdateVariables = {
 
 export async function updateDatabaseTrigger({
   projectRef,
+  grant,
   connectionString,
   originalTrigger,
   updatedTrigger,
@@ -33,8 +37,11 @@ export async function updateDatabaseTrigger({
   await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-update-transaction',
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'update', originalTrigger.id],
+    grant,
   })
   return updatedTrigger
 }
@@ -48,14 +55,14 @@ export const useDatabaseTriggerUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseTriggerUpdateTxnData,
-    ResponseError,
+    StudioError,
     DatabaseTriggerUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>({
+  return useMutation<DatabaseTriggerUpdateTxnData, StudioError, DatabaseTriggerUpdateVariables>({
     mutationFn: (vars) => updateDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -15,9 +15,9 @@ For example:
 - **User profile APIs** should require authentication
 - **Some functions** might need special dependencies or different file types
 
-To enable these per-function rules, create `supabase/config.toml` in your project root:
+To enable these per-function rules, add the following to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 # Disables authentication for the Stripe webhook.
 [functions.stripe-webhook]
 verify_jwt = false
@@ -37,7 +37,7 @@ You set these rules once and never worry about them again. Deploy your functions
 
 <Admonition type="note">
 
-To see more general `config.toml` options, check out [this guide](/docs/guides/local-development/managing-config).
+To see more general config file options, check out [this guide](/docs/guides/local-development/managing-config).
 
 </Admonition>
 
@@ -45,9 +45,9 @@ To see more general `config.toml` options, check out [this guide](/docs/guides/l
 
 ## Skipping authorization checks
 
-By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can configure this in your `config.toml`:
+By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can configure this in your config file:
 
-```toml
+```toml supabase/config.toml
 [functions.stripe-webhook]
 verify_jwt = false
 ```
@@ -76,9 +76,9 @@ Be careful when using this flag, as it will allow anyone to invoke your Edge Fun
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
 
-Save your Function as a JavaScript file (e.g. `index.js`) update the `supabase/config.toml` :
+Save your function as a JavaScript file (for example, `index.js`), and then update your config file:
 
-```toml
+```toml supabase/config.toml
 [functions.hello-world]
 entrypoint = './functions/hello-world/index.js' # path must be relative to config.toml
 ```

@@ -15,7 +15,7 @@ video: https://www.youtube.com/v/NpEl20iuOtg
 youtubeHero: https://www.youtube-nocookie.com/embed/NpEl20iuOtg
 ---
 
-Today we're introducing three new features for Supabase Storage: Image resizing, webhooks, and a Smart CDN.
+Today we're introducing three new features for [Supabase Storage](/storage): Image resizing, webhooks, and a [Smart CDN](/features/smart-cdn).
 
 These features are designed to work together to deliver a next-gen image resizing system. Let's explore how it works.
 
@@ -27,7 +27,7 @@ These features are designed to work together to deliver a next-gen image resizin
 
 ## Image resizing
 
-Image resizing has been a popular request since we released Supabase Storage. For good reason - if you're providing an image upload function to your users, you can't expect them to optimize the images before uploading.
+Image resizing has been a popular request since we released [Supabase Storage](/docs/guides/storage). For good reason - if you're providing an image upload function to your users, you can't expect them to optimize the images before uploading.
 
 Supabase developers have been hacking together all sorts of workarounds using client-side compression, or external providers like Cloudinary and Imgix.
 
@@ -84,7 +84,7 @@ Behind the scenes, we've provided a few small niceties:
 
 - **No footguns:** an image will never be resized bigger than original dimensions (even if the user specifies larger dimensions)
 - **Sane defaults:** default mode maintains aspect ratio and the resize mode is `cover`
-- **Standardization**: resize modes mirror the [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) property of CSS. We support the contain, cover and fill modes.
+- **Standardization**: resize modes mirror the [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit) property of CSS. We support the contain, cover and fill modes.
 
 <div className="bg-gray-300 rounded-lg p-6 italic">
 
@@ -145,7 +145,7 @@ Let's imagine one of your users makes a request for a resized cat (kitten?) imag
 ![Cache miss flow](/images/blog/launch-week-6/day-2-storage-resize/cache-miss.png)
 
 1. The request hits our globally-distributed API Gateway. This gateway reads the image metadata from a global KV store (this metadata is created when the image was uploaded).
-2. Inside the image metadata is a Cache Key - this is comprised of an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) + tenant ID + bucketname + image name. The Gateway tries to find a cached object in our CDN using the Cache Key. If the image has never been accessed, it is a “Cache miss”.
+2. Inside the image metadata is a Cache Key - this is comprised of an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag) + tenant ID + bucketname + image name. The Gateway tries to find a cached object in our CDN using the Cache Key. If the image has never been accessed, it is a “Cache miss”.
 3. The request falls back to the Storage server. Because this is a resize request, it is forwards a short-lived S3 URL to Imgproxy.
 4. Imgproxy resizes the image and returns it to the Storage Server which in then returns it to the API Gateway, with stores it in the Cache (which means that the next time the Etag is checked, the result will return directly from the cache).
 
@@ -178,7 +178,7 @@ Besides solving issues with stale data, one of the biggest benefits this archite
 
 ![Cache hit improvement](/images/blog/launch-week-6/day-2-storage-resize/hit%20rate%20improvement.png)
 
-The green line here shows the number of cache hits to our CDN. As you can see, when we enabled the Smart CDN, the number of requests cache hits increased significantly (which means faster cat images).
+The green line here shows the number of cache hits to our CDN. As you can see, when we enabled the [Smart CDN](/docs/guides/storage/cdn/smart-cdn), the number of requests cache hits increased significantly (which means faster cat images).
 
 ## Availability and Pricing
 
@@ -198,7 +198,7 @@ Of course, all of this functionality is free in the self-hosting setup too. You 
 
 For local development, this is available in our CLI from v1.23.0.
 
-Upgrade to supabase-js v2.2.0.
+Upgrade to [supabase-js](/docs/reference/javascript/introduction) v2.2.0.
 
 ## Coming soon
 
@@ -206,7 +206,7 @@ A few features to look out for in the future:
 
 - **Webhooks**: we'll expose all Storage webhooks and events so that you can consume them from your own services.
 - **More Transformations**: quality, rotate, blur? Cast your vote on [this GitHub Discussion](https://github.com/supabase/supabase/discussions/10918).
-- **Integrations**: Native integration with [next/image](https://nextjs.org/docs/api-reference/next/image) and [Edge Functions](https://supabase.com/edge-functions) for advanced transformations.
+- **Integrations**: Native integration with [next/image](https://nextjs.org/docs/app/api-reference/components/image) and [Edge Functions](https://supabase.com/edge-functions) for advanced transformations.
 
 ## Getting started
 

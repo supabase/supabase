@@ -42,9 +42,9 @@ Config in code: settings like auth providers, API limits, and storage buckets li
   wide
 />
 
-Compute runs web services and agents in any language next to your database. There's no limit on how long a service runs, you choose the memory and CPU, and each service gets a full Linux environment, which Edge Functions don't have.
+Compute runs web services and agents in any language next to your database. There's no limit on how long a service runs, you choose the memory and CPU, and each service gets a full Linux environment, which [Edge Functions](/docs/guides/functions) don't have.
 
-Deploy from the Supabase CLI, or manage services through the Management API. The service definition lives in `config.toml`, and agent skills for Compute let your coding agent write, deploy, monitor, and debug a service for you. A service gets the same default environment variables as your Edge Functions, so it connects to your database and other Supabase services. In the dashboard you see each service's runtime, invocations, and logs.
+Deploy from the Supabase CLI, or manage services through the [Management API](/docs/reference/api/introduction). The service definition lives in `config.toml`, and agent skills for Compute let your coding agent write, deploy, monitor, and debug a service for you. A service gets the same default environment variables as your Edge Functions, so it connects to your database and other Supabase services. In the dashboard you see each service's runtime, invocations, and logs.
 
 Each service gets a public HTTP URL, like an Edge Function. Set the number of instances, and Supabase balances requests across them. You can also deploy a service as private, with no HTTP endpoint, for background jobs from a database queue or as a sandbox for an agent. To tighten security further, network restrictions can limit database access to your Compute instances.
 
@@ -58,9 +58,9 @@ Join the waitlist for private alpha [here](https://supabase.com/compute).
   wide
 />
 
-MCP is the standard that lets agents talk to your app on behalf of your users. Your app's MCP server is separate from the official Supabase MCP server, which helps you build your app.
+MCP is the standard that lets agents talk to your app on behalf of your users. Your app's MCP server is separate from the official [Supabase MCP server](/docs/guides/ai-tools/mcp), which helps you build your app.
 
-Add a customizable MCP server to your own app from the [Supabase library](https://supabase.com/library). One shadcn command adds an authenticated Edge Function to your codebase, ready to deploy to Supabase. You own the code, so your agent can use the included instructions and Supabase client to add the tools that fit your product, and your RLS policies still decide which rows each user can reach.
+Add a customizable MCP server to your own app from the [Supabase library](https://supabase.com/library). One shadcn command adds an authenticated Edge Function to your codebase, ready to deploy to Supabase. You own the code, so your agent can use the included instructions and [Supabase client](/docs/reference/javascript/introduction) to add the tools that fit your product, and your RLS policies still decide which rows each user can reach.
 
 It's built on `@supabase/server` and the new Supabase Middleware, which also work on their own in any server code that needs to know who is signed in.
 
@@ -71,4 +71,4 @@ We also built a [headless app template](https://supabase.com/library/docs/tansta
 - Agent-ready local development: update the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started), then add `[experimental]` and `stack = true` to `supabase/config.toml`, or set `SUPABASE_EXPERIMENTAL_STACK=1`.
 - Declarative Schemas 2.0: put your schema in `supabase/schemas/*.sql`, run `supabase db schema declarative sync` to generate and apply the migration locally, then run `supabase db push`. Existing projects: add `[experimental.pgdelta]` and `enabled = true` to `supabase/config.toml`. [Docs](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 - Supabase Compute: in private alpha. [Join the waitlist](https://supabase.com/compute).
-- Your app's MCP server: get your project into code with `supabase pull`, then run `npx shadcn@latest add @supabase/mcp-server` from the [MCP server block](https://supabase.com/library/docs/headless/mcp). It needs asymmetric signing keys and the Supabase Auth OAuth server turned on.
+- Your app's MCP server: get your project into code with `supabase pull`, then run `npx shadcn@latest add @supabase/mcp-server` from the [MCP server block](https://supabase.com/library/docs/headless/mcp). It needs asymmetric signing keys and the Supabase Auth [OAuth server](/docs/guides/auth/oauth-server) turned on.

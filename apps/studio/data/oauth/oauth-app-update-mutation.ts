@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { oauthAppKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppUpdateVariables = {
   id: string
@@ -14,6 +15,9 @@ export type OAuthAppUpdateVariables = {
   icon?: string
   scopes: OAuthScope[]
   redirect_uris: string[]
+  grant_kind?: 'organization_bound' | 'member_bound'
+  project_scoping_mode?: boolean
+  allow_partial_grants?: boolean
 }
 
 export async function updateOAuthApp({
@@ -24,6 +28,9 @@ export async function updateOAuthApp({
   icon,
   scopes,
   redirect_uris,
+  grant_kind,
+  project_scoping_mode,
+  allow_partial_grants,
 }: OAuthAppUpdateVariables) {
   if (!id) throw new Error('OAuth app ID is required')
   if (!slug) throw new Error('Organization slug is required')
@@ -39,6 +46,9 @@ export async function updateOAuthApp({
       icon,
       scopes,
       redirect_uris,
+      grant_kind,
+      project_scoping_mode,
+      allow_partial_grants,
     },
   })
   if (error) throw handleError(error)
@@ -52,12 +62,12 @@ export const useOAuthAppUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>,
+  UseCustomMutationOptions<OAuthAppUpdateData, StudioError, OAuthAppUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>({
+  return useMutation<OAuthAppUpdateData, StudioError, OAuthAppUpdateVariables>({
     mutationFn: (vars) => updateOAuthApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

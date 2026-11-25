@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, Calendar } from 'lucide-react'
+import { ArrowRightIcon, CalendarIcon } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -218,7 +218,7 @@ export function DatePicker({
         <Button
           title={triggerButtonTitle}
           variant={triggerButtonVariant}
-          icon={<Calendar />}
+          icon={<CalendarIcon />}
           size={triggerButtonSize}
           className={triggerButtonClassName}
         >
@@ -265,7 +265,7 @@ export function DatePicker({
                       />
                     </div>
                     <div className="flex items-center justify-center w-12 text-foreground-lighter">
-                      <ArrowRight strokeWidth={1.5} size={14} />
+                      <ArrowRightIcon strokeWidth={1.5} size={14} />
                     </div>
                   </>
                 )}

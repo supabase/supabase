@@ -1,14 +1,14 @@
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { TOOLTIP_UNDERLINE_CLASS_NAME } from './DetailSubtext'
 import { getPipelineDisplayState, getStatusName } from './Pipeline.utils'
 import type { PipelineDisplayType } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
+import { TOOLTIP_UNDERLINE_CLASS_NAME } from '@/components/ui/tooltip-styles'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
-import type { ResponseError } from '@/types'
 
 const VARIANT_BY_TYPE: Record<PipelineDisplayType, StateDotVariant> = {
   success: 'success',
@@ -19,13 +19,13 @@ const VARIANT_BY_TYPE: Record<PipelineDisplayType, StateDotVariant> = {
 
 interface PipelineStatePillProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
   requestStatus: PipelineStatusRequestStatus
   projectRef?: string
-  pipelineId?: number
+  pipelineId?: string
 }
 
 /**
@@ -83,7 +83,9 @@ export const PipelineStatePill = ({
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-64">
           {tooltipMessage}
-          {isError && isRequestPending && ` Unable to refresh status: ${error?.message}.`}
+          {isError && isRequestPending && (
+            <span>{` Unable to refresh status: ${error?.message}.`}</span>
+          )}
         </TooltipContent>
       </Tooltip>
     </span>

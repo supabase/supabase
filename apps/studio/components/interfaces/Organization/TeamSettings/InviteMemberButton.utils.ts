@@ -91,13 +91,13 @@ export function categorizeInviteEmails(
 
 export function buildProjectPayload(
   applyToOrg: boolean,
-  projectRef: string
+  projectRefs: string[]
 ): { projects: string[] } | Record<string, never> {
   if (applyToOrg) return {}
-  if (!projectRef) {
-    throw new Error('projectRef is required when applyToOrg is false')
+  if (projectRefs.length === 0) {
+    throw new Error('At least one project is required when applyToOrg is false')
   }
-  return { projects: [projectRef] }
+  return { projects: projectRefs }
 }
 
 export function buildSsoPayload(

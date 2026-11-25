@@ -3,7 +3,8 @@ import { CloudProvider } from 'shared-data'
 
 import { configKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
@@ -36,7 +37,7 @@ export async function getPostgresCreationVersions(
 export type ProjectCreationPostgresVersionData = Awaited<
   ReturnType<typeof getPostgresCreationVersions>
 >
-export type ProjectCreationPostgresVersionError = ResponseError
+export type ProjectCreationPostgresVersionError = StudioError
 
 export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationPostgresVersionData>(
   {

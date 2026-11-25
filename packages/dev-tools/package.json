@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "common": "workspace:*",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "ui": "workspace:*"
   },
   "devDependencies": {
@@ -30,14 +30,12 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "config": "workspace:*",
-    "next-router-mock": "^0.9.13",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   }

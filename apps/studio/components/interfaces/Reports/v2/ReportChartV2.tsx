@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
@@ -9,6 +9,7 @@ import { ComposedChart } from '@/components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { useChartHighlight } from '@/components/ui/Charts/useChartHighlight'
 import type { AnalyticsInterval } from '@/data/analytics/constants'
+import { reportKeys } from '@/data/reports/keys'
 import type { ReportConfig } from '@/data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -92,9 +93,7 @@ export const ReportChartV2 = ({
     isFetching,
   } = useQuery({
     queryKey: [
-      'projects',
-      projectRef,
-      'report-v2',
+      ...reportKeys.charts(projectRef),
       { reportId: report.id, queryGroup, startDate, endDate, interval, filters },
     ],
     queryFn: async () => {
@@ -150,7 +149,7 @@ export const ReportChartV2 = ({
         )}
       >
         {isLoadingChart ? (
-          <Loader2 className="size-5 animate-spin text-foreground-light" />
+          <Loader2Icon className="size-5 animate-spin text-foreground-light" />
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
@@ -183,6 +182,7 @@ export const ReportChartV2 = ({
               sql={queryResult?.query}
               highlightActions={highlightActions}
               showNewBadge={report.showNewBadge}
+              getHeaderStats={report.getHeaderStats}
             />
           </div>
         )}

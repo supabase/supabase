@@ -1,5 +1,5 @@
 import { useParams } from 'common/hooks'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -137,7 +137,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                         )}
                         size="small"
                         iconRight={
-                          <ChevronsUpDown
+                          <ChevronsUpDownIcon
                             className="ml-2 h-4 w-4 shrink-0 opacity-50"
                             strokeWidth={1}
                           />
@@ -166,7 +166,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                                     setOpen(false)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'mr-2 h-4 w-4',
                                       fn.url === field.value ? 'opacity-100' : 'opacity-0'

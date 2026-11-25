@@ -6,7 +6,7 @@ tocVideo: '4Roog4PAmZ8'
 
 ## Introduction
 
-In this tutorial you will learn how to build an edge API to generate, stream, store, and cache speech using Supabase Edge Functions, Supabase Storage, and [ElevenLabs text to speech API](https://elevenlabs.io/text-to-speech).
+In this tutorial you will learn how to build an edge API to generate, stream, store, and cache speech using Supabase Edge Functions, [Supabase Storage](/docs/guides/storage/quickstart), and [ElevenLabs text to speech API](https://elevenlabs.io/text-to-speech).
 
 <Admonition type="note">
 
@@ -16,7 +16,7 @@ Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-ex
 
 ## Requirements
 
-- An ElevenLabs account with an [API key](/app/settings/api-keys).
+- An ElevenLabs account with an [API key](https://elevenlabs.io/app/developers/api-keys).
 - A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
 - The [Supabase CLI](/docs/guides/local-development) installed on your machine.
 - The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your favourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
@@ -33,9 +33,9 @@ supabase init
 
 ### Configure the storage bucket
 
-You can configure the Supabase CLI to automatically generate a storage bucket by adding this configuration in the `config.toml` file:
+You can configure the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to automatically generate a storage bucket by adding this configuration in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml ./supabase/config.toml
+```toml supabase/config.toml
 [storage.buckets.audio]
 public = false
 file_size_limit = "50MiB"
@@ -45,15 +45,15 @@ objects_path = "./audio"
 
 <Admonition type="note">
 
-Upon running `supabase start` this will create a new storage bucket in your local Supabase project. Should you want to push this to your hosted Supabase project, you can run `supabase seed buckets --linked`.
+Upon running `supabase start` this will create a new storage bucket in your local Supabase project. Should you want to push this to your hosted Supabase project, you can run `supabase seed buckets --remote`.
 
 </Admonition>
 
 ### Configure background tasks for Supabase Edge Functions
 
-To use background tasks in Supabase Edge Functions when developing locally, you need to add the following configuration in the `config.toml` file:
+To use background tasks in Supabase Edge Functions when developing locally, you need to add the following configuration in your config file:
 
-```toml ./supabase/config.toml
+```toml supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```
@@ -78,8 +78,8 @@ If you're using VS Code or Cursor, select `y` when the CLI prompts "Generate VS 
 
 Within the `supabase/functions` directory, create a new `.env` file and add the following variables:
 
-```env supabase/functions/.env
-# Find / create an API key at https://elevenlabs.io/app/settings/api-keys
+```dotenv supabase/functions/.env
+# Find / create an API key at https://elevenlabs.io/app/developers/api-keys
 ELEVENLABS_API_KEY=your_api_key
 ```
 
@@ -91,7 +91,7 @@ The project uses a couple of dependencies:
 - The ElevenLabs [JavaScript SDK](https://github.com/elevenlabs/elevenlabs-js) to interact with the text-to-speech API.
 - The open-source [object-hash](https://www.npmjs.com/package/object-hash) to generate a hash from the request parameters.
 
-Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
+Since Supabase Edge Function uses the [Deno runtime](https://deno.com/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
 
 ## Code the Supabase Edge Function
 

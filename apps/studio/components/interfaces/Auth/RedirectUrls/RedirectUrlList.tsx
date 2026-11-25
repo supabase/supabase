@@ -1,12 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe, Trash } from 'lucide-react'
+import { GlobeIcon, TrashIcon } from 'lucide-react'
 import { Button, Checkbox } from 'ui'
 
 import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EmptyListState } from '@/components/ui/EmptyListState'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
@@ -26,9 +25,8 @@ export const RedirectUrlList = ({
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   // [Joshen] One for next time: maybe shift this into a reusable logic since it
@@ -63,9 +61,16 @@ export const RedirectUrlList = ({
     }
   }
 
+  const hasUrls = allowList.length > 0
+
   return (
     <div className="-space-y-px">
-      <ValueContainer className="py-3 flex items-center justify-end">
+      <ValueContainer className="py-3 flex flex-wrap items-center justify-end gap-y-2">
+        {hasUrls && (
+          <p className="mr-auto whitespace-nowrap text-foreground-muted text-sm">
+            Total URLs: {allowList.length}
+          </p>
+        )}
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
             <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
@@ -79,7 +84,7 @@ export const RedirectUrlList = ({
                     : undefined,
                 },
               }}
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
             >
               Remove ({selectedUrls.length})
@@ -111,7 +116,7 @@ export const RedirectUrlList = ({
           </Shortcut>
         )}
       </ValueContainer>
-      {allowList.length > 0 ? (
+      {hasUrls ? (
         <>
           {allowList.map((url) => {
             const isSelected = selectedUrls.includes(url)
@@ -121,7 +126,7 @@ export const RedirectUrlList = ({
                   <div className="w-5 h-5 flex items-center justify-center">
                     <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
-                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
+                  <GlobeIcon strokeWidth={2} size={14} className="text-foreground-lighter" />
                   <span className="text-sm grow">{url}</span>
                 </div>
               </ValueContainer>
@@ -140,11 +145,6 @@ export const RedirectUrlList = ({
             description="Auth providers may need a URL to redirect back to"
           />
         </div>
-      )}
-      {allowList.length > 0 && (
-        <ValueContainer className="py-3 flex items-center justify-between">
-          <p className="pl-9 text-foreground-muted text-sm">Total URLs: {allowList.length}</p>
-        </ValueContainer>
       )}
     </div>
   )

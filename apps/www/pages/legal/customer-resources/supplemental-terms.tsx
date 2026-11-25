@@ -5,6 +5,7 @@ import LegalDocVersions, { type LegalDocVersion } from '~/components/Legal/Legal
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
 import V1 from '~/data/legal/customer-resources/supplemental-terms/v1.mdx'
+import V2 from '~/data/legal/customer-resources/supplemental-terms/v2.mdx'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { NextSeo } from 'next-seo'
 
@@ -19,7 +20,8 @@ const meta = {
 }
 
 const versions: LegalDocVersion[] = [
-  { id: 'v1', label: 'Version 1', effectiveDate: 'TBD', Component: V1 },
+  { id: 'v2', label: 'Version 2', effectiveDate: 'November 24, 2026', Component: V2 },
+  { id: 'v1', label: 'Version 1', effectiveDate: 'October 27, 2026', Component: V1 },
 ]
 
 export default function SupplementalTermsPage() {

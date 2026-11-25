@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useMemo } from 'react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
@@ -91,7 +91,7 @@ export const HaInstanceConfiguration = () => {
         {isPending ? (
           <>
             <span className="sr-only">Loading cluster topology...</span>
-            <Loader2
+            <Loader2Icon
               aria-hidden="true"
               className="motion-safe:animate-spin text-foreground-light"
             />
@@ -99,7 +99,7 @@ export const HaInstanceConfiguration = () => {
         ) : (
           <EmptyStatePresentational
             icon={
-              <Loader2
+              <Loader2Icon
                 size={24}
                 strokeWidth={1.5}
                 aria-hidden="true"

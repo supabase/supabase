@@ -1,11 +1,19 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
+import { CreditCardIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
@@ -13,11 +21,6 @@ import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
@@ -26,7 +29,7 @@ import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
@@ -48,13 +51,11 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug }, { enabled: inView })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
-  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.payment_methods'
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
@@ -63,18 +64,18 @@ const PaymentMethods = () => {
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   return (
     <>
-      <ScaffoldSection ref={ref}>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-2 top-12">
-            <p className="text-foreground text-base m-0">Payment Methods</p>
-            <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
+      <PageSection ref={ref} orientation="horizontal" className="pb-12">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Payment Methods</PageSectionTitle>
+            <PageSectionDescription>
               {isStripeManagedOrganization
                 ? 'Billing for this organisation is handled through Stripe Projects.'
                 : 'Payments for your subscription are made using the default card.'}
-            </p>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="flex flex-col gap-6">
           {selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
@@ -116,7 +117,7 @@ const PaymentMethods = () => {
                           <Button
                             asChild
                             key="stripe-projects-billing-docs"
-                            iconRight={<ExternalLink size={14} />}
+                            iconRight={<ExternalLinkIcon size={14} />}
                           >
                             <a
                               href="https://docs.stripe.com/projects#manage-billing"
@@ -153,7 +154,7 @@ const PaymentMethods = () => {
                             <div />
                           )}
                           <Button
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canUpdatePaymentMethods}
                             onClick={() => setShowAddPaymentMethodModal(true)}
                           >
@@ -193,8 +194,8 @@ const PaymentMethods = () => {
               )}
             </>
           )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}

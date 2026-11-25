@@ -8,6 +8,7 @@ import { Inter, Manrope, Source_Code_Pro } from 'next/font/google'
 
 import { Providers } from './Providers'
 import { Toaster } from './toaster'
+import { libraryUrl } from '@/lib/canonical'
 import { API_URL } from '@/lib/constants'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
@@ -20,16 +21,19 @@ const sourceCodePro = Source_Code_Pro({
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 export const metadata: Metadata = {
   applicationName: 'Supabase Library',
   title: 'Supabase Library',
   description: 'Supabase blocks and starter apps for authentication, storage, realtime, and more',
   metadataBase: new URL('https://supabase.com'),
-  icons: genFaviconData(BASE_PATH),
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',
-    url: `${BASE_PATH}`,
+    url: libraryUrl(''),
     images: `${BASE_PATH}/img/supabase-og-image.png`,
     publishedTime: new Date().toISOString(),
     modifiedTime: new Date().toISOString(),

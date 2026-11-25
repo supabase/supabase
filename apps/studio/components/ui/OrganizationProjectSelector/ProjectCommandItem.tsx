@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, CommandItem } from 'ui'
 
@@ -45,9 +45,9 @@ export function ProjectCommandItem({
             project.ref !== selectedRef && checkPosition === 'left' && 'ml-6'
           )}
         >
-          {checkPosition === 'left' && project.ref === selectedRef && <Check size={16} />}
+          {checkPosition === 'left' && project.ref === selectedRef && <CheckIcon size={16} />}
           {project.name}
-          {checkPosition === 'right' && project.ref === selectedRef && <Check size={16} />}
+          {checkPosition === 'right' && project.ref === selectedRef && <CheckIcon size={16} />}
         </div>
       )}
     </>

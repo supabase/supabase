@@ -1,4 +1,4 @@
-import { CheckIcon, Globe } from 'lucide-react'
+import { CheckIcon, GlobeIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
   Card,
@@ -26,7 +26,11 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import {
+  getTimezoneLabel,
+  getTimezoneLabelByIana,
+  TIMEZONES_BY_IANA,
+} from '@/lib/constants/timezones'
 import { useTimezone } from '@/lib/datetime'
 import { guessLocalTimezone } from '@/lib/dayjs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -44,7 +48,7 @@ export const TimezoneSettings = () => {
   // option will revert to.
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
-  const triggerLabel = useMemo(() => findTimezoneByIana(timezone)?.text ?? timezone, [timezone])
+  const triggerLabel = useMemo(() => getTimezoneLabelByIana(timezone), [timezone])
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
@@ -90,7 +94,7 @@ export const TimezoneSettings = () => {
                     size="small"
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+                      <GlobeIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
                       <span className="truncate">
                         {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
                       </span>
@@ -130,10 +134,10 @@ export const TimezoneSettings = () => {
                                 key={ianaName}
                                 // CommandItem matches against the `value` prop for the input filter — include
                                 // both the human label and the IANA name so search works for either.
-                                value={`${entry.text} ${ianaName}`}
+                                value={`${getTimezoneLabel(entry)} ${ianaName}`}
                                 onSelect={() => handleSelect(ianaName)}
                               >
-                                {entry.text}
+                                {getTimezoneLabel(entry)}
                                 <CheckIcon
                                   className={cn(
                                     'ml-auto h-4 w-4',

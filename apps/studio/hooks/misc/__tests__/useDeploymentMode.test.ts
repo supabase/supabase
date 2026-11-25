@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -41,43 +42,18 @@ describe('useDeploymentMode', () => {
     })
   })
 
-  test('non-platform, loading window (data undefined): defaults to CLI', () => {
-    // `?? true` flip — see useDeploymentMode for the asymmetry rationale.
-    // `'direct'` is the only universally-valid method, so CLI-during-loading
-    // is the safe guess that avoids pinning an invalid `connectionMethod`.
-    mockUseDeploymentModeQuery.mockReturnValue({ data: undefined })
+  // Loading (data undefined) defaults to CLI via the `?? true` flip — see useDeploymentMode for
+  // the asymmetry rationale: `'direct'` is the only universally-valid connection method.
+  test.each([
+    ['loading window (data undefined)', undefined, { isCli: true, isSelfHosted: false }],
+    ['resolved is_cli_mode=true', { is_cli_mode: true }, { isCli: true, isSelfHosted: false }],
+    ['resolved is_cli_mode=false', { is_cli_mode: false }, { isCli: false, isSelfHosted: true }],
+  ])('non-platform, %s', (_, data, expected) => {
+    mockUseDeploymentModeQuery.mockReturnValue({ data })
 
     const { result } = renderHook(() => useDeploymentMode())
 
-    expect(result.current).toEqual({
-      isPlatform: false,
-      isCli: true,
-      isSelfHosted: false,
-    })
-  })
-
-  test('non-platform, resolved is_cli_mode=true: CLI', () => {
-    mockUseDeploymentModeQuery.mockReturnValue({ data: { is_cli_mode: true } })
-
-    const { result } = renderHook(() => useDeploymentMode())
-
-    expect(result.current).toEqual({
-      isPlatform: false,
-      isCli: true,
-      isSelfHosted: false,
-    })
-  })
-
-  test('non-platform, resolved is_cli_mode=false: self-hosted', () => {
-    mockUseDeploymentModeQuery.mockReturnValue({ data: { is_cli_mode: false } })
-
-    const { result } = renderHook(() => useDeploymentMode())
-
-    expect(result.current).toEqual({
-      isPlatform: false,
-      isCli: false,
-      isSelfHosted: true,
-    })
+    expect(result.current).toEqual({ isPlatform: false, ...expected })
   })
 
   test('returns a stable reference across renders when primitive flags do not change', () => {

@@ -17,6 +17,10 @@ describe('parseAppVersionKey', () => {
     expect(parseAppVersionKey('supabase-postgres-x86_64-17.9.0.019')).toEqual([17, 9, 0, 19])
   })
 
+  it.each(['arm', 'aarch64', 'amd64'])('parses the %s arch prefix', (arch) => {
+    expect(parseAppVersionKey(`supabase-postgres-${arch}-17.9.0.019`)).toEqual([17, 9, 0, 19])
+  })
+
   it('returns null for non-conforming strings', () => {
     expect(parseAppVersionKey('CUSTOM_AMI_SENTINEL')).toBeNull()
     expect(parseAppVersionKey('not-a-version')).toBeNull()

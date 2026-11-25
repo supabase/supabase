@@ -2,12 +2,12 @@ import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 import { Badge, Button, cn } from 'ui'
 import { Image } from 'ui-patterns/Image'
 
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import CTABanner from '@/components/CTABanner'
+import { FeatureDescription } from '@/components/FeatureDescription'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import PrevNextFeatureNav from '@/components/PrevNextFeatureNav'
@@ -130,70 +130,72 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                 <h1 className="h1 m-0!">{feature.title}</h1>
                 <p>{feature.subtitle}</p>
               </div>
-              <div
-                className={cn(
-                  'relative w-full bg-brand-default',
-                  'border rounded-lg overflow-hidden',
-                  'mx-auto max-w-3xl',
-                  'flex items-center justify-center',
-                  feature.heroImage.includes('.mp4') ? 'h-fit' : 'aspect-video'
-                )}
-              >
-                {!!feature.heroImage ? (
-                  feature.heroImage.includes('.mp4') ? (
-                    <video
-                      width="100%"
-                      muted
-                      autoPlay
-                      playsInline
-                      controls
-                      loop
-                      className="relative inset-0"
-                    >
-                      <source src={feature.heroImage} type="video/mp4" />
-                    </video>
-                  ) : feature.heroImage.includes('.youtube') ? (
-                    <div className="video-container rounded-none! border-none!">
-                      <iframe
-                        className="w-full"
-                        src={feature.heroImage}
-                        title="YouTube video player"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <Image
-                        src={feature.heroImage}
-                        fill
-                        sizes="(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 300vw"
-                        quality={100}
-                        zoomable
-                        priority
-                        alt={`${feature.title} thumbnail`}
-                        containerClassName={cn(
-                          'absolute inset-0 object-cover object-center',
-                          feature.heroImageLight && 'hidden dark:block'
-                        )}
-                      />
-                      {feature.heroImageLight && (
+              {!feature.hideHero && (
+                <div
+                  className={cn(
+                    'relative w-full bg-brand-default',
+                    'border rounded-lg overflow-hidden',
+                    'mx-auto max-w-3xl',
+                    'flex items-center justify-center',
+                    feature.heroImage.includes('.mp4') ? 'h-fit' : 'aspect-video'
+                  )}
+                >
+                  {!!feature.heroImage ? (
+                    feature.heroImage.includes('.mp4') ? (
+                      <video
+                        width="100%"
+                        muted
+                        autoPlay
+                        playsInline
+                        controls
+                        loop
+                        className="relative inset-0"
+                      >
+                        <source src={feature.heroImage} type="video/mp4" />
+                      </video>
+                    ) : feature.heroImage.includes('.youtube') ? (
+                      <div className="video-container rounded-none! border-none!">
+                        <iframe
+                          className="w-full"
+                          src={feature.heroImage}
+                          title="YouTube video player"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+                        />
+                      </div>
+                    ) : (
+                      <>
                         <Image
-                          src={feature.heroImageLight}
+                          src={feature.heroImage}
                           fill
                           sizes="(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 300vw"
                           quality={100}
-                          priority
                           zoomable
+                          priority
                           alt={`${feature.title} thumbnail`}
-                          containerClassName="absolute inset-0 object-cover object-center dark:hidden"
+                          containerClassName={cn(
+                            'absolute inset-0 object-cover object-center',
+                            feature.heroImageLight && 'hidden dark:block'
+                          )}
                         />
-                      )}
-                    </>
-                  )
-                ) : (
-                  <Icon className="w-8 h-8 md:w-10 md:h-10 text-background" />
-                )}
-              </div>
+                        {feature.heroImageLight && (
+                          <Image
+                            src={feature.heroImageLight}
+                            fill
+                            sizes="(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 300vw"
+                            quality={100}
+                            priority
+                            zoomable
+                            alt={`${feature.title} thumbnail`}
+                            containerClassName="absolute inset-0 object-cover object-center dark:hidden"
+                          />
+                        )}
+                      </>
+                    )
+                  ) : (
+                    <Icon className="w-8 h-8 md:w-10 md:h-10 text-background" />
+                  )}
+                </div>
+              )}
             </SectionContainer>
           </header>
           <SectionContainer className="pt-0!">
@@ -221,9 +223,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
             </div>
             <main className="max-w-xl mx-auto flex flex-col items-start gap-8">
-              <div className="prose prose-docs">
-                <ReactMarkdown>{feature.description}</ReactMarkdown>
-              </div>
+              <FeatureDescription
+                title={feature.title}
+                description={feature.description}
+                ctaLabel={feature.ctaLabel}
+              />
               {(feature.docsUrl || feature.blogUrl) && (
                 <div className="flex flex-wrap gap-2">
                   {feature.docsUrl && (

@@ -1,28 +1,24 @@
 ---
 id: 'storage-access-control'
-title: 'Ownership'
-description: 'Learn how ownership works in Supabase Storage and how to control access'
-sidebar_label: 'Security'
+title: 'Storage ownership'
+description: 'Learn how Supabase Storage assigns an owner to each bucket and object from the JWT, and how to scope access to that owner with Row Level Security policies.'
+sidebar_label: 'Ownership'
 ---
 
-When creating new buckets or objects in Supabase Storage, an owner is automatically assigned to the bucket or object. The owner is the user who created the resource and the value is derived from the `sub` claim in the JWT.
-We store the `owner` in the `owner_id` column.
+Knowing who owns a Storage object lets you write access rules scoped to that user. For how to write those rules, see [Storage access control](/docs/guides/storage/security/access-control).
 
-<Admonition type="note">
+## How Storage assigns an owner
 
-When using the `service_key` to create a resource, the owner will not be set and the resource will be owned by anyone. This is also the case when you are creating Storage resources via the Dashboard.
+Storage automatically records an owner for each bucket and object, except those created with the `service_key` or in the Dashboard:
 
-</Admonition>
-
-<Admonition type="note">
-
-The Storage schema has 2 fields to represent ownership: `owner` and `owner_id`. `owner` is deprecated and will be removed. Use `owner_id` instead.
-
-</Admonition>
+- The owner is the user who created the resource, taken from the `sub` claim in the JWT.
+- When a user copies or moves an object, the owner of the new object is the user who initiated the operation. For details, see [Copy objects](/docs/guides/storage/management/copy-move-objects).
+- Storage keeps the owner in the `owner_id` column of the [Storage schema](/docs/guides/storage/schema/design). The schema also has an `owner` column, which is deprecated. Use `owner_id` instead.
+- A resource you create with the `service_key`, or in the Dashboard, has no owner set, so it's owned by anyone.
 
 ## Access control
 
-By itself, the ownership of a resource does not provide any access control. However, you can enforce the ownership by implementing access control against storage resources scoped to their owner.
+Ownership by itself provides no access control. To enforce it, scope access control on Storage resources to their owner.
 
 For example, you can implement a policy where only the owner of an object can delete it. To do this, check the `owner_id` field of the object and compare it with the `sub` claim of the JWT:
 
@@ -36,4 +32,9 @@ using (
 );
 ```
 
-The use of RLS policies is one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+Row Level Security (RLS) policies are one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+
+## Related resources
+
+- [Storage access control](/docs/guides/storage/security/access-control): write RLS policies for Storage.
+- [Storage schema](/docs/guides/storage/schema/design): the tables that hold the `owner_id` column.

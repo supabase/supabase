@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -8,10 +7,11 @@ import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -19,7 +19,7 @@ import { useOrganizationMembersQuery } from '@/data/organizations/organization-m
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -38,13 +38,11 @@ export const SecuritySettings = () => {
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
 
-  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'organizations'
+  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
   )
-  const { can: canUpdateMfaConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const track = useTrack()
 
@@ -104,8 +102,8 @@ export const SecuritySettings = () => {
   }
 
   return (
-    <ScaffoldContainer size="small" className="px-6 xl:px-10">
-      <ScaffoldSection isFullWidth>
+    <PageContainer size="small">
+      <PageSection>
         {!hasAccessToEnforceMfa && !isLoadingEntitlement ? (
           <UpgradeToPro
             source="organizationMfa"
@@ -199,7 +197,7 @@ export const SecuritySettings = () => {
             )}
           </>
         )}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

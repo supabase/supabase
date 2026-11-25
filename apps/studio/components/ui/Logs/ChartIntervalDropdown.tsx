@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -11,15 +11,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { CHART_INTERVALS } from './logs.utils'
+import { CHART_INTERVALS, getDaysRequired } from './logs.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-
-function getDaysRequired(startValue: number, startUnit: string): number {
-  if (startUnit === 'day') return startValue
-  if (startUnit === 'hour') return startValue / 24
-  return 0
-}
 
 interface ChartIntervalDropdownProps {
   value: string
@@ -48,7 +42,7 @@ export const ChartIntervalDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button iconRight={<ChevronDown size={14} />}>
+        <Button iconRight={<ChevronDownIcon size={14} />}>
           <span>{selectedInterval.label}</span>
         </Button>
       </DropdownMenuTrigger>
@@ -69,7 +63,8 @@ export const ChartIntervalDropdown = ({
                   <TooltipContent side={tooltipSide}>
                     <p>
                       Your plan only includes up to {retentionDays} day
-                      {retentionDays !== undefined && retentionDays > 1 ? 's' : ''} of log retention
+                      {retentionDays !== undefined && retentionDays > 1 ? <span>s</span> : ''}{' '}
+                      <span>of log retention</span>
                     </p>
                     <p className="text-foreground-light">
                       {organizationSlug ? (

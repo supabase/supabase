@@ -163,7 +163,7 @@ describe('connect.resolver:resolveSteps', () => {
     steps,
   })
 
-  test('should resolve steps array for framework mode', () => {
+  test('should resolve the steps array for the current mode', () => {
     const schema = createMockSchema({
       mode: {
         framework: [
@@ -181,26 +181,11 @@ describe('connect.resolver:resolveSteps', () => {
       },
     })
 
-    const steps = resolveSteps(schema, { mode: 'framework' })
-    expect(steps).toHaveLength(2)
-    expect(steps[0].id).toBe('step1')
-    expect(steps[0].title).toBe('Install')
-    expect(steps[1].id).toBe('step2')
-  })
+    const frameworkSteps = resolveSteps(schema, { mode: 'framework' })
+    expect(frameworkSteps.map((s) => s.id)).toEqual(['step1', 'step2'])
+    expect(frameworkSteps[0].title).toBe('Install')
 
-  test('should resolve steps for direct mode', () => {
-    const schema = createMockSchema({
-      mode: {
-        framework: [{ id: 'step1', title: 'Install', description: 'Install', content: 'install' }],
-        direct: [
-          { id: 'connection', title: 'Connection', description: 'Connect', content: 'direct' },
-        ],
-      },
-    })
-
-    const steps = resolveSteps(schema, { mode: 'direct' })
-    expect(steps).toHaveLength(1)
-    expect(steps[0].id).toBe('connection')
+    expect(resolveSteps(schema, { mode: 'direct' }).map((s) => s.id)).toEqual(['connection'])
   })
 
   test('should filter out steps with empty content', () => {
@@ -245,17 +230,6 @@ describe('connect.resolver:resolveSteps', () => {
 
     const vueSteps = resolveSteps(schema, { mode: 'framework', framework: 'vue' })
     expect(vueSteps[0].content).toBe('generic-content')
-  })
-
-  test('should return empty array when no steps resolve', () => {
-    const schema = createMockSchema({
-      mode: {
-        framework: [{ id: 'step1', title: 'Step', description: 'Desc', content: '' }],
-      },
-    })
-
-    const steps = resolveSteps(schema, { mode: 'framework' })
-    expect(steps).toEqual([])
   })
 
   test('should return empty array when steps is not an array', () => {
@@ -593,20 +567,21 @@ describe('connect.resolver:resetDependentFields', () => {
     expect(newState.frameworkUi).toBe(true)
   })
 
-  test('should handle mode changes', () => {
+  test('should drop fields from the other mode when the mode changes', () => {
     const schema = createSchemaForReset()
     const state: ConnectState = {
-      mode: 'direct', // Changed mode
+      mode: 'direct',
       framework: 'nextjs',
       frameworkVariant: 'app',
+      connectionMethod: 'direct',
     }
 
-    // Note: The current implementation of resetDependentFields for mode changes
-    // looks for fields not in the current mode, but the logic compares against previous mode
     const newState = resetDependentFields(state, 'mode', schema)
 
-    // Mode-specific field reset logic is handled
     expect(newState.mode).toBe('direct')
+    expect(newState.connectionMethod).toBe('direct')
+    expect(newState.framework).toBeUndefined()
+    expect(newState.frameworkVariant).toBeUndefined()
   })
 
   test('should not modify state for fields without dependencies', () => {

@@ -7,5 +7,5 @@ export function GroupHeader({ label }: { label: string }) {
 }
 
 export function GroupSeparator() {
-  return <div className="h-px bg-border-muted my-1" />
+  return <div className="h-px bg-border-muted -mx-1 my-1" />
 }

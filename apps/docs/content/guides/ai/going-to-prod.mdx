@@ -38,7 +38,7 @@ On the other hand, if you need to scale your application, you will need to [crea
   height={796}
 />
 
-## HNSW, understanding `ef_construction`, `ef_search`, and `m`
+## HNSW, understanding `ef_construction`, `ef_search`, and `m` [#hnsw-understanding-efconstruction--efsearch--and-m]
 
 Index build parameters:
 
@@ -48,7 +48,37 @@ Index build parameters:
 
 Search parameters:
 
-- `ef_search` is the size of the dynamic list for the nearest neighbors (used during the search). Increasing `ef_search` will result in better accuracy, but it will also increase the time required to execute a query (40 is the default value).
+- `ef_search` is the size of the dynamic list for the nearest neighbors (used during the search). Increasing `ef_search` improves accuracy but makes each query slower. The setting is `hnsw.ef_search`, which defaults to 40 and accepts values from 1 to 1,000.
+
+Without iterative index scans, an HNSW index scan returns at most `ef_search` rows, even when the query's `limit` is larger.
+
+Set `hnsw.ef_search` for the rest of the session with `set`, or for one transaction with `set local`. A [transaction-mode pooler](/docs/guides/database/connecting-to-postgres#transaction-mode-limitations) doesn't keep session settings between your transactions, so use `set local` in the same transaction as the query. For queries through the Data API, add `set hnsw.ef_search = 100` to the definition of the [database function](/docs/guides/ai/vector-columns#querying-a-vector--embedding) you call.
+
+```sql
+-- For the rest of the session
+set hnsw.ef_search = 100;
+
+-- For one transaction only
+begin;
+set local hnsw.ef_search = 100;
+select * from items order by embedding <-> '[3,1,2]' limit 100;
+commit;
+```
+
+```sql
+-- For every call to a database function
+create or replace function match_items(query_embedding extensions.vector(3), match_count int)
+returns setof items
+language sql stable
+set hnsw.ef_search = 100
+as $$
+  select * from items
+  order by embedding <-> query_embedding
+  limit match_count;
+$$;
+```
+
+To return more rows than `ef_search`, including more than 1,000, turn on iterative index scans with `hnsw.iterative_scan`. Iterative scans need `pgvector` 0.8.0 or later. See [Filtering with HNSW indexes](/docs/guides/ai/vector-indexes/hnsw-indexes#filtering-with-hnsw-indexes).
 
 <Image
   alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters"

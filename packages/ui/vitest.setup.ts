@@ -18,8 +18,6 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-vi.mock('next/navigation', () => require('next-router-mock'))
-
 afterEach(() => {
   cleanup()
 })

@@ -1,4 +1,4 @@
-import { ChevronDown, Terminal } from 'lucide-react'
+import { ChevronDownIcon, TerminalIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -45,11 +45,11 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
                     width="14"
                   />
                 ) : (
-                  <Terminal size={14} strokeWidth={2.5} />
+                  <TerminalIcon size={14} strokeWidth={2.5} />
                 )
               ) : undefined
             }
-            iconRight={!simplifiedVersion && <ChevronDown size={14} strokeWidth={2} />}
+            iconRight={!simplifiedVersion && <ChevronDownIcon size={14} strokeWidth={2} />}
           >
             {!simplifiedVersion
               ? `Language: ${snap.docsLanguage === 'js' ? 'Javascript' : 'Bash'}`

@@ -6,7 +6,7 @@ import {
   type OrganizationInviteStatus,
 } from './OrganizationInvite.utils'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const READY_INVITE: OrganizationInviteByToken = {
   authorized_user: true,
@@ -18,7 +18,7 @@ const READY_INVITE: OrganizationInviteByToken = {
   token_does_not_exist: false,
 }
 
-const responseError = (message: string, code = 500) => ({ message, code }) as ResponseError
+const responseError = (message: string, code = 500) => ({ message, code }) as StudioError
 type StatusOverrides = Partial<Parameters<typeof getOrganizationInviteStatus>[0]>
 
 const getStatus = (overrides: StatusOverrides = {}) =>

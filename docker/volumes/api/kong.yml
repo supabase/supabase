@@ -77,6 +77,26 @@ services:
           - /auth/v1/.well-known/jwks.json
     plugins:
       - name: cors
+  - name: auth-v1-open-well-known-oauth
+    _comment: 'Auth: /auth/v1/.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    url: http://auth:9999/.well-known/oauth-authorization-server
+    routes:
+      - name: auth-v1-open-well-known-oauth
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/oauth-authorization-server
+    plugins:
+      - name: cors
+  - name: auth-v1-open-well-known-openid
+    _comment: 'Auth: /auth/v1/.well-known/openid-configuration -> http://auth:9999/.well-known/openid-configuration'
+    url: http://auth:9999/.well-known/openid-configuration
+    routes:
+      - name: auth-v1-open-well-known-openid
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/openid-configuration
+    plugins:
+      - name: cors
 
   - name: auth-v1-open-sso-acs
     url: "http://auth:9999/sso/saml/acs"
@@ -97,6 +117,24 @@ services:
         - /auth/v1/sso/saml/metadata
     plugins:
       - name: cors
+
+  ## OAuth 2.1 server endpoints that third-party clients call without an
+  ## API key. The consent endpoints (/oauth/authorizations/...) stay on the
+  ## secure auth-v1 route.
+  - name: auth-v1-open-oauth
+    _comment: 'Auth: /auth/v1/oauth/{authorize,clients/register,token,userinfo} -> http://auth:9999/oauth/*'
+    url: http://auth:9999/
+    routes:
+      - name: auth-v1-open-oauth
+        strip_path: false
+        paths:
+          - /auth/v1/oauth/(?<endpoint>authorize|clients/register|token|userinfo)$
+    plugins:
+      - name: cors
+      - name: request-transformer
+        config:
+          replace:
+            uri: /oauth/$(uri_captures.endpoint)
 
   ## Secure Auth routes
   - name: auth-v1
@@ -182,6 +220,21 @@ services:
           allow:
             - admin
             - anon
+      # Sandboxes responses, since Studio shares this origin: a document opened
+      # from these routes can't run script or submit forms. Subresources (<img>,
+      # fetch, downloads) ignore the policy. media-src 'self' lets the browser's player
+      # load audio and video opened directly, and style-src 'unsafe-inline' keeps
+      # inline styles in SVG files. `&sandbox_response` is a YAML anchor:
+      # the storage-v1 and functions-v1 services below reuse this same Lua code
+      # through the `*sandbox_response` alias, which YAML expands into a copy.
+      - name: post-function
+        config:
+          header_filter:
+            - &sandbox_response |
+              kong.response.set_header(
+                "Content-Security-Policy",
+                "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+              )
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -339,6 +392,9 @@ services:
               if auth == nil or auth == "" or auth:find("^%s*$") then
                 kong.service.request.clear_header("authorization")
               end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## Edge Functions routes
   ##
@@ -356,6 +412,9 @@ services:
   ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
   ## and re-adds the translated value; on no match the Lua expression yields nil
   ## (an empty header) which the post-function then removes.
+  ##
+  ## No `cors`: functions handle CORS themselves, as on the platform. Preflights
+  ## reach the function and its responses pass through unchanged.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -367,7 +426,6 @@ services:
         paths:
           - /functions/v1/
     plugins:
-      - name: cors
       - name: request-transformer
         config:
           remove:
@@ -384,16 +442,19 @@ services:
               if v == nil or v == "" or v:find("^%s*$") then
                 kong.service.request.clear_header("sb-api-key")
               end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
-    _comment: 'Auth: /.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    _comment: 'Auth: /.well-known/oauth-authorization-server/auth/v1 -> http://auth:9999/.well-known/oauth-authorization-server'
     url: http://auth:9999/.well-known/oauth-authorization-server
     routes:
       - name: well-known-oauth
         strip_path: true
         paths:
-          - /.well-known/oauth-authorization-server
+          - /.well-known/oauth-authorization-server/auth/v1
     plugins:
       - name: cors
 
@@ -475,7 +536,6 @@ services:
       # 1. Comment out the 'request-termination' section above
       # 2. Uncomment the entire section below, including 'deny'
       # 3. Add your local IPs to the 'allow' list
-      #- name: cors
       #- name: ip-restriction
       #  config:
       #    allow:
@@ -484,6 +544,7 @@ services:
       #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
+  ## No cors plugin: only Studio's own pages call these routes, from the same origin.
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://studio:3000/
@@ -493,7 +554,6 @@ services:
         paths:
           - /
     plugins:
-      - name: cors
       - name: basic-auth
         config:
           hide_credentials: true

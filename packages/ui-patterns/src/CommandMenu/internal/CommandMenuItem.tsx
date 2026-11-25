@@ -1,5 +1,6 @@
 'use client'
 
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import { forwardRef, type PropsWithChildren } from 'react'
 import { cn, CommandItem } from 'ui'
 
@@ -47,12 +48,13 @@ data-[disabled=true]:opacity-50
 
 interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem> {
   command: ICommand
+  section?: string
 }
 
 const CommandMenuItem = forwardRef<
   React.ElementRef<typeof CommandItem>,
   PropsWithChildren<CommandItemProps>
->(({ children, className, command: _command, ...props }, ref) => {
+>(({ children, className, command: _command, section, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
@@ -70,7 +72,8 @@ const CommandMenuItem = forwardRef<
           command_name: command.name,
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
-          search_query: query || undefined,
+          command_section: section,
+          search_query: describeSearchQuery(query).query,
           result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
         },
@@ -99,6 +102,7 @@ const CommandMenuItem = forwardRef<
       ref={ref}
       onSelect={handleCommandSelect}
       value={command.value ?? command.name}
+      keywords={command.keywords && [...command.keywords]}
       forceMount={command.forceMount}
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),

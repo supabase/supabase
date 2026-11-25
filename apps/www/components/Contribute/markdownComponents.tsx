@@ -5,15 +5,12 @@ export const markdownComponents: Components = {
     className ? (
       <code {...props} className="font-mono text-sm whitespace-pre block min-w-0" />
     ) : (
-      <code
-        {...props}
-        className="bg-surface-200 text-foreground px-1.5 py-0.5 rounded-sm text-sm font-mono"
-      />
+      <code {...props} />
     ),
   pre: ({ node, ...props }) => (
     <pre
       {...props}
-      className="bg-surface-200 text-foreground p-4 rounded-lg mb-3 w-full min-w-0 overflow-x-auto"
+      className="bg-surface-200 text-foreground p-4 rounded-lg mb-3 w-full min-w-0 overflow-x-auto font-mono text-sm whitespace-pre"
     />
   ),
   a: ({ node, ...props }) => (

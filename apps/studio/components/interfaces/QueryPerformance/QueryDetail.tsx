@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Lightbulb } from 'lucide-react'
+import { ChevronsUpDownIcon, LightbulbIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
@@ -107,7 +107,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
               variant="default"
               className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary"
             >
-              <Lightbulb />
+              <LightbulbIcon />
               <AlertTitle>Suggested optimization: Add an index</AlertTitle>
               <AlertDescription>
                 Adding an index will help this query execute faster
@@ -131,7 +131,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             <Button
               type="button"
               className="rounded-full"
-              icon={<ChevronsUpDown />}
+              icon={<ChevronsUpDownIcon />}
               aria-expanded={isExpanded}
               aria-controls="query-detail-sql-panel"
               onClick={() => setIsExpanded(!isExpanded)}

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildFirstReferrerData,
+  CLICK_ID_KEYS,
   FIRST_REFERRER_COOKIE_NAME,
   hasPaidSignals,
   isExternalReferrer,
@@ -47,6 +48,24 @@ describe('first-referrer-cookie', () => {
       expect(
         isOAuthRedirectReferrer('https://accounts.google.com/o/oauth2/auth?client_id=abc')
       ).toBe(true)
+    })
+
+    it.each([
+      'https://accounts.google.com.br/',
+      'https://accounts.google.co.uk/',
+      'https://accounts.youtube.com/',
+      'https://auth.openai.com/',
+      'https://appleid.apple.com/',
+    ])('returns true for sign-in page %s', (referrer) => {
+      expect(isOAuthRedirectReferrer(referrer)).toBe(true)
+    })
+
+    it('returns false for chatgpt.com', () => {
+      expect(isOAuthRedirectReferrer('https://chatgpt.com/')).toBe(false)
+    })
+
+    it('returns false for a lookalike of accounts.google.com', () => {
+      expect(isOAuthRedirectReferrer('https://accounts.google.com.example.org/')).toBe(false)
     })
 
     // GitHub OAuth — block bare domain only
@@ -142,6 +161,24 @@ describe('first-referrer-cookie', () => {
         msclkid: 'xyz456',
       })
     })
+
+    it('keeps the consent-gated bfcid out of the pre-consent cookie', () => {
+      expect(CLICK_ID_KEYS).not.toContain('bfcid')
+    })
+
+    it('extracts every click id in CLICK_ID_KEYS', () => {
+      const landingUrl = new URL('https://supabase.com/')
+      for (const key of CLICK_ID_KEYS) landingUrl.searchParams.set(key, `${key}-value`)
+
+      const data = buildFirstReferrerData({
+        referrer: 'https://www.google.com/',
+        landingUrl: landingUrl.href,
+      })
+
+      expect(data.click_ids).toEqual(
+        Object.fromEntries(CLICK_ID_KEYS.map((key) => [key, `${key}-value`]))
+      )
+    })
   })
 
   describe('serialize / parse', () => {
@@ -229,6 +266,7 @@ describe('first-referrer-cookie', () => {
       expect(hasPaidSignals(new URL('https://supabase.com/?ttclid=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?twclid=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?li_fat_id=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?oppref=abc'))).toBe(true)
     })
 
     it('detects paid utm_medium values', () => {

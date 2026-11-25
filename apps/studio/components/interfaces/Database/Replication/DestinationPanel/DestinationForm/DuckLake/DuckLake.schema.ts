@@ -1,14 +1,12 @@
 import * as z from 'zod'
 
-// `supabase` mode picks Supabase projects for catalog + storage (managed), while `custom`
-// mode keeps the manual PostgreSQL catalog URL + S3-compatible credentials.
+// `supabase` mode uses the current project for managed catalog and storage. `custom` mode connects
+// to an existing Postgres catalog and S3-compatible storage.
 export const DuckLakeFormSchema = z.object({
   ducklakeMode: z.enum(['supabase', 'custom']).optional(),
-  // DuckLake "Use Supabase" fields
-  ducklakeCatalogProjectRef: z.string().optional(),
-  ducklakeStorageProjectRef: z.string().optional(),
+  // Managed DuckLake fields
   ducklakeStorageBucket: z.string().optional(),
-  // DuckLake "Custom parameters" fields
+  // DuckLake connection fields
   ducklakeCatalogUrl: z.string().optional(),
   ducklakeDataPath: z.string().optional(),
   ducklakePoolSize: z

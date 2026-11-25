@@ -6,7 +6,7 @@ import type {
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
 import { Storage } from 'icons'
-import { ImageOff, Trash2, X } from 'lucide-react'
+import { ImageOffIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -268,7 +268,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                   'disabled:pointer-events-none data-[state=open]:bg-secondary'
                 )}
               >
-                <X className="h-3 w-3" />
+                <XIcon className="h-3 w-3" />
                 <span className="sr-only">Close</span>
               </SheetClose>
               <SheetTitle className="truncate">
@@ -312,7 +312,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                                   }}
                                 >
-                                  {!hasLogo && <ImageOff size={14} />}
+                                  {!hasLogo && <ImageOffIcon size={14} />}
                                 </div>
                                 <div className="flex min-w-0 flex-1 items-center gap-2">
                                   <div className="group relative min-w-0 flex-1">
@@ -343,7 +343,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                   {field.value ? (
                                     <Button
                                       size="tiny"
-                                      icon={<Trash2 size={12} />}
+                                      icon={<Trash2Icon size={12} />}
                                       onClick={handleRemoveLogo}
                                     />
                                   ) : null}

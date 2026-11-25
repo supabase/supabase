@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Activity, Gauge, Inbox, Shield } from 'lucide-react'
+import { ActivityIcon, GaugeIcon, InboxIcon, ShieldIcon } from 'lucide-react'
 import type { ElementType } from 'react'
 
 import type { AdvisorItem, AdvisorLintItem, AdvisorNotificationItem } from './AdvisorPanel.types'
@@ -7,8 +7,6 @@ import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification, NotificationData } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
-
-export const MAX_HOMEPAGE_ADVISOR_ITEMS = 4
 
 export const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
@@ -173,10 +171,10 @@ export const getAdvisorItemSecondaryText = (
 }
 
 export const advisorCategoryIcons: Record<AdvisorCategory, ElementType> = {
-  security: Shield,
-  performance: Gauge,
-  health: Activity,
-  messages: Inbox,
+  security: ShieldIcon,
+  performance: GaugeIcon,
+  health: ActivityIcon,
+  messages: InboxIcon,
 }
 
 export const advisorCategoryLabels: Record<AdvisorCategory, string> = {

@@ -257,6 +257,17 @@ describe('serializeContentListingGroupToMarkdown', () => {
 })
 
 describe('ContentListings markdown handler', () => {
+  it.each([
+    'getting-started-use-cases',
+    'getting-started-framework-quickstarts',
+    'getting-started-web-app-demos',
+    'getting-started-mobile-tutorials',
+  ])('renders %s as a second-level section under the page title', (id) => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id } })
+
+    expect(markdown).toMatch(/^## [^\n]+\n/)
+  })
+
   it('serializes the group looked up by id', () => {
     const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
 

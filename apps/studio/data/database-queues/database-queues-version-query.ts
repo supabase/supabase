@@ -1,6 +1,6 @@
 import { PGMQ_EXTENSION_NAME } from './constants'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type DatabaseQueuesVersionVariables = {
   projectRef?: string
@@ -8,7 +8,7 @@ export type DatabaseQueuesVersionVariables = {
 }
 
 export type DatabaseQueueVersionData = string | null
-export type DatabaseQueueVersionError = ResponseError
+export type DatabaseQueueVersionError = StudioError
 
 export const useDatabaseQueuesVersionQuery = (
   { projectRef, connectionString }: DatabaseQueuesVersionVariables,

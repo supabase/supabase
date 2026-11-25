@@ -24,15 +24,13 @@ function mockProject(
 ): OrgProject {
   return {
     cloud_provider: 'AWS',
-    databases: databases.map(
-      ({ region, type }): OrgDatabase => ({
-        cloud_provider: 'AWS',
-        identifier: ref,
-        region,
-        status: 'ACTIVE_HEALTHY',
-        type,
-      })
-    ),
+    databases: databases.map(({ region, type }): OrgDatabase => ({
+      cloud_provider: 'AWS',
+      identifier: ref,
+      region,
+      status: 'ACTIVE_HEALTHY',
+      type,
+    })),
     inserted_at: new Date().toISOString(),
     integration_source: null,
     is_branch: false,
@@ -153,32 +151,7 @@ describe('StatusBanner', () => {
     })
   })
 
-  test('dismissing hides the banner and writes the dismissed key to local storage', async () => {
-    mswServer.use(
-      http.get(`${BASE_PATH}/api/status-page`, () =>
-        HttpResponse.json<StatusPageResponse>(
-          buildStatusPage({ ongoing_incidents: [buildIncident({ id: 'inc-1' })] })
-        )
-      )
-    )
-    mockOrgProjectEndpoints()
-
-    customRender(<StatusBanner />, { profileContext: createMockProfileContext() })
-
-    await screen.findByText(INCIDENT_TITLE)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss banner' }))
-
-    await waitFor(() => {
-      expect(screen.queryByText(INCIDENT_TITLE)).not.toBeInTheDocument()
-    })
-
-    expect(JSON.parse(window.localStorage.getItem('status-banner-dismissed-keys') ?? '[]')).toEqual(
-      ['incident:inc-1']
-    )
-  })
-
-  test('a new incident brings the banner back even though the previous one is dismissed', async () => {
+  test('dismissing persists the incident key, and a new incident brings the banner back', async () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
     mswServer.use(
@@ -199,6 +172,9 @@ describe('StatusBanner', () => {
     await waitFor(() => {
       expect(screen.queryByText(INCIDENT_TITLE)).not.toBeInTheDocument()
     })
+    expect(JSON.parse(window.localStorage.getItem('status-banner-dismissed-keys') ?? '[]')).toEqual(
+      ['incident:inc-1']
+    )
 
     mswServer.use(
       http.get(`${BASE_PATH}/api/status-page`, () =>

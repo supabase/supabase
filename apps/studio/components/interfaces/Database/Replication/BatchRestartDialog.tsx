@@ -49,8 +49,7 @@ export const BatchRestartDialog = ({
   onResetStart,
   onResetComplete,
 }: BatchRestartDialogProps) => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const pipelineId = Number(_pipelineId)
+  const { ref: projectRef, pipelineId } = useParams()
   const { runWithRequestStatus } = usePipelineRequestStatus()
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const affectedTables = useMemo(() => {
@@ -68,7 +67,7 @@ export const BatchRestartDialog = ({
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
-      toast.success(`Resetting ${count} table${count > 1 ? 's' : ''}`)
+      toast.success(`Replication progress reset for ${count} table${count > 1 ? 's' : ''}`)
       onOpenChange(false)
     },
     onError: (error) => {
@@ -78,6 +77,7 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
+    if (!pipelineId) return
     onResetStart?.(affectedTableIds)
     try {
       await runWithRequestStatus(pipelineId, restartRequestStatus, () =>
@@ -101,22 +101,23 @@ export const BatchRestartDialog = ({
   }
   const destinationData = count === 1 ? 'its destination data' : 'their destination data'
 
-  let resetDescription = `This resets ${resetScope} and deletes ${destinationData}. Initial sync is skipped, so replication resumes with new changes only.`
+  const resetProgress = `This clears saved replication progress for ${resetScope}. When replication resumes, ${destinationData} is deleted.`
+  let resetDescription = `${resetProgress} Initial sync is skipped, so only new changes are replicated.`
   if (copiedTables.length === affectedTables.length) {
-    resetDescription = `This resets ${resetScope}, deletes ${destinationData}, and syncs existing rows again.`
+    resetDescription = `${resetProgress} Existing source rows are copied again.`
   } else if (copiedTables.length > 0) {
     const remainingTables =
       remainingTableCount === 1
-        ? 'the remaining table'
-        : `the remaining ${remainingTableCount} tables`
+        ? 'The remaining table'
+        : `The remaining ${remainingTableCount} tables`
     const remainingAction = remainingTableCount === 1 ? 'skips' : 'skip'
-    resetDescription = `This resets ${resetScope} and deletes ${destinationData}. Existing rows sync again for ${copiedTables.length} of ${count} ${tableWord}, while ${remainingTables} ${remainingAction} initial sync and resume with new changes only.`
+    resetDescription = `${resetProgress} Existing source rows are copied again for ${copiedTables.length} of ${count} ${tableWord}. ${remainingTables} ${remainingAction} initial sync and resume with new changes only.`
   }
 
   const shouldRestartPipeline = restartRequestStatus !== PipelineStatusRequestStatus.None
   const description = shouldRestartPipeline
-    ? `${resetDescription} The pipeline restarts automatically to apply the reset.`
-    : resetDescription
+    ? `${resetDescription} The pipeline restarts automatically. Other tables' unfinished initial syncs also start over.`
+    : `${resetDescription} A stopped pipeline stays stopped until you start it.`
 
   const dialogContent =
     mode === 'all'

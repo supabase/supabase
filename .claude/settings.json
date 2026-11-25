@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/scripts/format_and_lint.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.agents/scripts/format_and_lint.sh",
             "statusMessage": "Formatting & linting..."
           }
         ]

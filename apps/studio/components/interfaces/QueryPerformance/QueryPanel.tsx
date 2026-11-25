@@ -1,5 +1,5 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -69,9 +69,9 @@ export const QueryPanelScoreSection = ({
             {before !== undefined && !hideArrowMarkers && (
               <div className="flex items-center gap-x-1">
                 {after > before ? (
-                  <ArrowUp size={14} className="text-warning" />
+                  <ArrowUpIcon size={14} className="text-warning" />
                 ) : (
-                  <ArrowDown size={14} className="text-primary" />
+                  <ArrowDownIcon size={14} className="text-primary" />
                 )}
                 {before !== 0 && !isNaN(before) && isFinite(before) && (
                   <span

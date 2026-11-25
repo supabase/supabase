@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GitHubConnectionsVariables = {
   organizationId?: number
@@ -29,7 +30,7 @@ export async function getGitHubConnections(
 }
 
 export type GitHubConnectionsData = Awaited<ReturnType<typeof getGitHubConnections>>
-export type GitHubConnectionsError = ResponseError
+export type GitHubConnectionsError = StudioError
 
 export type GitHubConnection = GitHubConnectionsData[0]
 

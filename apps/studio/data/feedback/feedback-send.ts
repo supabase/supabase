@@ -1,8 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SendFeedbackVariables = {
   message: string
@@ -26,6 +27,7 @@ export async function sendFeedback({
       organizationSlug,
       pathname,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -37,10 +39,10 @@ export const useSendFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SendFeedbackData, ResponseError, SendFeedbackVariables>,
+  UseCustomMutationOptions<SendFeedbackData, StudioError, SendFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>({
+  return useMutation<SendFeedbackData, StudioError, SendFeedbackVariables>({
     mutationFn: (vars) => sendFeedback(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

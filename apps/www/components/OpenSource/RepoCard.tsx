@@ -1,12 +1,20 @@
-import { motion } from 'framer-motion'
-import { Star } from 'lucide-react'
-import Link from 'next/link'
-
 import Panel from '~/components/Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Star } from 'lucide-react'
+import { motion } from 'motion/react'
+import Link from 'next/link'
+import { useSyncExternalStore } from 'react'
+
+const subscribeToNothing = () => () => {}
 
 const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; index: number }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const isHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  )
+  const countLocale = isHydrated ? undefined : 'en-US'
   return (
     <motion.div
       key={`${activeTab}-${repo.name}`}
@@ -57,7 +65,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
             <p>{repo.full_name}</p>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
-                <span>{repo.forks.toLocaleString()}</span>
+                <span>{repo.forks.toLocaleString(countLocale)}</span>
                 <svg
                   viewBox="0 0 16 16"
                   fill="none"
@@ -71,7 +79,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
                 </svg>
               </div>
               <div className="flex items-center gap-1">
-                <span>{repo.stargazers_count.toLocaleString()}</span>
+                <span>{repo.stargazers_count.toLocaleString(countLocale)}</span>
                 <Star className="w-4 fill-foreground-lighter stroke-none" />
               </div>
             </div>

@@ -16,7 +16,7 @@ toc_depth: 2
 
 In 2021, we open-sourced the Stripe Sync Engine repo to solve a problem we had ourselves. Billing data lived in Stripe, product data lived in Postgres, and there was no good way to join them. We built a tool to sync Stripe data into a `stripe` schema in Postgres, kept building it in the open, and it grew into something bigger than we expected.
 
-Today, the repo moves from [`supabase/stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) to [`stripe/sync-engine`](https://github.com/stripe/sync-engine).
+Today, the repo moves from [`supabase/stripe-sync-engine`](https://github.com/stripe/sync-engine) to [`stripe/sync-engine`](https://github.com/stripe/sync-engine).
 
 ## How we got here
 
@@ -24,7 +24,7 @@ In December 2025, we announced a one-click integration that brought the Stripe S
 
 Stripe engineers contributed directly to the repo: incremental sync using cursor-based pagination, JSONB storage with generated columns, multi-account support for [Stripe Connect](https://stripe.com/connect) platforms, and a new CLI with proper event ordering.
 
-A key part of that collaboration was Stripe's work on automatic, incremental backfilling using Supabase Cron and Queue. This is what made it possible to ingest all of your existing Stripe data into Postgres reliably and at scale, and what unlocked the dashboard integration.
+A key part of that collaboration was Stripe's work on automatic, incremental backfilling using [Supabase Cron](/docs/guides/cron) and [Queue](/docs/guides/queues). This is what made it possible to ingest all of your existing Stripe data into Postgres reliably and at scale, and what unlocked the dashboard integration.
 
 Both teams kept iterating after launch on reliability, install flows, and expanded Stripe object support. The result is a more stable, more capable integration than either team would have shipped alone.
 
@@ -56,7 +56,7 @@ Reliability and UX:
 
 - Smarter install flow: buttons auto-reset if a process gets stuck
 - Clearer, more actionable error messages
-- Edge Function source code now visible directly in the dashboard
+- [Edge Function](/docs/guides/functions) source code now visible directly in the dashboard
 
 ## Get started
 

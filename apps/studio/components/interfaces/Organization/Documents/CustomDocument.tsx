@@ -1,12 +1,15 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { Button } from 'ui'
-
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+
 import { CustomContentTypes } from '@/hooks/custom-content/CustomContent.types'
 
 interface CustomDocumentProps {
@@ -15,24 +18,24 @@ interface CustomDocumentProps {
 
 export const CustomDocument = ({ doc }: CustomDocumentProps) => {
   return (
-    <ScaffoldContainer id={doc.id}>
-      <ScaffoldSection className="py-12">
-        <ScaffoldSectionDetail>
-          <p className="text-base m-0">{doc.name}</p>
-          <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
-            <p>{doc.description}</p>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
+    <PageContainer id={doc.id}>
+      <PageSection orientation="horizontal">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>{doc.name}</PageSectionTitle>
+            <PageSectionDescription>{doc.description}</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild iconRight={<ExternalLink />}>
+            <Button asChild iconRight={<ExternalLinkIcon />}>
               <a download href={doc.action.url} target="_blank" rel="noreferrer noopener">
                 {doc.action.text}
               </a>
             </Button>
           </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }

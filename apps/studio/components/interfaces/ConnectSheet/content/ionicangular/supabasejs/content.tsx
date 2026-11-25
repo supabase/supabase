@@ -10,7 +10,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       code: `
 export const environment = {
   supabaseUrl: '${projectKeys.apiUrl ?? 'your-project-url'}',
-  supabaseKey: '${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile apps>'}',
+  supabaseKey: '${projectKeys.publishableKey ?? 'your-publishable-key'}',
 };
 `,
     },

@@ -1,5 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { Blocks, ExternalLink } from 'lucide-react'
+import { BlocksIcon, ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
@@ -29,7 +29,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       <div className="flex flex-col gap-y-4 text-left py-2 w-full">
         <div className="flex items-center gap-x-3">
           <p className="text-lg font-bold">Sorry! A browser extension may have caused an error.</p>
-          <Blocks className="text-foreground-lighter" />
+          <BlocksIcon className="text-foreground-lighter" />
         </div>
 
         <div className="flex flex-col gap-y-2">
@@ -54,7 +54,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       </div>
 
       <div className="flex gap-x-2 justify-center items-center">
-        <Button asChild icon={<ExternalLink />}>
+        <Button asChild icon={<ExternalLinkIcon />}>
           <a
             target="_blank"
             rel="noreferrer"

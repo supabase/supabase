@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -14,20 +13,23 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { z } from 'zod'
 
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -38,13 +40,11 @@ const formSchema = z.object({
 const BillingEmail = () => {
   const { slug } = useParams()
 
-  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.customer'
+  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
-  const { can: canUpdateBillingData } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
+  const { can: canUpdateBillingData } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const { ref, inView } = useInView({ triggerOnce: true })
@@ -107,16 +107,16 @@ const BillingEmail = () => {
   }, [form, customerProfile, isDirty])
 
   return (
-    <ScaffoldSection ref={ref}>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12">
-          <p className="text-foreground text-base m-0">Email Recipient</p>
-          <p className="text-sm text-foreground-light m-0">
+    <PageSection ref={ref} orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Email Recipient</PageSectionTitle>
+          <PageSectionDescription>
             All billing correspondence will go to this email
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         {isPermissionsLoaded && !canReadBillingEmail ? (
           <NoPermission resourceText="view this organization's email recipients" />
         ) : (
@@ -218,8 +218,8 @@ const BillingEmail = () => {
             </form>
           </Form>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

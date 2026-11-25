@@ -1,7 +1,4 @@
-'use client'
-
-import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
+import { FaqList } from '~/components/FaqList'
 
 const faqs = [
   {
@@ -27,7 +24,7 @@ const faqs = [
   {
     question: 'Can I attach a persistent disk?',
     answer:
-      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files — both reachable with near-zero intra-region latency and no data-transfer tax. Mountable persistent disks are on the roadmap.',
+      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files, both reachable with near-zero intra-region latency. Mountable persistent disks are on the roadmap.',
   },
   {
     question: 'How will pricing work?',
@@ -47,22 +44,7 @@ export function FAQSection() {
       <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <h2 className="h3 text-center">Frequently asked questions</h2>
         <div className="my-16">
-          <Accordion type="multiple" className="text-foreground-light">
-            {faqs.map((faq, i) => (
-              <div className="border-b py-2" key={i}>
-                <AccordionItem value={`faq--${i.toString()}`} className="border-none">
-                  <AccordionTrigger>
-                    <span className="text-foreground text-left">{faq.question}</span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="prose text-foreground-lighter">
-                      <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </div>
-            ))}
-          </Accordion>
+          <FaqList items={faqs} />
         </div>
       </div>
     </div>

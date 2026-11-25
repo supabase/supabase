@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -51,7 +50,7 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -64,13 +63,11 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
+  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ
   )
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })

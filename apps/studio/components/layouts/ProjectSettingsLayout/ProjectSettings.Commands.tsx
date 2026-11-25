@@ -39,7 +39,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-add-ons',
         name: 'Add-ons',
-        value: 'Add-ons addons add ons add on add-on',
+        keywords: ['addons', 'add ons', 'add on', 'add-on'],
         route: `/project/${ref}/settings/addons`,
         defaultHidden: true,
       },
@@ -102,7 +102,12 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-integration',
         name: 'Project Integrations',
-        value: 'Branch integration, Vercel integration, GitHub integration, AWS PrivateLink',
+        keywords: [
+          'Branch integration',
+          'Vercel integration',
+          'GitHub integration',
+          'AWS PrivateLink',
+        ],
         route: `/project/${ref}/settings/integrations`,
       },
       {
@@ -124,7 +129,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-restart-project',
         name: 'Project availability',
-        value: 'project availability restart project pause project resume project',
+        keywords: ['restart project', 'pause project', 'resume project'],
         route: `/project/${ref}/settings/general#restart-project`,
         defaultHidden: true,
       },

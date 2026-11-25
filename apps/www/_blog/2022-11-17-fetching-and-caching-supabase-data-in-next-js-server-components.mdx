@@ -87,7 +87,7 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-> The values for these can be found in [your project’s API settings](https://supabase.com/dashboard/project/_/settings/api).
+> The values for these can be found in [your project’s API settings](https://supabase.com/dashboard/project/_/integrations/data_api/overview).
 
 Lastly, we need to create a Supabase client. Create a file at `utils/supabase.ts` with the following content:
 
@@ -104,7 +104,7 @@ export default createClient(
 
 Okay, let’s look at some different data fetching and caching strategies.
 
-# Static
+## Static
 
 By default any page component in the `app` folder is a Server Component, and its data is fetched and cached by Next.js every time we build a new version of our application. This is equivalent to exporting a `getStaticProps` function from a component in the `pages` directory.
 
@@ -127,6 +127,7 @@ Let’s modify this component to render out a collection of `<Link />` component
 
 ```tsx title="app/static/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export default async function Posts() {
@@ -149,8 +150,9 @@ export default async function Posts() {
 Let’s create a dynamic route to handle displaying an individual post. Create a new file at `app/static/[id]/page.tsx` and populate with the following:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export default async function Post({ params: { id } }: { params: { id: string } }) {
   const { data } = await supabase.from('posts').select().match({ id }).single()
@@ -182,8 +184,9 @@ export async function generateStaticParams() {
 The full component should look something like this:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export async function generateStaticParams() {
   const { data: posts } = await supabase.from('posts').select('id')
@@ -208,7 +211,7 @@ Awesome! We now have a Supa snappy blog! The user never needs to wait for data t
 
 Unfortunately, this means any changes we make in Supabase — adding, updating or deleting posts etc — will not be reflected in our blog. If we want to refresh this data on a regular basis, we need to tell Next.js when to _revalidate_.
 
-# Static with Revalidation
+## Static with Revalidation
 
 By exporting a `revalidate` variable from our component, we can specify how many seconds we consider this data to be “fresh”.
 
@@ -224,6 +227,7 @@ The `Posts` component should now look like this:
 
 ```tsx title="app/static-with-revalidate/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export const revalidate = 60
@@ -246,8 +250,9 @@ export default async function Posts() {
 And the `Post` component should look like this:
 
 ```tsx title="app/static-with-revalidate/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export const revalidate = 60
 
@@ -274,7 +279,7 @@ We now get all the benefits of static — users not waiting around while data is
 
 Very cool! 😎
 
-# Dynamic
+## Dynamic
 
 If we want fresh data to be fetched on every single request, we can simply set our `revalidate` value to `0`.
 
@@ -282,6 +287,7 @@ If we want fresh data to be fetched on every single request, we can simply set o
 
 ```tsx title="app/server-rendered/page.tsx"
 import Link from 'next/link'
+
 import supabase from '../../utils/supabase'
 
 export const revalidate = 0
@@ -304,8 +310,9 @@ export default async function Posts() {
 **Single Post Component**
 
 ```tsx title="app/server-rendered/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
+
+import supabase from '../../../utils/supabase'
 
 export const revalidate = 0
 
@@ -332,13 +339,13 @@ This is similar to exporting a `getServerSideProps` function from a component in
 
 All this server stuff is great, but what if you want to use Supabase client-side? 🤔
 
-# Client-side
+## Client-side
 
 There are many use-cases where you need to use Supabase client-side:
 
 1. Authentication
 
-   Supabase Auth does a bunch of stuff behind the scenes — handling 3rd party OAuth flows, for example. This will break if you try to sign users in and out on the server.
+   [Supabase Auth](/auth) does a bunch of stuff behind the scenes — handling 3rd party OAuth flows, for example. This will break if you try to sign users in and out on the server.
 
 2. Realtime
 
@@ -358,6 +365,7 @@ Let’s implement client-side data fetching.
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import supabase from '../../utils/supabase'
 
 export default function ClientPosts() {
@@ -382,7 +390,7 @@ export default function ClientPosts() {
 
 But now we have loading spinners! Yuck!
 
-# Realtime
+## Realtime
 
 Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://supabase.com/dashboard/project/_/database/publications) on the posts table.
 
@@ -408,6 +416,7 @@ export default async function Realtime() {
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import supabase from '../../utils/supabase'
 
 export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
@@ -438,7 +447,7 @@ export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
 
 This is a great pattern for fetching initial data server-side and subscribing to realtime changes client-side. This will likely be replaced by the `use` hook once it is stable with Next.js — it also uses suspense to _suspend_ the rendering of a component while fetching data, and cleans up those loading and error states.
 
-# Conclusion
+## Conclusion
 
 Next.js 13 Server Components are awesome! Suspense is awesome! Async components are awesome!
 
@@ -446,9 +455,9 @@ The combination of these concepts allow us to think about data fetching and cach
 
 Additionally, by allowing any component in the tree to be either a server or client component — that is responsible for its own data and suspends rendering until it is ready — drastically simplifies our code, and provides much more flexible patterns for creating maintainable applications as complexity grows.
 
-# More Next.js 13 Resources
+## More Next.js 13 Resources
 
-- [Next.js Quickstart](https://supabase.com/docs/guides/with-nextjs)
+- [Next.js Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
 - [Next.js 13 Beta Docs](https://beta.nextjs.org/docs)
 - [Creating an authenticated Supabase client in Next.js 13 Server Component](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components)
 - [Data fetching and caching with Next.js 13 - Supabase Happy Hour #26](https://www.youtube.com/watch?v=QH0P5xZt5wY)

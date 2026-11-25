@@ -67,6 +67,8 @@ values
 
 ## Usage
 
+For how keyword search works and when to use it instead of semantic search, see [Keyword search](/docs/guides/ai/keyword-search).
+
 The functions we'll cover in this guide are:
 
 ### `to_tsvector()` [#to-tsvector]
@@ -1243,7 +1245,7 @@ var result = await supabase
 </$Show>
 </Tabs>
 
-### Negation: `!` [#negation]
+### Negation: `!` [#query-operators-negation]
 
 The negation symbol can be used to find phrases which _don't_ contain a search term.
 For example, to find records that have the word `big` but not `little`:

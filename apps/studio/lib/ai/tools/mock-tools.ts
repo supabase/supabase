@@ -2,8 +2,18 @@ import assert from 'node:assert'
 import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
-import { getStudioTools } from '../tools/studio-tools'
-import { getNotebookTools } from './notebook-tools'
+import { createTool as createCreateNotebookTool } from './create-notebook.server'
+import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
+import { createTool as createDeployEdgeFunctionTool } from './deploy-edge-function.server'
+import { createTool as createExecuteSqlTool } from './execute-sql.server'
+import { createTool as createGetNotebookTool } from './get-notebook.server'
+import { createTool as createListDatabasesTool } from './list-databases.server'
+import { createTool as createListNotebooksTool } from './list-notebooks.server'
+import { createTool as createLoadKnowledgeTool } from './load-knowledge.server'
+import { createTool as createRenameChatTool } from './rename-chat.server'
+import { createTool as createRunNotebookTool } from './run-notebook.server'
+import { createTool as createUpdateNotebookTool } from './update-notebook.server'
+import { createTool as createUpdateOptInLevelTool } from './update-opt-in-level.server'
 import {
   applyNotebookOperations,
   describeNotebookOperationError,
@@ -15,6 +25,7 @@ import type {
   CellWire,
   NotebookWire,
 } from '@/data/content/notebooks/notebook-schema'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 const listTablesInputSchema = z.object({
@@ -232,13 +243,31 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
 ]
 
 function createMockedStudioTools() {
-  const studioTools = getStudioTools()
+  // Pinned to `schema` so the model sees the same execute_sql output it always has in evals,
+  // whatever level the eval runs at. Evals don't yet use one level for every tool and for replay.
+  const ctx = { aiOptInLevel: 'schema' } as const
+  const studioTools = {
+    execute_sql: createExecuteSqlTool(ctx),
+    deploy_edge_function: createDeployEdgeFunctionTool(ctx),
+    rename_chat: createRenameChatTool(ctx),
+    load_knowledge: createLoadKnowledgeTool(ctx),
+  }
 
   return Object.fromEntries(
     Object.entries(studioTools).map(([name, baseTool]) => {
       // Always mock execute_sql and deploy_edge_function with needsApproval disabled
       if (name === 'execute_sql') {
-        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+        return [
+          name,
+          {
+            ...baseTool,
+            needsApproval: false,
+            execute: async () => ({
+              rows: [] as unknown[],
+              optInLevel: 'schema_and_log_and_data' as const,
+            }),
+          },
+        ]
       }
       if (name === 'deploy_edge_function') {
         return [
@@ -432,6 +461,7 @@ const MOCK_DATABASES_DATA = [
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
+  const ctx = { aiOptInLevel: 'schema_and_log_and_data' } as const
   const {
     list_databases,
     list_notebooks,
@@ -440,7 +470,15 @@ function createMockNotebookTools(store: MockNotebookStore) {
     create_notebook,
     update_notebook,
     delete_notebook,
-  } = getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
+  } = {
+    list_databases: createListDatabasesTool(ctx),
+    list_notebooks: createListNotebooksTool(ctx),
+    get_notebook: createGetNotebookTool(ctx),
+    run_notebook: createRunNotebookTool(ctx),
+    create_notebook: createCreateNotebookTool(ctx),
+    update_notebook: createUpdateNotebookTool(ctx),
+    delete_notebook: createDeleteNotebookTool(ctx),
+  }
 
   return {
     list_databases: {
@@ -502,6 +540,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           id,
           name: notebook.name,
           updated_at: notebook.updated_at,
+          optInLevel: 'schema_and_log_and_data' as const,
           cells: notebook.content.cells.flatMap((cell) =>
             cell._tag === 'markdown_cell'
               ? []
@@ -593,7 +632,10 @@ export type MockToolOverrides = {
  *
  * Note: search_docs uses the real implementation.
  */
-export async function getMockTools(overrides: MockToolOverrides | undefined) {
+export async function getMockTools(
+  overrides: MockToolOverrides | undefined,
+  aiOptInLevel: AiOptInLevel = 'schema_and_log_and_data'
+) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
@@ -601,6 +643,7 @@ export async function getMockTools(overrides: MockToolOverrides | undefined) {
 
   const tools = {
     ...mockedStudioTools,
+    update_opt_in_level: createUpdateOptInLevelTool({ aiOptInLevel }),
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

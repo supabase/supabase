@@ -15,9 +15,9 @@ imgThumb: launch-week-15/day-2-stripe-engine/thumb.png
 launchweek: '15'
 ---
 
-We're excited to announce that [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) is now available as a standalone npm package: [`@supabase/stripe-sync-engine`](https://www.npmjs.com/package/@supabase/stripe-sync-engine)!
+We're excited to announce that [`stripe-sync-engine`](https://github.com/stripe/sync-engine) is now available as a standalone npm package: [`@supabase/stripe-sync-engine`](https://www.npmjs.com/package/@supabase/stripe-sync-engine)!
 
-Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend project—whether you're using Node.js, running Express on a server, or even deploying on Supabase Edge Functions.
+Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend project—whether you're using Node.js, running Express on a server, or even deploying on [Supabase Edge Functions](/docs/guides/functions).
 
 Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into structured Postgres inserts/updates. It listens to Stripe webhook events (like `invoice.payment_failed`, `customer.subscription.updated`, etc), normalizes and stores them in a relational format in Postgres.
 
@@ -31,7 +31,7 @@ Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into st
 
 ## Why sync Stripe data to Postgres?
 
-While Supabase offers a convenient [foreign data wrapper](https://supabase.com/partners/integrations/supabase_wrapper_stripe) (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
+While Supabase offers a convenient [foreign data wrapper](https://supabase.com/partners/catalog/stripe?tab=stripe-wrapper) (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
 
 - **Lower latency**: Avoid round-trips to the Stripe API.
 - **Better joins**: Query subscriptions, invoices, and charges together.
@@ -132,4 +132,4 @@ As webhooks come in, the data is automatically persisted in the `stripe` schema.
 
 ## Final thoughts
 
-If you're building with Stripe and Supabase, [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) gives you a reliable, scalable way to bring your billing data closer to your database and application. Whether you want better analytics, faster dunning workflows, or simpler integrations—this package is built to make that seamless.
+If you're building with Stripe and Supabase, [`stripe-sync-engine`](https://github.com/stripe/sync-engine) gives you a reliable, scalable way to bring your billing data closer to your database and application. Whether you want better analytics, faster dunning workflows, or simpler integrations—this package is built to make that seamless.

@@ -6,8 +6,10 @@ import {
   isQueueNameValid,
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesMetricsVariables = {
   projectRef?: string
@@ -57,7 +59,10 @@ export async function getDatabaseQueuesMetrics({
     const { result } = await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'database-queues-metrics-precise',
       sql: preciseMetricsSqlQuery(queueName),
+      grant: unguarded.migrating,
     })
     return {
       queue_name: queueName,
@@ -70,7 +75,10 @@ export async function getDatabaseQueuesMetrics({
       const { result } = await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'database-queues-metrics-estimate',
         sql: estimateMetricsSqlQuery(queueName),
+        grant: unguarded.migrating,
       })
       return {
         queue_name: queueName,
@@ -83,7 +91,7 @@ export async function getDatabaseQueuesMetrics({
 }
 
 export type DatabaseQueuesMetricsData = PostgresQueueMetric
-export type DatabaseQueuesMetricsError = ResponseError
+export type DatabaseQueuesMetricsError = StudioError
 
 export const useQueuesMetricsQuery = <TData = DatabaseQueuesMetricsData>(
   { projectRef, connectionString, queueName }: DatabaseQueuesMetricsVariables,

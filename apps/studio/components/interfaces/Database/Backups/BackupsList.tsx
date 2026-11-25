@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -63,7 +63,7 @@ export const BackupsList = () => {
         addon="pitr"
         source="backups"
         featureProposition="have up to 7 days of scheduled backups"
-        icon={<Clock size={20} />}
+        icon={<ClockIcon size={20} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
         buttonText="Upgrade"

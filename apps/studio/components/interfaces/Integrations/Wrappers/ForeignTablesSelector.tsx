@@ -1,4 +1,4 @@
-import { Edit, Trash } from 'lucide-react'
+import { EditIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -75,7 +75,7 @@ export const ForeignTablesSelector = ({
               </div>
               <div className="flex items-center space-x-2">
                 <ButtonTooltip
-                  icon={<Edit />}
+                  icon={<EditIcon />}
                   onClick={() => {
                     setSelectedTableFieldIndex(tableIndex)
                     setSelectedTableToEdit(table)
@@ -83,7 +83,7 @@ export const ForeignTablesSelector = ({
                   tooltip={{ content: { side: 'bottom', text: 'Edit foreign table' } }}
                 />
                 <ButtonTooltip
-                  icon={<Trash />}
+                  icon={<TrashIcon />}
                   onClick={() => onRemove(tableIndex)}
                   tooltip={{ content: { side: 'bottom', text: 'Remove foreign table' } }}
                 />

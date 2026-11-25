@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { PowerOff } from 'lucide-react'
+import { PowerOffIcon } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
@@ -49,7 +49,7 @@ export const AutosaveStatus = ({ id }: AutosaveStatusProps) => {
               size="tiny"
               className="px-1"
               aria-label="Disable autosave"
-              icon={<PowerOff size={14} className="text-foreground-light" />}
+              icon={<PowerOffIcon size={14} className="text-foreground-light" />}
               onClick={() => {
                 track('sql_editor_autosave_disable_clicked')
                 selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE)

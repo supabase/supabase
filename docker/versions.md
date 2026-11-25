@@ -1,5 +1,43 @@
 # Docker image version updates in docker-compose.yml
 
+## 2026-11-23
+- supabase/studio:2026.11.23-sha-4a73166 (prev supabase/studio:2026.11.02-sha-a05e7ec)
+- supabase/gotrue:v2.198.0 (prev supabase/gotrue:v2.197.0)
+- supabase/realtime:v2.174.6 (prev supabase/realtime:v2.148.3)
+- supabase/storage-api:v1.98.6 (prev supabase/storage-api:v1.89.12)
+- ghcr.io/imgproxy/imgproxy:v4.0.24 (prev darthsim/imgproxy:v4.0.21)
+- supabase/postgres-meta:v0.100.1 (prev supabase/postgres-meta:v0.100.0)
+- supabase/edge-runtime:v1.79.2 (prev supabase/edge-runtime:v1.77.9)
+- supabase/supavisor:2.10.1 (prev supabase/supavisor:2.9.13)
+- kong/kong:3.9.5 (prev kong/kong:3.9.3)
+- jonasal/nginx-certbot:6.2.0-nginx1.31.9 (prev jonasal/nginx-certbot:6.2.0-nginx1.31.8)
+- edoburu/pgbouncer:v1.26.1-p0 (prev edoburu/pgbouncer:v1.25.2-p0)
+- rustfs/rustfs:1.0.6 (prev rustfs/rustfs:1.0.4)
+- timberio/vector:0.62.0-alpine (prev timberio/vector:0.53.0-alpine)
+
+## 2026-11-05
+- supabase/studio:2026.11.02-sha-a05e7ec (prev supabase/studio:2026.10.12-sha-3699278)
+- envoyproxy/envoy:v1.39.6 (prev envoyproxy/envoy:v1.39.1)
+- supabase/realtime:v2.148.3 (prev supabase/realtime:v2.143.3)
+- supabase/storage-api:v1.89.12 (prev supabase/storage-api:v1.81.0)
+- darthsim/imgproxy:v4.0.21 (prev darthsim/imgproxy:v3.31.4)
+- supabase/edge-runtime:v1.77.9 (prev supabase/edge-runtime:v1.77.4)
+- jonasal/nginx-certbot:6.2.0-nginx1.31.8 (prev jonasal/nginx-certbot:6.2.0-nginx1.31.6)
+- rustfs/rustfs:1.0.4 (prev rustfs/rustfs:1.0.1)
+
+## 2026-10-16
+- supabase/studio:2026.10.12-sha-3699278 (prev supabase/studio:2026.09.07-sha-7996410)
+- supabase/gotrue:v2.197.0 (prev supabase/gotrue:v2.196.0)
+- postgrest/postgrest:v14.18 (prev postgrest/postgrest:v14.17)
+- supabase/realtime:v2.143.3 (prev supabase/realtime:v2.134.10)
+- supabase/storage-api:v1.81.0 (prev supabase/storage-api:v1.74.0)
+- supabase/postgres-meta:v0.100.0 (prev supabase/postgres-meta:v0.99.0)
+- supabase/edge-runtime:v1.77.4 (prev supabase/edge-runtime:v1.76.2)
+- supabase/supavisor:2.9.13 (prev supabase/supavisor:2.9.12)
+- jonasal/nginx-certbot:6.2.0-nginx1.31.6 (prev jonasal/nginx-certbot:6.2.0-nginx1.31.5)
+- rustfs/rustfs:1.0.1 (prev rustfs/rustfs:v1.0.0-rc.5)
+- supabase/logflare:1.50.15 (prev supabase/logflare:1.50.10)
+
 ## 2026-09-09
 - supabase/studio:2026.09.07-sha-7996410 (prev supabase/studio:2026.08.03-sha-022b374)
 - envoyproxy/envoy:v1.39.1 (prev envoyproxy/envoy:v1.39.0)

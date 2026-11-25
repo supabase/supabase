@@ -9,7 +9,7 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-You can now develop and test Vector Bucket integrations in your local environment using the Supabase CLI.
+You can now develop and test Vector Bucket integrations in your local environment using the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
 
 This allows you to build and iterate on your vector search applications without needing to deploy to a live environment.
 Make sure you have the latest version of the Supabase CLI installed to access this feature.
@@ -25,9 +25,9 @@ See [Vector Bucket limits](/docs/guides/storage/vector/limits) for the full comp
 </Admonition>
 ## Setting up local vector buckets
 
-Make sure you have the feature enabled in your `config.toml` file:
+Make sure you have the feature enabled in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 
 # Store vector embeddings in S3 for large and durable datasets
 [storage.vector]
@@ -36,11 +36,11 @@ enabled = true
 
 ### Declarative configuration
 
-You can define your vector buckets in the `config.toml` file using the following syntax:
+You can define your vector buckets in your config file using the following syntax:
 
-```toml
+```toml supabase/config.toml
 [storage.vector.buckets.documents-openai]
 [storage.vector.buckets.images]
 ```
 
-Then use `supabase seed buckets` to create the buckets in your local environment or linked project.
+Then use `supabase seed buckets` to create the buckets in your local environment, or `supabase seed buckets --remote` to create them in your linked project.

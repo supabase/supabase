@@ -1,41 +1,63 @@
 ---
 id: 'ai-vector-indexes'
 title: 'Vector indexes'
-description: 'Understanding vector indexes'
+description: 'Learn when to add a vector index with pgvector, which index type to choose, and which distance operators and dimension limits each vector index supports.'
 sidebar_label: 'Vector indexes'
 ---
 
-Once your vector table starts to grow, you will likely want to add an index to speed up queries. Without indexes, you'll be performing a sequential scan which can be a resource-intensive operation when you have many records.
+Knowing which index type and distance operator fit your queries tells you how to keep vector search fast as your table grows. For how to create an index, see [HNSW indexes](/docs/guides/ai/vector-indexes/hnsw-indexes).
 
-## Choosing an index
+## Index types
 
-Today `pgvector` supports two types of indexes:
+A vector index speeds up queries as your vector table grows. Without an index, each query performs a sequential scan, which can be resource-intensive when you have many records.
+
+`pgvector` supports two types of indexes:
 
 - [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)
 - [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes)
 
-In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
+In general we recommend using HNSW because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes). If queries are slow on an existing table, see [Increase vector lookup speeds with HNSW](/kb/troubleshooting/increase-vector-lookup-speeds-by-applying-an-hsnw-index-ohLHUM).
 
 ## Distance operators
 
-Indexes can be used to improve performance of nearest neighbor search using various distance measures. `pgvector` includes 3 distance operators:
+An index speeds up nearest neighbor search for a given distance measure. `pgvector` includes three distance operators:
 
-| Operator | Description            | [**Operator class**](https://www.postgresql.org/docs/current/sql-createopclass.html) |
-| -------- | ---------------------- | ------------------------------------------------------------------------------------ |
-| `<->`    | Euclidean distance     | `vector_l2_ops`                                                                      |
-| `<#>`    | negative inner product | `vector_ip_ops`                                                                      |
-| `<=>`    | cosine distance        | `vector_cosine_ops`                                                                  |
+| Operator | Description            | Operator class      |
+| -------- | ---------------------- | ------------------- |
+| `<->`    | Euclidean distance     | `vector_l2_ops`     |
+| `<#>`    | negative inner product | `vector_ip_ops`     |
+| `<=>`    | cosine distance        | `vector_cosine_ops` |
 
-For pgvector versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
+For more on operator classes, see the Postgres documentation on [operator classes](https://www.postgresql.org/docs/current/sql-createopclass.html).
 
-- vector: up to 2,000 dimensions
-- halfvec: up to 4,000 dimensions
-- bit: up to 64,000 dimensions
+## Limits
 
-You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
+For [pgvector](/docs/guides/database/extensions/pgvector) versions 0.7.0 and later, you can index vectors with the following maximum dimensions:
 
-If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/general).
+- `vector`: up to 2,000 dimensions
+- `halfvec`: up to 4,000 dimensions
+- `bit`: up to 64,000 dimensions
 
-## Resources
+To check your pgvector version, run `select * from pg_extension where extname = 'vector';`, or open the [Extensions](/dashboard/project/_/database/extensions) page in the Supabase Dashboard.
 
-Read more about indexing on `pgvector`'s [GitHub page](https://github.com/pgvector/pgvector#indexing).
+If your pgvector version is earlier than 0.7.0, [upgrade your project](/dashboard/project/_/settings/general) in the Supabase Dashboard.
+
+## Trade-offs
+
+Nearest neighbor search with either index type is approximate, because exact search on high-dimensional data can't be indexed efficiently. Similarity results can change slightly after you add an index, trading some accuracy for speed.
+
+## When to use each index type
+
+HNSW is the default choice. The two index types differ in when you can build them:
+
+| Index type                                            | When to build it                                                                                                                                                      |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)   | Right after you create the table. As new data is added, the index fills automatically and its structure stays optimal.                                                |
+| [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes) | Only after the table has enough data, so its cell clusters match your data's distribution. Consider rebuilding the index when the distribution changes significantly. |
+
+## Related resources
+
+- [HNSW indexes](/docs/guides/ai/vector-indexes/hnsw-indexes): create the recommended index type.
+- [IVFFlat indexes](/docs/guides/ai/vector-indexes/ivf-indexes): create the alternative index type.
+- [pgvector](/docs/guides/database/extensions/pgvector): enable and use the extension.
+- The pgvector documentation on [indexing](https://github.com/pgvector/pgvector#indexing) on GitHub: the full indexing reference.

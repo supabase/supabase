@@ -37,6 +37,7 @@ function Providers({ children }: { children: React.ReactNode }) {
                   <WwwCommandMenu />
                   <PageTelemetry
                     API_URL={API_URL}
+                    platform="www"
                     hasAcceptedConsent={hasAcceptedConsent}
                     enabled={IS_PLATFORM}
                   />

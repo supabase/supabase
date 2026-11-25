@@ -1,6 +1,6 @@
 'use client'
 
-import { useReducedMotion } from 'framer-motion'
+import { useReducedMotion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import UnicornScene from 'unicornstudio-react/next'

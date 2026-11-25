@@ -1,4 +1,4 @@
-import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
+import { ArchiveIcon, ArchiveRestoreIcon, ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -79,7 +79,7 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
                 ? action.url.replace('[slug]', organization?.slug ?? data.org_slug ?? '_')
                 : action.url
             return (
-              <Button key={key} icon={<ExternalLink strokeWidth={1.5} />} asChild>
+              <Button key={key} icon={<ExternalLinkIcon strokeWidth={1.5} />} asChild>
                 <Link href={url} target="_blank" rel="noreferrer">
                   {action.label}
                 </Link>
@@ -104,7 +104,7 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
           </Button>
         ) : (
           <Button
-            icon={<Archive size={14} strokeWidth={1.5} />}
+            icon={<ArchiveIcon size={14} strokeWidth={1.5} />}
             onClick={() => onUpdateStatus(notification.id, 'archived')}
           >
             Archive

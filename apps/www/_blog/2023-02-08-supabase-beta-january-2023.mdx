@@ -14,13 +14,13 @@ toc_depth: 3
 
 We have so much good stuff this month that it’s hard to fit in a single blog post 🚢.
 
-We’ve got some new Postgres extensions, GraphQL updates, changes to Edge Functions, and more!
+We’ve got some new Postgres extensions, GraphQL updates, changes to [Edge Functions](/docs/guides/functions), and more!
 
 ## Storing OpenAI embeddings in Postgres with pgvector
 
 ![Storing OpenAI embeddings in Postgres with pgvector](/images/blog/2023-02-08-january-beta-update/pgvector.png)
 
-pgvector is a popular PostgreSQL extension for storing embeddings and performing vector similarity search. It was one of the most requested extensions by the AI/ML community and is now available thanks to [gregnr](https://github.com/gregnr).
+[pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) is a popular PostgreSQL extension for storing embeddings and performing vector similarity search. It was one of the most requested extensions by the AI/ML community and is now available thanks to [gregnr](https://github.com/gregnr).
 
 [Read the announcement](https://supabase.com/blog/openai-embeddings-postgres-vector)
 
@@ -39,7 +39,7 @@ Greg wasted no time and took pgvector for a spin, he combined it with OpenAI t
 
 We have released extensive reference docs for C# and Python, detailing every object and method. What are you going to build?
 
-- [C# Client Library](https://supabase.com/docs/reference/csharp/)
+- [C# Client Library](https://supabase.com/docs/reference/csharp/introduction)
 - [Python Client Library](https://supabase.com/docs/reference/python/initializing)
 
 ## pg_graphql now supports Views, Materialized Views, and Foreign Tables
@@ -62,13 +62,13 @@ WebP is a modern image format that provides superior lossless and lossy compress
 
 -  Postgres Extension: Another powerful and time-tested extension, pg_repack, is added to Supabase. [[PR]](https://github.com/supabase/postgres/pull/492)
 
-- Auth: Multi-tab session support using the new browser BroadcastChannel API. If a user logs out on one tab, they will now be logged out on all tabs. [[PR]](https://github.com/supabase/gotrue-js/pull/566)
+- Auth: Multi-tab session support using the new browser BroadcastChannel API. If a user logs out on one tab, they will now be logged out on all tabs. [[PR]](https://github.com/supabase/auth-js/pull/566)
 
 - Postgres: Superior speed with lz4 database compression. [[PR]](https://github.com/supabase/postgres/pull/490)
 
 - Postgres: Use ICU locales and collations for text attribute ordering in database queries. [[PR]](https://github.com/supabase/postgres/pull/491)
 
-- Docs: New guide on scheduling functions with pg_cron. [[Guide]](https://supabase.com/docs/guides/functions/schedule-functions)
+- Docs: New guide on scheduling functions with [pg_cron](/docs/guides/database/extensions/pg_cron). [[Guide]](https://supabase.com/docs/guides/functions/schedule-functions)
 
 - Edge Functions: You can now download source codes of deployed edge functions from the CLI. [[Doc]](https://supabase.com/docs/reference/cli/supabase-functions-download)
 
@@ -96,7 +96,7 @@ Massive thanks to the community for all the support 👁️⚡️👁️
 
 ![Made with Supabase](/images/blog/2022-12-07-november-beta-update/madewithsupabase.jpg)
 
-[supermeme.ai](https://www.supermeme.ai/) | Two things that we are fans of are memes and AI. Just describe your thoughts and let AI create original memes for you. Available in 110+ languages!
+[supermeme.ai](https://supermeme.ai/) | Two things that we are fans of are memes and AI. Just describe your thoughts and let AI create original memes for you. Available in 110+ languages!
 
 Discover other great projects: [Made with Supabase](https://www.madewithsupabase.com/).
 
@@ -104,7 +104,7 @@ Discover other great projects: [Made with Supabase](https://www.madewithsupabas
 
 ![Community](/images/blog/2022-june/community.jpg)
 
-- JWT Helper for Supabase by Zuplo. [Tool](https://zuplo.com/blog/2023/01/05/supabase-jwt-auth-helper/) <br/>
+- JWT Helper for Supabase by Zuplo. [Tool](https://zuplo.com/blog/supabase-jwt-auth-helper) <br/>
 
 - ClickHouse and PostgreSQL - a Match Made in Data Heaven - Part 2. [Blog Post](https://clickhouse.com/blog/migrating-data-between-clickhouse-postgres-part-2)
 - Building a Startup from Scratch: My Mistakes as CTO. [Blog Post](https://egor-romanov.medium.com/building-a-startup-from-scratch-my-mistakes-as-cto-b20b463e0058)

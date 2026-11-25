@@ -17,9 +17,11 @@ vi.mock('react-use', () => ({
 
 function MobileSheetNavWithState({
   shouldCloseOnRouteChange = true,
+  shouldCloseOnQueryChange = true,
   shouldCloseOnViewportResize = true,
 }: {
   shouldCloseOnRouteChange?: boolean
+  shouldCloseOnQueryChange?: boolean
   shouldCloseOnViewportResize?: boolean
 }) {
   const [open, setOpen] = useState(false)
@@ -33,6 +35,7 @@ function MobileSheetNavWithState({
         open={open}
         onOpenChange={setOpen}
         shouldCloseOnRouteChange={shouldCloseOnRouteChange}
+        shouldCloseOnQueryChange={shouldCloseOnQueryChange}
         shouldCloseOnViewportResize={shouldCloseOnViewportResize}
       >
         <div>Nav content</div>
@@ -121,6 +124,35 @@ describe('MobileSheetNav', () => {
       })
 
       expect(onOpenChange).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('query changes', () => {
+    it('closes the sheet for query navigation by default', () => {
+      const onOpenChange = vi.fn()
+      const { rerender } = render(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
+      onOpenChange.mockClear()
+      mockRouter.asPath = '/initial?type=wrappers'
+      rerender(<MobileSheetNav {...defaultProps} onOpenChange={onOpenChange} />)
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+
+    it('keeps filters open when opted out, and closes on path navigation', async () => {
+      mockRouter.asPath = '/project/default/issues'
+      const { rerender } = render(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
+      expect(await screen.findByText('Nav content')).toBeInTheDocument()
+
+      mockRouter.asPath = '/project/default/issues?q=function'
+      rerender(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
+      expect(screen.getByText('Nav content')).toBeInTheDocument()
+
+      mockRouter.asPath = '/project/default/issues'
+      rerender(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
+      expect(screen.getByText('Nav content')).toBeInTheDocument()
+
+      mockRouter.asPath = '/project/default/issues/function_search_path_mutable'
+      rerender(<MobileSheetNavWithState shouldCloseOnQueryChange={false} />)
+      await waitFor(() => expect(screen.queryByText('Nav content')).not.toBeInTheDocument())
     })
   })
 

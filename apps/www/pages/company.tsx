@@ -134,7 +134,7 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="text-foreground mb-0 text-3xl">{x.stat}</h1>
+                <p className="text-foreground mb-0 text-3xl">{x.stat}</p>
                 <p className="text-foreground-light text-sm">{x.statLabel}</p>
               </div>
             </div>
@@ -199,7 +199,7 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h1 className="text-foreground mb-0 text-base">{x.name}</h1>
+                  <p className="text-foreground mb-0 text-base">{x.name}</p>
                   <p className="text-foreground-lighter mb-0 text-xs">{x.title}</p>
                 </div>
               </div>

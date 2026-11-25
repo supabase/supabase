@@ -1,8 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Search } from 'lucide-react'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { SearchIcon } from 'lucide-react'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -14,30 +13,29 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { PageSection } from 'ui-patterns/PageSection'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { InviteMemberButton } from './InviteMemberButton'
 import { MFA_FILTER_OPTIONS, type MfaFilter } from './MembersList.constants'
 import { MembersView } from './MembersView'
-import {
-  ScaffoldActionsContainer,
-  ScaffoldActionsGroup,
-  ScaffoldFilterAndContent,
-  ScaffoldSectionContent,
-} from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FilterPopover } from '@/components/ui/FilterPopover'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export const TeamSettings = () => {
   const { slug } = useParams()
-  const [searchString, setSearchString] = useState('')
+  const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
   const [mfaFilter, setMfaFilter] = useQueryState(
     'mfa',
     parseAsStringEnum<MfaFilter>(MFA_FILTER_OPTIONS.map((option) => option.value)).withDefault(
       'all'
     )
+  )
+  const [rolesFilter, setRoleNamesFilter] = useQueryState(
+    'roles',
+    parseAsArrayOf(parseAsString).withDefault([])
   )
 
   const mfaFilterLabel =
@@ -49,6 +47,7 @@ export const TeamSettings = () => {
 
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
+  const organizationRoles = roles?.org_scoped_roles ?? []
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
   const totalCount = data?.pages[0].pagination.count ?? 0
@@ -67,13 +66,13 @@ export const TeamSettings = () => {
 
       <PageContainer size="default">
         <PageSection className="pt-4 last:pb-0">
-          <ScaffoldFilterAndContent>
-            <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
+          <div className="flex flex-col gap-3 items-center">
+            <div className="flex w-full items-center flex-col md:flex-row gap-2 justify-between">
               <div className="flex items-center gap-x-2">
                 <Input
                   size="tiny"
                   autoComplete="off"
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   value={searchString}
                   onChange={(e) => setSearchString(e.target.value)}
                   name="email"
@@ -101,12 +100,20 @@ export const TeamSettings = () => {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                <FilterPopover
+                  name="Roles"
+                  options={organizationRoles}
+                  labelKey="name"
+                  valueKey="name"
+                  activeOptions={rolesFilter}
+                  onSaveFilters={(values) => setRoleNamesFilter(values)}
+                />
               </div>
-              <ScaffoldActionsGroup className="w-full md:w-auto">
+              <div className="flex flex-row gap-3 w-full md:w-auto">
                 <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
                 <InviteMemberButton />
-              </ScaffoldActionsGroup>
-            </ScaffoldActionsContainer>
+              </div>
+            </div>
 
             {hasProjectScopedRoles && totalCount > threshold && (
               <Admonition
@@ -116,13 +123,15 @@ export const TeamSettings = () => {
               />
             )}
 
-            <ScaffoldSectionContent className="w-full">
+            <PageSectionContent className="w-full">
               <MembersView
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
                 mfaFilter={mfaFilter}
+                roleNames={rolesFilter}
+                totalNumOrgProjects={totalCount}
               />
-            </ScaffoldSectionContent>
-          </ScaffoldFilterAndContent>
+            </PageSectionContent>
+          </div>
         </PageSection>
       </PageContainer>
     </>

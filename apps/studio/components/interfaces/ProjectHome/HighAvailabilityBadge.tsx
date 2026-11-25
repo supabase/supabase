@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 
@@ -22,7 +22,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             'bg-purple-400 text-purple-1100 dark:bg-purple-100'
           )}
         >
-          {size === 'small' ? 'HA' : 'High Availability'}
+          {size === 'small' ? <span>HA</span> : <span>High Availability</span>}
           <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
         </div>
       </HoverCardTrigger>
@@ -48,7 +48,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             className="mt-1 inline-flex items-center gap-1 text-xs text-foreground-lighter transition-colors hover:text-foreground"
           >
             Read more
-            <ArrowRight size={12} strokeWidth={1.5} />
+            <ArrowRightIcon size={12} strokeWidth={1.5} />
           </Link>
         </div>
       </HoverCardContent>

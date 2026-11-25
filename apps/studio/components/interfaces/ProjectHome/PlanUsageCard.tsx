@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
@@ -149,7 +149,7 @@ const CompactMetricRow = ({
             <span className="text-muted"> / </span>
             <span className="text-foreground-lighter">{formatted.limit}</span>
           </span>
-          <ChevronRight
+          <ChevronRightIcon
             size={12}
             strokeWidth={1.5}
             className="text-foreground w-0 ml-0 opacity-0 overflow-hidden group-hover/row:w-3 group-hover/row:ml-1 group-hover/row:opacity-100 transition-all"

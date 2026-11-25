@@ -1,4 +1,4 @@
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, copyToClipboard } from 'ui'
@@ -39,7 +39,7 @@ export const CopyEnvButton = ({
   }, [serverOptions, values])
 
   return (
-    <Button loading={isLoading} icon={<Copy />} onClick={onCopy}>
+    <Button loading={isLoading} icon={<CopyIcon />} onClick={onCopy}>
       Copy all
     </Button>
   )

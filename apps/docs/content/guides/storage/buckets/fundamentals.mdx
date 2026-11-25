@@ -1,40 +1,54 @@
 ---
 id: 'storage-bucket-public-and-private'
-title: 'Storage Buckets'
-description: 'Learn how Supabase Storage Buckets works.'
+title: 'Storage buckets'
+description: 'Learn how Supabase Storage buckets organize your files, how public and private buckets control access, and which use cases suit each type of Storage bucket.'
 sidebar_label: 'Buckets'
+tocVideo: ch2UGHMreB0
 ---
 
-Buckets allow you to keep your files organized and determines the [Access Model](#access-model) for your assets. [Upload restrictions](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) like max file size and allowed content types are also defined at the bucket level.
+Knowing the difference between public and private buckets tells you which kind to create for each kind of file. For how to create a bucket, see [Creating buckets](/docs/guides/storage/buckets/creating-buckets).
 
 ## Access model
 
-There are 2 access models for buckets, **public** and **private** buckets.
+Buckets keep your files organized and determine the access model for your assets. There are two access models for buckets, public and private:
 
-### Private buckets
+| Access model                | Retrieving and serving files                                                                           | Other operations        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------- |
+| [Private](#private-buckets) | Downloads with the user's JWT are subject to RLS policies. A signed URL gives access until it expires. | Subject to RLS policies |
+| [Public](#public-buckets)   | Anyone with the asset URL                                                                              | Access control enforced |
 
-When a bucket is set to **Private** all operations are subject to access control via [RLS policies](/docs/guides/storage/security/access-control). This also applies when downloading assets. Buckets are private by default.
+[Upload restrictions](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) like max file size and allowed content types are also defined at the bucket level.
 
-The only ways to download assets within a private bucket is to:
+## Private buckets
 
-- Use the [download method](/docs/reference/javascript/file-buckets-download) by providing an authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
+When a bucket is set to **Private**, all operations are subject to access control via [RLS policies](/docs/guides/storage/security/access-control). This also applies when downloading assets. Buckets are private by default.
+
+The only ways to download assets within a private bucket are:
+
+- Use the [download method](/docs/reference/javascript/file-buckets-download) by providing an authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table uses this user to determine if they have access.
 - Create a signed URL with the [`createSignedUrl` method](/docs/reference/javascript/file-buckets-createsignedurl) that can be accessed for a limited time.
 
-#### Example use cases:
+The following are example use cases for private buckets:
 
 - Uploading users' sensitive documents
 - Securing private assets by using RLS to set up fine-grain access controls
 
-### Public buckets
+## Public buckets
 
-When a bucket is designated as 'Public,' it effectively bypasses access controls for both retrieving and serving files within the bucket. This means that anyone who possesses the asset URL can readily access the file.
+When a bucket is set to **Public**, it bypasses access controls for both retrieving and serving files within the bucket. Anyone with the asset URL can access the file.
 
-Access control is still enforced for other types of operations including uploading, deleting, moving, and copying.
+[Access control is still enforced](/kb/troubleshooting/why-cant-i-uploadlistetc-my-public-bucket-Z6CmGt) for other types of operations including uploading, deleting, moving, and copying.
 
-#### Example use cases:
+The following are example use cases for public buckets:
 
 - User profile pictures
 - User public media
 - Blog post content
 
-Public buckets are more performant than private buckets since they are [cached differently](/docs/guides/storage/cdn/fundamentals#public-vs-private-buckets).
+Public buckets get a better cache hit rate than private buckets, because they're [cached differently](/docs/guides/storage/cdn/fundamentals#public-vs-private-buckets).
+
+## Related resources
+
+- [Creating buckets](/docs/guides/storage/buckets/creating-buckets): create a bucket and set upload restrictions.
+- [Storage access control](/docs/guides/storage/security/access-control): write the RLS policies that private buckets use.
+- [Storage CDN](/docs/guides/storage/cdn/fundamentals): how public and private buckets are cached.

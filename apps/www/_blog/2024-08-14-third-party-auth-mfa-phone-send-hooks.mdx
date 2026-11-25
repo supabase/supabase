@@ -14,7 +14,7 @@ date: '2024-08-14'
 toc_depth: 2
 ---
 
-Today we have 3 new announcements for Supabase Auth:
+Today we have 3 new announcements for [Supabase Auth](/auth):
 
 1. Support for third-party Auth providers
 2. Phone-based Multi-factor Authentication (SMS and Whatsapp)
@@ -56,9 +56,9 @@ Firebase Auth is currently under a private-alpha release stage, as we're still i
 
 Migrating auth providers can be costly and technically challenging, especially for applications with large user bases. You can use Supabase's native auth offering alongside your third-party authentication provider to achieve a disruption-free migration.
 
-All of the third-party providers are supported in the Supabase CLI, so you can evaluate, test, and develop your integration for free.
+All of the third-party providers are supported in the [Supabase CLI](/docs/guides/local-development/cli/getting-started), so you can evaluate, test, and develop your integration for free.
 
-The Supabase client supports third-party auth like this:
+The [Supabase client](/docs/reference/javascript/introduction) supports third-party auth like this:
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
@@ -117,7 +117,7 @@ We've heard the (rather loud) feedback that the built-in email templates (based 
 
 **SMS Hooks**
 
-Supabase Auth has built-in support for popular SMS sending providers like Twilio, Messagebird, Textlocal and Vonage, but we realize this choice can be limiting.
+[Supabase Auth](/docs/guides/auth) has built-in support for popular SMS sending providers like Twilio, Messagebird, Textlocal and Vonage, but we realize this choice can be limiting.
 
 Today we're launching a new ["Send SMS" Auth Hook](https://supabase.com/docs/guides/auth/auth-hooks/send-sms-hook). You no longer need to use the built-in provider - you can implement your own by specifying a HTTP endpoint that receives a POST request when a message needs to be sent.
 

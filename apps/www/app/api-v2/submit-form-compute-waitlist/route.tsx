@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { parseProjectRef } from '~/lib/compute-project-ref'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
     })
   }
 
-  const { firstName, lastName, email, company, useCase, details, honeypot } = body
+  const { firstName, lastName, email, company, projectRef, useCase, details, honeypot } = body
 
   // Anti-spam honeypot: real users never fill this hidden field.
   if (honeypot) {
@@ -116,6 +117,18 @@ export async function POST(req: Request) {
     })
   }
 
+  const parsedProjectRef =
+    typeof projectRef === 'string' && projectRef.length <= MAX_FIELD_LENGTH
+      ? parseProjectRef(projectRef)
+      : null
+
+  if (projectRef && !parsedProjectRef) {
+    return new Response(JSON.stringify({ message: 'Invalid project ID' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 422,
+    })
+  }
+
   try {
     if (!HUBSPOT_PORTAL_ID || !HUBSPOT_FORM_GUID) {
       throw new Error('HubSpot credentials not configured')
@@ -126,6 +139,9 @@ export async function POST(req: Request) {
       { objectTypeId: '0-1', name: 'lastname', value: lastName },
       { objectTypeId: '0-1', name: 'email', value: email },
       ...(company ? [{ objectTypeId: '0-1', name: 'company', value: company }] : []),
+      ...(parsedProjectRef
+        ? [{ objectTypeId: '0-1', name: 'supabase_project_ref', value: parsedProjectRef }]
+        : []),
       ...(useCase ? [{ objectTypeId: '0-1', name: 'compute_use_case', value: useCase }] : []),
       ...(details ? [{ objectTypeId: '0-1', name: 'message', value: details }] : []),
     ]

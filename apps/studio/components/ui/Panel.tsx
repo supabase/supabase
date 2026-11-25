@@ -1,4 +1,4 @@
-import { Megaphone } from 'lucide-react'
+import { MegaphoneIcon } from 'lucide-react'
 import { forwardRef, type PropsWithChildren, type ReactNode } from 'react'
 import { Badge, Button, cn, Loading } from 'ui'
 
@@ -117,7 +117,7 @@ const PanelNotice = forwardRef<
               variant={'default'}
               className="rounded-r-none pr-2 shrink-0 gap-1.5 border-dashed bg-surface-400/0 text-foreground-lighter"
             >
-              <Megaphone size={16} strokeWidth={1.2} />
+              <MegaphoneIcon size={16} strokeWidth={1.2} />
               <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
             </Badge>
             <Badge

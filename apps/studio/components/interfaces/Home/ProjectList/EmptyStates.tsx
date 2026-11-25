@@ -1,5 +1,5 @@
 import { BoxPlus } from 'icons'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -84,7 +84,7 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
       description="Launch a complete backend built on Postgres."
     >
       {projectCreationEnabled && (
-        <Button size="tiny" asChild icon={<Plus />}>
+        <Button size="tiny" asChild icon={<PlusIcon />}>
           <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
@@ -98,7 +98,7 @@ export const NoOrganizationsState = () => {
       title="Create an organization"
       description="Manage your team and projects in one place."
     >
-      <Button size="tiny" variant="primary" asChild icon={<Plus />}>
+      <Button size="tiny" variant="primary" asChild icon={<PlusIcon />}>
         <Link href="/new">New organization</Link>
       </Button>
     </EmptyStatePresentational>

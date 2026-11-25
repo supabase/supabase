@@ -5,10 +5,19 @@ import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from './blog-view'
 import BlogClient from './BlogClient'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import { breadcrumbs } from '@/lib/breadcrumbs'
+import { canonicalAlternates } from '@/lib/canonical'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getSortedPosts } from '@/lib/posts'
 
 export const metadata: Metadata = {
+  alternates: {
+    ...canonicalAlternates('/blog'),
+    types: {
+      'application/rss+xml': [
+        { url: 'https://supabase.com/rss.xml', title: 'RSS feed for the Supabase blog' },
+      ],
+    },
+  },
   title: 'Supabase Blog: the Postgres development platform',
   description: 'Get all your Supabase News on the Supabase blog.',
   openGraph: {

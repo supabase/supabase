@@ -1,15 +1,15 @@
+import { components } from 'api-types'
 import type { ReactNode } from 'react'
 import { Button } from 'ui'
 
 import { ScopeGroupCard } from './ScopeGroupCard'
-import type { OAuthAppsAuthorizeOrganizationProject, OAuthScope } from '@/data/oauth-apps/types'
 
 export type AuthorizeSuccessGrant = {
   email: string
   organization_slug: string
   project_refs: string[] | null
-  projects: OAuthAppsAuthorizeOrganizationProject[]
-  scopes: OAuthScope[]
+  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  scopes?: string[]
 }
 
 export interface AuthorizeSuccessScreenProps {
@@ -45,7 +45,7 @@ export const AuthorizeSuccessScreen = ({
               {grant.projects.map((project, index) => (
                 <span key={project.ref}>
                   {project.name}
-                  {index < grant.projects.length - 1 ? ',' : ''}
+                  {index < grant.projects.length - 1 ? <span>,</span> : ''}
                 </span>
               ))}
             </span>
@@ -54,8 +54,14 @@ export const AuthorizeSuccessScreen = ({
       </div>
 
       <section className="flex flex-col gap-3">
-        <p className="text-xs text-foreground">Permissions granted</p>
-        <ScopeGroupCard scopes={grant.scopes} />
+        <h2 className="text-xs text-foreground">Permissions granted</h2>
+        {grant.scopes == null ? (
+          <div className="divide-y rounded-md border bg-surface-75 px-4">
+            <p className="font-mono text-xs uppercase text-foreground-light">No scopes</p>
+          </div>
+        ) : (
+          <ScopeGroupCard scopes={grant.scopes} />
+        )}
       </section>
 
       <Button variant="text" block onClick={onReturn}>

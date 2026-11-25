@@ -1,6 +1,6 @@
 import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
-import { Check, ChevronDown, Copy } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, CopyIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SplitButtonGroup,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -125,7 +126,7 @@ export function AiAssistantDropdown({
   }
 
   const buttonContent = (
-    <div className={cn('flex items-center', iconOnly ? 'gap-0' : 'gap-0')}>
+    <SplitButtonGroup className={cn('items-center', iconOnly ? 'gap-0' : 'gap-0')}>
       {/* Main button */}
       <Button
         variant={variant}
@@ -133,11 +134,7 @@ export function AiAssistantDropdown({
         disabled={disabled}
         onClick={handleOpenAssistant}
         icon={<AiIconAnimation size={iconOnly ? 16 : 14} loading={loading} />}
-        className={cn(
-          'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm',
-          iconOnly && 'px-1.5',
-          className
-        )}
+        className={cn(iconOnly && 'px-1.5', className)}
       >
         {!iconOnly && label}
       </Button>
@@ -150,14 +147,14 @@ export function AiAssistantDropdown({
             variant={variant}
             size={size}
             disabled={disabled}
-            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-            icon={<ChevronDown size={12} />}
+            className="shrink-0 px-1 py-1.25"
+            icon={<ChevronDownIcon size={12} />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
-            {showCopied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
-            {showCopied ? 'Copied!' : copyLabel}
+            {showCopied ? <CheckIcon size={14} className="text-primary" /> : <CopyIcon size={14} />}
+            {showCopied ? <span>Copied!</span> : copyLabel}
           </DropdownMenuItem>
 
           {showExternalAI && (
@@ -198,7 +195,7 @@ export function AiAssistantDropdown({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </SplitButtonGroup>
   )
 
   // Wrap in tooltip for icon-only mode

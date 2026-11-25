@@ -1,4 +1,5 @@
-import { TextSearch } from 'lucide-react'
+import { useFlag } from 'common'
+import { TextSearchIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import type { AdvisorCategory } from '@/state/advisor-state'
@@ -37,6 +38,7 @@ export const EmptyAdvisor = ({
   hasFilters,
   onClearFilters,
 }: EmptyAdvisorProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const singleCategory = categoryFilters.length === 1 ? categoryFilters[0] : undefined
   const canClearFilters = hasFilters || categoryFilters.length > 0
 
@@ -44,7 +46,9 @@ export const EmptyAdvisor = ({
     if (hasFilters) {
       return {
         heading: 'No items found',
-        message: 'No advisor items match your current filters',
+        message: isIssuesInboxEnabled
+          ? 'No issues match your current filters'
+          : 'No advisor items match your current filters',
       }
     }
 
@@ -57,7 +61,7 @@ export const EmptyAdvisor = ({
 
   return (
     <div className="h-full px-6 flex flex-col items-center justify-center w-full gap-y-2">
-      <TextSearch className="text-foreground-muted" strokeWidth={1} />
+      <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
       <div className="flex flex-col items-center gap-y-0.5 text-center">
         <h3 className="heading-default">{heading}</h3>
         <p className="text-foreground-light text-sm text-balance">{message}</p>

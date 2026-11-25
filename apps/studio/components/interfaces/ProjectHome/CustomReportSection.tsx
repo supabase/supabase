@@ -7,11 +7,10 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Plus, RefreshCw } from 'lucide-react'
+import { PlusIcon, RefreshCwIcon } from 'lucide-react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -34,7 +33,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -70,23 +72,22 @@ export function CustomReportSection() {
   )
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
+  const { can: canCreateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: homeReport?.visibility,
-        owner_id: homeReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    homeReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: homeReport.visibility,
+          ownerId: homeReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()
@@ -112,15 +113,13 @@ export function CustomReportSection() {
 
   const recomputeSimpleGrid = useCallback(
     (layout: Dashboards.Chart[]) =>
-      layout.map(
-        (block, idx): Dashboards.Chart => ({
-          ...block,
-          x: idx % 2,
-          y: Math.floor(idx / 2),
-          w: 1,
-          h: 1,
-        })
-      ),
+      layout.map((block, idx): Dashboards.Chart => ({
+        ...block,
+        x: idx % 2,
+        y: Math.floor(idx / 2),
+        w: 1,
+        h: 1,
+      })),
     []
   )
 
@@ -375,7 +374,7 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
@@ -386,7 +385,7 @@ export function CustomReportSection() {
             <SnippetDropdown
               projectRef={ref}
               onSelect={handleSelectSnippet}
-              trigger={<Button icon={<Plus />}>Add block</Button>}
+              trigger={<Button icon={<PlusIcon />}>Add block</Button>}
               side="bottom"
               align="end"
               autoFocus
@@ -413,7 +412,7 @@ export function CustomReportSection() {
               <SnippetDropdown
                 projectRef={ref}
                 onSelect={handleSelectSnippet}
-                trigger={<Button iconRight={<Plus size={14} />}>Add your first block</Button>}
+                trigger={<Button iconRight={<PlusIcon size={14} />}>Add your first block</Button>}
                 side="bottom"
                 align="center"
                 autoFocus

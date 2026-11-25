@@ -1,7 +1,6 @@
 'use client'
 
 import { ExternalLink } from 'lucide-react'
-import Image from 'next/image'
 import { Button, cn } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
@@ -55,9 +54,10 @@ export function McpConfigurationDisplay({
               className="flex items-center gap-2 [&>span]:flex [&>span]:items-center [&>span]:gap-2"
               onClick={onInstallCallback}
             >
-              <Image
+              <img
                 src={mcpButtonData.imageSrc}
-                alt={`${selectedClient.label} icon`}
+                alt=""
+                aria-hidden="true"
                 width={16}
                 height={16}
                 className="shrink-0"
@@ -79,11 +79,7 @@ export function McpConfigurationDisplay({
               : mcpButtonData
                 ? 'Or add'
                 : 'Add'}{' '}
-            this configuration to{' '}
-            <code className="px-1 py-0.5 bg-surface-200 rounded-sm">
-              {selectedClient.configFile}
-            </code>
-            :
+            this configuration to <code>{selectedClient.configFile}</code>:
           </div>
           <CodeBlock
             value={configValue}

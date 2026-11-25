@@ -21,7 +21,7 @@ You can use file storage to:
 
 ## Persistent Storage
 
-The persistent storage option is built on top of the S3 protocol. It allows you to mount any S3-compatible bucket, including Supabase Storage Buckets, as a directory for your Edge Functions.
+The persistent storage option is built on top of the S3 protocol. It allows you to mount any S3-compatible bucket, including [Supabase Storage](/docs/guides/storage) Buckets, as a directory for your Edge Functions.
 You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
 
 To access an S3 bucket from Edge Functions, you must set the following for environment variables in Edge Function Secrets.
@@ -50,7 +50,7 @@ await Deno.writeTextFile('/s3/my-bucket/demo.txt', 'hello world')
 
 Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read within the same invocation.
 
-You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
+You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system/) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
 
 ```tsx
 Deno.serve(async (req) => {
@@ -83,7 +83,7 @@ You can use ephemeral storage with [Background Tasks](/docs/guides/functions/bac
 
 Imagine you have a Photo Album application that accepts photo uploads as zip files. A streaming implementation will run into memory limit errors with zip files exceeding 100MB, as it retains all archive files in memory simultaneously.
 
-You can write the zip file to ephemeral storage first, then use a background task to extract and upload files to Supabase Storage. This way, you only read parts of the zip file to the memory.
+You can write the zip file to ephemeral storage first, then use a background task to extract and upload files to [Supabase Storage](/docs/guides/storage/quickstart). This way, you only read parts of the zip file to the memory.
 
 ```tsx
 import { BlobWriter, ZipReader } from 'https://deno.land/x/zipjs/index.js'
@@ -162,6 +162,7 @@ Deno.serve(async (req) => {
 
 You can safely use the following synchronous Deno APIs (and their Node counterparts) _during initial script evaluation_:
 
+- Deno.lstatSync
 - Deno.statSync
 - Deno.removeSync
 - Deno.writeFileSync
@@ -170,7 +171,9 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 - Deno.readTextFileSync
 - Deno.mkdirSync
 - Deno.makeTempDirSync
+- Deno.makeTempFileSync
 - Deno.readDirSync
+- Deno.copyFileSync
 
 **Keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or `setTimeout`.
 
@@ -178,11 +181,11 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 Deno.statSync('...') // ✅
 
 setTimeout(() => {
-  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+  Deno.statSync('...') // 💣 PermissionDenied: Deno.statSync is blocklisted on the current context
 })
 
 Deno.serve(() => {
-  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+  Deno.statSync('...') // 💣 PermissionDenied: Deno.statSync is blocklisted on the current context
 })
 ```
 

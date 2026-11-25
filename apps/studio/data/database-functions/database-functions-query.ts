@@ -1,13 +1,17 @@
 import pgMeta, { type SafeSqlFragment } from '@supabase/pg-meta'
-import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+
+export type DatabaseFunctionsGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
+  grant?: DatabaseFunctionsGrant
   connectionString?: string | null
   schema?: string
 }
@@ -30,7 +34,12 @@ export type SavedDatabaseFunction = Omit<
 }
 
 export async function getDatabaseFunctions(
-  { projectRef, connectionString, schema }: DatabaseFunctionsVariables,
+  {
+    projectRef,
+    connectionString,
+    schema,
+    grant,
+  }: Omit<DatabaseFunctionsVariables, 'grant'> & { grant: DatabaseFunctionsGrant },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -43,8 +52,11 @@ export async function getDatabaseFunctions(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'database-functions',
       sql: pgMetaFunctionsList.sql,
       queryKey: ['database-functions'],
+      grant,
     },
     signal,
     headers
@@ -54,20 +66,27 @@ export async function getDatabaseFunctions(
 }
 
 export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctions>>
-export type DatabaseFunctionsError = ResponseError
+export type DatabaseFunctionsError = StudioError
 
-export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
+export const databaseFunctionsQueryOptions = <TData = DatabaseFunctionsData>(
   vars: DatabaseFunctionsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
+  options?: GrantedQueryCallerOptions<
+    DatabaseFunctionsData,
+    DatabaseFunctionsError,
+    TData,
+    ReturnType<typeof databaseKeys.databaseFunctions>
+  >
 ) => {
-  const { projectRef, schema } = vars
-  return useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>({
-    queryKey: databaseKeys.databaseFunctions(projectRef, schema),
-    queryFn: ({ signal }) => getDatabaseFunctions(vars, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
-    ...options,
-  })
+  const { projectRef, connectionString, schema, grant } = vars
+  return grantedQueryOptions(
+    {
+      queryKey: databaseKeys.databaseFunctions(projectRef, schema),
+      queryFn:
+        projectRef && grant
+          ? ({ signal }) =>
+              getDatabaseFunctions({ projectRef, connectionString, schema, grant }, signal)
+          : undefined,
+    },
+    options
+  )
 }

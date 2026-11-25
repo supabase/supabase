@@ -17,6 +17,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "@types/pg": "^8.11.11",
     "@vitest/coverage-v8": "catalog:",
     "npm-run-all": "^4.1.5",

@@ -5,8 +5,9 @@ import { lintKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectLintsVariables = {
   projectRef?: string
@@ -29,7 +30,7 @@ export async function getProjectLints({ projectRef }: ProjectLintsVariables, sig
 }
 
 export type ProjectLintsData = Awaited<ReturnType<typeof getProjectLints>>
-export type ProjectLintsError = ResponseError
+export type ProjectLintsError = StudioError
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
   { projectRef }: ProjectLintsVariables,
@@ -38,7 +39,7 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
     ...options
   }: UseCustomQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectLintsData, ProjectLintsError, TData>({

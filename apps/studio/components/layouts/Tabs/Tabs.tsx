@@ -8,11 +8,12 @@ import {
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
 import {
+  Checkbox,
   cn,
   ContextMenu,
   ContextMenuContent,
@@ -22,6 +23,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
@@ -61,6 +63,7 @@ export const EditorTabs = ({
   const tabs = useTabsStateSnapshot()
   const [pendingClose, setPendingClose] = useState<(() => void) | null>(null)
   const [pendingConfirmation, setPendingConfirmation] = useState<TabCloseConfirmation | null>(null)
+  const [isOptOutChecked, setIsOptOutChecked] = useState(false)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -117,6 +120,12 @@ export const EditorTabs = ({
     } else {
       performClose()
     }
+  }
+
+  const resetPendingClose = () => {
+    setPendingClose(null)
+    setPendingConfirmation(null)
+    setIsOptOutChecked(false)
   }
 
   const handleClose = (tabId: string) => {
@@ -247,7 +256,7 @@ export const EditorTabs = ({
                       'hover:bg-surface-300 dark:hover:bg-surface-100'
                     )}
                   >
-                    <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                    <PlusIcon size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
                     <div className="flex items-center gap-0">
                       <span>New</span>
                     </div>
@@ -279,7 +288,7 @@ export const EditorTabs = ({
                       'cursor-pointer'
                     )}
                   >
-                    <X size={12} className="text-foreground-light" />
+                    <XIcon size={12} className="text-foreground-light" />
                   </button>
                 </div>
               )}
@@ -298,7 +307,7 @@ export const EditorTabs = ({
                       animate={{ opacity: 1, scale: 1, x: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Plus
+                      <PlusIcon
                         size={16}
                         strokeWidth={1.5}
                         className="text-foreground-lighter hover:text-foreground-light"
@@ -319,17 +328,30 @@ export const EditorTabs = ({
       <DiscardChangesConfirmationDialog
         visible={pendingClose !== null}
         onClose={() => {
+          if (isOptOutChecked) pendingConfirmation?.optOut?.onOptOut()
           pendingClose?.()
-          setPendingClose(null)
-          setPendingConfirmation(null)
+          resetPendingClose()
         }}
-        onCancel={() => {
-          setPendingClose(null)
-          setPendingConfirmation(null)
-        }}
+        onCancel={resetPendingClose}
         title={pendingConfirmation?.title ?? 'Unsaved changes'}
         description={pendingConfirmation?.description}
-      />
+      >
+        {pendingConfirmation?.optOut && (
+          <FormItemLayout
+            isReactForm={false}
+            layout="flex"
+            name="optOutOfCloseConfirmation"
+            label={pendingConfirmation.optOut.label}
+            className="[&>div:first-child>button]:translate-y-0.5"
+          >
+            <Checkbox
+              id="optOutOfCloseConfirmation"
+              checked={isOptOutChecked}
+              onCheckedChange={(value) => setIsOptOutChecked(!!value)}
+            />
+          </FormItemLayout>
+        )}
+      </DiscardChangesConfirmationDialog>
     </>
   )
 }

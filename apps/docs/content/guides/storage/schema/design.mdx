@@ -1,25 +1,23 @@
 ---
 id: 'storage-schema-design'
-title: 'The Storage Schema'
-description: 'Learn about the storage schema'
-subtitle: 'Learn about the storage schema'
+title: 'Storage schema'
+description: 'Learn how Supabase Storage keeps bucket and object metadata in the storage schema in Postgres, which tables it holds, and why you treat them as read-only.'
 sidebar_label: 'Schema'
+tocVideo: ch2UGHMreB0
 ---
 
-Storage uses Postgres to store metadata regarding your buckets and objects. Users can use RLS (Row-Level Security) policies for access control. This data is stored in a dedicated schema within your project called `storage`.
+Knowing the Storage schema tells you what you can query directly and what you change only through the Storage API. For how to write policies on these tables, see [Storage access control](/docs/guides/storage/security/access-control).
 
-<Admonition type="note">
+## Tables
 
-When working with SQL, it's crucial to consider all records in Storage tables as read-only. All operations, including uploading, copying, moving, and deleting, should **exclusively go through the API**.
+Storage keeps metadata about your buckets and objects in a dedicated Postgres schema in your project called `storage`. The objects themselves are stored in a provider like S3. You can use [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies on these tables for access control.
 
-This is important because the storage schema only stores the metadata and the actual objects are stored in a provider like S3. Deleting the metadata doesn't remove the object in the underlying storage provider. This results in your object being inaccessible, but you'll still be billed for it.
-
-</Admonition>
-
-Here is the schema that represents the Storage service, you have the option to query this table directly to retrieve information about your files in Storage without the need to go through our API.
+The following diagram shows the schema. You can query these tables directly to retrieve information about your files without going through the Storage API.
 
 ```mermaid
 erDiagram
+  accTitle: Storage schema tables
+  accDescr: Three tables. Each row in buckets can own many rows in objects, joined on buckets.id and objects.bucket_id. The migrations table stands alone.
   buckets ||--o{ objects : "buckets_id:id"
   buckets {
     text id PK
@@ -50,10 +48,31 @@ erDiagram
   }
 ```
 
-The schema centers on three tables. Each `buckets` row can own many `objects` rows by a one-to-many relationship that joins `buckets.id` to `objects.bucket_id`. The `buckets` table holds bucket configuration. Its `id` and `name`, whether the bucket is `public`, and constraints such as `file_size_limit` and `allowed_mime_types`. The `objects` table holds per-file metadata: the owning `bucket_id`, the object `name` and `path_tokens`, a `metadata` JSON blob, and version information. The `migrations` table is standalone and tracks the schema migrations applied to the storage service.
+The schema centers on three tables. Each `buckets` row can own many `objects` rows by a one-to-many relationship that joins `buckets.id` to `objects.bucket_id`.
+
+| Table        | Holds                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `buckets`    | Bucket configuration: its `id` and `name`, whether the bucket is `public`, and constraints such as `file_size_limit` and `allowed_mime_types`. |
+| `objects`    | Per-file metadata: the owning `bucket_id`, the object `name` and `path_tokens`, a `metadata` JSON blob, and version information.               |
+| `migrations` | The schema migrations applied to the storage service. This table is standalone.                                                                |
 
 ## Modifying the schema
 
-We strongly recommend refraining from making any alterations to the `storage` schema and treating it as read-only. This approach is important because any modifications to the schema on your end could potentially clash with our future updates, leading to downtime.
+<Admonition type="danger">
 
-However, we encourage you to add custom indexes as they can significantly improve the performance of the RLS policies you create for enforcing access control.
+Changing the `storage` schema or its records with SQL can leave objects that you can't access but are still billed for. Treat the schema and its records as read-only, and do all operations, including uploading, copying, moving, and deleting, **through the Storage API**.
+
+</Admonition>
+
+Changing the schema or its records with SQL causes problems that the Storage API avoids:
+
+- Deleting metadata doesn't remove the object from the underlying storage provider.
+- Changing the schema can conflict with Supabase updates to it and cause downtime.
+
+Supabase does encourage custom indexes, because they can significantly improve the performance of the RLS policies that enforce access control.
+
+## Related resources
+
+- [Storage access control](/docs/guides/storage/security/access-control): write RLS policies on the `storage.objects` table.
+- [Storage ownership](/docs/guides/storage/security/ownership): how the `owner_id` column is set.
+- [Row Level Security](/docs/guides/database/postgres/row-level-security): how policies work in Postgres.

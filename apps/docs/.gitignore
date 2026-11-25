@@ -6,6 +6,7 @@
 
 # Generated files
 .cache-loader
+next-env.d.ts
 
 # Misc
 .DS_Store
@@ -28,7 +29,7 @@ yarn-error.log*
 # Sitemap
 public/sitemap.xml
 # Generated guide and reference markdown files. manifest.json is committed
-# with a placeholder empty array so middleware.ts's import always resolves,
+# with a placeholder empty array so proxy.ts's import always resolves,
 # even when build:markdown hasn't run (e.g. in local dev, which skips it).
 public/markdown/*
 !public/markdown/manifest.json

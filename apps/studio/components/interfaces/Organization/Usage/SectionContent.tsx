@@ -1,10 +1,11 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { CategoryAttribute } from './Usage.constants'
-import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
+import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
@@ -20,7 +21,7 @@ export const SectionContent = ({
 
   return (
     <>
-      <ScaffoldContainer>
+      <PageContainer>
         <div className="mx-auto flex flex-col gap-10 py-8 md:py-16">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-5">
@@ -48,7 +49,7 @@ export const SectionContent = ({
                         <Link href={link.url} target="_blank" rel="noreferrer">
                           <div className="inline-flex items-center space-x-2 text-foreground-light hover:text-foreground transition">
                             <p className="text-sm">{link.name}</p>
-                            <ExternalLink size={16} strokeWidth={1.5} />
+                            <ExternalLinkIcon size={16} strokeWidth={1.5} />
                           </div>
                         </Link>
                       </div>
@@ -60,7 +61,7 @@ export const SectionContent = ({
             <div className="col-span-12 lg:col-span-7 space-y-6">{children}</div>
           </div>
         </div>
-      </ScaffoldContainer>
+      </PageContainer>
       <ScaffoldDivider />
     </>
   )

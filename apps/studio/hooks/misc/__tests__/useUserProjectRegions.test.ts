@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { waitFor } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -20,15 +21,13 @@ function mockProject(
 ): OrgProject {
   return {
     cloud_provider: 'AWS',
-    databases: databases.map(
-      ({ region, type }): OrgDatabase => ({
-        cloud_provider: 'AWS',
-        identifier: ref,
-        region,
-        status: 'ACTIVE_HEALTHY',
-        type,
-      })
-    ),
+    databases: databases.map(({ region, type }): OrgDatabase => ({
+      cloud_provider: 'AWS',
+      identifier: ref,
+      region,
+      status: 'ACTIVE_HEALTHY',
+      type,
+    })),
     inserted_at: new Date().toISOString(),
     integration_source: null,
     is_branch: false,

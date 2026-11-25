@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EnablePhysicalBackupsVariables = {
   ref: string
@@ -23,10 +24,10 @@ export const useEnablePhysicalBackupsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>,
+  UseCustomMutationOptions<BackupRestoreData, StudioError, EnablePhysicalBackupsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>({
+  return useMutation<BackupRestoreData, StudioError, EnablePhysicalBackupsVariables>({
     mutationFn: (vars) => enablePhysicalBackups(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

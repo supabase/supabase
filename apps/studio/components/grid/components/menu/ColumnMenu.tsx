@@ -1,4 +1,14 @@
-import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Eye, Lock, Trash, Unlock } from 'lucide-react'
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  EditIcon,
+  EyeIcon,
+  LockIcon,
+  TrashIcon,
+  UnlockIcon,
+} from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import type { CalculatedColumn } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -132,7 +142,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
           onClick={() => onSortColumn(true)}
         >
-          <ArrowUp size={14} strokeWidth={currentSort?.ascending ? 3 : 1.5} />
+          <ArrowUpIcon size={14} strokeWidth={currentSort?.ascending ? 3 : 1.5} />
           <span>Sort Ascending</span>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -144,7 +154,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
           onClick={() => onSortColumn(false)}
         >
-          <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
+          <ArrowDownIcon size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
           <span>Sort Descending</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -155,7 +165,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             copyToClipboard(columnName)
           }}
         >
-          <Copy size={12} />
+          <CopyIcon size={12} />
           <span>Copy name</span>
         </DropdownMenuItem>
         {snap.editable && (
@@ -167,7 +177,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                   onClick={onEditColumn}
                   disabled={isEncrypted}
                 >
-                  <Edit size={14} strokeWidth={1.5} />
+                  <EditIcon size={14} strokeWidth={1.5} />
                   <span>Edit column</span>
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -183,12 +193,12 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         >
           {column.frozen ? (
             <>
-              <Unlock size={14} strokeWidth={1.5} />
+              <UnlockIcon size={14} strokeWidth={1.5} />
               <span>Unfreeze column</span>
             </>
           ) : (
             <>
-              <Lock size={14} strokeWidth={1.5} />
+              <LockIcon size={14} strokeWidth={1.5} />
               <span>Freeze column</span>
             </>
           )}
@@ -199,7 +209,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             disabled={snap.temporarilyRevealedColumns.has(columnKey)}
             onClick={onToggleSensitiveData}
           >
-            <Eye size={14} strokeWidth={1.5} />
+            <EyeIcon size={14} strokeWidth={1.5} />
             <span>
               {snap.temporarilyRevealedColumns.has(columnKey) ? 'Data revealed (5s)' : 'Show data'}
             </span>
@@ -209,7 +219,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
-              <Trash size={14} className="text-destructive" />
+              <TrashIcon size={14} className="text-destructive" />
               <span>Delete column</span>
             </DropdownMenuItem>
           </>
@@ -230,7 +240,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
               e.stopPropagation()
             }}
             aria-label={`Column ${column.name} actions`}
-            icon={<ChevronDown />}
+            icon={<ChevronDownIcon />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="bottom">

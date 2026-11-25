@@ -1,7 +1,7 @@
 'use client'
 
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 

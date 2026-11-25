@@ -21,7 +21,7 @@ This is an open-source-only release. Multigres for Supabase is coming soon.
 
 Multigres is a scalable operating system for Postgres: it holistically manages your Postgres instances and gives you sharding, connection pooling, automatic failover, and backup orchestration.
 
-Postgres at scale is operationally complex: You need to manage read replicas, failovers, connection limits, backups, and more. Multigres handles these chores as a single cohesive system. And when the time comes to scale, Multigres will help you shard your database and scale it horizontally.
+Postgres at scale is operationally complex: You need to manage [read replicas](/docs/guides/platform/read-replicas), failovers, connection limits, backups, and more. Multigres handles these chores as a single cohesive system. And when the time comes to scale, Multigres will help you shard your database and scale it horizontally.
 
 The v0.1 alpha introduces advanced connection pooling, automatic failovers, and a Kubernetes operator for deployment.
 
@@ -46,7 +46,7 @@ For more information on HA, you may read the following posts:
 
 ## Connection Pooling
 
-Multigres ships its own connection pooling solution using a two-service architecture. It consists of a **multigateway** that accepts client connections and routes queries, and a **multipooler** that manages backend connections. This architecture provides some distinct advantages over a single-process pooler.
+Multigres ships its own connection pooling solution using a two-service architecture. It consists of a **multigateway** that accepts client connections and routes queries, and a **multipooler** that manages backend connections. This architecture provides some distinct advantages over a single-process [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
 
 - **Traffic routing**: The integration with the HA system allows multigateway to transparently route connections to the current primary. During a failover, multigateway can hold requests until a new primary is promoted, thereby minimizing errors. Additionally, you can balance read load across multiple replicas. In the future, multigateway will handle routing of traffic to different shards.
 - **Context-aware pooling**: Multigres does not require you to [choose a pooling mode](https://multigres.com/blog/pooling-without-choosing-a-mode) like transaction, session, etc. This is because it has a built-in parser and understands the effects of each request. This allows it to track connection state and reuse them wherever applicable. If a request requires a stateful connection, like a transaction, the connection gets pinned to that client until the stateful requirement is satisfied.

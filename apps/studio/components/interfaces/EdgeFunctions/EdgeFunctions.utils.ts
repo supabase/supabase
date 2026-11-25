@@ -229,12 +229,23 @@ export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content' | 'stat
     .map(({ name }) => name)
 }
 
+// Finds the body file the entrypoint refers to: any file whose path is a trailing path of the
+// entrypoint. When several match (e.g. `index.ts` and `functions/hello/index.ts` for an entrypoint
+// ending in `functions/hello/index.ts`), the one closest to the root wins.
+function findEntrypointFileName(entrypoint: string, fileNames: string[]): string | undefined {
+  const depth = (name: string) => name.split('/').length
+
+  return fileNames
+    .filter((name) => entrypoint === name || entrypoint.endsWith(`/${name}`))
+    .sort((a, b) => depth(a) - depth(b))[0]
+}
+
 function getBasePath(entrypoint: string | undefined, fileNames: string[]): string {
   if (!entrypoint) {
     return '/'
   }
 
-  let candidate = fileNames.find((name) => entrypoint.endsWith(name))
+  let candidate = findEntrypointFileName(entrypoint, fileNames)
 
   if (candidate) {
     return dirname(candidate)
@@ -284,7 +295,12 @@ export const formatFunctionBodyToFiles = ({
         }
       })
 
-    return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
+    // sort by displayed (relative) name before assigning ids, so ids follow list order
+    const sortedFiles = [...filesWithRelPath].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    )
+
+    return sortedFiles.map((file: { name: string; content: string }, index: number) => {
       return {
         id: index + 1,
         name: file.name,
@@ -295,4 +311,80 @@ export const formatFunctionBodyToFiles = ({
   }
 
   return []
+}
+
+// Picks the file to open by default: the function's entrypoint, then `index.ts`, then the first file.
+export const getDefaultSelectedFileId = (
+  files: Pick<FileData, 'id' | 'name'>[],
+  entrypointPath?: string | null
+): number | undefined => {
+  const entrypointName = entrypointPath?.split('/').pop()
+  const entrypointFile = entrypointName
+    ? files.find((file) => file.name === entrypointName)
+    : undefined
+
+  return (entrypointFile ?? files.find((file) => file.name === 'index.ts') ?? files[0])?.id
+}
+
+type FunctionZipFile = { name: string; content: string | Uint8Array<ArrayBuffer> }
+
+// Resolves `.`, empty (e.g. from a leading `/`) and inner `..` segments, so the only `..` left are
+// leading ones that reach above the base, e.g. `a/../../b` becomes `../b`.
+const normalizePathSegments = (path: string): string[] =>
+  path.split(/[\\/]/).reduce<string[]>((segments, segment) => {
+    if (segment === '' || segment === '.') return segments
+    if (segment === '..' && segments.length > 0 && segments[segments.length - 1] !== '..') {
+      return segments.slice(0, -1)
+    }
+    return [...segments, segment]
+  }, [])
+
+// Decides where each function file lands inside the downloaded ZIP. Paths are normalized so no
+// entry can escape the extraction folder, and files that reach above the base (`../_shared`) are
+// kept in place by nesting everything else under `src/`.
+// - `multipart`: names include the deploy path, so they're first made relative to the function slug.
+// - `eszip`: names are already relative to the function root. Running slug-relative logic on them
+//   would drop folders that happen to share the slug's name.
+export const getFunctionZipEntries = ({
+  files,
+  slug,
+  source,
+}: {
+  files: FunctionZipFile[]
+  slug: string
+  source: 'multipart' | 'eszip'
+}): { path: string; content: string | Uint8Array<ArrayBuffer> }[] => {
+  const relativeNames = files.map(({ name }) => {
+    if (source === 'eszip') return normalizePathSegments(name)
+    const nameSections = name.split('/')
+    const slugIndex = nameSections.indexOf(slug)
+    return normalizePathSegments(nameSections.slice(slugIndex + 1).join('/'))
+  })
+
+  const countParentDirs = (segments: string[]) => {
+    const firstRealSegment = segments.findIndex((segment) => segment !== '..')
+    return firstRealSegment === -1 ? segments.length : firstRealSegment
+  }
+
+  // The deepest `../` reach decides how many `src` levels are needed to keep files in place
+  const maxDepth = Math.max(0, ...relativeNames.map(countParentDirs))
+
+  // The generated `src` folders must not share a name with a real top-level folder, otherwise
+  // e.g. `hello/index.ts` and `hello/../src/index.ts` would both end up at `src/index.ts`
+  const takenNames = new Set(relativeNames.map((segments) => segments[countParentDirs(segments)]))
+  const baseDirNames = Array.from({ length: maxDepth }, (_, i) => {
+    let name = i === 0 ? 'src' : `src${i}`
+    while (takenNames.has(name)) name += '_'
+    return name
+  })
+
+  return files.map(({ content }, index) => {
+    const segments = relativeNames[index]
+    const parentDirCount = countParentDirs(segments)
+    const remainingSegments = segments.slice(parentDirCount)
+    const depthFromBase = maxDepth - parentDirCount
+    const baseDirs = baseDirNames.slice(0, Math.max(depthFromBase, 0))
+
+    return { path: [...baseDirs, ...remainingSegments].join('/'), content }
+  })
 }

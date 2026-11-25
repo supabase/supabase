@@ -4,10 +4,10 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '../Support/SupportLink'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface StorageBucketsErrorProps {
-  error: ResponseError
+  error: StudioError
 }
 
 const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
@@ -25,7 +25,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
               <p className="mb-1">
                 Please try refreshing your browser, or contact support if the issue persists
               </p>
-              <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
+              <p>Error: {(error as any)?.message ?? <span>Unknown</span>}</p>
             </>
           }
           actions={

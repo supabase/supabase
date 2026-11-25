@@ -2,7 +2,7 @@
 
 A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://supabase.com/dashboard). Built with:
 
-- [Next.js](https://nextjs.org/)
+- [TanStack Start](https://tanstack.com/start)
 - [Tailwind](https://tailwindcss.com/)
 
 ## What's included
@@ -22,6 +22,8 @@ As such, the features exposed on Studio for existing deployments are limited to 
 Project settings are managed outside of the Dashboard. If you use docker compose, you should manage the settings in your docker-compose file. If you're deploying Supabase to your own cloud, you should store your secrets and env vars in a vault or secrets manager.
 
 ## How to contribute?
+
+For Assistant work, start with the [Supabase Assistant code guide](lib/ai/README.md) for the architecture, file map, tools, and validation workflow.
 
 - Branch from `master` and name your branches with the following structure
   - `{type}/{branch_name}`

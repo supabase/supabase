@@ -3,45 +3,242 @@ id: release-notes
 title: Release Notes
 ---
 
+## 8.13.0 - 2026-11-19
+
+**Features**
+
+- Realtime: add presence join and leave handlers, `AddJoinHandler` and `AddLeaveHandler`, that receive the key and the presences involved ([#756](https://github.com/supabase/supabase-csharp/issues/756)).
+- Realtime: `Subscribe()` connects the socket when the client has none, so `ConnectAsync()` is no longer required first ([#780](https://github.com/supabase/supabase-csharp/issues/780)).
+- Realtime: reconnect as soon as the network comes back, controlled by `ClientOptions.MonitorsNetworkPath` ([#799](https://github.com/supabase/supabase-csharp/issues/799)).
+- Realtime: log channel state changes to the supplied logger ([#797](https://github.com/supabase/supabase-csharp/issues/797)).
+- Add `SupabaseOptions.LoggerFactory` to log request outcomes, retries, and background work such as token refresh and Realtime reconnects. Credentials, bodies, and query strings are never logged ([#766](https://github.com/supabase/supabase-csharp/issues/766)).
+- Send the current trace context (`traceparent`, `tracestate`, `baggage`) with every Auth, Database, Storage, and Functions request. Turn it off with `SupabaseOptions.TracePropagation = TracePropagation.Disabled`. See [Client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp) ([#762](https://github.com/supabase/supabase-csharp/issues/762)).
+- Send Storage requests, uploads, and downloads through the client set in `SupabaseOptions.HttpClient` ([#758](https://github.com/supabase/supabase-csharp/issues/758)).
+- Auth: disable session persistence with `SessionPersistence.Disabled` ([#761](https://github.com/supabase/supabase-csharp/issues/761)).
+- Auth: manage OAuth clients as an admin: list, read, register, update, delete, and regenerate the secret ([#789](https://github.com/supabase/supabase-csharp/issues/789), [#791](https://github.com/supabase/supabase-csharp/issues/791), [#786](https://github.com/supabase/supabase-csharp/issues/786), [#792](https://github.com/supabase/supabase-csharp/issues/792), [#784](https://github.com/supabase/supabase-csharp/issues/784), [#788](https://github.com/supabase/supabase-csharp/issues/788)).
+- Postgrest: bulk insert and upsert rows that carry different fields, and use column defaults for omitted fields ([#770](https://github.com/supabase/supabase-csharp/issues/770), [#774](https://github.com/supabase/supabase-csharp/issues/774)).
+- Postgrest: cap how many rows an update or delete may affect with `MaxAffected` ([#771](https://github.com/supabase/supabase-csharp/issues/771)).
+- Postgrest: read exactly one row with `SingleOrThrowAsync` ([#776](https://github.com/supabase/supabase-csharp/issues/776)).
+
+**Fixes**
+
+- Realtime: close a channel removed while it is still joining ([#754](https://github.com/supabase/supabase-csharp/issues/754)), wait `ReconnectAfterInterval` between reconnect attempts ([#783](https://github.com/supabase/supabase-csharp/issues/783)), send queued messages after a rejoin ([#755](https://github.com/supabase/supabase-csharp/issues/755)), and complete a push only on its own reply ([#781](https://github.com/supabase/supabase-csharp/issues/781)).
+- Realtime: do not open the socket when `Disconnect()` runs during the token lookup ([#782](https://github.com/supabase/supabase-csharp/issues/782)), and ignore exceptions thrown by debug handlers ([#731](https://github.com/supabase/supabase-csharp/issues/731)).
+- Storage: add `Bucket.FileSizeLimitInBytes` to read a numeric `file_size_limit` ([#801](https://github.com/supabase/supabase-csharp/issues/801)), and read `FileObjectV2.Size` as a `long` so objects over 2 GiB deserialize ([#804](https://github.com/supabase/supabase-csharp/issues/804)).
+
+## 8.12.0 - 2026-11-16
+
+**Features**
+
+- Realtime: `PrivateChannel()` joins a private channel with the client's own access token ([#745](https://github.com/supabase/supabase-csharp/issues/745)).
+- Realtime: `ProbeConnection()` checks the connection when the app returns to the foreground and reconnects if there is no reply ([#732](https://github.com/supabase/supabase-csharp/issues/732)).
+- Authenticate the client through a third-party auth provider with `SupabaseOptions.ThirdPartyAccessToken` ([#741](https://github.com/supabase/supabase-csharp/issues/741)).
+- Postgrest, Storage, and Functions: supply the access token from an async `RetrieveAccessToken` callback on every request ([#735](https://github.com/supabase/supabase-csharp/issues/735)).
+- Auth: choose the OAuth flow type once with `SupabaseOptions.AuthFlowType` ([#737](https://github.com/supabase/supabase-csharp/issues/737)).
+- Auth: sign in with a Solana or Ethereum wallet signature ([#707](https://github.com/supabase/supabase-csharp/issues/707)).
+- Auth: sign up with PKCE and a messaging channel, returning a `SignUpState` ([#713](https://github.com/supabase/supabase-csharp/issues/713)).
+- Auth: tell listeners why the user was signed out ([#708](https://github.com/supabase/supabase-csharp/issues/708)).
+- Auth: claim concurrent PKCE flows through caller-owned verifiers ([#710](https://github.com/supabase/supabase-csharp/issues/710)).
+- Auth: manage single sign-on identity providers as an admin: list, read, register, change, and delete ([#722](https://github.com/supabase/supabase-csharp/issues/722), [#719](https://github.com/supabase/supabase-csharp/issues/719), [#724](https://github.com/supabase/supabase-csharp/issues/724), [#728](https://github.com/supabase/supabase-csharp/issues/728), [#721](https://github.com/supabase/supabase-csharp/issues/721)).
+
+**Fixes**
+
+- Auth: keep the local session when a global sign-out fails on the server ([#714](https://github.com/supabase/supabase-csharp/issues/714)), and return the PKCE verifier from an SSO sign-in ([#709](https://github.com/supabase/supabase-csharp/issues/709)).
+- Auth: resume `ExchangeCodeForSession` off the caller's synchronization context ([#705](https://github.com/supabase/supabase-csharp/issues/705)).
+- Realtime: clear only the given presence event type ([#733](https://github.com/supabase/supabase-csharp/issues/733)), and stop sending `phx_ref` in the presence track payload ([#699](https://github.com/supabase/supabase-csharp/issues/699)).
+- Pass the MFA-verified access token to Realtime instead of throwing ([#704](https://github.com/supabase/supabase-csharp/issues/704)).
+
+## 8.11.0 - 2026-11-11
+
+**Features**
+
+- Realtime: broadcast over HTTP without subscribing, with `channel.HttpSendAsync()` ([#623](https://github.com/supabase/supabase-csharp/issues/623)).
+- Realtime: read the connection state with `ConnectionState` ([#695](https://github.com/supabase/supabase-csharp/issues/695)).
+- Realtime: add an access token callback, `ClientOptions.RetrieveAccessToken`, called on connect and on every heartbeat ([#697](https://github.com/supabase/supabase-csharp/issues/697)).
+- Auth: send the PKCE code challenge on resend ([#685](https://github.com/supabase/supabase-csharp/issues/685)).
+
+**Fixes**
+
+- Realtime: keep receiving when a frame cannot be decoded ([#683](https://github.com/supabase/supabase-csharp/issues/683)).
+
+## 8.10.0 - 2026-11-09
+
+**Features**
+
+- Realtime: add heartbeat handlers with `AddHeartbeatHandler()`. The status is `Sent`, `Ok`, `Error`, or `Timeout` ([#684](https://github.com/supabase/supabase-csharp/issues/684)).
+
+**Fixes**
+
+- Realtime: close channels on disconnect ([#670](https://github.com/supabase/supabase-csharp/issues/670)), report `Close` when the connection drops ([#674](https://github.com/supabase/supabase-csharp/issues/674)), and close the socket when `Disconnect()` runs before a connect finishes ([#681](https://github.com/supabase/supabase-csharp/issues/681)).
+- Realtime: fail `Subscribe()` when the channel closes during the join ([#671](https://github.com/supabase/supabase-csharp/issues/671)).
+- Realtime: keep receiving when a message handler throws ([#677](https://github.com/supabase/supabase-csharp/issues/677)), and keep the socket going when a state or error handler throws ([#682](https://github.com/supabase/supabase-csharp/issues/682)).
+
+## 8.9.0 - 2026-11-04
+
+**Features**
+
+- Realtime: remove all channels in one call with `RemoveAll()` ([#633](https://github.com/supabase/supabase-csharp/issues/633)).
+- Auth: passkeys. Sign in with a passkey ([#646](https://github.com/supabase/supabase-csharp/issues/646)), register one ([#649](https://github.com/supabase/supabase-csharp/issues/649)), list ([#634](https://github.com/supabase/supabase-csharp/issues/634)), rename ([#645](https://github.com/supabase/supabase-csharp/issues/645)), and delete ([#637](https://github.com/supabase/supabase-csharp/issues/637)) the signed-in user's passkeys, and list ([#651](https://github.com/supabase/supabase-csharp/issues/651)) and delete ([#653](https://github.com/supabase/supabase-csharp/issues/653)) a user's passkeys as an admin.
+- Auth: regenerate a user's MFA recovery codes ([#643](https://github.com/supabase/supabase-csharp/issues/643)).
+
+**Fixes**
+
+- Realtime: drop presences that left during a reconnect ([#661](https://github.com/supabase/supabase-csharp/issues/661)), tell state handlers when the socket reconnects ([#660](https://github.com/supabase/supabase-csharp/issues/660)), and guard socket handler lists against concurrent changes ([#662](https://github.com/supabase/supabase-csharp/issues/662)).
+
+## 8.8.0 - 2026-11-02
+
+**Features**
+
+- Auth: generate the signed-in user's MFA recovery codes ([#626](https://github.com/supabase/supabase-csharp/issues/626)).
+- Auth: verify an MFA recovery code to reach `aal2` ([#627](https://github.com/supabase/supabase-csharp/issues/627)).
+
+**Fixes**
+
+- Realtime: keep presence when one of several connections leaves ([#620](https://github.com/supabase/supabase-csharp/issues/620)).
+- Do not propagate the `Authorization` header on the Realtime client ([#622](https://github.com/supabase/supabase-csharp/issues/622)).
+
+## 8.7.0 - 2026-10-30
+
+**Features**
+
+- Auth: manage custom OAuth/OIDC providers as an admin: list, read, register, update ([#599](https://github.com/supabase/supabase-csharp/issues/599), [#591](https://github.com/supabase/supabase-csharp/issues/591), [#590](https://github.com/supabase/supabase-csharp/issues/590), [#600](https://github.com/supabase/supabase-csharp/issues/600)).
+- Auth: list the identities linked to the signed-in user ([#606](https://github.com/supabase/supabase-csharp/issues/606)).
+- Auth: read how many MFA recovery codes the signed-in user has left, and remove them ([#610](https://github.com/supabase/supabase-csharp/issues/610), [#611](https://github.com/supabase/supabase-csharp/issues/611)).
+- Auth: sign a user out from their access token as an admin ([#594](https://github.com/supabase/supabase-csharp/issues/594)).
+- Auth: update a user's MFA factor as an admin ([#609](https://github.com/supabase/supabase-csharp/issues/609)).
+
+## 8.6.0 - 2026-10-29
+
+**Features**
+
+- Auth: delete a custom OAuth/OIDC provider as an admin ([#581](https://github.com/supabase/supabase-csharp/issues/581)).
+
+**Fixes**
+
+- Auth: keep caller-supplied ids inside one request path segment ([#586](https://github.com/supabase/supabase-csharp/issues/586)).
+- Auth: URL-encode `redirect_to` on otp, recover, invite, generate_link, and resend ([#552](https://github.com/supabase/supabase-csharp/issues/552)).
+- Report the Unity version, platform, and runtime in the `X-Client-Info` header ([#556](https://github.com/supabase/supabase-csharp/issues/556)).
+
+## 8.5.1 - 2026-10-26
+
+**Fixes**
+
+- Realtime: reconnect when a heartbeat goes unanswered ([#547](https://github.com/supabase/supabase-csharp/issues/547)).
+- Cache the `X-Client-Info` header per client assembly ([#548](https://github.com/supabase/supabase-csharp/issues/548)).
+
+## 8.5.0 - 2026-10-23
+
+**Features**
+
+- Realtime: optionally disconnect when the last channel closes, with `ClientOptions.DisconnectOnEmptyChannelsAfter` ([#540](https://github.com/supabase/supabase-csharp/issues/540)).
+- Auth: add the resend API to request a confirmation code ([#435](https://github.com/supabase/supabase-csharp/issues/435)).
+
+**Fixes**
+
+- Realtime: fire every matching Postgres changes handler ([#539](https://github.com/supabase/supabase-csharp/issues/539)), forget a channel on `Unsubscribe()` ([#527](https://github.com/supabase/supabase-csharp/issues/527)), and keep the socket when `ConnectAsync()` is called again ([#541](https://github.com/supabase/supabase-csharp/issues/541)).
+- Realtime: send the join ref with every channel push ([#526](https://github.com/supabase/supabase-csharp/issues/526)), and stop timed-out pushes from leaking ([#543](https://github.com/supabase/supabase-csharp/issues/543)).
+- Reset the Realtime token to the API key on sign-out ([#532](https://github.com/supabase/supabase-csharp/issues/532)).
+- Postgrest: stop a failed cached `Get` from crashing the app ([#525](https://github.com/supabase/supabase-csharp/issues/525)), and stop setting `Upsert` on the caller's options ([#522](https://github.com/supabase/supabase-csharp/issues/522)).
+- Functions: stop writing request headers into the caller's options ([#521](https://github.com/supabase/supabase-csharp/issues/521)).
+
+## 8.4.0 - 2026-10-16
+
+**Features**
+
+- Functions: add `SetAuth` ([#510](https://github.com/supabase/supabase-csharp/issues/510)).
+- Auth: add `StartAutoRefresh` and `StopAutoRefresh` ([#505](https://github.com/supabase/supabase-csharp/issues/505)).
+- Postgrest: add a request timeout ([#512](https://github.com/supabase/supabase-csharp/issues/512)), add `StripNulls` ([#509](https://github.com/supabase/supabase-csharp/issues/509)), and report a 414 as `UriTooLong` ([#513](https://github.com/supabase/supabase-csharp/issues/513)).
+- Storage: add `ListV2Async` for paged listing ([#504](https://github.com/supabase/supabase-csharp/issues/504)).
+
+**Fixes**
+
+- Storage: throw `SupabaseStorageException` when a TUS exception has no response ([#508](https://github.com/supabase/supabase-csharp/issues/508)).
+- Dependency injection: avoid setting the proxy when it is null ([#503](https://github.com/supabase/supabase-csharp/issues/503)).
+
+## 8.3.1 - 2026-10-09
+
+**Fixes**
+
+- Auth: classify errors by `error_code` ([#431](https://github.com/supabase/supabase-csharp/issues/431)), throw a `GotrueException` for a non-JSON 2xx body ([#494](https://github.com/supabase/supabase-csharp/issues/494)), and verify ES256 tokens on the server when the platform has no `ECDsa` ([#482](https://github.com/supabase/supabase-csharp/issues/482)).
+- Storage: throw a `SupabaseStorageException` for a non-JSON 2xx body ([#495](https://github.com/supabase/supabase-csharp/issues/495)).
+- Auth, Postgrest, and Storage: reuse the `HttpClient` when a proxy is set ([#478](https://github.com/supabase/supabase-csharp/issues/478), [#477](https://github.com/supabase/supabase-csharp/issues/477), [#476](https://github.com/supabase/supabase-csharp/issues/476)).
+- Realtime: fail `Subscribe()` when the join times out ([#480](https://github.com/supabase/supabase-csharp/issues/480)), and stop deserializing `postgres_changes` into the typed payload ([#491](https://github.com/supabase/supabase-csharp/issues/491)).
+- Storage: finish an empty resumable upload at the create step ([#500](https://github.com/supabase/supabase-csharp/issues/500)), and throw when a resumable upload chunk is cancelled or fails ([#475](https://github.com/supabase/supabase-csharp/issues/475)).
+
+## 8.3.0 - 2026-10-05
+
+**Features**
+
+- Auth: add a captcha token to password sign-in ([#457](https://github.com/supabase/supabase-csharp/issues/457)) and to sign-up options ([#453](https://github.com/supabase/supabase-csharp/issues/453)).
+- Auth: add a sign-out scope to the stateless client ([#447](https://github.com/supabase/supabase-csharp/issues/447)).
+
+**Fixes**
+
+- Auth: sign out locally even if the server call fails ([#448](https://github.com/supabase/supabase-csharp/issues/448)).
+- Functions: return `null` from `Invoke<T>` for an empty body ([#462](https://github.com/supabase/supabase-csharp/issues/462)), and send the caller's content type instead of dropping it ([#451](https://github.com/supabase/supabase-csharp/issues/451)).
+- Postgrest: throw a `PostgrestException` for a non-JSON 2xx body ([#459](https://github.com/supabase/supabase-csharp/issues/459)).
+- Realtime: skip unreadable JSON arrays instead of failing the record ([#449](https://github.com/supabase/supabase-csharp/issues/449)).
+- Storage: use fresh, per-request headers on upload ([#468](https://github.com/supabase/supabase-csharp/issues/468), [#470](https://github.com/supabase/supabase-csharp/issues/470)), and close the local file after a resumable upload ([#466](https://github.com/supabase/supabase-csharp/issues/466)).
+- Avoid setting the proxy when it is null ([#485](https://github.com/supabase/supabase-csharp/issues/485)).
+
+## 8.2.0 - 2026-09-24
+
+**Features**
+
+- Auth: add `GetClaimsAsync` with local JWKS verification ([#439](https://github.com/supabase/supabase-csharp/issues/439)).
+
+**Fixes**
+
+- Postgrest: allow null reference values in `Set` ([#434](https://github.com/supabase/supabase-csharp/issues/434)), and resolve nullable `Value` in bare boolean predicates ([#432](https://github.com/supabase/supabase-csharp/issues/432)).
+- Realtime: parse Postgres array literals instead of splitting on commas ([#436](https://github.com/supabase/supabase-csharp/issues/436)).
+
+## 8.1.1 - 2026-09-14
+
+**Fixes**
+
+- Auth: keep the user from a sign-up that awaits confirmation ([#426](https://github.com/supabase/supabase-csharp/issues/426)), and stop copying the user token into the `apikey` header ([#425](https://github.com/supabase/supabase-csharp/issues/425)).
+- Postgrest: keep the test of a ternary in `Where` filters ([#422](https://github.com/supabase/supabase-csharp/issues/422)), resolve nullable `Value` comparisons to mapped columns ([#430](https://github.com/supabase/supabase-csharp/issues/430)), and stop duplicating the package id in `X-Client-Info` ([#418](https://github.com/supabase/supabase-csharp/issues/418)).
+- Storage: forward metadata and custom headers in `UploadToSignedUrl` ([#423](https://github.com/supabase/supabase-csharp/issues/423)).
+
 ## 8.1.0 - 2026-09-07
 
-- Stream Edge Function responses ([#417](https://github.com/supabase-community/supabase-csharp/issues/417)).
-- Realtime: add an `enabled` flag to opt into the initial presence sync ([#407](https://github.com/supabase-community/supabase-csharp/issues/407)).
-- Fix: keep `!` and unary `-` attached to their values in `Where` filter expressions ([#414](https://github.com/supabase-community/supabase-csharp/issues/414)).
-- Fix: write integer arrays as JSON arrays and reject invalid literals with a `JsonException` ([#408](https://github.com/supabase-community/supabase-csharp/issues/408)).
+- Stream Edge Function responses ([#417](https://github.com/supabase/supabase-csharp/issues/417)).
+- Realtime: add an `enabled` flag to opt into the initial presence sync ([#407](https://github.com/supabase/supabase-csharp/issues/407)).
+- Fix: keep `!` and unary `-` attached to their values in `Where` filter expressions ([#414](https://github.com/supabase/supabase-csharp/issues/414)).
+- Fix: write integer arrays as JSON arrays and reject invalid literals with a `JsonException` ([#408](https://github.com/supabase/supabase-csharp/issues/408)).
 
 ## 8.0.0 - 2026-09-03
 
-Major release. All `Supabase.*` packages are versioned in lockstep. See the [migration guide](https://github.com/supabase-community/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) for upgrade steps.
+Major release. All `Supabase.*` packages are versioned in lockstep. See the [migration guide](https://github.com/supabase/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) for upgrade steps.
 
 **Breaking changes**
 
-- Migrate from `Newtonsoft.Json` to `System.Text.Json` across every package. Custom models with `[JsonProperty]` should move to `[JsonPropertyName]`; direct `JsonConvert` calls should move to `JsonSerializer` ([#360](https://github.com/supabase-community/supabase-csharp/issues/360)).
+- Migrate from `Newtonsoft.Json` to `System.Text.Json` across every package. Custom models with `[JsonProperty]` should move to `[JsonPropertyName]`; direct `JsonConvert` calls should move to `JsonSerializer` ([#360](https://github.com/supabase/supabase-csharp/issues/360)).
 - Retarget every package to `netstandard2.1` (from `netstandard2.0`). .NET Framework and pre-`netstandard2.1` runtimes (Mono < 6.4, older Xamarin/Unity) are no longer supported — move to a `netstandard2.1`-capable target (.NET Core 3.0+/.NET 5+).
-- Postgrest: parameterless `Table.Delete()` now returns `Task<ModeledResponse<T>>` (the deleted rows) instead of `Task` ([#342](https://github.com/supabase-community/supabase-csharp/issues/342)).
-- Postgrest: `Single()` now throws a `PostgrestException` (status `406`) when more than one row matches, instead of returning `null` ([#346](https://github.com/supabase-community/supabase-csharp/issues/346)).
-- Realtime: registering a `postgres_changes` listener after `Subscribe()` now throws a `RealtimeException` ([#385](https://github.com/supabase-community/supabase-csharp/issues/385)).
-- Gotrue: stop sending the OAuth `state` parameter to `/authorize`; `SignInOptions.State` and `ProviderAuthState.State` are removed ([#388](https://github.com/supabase-community/supabase-csharp/issues/388)).
+- Postgrest: parameterless `Table.Delete()` now returns `Task<ModeledResponse<T>>` (the deleted rows) instead of `Task` ([#342](https://github.com/supabase/supabase-csharp/issues/342)).
+- Postgrest: `Single()` now throws a `PostgrestException` (status `406`) when more than one row matches, instead of returning `null` ([#346](https://github.com/supabase/supabase-csharp/issues/346)).
+- Realtime: registering a `postgres_changes` listener after `Subscribe()` now throws a `RealtimeException` ([#385](https://github.com/supabase/supabase-csharp/issues/385)).
+- Gotrue: stop sending the OAuth `state` parameter to `/authorize`; `SignInOptions.State` and `ProviderAuthState.State` are removed ([#388](https://github.com/supabase/supabase-csharp/issues/388)).
 - Gotrue: rename `NetworkStatus.PingCheck` to `PingCheckAsync`.
 
 **Features**
 
-- Add the `Supabase.Extensions.DependencyInjection` package for DI registration ([#387](https://github.com/supabase-community/supabase-csharp/issues/387)).
-- Add retry/backoff and injectable `HttpClient` support across all services ([#383](https://github.com/supabase-community/supabase-csharp/issues/383)).
-- Support publishable and secret API keys ([#397](https://github.com/supabase-community/supabase-csharp/issues/397)).
-- Gotrue: support async session persistence ([#399](https://github.com/supabase-community/supabase-csharp/issues/399)) and soft-delete on admin `DeleteUser` ([#402](https://github.com/supabase-community/supabase-csharp/issues/402)).
-- Storage: expose the service error code ([#380](https://github.com/supabase-community/supabase-csharp/issues/380)).
+- Add the `Supabase.Extensions.DependencyInjection` package for DI registration. See [`AddSupabase()`](/docs/reference/csharp/initializing) ([#387](https://github.com/supabase/supabase-csharp/issues/387)).
+- Add retry/backoff and injectable `HttpClient` support across all services ([#383](https://github.com/supabase/supabase-csharp/issues/383)).
+- Support publishable and secret API keys ([#397](https://github.com/supabase/supabase-csharp/issues/397)).
+- Gotrue: support async session persistence ([#399](https://github.com/supabase/supabase-csharp/issues/399)) and soft-delete on admin `DeleteUser` ([#402](https://github.com/supabase/supabase-csharp/issues/402)).
+- Storage: expose the service error code ([#380](https://github.com/supabase/supabase-csharp/issues/380)).
 
 **Fixes**
 
-- Gotrue: a failed token refresh no longer signs the user out — only a server-reported invalid refresh token does ([#394](https://github.com/supabase-community/supabase-csharp/issues/394)).
-- Postgrest: drop the `.` before nested `and`/`or` groups ([#389](https://github.com/supabase-community/supabase-csharp/issues/389)).
-- Storage: percent-encode the object key in CDN purge URLs ([#384](https://github.com/supabase-community/supabase-csharp/issues/384)).
+- Gotrue: a failed token refresh no longer signs the user out — only a server-reported invalid refresh token does ([#394](https://github.com/supabase/supabase-csharp/issues/394)).
+- Postgrest: drop the `.` before nested `and`/`or` groups ([#389](https://github.com/supabase/supabase-csharp/issues/389)).
+- Storage: percent-encode the object key in CDN purge URLs ([#384](https://github.com/supabase/supabase-csharp/issues/384)).
 
 ## 1.6.0 - 2026-08-07
 
-- Bump Supabase dependencies ([#301](https://github.com/supabase-community/supabase-csharp/issues/301)).
-- Fix: match auth header names case-insensitively, enabling developer overrides ([#295](https://github.com/supabase-community/supabase-csharp/issues/295)).
+- Bump Supabase dependencies ([#301](https://github.com/supabase/supabase-csharp/issues/301)).
+- Fix: match auth header names case-insensitively, enabling developer overrides ([#295](https://github.com/supabase/supabase-csharp/issues/295)).
 
 ## 1.5.0 - 2026-07-30
 
@@ -57,7 +254,7 @@ Major release. All `Supabase.*` packages are versioned in lockstep. See the [mig
 
 This is the observability release: every child library now emits diagnostics through `System.Diagnostics`, making the SDK compatible with OpenTelemetry.
 
-- Expose aggregated telemetry source names for OpenTelemetry ([#285](https://github.com/supabase-community/supabase-csharp/issues/285)).
+- Expose aggregated telemetry source names for OpenTelemetry ([#285](https://github.com/supabase/supabase-csharp/issues/285)).
 - Update dependency: `Supabase.Core@1.2.0`
   - Add OpenTelemetry-compatible diagnostics primitives ([#6](https://github.com/supabase-community/core-csharp/issues/6)).
 - Update dependency: `Supabase.Gotrue@6.2.0`
@@ -71,7 +268,7 @@ This is the observability release: every child library now emits diagnostics thr
 
 ## 1.3.0 - 2026-07-20
 
-- Wire Realtime's Postgrest client automatically so models received from `postgres_changes` support `Update()` and `Delete()` ([#282](https://github.com/supabase-community/supabase-csharp/issues/282)).
+- Wire Realtime's Postgrest client automatically so models received from `postgres_changes` support `Update()` and `Delete()` ([#282](https://github.com/supabase/supabase-csharp/issues/282)).
 - Update dependency: `Supabase.Postgrest@4.3.0`
   - Add `Client.Attach<T>()` to populate a model's client context for `Update`/`Delete` ([#135](https://github.com/supabase-community/postgrest-csharp/issues/135)).
   - Add `ClientOptions.SerializeEnumsAsStrings` to opt into string enum serialization ([#134](https://github.com/supabase-community/postgrest-csharp/issues/134)).
@@ -81,7 +278,7 @@ This is the observability release: every child library now emits diagnostics thr
 
 ## 1.2.0 - 2026-07-16
 
-- Lower the `Newtonsoft.Json` minimum version to `13.0.2` across all packages to ease dependency resolution ([#275](https://github.com/supabase-community/supabase-csharp/issues/275)).
+- Lower the `Newtonsoft.Json` minimum version to `13.0.2` across all packages to ease dependency resolution ([#275](https://github.com/supabase/supabase-csharp/issues/275)).
 - Update dependency: `Supabase.Gotrue@6.1.0`
   - Add an option for setting `redirect_url` on MagicLink sign-in.
   - Add `state` parameter support to OAuth provider sign-in.
@@ -117,7 +314,7 @@ This is the observability release: every child library now emits diagnostics thr
 - Update dependency: `Supabase.Realtime@7.0.2`
   - Updates dependency: `Websocket.Client@5.1.2`.
   - Updates dependency: `Supabase.Postgrest@4.0.3`.
-  - Adds support for specifying `GetHeaders` on the `RealtimeClient`, which are included on the initial request to establish the websocket connection ([#167](https://github.com/supabase-community/supabase-csharp/issues/167)).
+  - Adds support for specifying `GetHeaders` on the `RealtimeClient`, which are included on the initial request to establish the websocket connection ([#167](https://github.com/supabase/supabase-csharp/issues/167)).
 
 ## 1.1.0 - 2024-07-25
 
@@ -170,10 +367,10 @@ This is the observability release: every child library now emits diagnostics thr
 - Assembly Name has been changed to `Supabase.dll`
 - Update dependency: `postgrest-csharp@5.0.0`
   - [MAJOR] Moves namespaces from `Postgrest` to `Supabase.Postgrest`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `postgrest-csharp` to `Supabase.Postgrest`
 - Update dependency: `gotrue-csharp@5.0.0`
-  - Re: [#135](supabase-community/supabase-csharp#135) Update nuget package name `gotrue-csharp` to `Supabase.Gotrue`
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package name `gotrue-csharp` to `Supabase.Gotrue`
   - Re: [#89](https://github.com/supabase-community/gotrue-csharp/issues/89), Only add `access_token` to request body
     when it is explicitly declared.
   - [MINOR] Re: [#89](https://github.com/supabase-community/gotrue-csharp/issues/89) Update signature
@@ -185,16 +382,17 @@ This is the observability release: every child library now emits diagnostics thr
 - Update dependency: `realtime-csharp@7.0.0`
   - Merges [#45](https://github.com/supabase-community/realtime-csharp/pull/45) - Updating
     the `Websocket.Client@5.1.1`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `realtime-csharp` to `Supabase.Realtime`
 - Update dependency: `storage-csharp@2.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `storage-csharp` to `Supabase.Storage`
 - Update dependency: `functions-csharp@2.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `functions-csharp` to `Supabase.Functions`
 - Update dependency: `core-csharp@1.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `supabase-core`
     to `Supabase.Core`
 - Adds comments to the remaining undocumented code.
+- Emit OpenTelemetry-compatible traces and metrics through `System.Diagnostics` from the Auth, Database, Storage, and Functions clients. See [Client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp).

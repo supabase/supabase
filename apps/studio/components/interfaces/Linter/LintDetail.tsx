@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -102,7 +102,7 @@ export const LintDetail = ({
             className="no-underline"
           >
             <span className="flex items-center gap-2">
-              Learn more <ExternalLink size={14} />
+              Learn more <ExternalLinkIcon size={14} />
             </span>
           </Link>
         </Button>

@@ -1,7 +1,5 @@
-import '@testing-library/jest-dom/vitest'
 import './lib/disabled-matchers'
 
-import { cleanup } from '@testing-library/react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
@@ -27,32 +25,33 @@ dayjs.extend(relativeTime)
 // })
 
 // These must stay at module scope: Vitest hoists `vi.mock` above imports.
-vi.mock('next/router', () => require('next-router-mock'))
+// Inside `renderRoute`, the router hooks defer to the app's `compat/next` shims so they reflect
+// the memory router's URL; elsewhere they use the static mocks.
+vi.mock('next/router', async () => (await import('./lib/route-aware-hooks')).mockNextRouter())
+vi.mock('next/compat/router', async () =>
+  (await import('./lib/route-aware-hooks')).mockNextRouter()
+)
 vi.mock('next/navigation', async () => {
   const actual = await vi.importActual('next/navigation')
+  const { routeAwareHook } = await import('./lib/route-aware-hooks')
+  const compat = await import('@/compat/next/navigation')
   return {
     ...actual,
-    useRouter: () => {
-      return {
-        push: vi.fn(),
-        replace: vi.fn(),
-      }
-    },
-    usePathname: () => vi.fn(),
-    useSearchParams: () => ({
-      get: vi.fn(),
-    }),
+    useRouter: routeAwareHook(compat.useRouter, () => ({ push: vi.fn(), replace: vi.fn() })),
+    usePathname: routeAwareHook(
+      compat.usePathname,
+      () => require('next-router-mock').useRouter().asPath.split(/[?#]/, 1)[0]
+    ),
+    useSearchParams: routeAwareHook(compat.useSearchParams, () => ({ get: vi.fn() })),
   }
 })
 
-vi.mock('next/compat/router', () => require('next-router-mock'))
-
-// Mock the useParams hook from common module globally
-vi.mock('common', async (importOriginal: any) => {
-  const actual = await importOriginal()
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  const { routeAwareHook } = await import('./lib/route-aware-hooks')
   return {
-    ...(typeof actual === 'object' ? actual : {}),
-    useParams: () => ({ ref: 'default' }),
+    ...actual,
+    useParams: routeAwareHook(actual.useParams, () => ({ ref: 'default' })),
   }
 })
 
@@ -63,7 +62,6 @@ beforeAll(() => {
 
 afterEach(() => {
   mswServer.resetHandlers()
-  cleanup()
 })
 
 afterAll(() => {

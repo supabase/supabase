@@ -1,10 +1,10 @@
 'use client'
 
 import SectionContainerWithCn from 'components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Database } from 'icons'
 import type { LucideIcon } from 'lucide-react'
 import { Bot, User } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { cn } from 'ui'
 

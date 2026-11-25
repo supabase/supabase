@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { BatchRestartDialog } from './BatchRestartDialog'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
+import { PipelineStatusName } from './Replication.constants'
 import { RestartTableDialog } from './RestartTableDialog'
 import { replicationKeys } from '@/data/replication/keys'
 import type { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
@@ -63,7 +64,7 @@ describe('BatchRestartDialog', () => {
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
       response: () =>
         HttpResponse.json<ReplicationPipelineStatusResponse>({
-          pipeline_id: 9,
+          pipeline_id: '9',
           status: { name: 'stopped' },
         }),
     })
@@ -75,7 +76,7 @@ describe('BatchRestartDialog', () => {
       response: async ({ request }) => {
         requests.push(await request.json())
         return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-          pipeline_id: 9,
+          pipeline_id: '9',
           tables: [1, 2, 3].map((table_id) => ({ table_id, new_state: { name: 'queued' } })),
         })
       },
@@ -93,10 +94,10 @@ describe('BatchRestartDialog', () => {
       </PipelineRequestStatusProvider>
     )
 
-    expect(screen.getByText(/This resets 3 failed tables/)).toBeInTheDocument()
+    expect(screen.getByText(/saved replication progress for 3 failed tables/)).toBeInTheDocument()
     expect(
       screen.getByText(
-        /Existing rows sync again for 2 of 3 tables, while the remaining table skips initial sync/
+        /Existing source rows are copied again for 2 of 3 tables\. The remaining table skips initial sync/
       )
     ).toBeInTheDocument()
     expect(screen.getByTestId('copy-targets')).toHaveTextContent('public.table_1,public.table_2')
@@ -122,11 +123,30 @@ describe('BatchRestartDialog', () => {
       </PipelineRequestStatusProvider>
     )
 
-    expect(
-      screen.getByText(
-        'This resets the table, deletes its destination data, and syncs existing rows again.'
-      )
-    ).toBeInTheDocument()
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toHaveTextContent('saved replication progress for the table')
+    expect(dialog).toHaveTextContent('When replication resumes, its destination data is deleted.')
+    expect(dialog).toHaveTextContent('Existing source rows are copied again.')
+  })
+
+  it('explains that skipping initial sync still deletes destination data after a reset', () => {
+    customRender(
+      <PipelineRequestStatusProvider>
+        <RestartTableDialog
+          open
+          table={table(1, { name: 'following_wal' })}
+          tableSyncCopy={{ type: 'skip_all_tables' }}
+          pipelineStatusName={PipelineStatusName.STOPPED}
+          onOpenChange={vi.fn()}
+        />
+      </PipelineRequestStatusProvider>
+    )
+
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toHaveTextContent('When replication resumes, its destination data is deleted.')
+    expect(dialog).toHaveTextContent('Initial sync is skipped, so only new changes are replicated.')
+    expect(dialog).toHaveTextContent('A stopped pipeline stays stopped until you start it.')
+    expect(screen.getByTestId('copy-targets')).toBeEmptyDOMElement()
   })
 
   it.each([
@@ -176,7 +196,7 @@ describe('BatchRestartDialog', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
         response: () =>
           HttpResponse.json<ReplicationPipelineStatusResponse>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             status: { name: backendStatus },
           }),
       })
@@ -187,7 +207,7 @@ describe('BatchRestartDialog', () => {
           requests.push(await request.json())
           await response
           return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             tables: [{ table_id: 1, new_state: { name: 'queued' } }],
           })
         },
@@ -204,13 +224,17 @@ describe('BatchRestartDialog', () => {
         { queryClient }
       )
       await screen.findByText(initialStatus === 'started' ? 'Running' : 'Stopped')
-      expect(
-        screen.getByText(
-          initialStatus === 'started'
-            ? 'This resets the table, deletes its destination data, and syncs existing rows again. The pipeline restarts automatically to apply the reset.'
-            : 'This resets the table, deletes its destination data, and syncs existing rows again.'
-        )
-      ).toBeInTheDocument()
+      const dialog = screen.getByRole('alertdialog')
+      expect(dialog).toHaveTextContent('saved replication progress')
+      expect(dialog).toHaveTextContent('When replication resumes, its destination data is deleted')
+      expect(dialog).toHaveTextContent('source rows are copied again')
+      if (initialStatus === 'started') {
+        expect(dialog).toHaveTextContent('The pipeline restarts automatically.')
+        expect(dialog).toHaveTextContent("Other tables' unfinished initial syncs also start over.")
+      } else {
+        expect(dialog).toHaveTextContent('A stopped pipeline stays stopped until you start it.')
+        expect(dialog).not.toHaveTextContent('The pipeline restarts automatically.')
+      }
       fireEvent.click(
         screen.getByRole('button', {
           name: target === 'all' ? 'Reset all tables' : 'Reset table',
@@ -221,7 +245,7 @@ describe('BatchRestartDialog', () => {
       backendStatus = nextStatus
       await act(async () => {
         await queryClient.invalidateQueries(
-          { queryKey: replicationKeys.pipelinesStatus('default', 9) },
+          { queryKey: replicationKeys.pipelinesStatus('default', '9') },
           { cancelRefetch: false }
         )
       })
@@ -253,7 +277,7 @@ describe('BatchRestartDialog', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
         response: () =>
           HttpResponse.json<ReplicationPipelineStatusResponse>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             status: { name: 'started' },
           }),
       })
@@ -308,7 +332,7 @@ const RestartDialogWithStatus = ({
 }) => {
   const { data, error, isPending, isError, isSuccess } = useReplicationPipelineStatusQuery({
     projectRef: 'default',
-    pipelineId: 9,
+    pipelineId: '9',
   })
   const { getRequestStatus } = usePipelineRequestStatus()
   const pipelineStatusName = getStatusName(data?.status)
@@ -320,7 +344,7 @@ const RestartDialogWithStatus = ({
         isLoading={isPending}
         isError={isError}
         isSuccess={isSuccess}
-        requestStatus={getRequestStatus(9)}
+        requestStatus={getRequestStatus('9')}
       />
       {target === 'all' ? (
         <BatchRestartDialog

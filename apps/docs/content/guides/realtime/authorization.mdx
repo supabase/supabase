@@ -35,7 +35,7 @@ Remove the `ALTER TABLE` line and the rest of the migration passes. If a migrati
 select relrowsecurity from pg_class where oid = 'realtime.messages'::regclass;
 ```
 
-If you hit that error, see [must be owner of table messages](/docs/guides/troubleshooting/realtime-must-be-owner-of-table-messages).
+If you hit that error, see [must be owner of table messages](/kb/troubleshooting/realtime-must-be-owner-of-table-messages).
 
 </Admonition>
 
@@ -141,7 +141,7 @@ The `extension` field on the `realtime.messages` table records the message type.
 
 To join a Broadcast Channel, a user must have at least one read or write permission on the Channel topic.
 
-Here, we allow reads (`select`s) for users who are linked to the requested topic within the relationship table `public.room_users`:
+Here, we allow reads (`select`s) for users who are linked to the requested topic within the relationship table `public.rooms_users`:
 
 ```sql
 create policy "authenticated can receive broadcast"
@@ -153,7 +153,7 @@ exists (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -274,7 +274,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
 
 To authorize sending Broadcast messages, create a policy for `insert` where the value of `realtime.messages.extension` is `broadcast`.
 
-Here, we allow writes (sends) for users who are linked to the requested topic within the relationship table `public.room_users`:
+Here, we allow writes (sends) for users who are linked to the requested topic within the relationship table `public.rooms_users`:
 
 ```sql
 create policy "authenticated can send broadcast on topic"
@@ -286,7 +286,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -313,7 +313,7 @@ using (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -336,7 +336,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -363,7 +363,7 @@ using (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -386,7 +386,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())

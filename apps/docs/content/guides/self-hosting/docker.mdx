@@ -34,12 +34,12 @@ If you're new to these topics, consider starting with the managed [Supabase plat
 
 You need the following installed on your system:
 
-- [Git](https://git-scm.com/downloads)
+- [Git](https://git-scm.com/downloads/)
 - [Docker](https://docs.docker.com/manuals/):
   - **Linux server/VPS**: Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/)
   - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
-  - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
-  - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+  - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
+  - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
 ## System requirements
 
@@ -123,7 +123,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.8.2 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.5 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -140,7 +140,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.2\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.5\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -154,7 +154,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.2 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.5 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -176,7 +176,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.2\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.5\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -320,7 +320,7 @@ You will be prompted for a username and password. See the [Studio authentication
 
 ## Accessing Postgres
 
-Self-hosted Supabase pools Postgres connections through Supavisor by default, with an optional PgBouncer pooler and a direct-connection option. For connection strings, pooler configuration, switching poolers, and exposing Postgres directly, see [Accessing Postgres](/docs/guides/self-hosting/accessing-postgres).
+Self-hosted Supabase pools Postgres connections through [Supavisor](https://supabase.github.io/supavisor/) by default, with an optional PgBouncer pooler and a direct-connection option. For connection strings, pooler configuration, switching poolers, and exposing Postgres directly, see [Accessing Postgres](/docs/guides/self-hosting/accessing-postgres).
 
 To change the database password, read [Changing database password](#changing-database-password).
 
@@ -339,7 +339,7 @@ Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart 
 sh run.sh restart functions
 ```
 
-The main worker loads each function from disk per request, so a restart is enough to pick up new or changed function code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
+A restart stops the running function workers, so the next request to each function starts a worker from the new or changed code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
 
 See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
@@ -549,9 +549,9 @@ JWT_SECRET=${JWT_SECRET}
 
 </$CodeTabs>
 
-### Configuring social login (OAuth) providers
+### Configuring social sign-in (OAuth) providers
 
-See the [Configure social login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
+See the [Configure social sign-in (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
 
 ### Configuring phone sign-in, SMS, and MFA
 
@@ -597,7 +597,7 @@ Some suggested systems include:
 
 - [Doppler](https://www.doppler.com/)
 - [Infisical](https://infisical.com/)
-- [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) by Azure (Microsoft)
+- [Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/general/overview) by Azure (Microsoft)
 - [Secrets Manager](https://aws.amazon.com/secrets-manager/) by AWS
 - [Secrets Manager](https://cloud.google.com/secret-manager) by GCP
 - [Vault](https://www.hashicorp.com/products/vault) by HashiCorp

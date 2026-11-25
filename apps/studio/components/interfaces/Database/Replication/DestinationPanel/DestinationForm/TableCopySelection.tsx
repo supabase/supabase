@@ -7,6 +7,11 @@ import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import {
+  getTableSyncSelectionDescription,
+  INITIAL_SYNC_FIELD_COPY,
+  INITIAL_SYNC_LABELS,
+} from './DestinationFormFieldCopy'
+import {
   isMetadataListErrorVisible,
   isMetadataListLoading,
   isMetadataValueLoading,
@@ -17,15 +22,9 @@ import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 
 interface TableCopySelectionProps {
+  showLoadError?: boolean
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
-}
-
-const INITIAL_SYNC_LABELS = {
-  include_all_tables: 'All tables',
-  skip_all_tables: 'No tables',
-  include_tables: 'Selected tables only',
-  skip_tables: 'All except selected tables',
 }
 
 const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) =>
@@ -33,7 +32,11 @@ const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) 
 
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
 
-export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) => {
+export const TableCopySelection = ({
+  form,
+  editMode,
+  showLoadError = true,
+}: TableCopySelectionProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
 
@@ -90,33 +93,33 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Initial sync"
-            description="Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped."
+            label={INITIAL_SYNC_FIELD_COPY.label}
+            description={INITIAL_SYNC_FIELD_COPY.description}
           >
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>{INITIAL_SYNC_LABELS[field.value]}</SelectTrigger>
                 <SelectContent side="bottom" collisionPadding={16}>
                   <SelectItem value="include_all_tables" className="[&>span]:top-2.5">
-                    <p>All tables</p>
+                    <p>{INITIAL_SYNC_LABELS.include_all_tables}</p>
                     <p className="text-foreground-lighter">
                       Run initial sync for every publication table.
                     </p>
                   </SelectItem>
                   <SelectItem value="skip_tables" className="[&>span]:top-2.5">
-                    <p>All except selected tables</p>
+                    <p>{INITIAL_SYNC_LABELS.skip_tables}</p>
                     <p className="text-foreground-lighter">
                       Skip initial sync for selected tables.
                     </p>
                   </SelectItem>
                   <SelectItem value="include_tables" className="[&>span]:top-2.5">
-                    <p>Selected tables only</p>
+                    <p>{INITIAL_SYNC_LABELS.include_tables}</p>
                     <p className="text-foreground-lighter">
                       Run initial sync only for selected tables.
                     </p>
                   </SelectItem>
                   <SelectItem value="skip_all_tables" className="[&>span]:top-2.5">
-                    <p>No tables</p>
+                    <p>{INITIAL_SYNC_LABELS.skip_all_tables}</p>
                     <p className="text-foreground-lighter">
                       Skip initial sync and replicate new changes only.
                     </p>
@@ -128,7 +131,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         )}
       />
 
-      {isErrorPublications && (
+      {isErrorPublications && showLoadError && (
         <Admonition type="warning" title="Publication tables could not be loaded">
           <p className="leading-normal!">
             Refresh the page before changing or saving the initial sync settings.
@@ -146,11 +149,11 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
               label={`${tableSyncCopyMode === 'skip_tables' ? 'Tables to exclude' : 'Tables to include'}${
                 editMode ? '*' : ''
               }`}
-              description={
-                tableSyncCopyMode === 'skip_tables'
-                  ? `${selectedPublicationCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
-                  : `${selectedPublicationCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`
-              }
+              description={getTableSyncSelectionDescription({
+                mode: tableSyncCopyMode === 'skip_tables' ? 'skip_tables' : 'include_tables',
+                selectedCount: selectedPublicationCount,
+                tableCount,
+              })}
             >
               <FormControl>
                 <MultiSelector

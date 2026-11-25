@@ -1,12 +1,16 @@
 'use client'
 
+import { motion, useInView, type Transition } from 'motion/react'
 import React, { FC, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { Switch, cn } from 'ui'
+import { cn, Switch } from 'ui'
 
 interface Props {
   className?: string
 }
+
+const SPEND_CAP = 50
+
+const barHeightTransition: Transition = { ease: [0.11, 0.04, 0, 1], duration: 0.3 }
 
 const CostControlAnimation: FC<Props> = ({ className }) => {
   const [hasSpendCap, setHasSpendCap] = useState(true)
@@ -17,22 +21,8 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
 
   const bars = [{ y: 30 }, { y: 45 }, { y: 55 }, { y: 65 }, { y: 80 }]
 
-  const variants = {
-    hidden: {
-      opacity: 0,
-      transition: {
-        when: 'beforeChildren',
-        duration: 0.2,
-      },
-    },
-    enabled: {
-      opacity: 1,
-      transition: {
-        when: 'beforeChildren',
-        duration: 0,
-      },
-    },
-  }
+  const getBarHeight = (y: number) => `${hasSpendCap ? Math.min(y, SPEND_CAP) : y}%`
+
   const barVariant = {
     hidden: {
       opacity: 0,
@@ -69,92 +59,63 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
       </div>
       <div className="absolute inset-0 z-20 w-full h-full flex items-center justify-center">
         <span
+          aria-hidden="true"
           className={cn(
-            'w-full h-px border border-b border-dashed transition-all opacity-90 border-strong',
-            hasSpendCap && 'opacity-100 border-warning'
+            'h-0.5 w-full transition-shadow',
+            hasSpendCap ? 'groove-primary' : 'groove-page'
           )}
         />
       </div>
-      <div className="w-full h-full">
-        <AnimatePresence mode="wait">
-          {hasSpendCap && (
-            <motion.div
-              key="enabled"
+      <div className="absolute inset-0 z-10 w-full h-full flex justify-between items-end px-16 p-8">
+        {bars.map((bar, index) => (
+          <motion.div
+            key={bar.y}
+            className="w-[6%] overflow-hidden flex flex-col justify-end"
+            initial={false}
+            animate={{ height: getBarHeight(bar.y) }}
+            transition={barHeightTransition}
+          >
+            <motion.span
+              custom={index}
+              variants={barVariant}
               initial="hidden"
-              animate={isInView && 'enabled'}
-              exit="hidden"
-              variants={variants}
-              className="absolute inset-0 z-10 w-full h-full flex justify-between items-end px-16 p-8"
-            >
-              {bars.map((bar, index) => (
-                <div
-                  key={`enabled-${index}`}
-                  className="w-[6%] h-full overflow-hidden flex flex-col justify-end"
-                  style={{ height: (bar.y > 50 ? 50 : bar.y) + '%' }}
+              animate={isInView ? 'enabled' : 'hidden'}
+              className="w-full bg-surface-200 border-stronger border-2 rounded-sm h-0"
+            />
+          </motion.div>
+        ))}
+        <div className="z-20 absolute inset-0 w-full h-1/2 overflow-hidden">
+          <div className="absolute inset-0 w-full h-[200%] flex justify-between items-end px-16 p-8">
+            {bars.map((bar, index) => (
+              <motion.div
+                key={bar.y}
+                className="relative w-[6%] flex flex-col justify-end"
+                initial={false}
+                animate={{ height: getBarHeight(bar.y) }}
+                transition={barHeightTransition}
+              >
+                <motion.span
+                  custom={index}
+                  variants={barVariant}
+                  initial="hidden"
+                  animate={isInView ? 'enabled' : 'hidden'}
+                  className="relative w-full bg-warning-400 border-warning border-2 rounded-sm h-0"
                 >
-                  <motion.span
-                    custom={index}
-                    variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded-sm h-0 transform transition-all'
-                    )}
-                  />
-                </div>
-              ))}
-            </motion.div>
-          )}
-          {!hasSpendCap && (
-            <motion.div
-              key="disabled"
-              initial="hidden"
-              animate={isInView && 'enabled'}
-              exit="hidden"
-              variants={variants}
-              className="absolute inset-0 z-10 w-full h-full flex justify-between items-end px-16 p-8"
-            >
-              {bars.map((bar, index) => (
-                <div
-                  key={`disabled-gold-${index}`}
-                  className="w-[6%] h-full overflow-hidden flex flex-col justify-end transition-all"
-                  style={{ height: bar.y + '%' }}
-                >
-                  <motion.span
-                    custom={index}
-                    variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded-sm h-0 transform transition-all'
-                    )}
-                  />
-                </div>
-              ))}
-              <div className="z-20 absolute inset-0 w-full h-1/2 overflow-hidden">
-                <div className="absolute inset-0 w-full h-[200%] flex justify-between items-end px-16 p-8">
-                  {bars.map((bar, index) => (
-                    <div
-                      key={`disabled-gold-${index}`}
-                      className="relative w-[6%] h-full flex flex-col justify-end transition-all"
-                      style={{ height: bar.y + '%' }}
+                  {bar.y > SPEND_CAP && (
+                    <span
+                      className={cn(
+                        'absolute left-0 right-0 mx-auto -top-7 font-mono text-center w-full text-warning transition-opacity',
+                        hasSpendCap && 'opacity-0'
+                      )}
                     >
-                      <motion.span
-                        custom={index}
-                        variants={barVariant}
-                        className={cn(
-                          'relative w-full bg-warning-400 border-warning border-2 rounded-sm h-0 transform transition-all'
-                        )}
-                      >
-                        {bar.y > 50 && (
-                          <span className="absolute left-0 right-0 mx-auto -top-7 font-mono text-center w-full text-warning">
-                            $
-                          </span>
-                        )}
-                      </motion.span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      $
+                    </span>
+                  )}
+                </motion.span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
       <Grid />
     </div>

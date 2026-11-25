@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { vaultSecretsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type VaultSecretDeleteVariables = {
   projectRef: string
@@ -18,7 +20,14 @@ export async function deleteVaultSecret({
   id,
 }: VaultSecretDeleteVariables) {
   const sql = new Query().from('secrets', 'vault').delete().match({ id }).toSql()
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'vault-secret-delete',
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -29,12 +38,12 @@ export const useVaultSecretDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>,
+  UseCustomMutationOptions<VaultSecretDeleteData, StudioError, VaultSecretDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>({
+  return useMutation<VaultSecretDeleteData, StudioError, VaultSecretDeleteVariables>({
     mutationFn: (vars) => deleteVaultSecret(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
