@@ -1,37 +1,11 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { customRender } from '@/tests/lib/custom-render'
 
 describe('<ScopeGroupCardWithDiff>', () => {
-  const findPermissionDiffInSection = async (section: string, permissionDiff: string) => {
-    try {
-      const sectionTitle = await screen.findByText(section)
-      const sectionContainer = sectionTitle.parentElement!
-
-      await within(sectionContainer).findByText(
-        (_, element) => element?.textContent === permissionDiff,
-        { selector: 'span' }
-      )
-    } catch {
-      throw new Error(`Couldn't find "${permissionDiff}" in section "${section}"`)
-    }
-  }
-  const findAlreadyGrantedPermissionInSection = async (section: string, permissionDiff: string) => {
-    try {
-      const button = await screen.findByRole('button', { name: /Already granted/ })
-      const alreadyGrantedSection = button.parentElement!
-      const sectionTitle = await within(alreadyGrantedSection).findByText(section)
-      const sectionContainer = sectionTitle.parentElement!
-
-      await within(sectionContainer).findByText(
-        (_, element) => element?.textContent === permissionDiff
-      )
-    } catch {
-      throw new Error(`Couldn't find "${permissionDiff}" in section "${section}"`)
-    }
-  }
+  const getPermissionGroup = (name: string) => within(screen.getByRole('list', { name }))
 
   test('shows new, upgraded, downgraded, removed, and unchanged permissions', async () => {
     customRender(
@@ -53,15 +27,17 @@ describe('<ScopeGroupCardWithDiff>', () => {
       />
     )
 
-    await findPermissionDiffInSection('Write', 'Analytics (New)')
-    await findPermissionDiffInSection(
-      'Read and write',
-      'Database management (Upgraded from Read only)'
+    expect(getPermissionGroup('Write').getByText('Analytics').closest('li')).toHaveTextContent(
+      'Added'
     )
-    await findPermissionDiffInSection('Read only', 'Domains (Demoted from Read and write)')
-    await findPermissionDiffInSection('Removed', 'Organizations (Read only)')
-    fireEvent.click(await screen.findByRole('button', { name: 'Already granted (1)' }))
-    await findAlreadyGrantedPermissionInSection('Read only', 'Projects')
+    const readWrite = getPermissionGroup('Read and write')
+    expect(readWrite.getByText('Database management').closest('li')).toHaveTextContent('Added')
+    expect(readWrite.getByText('Domains').closest('li')).toHaveTextContent('Removed')
+    const read = getPermissionGroup('Read only')
+    expect(read.getByText('Database management').closest('li')).toHaveTextContent('Removed')
+    expect(read.getByText('Domains').closest('li')).toHaveTextContent('Added')
+    expect(read.getByText('Organizations').closest('li')).toHaveTextContent('Removed')
+    expect(read.getByText('Projects').closest('li')).toHaveTextContent('Unchanged')
   })
 
   test('hides unchanged permissions if empty', async () => {
@@ -72,10 +48,9 @@ describe('<ScopeGroupCardWithDiff>', () => {
       />
     )
 
-    await findPermissionDiffInSection(
-      'Read and write',
-      'Database management (Upgraded from Read only)'
-    )
-    expect(screen.queryByRole('button', { name: /Already granted/ })).toBeNull()
+    expect(getPermissionGroup('Read and write').getByText('Added')).toBeInTheDocument()
+    expect(getPermissionGroup('Read only').getByText('Removed')).toBeInTheDocument()
+    expect(screen.queryByText('Unchanged')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Already granted/ })).not.toBeInTheDocument()
   })
 })
