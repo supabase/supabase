@@ -195,12 +195,13 @@ export const MicroComputeUpgradeCard = ({
         <CardContent className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
             <h2 className="text-lg text-foreground">
-              {rows.length} {pluralize(rows.length, 'project')} can move to Micro for no additional
-              costs
+              {rows.length} {pluralize(rows.length, 'project')} can upgrade to Micro Compute for no
+              additional costs
             </h2>
             <p className="text-sm text-foreground-light">
               <span>
-                You're already billed at the Micro rate. Upgrading just unlocks the extra capacity.
+                You're already billed at the Micro Compute rate. Upgrading just unlocks the extra
+                capacity.
               </span>
             </p>
           </div>
@@ -249,7 +250,7 @@ export const MicroComputeUpgradeCard = ({
       <ConfirmationModal
         visible={projectToConfirm !== undefined}
         title={`Upgrade ${projectToConfirm?.name ?? 'project'} to Micro`}
-        description="The project restarts for ~1 minute and is unavailable while it moves to Micro. There's no additional cost."
+        description="The project restarts for ~1 minute and is unavailable while the upgrade to Micro Compute is running. There's no additional cost."
         confirmLabel="Upgrade to Micro"
         confirmLabelLoading="Upgrading"
         loading={isUpdatingAddon}

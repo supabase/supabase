@@ -115,13 +115,13 @@ export const PlanUpgradeSuccessView = ({
       />
 
       {planId === 'pro' && (
-        <Section title="Now included">
+        <Section title="Now available">
           <ProPlanBenefits ref={projectRef} />
         </Section>
       )}
 
       {planId === 'team' && (
-        <Section title={isTeamFromFree ? 'Now included' : 'Everything in Pro, plus'}>
+        <Section title={isTeamFromFree ? 'Now available' : 'Everything in Pro, plus'}>
           <TeamPlanBenefits
             ref={projectRef}
             slug={organizationSlug}
@@ -180,7 +180,7 @@ export const PlanUpgradeSuccessView = ({
             <NextStep
               icon={CalendarIcon}
               title="Meet Success Engineering"
-              description="Plan migrations, scaling, or your Team rollout."
+              description="If you have any questions or need assistance, please reach out."
             >
               <Button asChild variant="default" iconRight={<ArrowUpRightIcon />}>
                 <a href={TEAM_BOOK_SUCCESS_ENGINEERING_URL} target="_blank" rel="noreferrer">
