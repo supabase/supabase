@@ -130,7 +130,7 @@ When a test phone number requests an OTP, the Auth service skips SMS delivery an
 
 <Admonition type="caution">
 
-Remove test OTPs before deploying to production. You can also set an expiration with `SMS_TEST_OTP_VALID_UNTIL` (ISO 8601 datetime, e.g., `2026-12-31T23:59:59Z`) so they stop working automatically.
+Remove test OTPs before deploying to production. You can also set an expiration with `SMS_TEST_OTP_VALID_UNTIL` so they stop working automatically. Use a full date and time with a time zone, for example `2026-12-31T23:59:59Z`, and uncomment `GOTRUE_SMS_TEST_OTP_VALID_UNTIL: ${SMS_TEST_OTP_VALID_UNTIL}` in `docker-compose.yml`.
 
 </Admonition>
 
