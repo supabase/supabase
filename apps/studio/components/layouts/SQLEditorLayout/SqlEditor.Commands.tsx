@@ -1,8 +1,8 @@
 import type { PGColumn } from '@supabase/pg-meta'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AlertTriangleIcon, CodeIcon, Loader2Icon, Table2Icon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -159,7 +159,7 @@ function EmptyState({
   projectRef: string | undefined
   canCreateNew: boolean
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   return (
     <div className="p-6">
@@ -169,7 +169,12 @@ function EmptyState({
           <CommandItem
             id="create-snippet"
             className={generateCommandClassNames(false)}
-            onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
+            onSelect={() =>
+              void navigate({
+                to: '/project/$ref/sql/$id',
+                params: { ref: projectRef ?? '_', id: 'new' },
+              })
+            }
           >
             {canCreateNew ? 'Create new snippet' : 'Run new SQL'}
           </CommandItem>
@@ -188,7 +193,7 @@ function SnippetSelector({
   snippets: Array<SnippetWithContent> | undefined
   canCreateNew: boolean
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const selectedValue = useCommandFilterState((state) => state.value)
   const selectedSnippet = snippets?.find((snippet) => snippetValue(snippet) === selectedValue)
@@ -210,7 +215,12 @@ function SnippetSelector({
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}
-                onSelect={() => void router.push(`/project/${projectRef ?? '_'}/sql/${snippet.id}`)}
+                onSelect={() =>
+                  void navigate({
+                    to: '/project/$ref/sql/$id',
+                    params: { ref: projectRef ?? '_', id: snippet.id },
+                  })
+                }
               >
                 {snippet.name}
               </CommandItem>
@@ -224,7 +234,12 @@ function SnippetSelector({
               <CommandItem
                 id="create-snippet"
                 className={generateCommandClassNames(false)}
-                onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
+                onSelect={() =>
+                  void navigate({
+                    to: '/project/$ref/sql/$id',
+                    params: { ref: projectRef ?? '_', id: 'new' },
+                  })
+                }
                 forceMount={true}
               >
                 Create new snippet
@@ -307,7 +322,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
 }
 
 function TableSelector() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
@@ -375,9 +390,11 @@ function TableSelector() {
                   className={generateCommandClassNames(false)}
                   value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
                   onSelect={() => {
-                    router.push(
-                      `/project/${project?.ref ?? '_'}/sql/new?content=${encodeURIComponent(generateSelectStatement(table))}`
-                    )
+                    void navigate({
+                      to: '/project/$ref/sql/$id',
+                      params: { ref: project?.ref ?? '_', id: 'new' },
+                      search: { content: generateSelectStatement(table) },
+                    })
                   }}
                 >
                   {`${table.schema}.${table.name}`}

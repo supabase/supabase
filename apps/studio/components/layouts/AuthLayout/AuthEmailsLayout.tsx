@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -18,7 +18,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 

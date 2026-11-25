@@ -36,7 +36,6 @@ const nextShims: Record<string, string> = {
   'next/image': path.join(compatRoot, 'image.tsx'),
   'next/legacy/image': path.join(compatRoot, 'legacy/image.tsx'),
   'next/link': path.join(compatRoot, 'link.tsx'),
-  'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
 }

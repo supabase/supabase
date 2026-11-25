@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -15,7 +15,7 @@ import { PageNav } from 'ui-patterns/PageNav'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
 
   const navigationItems = [
     {

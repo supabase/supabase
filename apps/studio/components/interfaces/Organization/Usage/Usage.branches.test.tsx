@@ -26,11 +26,6 @@ vi.mock('@/lib/constants', async (importOriginal) => ({
   IS_PLATFORM: true,
 }))
 
-vi.mock('next/navigation', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('next/navigation')>()),
-  usePathname: () => routerMock.pathname,
-}))
-
 const parent = createMockProject({ ref: 'parent-ref', name: 'Parent project' })
 const branch = createTestBranch({ name: 'Preview branch' })
 const main = createTestBranch({ id: 'main-id', project_ref: parent.ref, is_default: true })
@@ -63,6 +58,7 @@ function renderUsage(branchRef: string | null = branch.project_ref, projectRef =
     query: { slug: 'test-org', ...searchParams },
   })
   customRender(<Usage />, {
+    initialUrl: '/org/test-org/usage',
     profileContext: createMockProfileContext(),
     nuqs: { searchParams, hasMemory: true, onUrlUpdate },
   })

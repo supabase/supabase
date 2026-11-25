@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
 
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -14,8 +14,8 @@ export const Restriction = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess: isSuccessOrgUsage } = useOrgUsageQuery({ orgSlug: org?.slug })
 
-  const pathname = usePathname()
-  const isUsagePage = pathname?.endsWith('/usage')
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const isUsagePage = pathname.endsWith('/usage')
 
   const hasExceededAnyLimits = Boolean(
     usage?.usages.find(

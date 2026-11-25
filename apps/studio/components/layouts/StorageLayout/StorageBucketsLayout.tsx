@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -30,7 +30,7 @@ export const StorageBucketsLayout = ({
   children,
 }: PropsWithChildren<{ title?: string; hideSubtitle?: boolean }>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const page = useStorageV2Page()
   const config = getPageHeaderConfig(page)
 

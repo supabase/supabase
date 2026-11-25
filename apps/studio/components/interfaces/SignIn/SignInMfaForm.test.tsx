@@ -6,9 +6,6 @@ import { SignInMfaForm } from './SignInMfaForm'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
-vi.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams('returnTo=%2Fproject%2Fexample'),
-}))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
 beforeEach(() => {
@@ -45,7 +42,8 @@ test.each(['forgot-password', 'sign-in'] as const)(
         value={{ configcat: { enableAuthRecoveryCodes: true }, posthog: {}, hasLoaded: true }}
       >
         <SignInMfaForm context={context} />
-      </FeatureFlagContext.Provider>
+      </FeatureFlagContext.Provider>,
+      { initialUrl: '/sign-in-mfa?returnTo=%2Fproject%2Fexample' }
     )
 
     const link = await screen.findByRole('link', { name: 'Authenticate using a recovery code' })

@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useLocation } from '@tanstack/react-router'
 import { useAuthError, useFlag, useParams } from 'common'
 import { LockIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -41,8 +41,8 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
-  const searchParams = useSearchParams()
-  const recoveryCodeSearchParams = new URLSearchParams(searchParams?.toString())
+  const searchStr = useLocation({ select: (location) => location.searchStr })
+  const recoveryCodeSearchParams = new URLSearchParams(searchStr)
   if (context === 'forgot-password') {
     recoveryCodeSearchParams.set('context', 'forgot-password')
   }
