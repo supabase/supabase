@@ -319,7 +319,7 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    ></div>
    ```
 
-   The `data-nonce` attribute is optional. Include it only if you configure a nonce, as described in step 5, _Configure a nonce_.
+   If you configure a nonce, as described in the following _Configure a nonce_ step, keep the `data-nonce` attribute. Otherwise, remove it. Supabase Auth rejects the sign-in when the ID token has a nonce and `signInWithIdToken` doesn't pass one, unless the `Skip nonce check` option is enabled.
 
 1. Create a `handleSignInWithGoogle` function that takes the `CredentialResponse` and passes the included token to Supabase. The function needs to be available in the global scope for Google's code to find it.
 
@@ -361,7 +361,7 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    // Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
    ```
 
-   Because the nonce changes on every sign-in, don't hard-code it in the HTML. Have your page's code write the `g_id_onload` element with its `data-nonce` value first. Then load the Google client script from that code, instead of with the static tag from step 1. Or pass the hashed nonce to `google.accounts.id.initialize`, as in [One-tap with Next.js](#one-tap-with-nextjs).
+   Because the nonce changes on every sign-in, generate the `data-nonce` value in your page's code. To keep the HTML data attributes, have that code write the `g_id_onload` element with its `data-nonce` value. Then load the Google client script from that code, in place of the `<script>` tag from the first step. To use the JavaScript API instead, pass the hashed nonce to `google.accounts.id.initialize`, as in [One-tap with Next.js](#one-tap-with-nextjs).
 
 ### One-tap with Next.js
 
