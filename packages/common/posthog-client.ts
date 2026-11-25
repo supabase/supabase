@@ -7,6 +7,7 @@ import posthog, {
 import { safeSessionStorage } from './safe-storage'
 import {
   getTelemetryCookieOptions,
+  getTelemetryPageTitle,
   getTelemetryPlatform,
   redactEventUrlKeywords,
 } from './telemetry-utils'
@@ -100,6 +101,11 @@ class PostHogClient {
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
+      // Each of these sends page text or the page URL where before_send's redaction does not
+      // reach, and a project setting would otherwise switch it on without a deploy.
+      capture_dead_clicks: false,
+      capture_heatmaps: false,
+      capture_performance: { web_vitals: false },
       opt_out_persistence_by_default: true,
       // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
       // load on init, identify and group changes.
@@ -111,6 +117,7 @@ class PostHogClient {
         const platform = getTelemetryPlatform()
         if (event && platform) event.properties.platform = platform
         if (event) redactEventUrlKeywords(event)
+        if (event?.event === '$pageview') event.properties.title = getTelemetryPageTitle()
         return event
       },
       loaded: (posthog) => {
