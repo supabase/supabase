@@ -1,7 +1,7 @@
 import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceWarningMessage {
-  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
+  // should match route patterns, ex: ('/', '/project/$ref/auth', '/project/$ref/database', '/project/$ref/settings/api')
   restrictToRoutes?: string[]
 
   bannerContent: {

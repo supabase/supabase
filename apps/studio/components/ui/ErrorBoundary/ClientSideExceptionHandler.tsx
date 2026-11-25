@@ -1,7 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useNavigate } from '@tanstack/react-router'
 import { safeLocalStorage, safeSessionStorage } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -22,7 +22,7 @@ export const ClientSideExceptionHandler = ({
   urlMessage,
   resetErrorBoundary,
 }: ClientSideExceptionHandlerProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -59,7 +59,7 @@ export const ClientSideExceptionHandler = ({
           <li>
             <span
               className={cn(InlineLinkClassName, 'cursor-pointer')}
-              onClick={() => router.push('/logout')}
+              onClick={() => void navigate({ to: '/logout' })}
             >
               Sign out
             </span>{' '}
@@ -96,7 +96,7 @@ export const ClientSideExceptionHandler = ({
         {/* [Joshen] For local and staging, allow us to escape the error boundary */}
         {/* We could actually investigate how to make this available on prod, but without being able to reliably test this, I'm not keen to do it now */}
         {isProduction ? (
-          <Button variant="outline" onClick={() => router.reload()}>
+          <Button variant="outline" onClick={() => window.location.reload()}>
             Reload dashboard
           </Button>
         ) : (

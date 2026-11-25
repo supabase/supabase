@@ -1,7 +1,8 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useCallback } from 'react'
 
 import type { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
+import { navigateToUrl } from '@/lib/navigation'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface ProductMenuShortcutsProps {
@@ -25,14 +26,14 @@ const getShortcutItems = (items: ProductMenuGroupItem[]): ProductMenuShortcutIte
 }
 
 const ProductMenuShortcut = ({ item }: { item: ProductMenuShortcutItem }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { shortcutId, url } = item
 
-  const navigate = useCallback(() => {
-    router.push(url)
-  }, [router, url])
+  const handleNavigate = useCallback(() => {
+    void navigateToUrl(navigate, url)
+  }, [navigate, url])
 
-  useShortcut(shortcutId, navigate, {
+  useShortcut(shortcutId, handleNavigate, {
     label: shortcutId.startsWith('nav.advisors-') ? `Go to ${item.name}` : undefined,
   })
 

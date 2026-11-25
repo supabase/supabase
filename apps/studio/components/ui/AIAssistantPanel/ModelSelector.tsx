@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Badge,
@@ -27,7 +27,7 @@ interface ModelSelectorProps {
 }
 
 export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('assistant.advance_model')
@@ -36,15 +36,17 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
 
   const slug = organization?.slug ?? '_'
 
-  const upgradeHref = `/org/${slug}/billing?panel=subscriptionPlan&source=ai-assistant-model`
-
   const handleSelectModel = (modelId: AssistantModelId) => {
     if (isLoadingEntitlements && isAdvanceOnlyModelId(modelId)) {
       return
     }
     if (isAdvanceOnlyModelId(modelId) && !hasAccessToAdvanceModel) {
       setOpen(false)
-      void router.push(upgradeHref)
+      void navigate({
+        to: '/org/$slug/billing',
+        params: { slug },
+        search: { panel: 'subscriptionPlan', source: 'ai-assistant-model' },
+      })
       return
     }
 

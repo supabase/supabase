@@ -8,7 +8,6 @@ import {
   WrenchIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Alert,
   AlertDescription,
@@ -39,6 +38,7 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useShowDiskIOBurstBalanceChart } from '@/hooks/misc/useShowDiskIOBurstBalanceChart'
 import { useTrack } from '@/lib/telemetry/track'
@@ -100,7 +100,7 @@ const TroubleshootMenuItem = ({
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { limits: diskLimits } = useProjectDiskLimits()
   const diskIoBaselineLabel =
@@ -239,7 +239,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const hasNoWarningContent =
     warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
-    router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
+    routePattern.endsWith('/usage') || routePattern.endsWith('/infrastructure')
   // Compute warnings now link to infrastructure, so they should remain visible on usage.
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage &&
@@ -248,7 +248,7 @@ export const ResourceExhaustionWarningBanner = () => {
   // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
   // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
   const shouldSuppressOnInfrastructurePage =
-    router.pathname.endsWith('settings/infrastructure') &&
+    routePattern.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
@@ -258,15 +258,15 @@ export const ResourceExhaustionWarningBanner = () => {
   const isVisible =
     restrictToRoutes === undefined ||
     restrictToRoutes.some((route: string) => {
-      // check for exact match with /project/[ref] (project home) first
+      // check for exact match with /project/$ref (project home) first
       // doing this let's us avoid checking with regex, keeping it simple
-      if (route === '/project/[ref]') {
-        const isExactMatch = router.pathname === '/project/[ref]'
+      if (route === '/project/$ref') {
+        const isExactMatch = routePattern === '/project/$ref'
         return isExactMatch
       }
 
       // For other routes, use the original startsWith logic
-      const isMatch = router.pathname.startsWith(route)
+      const isMatch = routePattern.startsWith(route)
       return isMatch
     })
 

@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
+import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
 import { useParams } from 'common/hooks'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 import { toast } from 'sonner'
 
@@ -13,6 +13,8 @@ import {
   consumeAssistantHandoff,
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
+import type { SearchRecord } from '@/lib/router-search-params'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -34,7 +36,12 @@ const isSameSnippet = (snippet: SqlSnippet, currentQuery: CurrentQuerySnippet) =
   snippet.source === currentQuery.source
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const routePattern = useRoutePattern()
+  const currentPathname = useLocation({ select: (location) => location.pathname })
+  const handoffToken = useLocation({
+    select: (location) => (location.search as SearchRecord)[ASSISTANT_HANDOFF_QUERY_PARAM],
+  })
   const { id: entityId, source: sourceParam, ref: routeRef } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
@@ -48,7 +55,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     enabled: shortcutsEnabled,
   })
 
-  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const isInSQLEditor = routePattern.includes('/sql/$id')
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.unchecked_sql
   const openSnippetSource = isInSQLEditor
@@ -103,8 +110,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       toast.error("Couldn't load your ticket context here — started a new chat instead.")
     }
 
-    const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restQuery } = router.query
-    router.replace({ pathname: router.pathname, query: restQuery }, undefined, { shallow: true })
+    void navigate<AnyRouter, string>({
+      to: currentPathname,
+      search: (prev: Record<string, unknown>) => {
+        const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restSearch } = prev
+        return restSearch
+      },
+      replace: true,
+    })
   })
 
   // Picks up a support chat handed off from an org-level support page. Waits for
@@ -114,11 +127,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   useEffect(() => {
     if (!snap.isInitialized) return
 
-    const handoffToken = router.query[ASSISTANT_HANDOFF_QUERY_PARAM]
     if (typeof handoffToken !== 'string') return
 
     processAssistantHandoff(handoffToken)
-  }, [snap.isInitialized, router.query[ASSISTANT_HANDOFF_QUERY_PARAM]])
+  }, [snap.isInitialized, handoffToken])
 
   useEffect(() => {
     if (!shortcutsEnabled || !isInSQLEditor || !snippetContent) return

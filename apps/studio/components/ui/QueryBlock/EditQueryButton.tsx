@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { EditIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { ComponentProps } from 'react'
 import {
   cn,
@@ -35,14 +35,14 @@ export const EditQueryButton = ({
   className,
   variant = 'text',
 }: EditQueryButtonProps) => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { newQuery } = useNewQuery()
 
   const diffRequest = useSqlEditorDiffRequestSnapshot()
   const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
-  const isInSQLEditor = router.pathname.includes('/sql')
-  const isInNewSnippet = router.pathname.endsWith('/sql')
+  const isInSQLEditor = pathname.includes('/sql')
+  const isInNewSnippet = pathname.endsWith('/sql')
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const tooltip: { content: ComponentProps<typeof TooltipContent> & { text: string } } = {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
