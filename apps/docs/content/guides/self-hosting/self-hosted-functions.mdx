@@ -212,6 +212,22 @@ For more details, see:
 
 In your functions, the [supported synchronous Deno file APIs](/docs/guides/functions/ephemeral-storage#using-synchronous-file-apis), such as `Deno.readFileSync`, work only during initial script evaluation. A call inside a request handler or a timer such as `setTimeout` throws a `PermissionDenied` error: `Deno.<name> is blocklisted on the current context`. The functions service runs each of your functions in its own user worker, where this rule applies. The main worker, which runs the router in `volumes/functions/main/index.ts`, isn't restricted.
 
+## Worker lifecycle
+
+Each function runs in a worker that serves many requests, not one worker per request. The router in `volumes/functions/main/index.ts` calls `EdgeRuntime.userWorkers.create()` on every request. Edge Runtime's default `--policy` is `per_worker`, and the `functions` service command in `docker-compose.yml` doesn't change it. With this policy, `create()` returns the function's running worker when one exists. It starts a new worker only when the function has no live worker.
+
+Once a worker is running, later and concurrent requests to the same function share it. Concurrent requests that arrive before any worker is live can each start a worker. Code at the top level of the function's `index.ts` runs once per worker, not once per request. Put heavy setup, such as creating clients, loading schemas, or filling caches, at the top level, outside the request handler. State created at the top level lasts only as long as the worker.
+
+The next request starts a new worker, with a cold start and a new run of top-level code, after any of these events:
+
+- The worker reaches its maximum lifetime, set by `workerTimeoutMs`. See [Timeout errors](#timeout-errors).
+- The worker gets no requests for the time set by `requestAbsentTimeoutMs` and has no pending tasks. See [Timeout errors](#timeout-errors).
+- [Idle-worker cleanup](#idle-worker-cleanup) retires the worker under memory pressure.
+- The worker exits on an error or a resource limit, such as the [per-worker memory limit](#per-worker-memory-limit).
+- The functions service restarts or is recreated.
+
+You don't need to build your own worker pool. To keep workers alive longer, raise `requestAbsentTimeoutMs` and `workerTimeoutMs` in `volumes/functions/main/index.ts`, then restart the functions service. Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
+
 ## Memory management
 
 The functions service has two memory limits: a shared container budget and a per-worker limit. Idle-worker cleanup responds to usage of the container budget.
