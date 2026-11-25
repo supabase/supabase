@@ -5,6 +5,7 @@ import { TooltipProvider } from 'ui'
 import { MessageRole, MessageStatus, type Message } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { reshapeDocsResult } from './reshapeDocsResult'
 import { SearchV2Provider } from './SearchV2Provider'
 import { SearchV2Trigger } from './SearchV2Trigger'
 
@@ -99,7 +100,10 @@ describe('SearchV2 telemetry', () => {
   it("searches through the docs app's own route, under its base path", () => {
     openDialog()
 
-    expect(useDocsSearchV2).toHaveBeenCalledWith({ endpoint: '/docs/api/search_v2' })
+    expect(useDocsSearchV2).toHaveBeenCalledWith({
+      endpoint: '/docs/api/search_v2',
+      reshape: reshapeDocsResult,
+    })
   })
 
   it('sends docs_search_v2_opened with search_input when the trigger is clicked', () => {
@@ -401,6 +405,26 @@ describe('SearchV2 telemetry', () => {
       })
       expect(push).toHaveBeenCalledWith('/guides/auth')
       expect(eventActions()).toEqual(['docs_search_v2_result_clicked', 'docs_search_v2_closed'])
+    })
+
+    it('links a section result to its anchor and pushes it on Enter, while resultPath stays the page', () => {
+      const view = openDialog()
+      setSearchState(view, { ...resultsState, results: [{ ...result, anchor: 'sign-in' }] })
+      sendTelemetryEvent.mockClear()
+
+      expect(screen.getByRole('option', { name: /Learn about auth/ }).getAttribute('href')).toBe(
+        '/guides/auth#sign-in'
+      )
+
+      fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Enter' })
+
+      expect(push).toHaveBeenCalledWith('/guides/auth#sign-in')
+      expect(sendTelemetryEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'docs_search_v2_result_clicked',
+          properties: expect.objectContaining({ resultPath: '/guides/auth' }),
+        })
+      )
     })
 
     it('reports the query the visible results belong to while a new search is loading', () => {
