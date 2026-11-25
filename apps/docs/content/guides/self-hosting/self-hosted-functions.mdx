@@ -216,7 +216,7 @@ In your functions, the [supported synchronous Deno file APIs](/docs/guides/funct
 
 The functions service reuses workers. A request goes to a running worker for its function, and a new worker starts only when the function has none. Code at the top level of the function's `index.ts` runs once per worker, not once per request, so put heavy setup there, such as creating clients or loading schemas. State created at the top level belongs to one worker and lasts only as long as that worker.
 
-A worker stops taking new requests when it reaches half of `workerTimeoutMs`, goes `requestAbsentTimeoutMs` without requests, is retired by [idle-worker cleanup](#idle-worker-cleanup), or exits on an error or a resource limit. The next request then starts a new worker and runs the top-level code again. To keep workers alive longer, raise the values described in [Timeout errors](#timeout-errors). Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
+A worker stops taking new requests when it reaches half of `workerTimeoutMs`, goes `requestAbsentTimeoutMs` without requests while no tasks are pending, is retired by [idle-worker cleanup](#idle-worker-cleanup), or exits on an error or a resource limit. When the function has no running worker left, the next request starts a new one and runs the top-level code again. To keep workers alive longer, raise the values described in [Timeout errors](#timeout-errors). Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
 
 ## Memory management
 
