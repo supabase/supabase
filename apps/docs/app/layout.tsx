@@ -11,6 +11,7 @@ import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
 import { SIGNED_IN_HINT_SCRIPT } from 'common/gotrue'
+import { LLMS_TXT_DIRECTIVE_HTML } from 'common/markdown-affordance'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
@@ -69,6 +70,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <script dangerouslySetInnerHTML={{ __html: SIGNED_IN_HINT_SCRIPT }} />
       </head>
       <body>
+        {/* for agents that fetch HTML and never try the markdown path */}
+        <div
+          className="sr-only"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: LLMS_TXT_DIRECTIVE_HTML }}
+        />
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
         <GlobalProviders>
