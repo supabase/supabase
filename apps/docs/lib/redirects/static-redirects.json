@@ -2650,36 +2650,6 @@
     "permanent": true
   },
   {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes-generate",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes-getstatus",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes-regenerate",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes-unenroll",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
-    "source": "/docs/reference/javascript/auth-mfa-recovery-codes-verify",
-    "destination": "/docs/reference/javascript/auth-mfa",
-    "permanent": true
-  },
-  {
     "source": "/docs/reference/javascript/auth-reauthentication",
     "destination": "/docs/reference/javascript/auth-reauthenticate",
     "permanent": true
