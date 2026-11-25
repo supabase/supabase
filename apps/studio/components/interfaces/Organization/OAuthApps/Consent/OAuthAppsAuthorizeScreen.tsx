@@ -200,6 +200,15 @@ export const OAuthAppsAuthorizeScreen = ({
       return
     }
 
+    // for already-approved apps that the user navigates back to after a redirect error, if there's an approved_organization_slug and no project refs
+    if (
+      (request.approved_organization_slug && request.approved_project_refs == null) ||
+      request.approved_project_refs?.length === 0
+    ) {
+      setAllProjectsSelected(true)
+      return
+    }
+
     let projectRefs = projectRef != undefined ? [projectRef!] : []
 
     if (request.approved_project_refs) {
