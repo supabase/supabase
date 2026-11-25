@@ -76,6 +76,12 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
 
+  useEffect(() => {
+    if (request?.approved_organization_slug) {
+      setOrganizationSlug(request.approved_organization_slug)
+    }
+  }, [request])
+
   const {
     data: memberOrg,
     error: memberOrgError,
@@ -83,7 +89,7 @@ export const OAuthAppsAuthorizeScreen = ({
     isError: isErrorMemberOrg,
   } = useMemberOrganization({
     // for already-approved apps that the user navigates back to after a redirect error, the approved_organization_slug takes precedence
-    organizationSlug: request?.approved_organization_slug ?? organizationSlug,
+    organizationSlug,
     projectRef,
     request,
   })
@@ -111,7 +117,7 @@ export const OAuthAppsAuthorizeScreen = ({
       search,
     },
     {
-      enabled: memberOrg != null,
+      enabled: !isPendingRequest && memberOrg != null,
     }
   )
 
@@ -211,11 +217,11 @@ export const OAuthAppsAuthorizeScreen = ({
 
     let projectRefs = projectRef != undefined ? [projectRef!] : []
 
-    if (request.approved_project_refs) {
-      projectRefs = request.approved_project_refs
-    }
     if (grant?.project_refs) {
       projectRefs = grant.project_refs
+    }
+    if (request.approved_project_refs) {
+      projectRefs = request.approved_project_refs
     }
 
     const refs = getPreselectedProjectRefs({
