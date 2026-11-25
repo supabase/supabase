@@ -1,4 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -31,3 +32,33 @@ export const toRequestClusterId = (
   clusterId: string | null | undefined,
   defaultClusterId: string | undefined
 ) => (clusterId === null || clusterId === defaultClusterId ? undefined : clusterId)
+
+export type ReplicationRegion = ReplicationClustersData['regions'][number]
+
+export type ReplicationClusterGroup = {
+  clusterId: string | undefined
+  region?: ReplicationRegion
+}
+
+/** Every cluster to query, default first. Only the default cluster when regions are unavailable. */
+export const useReplicationClusterGroups = () => {
+  const { data } = useQuery(replicationClustersQueryOptions())
+  const groups = useMemo<ReplicationClusterGroup[]>(() => {
+    const regions = data?.regions ?? []
+    if (regions.length === 0) return [{ clusterId: undefined }]
+    const isDefault = (region: ReplicationRegion) => region.cluster_id === data?.default_cluster_id
+    return [...regions.filter(isDefault), ...regions.filter((region) => !isDefault(region))].map(
+      (region) => ({
+        clusterId: toRequestClusterId(region.cluster_id, data?.default_cluster_id),
+        region,
+      })
+    )
+  }, [data])
+
+  return { groups, hasMultipleRegions: groups.length > 1 }
+}
+
+export const getReplicationRegionLabel = (region: ReplicationRegion | undefined) => {
+  if (!region) return undefined
+  return region.region_code ? `${region.region_name} (${region.region_code})` : region.region_name
+}

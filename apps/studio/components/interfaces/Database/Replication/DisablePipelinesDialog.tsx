@@ -18,11 +18,16 @@ import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-te
 import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface DisablePipelinesDialogProps {
+  canConfirm?: boolean
   open: boolean
   setOpen: (value: boolean) => void
 }
 
-export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialogProps) => {
+export const DisablePipelinesDialog = ({
+  open,
+  setOpen,
+  canConfirm = true,
+}: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
   const clusterId = useReplicationClusterId()
   const [error, setError] = useState<string | null>(null)
@@ -37,6 +42,7 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
     })
 
   const onConfirm = async () => {
+    if (!canConfirm) return
     setError(null)
 
     try {
@@ -73,7 +79,12 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
         )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="danger" loading={isSubmitting} onClick={onConfirm}>
+          <AlertDialogAction
+            variant="danger"
+            disabled={!canConfirm}
+            loading={isSubmitting}
+            onClick={onConfirm}
+          >
             Disable Pipelines
           </AlertDialogAction>
         </AlertDialogFooter>

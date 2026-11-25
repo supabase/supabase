@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -29,6 +29,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { useUrlReplicationClusterId } from './PipelineClusterScope'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
@@ -42,13 +43,16 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
+import {
+  replicationClustersQueryOptions,
+  useReplicationClusterGroups,
+} from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { useReplicationClusterId } from '@/state/replication-cluster'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -67,11 +71,6 @@ export const Destinations = () => {
   const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
-  const { data: clusters } = useQuery(replicationClustersQueryOptions())
-  const pipelineRegion = clusters?.regions.find(
-    (region) => region.cluster_id === (clusterId ?? clusters.default_cluster_id)
-  )?.region_name
   const { data: organization } = useSelectedOrganizationQuery()
 
   useRedirectLegacyReadReplicaDestination()
@@ -82,6 +81,8 @@ export const Destinations = () => {
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
+  const [edit] = useQueryState('edit', parseAsInteger)
+  const editClusterId = useUrlReplicationClusterId()
   const [, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
@@ -95,6 +96,13 @@ export const Destinations = () => {
     })
   )
 
+  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const {
+    isLoading: isDiscoveringRegions,
+    isSuccess: isRegionsSuccess,
+    isError: isRegionsError,
+    error: regionsError,
+  } = useQuery(replicationClustersQueryOptions())
   const [sort, setSort] = useState<DestinationSort>('name:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
 
@@ -110,44 +118,49 @@ export const Destinations = () => {
 
   const { clusterResults, sortedDestinations } = usePipelineList({
     projectRef,
-    groups: [{ clusterId }],
+    groups,
     filterString,
     sortColumn,
     sortDirection,
   })
-  const { destinationsResult, pipelinesResult, sourcesResult, destinations, pipelines } =
-    clusterResults[0]
+  const isDestinationsLoading =
+    isDiscoveringRegions || clusterResults.some(({ isPending }) => isPending)
+  const hasDestinations = clusterResults.some(
+    ({ visibleDestinations }) => visibleDestinations.length > 0
+  )
+  const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
+  const shouldShowTable = !isDestinationsLoading && !hasClusterErrors && hasDestinations
+  const tableColumnCount = 6
+
   const {
-    error: destinationsError,
-    isPending: isDestinationsLoading,
-    isError: isDestinationsError,
-    isSuccess: isDestinationsSuccess,
-  } = destinationsResult
-  const hasDestinations = isDestinationsSuccess && destinations.length > 0
-  const { isSuccess: isPipelinesSuccess } = pipelinesResult
-  const {
-    data: sourcesData,
+    data: defaultSources,
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
     refetch: refetchSources,
-  } = sourcesResult
-  const externalReplicationSource = sourcesData?.sources.find(
-    (source) => source.name === projectRef
+  } = clusterResults[0].sourcesResult
+  const clustersWithProjectSource = clusterResults
+    .filter(({ sourcesResult }) =>
+      sourcesResult.data?.sources.some(({ name }) => name === projectRef)
+    )
+    .map(({ group }) => group.clusterId)
+  const hasExternalReplicationSource = clustersWithProjectSource.length > 0
+  const replicationNotEnabled = isSourcesSuccess && !hasExternalReplicationSource
+
+  const hasRegionalPipelines = clusterResults.some(
+    ({ destinations, pipelines }) => destinations.length > 0 || pipelines.length > 0
   )
-  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
-
+  const canConfirmDisable =
+    (!IS_PLATFORM || isRegionsSuccess) &&
+    !hasRegionalPipelines &&
+    clusterResults.every(
+      ({ destinationsResult, pipelinesResult, sourcesResult }) =>
+        destinationsResult.isSuccess && pipelinesResult.isSuccess && sourcesResult.isSuccess
+    )
   const canDisablePipelines =
-    isSourcesSuccess &&
-    isDestinationsSuccess &&
-    isPipelinesSuccess &&
-    !!externalReplicationSource &&
-    destinations.length === 0 &&
-    pipelines.length === 0
+    canConfirmDisable && hasExternalReplicationSource && !hasMultipleRegions
 
-  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
-  const hasErrorsFetchingData = !isLocalPipelinesNotSetUp && isDestinationsError
-
+  const isDefaultRegionEnabled = defaultSources?.sources.some(({ name }) => name === projectRef)
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
   const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
@@ -155,11 +168,10 @@ export const Destinations = () => {
     : 'Failed to retrieve pipeline enablement status'
 
   const canLinkToWizard =
-    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+    isWizardEnabled && hasWizardDestination && !!projectRef && isDefaultRegionEnabled && canCreate
   const wizardLink = linkOptions({
     to: '/project/$ref/database/pipelines/new',
     params: { ref: projectRef ?? '_' },
-    search: { cluster_id: clusterId },
   })
 
   const openCreation = (type: DestinationType) => {
@@ -172,7 +184,7 @@ export const Destinations = () => {
 
   const handleAddPipeline = () => {
     if (!canCreate) return
-    if (replicationNotEnabled) {
+    if (!isDefaultRegionEnabled) {
       pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return
@@ -190,8 +202,7 @@ export const Destinations = () => {
     pendingCreationTypeRef.current = null
     if (
       type &&
-      queryClient.getQueryState(replicationKeys.sources(projectRef, clusterId))?.status ===
-        'success'
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
       openCreation(type)
     }
@@ -276,7 +287,13 @@ export const Destinations = () => {
                   <div className="flex flex-col gap-y-0.5">
                     <p>Disable Pipelines</p>
                     {!canDisablePipelines && (
-                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                      <p className="text-foreground-lighter">
+                        {hasRegionalPipelines
+                          ? 'Delete all pipelines first'
+                          : hasMultipleRegions
+                            ? 'Multi-region disablement is unavailable'
+                            : 'Check every region first'}
+                      </p>
                     )}
                   </div>
                 </DropdownMenuItem>
@@ -315,6 +332,14 @@ export const Destinations = () => {
           {isDestinationsLoading ? 'Loading pipelines' : ''}
         </p>
 
+        {isRegionsError && (
+          <AlertError
+            error={regionsError}
+            projectRef={projectRef}
+            subject="Failed to retrieve pipeline regions"
+          />
+        )}
+
         {isSourcesError && (
           <AlertError
             layout="responsive"
@@ -331,15 +356,18 @@ export const Destinations = () => {
           />
         )}
 
-        {hasErrorsFetchingData && (
-          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
+        {hasClusterErrors && (
+          <AlertError
+            error={clusterResults.find(({ error }) => error)?.error}
+            subject="Failed to retrieve pipelines"
+          />
         )}
 
-        {isDestinationsLoading && (
+        {isDestinationsLoading && !shouldShowTable && (
           <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
         )}
 
-        {!isDestinationsLoading && hasDestinations && (
+        {shouldShowTable && (
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -372,24 +400,30 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedDestinations.map(({ destination }) => (
-                    <DestinationRow
-                      key={destination.id}
-                      destinationId={destination.id}
-                      pipelineRegion={pipelineRegion}
-                    />
+                  {sortedDestinations.map(({ group, destination }) => (
+                    <ReplicationClusterProvider
+                      key={`${group.clusterId ?? 'default'}:${destination.id}`}
+                      clusterId={group.clusterId}
+                    >
+                      <DestinationRow
+                        destinationId={destination.id}
+                        pipelineRegion={group.region?.region_name}
+                      />
+                    </ReplicationClusterProvider>
                   ))}
-
-                  {!isDestinationsLoading && sortedDestinations.length === 0 && hasDestinations && (
-                    <TableRowNoResults colSpan={6} search={filterString} />
-                  )}
+                  {!isDestinationsLoading &&
+                    !hasClusterErrors &&
+                    sortedDestinations.length === 0 &&
+                    hasDestinations && (
+                      <TableRowNoResults colSpan={tableColumnCount} search={filterString} />
+                    )}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
         )}
 
-        {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
+        {!isDestinationsLoading && !hasDestinations && !hasClusterErrors && (
           <EmptyStatePresentational
             icon={WorkflowIcon}
             title="Add a pipeline"
@@ -412,7 +446,9 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel />
+      <ReplicationClusterProvider clusterId={edit === null ? undefined : editClusterId}>
+        <DestinationPanel />
+      </ReplicationClusterProvider>
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}
@@ -421,6 +457,7 @@ export const Destinations = () => {
       />
 
       <DisablePipelinesDialog
+        canConfirm={canConfirmDisable && !hasMultipleRegions}
         open={showDisablePipelinesDialog}
         setOpen={setShowDisablePipelinesDialog}
       />

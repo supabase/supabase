@@ -10,6 +10,7 @@ import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeli
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { replicationPipelinesQueryOptions } from '@/data/replication/pipelines-query'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 
 type PipelineListGroup = {
   clusterId?: string
@@ -73,13 +74,30 @@ export function usePipelineList({
   const clusterResults = groups.map((group, index) => {
     const destinationsResult = destinationResults[index]
     const pipelinesResult = pipelineResults[index]
+    const sourcesResult = sourceResults[index]
+    const destinations = destinationsResult.data?.destinations ?? []
+    const pipelines = pipelinesResult.data?.pipelines ?? []
+    const pipelinesByDestination = new Map(
+      pipelines.map((pipeline) => [pipeline.destination_id, pipeline])
+    )
+    const visibleDestinations = pipelinesResult.isPending
+      ? destinations
+      : destinations.filter((destination) => pipelinesByDestination.has(destination.id))
+    const error =
+      destinationsResult.error ??
+      pipelinesResult.error ??
+      (group.clusterId === undefined ? null : sourcesResult.error)
     return {
       group,
       destinationsResult,
       pipelinesResult,
-      sourcesResult: sourceResults[index],
-      destinations: destinationsResult.data?.destinations ?? [],
-      pipelines: pipelinesResult.data?.pipelines ?? [],
+      sourcesResult,
+      destinations,
+      pipelines,
+      pipelinesByDestination,
+      visibleDestinations,
+      error: checkLocalPipelinesNotSetUp(error) ? null : error,
+      isPending: destinationsResult.isPending || pipelinesResult.isPending,
     }
   })
 
@@ -106,11 +124,11 @@ export function usePipelineList({
 
   const search = filterString.toLowerCase()
   const sortedDestinations = clusterResults
-    .flatMap(({ group, destinations, pipelines }) =>
-      destinations
+    .flatMap(({ group, visibleDestinations, pipelinesByDestination }) =>
+      visibleDestinations
         .filter(({ name }) => name.toLowerCase().includes(search))
         .map((destination) => {
-          const pipeline = pipelines.find(({ destination_id }) => destination_id === destination.id)
+          const pipeline = pipelinesByDestination.get(destination.id)
           return {
             group,
             destination,

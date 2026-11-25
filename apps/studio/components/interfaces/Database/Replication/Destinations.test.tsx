@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterContextProvider,
 } from '@tanstack/react-router'
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
@@ -187,9 +187,9 @@ const renderList = async (waitForSources = true, clusterId?: string) => {
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(
-        view.queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status
-      ).toBe('success')
+      expect(view.queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe(
+        'success'
+      )
     )
   return view
 }
@@ -315,20 +315,16 @@ test('renders both wizard entry controls as links', async () => {
   const { router } = await renderList(true, 'eu-west-1')
   const links = screen.getAllByRole('link', { name: 'Add pipeline' })
   expect(links).toHaveLength(2)
-  links.forEach((link) =>
-    expect(link).toHaveAttribute('href', `${listPath}/new?cluster_id=eu-west-1`)
-  )
+  links.forEach((link) => expect(link).toHaveAttribute('href', `${listPath}/new`))
   fireEvent.click(links[0], { ctrlKey: true })
   expect(router.history.location.href).toBe(listPath)
 })
-test('opens the wizard in the active cluster with the shortcut', async () => {
+test('opens the wizard from the combined list with the shortcut', async () => {
   options.wizard = true
   isEnabled = true
   const { router } = await renderList(true, 'eu-west-1')
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-  await waitFor(() =>
-    expect(router.history.location.href).toBe(`${listPath}/new?cluster_id=eu-west-1`)
-  )
+  await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
 })
 test('enables Pipelines before opening the wizard', async () => {
   options.wizard = true
@@ -470,5 +466,100 @@ describe('regions', () => {
     expect(screen.queryByRole('columnheader', { name: 'Publication' })).not.toBeInTheDocument()
     await waitFor(() => expect(statusRequests).toContain('42:omitted'))
     expect(statusRequests.every((request) => request.endsWith(':omitted'))).toBe(true)
+  })
+
+  test('shows each pipeline region and routes each pipeline to its cluster', async () => {
+    mockRegions()
+    const { statusRequests } = mockRegionResources()
+    renderRegions()
+
+    const singapore = (await screen.findByText('Singapore sync')).closest('tr')
+    const frankfurt = (await screen.findByText('Frankfurt sync')).closest('tr')
+    expect(within(singapore!).getByRole('cell', { name: 'Singapore' })).toBeInTheDocument()
+    expect(within(frankfurt!).getByRole('cell', { name: 'Frankfurt' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Region' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Publication' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('row').slice(1)).toEqual([frankfurt, singapore])
+    await waitFor(() =>
+      expect(statusRequests).toEqual(expect.arrayContaining(['42:omitted', 'frankfurtpipeline:2']))
+    )
+    expect(statusRequests).not.toContain('frankfurtpipeline:omitted')
+    expect(statusRequests).not.toContain('42:1')
+
+    fireEvent.pointerDown(within(frankfurt!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    expect(await screen.findByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+      'href',
+      '/project/default/database/pipelines/frankfurtpipeline?cluster_id=2'
+    )
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    fireEvent.pointerDown(within(singapore!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    await waitFor(() =>
+      expect(screen.getByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+        'href',
+        '/project/default/database/pipelines/42'
+      )
+    )
+  })
+
+  test('sorts and filters pipelines across regions', async () => {
+    mockRegions()
+    mockRegionResources()
+    renderRegions()
+
+    await screen.findByText('Failed')
+    await screen.findByText('Running')
+    const singapore = screen.getByRole('row', { name: /Singapore sync/ })
+    const frankfurt = screen.getByRole('row', { name: /Frankfurt sync/ })
+    fireEvent.click(
+      within(screen.getByRole('columnheader', { name: 'Status' })).getByRole('button')
+    )
+    expect(screen.getAllByRole('row').slice(1)).toEqual([singapore, frankfurt])
+
+    fireEvent.change(screen.getByPlaceholderText('Search pipelines'), {
+      target: { value: 'FRANKFURT' },
+    })
+    expect(screen.getAllByRole('row').slice(1)).toEqual([frankfurt])
+    expect(screen.queryByRole('row', { name: /Singapore sync/ })).not.toBeInTheDocument()
+  })
+
+  test('keeps multi-region disablement unavailable', async () => {
+    mockRegions()
+    isEnabled = true
+    renderRegions()
+    await screen.findByRole('heading', { name: 'Add a pipeline' })
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    expect(await screen.findByRole('menuitem', { name: /Disable Pipelines/ })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+  })
+  test('blocks an open disable dialog when a pipeline appears', async () => {
+    mockRegions([SINGAPORE])
+    isEnabled = true
+    const { queryClient } = renderRegions()
+    await screen.findByRole('heading', { name: 'Add a pipeline' })
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Disable Pipelines' }))
+    const dialog = await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
+    expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeEnabled()
+    mockRegionResources()
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines('default') })
+    )
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeDisabled()
+    )
   })
 })
