@@ -31,7 +31,7 @@ export const billingPartnerLabel = (billingPartner?: string) => {
   }
 }
 
-type PlanChangeType = 'upgrade' | 'downgrade' | 'none'
+export type PlanChangeType = 'upgrade' | 'downgrade' | 'none'
 
 export const getPlanChangeType = (
   fromPlan: PlanId | undefined,

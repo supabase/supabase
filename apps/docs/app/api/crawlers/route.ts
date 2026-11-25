@@ -8,6 +8,7 @@ import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { PROD_URL } from '~/lib/constants'
+import { LLMS_TXT_DIRECTIVE_HTML } from 'common/markdown-affordance'
 import { toHtml } from 'hast-util-to-html'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
@@ -115,6 +116,7 @@ function htmlShell(
     `">` +
     '</head>' +
     '<body>' +
+    `<p>${LLMS_TXT_DIRECTIVE_HTML}</p>` +
     body +
     '</body></html>'
   )

@@ -15,7 +15,6 @@ import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
-import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
 import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
 import { PageActionButtons } from './PageActionButtons'
 import { AskAiTrigger } from '@/features/SearchV2'
@@ -49,18 +48,15 @@ export const DesktopTopNavBar = ({ headingSlotRef, updatedAtSlotRef }: DesktopTo
       className="relative w-full z-40 flex flex-col bg-default/75 backdrop-blur-sm backdrop-filter"
     >
       <div className="w-full flex h-(--header-height) border-b">
-        <div
-          style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
-          className="docs-sections-cell relative flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
-        >
-          <a
-            href="https://supabase.com"
-            aria-label="Supabase.com"
-            className="flex shrink-0 items-center rounded-md focus-ring"
+        <div className="flex w-(--docs-side-column-width) shrink-0 items-center pl-5.75 pr-4 border-r">
+          <Link
+            href="/"
+            aria-label="Supabase docs"
+            className="flex shrink-0 items-center gap-1.5 rounded-md focus-ring"
           >
             <HeaderLogoContent hasDocsLabel={false} />
-          </a>
-          <DocsSectionsMenu />
+            <span className="pb-px text-sm font-medium leading-3.5 text-primary">Docs</span>
+          </Link>
         </div>
         <div className="flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
           <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />

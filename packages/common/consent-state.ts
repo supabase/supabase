@@ -3,9 +3,18 @@ import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
+import { FIRST_REFERRER_COOKIE_NAME } from './first-referrer-cookie'
 import { posthogClient } from './posthog-client'
 
-const TRACKING_COOKIE_NAMES = ['_ga', 'FPID', 'FPAU', 'FPLC', '_dcid', 'session_id']
+const TRACKING_COOKIE_NAMES = [
+  '_ga',
+  'FPID',
+  'FPAU',
+  'FPLC',
+  '_dcid',
+  'session_id',
+  FIRST_REFERRER_COOKIE_NAME,
+]
 const isTrackingCookie = (name: string) =>
   TRACKING_COOKIE_NAMES.includes(name) ||
   name.startsWith('_ga_') ||
