@@ -68,7 +68,7 @@ export const WarehouseMetricChart = ({
       )
   )
   return (
-    <section aria-label={title}>
+    <section aria-label={title} className="min-w-0">
       <Card>
         <CardContent className="flex flex-col gap-y-4 p-4">
           {hasValues ? (
