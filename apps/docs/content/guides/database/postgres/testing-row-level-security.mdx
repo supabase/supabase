@@ -274,6 +274,18 @@ Use the following approaches so tests don't collide over shared data:
 - **Cleanup:** delete the data a suite creates in an `afterAll` or `afterEach` hook.
 - **Isolated data sets:** use prefixes or namespaces in data to separate test cases.
 
+### Check writes through both user sessions
+
+Use two authenticated clients connected to the local Supabase stack. Seed a todo for user 1 and verify that user 1 can read it. Then run the affected operations through the same client code your application uses.
+
+| Request | Expected result |
+| --- | --- |
+| User 1 edits their own todo | The updated value is visible to user 1. |
+| User 2 attempts to edit that todo | No rows change. User 1 can still read the updated value. |
+| User 2 attempts to delete that todo | No rows change. User 1 can still read the todo. |
+
+Check the documented response for each request and read back the record as user 1. A filtered update or delete can complete without an error even when it matches zero rows.
+
 ## Write quality tests with agents
 
 Give the following rules to the agent that writes your tests. Each rule keeps the suite focused on the mistakes a policy test exists to catch.
