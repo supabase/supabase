@@ -1,8 +1,8 @@
 'use client'
 
+import { FrameworkLink } from 'common'
 import dayjs from 'dayjs'
 import { HelpCircle, Loader2 } from 'lucide-react'
-import Link from 'next/link'
 import { Slot } from 'radix-ui'
 import * as React from 'react'
 import { useContext, useMemo, useRef, useState } from 'react'
@@ -195,10 +195,10 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
                     asChild={isLink}
                   >
                     {isLink ? (
-                      <Link href={action.href!}>
+                      <FrameworkLink href={action.href!}>
                         {action.icon}
                         <span className="sr-only">{action.label}</span>
-                      </Link>
+                      </FrameworkLink>
                     ) : (
                       <>
                         {action.icon}
@@ -482,7 +482,11 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
                 onMouseEnter={() => setIsHoveringButton(true)}
                 onMouseLeave={() => setIsHoveringButton(false)}
               >
-                {action.href ? <Link href={action.href}>{action.label}</Link> : <>{action.label}</>}
+                {action.href ? (
+                  <FrameworkLink href={action.href}>{action.label}</FrameworkLink>
+                ) : (
+                  <>{action.label}</>
+                )}
               </Button>
             ))}
           </div>

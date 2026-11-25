@@ -224,6 +224,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      icon: 'reference',
       menuItems: [
         [
           {
@@ -3592,6 +3593,17 @@ export const reference_swift_v1 = {
 }
 
 export const reference_swift_v2 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase-swift',
+    repo: 'https://github.com/supabase/supabase-swift',
+  },
+}
+
+export const reference_swift_v3 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',

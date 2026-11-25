@@ -2,9 +2,10 @@ import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
 import { Badge } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { CategoryAttribute } from './Usage.constants'
-import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
+import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
@@ -22,7 +23,7 @@ export const SectionContent = ({
 
   return (
     <>
-      <ScaffoldContainer>
+      <PageContainer>
         <div className="mx-auto flex flex-col gap-10 py-8 md:py-16">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-5">
@@ -63,7 +64,7 @@ export const SectionContent = ({
             <div className="col-span-12 lg:col-span-7 space-y-6">{children}</div>
           </div>
         </div>
-      </ScaffoldContainer>
+      </PageContainer>
       <ScaffoldDivider />
     </>
   )

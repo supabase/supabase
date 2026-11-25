@@ -1,6 +1,6 @@
 # Supabase Monorepo
 
-pnpm 11 + Turborepo monorepo. Requires Node 24 (see `.nvmrc`).
+pnpm 12 + Turborepo monorepo. Requires Node 26 (see `.nvmrc`).
 
 ## Structure
 
@@ -35,14 +35,14 @@ pnpm e2e                     # Studio E2E tests (playwright)
 pnpm build --filter=studio   # build Studio
 pnpm lint --filter=studio    # lint Studio
 pnpm typecheck               # typecheck all packages
-pnpm format                  # Prettier write (check: pnpm test:prettier)
+pnpm format                  # oxfmt write (check: pnpm format:check)
 pnpm generate:types          # local DB types → supabase/functions/common/database-types.ts
 pnpm api:codegen             # platform Management API types → packages/api-types
 ```
 
 ## CI
 
-Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes and the Tailwind class rules (`shadcn/*`) for `www`, `docs`, `design-system`, `ui-library`, `learn`, and `kb`; app-specific test suites run on their own paths.
+Every PR must pass typecheck + lint (one workflow), oxfmt formatting, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes and the Tailwind class rules (`shadcn/*`) for `www`, `docs`, `design-system`, `ui-library`, `learn`, and `kb`; app-specific test suites run on their own paths.
 
 Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`, `apps/docs/content/_partials/access-control/scoped_pat_*.mdx` (run `make -C apps/docs/spec generate.partials.access-control`).
 

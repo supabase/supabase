@@ -3,13 +3,18 @@ import { isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns/Fil
 
 import {
   getLogAttributeKey,
+  logsFilterGroupsToUrlParams,
   logsFiltersToUrlParams,
+  parseLogsFilterGroupUrlParams,
   parseLogsFilterUrlParams,
+  TOP_LEVEL_ONLY_FILTER_COLUMNS,
   type LogsFilter,
+  type LogsFilterGroup,
 } from './UnifiedLogs.filters'
 import type { SearchParamsType } from './UnifiedLogs.types'
 import {
   logsViewFilterConditionSchema,
+  logsViewFilterGroupSchema,
   logsViewOptionKeySchema,
   logsViewOptionsSchema,
 } from '@/data/content/log-content-schema'
@@ -67,9 +72,18 @@ export const serializeView = ({
   logSource: string
   search: Pick<SearchParamsType, 'filter'> & Partial<Pick<SearchParamsType, ViewOptionKey>>
 }): LogsViewDraft => {
-  const conditions: FilterCondition[] = parseLogsFilterUrlParams(search.filter).map(
-    ({ column, operator, value }): FilterCondition => ({ propertyName: column, operator, value })
-  )
+  const toCondition = ({ column, operator, value }: LogsFilter): FilterCondition => ({
+    propertyName: column,
+    operator,
+    value,
+  })
+  const conditions: (FilterCondition | FilterGroup)[] = [
+    ...parseLogsFilterUrlParams(search.filter).map(toCondition),
+    ...parseLogsFilterGroupUrlParams(search.filter).map((group): FilterGroup => ({
+      logicalOperator: 'OR',
+      conditions: group.filters.map(toCondition),
+    })),
+  ]
 
   const viewOptions: Record<string, unknown> = {}
   for (const key of VIEW_OPTION_KEYS) {
@@ -86,21 +100,19 @@ export const serializeView = ({
   }
 }
 
-// Inverse of serializeView. Unknown filter columns (not in `filterableNames`), nested
-// filter groups (only flat AND is produced today), and unknown viewOptions keys are
-// dropped and reported in `dropped` instead of throwing. Never reads or sets `date`.
+// Inverse of serializeView. Unknown filter columns (not in `filterableNames`), filter groups
+// that aren't a flat OR of valid conditions, and unknown viewOptions keys are dropped and
+// reported in `dropped` instead of throwing. A group is dropped whole, since dropping one of
+// its conditions would silently narrow the OR. Never reads or sets `date`.
 export const applyView = (
   view: LogsView,
   { filterableNames }: { filterableNames: Set<string> }
 ): ApplyViewResult => {
   const dropped: string[] = []
   const filters: LogsFilter[] = []
+  const groups: LogsFilterGroup[] = []
 
-  for (const condition of view.filters.conditions) {
-    if (isGroup(condition)) {
-      dropped.push('(nested group)')
-      continue
-    }
+  const toLogsFilter = (condition: FilterCondition): LogsFilter | undefined => {
     const attributeKey = getLogAttributeKey(condition.propertyName)
     const isDynamicFilter =
       attributeKey !== undefined
@@ -110,19 +122,34 @@ export const applyView = (
       condition.propertyName === 'date' ||
       (!filterableNames.has(condition.propertyName) && !isDynamicFilter)
     ) {
-      dropped.push(condition.propertyName)
-      continue
+      return undefined
     }
     const parsed = logsViewFilterConditionSchema.safeParse(condition)
-    if (!parsed.success) {
-      dropped.push(condition.propertyName)
-      continue
-    }
-    filters.push({
+    if (!parsed.success) return undefined
+    return {
       column: parsed.data.propertyName,
       operator: parsed.data.operator,
       value: String(parsed.data.value),
-    })
+    }
+  }
+
+  for (const condition of view.filters.conditions) {
+    if (!isGroup(condition)) {
+      const filter = toLogsFilter(condition)
+      if (filter) filters.push(filter)
+      else dropped.push(condition.propertyName)
+      continue
+    }
+
+    const parsedGroup = logsViewFilterGroupSchema.safeParse(condition)
+    const candidates = parsedGroup.success ? parsedGroup.data.conditions.map(toLogsFilter) : []
+    const groupFilters = candidates.flatMap((filter) => (filter ? [filter] : []))
+    const isUsable =
+      groupFilters.length > 0 &&
+      groupFilters.length === candidates.length &&
+      groupFilters.every(({ column }) => !TOP_LEVEL_ONLY_FILTER_COLUMNS.includes(column))
+    if (isUsable) groups.push({ operator: 'or', filters: groupFilters })
+    else dropped.push('(filter group)')
   }
 
   const options = logsViewOptionsSchema.safeParse(view.viewOptions)
@@ -131,7 +158,7 @@ export const applyView = (
     if (!logsViewOptionKeySchema.safeParse(key).success) dropped.push(key)
   }
   const params: SavedViewSearchParams = {
-    filter: filters.length > 0 ? logsFiltersToUrlParams(filters) : [],
+    filter: [...logsFiltersToUrlParams(filters), ...logsFilterGroupsToUrlParams(groups)],
     latency: null,
     'timing.dns': null,
     'timing.connection': null,

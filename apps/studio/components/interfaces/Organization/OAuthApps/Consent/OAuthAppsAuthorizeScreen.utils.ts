@@ -1,6 +1,5 @@
 import { capitalize } from 'lodash'
 
-import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
@@ -35,6 +34,7 @@ export function groupScopesByLevel(scopes: string[]) {
 }
 
 export function formatPermissionName(name: string) {
+  if (name === 'database') return 'Database management'
   return name
     .split('_')
     .map((part) => capitalize(part))
@@ -158,19 +158,13 @@ export function getFailedProjects(
 }
 
 export function getPreselectedProjectRefs({
-  existingGrant,
-  projectRef,
+  projectRefs,
   liveProjects,
 }: {
-  existingGrant: OAuthAppsPreflightValidationData['existing_grant']
-  projectRef: string | undefined
+  projectRefs: string[] | undefined
   liveProjects: OrgProject[]
 }): string[] {
   const liveRefs = new Set(liveProjects.map((project) => project.ref))
-  const candidates = existingGrant?.project_refs?.length
-    ? existingGrant.project_refs
-    : projectRef
-      ? [projectRef]
-      : []
+  const candidates = projectRefs?.length ? projectRefs : []
   return candidates.filter((ref) => liveRefs.has(ref))
 }

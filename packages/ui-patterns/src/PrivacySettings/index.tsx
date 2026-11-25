@@ -2,7 +2,6 @@
 
 import { useConsentState } from 'common/consent-state'
 import { getPrivacyLinkLabel, readVisitorCountry } from 'common/visitor-country'
-import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
@@ -94,9 +93,9 @@ export const PrivacySettings = ({
                   <>
                     We couldn't load the privacy settings due to an ad blocker or network error.
                     Please disable any ad blockers and try again. If the problem persists, please{' '}
-                    <Link href="https://supabase.com/dashboard/support/new" className="underline">
+                    <a href="https://supabase.com/dashboard/support/new" className="underline">
                       contact support
-                    </Link>
+                    </a>
                     .
                   </>
                 }
@@ -167,12 +166,12 @@ function Category({
         <div className="text-sm text-foreground-light" id={`${category.slug}-description`}>
           {category.description}
           <br />
-          <Link
+          <a
             href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
             className="underline"
           >
             Learn more
-          </Link>
+          </a>
         </div>
       </div>
       <Switch

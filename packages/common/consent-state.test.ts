@@ -491,7 +491,7 @@ describe('revokeTrackingConsent', () => {
     vi.clearAllMocks()
   })
 
-  it('clears GA, sGTM, Google Ads, and PostHog cookies and keeps the rest', () => {
+  it('clears GA, sGTM, Google Ads, PostHog, and first-referrer cookies and keeps the rest', () => {
     ;[
       '_ga',
       '_ga_XW18KGKGNR',
@@ -514,12 +514,13 @@ describe('revokeTrackingConsent', () => {
 
     revokeTrackingConsent()
 
-    expect(cookieNames()).toEqual(['_sb_first_referrer', 'unrelated'])
+    expect(cookieNames()).toEqual(['unrelated'])
   })
 
   it('clears cookies set on the shared .supabase.com domain', () => {
     document.cookie = '_ga=1; path=/; domain=.supabase.com'
     document.cookie = 'ph_phc_abc123_posthog=1; path=/; domain=.supabase.com'
+    document.cookie = '_sb_first_referrer=1; path=/; domain=.supabase.com'
 
     revokeTrackingConsent()
 

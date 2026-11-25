@@ -44,6 +44,7 @@
 // the router shim's pre-stripped targets — pass through unchanged, since
 // no studio route pathname itself starts with the basePath segment.)
 
+import { BASE_PATH } from './constants'
 import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 
 // Inlined at build time via Vite's `define`. Must agree with Vite `base`
@@ -122,4 +123,45 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
     search: Object.keys(search).length > 0 ? search : undefined,
     hash,
   }
+}
+
+// Next's pages-router exposes `router.pathname` as the route *pattern*
+// (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
+// route id uses `$param` — convert so legacy code that does
+// `router.pathname.endsWith('/sql/[id]')` keeps working.
+//
+// Also strip the trailing slash TanStack appends to index-route ids
+// (`/project/$ref/`). Next's pages-router never includes a trailing
+// slash, so consumers like `router.pathname.split('/')[3]` (used in
+// the project sidebar's active-route check) silently see an empty
+// string for index pages instead of `undefined`, and the home icon
+// stops highlighting. The root path stays `/` either way.
+export function toRoutePattern(routeId: string): string {
+  // Strip TanStack's layout-route segments — they're prefixed with `_`
+  // (`_app`, `_auth`, etc.) and don't appear in the URL or in Next's
+  // `router.pathname`. Without this, downstream code that derives a path
+  // segment from `pathname.split('/')[N]` indexes into the wrong slot —
+  // e.g. Sidebar uses index 3 to pick the active route, expecting
+  // `/org/[slug]/general` but receiving `/_app/org/[slug]/general` and
+  // ending up with `[slug]` instead of `general`.
+  const withoutLayoutSegments = routeId.replace(/\/_[a-zA-Z0-9_]+(?=\/|$)/g, '')
+  const withBracketParams = withoutLayoutSegments.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+  if (withBracketParams === '' || withBracketParams === '/') return '/'
+  return withBracketParams.replace(/\/$/, '')
+}
+
+// Prefix an app-served asset path with the basePath, as Next's image
+// optimizer URL does. Full URLs, already-prefixed and relative paths are
+// returned unchanged.
+export function applyBasePath(src: string): string {
+  if (!BASE_PATH) return src
+  // Schemes (http:, https:, data:, blob:) and protocol-relative URLs.
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
+  // Already prefixed — happens when callers manually prepend BASE_PATH
+  // (several studio components do this today).
+  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
+  // Absolute app path — prepend.
+  if (src.startsWith('/')) return `${BASE_PATH}${src}`
+  // Relative path — leave alone.
+  return src
 }

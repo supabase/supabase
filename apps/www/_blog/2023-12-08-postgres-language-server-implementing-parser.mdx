@@ -187,7 +187,7 @@ For the implementation, we only need to provide the distinct keywords each state
 
 ### Reverse-Engineering the CST
 
-The second limitation we encountered: `libpg_query` only exposes an API for the AST, not for the CST. To provide language intelligence on the source code, both are required. Since we do not want to implement our own parser, we need to work with what we have to build the CST: the AST and a stream of tokens. The goal is to reverse-engineer the AST into the CST. This involves re-using the AST nodes as CST nodes, and figuring out what token belongs beneath what node. The exemplary statement `select '1';` should be be parsed into
+The second limitation we encountered: `libpg_query` only exposes an API for the AST, not for the CST. To provide language intelligence on the source code, both are required. Since we do not want to implement our own parser, we need to work with what we have to build the CST: the AST and a stream of tokens. The goal is to reverse-engineer the AST into the CST. This involves re-using the AST nodes as CST nodes, and figuring out what token belongs beneath what node. The exemplary statement `select '1';` should be parsed into
 
 ```rust
 SelectStmt@0..11

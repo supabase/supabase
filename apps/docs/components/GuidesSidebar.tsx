@@ -76,10 +76,10 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
           <GuideToc toc={toc} activeUrl={toc[activeIndex]?.url} />
         )}
       </div>
-      <footer className="shrink-0 border-t py-3 pl-6 pr-4">
+      <footer className="shrink-0 border-t py-2 pl-6 pr-4">
         <ul className="flex flex-col">
           {showFeedback ? (
-            <li className="-ml-2 flex h-8 items-center">
+            <li className="-ml-2.5 flex h-8 items-center">
               <Feedback key={pathname} variant="rail" className="w-full" />
             </li>
           ) : null}
@@ -89,9 +89,12 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
               target="_blank"
               rel="noreferrer noopener"
               onClick={handlePreferredSourceClick}
-              className="-ml-2 flex h-8 items-center gap-2 rounded-md py-2 pr-2 pl-1.5 text-sm text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground focus-ring focus-visible:bg-surface-200 focus-visible:text-foreground"
+              className="group -mr-0.5 -ml-2.5 flex h-8 items-center gap-2 rounded-md py-2 pr-2.5 pl-2 text-sm text-foreground-light hover:text-foreground focus-inset focus-visible:text-foreground"
             >
-              <Google aria-hidden className="size-4 text-foreground-lighter" />
+              <Google
+                aria-hidden
+                className="size-4 text-foreground-lighter group-hover:text-foreground group-focus-visible:text-foreground"
+              />
               Prefer on Google
             </a>
           </li>
@@ -101,9 +104,12 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
                 href={editHref}
                 target="_blank"
                 rel="noreferrer noopener edit"
-                className="-ml-2 flex h-8 items-center gap-2 rounded-md py-2 pr-2 pl-1.5 text-sm text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground focus-ring focus-visible:bg-surface-200 focus-visible:text-foreground"
+                className="group -mr-0.5 -ml-2.5 flex h-8 items-center gap-2 rounded-md py-2 pr-2.5 pl-2 text-sm text-foreground-light hover:text-foreground focus-inset focus-visible:text-foreground"
               >
-                <IconGitHubSolid aria-hidden className="size-4 text-foreground-lighter" />
+                <IconGitHubSolid
+                  aria-hidden
+                  className="size-4 text-foreground-lighter group-hover:text-foreground group-focus-visible:text-foreground"
+                />
                 Edit this page
               </a>
             </li>
@@ -117,8 +123,8 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
 
 const GuideToc = ({ toc, activeUrl }: GuideTocProps) => (
   <nav aria-label="On this page" className="flex min-h-0 flex-1 flex-col">
-    <TOCScrollArea className="-me-4 pe-4">
-      <ul className="flex flex-col gap-1 pb-6">
+    <TOCScrollArea className="-ms-2 -me-4 pe-4">
+      <ul className="flex flex-col gap-1 px-2 pb-6">
         {toTocTree(toc).map(({ item, children }) => (
           <li key={item.url} className={cn(children.length > 0 && 'pt-2 first:pt-0')}>
             <GuideTocLink

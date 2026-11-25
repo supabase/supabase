@@ -10,11 +10,11 @@ sidebar_label: 'Copy / Move Objects'
 
 You can copy objects between buckets or within the same bucket. Currently only objects up to 5 GB can be copied using the API.
 
-When making a copy of an object, the owner of the new object will be the user who initiated the copy operation.
+When making a copy of an object, the owner of the new object will be the user who initiated the copy operation. For how Storage assigns owners, see [Storage ownership](/docs/guides/storage/security/ownership).
 
 ### Copying objects within the same bucket
 
-To copy an object within the same bucket, use the `copy` method.
+To copy an object within the same bucket, use the `copy` method. Replace `YOUR_USER_ID` with the signed-in user's ID so the destination's first folder matches their JWT `sub` claim.
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
@@ -22,7 +22,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
-await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png')
+await supabase.storage.from('avatars').copy('public/avatar1.png', 'YOUR_USER_ID/avatar2.png')
 ```
 
 ### Copying objects across buckets
@@ -35,7 +35,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
-await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png', {
+await supabase.storage.from('avatars').copy('public/avatar1.png', 'YOUR_USER_ID/avatar2.png', {
   destinationBucket: 'avatars2',
 })
 ```
@@ -90,7 +90,7 @@ on storage.objects
 for select
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.jwt()->>'sub')
 );
 
 create policy "User can insert in their own folders (in any buckets)"
@@ -98,7 +98,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-    (storage.foldername(name))[1] = (select auth.uid())
+    (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
 );
 
 create policy "User can update their own objects (in any buckets)"
@@ -106,6 +106,6 @@ on storage.objects
 for update
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.jwt()->>'sub')
 );
 ```
