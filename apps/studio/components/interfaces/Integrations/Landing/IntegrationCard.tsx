@@ -56,7 +56,8 @@ export const IntegrationCard = ({
             {image ? (
               <img
                 src={image}
-                alt={`${name} integration`}
+                alt=""
+                aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (

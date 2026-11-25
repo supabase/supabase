@@ -24,7 +24,7 @@ export const AdvisorRulesPreview = () => {
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
         width={1296}
         height={900}
-        alt="api-docs-side-panel-preview"
+        alt="Advisor rules list showing a toggle to disable a lint for the project"
         className="rounded-sm border mb-4"
       />
       <div className="space-y-2 mt-4!">

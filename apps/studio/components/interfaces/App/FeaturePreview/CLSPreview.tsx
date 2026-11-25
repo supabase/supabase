@@ -39,7 +39,7 @@ export const CLSPreview = () => {
         src={`${BASE_PATH}/img/previews/cls-preview.png`}
         width={1860}
         height={970}
-        alt="api-docs-side-panel-preview"
+        alt="Column-level privileges table with Select, Insert, Update, and Delete toggles per column"
         className="rounded-sm border"
       />
       <div className="space-y-2 mt-4!">

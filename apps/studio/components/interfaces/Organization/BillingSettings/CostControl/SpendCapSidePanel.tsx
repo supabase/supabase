@@ -256,7 +256,8 @@ export const SpendCapSidePanel = () => {
                       onClick={() => !isFreePlan && setSelectedOption(option.value)}
                     >
                       <img
-                        alt="Spend Cap"
+                        alt=""
+                        aria-hidden="true"
                         className={cn(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                           isSelected

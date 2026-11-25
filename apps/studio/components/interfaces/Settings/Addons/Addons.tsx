@@ -261,7 +261,8 @@ export const Addons = () => {
                 media={
                   <img
                     className="bg rounded-lg border"
-                    alt="IPv4"
+                    alt=""
+                    aria-hidden="true"
                     width={160}
                     height={96}
                     src={
@@ -311,7 +312,8 @@ export const Addons = () => {
               media={
                 <img
                   className="bg rounded-lg border"
-                  alt="PITR"
+                  alt=""
+                  aria-hidden="true"
                   width={160}
                   height={96}
                   src={
@@ -363,7 +365,8 @@ export const Addons = () => {
                 media={
                   <img
                     className="bg rounded-lg border"
-                    alt="Custom Domain"
+                    alt=""
+                    aria-hidden="true"
                     width={160}
                     height={96}
                     src={

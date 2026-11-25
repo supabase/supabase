@@ -94,7 +94,8 @@ export const AccountConnections = () => {
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={30}
                   height={30}
-                  alt={`GitHub icon`}
+                  alt=""
+                  aria-hidden="true"
                 />
                 <div>
                   <div className="flex items-center gap-x-2">

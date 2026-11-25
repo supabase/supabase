@@ -151,7 +151,8 @@ export const CostControl = () => {
                     <div>
                       <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow-sm">
                         <img
-                          alt="Spend Cap"
+                          alt=""
+                          aria-hidden="true"
                           width={160}
                           height={96}
                           src={

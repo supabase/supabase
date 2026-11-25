@@ -69,6 +69,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       {filteredHooks.map((x) => {
         const [url, method] = x.function_args
         const isEdgeFunction = isEdgeFunctionUrl(url, ref ?? '', restUrl)
+        const hookTypeLabel = isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'
 
         return (
           <TableRow key={x.id}>
@@ -81,10 +82,10 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                         ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
                         : `${BASE_PATH}/img/function-providers/http-request.png`
                     }
-                    alt="hook-type"
+                    alt={hookTypeLabel}
                     width={20}
                     height={20}
-                    title={isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'}
+                    title={hookTypeLabel}
                   />
                 </div>
                 <p title={x.name} className="truncate">

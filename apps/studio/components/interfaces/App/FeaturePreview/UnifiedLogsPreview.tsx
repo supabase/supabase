@@ -13,7 +13,7 @@ export const UnifiedLogsPreview = () => {
         unified view across all your services. Built for better performance and easier debugging.
       </p>
       <img
-        alt="new-logs-preview"
+        alt="Unified Logs interface with time range, log type, and status filters alongside a log entries table"
         src={`${BASE_PATH}/img/previews/new-logs-preview.png`}
         width={1296}
         height={900}

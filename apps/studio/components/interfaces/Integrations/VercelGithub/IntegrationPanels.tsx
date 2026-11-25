@@ -59,7 +59,7 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
 const Avatar = ({ src }: { src: string | undefined }) => {
   return (
     <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
-      <img src={src || ''} alt="avatar" className="absolute inset-0 h-full w-full" />
+      <img src={src || ''} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full" />
     </div>
   )
 }

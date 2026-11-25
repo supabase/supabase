@@ -61,7 +61,8 @@ export const GitHubStatus = () => {
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={16}
                   height={16}
-                  alt="GitHub"
+                  alt=""
+                  aria-hidden="true"
                 />
                 {githubConnection?.repository.name}
               </>

@@ -25,7 +25,7 @@ export const ExplorerPreview = () => {
         src={`${BASE_PATH}/img/previews/explorer-preview.png`}
         width={1296}
         height={900}
-        alt="explorer-preview"
+        alt="Explorer workspace showing the notebooks sidebar and a User growth notebook with a weekly signups chart"
         className="rounded-sm border"
       />
 
