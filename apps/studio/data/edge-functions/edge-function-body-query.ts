@@ -60,6 +60,8 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
+  const contentsByFilename = new Map<string, Set<string>>()
+
   let metadata: {
     deno2_entrypoint_path?: string | null
   } = {}
@@ -70,10 +72,19 @@ export async function getEdgeFunctionBody(
       maxFileSize: 20 * 1024 * 1024,
     })) {
       if (part.isFile) {
-        files.push({
-          name: part.filename,
-          content: part.text,
-        })
+        const name = part.filename
+        const content = part.text
+
+        // A bundle can repeat a file part. Keep distinct contents for the same
+        // path so opening the bundle never silently discards a conflicting file.
+        if (typeof name === 'string') {
+          const seenContents = contentsByFilename.get(name) ?? new Set<string>()
+          if (seenContents.has(content)) continue
+          seenContents.add(content)
+          contentsByFilename.set(name, seenContents)
+        }
+
+        files.push({ name, content })
       } else {
         // treat it as metadata
         metadata = JSON.parse(part.text)
