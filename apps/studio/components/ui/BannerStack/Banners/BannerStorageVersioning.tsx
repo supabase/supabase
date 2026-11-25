@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { CircleHelpIcon, FileIcon } from 'lucide-react'
+import { CircleHelpIcon, FileIcon, MoreVerticalIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
@@ -75,8 +75,9 @@ const BannerStorageVersioning = ({ onDismiss }: { onDismiss: () => void }) => {
               <Badge variant="success">New</Badge>
               <Badge variant="warning">Public Alpha</Badge>
             </div>
-            <p className="text-sm font-medium text-balance">
-              Introducing Storage Object Versioning and Lifecycle Policies
+            <p className="text-sm font-medium">
+              Introducing Storage Object Versioning <br />
+              and Lifecycle Policies
             </p>
             <p className="text-xs text-foreground-lighter text-pretty">
               Preserve and restore versions of files in your buckets, and automatically expire
@@ -122,9 +123,11 @@ const BannerStorageVersioning = ({ onDismiss }: { onDismiss: () => void }) => {
 }
 
 const INITIAL_VERSIONS = [
-  { id: 'v4', date: 'Today, 9:42 AM', size: '1.2 MB' },
-  { id: 'v2', date: 'Yesterday, 9:05 AM', size: '980 KB' },
+  { id: 'v4', date: 'Today, 10:16 AM', size: '1.2 MB' },
+  { id: 'v2', date: 'Yesterday, 3:48 PM', size: '980 KB' },
 ]
+
+const DEMO_TIMESTAMPS = ['10:23 AM', '2:47 PM', '9:16 AM', '4:38 PM', '11:52 AM', '6:04 PM']
 
 const VersionHistoryPreview = () => {
   const [versions, setVersions] = useState(INITIAL_VERSIONS)
@@ -151,7 +154,7 @@ const VersionHistoryPreview = () => {
               },
               ...currentVersions.map((version, index) => ({
                 ...version,
-                date: index === 0 ? 'Today, 9:42 AM' : 'Yesterday, 9:05 AM',
+                date: `${index === 0 ? 'Today' : 'Yesterday'}, ${DEMO_TIMESTAMPS[(nextVersionNumber + index) % DEMO_TIMESTAMPS.length]}`,
               })),
             ])
             nextVersionNumber += 1
@@ -192,8 +195,8 @@ const VersionHistoryPreview = () => {
   }, [])
 
   return (
-    <div className="border-b bg-surface-100 px-4 py-3">
-      <div className="rounded-md border bg-surface-75 p-3 shadow-sm">
+    <div className="border-b bg-surface-100 bg-[radial-gradient(oklch(from_var(--foreground-default)_l_c_h/0.02)_1px,transparent_1px)] bg-size-[6px_6px] px-3 pt-3">
+      <div className="rounded-md rounded-b-none border border-b-0 bg-surface-100 p-3 shadow-sm">
         <div className="mb-1 flex items-center gap-1 text-[9px] font-medium text-foreground-light">
           <span>Versions</span>
           <span className="text-[8px] text-foreground-lighter">{versions.length}</span>
@@ -207,7 +210,7 @@ const VersionHistoryPreview = () => {
           </span>
         </div>
         <ol className="flex min-h-[5.5rem] flex-col gap-y-0.5">
-          <AnimatePresence initial={false} mode="popLayout">
+          <AnimatePresence initial={false}>
             {versions.map((version, index) => {
               const isCurrent = index === 0
               const isExpiring = isAtRetentionLimit && index === versions.length - 1
@@ -215,7 +218,6 @@ const VersionHistoryPreview = () => {
               return (
                 <motion.li
                   key={version.id}
-                  layout={!shouldReduceMotion}
                   initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
@@ -248,6 +250,12 @@ const VersionHistoryPreview = () => {
                       Expires on next upload or in 2d
                     </motion.span>
                   )}
+                  <span
+                    aria-hidden="true"
+                    className="flex h-5 w-4 shrink-0 items-center justify-center text-foreground-lighter"
+                  >
+                    <MoreVerticalIcon size={12} />
+                  </span>
                 </motion.li>
               )
             })}
