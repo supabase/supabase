@@ -1,9 +1,9 @@
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -30,15 +30,14 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { getStatusName } from './Pipeline.utils'
 import { useUrlReplicationClusterId } from './PipelineClusterScope'
-import { PipelineStatusName } from './Replication.constants'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from './useIsPipelinesEnabled'
+import { usePipelineList } from './usePipelineList'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
@@ -49,12 +48,7 @@ import {
   replicationClustersQueryOptions,
   useReplicationClusterGroups,
 } from '@/data/replication/clusters-query'
-import { replicationDestinationsQueryOptions } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
-import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
-import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
-import { replicationPipelinesQueryOptions } from '@/data/replication/pipelines-query'
-import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -65,28 +59,6 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type DestinationSortColumn = 'name' | 'status'
 type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
-
-// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
-const STATUS_SORT_ORDER: PipelineStatusName[] = [
-  PipelineStatusName.FAILED,
-  PipelineStatusName.STOPPED,
-  PipelineStatusName.STOPPING,
-  PipelineStatusName.STARTING,
-  PipelineStatusName.STARTED,
-  PipelineStatusName.UNKNOWN,
-]
-
-const compareStatusNames = (
-  a: PipelineStatusName | undefined,
-  b: PipelineStatusName | undefined,
-  direction: 'asc' | 'desc'
-) => {
-  if (a === undefined) return b === undefined ? 0 : 1
-  if (b === undefined) return -1
-
-  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
-  return direction === 'asc' ? comparison : -comparison
-}
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -104,7 +76,6 @@ export const Destinations = () => {
 
   useRedirectLegacyReadReplicaDestination()
 
-  const prefetchedClustersRef = useRef(new Set<string>())
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
@@ -135,51 +106,26 @@ export const Destinations = () => {
     error: regionsError,
     refetch: refetchRegions,
   } = useQuery(replicationClustersQueryOptions())
-  const destinationResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
-      replicationDestinationsQueryOptions({ projectRef, clusterId })
-    ),
-  })
-  const pipelineResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
-      replicationPipelinesQueryOptions({ projectRef, clusterId })
-    ),
-  })
-  const sourceResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
-      replicationSourcesQueryOptions({ projectRef, clusterId })
-    ),
-  })
+  const [sort, setSort] = useState<DestinationSort>('name:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
 
-  const clusterResults = groups.map((group, index) => {
-    const destinationsResult = destinationResults[index]
-    const pipelinesResult = pipelineResults[index]
-    const sourcesResult = sourceResults[index]
-    const destinations = destinationsResult.data?.destinations ?? []
-    const pipelines = pipelinesResult.data?.pipelines ?? []
-    const pipelinesByDestination = new Map(
-      pipelines.map((pipeline) => [pipeline.destination_id, pipeline])
-    )
-    const visibleDestinations = pipelinesResult.isPending
-      ? destinations
-      : destinations.filter((destination) => pipelinesByDestination.has(destination.id))
-    const listError = destinationsResult.error ?? pipelinesResult.error
-    const sourceError = group.clusterId === undefined ? null : sourcesResult.error
-    const error = listError ?? sourceError
-    return {
-      group,
-      destinationsResult,
-      pipelinesResult,
-      sourcesResult,
-      destinations,
-      pipelines,
-      pipelinesByDestination,
-      visibleDestinations,
-      error: checkLocalPipelinesNotSetUp(error) ? null : error,
-      isPending: destinationsResult.isPending || pipelinesResult.isPending,
-    }
-  })
+  const getAriaSort = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
 
+  const handleSortChange = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  const { clusterResults, sortedDestinations } = usePipelineList({
+    projectRef,
+    groups,
+    filterString,
+    sortColumn,
+    sortDirection,
+  })
   const isDestinationsLoading =
     isDiscoveringRegions || clusterResults.some(({ isPending }) => isPending)
   const hasDestinations = clusterResults.some(
@@ -205,64 +151,17 @@ export const Destinations = () => {
   }: (typeof clusterResults)[number]) =>
     destinationsResult.isFetching || pipelinesResult.isFetching || sourcesResult.isFetching
 
-  const pipelineEntries = clusterResults.flatMap(({ group, pipelines }) =>
-    pipelines.map((pipeline) => ({ pipeline, clusterId: group.clusterId }))
-  )
-
-  // These queries share the rows' query keys, so each status is fetched once per pipeline.
-  const statusResults = useQueries({
-    queries: pipelineEntries.map(({ pipeline, clusterId }) =>
-      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id, clusterId })
-    ),
-  })
-  const statuses = new Map(
-    pipelineEntries.map(({ pipeline }, index) => [
-      pipeline,
-      getStatusName(statusResults[index].data?.status),
-    ])
-  )
-
-  const [sort, setSort] = useState<DestinationSort>('name:asc')
-  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
-
-  const getAriaSort = (column: DestinationSortColumn) => {
-    if (sortColumn !== column) return 'none'
-    return sortDirection === 'asc' ? 'ascending' : 'descending'
-  }
-
-  const handleSortChange = (column: DestinationSortColumn) => {
-    if (sortColumn !== column) return setSort(`${column}:asc`)
-    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
-  }
-
-  const search = filterString.toLowerCase()
-  const sortedDestinations = clusterResults
-    .flatMap(({ group, visibleDestinations, pipelinesByDestination }) =>
-      visibleDestinations
-        .filter(({ name }) => name.toLowerCase().includes(search))
-        .map((destination) => {
-          const pipeline = pipelinesByDestination.get(destination.id)
-          return { group, destination, status: pipeline && statuses.get(pipeline) }
-        })
-    )
-    .sort((a, b) => {
-      const comparison = a.destination.name.localeCompare(b.destination.name)
-      const nameComparison = sortDirection === 'asc' ? comparison : -comparison
-      if (sortColumn === 'name') return nameComparison
-      return compareStatusNames(a.status, b.status, sortDirection) || nameComparison
-    })
-
   const {
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
     refetch: refetchSources,
-  } = sourceResults[0]
-  const clustersWithProjectSource = groups
-    .filter((_, index) =>
-      sourceResults[index].data?.sources.some(({ name }) => name === projectRef)
+  } = clusterResults[0].sourcesResult
+  const clustersWithProjectSource = clusterResults
+    .filter(({ sourcesResult }) =>
+      sourcesResult.data?.sources.some(({ name }) => name === projectRef)
     )
-    .map(({ clusterId }) => clusterId)
+    .map(({ group }) => group.clusterId)
   const hasExternalReplicationSource = clustersWithProjectSource.length > 0
   const replicationNotEnabled = isSourcesSuccess && !hasExternalReplicationSource
 
@@ -335,28 +234,6 @@ export const Destinations = () => {
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
-
-  useEffect(() => {
-    if (!projectRef) return
-    clusterResults.forEach(({ group, pipelinesResult, pipelines }) => {
-      const prefetchKey = JSON.stringify([projectRef, group.clusterId])
-      if (!pipelinesResult.isSuccess || prefetchedClustersRef.current.has(prefetchKey)) return
-      if (pipelines.length === 0) return
-      prefetchedClustersRef.current.add(prefetchKey)
-      pipelines.forEach((p) => {
-        if (!p?.id) return
-        queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, group.clusterId),
-          queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion(
-              { projectRef, pipelineId: p.id, clusterId: group.clusterId },
-              signal
-            ),
-          staleTime: Infinity,
-        })
-      })
-    })
-  }, [projectRef, clusterResults, queryClient])
 
   return (
     <div className="w-full space-y-4">
