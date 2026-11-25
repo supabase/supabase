@@ -98,7 +98,7 @@ The CLI resolves every config value, whether it comes from your config file or a
 1. A command-line flag.
 2. A shell environment variable.
 3. A project env file.
-4. Your config file: `supabase/config.json`, `supabase/config.jsonc`, or `supabase/config.toml`. A JSON file wins over `config.toml` when both exist. Having both `config.json` and `config.jsonc` is an error. A matched `remotes.<name>` entry takes precedence over the base config.
+4. Your config file: `supabase/config.json`, `supabase/config.jsonc`, or `supabase/config.toml`. A JSON file wins over `config.toml` when both exist (see [config file formats](/docs/guides/local-development/cli/config-formats)). Having both `config.json` and `config.jsonc` is an error. A matched `remotes.<name>` entry takes precedence over the base config.
 5. The default.
 
 For what the config file holds, see [Managing config and secrets](/docs/guides/local-development/managing-config).

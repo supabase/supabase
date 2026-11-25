@@ -38,7 +38,7 @@ Every new Expo app on Supabase used to start the same way. You created a project
 
 ## Preview builds get their own database
 
-A Supabase project holds one environment's data, so the integration gives each Expo environment its own. Add `--environment preview` and Preview gets a separate project with separate keys while Production keeps the first one. Preview builds and over-the-air updates work against preview data, and production data is untouched. Development can point at a local Supabase stack on your machine. The boundary is in place from the first build, and the tooling enforces it.
+A Supabase project holds one environment's data, so the integration gives each Expo environment its own. Add `--environment preview` and Preview gets a separate project with separate keys while Production keeps the first one. Preview builds and over-the-air updates work against preview data, and production data is untouched. Development can point at a [local Supabase stack](/docs/guides/local-development/cli/getting-started) on your machine. The boundary is in place from the first build, and the tooling enforces it.
 
 ## Security findings in your build logs
 
@@ -54,7 +54,7 @@ The teams getting the most out of Expo and Supabase together already work this w
 
 ## More than a database
 
-The project the CLI creates is the same full backend every Supabase app gets, so the features users expect from a mobile app are a configuration step away rather than a build. Users can sign in with Apple or Google and come back through a magic link that opens the app. They can upload a photo and only see the files they're allowed to see. A screen updates when the data behind it changes, and a push notification goes out when a row does. All of it runs on the [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions) already in the project, through the client the CLI installed.
+The project the CLI creates is the same full backend every Supabase app gets, so the features users expect from a mobile app are a configuration step away rather than a build. Users can [sign in with Apple or Google](/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in) and come back through a magic link that opens the app. They can upload a photo and only see the files they're allowed to see. A screen updates when the data behind it changes, and a [push notification](/docs/guides/functions/examples/push-notifications) goes out when a row does. All of it runs on the [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions) already in the project, through the client the CLI installed.
 
 ## Why Expo built Supabase into the EAS CLI
 

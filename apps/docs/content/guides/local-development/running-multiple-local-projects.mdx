@@ -216,7 +216,7 @@ supabase stack list
 
 The list shows each local project's name, project root, branch, runtime, whether its background process is reachable, and a short ID. Pass `--output-format json` to get the full ID that `--stack-id` accepts.
 
-To read a local project's logs, run `supabase stack logs` in its app directory. The command prints the last 200 retained lines and exits. It also works while the local project is stopped. These flags change what it prints:
+To read a local project's logs, run `supabase stack logs` in its app directory (this command is deprecated; see [Query logs from the CLI](/docs/guides/observability/cli-logs#migrate-existing-log-commands)). The command prints the last 200 retained lines and exits. It also works while the local project is stopped. These flags change what it prints:
 
 - `--follow` keeps streaming new lines after the history.
 - `--tail <n>` changes how many retained lines it prints.
