@@ -40,6 +40,7 @@ withTestDatabase('list roles', async ({ executeQuery }) => {
       "canCreateDb": true,
       "canCreateRole": true,
       "canLogin": true,
+      "comment": null,
       "config": {},
       "connectionLimit": 100,
       "id": Any<Number>,
@@ -77,6 +78,7 @@ withTestDatabase('list roles w/ default roles', async ({ executeQuery }) => {
       "canCreateDb": false,
       "canCreateRole": false,
       "canLogin": false,
+      "comment": null,
       "config": {},
       "connectionLimit": 100,
       "id": Any<Number>,
@@ -120,6 +122,7 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
       "canCreateDb": true,
       "canCreateRole": true,
       "canLogin": true,
+      "comment": null,
       "config": {
         "search_path": ""extension, public"",
       },
@@ -182,6 +185,7 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
       "canCreateDb": true,
       "canCreateRole": true,
       "canLogin": true,
+      "comment": null,
       "config": {},
       "connectionLimit": 100,
       "id": Any<Number>,
@@ -215,6 +219,7 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
       "canCreateDb": false,
       "canCreateRole": false,
       "canLogin": false,
+      "comment": null,
       "config": {
         "log_statement": "all",
         "search_path": "public",
@@ -349,4 +354,20 @@ withTestDatabase('update or remove a role that does not exist', async ({ execute
   ).rejects.toThrowErrorMatchingInlineSnapshot(
     `[Error: Failed to execute query: Cannot find role with id 999999]`
   )
+})
+
+withTestDatabase('retrieve a role comment', async ({ executeQuery }) => {
+  const name = uniqueRoleName('commented')
+  await executeQuery(pgMeta.roles.create({ name }).sql)
+
+  try {
+    const comment = '{"_supabase":{"oauth_app_id":"app"}}'
+    await executeQuery(safeSql`comment on role ${ident(name)} is ${literal(comment)}`)
+
+    const { sql, zod } = pgMeta.roles.retrieve({ name })
+    const role = zod.parse((await executeQuery(sql))[0])
+    expect(role?.comment).toBe(comment)
+  } finally {
+    await executeQuery(safeSql`drop role if exists ${ident(name)}`)
+  }
 })

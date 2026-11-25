@@ -10,7 +10,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateRolePanel } from './CreateRolePanel'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
-import { isSupabaseRole } from './Roles.utils'
+import { isSupabaseManagedRole } from './Roles.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -85,7 +85,7 @@ export const RolesList = () => {
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
   ).filter((role) => role.name.includes(filterString))
-  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) => isSupabaseRole(role.name))
+  const [supabaseRoles, otherRoles] = partition(filteredRoles, isSupabaseManagedRole)
 
   const totalActiveConnections = roles
     .map((role) => role.activeConnections)

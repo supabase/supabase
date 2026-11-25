@@ -26,6 +26,7 @@ select
        else rolconnlimit
   end as "connectionLimit",
   rolvaliduntil as "validUntil",
+  shobj_description(r.oid, 'pg_authid') as comment,
   coalesce(r_config.role_configs, '{}') as config
 from
   pg_roles r

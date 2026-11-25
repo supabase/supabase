@@ -17,6 +17,7 @@ const pgRoleZod = z.object({
   connectionLimit: z.number(),
   validUntil: z.union([z.string(), z.null()]),
   config: z.record(z.string(), z.string()),
+  comment: z.string().nullable(),
 })
 const pgRoleArrayZod = z.array(pgRoleZod)
 const pgRoleOptionalZod = z.optional(pgRoleZod)

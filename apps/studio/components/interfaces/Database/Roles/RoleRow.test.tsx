@@ -30,6 +30,7 @@ const createRole = (overrides: Partial<PgRole> = {}): PgRole => ({
   connectionLimit: -1,
   validUntil: null,
   config: {},
+  comment: null,
   ...overrides,
 })
 
