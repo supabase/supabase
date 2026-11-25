@@ -1,0 +1,105 @@
+name: Docs review category
+
+# Fails when a docs PR from a branch in this repository is ready for review
+# without a review category selected in the PR template, and posts one comment
+# explaining how to add it. Fork PRs are always reviewed as Low, so they pass.
+# This becomes a required check, so it runs on every PR and reports a result
+# instead of using a paths filter.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, edited]
+
+permissions: {}
+
+jobs:
+  review-category:
+    name: Docs review category
+    runs-on: ubuntu-latest
+    permissions:
+      checks: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Check for a review category
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          CHECK_NAME: Docs review category
+        with:
+          script: |
+            const pr = context.payload.pull_request
+            const { owner, repo } = context.repo
+
+            if (pr.draft) {
+              core.info('Draft PR, skipping.')
+              return
+            }
+
+            const isFork = !pr.head.repo || pr.head.repo.full_name !== pr.base.repo.full_name
+            if (isFork) {
+              core.info('Fork PRs are always reviewed as Low, skipping.')
+              return
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: pr.number,
+              per_page: 100,
+            })
+            if (!files.some((file) => file.filename.startsWith('apps/docs/'))) {
+              core.info('No docs changes, skipping.')
+              return
+            }
+
+            // On a description or title edit, only re-check when the last result failed.
+            if (context.payload.action === 'edited') {
+              const { data } = await github.rest.checks.listForRef({
+                owner,
+                repo,
+                ref: pr.head.sha,
+                check_name: process.env.CHECK_NAME,
+                filter: 'all',
+              })
+              const previous = data.check_runs
+                .filter((run) => run.status === 'completed')
+                .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at))[0]
+              if (previous?.conclusion === 'success') {
+                core.info('Last result passed, skipping.')
+                return
+              }
+            }
+
+            const categories = [
+              ...(pr.body ?? '').matchAll(/^\s*[-*]\s*\[[xX]\]\s*(Critical|Urgent|Moderate|Low)\b/gm),
+            ].map((match) => match[1])
+            if (categories.length === 1) {
+              core.info(`Review category: ${categories[0]}`)
+              return
+            }
+
+            const marker = '<!-- docs-review-category -->'
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: pr.number,
+              per_page: 100,
+            })
+            if (!comments.some((comment) => comment.body?.includes(marker))) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body: [
+                  marker,
+                  'This docs PR needs a review category before it can be reviewed. In the **Review category** section of the PR description, select the one category that fits your change. The category sets the review deadline.',
+                  '',
+                  'For what each category means, see [Pick a review category](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md#pick-a-review-category).',
+                ].join('\n'),
+              })
+            }
+
+            core.setFailed(
+              categories.length === 0
+                ? 'Select a review category in the PR description.'
+                : `Select only one review category. Selected: ${categories.join(', ')}.`
+            )
