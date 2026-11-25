@@ -29,6 +29,7 @@
     "astro": "^7.2.6",
     "common": "workspace:*",
     "docs-search": "workspace:*",
+    "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "hast-util-from-html": "^2.0.3",
     "lucide-react": "catalog:",

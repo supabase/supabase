@@ -1,4 +1,5 @@
 import type { DocsSearchV2Result } from 'common/hooks/useDocsSearchV2'
+import { slug as slugHeading } from 'github-slugger'
 
 import { BASE_PATH } from './constants'
 
@@ -31,6 +32,10 @@ export function reshapeKbResult(row: unknown): DocsSearchV2Result | null {
     return null
 
   const title = row.title as string
+  const heading = row.heading as string
+  // cached responses from before api/search returned headingLevel have none
+  const headingLevel =
+    'headingLevel' in row && typeof row.headingLevel === 'number' ? row.headingLevel : undefined
   const headingPath =
     'headingPath' in row && Array.isArray(row.headingPath) && row.headingPath.length > 0
       ? (row.headingPath as string[])
@@ -39,8 +44,11 @@ export function reshapeKbResult(row: unknown): DocsSearchV2Result | null {
   return {
     // origin is dropped so previews and local runs link to themselves, not to production
     path: new URL(row.href, 'https://supabase.com').pathname,
+    // the h1 is the page title. The intro before the first heading is level 0
+    anchor: headingLevel && headingLevel >= 2 ? slugHeading(heading) : undefined,
     title,
-    heading: row.heading as string,
+    heading,
+    headingLevel,
     excerpt: row.excerpt as string,
     headingPath,
     score: row.score as number,

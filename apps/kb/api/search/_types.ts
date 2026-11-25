@@ -12,6 +12,7 @@ export interface KbSearchResult {
   title: string
   href: string
   heading: string
+  headingLevel: number
   headingPath: string[]
   excerpt: string
   score: number

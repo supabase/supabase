@@ -6,6 +6,7 @@ const row = {
   title: 'Migrate from Neon to Supabase',
   href: 'https://supabase.com/kb/guides/migrate-from-neon',
   heading: 'Export your data',
+  headingLevel: 2,
   headingPath: ['Migrate from Neon to Supabase', 'Export your data'],
   excerpt: 'Dump your Neon database',
   score: 0.8,
@@ -15,8 +16,10 @@ describe('reshapeKbResult', () => {
   it('maps an api/search row to a search result with a site-relative path', () => {
     expect(reshapeKbResult(row)).toEqual({
       path: '/kb/guides/migrate-from-neon',
+      anchor: 'export-your-data',
       title: row.title,
       heading: row.heading,
+      headingLevel: 2,
       excerpt: row.excerpt,
       headingPath: row.headingPath,
       score: 0.8,
@@ -34,6 +37,12 @@ describe('reshapeKbResult', () => {
   it('falls back to the page title when there is no heading path', () => {
     expect(reshapeKbResult({ ...row, headingPath: [] })?.headingPath).toEqual([row.title])
     expect(reshapeKbResult({ ...row, headingPath: undefined })?.headingPath).toEqual([row.title])
+  })
+
+  it('links the page top for the title, the intro and rows without a heading level', () => {
+    expect(reshapeKbResult({ ...row, headingLevel: 1 })?.anchor).toBeUndefined()
+    expect(reshapeKbResult({ ...row, headingLevel: 0 })?.anchor).toBeUndefined()
+    expect(reshapeKbResult({ ...row, headingLevel: undefined })?.anchor).toBeUndefined()
   })
 
   it('drops rows that are not search results', () => {
