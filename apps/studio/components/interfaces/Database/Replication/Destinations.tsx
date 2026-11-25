@@ -130,7 +130,11 @@ export const Destinations = () => {
   )
   const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
   const shouldShowTable = hasDestinations
-  const tableColumnCount = 6
+  const shouldShowNoResults =
+    !isDestinationsLoading &&
+    !hasClusterErrors &&
+    sortedDestinations.length === 0 &&
+    hasDestinations
 
   const {
     data: defaultSources,
@@ -411,12 +415,7 @@ export const Destinations = () => {
                       />
                     </ReplicationClusterProvider>
                   ))}
-                  {!isDestinationsLoading &&
-                    !hasClusterErrors &&
-                    sortedDestinations.length === 0 &&
-                    hasDestinations && (
-                      <TableRowNoResults colSpan={tableColumnCount} search={filterString} />
-                    )}
+                  {shouldShowNoResults && <TableRowNoResults colSpan={6} search={filterString} />}
                 </TableBody>
               </Table>
             </CardContent>
