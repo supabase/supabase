@@ -6,6 +6,11 @@
   "allowTrailingCommas": true,
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The JSON Schema this file is validated against; editors use it for completion and validation.",
+      "examples": ["https://supabase.com/schemas/config/v1.json"]
+    },
     "project_id": {
       "type": "string",
       "description": "A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`."

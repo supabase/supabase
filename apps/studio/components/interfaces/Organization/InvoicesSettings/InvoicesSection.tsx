@@ -1,9 +1,13 @@
-import { InvoicesSettings } from './InvoicesSettings'
 import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+
+import { InvoicesSettings } from './InvoicesSettings'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
@@ -13,24 +17,23 @@ export const InvoicesSection = () => {
   )
 
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-6">
-          <p className="text-foreground text-base m-0">Past Invoices</p>
-
-          <p className="prose text-sm">
+    <PageSection orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Past Invoices</PageSectionTitle>
+          <PageSectionDescription>
             You get an invoice every time you change your plan or when your monthly billing cycle
             resets.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent className="flex flex-col gap-6">
         {isPermissionsLoaded && !canReadInvoices ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <InvoicesSettings />
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }

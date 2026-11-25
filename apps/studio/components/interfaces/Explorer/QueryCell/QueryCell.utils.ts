@@ -22,9 +22,8 @@ type ReadonlyChartConfig = Omit<ChartConfig, 'y_series'> & {
   readonly y_series: readonly string[]
 }
 
-export const cloneChartConfig = (
-  chart: ReadonlyChartConfig | undefined
-): ChartConfig | undefined => (chart ? { ...chart, y_series: [...chart.y_series] } : undefined)
+export const cloneChartConfig = (chart: ReadonlyChartConfig | undefined): ChartConfig | undefined =>
+  chart ? { ...chart, y_series: [...chart.y_series] } : undefined
 
 /** The display state a query cell hands the shared editor. */
 // `view` is already defaulted to 'table' by the domain transform, so there is nothing to
