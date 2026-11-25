@@ -2875,6 +2875,8 @@ functions:
       - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
+      - The `CreateOAuthClientParams` type does not include `client_type` as a typed field. To create a public client, pass `client_type: "public"` in the request dictionary.
+      - If both `client_type` and `token_endpoint_auth_method` are omitted, the client defaults to a confidential client.
     params:
       - name: params
         isOptional: false
@@ -2912,11 +2914,6 @@ functions:
     examples:
       - id: create-oauth-client
         name: Create OAuth client
-        notes: |
-          The `CreateOAuthClientParams` type does not include `client_type` as a typed field.
-          To create a public client, pass `client_type: "public"` in the request dictionary.
-          If both `client_type` and `token_endpoint_auth_method` are omitted, the client
-          defaults to a confidential client.
         code: |
           ```python
           response = supabase.auth.admin.oauth.create_client(
