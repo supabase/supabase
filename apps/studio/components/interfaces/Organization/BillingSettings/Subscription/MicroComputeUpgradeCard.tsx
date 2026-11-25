@@ -26,6 +26,7 @@ import {
   INSTANCE_NANO_SPECS,
   PROJECT_STATUS,
 } from '@/lib/constants'
+import { pluralize } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
 /** How often to refresh project statuses while a project restarts onto Micro. */
@@ -169,8 +170,6 @@ export const MicroComputeUpgradeCard = ({
 
   if (rows.length === 0) return null
 
-  const projectNoun = rows.length === 1 ? 'project' : 'projects'
-
   // `projectToUpgrade` is a snapshot from when the row was clicked. Only confirm against the
   // current rows, in case the project changed size or started upgrading from another session.
   const selectedRow = rows.find((row) => row.project.ref === projectToUpgrade?.ref)
@@ -196,7 +195,8 @@ export const MicroComputeUpgradeCard = ({
         <CardContent className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
             <h2 className="text-lg text-foreground">
-              {rows.length} {projectNoun} can move to Micro for no additional costs
+              {rows.length} {pluralize(rows.length, 'project')} can move to Micro for no additional
+              costs
             </h2>
             <p className="text-sm text-foreground-light">
               <span>
