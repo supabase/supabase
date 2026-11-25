@@ -3,7 +3,11 @@ import { isFeatureEnabled } from 'common'
 
 const billingEnabled = isFeatureEnabled('billing:all')
 
-export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade' | 'Others'
+export type ExtendedSupportCategories =
+  | SupportCategories
+  | 'Plan_upgrade'
+  | 'Permission_issue'
+  | 'Others'
 
 export const CATEGORY_OPTIONS: {
   value: ExtendedSupportCategories
@@ -45,6 +49,12 @@ export const CATEGORY_OPTIONS: {
     value: SupportCategories.LOGIN_ISSUES,
     label: 'Issues with logging in',
     description: 'Issues with logging in and MFA',
+    query: undefined,
+  },
+  {
+    value: 'Permission_issue' as const,
+    label: 'Permission issue',
+    description: 'Issues accessing an organization or project you should have access to',
     query: undefined,
   },
   ...(billingEnabled

@@ -69,6 +69,7 @@ const AssistantHandoffSchema = z.object({
   category: z.union([
     z.nativeEnum(SupportCategories),
     z.literal('Plan_upgrade'),
+    z.literal('Permission_issue'),
     z.literal('Others'),
   ]),
   severity: z.string(),
