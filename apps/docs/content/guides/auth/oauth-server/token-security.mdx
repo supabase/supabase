@@ -340,13 +340,13 @@ Track and review which clients have access:
 -- View all active OAuth clients
 SELECT
   oc.client_id,
-  oc.name,
+  oc.client_name,
   oc.created_at,
   COUNT(DISTINCT s.user_id) as active_users
 FROM auth.oauth_clients oc
-LEFT JOIN auth.sessions s ON s.client_id = oc.client_id
+LEFT JOIN auth.sessions s ON s.oauth_client_id = oc.id
 WHERE s.created_at > NOW() - INTERVAL '30 days'
-GROUP BY oc.client_id, oc.name, oc.created_at;
+GROUP BY oc.client_id, oc.client_name, oc.created_at;
 ```
 
 ## Testing your policies
