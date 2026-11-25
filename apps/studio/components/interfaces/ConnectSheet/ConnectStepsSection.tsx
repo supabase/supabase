@@ -1,4 +1,3 @@
-import { ClientOnly } from '@tanstack/react-router'
 import { useParams } from 'common'
 import Link from 'next/link'
 import {
@@ -216,16 +215,14 @@ function StepContent({
   const ContentComponent = getStepContentComponent(filePath)
 
   return (
-    <ClientOnly fallback={stepContentFallback}>
-      <Suspense fallback={stepContentFallback}>
-        <ContentComponent
-          state={state}
-          projectKeys={projectKeys}
-          connectionStringPooler={connectionStringPooler}
-          deploymentMode={deploymentMode}
-        />
-      </Suspense>
-    </ClientOnly>
+    <Suspense fallback={stepContentFallback}>
+      <ContentComponent
+        state={state}
+        projectKeys={projectKeys}
+        connectionStringPooler={connectionStringPooler}
+        deploymentMode={deploymentMode}
+      />
+    </Suspense>
   )
 }
 

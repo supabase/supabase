@@ -1,5 +1,4 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
-import { ClientOnly } from '@tanstack/react-router'
 import type { Tables } from 'common/marketplace.types'
 import {
   Clock5Icon,
@@ -210,15 +209,10 @@ const GraphQLOverviewTab = lazy(() =>
     default: mod.GraphQLOverviewTab,
   }))
 )
-const LazyGraphiQLTab = lazy(() =>
+const GraphiQLTab = lazy(() =>
   import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then((mod) => ({
     default: mod.GraphiQLTab,
   }))
-)
-const GraphiQLTab = () => (
-  <ClientOnly fallback={<Loading />}>
-    <LazyGraphiQLTab />
-  </ClientOnly>
 )
 
 const WrapperOverviewTab = lazy(() =>

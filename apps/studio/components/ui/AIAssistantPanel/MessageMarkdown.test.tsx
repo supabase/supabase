@@ -1,9 +1,8 @@
 import { render } from '@testing-library/react'
-import { renderToString } from 'react-dom/server'
 import { describe, expect, test } from 'vitest'
 
 import { wrapPlaceholderUrls } from './Message.utils'
-import { MessageMarkdown, OrderedList } from './MessageMarkdown'
+import { OrderedList } from './MessageMarkdown'
 
 describe('wrapPlaceholderUrls', () => {
   test('wraps a bare URL containing a placeholder in backticks', () => {
@@ -81,17 +80,5 @@ describe('OrderedList', () => {
     expect(ol).toBeInTheDocument()
     expect(ol).toHaveAttribute('start', '3')
     expect(ol).toHaveStyle({ counterReset: 'item 2' })
-  })
-})
-
-describe('MessageMarkdown', () => {
-  test('does not render Streamdown during SSR', () => {
-    // Rendering without a Suspense boundary verifies ClientOnly gates lazy Streamdown on the server.
-    const html = renderToString(
-      <MessageMarkdown id="msg-1" isLoading={false}>
-        Hello **world**
-      </MessageMarkdown>
-    )
-    expect(html).toBe('')
   })
 })

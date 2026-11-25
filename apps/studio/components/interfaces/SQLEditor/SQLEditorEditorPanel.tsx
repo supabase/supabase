@@ -1,5 +1,4 @@
 import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { ClientOnly } from '@tanstack/react-router'
 import { Loader2Icon } from 'lucide-react'
 import { lazy, Suspense, useCallback } from 'react'
 import { cn } from 'ui'
@@ -71,16 +70,14 @@ const SQLEditorDiffView = () => {
 
   return (
     <div className="w-full h-full">
-      <ClientOnly>
-        <Suspense fallback={null}>
-          <DiffEditor
-            language="pgsql"
-            original={defaultSqlDiff.original}
-            modified={defaultSqlDiff.modified}
-            onMount={handleDiffEditorMount}
-          />
-        </Suspense>
-      </ClientOnly>
+      <Suspense fallback={null}>
+        <DiffEditor
+          language="pgsql"
+          original={defaultSqlDiff.original}
+          modified={defaultSqlDiff.modified}
+          onMount={handleDiffEditorMount}
+        />
+      </Suspense>
       {showWidget && <DiffPromptWidget />}
     </div>
   )
@@ -153,26 +150,24 @@ const SQLEditorMainView = () => {
 
   return (
     <div key={id} className="w-full h-full relative">
-      <ClientOnly>
-        <Suspense fallback={null}>
-          <MonacoEditor
-            autoFocus
-            placeholder={
-              !promptState.isOpen && !editorRef.current?.getValue() ? generatePlaceholder(os) : ''
-            }
-            id={id}
-            snippetName={snippetName}
-            className={cn(isDiffOpen && 'hidden')}
-            editorRef={editorRef}
-            monacoRef={monacoRef}
-            executeQuery={runQuery}
-            prettifyQuery={prettifyQuery}
-            onHasSelection={setHasSelection}
-            onMount={onMount}
-            onPrompt={openPrompt}
-          />
-        </Suspense>
-      </ClientOnly>
+      <Suspense fallback={null}>
+        <MonacoEditor
+          autoFocus
+          placeholder={
+            !promptState.isOpen && !editorRef.current?.getValue() ? generatePlaceholder(os) : ''
+          }
+          id={id}
+          snippetName={snippetName}
+          className={cn(isDiffOpen && 'hidden')}
+          editorRef={editorRef}
+          monacoRef={monacoRef}
+          executeQuery={runQuery}
+          prettifyQuery={prettifyQuery}
+          onHasSelection={setHasSelection}
+          onMount={onMount}
+          onPrompt={openPrompt}
+        />
+      </Suspense>
       {editorRef.current && promptState.isOpen && !isDiffOpen && <MainPromptWidget />}
     </div>
   )

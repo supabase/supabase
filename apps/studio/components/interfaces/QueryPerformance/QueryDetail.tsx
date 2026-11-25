@@ -1,4 +1,3 @@
-import { ClientOnly } from '@tanstack/react-router'
 import { ChevronsUpDownIcon, LightbulbIcon } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
@@ -95,14 +94,12 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             isExpanded ? 'h-[348px]' : 'h-[120px]'
           )}
         >
-          <ClientOnly>
-            <Suspense fallback={null}>
-              <SqlMonacoBlock
-                value={query}
-                wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
-              />
-            </Suspense>
-          </ClientOnly>
+          <Suspense fallback={null}>
+            <SqlMonacoBlock
+              value={query}
+              wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
+            />
+          </Suspense>
           {isLinterWarning && (
             <Alert
               variant="default"

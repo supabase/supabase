@@ -1,4 +1,3 @@
-import { ClientOnly } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
 import { useCommandMenuInitiated } from 'ui-patterns/CommandMenu'
 
@@ -11,10 +10,8 @@ export const StudioCommandMenu = () => {
   if (!isInitiated) return null
 
   return (
-    <ClientOnly>
-      <Suspense fallback={null}>
-        <LazyCommandMenu />
-      </Suspense>
-    </ClientOnly>
+    <Suspense fallback={null}>
+      <LazyCommandMenu />
+    </Suspense>
   )
 }

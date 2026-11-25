@@ -1,4 +1,3 @@
-import { ClientOnly } from '@tanstack/react-router'
 import Link from 'next/link'
 import React, {
   isValidElement,
@@ -171,13 +170,11 @@ export const MessageMarkdown = memo(function MessageMarkdown({
   )
 
   return (
-    <ClientOnly>
-      <Suspense fallback={null}>
-        <Streamdown className={className} components={allMarkdownComponents}>
-          {markdownSource}
-        </Streamdown>
-      </Suspense>
-    </ClientOnly>
+    <Suspense fallback={null}>
+      <Streamdown className={className} components={allMarkdownComponents}>
+        {markdownSource}
+      </Streamdown>
+    </Suspense>
   )
 })
 
