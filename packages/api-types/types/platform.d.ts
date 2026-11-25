@@ -4150,7 +4150,7 @@ export interface paths {
     put?: never
     /**
      * Restart pipeline
-     * @description Restart the pipeline. Requires bearer auth and an active, healthy project. Fails with a conflict if the pipeline is not currently running.
+     * @description Restart the pipeline using its saved settings. Requires bearer auth and an active, healthy project. An active desired workload can be restarted even when its pod is failed or missing. Fails with a conflict if the desired workload is stopped or its saved settings cannot be read.
      */
     post: operations['PipelinesController_restartPipeline']
     delete?: never
@@ -5554,7 +5554,7 @@ export interface paths {
     }
     /**
      * Get Warehouse setup status
-     * @description Return Warehouse setup or disable status. During and after teardown, persisted lifecycle state is returned without querying ETL or inspecting the project FDW. Otherwise completion follows replication and table copy state.
+     * @description Return Warehouse setup or disable status. During and after teardown, persisted lifecycle state is returned without querying the Pipelines API or inspecting the project FDW. Otherwise completion follows replication and table copy state.
      */
     get: operations['WarehouseController_getSetupStatus']
     put?: never
@@ -11449,7 +11449,7 @@ export interface components {
          */
         active: boolean
         /**
-         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
+         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after the pipeline's local progress. Null when unavailable, including lost slots.
          * @example 2048
          */
         confirmed_flush_lsn_bytes?: number | null
@@ -11569,7 +11569,7 @@ export interface components {
            */
           active: boolean
           /**
-           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
+           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after the pipeline's local progress. Null when unavailable, including lost slots.
            * @example 2048
            */
           confirmed_flush_lsn_bytes?: number | null
@@ -11610,7 +11610,7 @@ export interface components {
     /** @description Pipeline */
     PipelineResponse_Output: {
       /**
-       * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+       * @description Stable ID of the Pipelines cluster containing this pipeline; independent of its display name.
        * @example 1
        */
       cluster_id: string
@@ -11764,7 +11764,7 @@ export interface components {
       /** @description List of pipelines */
       pipelines: {
         /**
-         * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+         * @description Stable ID of the Pipelines cluster containing this pipeline; independent of its display name.
          * @example 1
          */
         cluster_id: string
@@ -11916,6 +11916,19 @@ export interface components {
       }[]
     }
     PipelineStatusResponse_Output: {
+      /** @description Safe classification of the current runtime failure. Includes static customer guidance, without exit codes, provider messages or worker logs; does not establish its underlying cause. Unrecognized or malformed diagnostics are omitted. */
+      diagnostic?: {
+        /** @enum {string} */
+        code:
+          | 'out_of_memory'
+          | 'process_exited'
+          | 'crash_loop'
+          | 'image_unavailable'
+          | 'configuration_error'
+          | 'startup_failed'
+          | 'runtime_failed'
+        message: string
+      } | null
       /**
        * @description Pipeline ID
        * @example 03dg2o5teb2eucxr9ggh3uie6
@@ -32247,8 +32260,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is active or another operation is in progress. */
+      /** @description Pipeline is active. */
       409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another operation is in progress. Retry after it finishes. */
+      423: {
         headers: {
           [name: string]: unknown
         }
@@ -32826,8 +32846,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is active or another operation is in progress. */
+      /** @description Pipeline is active. */
       409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another operation is in progress. Retry after it finishes. */
+      423: {
         headers: {
           [name: string]: unknown
         }
@@ -32952,7 +32979,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is not running. */
+      /** @description Desired workload is stopped or saved settings cannot be read. */
       409: {
         headers: {
           [name: string]: unknown
@@ -33948,8 +33975,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Tenant has active pipelines. */
+      /** @description A pipeline or its source migration is still running. */
       409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another operation is in progress. Retry after it finishes. */
+      423: {
         headers: {
           [name: string]: unknown
         }
@@ -37393,8 +37427,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Another Warehouse mutation is running or the cleanup policy cannot be changed. */
+      /** @description The Warehouse cleanup policy cannot be changed. */
       409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another Warehouse mutation is running. Retry after it finishes. */
+      423: {
         headers: {
           [name: string]: unknown
         }

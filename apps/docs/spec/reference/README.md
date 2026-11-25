@@ -113,11 +113,7 @@ with `@category` (and optionally `@subcategory`):
               { "tag": "@subcategory", "content": [{ "kind": "text", "text": "Auth MFA" }] },
             ],
           },
-          "signatures": [
-            {
-              /* params + return type */
-            },
-          ],
+          "signatures": [{/* params + return type */}],
         },
       ],
     },
