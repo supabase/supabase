@@ -375,7 +375,8 @@ test('keeps request-access creation in the sheet when no wizard destination is a
 describe('regions', () => {
   const clusterOf = (request: Request) =>
     new URL(request.url).searchParams.get('cluster_id') ?? 'omitted'
-  const regionName = (cluster: string) => (cluster === '2' ? 'Frankfurt' : 'Singapore')
+  const regionNames: Record<string, string> = { '2': 'Frankfurt', '3': 'Sydney', '4': 'Virginia' }
+  const regionName = (cluster: string) => regionNames[cluster] ?? 'Singapore'
 
   const regionDestination = (cluster: string) => ({
     id: 1,
@@ -599,6 +600,8 @@ describe('regions', () => {
     failingClusters.clear()
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
     expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
+    expect(screen.getByText('Singapore sync')).toBeInTheDocument()
+    expect(screen.queryByText('Could not load results from Frankfurt')).not.toBeInTheDocument()
   })
 
   test('uses one loading row and one warning for several unavailable regions', async () => {
@@ -641,6 +644,10 @@ describe('regions', () => {
     const defaultRequests = requests.filter((cluster) => cluster === 'omitted').length
     unavailable = false
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    for (const region of ['Frankfurt', 'Sydney', 'Virginia']) {
+      expect(await screen.findByText(`${region} sync`)).toBeInTheDocument()
+    }
+    expect(screen.getByText('Singapore sync')).toBeInTheDocument()
     await waitFor(() =>
       expect(screen.queryByText('Could not load results from some regions')).not.toBeInTheDocument()
     )

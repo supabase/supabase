@@ -159,6 +159,9 @@ export const Destinations = () => {
       ? `Could not load results from ${failedRegions[0].group.region?.region_name ?? 'one region'}`
       : 'Could not load results from some regions'
 
+  const pipelineListStatus = hasClusterErrors ? `Warning: ${failedRegionTitle}` : ''
+  const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
+
   const {
     data: defaultSources,
     isSuccess: isSourcesSuccess,
@@ -356,7 +359,7 @@ export const Destinations = () => {
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {/* Mounted whether or not it has anything to say, so the update is announced */}
         <p role="status" aria-live="polite" className="sr-only">
-          {isDestinationsLoading ? 'Loading pipelines' : ''}
+          {pipelineListStatus || loadingStatus}
         </p>
 
         {isRegionsError && (
