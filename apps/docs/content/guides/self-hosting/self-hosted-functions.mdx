@@ -214,19 +214,19 @@ In your functions, the [supported synchronous Deno file APIs](/docs/guides/funct
 
 ## Worker lifecycle
 
-Each function runs in a worker that serves many requests, not one worker per request. The router in `volumes/functions/main/index.ts` calls `EdgeRuntime.userWorkers.create()` on every request. Edge Runtime's default `--policy` is `per_worker`, and the `functions` service command in `docker-compose.yml` doesn't change it. With this policy, `create()` returns the function's running worker when one exists. It starts a new worker only when the function has no live worker.
+Each function runs in a worker that serves many requests. The `functions` service uses Edge Runtime's default `per_worker` policy, which sends a request to a running worker for its function. A new worker starts only when the function has no running worker.
 
-Once a worker is running, later and concurrent requests to the same function share it. Concurrent requests that arrive before any worker is live can each start a worker. Code at the top level of the function's `index.ts` runs once per worker, not once per request. Put heavy setup, such as creating clients, loading schemas, or filling caches, at the top level, outside the request handler. State created at the top level lasts only as long as the worker.
+After a function has a running worker, later and concurrent requests go to it. Concurrent requests that arrive before any worker is running might each start a worker, up to the number of CPUs available to the container. Later requests rotate across those workers. Code at the top level of the function's `index.ts` runs once per worker, not once per request. Put heavy setup, such as creating clients, loading schemas, or filling caches, at the top level, outside the request handler. State created at the top level belongs to one worker and lasts only as long as that worker.
 
-The next request starts a new worker, with a cold start and a new run of top-level code, after any of these events:
+Each of these events stops a worker from taking new requests. When the function has no running worker left, the next request starts a new one, with a cold start and a new run of top-level code:
 
-- The worker reaches its maximum lifetime, set by `workerTimeoutMs`. See [Timeout errors](#timeout-errors).
+- The worker reaches half of its maximum lifetime, set by `workerTimeoutMs`, and stops taking new requests. See [Timeout errors](#timeout-errors).
 - The worker gets no requests for the time set by `requestAbsentTimeoutMs` and has no pending tasks. See [Timeout errors](#timeout-errors).
 - [Idle-worker cleanup](#idle-worker-cleanup) retires the worker under memory pressure.
 - The worker exits on an error or a resource limit, such as the [per-worker memory limit](#per-worker-memory-limit).
 - The functions service restarts or is recreated.
 
-You don't need to build your own worker pool. To keep workers alive longer, raise `requestAbsentTimeoutMs` and `workerTimeoutMs` in `volumes/functions/main/index.ts`, then restart the functions service. Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
+To keep workers alive longer, raise `requestAbsentTimeoutMs` and `workerTimeoutMs` in `volumes/functions/main/index.ts`, then restart the functions service. Idle workers then hold memory from the [container memory budget](#container-memory-budget) for longer.
 
 ## Memory management
 
