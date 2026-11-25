@@ -146,7 +146,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
         <TabsContent
           value={toTabValue(activeTopic)}
           className={cn(
-            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 px-6 py-2',
+            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 px-4 py-1',
             'transition-[height] duration-300 ease-move motion-reduce:transition-none'
           )}
         >
@@ -160,7 +160,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
               onTopicClear={handleTopicClear}
             />
             {hasMore ? (
-              <div className="flex justify-center py-6">
+              <div className="flex justify-center pt-7 pb-5">
                 <button
                   type="button"
                   onClick={handleLoadMore}
@@ -219,7 +219,7 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
               'text-foreground-lighter hover:text-foreground'
             )}
           >
-            <span className="flex items-center gap-1 px-3">
+            <span className="flex items-center gap-1 px-4">
               More
               <ChevronDown aria-hidden className="size-3.5" strokeWidth={2.25} />
             </span>
@@ -263,7 +263,7 @@ const TopicTab = ({ topic }: TopicTabProps) => (
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:bg-(image:--tab-flare-right)'
     )}
   >
-    <span className="block px-3">{topic ?? 'All'}</span>
+    <span className="block px-4">{topic ?? 'All'}</span>
   </TabsTrigger>
 )
 
@@ -303,7 +303,7 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               // community guides link off-site
               {...(externalHost && { target: '_blank', rel: 'noopener noreferrer' })}
               className={cn(
-                'group -mx-4 flex min-h-14 flex-col gap-1 rounded-md px-4 py-3 transition-colors',
+                'group -mx-3 flex min-h-14 flex-col gap-1 rounded-md px-3 py-3 transition-colors',
                 'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-hidden',
                 'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
               )}
