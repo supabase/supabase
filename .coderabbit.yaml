@@ -110,9 +110,10 @@ reviews:
           decorative text. Treat expressive text at 40px or larger as advisory rather
           than blocking.
 
-# Applies our internal engineering skills (.agents/skills/) as CodeRabbit review
-# guidelines. The skills are the single source of truth — they are consumed
-# directly, with no copy of their content elsewhere.
+# Applies our internal engineering skills (.agents/skills/) and the docs style
+# guide (apps/docs/style-guide/) as CodeRabbit review guidelines. Both are the
+# single source of truth — they are consumed directly, with no copy of their
+# content elsewhere.
 #
 # `applyTo` decouples where a guideline file lives from the code it governs.
 # Without it, CodeRabbit scopes a guideline file to its own directory and below;
@@ -131,5 +132,5 @@ knowledge_base:
       - files: '.agents/skills/studio-e2e-tests/SKILL.md'
         applyTo: 'e2e/studio/**/*.spec.ts'
       # Docs content: the style guide
-      - files: 'apps/docs/style-guide/**/*.md'
+      - files: 'apps/docs/style-guide/*.md'
         applyTo: 'apps/docs/content/**/*.mdx'

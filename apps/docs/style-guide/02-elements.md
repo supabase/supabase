@@ -238,6 +238,11 @@ Agents can't use the Dashboard. For any change a reader makes there, also give a
 path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
 steps in [tabs](#tabs).
 
+#### Name what a command changes
+
+When a command changes something beyond its stated purpose, say so in the step. For
+example, `supabase db reset` also deletes the data in the local database.
+
 #### For every "run the following SQL" step
 
 Paste this standard snippet before the SQL block:
@@ -247,6 +252,12 @@ Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Su
 ```
 
 ### Code blocks
+
+#### Model an example on the page's other examples
+
+A new example, such as a code block or a table, uses the names, setup, and length of
+the page's other examples. When the page has none, follow the closest examples in the
+docs. Show the general rule that the text teaches, not one reader's case.
 
 #### Keep code lines short so the reader doesn't scroll
 
@@ -504,6 +515,10 @@ Every link is a decision the reader has to make, so a page dense with them costs
 attention than it saves. When a term needs one sentence of explanation, write the
 sentence instead of sending the reader away. Link the same destination once per page,
 unless the page is long enough that a reader is unlikely to have seen the first one.
+
+Don't let two sections each send the reader to the other for the answer. A
+cross-reference between two halves of a split section is fine, as long as each half
+gives its own part.
 
 #### Write link text that describes the destination
 

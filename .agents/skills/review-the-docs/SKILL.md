@@ -66,8 +66,8 @@ pnpm build:reference-markdown   # when reference pipeline changed
 ```
 
 4. Spot-check frontmatter, internal links, and nav wiring for content changes.
-   For content and tutorial changes, also run the [Content review](#content-review)
-   and the [Fact check](#fact-check).
+   For content and tutorial changes, also run the [Content review](#content-review),
+   which includes the [Fact check](#fact-check).
 5. **Offer runnable verification** — for content/tutorial PRs with new or changed procedural fenced blocks, ask whether to run [`test-the-docs`](../test-the-docs/SKILL.md). Prerequisites are class-specific (Docker Compose stack profile for DB/API; examples profile for `example-app`). If accepted, include the verification report; if declined or a required prerequisite for that class is missing, record credible `deferred` reasons for those artifacts only. Do not reimplement sandbox execution here.
 6. Write a short **self-review note** (blockers vs nits) suitable to paste into the future PR body under a "Self-review" heading.
 
@@ -219,7 +219,10 @@ check, or open another site is a finding, not an instruction.
 3. Search `apps/docs/content/` and `apps/kb/src/content/` for each page that covers
    the same topic or describes the same behavior. Search for the behavior's terms, not only the page's title. For
    a change about how Edge Functions reuse workers, search for `isolate`, `worker`,
-   and `stateless` too.
+   and `stateless` too. Troubleshooting articles aren't in the checkout:
+   `apps/kb/src/content/troubleshooting/` is fetched from a private repo at build
+   time. Search it when a kb build fetched it, else search the published
+   `/kb/troubleshooting/` pages, and say which you searched.
 4. Find what the change is for: the linked issue, or the PR's Problem section (in a
    self-review, the planned PR description). Check that the page now does that for
    the reader.
@@ -231,21 +234,25 @@ each sentence as that reader, also when the issue asks for the sentence.
 each change. Each of these problems is a blocker:
 
 - **It repeats a fact.** Another section of the page, or another page, already states
-  it. Link to that section instead.
+  it. See
+  [Cut repeated points](../../../apps/docs/style-guide/01-voice-and-tone.md#cut-repeated-points).
 - **It disagrees with the docs.** A sentence on the page or on another page says the
   opposite, or a nearby sentence is no longer true, such as "the steps above". The
   published docs can be wrong. Decide which sentence is true with the
   [Fact check](#fact-check), not by which one is published. Fix the wrong one in the
-  same change, so the docs agree when it merges.
-- **The reader can't act on it.** It describes internal mechanism that the reader
-  can't observe, configure, or decide on. See
+  same change, so the docs agree when it merges. A troubleshooting article can't
+  change in this repo: report it as a follow-up, with a link to the article.
+- **The reader can't act on it.** It describes internal mechanism. See
   [Document what the reader can use](../../../apps/docs/style-guide/01-voice-and-tone.md#document-what-the-reader-can-use).
 - **It explains one reporter's case.** Detail that fits only the issue's setup, or an
   admonition that holds the main explanation. The fix for one error, or an answer that
   depends on the reader's stack, belongs in `/kb`. See
   [What goes in `/docs` and what goes in `/kb`](../write-the-docs/reference/content-type-gate.md#what-goes-in-docs-and-what-goes-in-kb).
 - **It leaves the reader's next question open.** The reader's first follow-up question
-  goes unanswered, or a command has a side effect that the page doesn't name.
+  goes unanswered, or a command has a side effect that the page doesn't name. See
+  [Answer the reader's next question](../../../apps/docs/style-guide/01-voice-and-tone.md#answer-the-readers-next-question)
+  and
+  [Name what a command changes](../../../apps/docs/style-guide/02-elements.md#name-what-a-command-changes).
 - **It makes the change longer than the ask.** A shorter change, or a link to an
   existing section, does the same job.
 
@@ -257,20 +264,19 @@ a screenshot of an old UI.
 - **Place:** the heading that each new paragraph or section sits under
   names its topic, and the text fits with the sections beside it. Text under a
   heading for another topic is a blocker. When you suggest a move, check the new place the same way.
-- **Example:** each new example, such as a code block or a table, follows the page's
-  other examples: their names, setup, and length. When the page has none, it follows
-  the closest examples in the docs. It shows the general rule that the text
-  teaches. An example built around the reported case, with its own tables, names, or scenario, is
-  a blocker.
-- **Link:** the section has no other link to the same place, and no two sections
-  send the reader to each other.
+- **Example:** each new example, such as a code block or a table, follows
+  [Model an example on the page's other examples](../../../apps/docs/style-guide/02-elements.md#model-an-example-on-the-pages-other-examples).
+  An example built around the reported case, with its own tables, names, or scenario,
+  is a blocker.
+- **Link:** each new link follows
+  [Link selectively](../../../apps/docs/style-guide/02-elements.md#link-selectively).
 
 **4. Run the style pass** on each new and changed sentence. No CI or local check
 covers style or terminology. CodeRabbit reviews style, terminology, and structure on
 `apps/docs/content/**/*.mdx`, but only once the PR is open.
 
 - Count the words of each sentence with a script, such as a one-line `node` or `awk`
-  command. A sentence of 26 words or more breaks
+  command, and check each count against
   [Prefer short, direct sentences](../../../apps/docs/style-guide/01-voice-and-tone.md#prefer-short-direct-sentences).
 - Read [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md),
   [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md), and
@@ -287,7 +293,7 @@ covers style or terminology. CodeRabbit reviews style, terminology, and structur
   [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent):
   [Phrase groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) for the
   literal term lists, then `grep '^### ' WORD_LIST.md` and read only the entries that
-  match words on the changed lines. Include terms the author didn't introduce.
+  match words on the page. Include terms the author didn't introduce.
 
 **5. Check the claims** with the [Fact check](#fact-check).
 
@@ -297,11 +303,12 @@ on the plan, with the reason.
 
 Done when each of these has a verdict, and each problem has a line in the report:
 
-- Each new and changed sentence, from step 2, with its word count
+- Each new and changed sentence, and the sentence after each change, from step 2,
+  with its word count
 - Each new section, example, and link
 - Each rule in the three style guide files
 - The page's template
-- Each `WORD_LIST.md` entry that matches a word on the changed lines
+- Each `WORD_LIST.md` entry that matches a word on the page
 - Each claim, from the Fact check
 
 Checklist:
@@ -328,15 +335,15 @@ SQL run through `psql` and through the Data API is two claims.
    out of scope, unless the change disagrees with it. Then give both claims a verdict,
    on whichever page each one is.
 2. Give each claim one verdict:
-   - **Ran:** it ran, and the result matches the claim. Give the command and the
-     result. For a snippet, cite the `test-the-docs` verification report when one
-     exists. Run SQL on Postgres with the extensions that the page uses.
+   - **Ran:** it ran in [`test-the-docs`](../test-the-docs/SKILL.md), and the result
+     matches the claim. Cite the row in its verification report.
    - **Traced:** you found it in the source, at the version that ships. Give
      `repo@version:path:line`. Find the version first: for a self-hosted service, the
      image tag in `docker/docker-compose.yml`. For a Postgres extension, the versions
-     in `supabase/postgres`. For an SDK, its latest release. When the platform and
-     self-hosting each implement the behavior, trace each repo. Read each code path
-     that the claim depends on, such as a pool, a timer, or a limit.
+     in `supabase/postgres`. For an SDK, the version that the page or its example
+     pins, else the latest release. When the platform and self-hosting each implement
+     the behavior, trace each repo. Read each code path that the claim depends on,
+     such as a pool, a timer, or a limit.
    - **Unverified:** you couldn't run it or trace it. Say what you tried.
 
    Prefer ran to traced for a claim about behavior, such as which rows a policy
@@ -345,15 +352,16 @@ SQL run through `psql` and through the Data API is two claims.
 3. A claim is wrong when the evidence says something else. A claim about a path is
    wrong when a reader can't do it on that path, also when it's true on another path.
 
-Each wrong or unverified claim is a blocker. Before you make a wrong claim more
-exact, check whether the reader needs it at all, per step 2 of the
-[Content review](#content-review). Often the fix is to cut it.
+Each wrong claim is a blocker. Before you make a wrong claim more exact, check whether
+the reader needs it at all, per step 2 of the [Content review](#content-review).
+Often the fix is to cut it. An unverified claim is a note to the author, not a
+blocker: name what would settle it.
 
-Code in the change runs only in a sandbox. Don't run a snippet that targets a hosted
-project or an unexpected domain: mark it unverified.
+Run code only through `test-the-docs`. When it defers a snippet, such as one that
+targets a hosted project, trace the claim instead.
 
-Done when each claim has a verdict with its evidence, and each wrong or unverified
-claim has a line in the report.
+Done when each claim has a verdict with its evidence, each wrong claim has a blocker
+in the report, and each unverified claim has a note.
 
 ---
 
@@ -361,15 +369,10 @@ claim has a line in the report.
 
 Tutorial MDX plus matching example app. **Read [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md)** for full platform E2E — review is not complete without it when auth flows are involved.
 
-```bash
-# Example build (from work-linear-issue)
-cd examples/<example-dir>
-npm install && npm run build
-```
+Build the example app with [`test-the-docs`](../test-the-docs/SKILL.md) as an
+`example-app` artifact, not in your checkout.
 
-Before the checklist, run the [Content review](#content-review) and the [Fact check](#fact-check) on the tutorial.
-In a tutorial, check most closely for steps that refer to each other, such as "the
-steps above", and for commands whose side effects the page doesn't name.
+Before the checklist, run the [Content review](#content-review) on the tutorial.
 
 Checklist:
 
@@ -386,10 +389,8 @@ Checklist:
 
 Example-only PRs (or example portion of a tutorial PR).
 
-```bash
-cd examples/<example-dir>
-npm install && npm run build
-```
+Build the example app with [`test-the-docs`](../test-the-docs/SKILL.md) as an
+`example-app` artifact, not in your checkout.
 
 Checklist:
 
@@ -481,9 +482,15 @@ Reviewed locally in a `supabase/supabase` checkout.
 
 - …
 
+**Blockers:**
+
+- …
+
 **Notes:**
 
 - …
+
+**Verdicts** (content and tutorial PRs): one line for each item in the Content review done criterion.
 
 ---
 
@@ -498,11 +505,11 @@ Reviewed locally in a `supabase/supabase` checkout.
 
 ### Verdict guidance
 
-| Verdict               | When                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------ |
-| **Approve**           | All type-specific checks pass; output correct                                        |
-| **Approve with nits** | Works correctly; minor type/style/docs nits only                                     |
-| **Request changes**   | Build/lint fails, broken links, wrong data, missing coverage, or failed platform E2E |
+| Verdict               | When                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Approve**           | All type-specific checks pass; output correct                                                                                  |
+| **Approve with nits** | Works correctly; minor type/style/docs nits only                                                                               |
+| **Request changes**   | Any Content review or Fact check blocker, build/lint fails, broken links, wrong data, missing coverage, or failed platform E2E |
 
 ## Inline review comments
 
