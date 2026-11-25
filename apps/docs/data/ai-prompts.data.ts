@@ -15,6 +15,9 @@ BEFORE QUERYING
    Use project-scoped Supabase MCP with project_ref and read_only=true.
    Use query_logs for ClickHouse, execute_sql for read-only Postgres diagnostics,
    and get_issues for security, performance, or health checks as applicable.
+   Check discovery first; if get_issues is unavailable, use get_advisors with its
+   advertised inputs and response format. Report any unsupported category as
+   unable to assess.
    Advisors remains available alongside Issues and is planned for deprecation
    in a future release; existing get_advisors callers can continue using it.
    Follow each tool's input schema. For get_issues, review checks for unavailable

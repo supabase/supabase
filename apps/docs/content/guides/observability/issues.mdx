@@ -17,6 +17,8 @@ Some issues may be intentional, so check them against your intended schema and a
 
 ## Check issues with the CLI
 
+`supabase issues` is available in CLI `v3.5.0-beta.1` and `v4.0.0-next.51`. Use one of these prereleases or a later release that includes the command; stable `v3.4.0` does not include it.
+
 Run checks against your local database, or use `--remote` for your linked project:
 
 ```sh
@@ -28,29 +30,38 @@ supabase issues --remote --output-format json
 
 `--type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `--severity` sets the minimum severity: `info`, `warning`, or `critical`. It defaults to `info`.
 
-Health checks require a remote project. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. You can select another remote project with `--remote=<ref|branch|url>`.
+Health checks require a remote project. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. Use `--remote=<project-ref>` or `--remote=<branch>` to select another hosted project, or `--remote=<postgresql-url>` for direct database checks. Supply the target with `=`, as in `--remote=your-project-ref`.
 
 The CLI defaults to JSON when it detects an agent. Use `--agent no --output-format text` to request human-readable output explicitly.
 
 Text output summarizes each issue and its affected-resource count, followed by check coverage. Use `--output-format json` or `--output-format stream-json` for structured results. The legacy `-o` / `--output` flag is unsupported.
 
-`--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`.
+`--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`. API, network, or decoding failures preserve successful categories and mark the failed category unavailable. Authentication and permission failures stop the command.
 
 The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command is planned for deprecation in a future release. It retains its existing flags, defaults, output, and exit behavior.
 
 ## Check issues with MCP
 
-Use `get_issues` with your project scope. For example, these tool arguments request security issues at warning severity or above:
+<Admonition type="note">
+
+`get_issues` requires an MCP server version that includes this tool. The published `v0.19.0` package predates it. Hosted MCP availability depends on its deployment; check your connection’s tool discovery before using it. Use `get_advisors` when `get_issues` is unavailable.
+
+</Admonition>
+
+On a project-scoped connection, these `get_issues` arguments request security issues at warning severity or above:
 
 ```json
 {
-  "project_id": "your-project-ref",
   "type": "security",
   "severity": "warning"
 }
 ```
 
-`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. A project-scoped MCP connection supplies `project_id` automatically.
+`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. A project-scoped MCP connection supplies `project_id` automatically and omits it from discovery. On an account-wide connection, add `"project_id": "your-project-ref"` to the arguments. Send `type` and `severity` explicitly when following the discovery schema. Platforms without health support omit `health` from the advertised type values; `all` still reports health as unavailable.
+
+`get_issues` belongs to the `debugging` feature group and supports read-only connections. Hosted checks require **Advisors** read access (`advisors_read`). Discovery can list the tool even when your token lacks this permission; a listed tool does not establish that you can call it.
+
+ChatGPT connections using published plugin metadata need an updated plugin submission to expose the new tool.
 
 The `get_advisors` tool is planned for deprecation in a future release. It remains available for existing callers.
 
@@ -60,7 +71,7 @@ CLI structured output and `get_issues` return `issues` and `checks`:
 
 - `issues` groups findings by check. Each issue includes its `id`, `title`, `description`, `severity`, `category`, `source`, `docs_url`, and `affected` resources.
 - Each `affected` entry preserves its resource, detail, severity, documentation URL, and finding ID. Severity filtering selects issues by their highest finding severity. The CLI retains all findings within a matching issue. MCP returns up to 20 `affected` entries per issue, with the full total in `affected_count`. Issue severity reflects all findings, including entries beyond that limit.
-- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable. MCP retains available findings when another category’s check fails. Authentication and permission errors still fail the tool call.
+- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable. MCP retains available findings when another category’s check fails. Authentication, permission, and protocol errors still fail the tool call.
 
 Check IDs identify checks within a project, rather than persistent incidents. These interfaces inspect current findings; they do not dismiss issues or track their resolution.
 

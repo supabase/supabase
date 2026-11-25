@@ -23,6 +23,8 @@ flowchart TD
 
 It uses `get_issues` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp).
 
+Check tool discovery before running the prompt. If your MCP server does not expose `get_issues`, use `get_advisors` with its advertised inputs and response format. See [MCP compatibility](/docs/guides/observability/issues#check-issues-with-mcp).
+
 ## When it watches
 
 <AgentWatchSchedule id="security" />

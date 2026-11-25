@@ -58,7 +58,8 @@ The Supabase MCP server provides tools organized into feature groups. Groups tha
 ### Debugging
 
 - `query_logs` - Run a read-only SQL query against project logs to filter, aggregate, or join across log fields. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
-- `get_issues` - Get security, performance, and health issues, grouped by check with affected resources and check coverage. `get_advisors` remains available and is planned for deprecation in a future release.
+- `get_advisors` - Get advisory notices for your project. This tool remains available and is planned for deprecation in a future release.
+- `get_issues` - Get security, performance, and health issues, grouped by check with affected resources and check coverage. Availability depends on your MCP server version and hosted deployment. Check tool discovery and see [Issues](/docs/guides/observability/issues#check-issues-with-mcp) for compatibility and permissions.
 
 ### Development
 

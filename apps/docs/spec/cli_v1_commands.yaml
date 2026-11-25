@@ -4943,15 +4943,19 @@ commands:
     description: |
 
 
+      Available in CLI `v3.5.0-beta.1` and `v4.0.0-next.51`, or later releases that include this command. Stable `v3.4.0` does not include it.
+
       Checks a project for security, performance, and health issues. Findings are grouped by check, with every affected resource and its evidence preserved. Severities are `info`, `warning`, and `critical`, corresponding to the underlying INFO, WARN, and ERROR findings.
 
       The default `--type all --severity info` displays every issue. Use `--fail-on warning` to exit with status 1 when a displayed issue is warning or critical. The severity filter applies before the exit threshold.
 
-      Inspects the local database by default. Use `--remote` for the linked project, or `--remote=<ref|branch|url>` for another target. Security and performance checks use a transaction that is always rolled back for local databases and direct database URLs. Health checks require a remote project: `--type health` rejects local and direct database targets, while `--type all` reports health coverage as unavailable for those targets.
+      Inspects the local database by default. Use `--remote` for the linked project, or `--remote=<ref|branch|url>` for another target. Security and performance checks use a transaction that is always rolled back for local databases and direct database URLs. Health checks cover elevated log error rates for the Data API, Auth, Storage, and Edge Functions and require a hosted project: `--type health` rejects local and direct database targets, while `--type all` reports health coverage as unavailable for those targets.
 
-      By default, the command prints a table with severity, category, issue title, and the number of affected resources, followed by check coverage. Long titles wrap to fit the terminal. Narrow terminals show stacked fields when the table cannot fit. Unavailable checks include their reason and an incomplete-results warning. An empty result means no issues match the selected severity; it does not establish that the project is healthy.
+      Hosted checks require `advisors_read`. Selecting a project can also require `projects_read`; resolving a branch can require `branching_development_read` or `branching_production_read`. Use `supabase issues --help` to inspect conditional token permissions.
 
-      Structured output contains `issues` and `checks`. Each issue includes its stable check ID, severity, category, documentation URL, and affected resources. Coverage reports each requested category as complete or unavailable. A remote check that cannot run is reported as unavailable and exits with status 1; it is never reported as a clean check.
+      Detected agents receive JSON by default. Use `--agent no --output-format text` to explicitly request terminal output. Otherwise, the command prints a table with severity, category, issue title, and the number of affected resources, followed by check coverage. Long titles wrap to fit the terminal. Narrow terminals show stacked fields when the table cannot fit. Unavailable checks include their reason and an incomplete-results warning. An empty result means no issues match the selected severity; it does not establish that the project is healthy.
+
+      Structured output contains `issues` and `checks`. Each issue includes its stable check ID, severity, category, documentation URL, and affected resources. Coverage reports each requested category as complete or unavailable. Remote API, network, or decoding failures preserve successful categories, mark the failed category unavailable, and exit with status 1. Authentication and permission failures stop the command.
 
       `supabase db advisors` is planned for deprecation in a future release. Its existing flags, defaults, output, and exit behavior remain supported.
 
