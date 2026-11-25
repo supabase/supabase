@@ -7,11 +7,11 @@ subtitle: 'Choose a format, convert, and validate.'
 
 The Supabase CLI reads project configuration from one of three files in the `supabase` directory.
 
-| File                    | Format                                                                     |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `supabase/config.toml`  | TOML.                                                                      |
-| `supabase/config.jsonc` | JSON with comments and trailing commas. `supabase init` creates this file. |
-| `supabase/config.json`  | JSON without comments.                                                     |
+| File                    | Format                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `supabase/config.toml`  | TOML.                                                                                             |
+| `supabase/config.jsonc` | JSON with comments and trailing commas. `supabase init` creates this file in CLI 3.4.0 and later. |
+| `supabase/config.json`  | JSON without comments.                                                                            |
 
 A project with a `config.toml` keeps working without changes. To use TOML, run `supabase config convert --to toml` after `supabase init`. See [Convert back to TOML](#convert-back-to-toml).
 
@@ -24,6 +24,8 @@ A `config.json` or `config.jsonc` file takes precedence over `config.toml`. Havi
 Supabase CLI 3.1.0 is the first release that reads `config.json` and `config.jsonc`. Older versions ignore these files and run with default settings. Everyone who works on the project, and any CI step that pins a CLI version such as [`supabase/setup-cli`](https://github.com/supabase/setup-cli), needs 3.1.0 or later.
 
 The `supabase config convert` and `supabase config validate` commands need CLI 3.2.0 or later. Converting back to TOML with `--to toml` needs CLI 3.3.0 or later.
+
+`supabase init` creates `config.jsonc` in CLI 3.4.0 and later. Earlier versions create `config.toml`.
 
 ## Convert TOML to JSONC
 
