@@ -1,7 +1,5 @@
 import { useParams } from 'common'
 import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 

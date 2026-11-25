@@ -7,11 +7,23 @@ interface BannerCardProps {
   onDismiss?: () => void
   children: React.ReactNode
   className?: string
+  size?: 'default' | 'wide'
 }
 
-export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) => {
+export const BannerCard = ({
+  onDismiss,
+  children,
+  className,
+  size = 'default',
+}: BannerCardProps) => {
   return (
-    <Card className={cn('relative overflow-hidden shadow-lg rounded-2xl', className)}>
+    <Card
+      className={cn(
+        'relative overflow-hidden shadow-lg rounded-2xl max-w-[calc(100vw-2rem)]',
+        size === 'wide' ? 'w-80' : 'w-72',
+        className
+      )}
+    >
       <div className="absolute -inset-16 z-0 opacity-100 pointer-events-none">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}

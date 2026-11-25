@@ -31,7 +31,7 @@ export const BannerStack = () => {
       animate={{ y: isHovered ? -8 : 0 }}
       transition={transition}
     >
-      <div className="relative w-full max-w-72">
+      <div className="relative w-full max-w-80">
         <AnimatePresence>
           {!isHovered &&
             peeks.map((depth) => (
@@ -63,7 +63,7 @@ export const BannerStack = () => {
           extraBanners.map((banner, index) => (
             <motion.div
               key={banner.id}
-              className="w-full max-w-72"
+              className="w-full max-w-80"
               initial={{ opacity: 0, scale: 0.98, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 8 }}

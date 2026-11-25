@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Badge, Menu } from 'ui'
 
-import { StorageVersioningPreviewBanner } from './FilesBuckets/StorageVersioningPreviewBanner'
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -67,8 +66,8 @@ export const StorageMenuV2 = () => {
   })
 
   return (
-    <Menu type="pills" className="my-2 md:my-4 flex grow flex-col" ulClassName="flex grow flex-col">
-      <div className="flex grow flex-col gap-y-4">
+    <Menu type="pills" className="my-2 md:my-4 flex grow flex-col">
+      <div className="space-y-4">
         <div className="md:mx-3">
           <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />
 
@@ -136,8 +135,6 @@ export const StorageMenuV2 = () => {
             </div>
           </>
         )}
-
-        <StorageVersioningPreviewBanner />
       </div>
     </Menu>
   )
