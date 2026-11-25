@@ -1,4 +1,5 @@
 import { IS_PROD } from './constants'
+import { CLICK_ID_KEYS } from './first-referrer-cookie'
 import { isBrowser } from './helpers'
 
 export type TelemetryPlatform = 'studio' | 'www' | 'docs' | 'kb' | 'learn' | 'ui-library'
@@ -45,29 +46,17 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
-export const FIRST_TOUCH_CLICK_ID_KEYS = [
-  'gclid', // Google Ads
-  'gbraid', // Google Ads (iOS)
-  'wbraid', // Google Ads (iOS)
-  'msclkid', // Microsoft Ads (Bing)
-  'fbclid', // Meta (Facebook/Instagram)
-  'rdt_cid', // Reddit Ads
-  'ttclid', // TikTok Ads
-  'twclid', // X Ads (Twitter)
-  'li_fat_id', // LinkedIn Ads
-  'bfcid', // Freebuff Ads
-  'oppref', // ChatGPT Ads (OpenAI)
-] as const
-
-// Attribution reads these values out of the URL downstream. Every other query value can hold
-// customer data or a credential (row filters, search text, invite tokens, OAuth codes).
+// The first-touch code and the attribution models read these values out of the URL. Every other
+// query value can hold customer data or a credential (row filters, search text, invite tokens,
+// OAuth codes).
 const READABLE_URL_PARAMS = new Set<string>([
   'utm_source',
   'utm_medium',
   'utm_campaign',
   'utm_content',
   'utm_term',
-  ...FIRST_TOUCH_CLICK_ID_KEYS,
+  ...CLICK_ID_KEYS,
+  'bfcid',
   'dub_id',
   'campaign_id',
   'cid',

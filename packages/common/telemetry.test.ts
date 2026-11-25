@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CLICK_ID_KEYS } from './first-referrer-cookie'
-import { getFirstTouchAttributionProps } from './page-telemetry'
+import { FIRST_TOUCH_CLICK_ID_KEYS, getFirstTouchAttributionProps } from './page-telemetry'
 import type { SharedTelemetryData } from './telemetry-first-touch-store'
-import { FIRST_TOUCH_CLICK_ID_KEYS } from './telemetry-utils'
 
 const makeTelemetryData = (pageUrl: string) =>
   ({
