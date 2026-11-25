@@ -13,7 +13,6 @@ vi.mock('../ai/tools/tool-sanitizer', () => ({
 vi.mock('@/lib/ai/ai-details', () => ({
   getAIDetails: vi.fn().mockResolvedValue({
     aiOptInLevel: 'schema_and_log_and_data',
-    hasAccessToAdvanceModel: true,
     orgId: 1,
   }),
 }))

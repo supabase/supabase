@@ -20,7 +20,7 @@ import { buildTranscript } from './transcript'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { getModel } from '@/lib/ai/model'
-import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
+import { ASSISTANT_CHAT_MODEL } from '@/lib/ai/model.utils'
 import { filterToolsByOptInLevel } from '@/lib/ai/tool-filter'
 import { getMockTools } from '@/lib/ai/tools/mock-tools'
 
@@ -37,8 +37,7 @@ Eval('Assistant', {
   maxConcurrency: 10,
   data: () => dataset,
   task: async (input) => {
-    const modelEntry = getAssistantModelEntry(DEFAULT_ASSISTANT_BASE_MODEL_ID)
-    const modelResponse = await getModel({ provider: 'openai', modelEntry })
+    const modelResponse = await getModel({ provider: 'openai', modelEntry: ASSISTANT_CHAT_MODEL })
     if (modelResponse.error) throw modelResponse.error
 
     const { aiOptInLevel, optInDecision } = input

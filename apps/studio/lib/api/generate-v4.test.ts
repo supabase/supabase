@@ -3,6 +3,7 @@ import { pipeUIMessageStreamToResponse, streamText, UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
 import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
+import { getModel } from '@/lib/ai/model'
 import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { Route } from '@/routes/api/ai/sql/generate-v4'
@@ -15,7 +16,6 @@ vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
 vi.mock('@/lib/ai/ai-details', () => ({
   getAIDetails: vi.fn().mockResolvedValue({
     aiOptInLevel: 'schema_and_log_and_data',
-    hasAccessToAdvanceModel: true,
     orgId: 1,
   }),
 }))
@@ -33,6 +33,11 @@ vi.mock('@/data/sql/execute-sql-mutation', () => ({
 
 vi.mock('@/lib/ai/tools', () => ({
   getTools: vi.fn().mockResolvedValue({}),
+}))
+
+vi.mock('braintrust', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('braintrust')>()),
+  wrapAISDK: (sdk: { streamText: typeof streamText }) => sdk,
 }))
 
 vi.mock('ai', async () => {
@@ -91,6 +96,7 @@ function createRequest() {
       connectionString: 'test-connection',
       orgSlug: 'test-org',
       supportMode: true,
+      model: 'gpt-5.4-nano',
     }),
     signal: clientConnection.signal,
   })
@@ -101,7 +107,7 @@ function createRequest() {
   }
 }
 
-test('generateV4 calls the tool sanitizer', async () => {
+test('generateV4 uses Luna and sanitizes tools for a legacy request', async () => {
   // Keep the stream open so only the client disconnect can release the request.
   vi.mocked(pipeUIMessageStreamToResponse).mockImplementationOnce(() => new Promise(() => {}))
   const { disconnectClient, callGenerateV4 } = createRequest()
@@ -110,6 +116,10 @@ test('generateV4 calls the tool sanitizer', async () => {
   expect(pipeUIMessageStreamToResponse).toHaveBeenCalledOnce()
   expect(response.status).toBe(200)
 
+  expect(getModel).toHaveBeenCalledWith({
+    provider: 'openai',
+    modelEntry: { id: 'gpt-6-luna', reasoningEffort: 'medium' },
+  })
   expect(sanitizeMessagePart).toHaveBeenCalled()
   expect(getTools).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -152,7 +162,10 @@ test('generateV4 streams a tool result that continues the previous assistant mes
   const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
 
   expect(chunks).toContainEqual(
-    expect.objectContaining({ type: 'tool-output-available', toolCallId: 'test-tool-call-id' })
+    expect.objectContaining({
+      type: 'tool-output-available',
+      toolCallId: 'test-tool-call-id',
+    })
   )
 })
 
@@ -176,7 +189,10 @@ test('generateV4 flags a response the deadline stopped and releases the request'
   await callGenerateV4()
   const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
 
-  expect(chunks).toContainEqual({ type: 'message-metadata', messageMetadata: { timedOut: true } })
+  expect(chunks).toContainEqual({
+    type: 'message-metadata',
+    messageMetadata: { timedOut: true },
+  })
   const params = vi.mocked(streamText).mock.calls[0][0]
   expect(params.timeout).toEqual({ totalMs: expect.any(Number) })
   const { totalMs } = params.timeout as { totalMs: number }

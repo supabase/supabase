@@ -1,12 +1,10 @@
 import { getProjectSettings } from '@/data/config/project-settings-v2-query'
-import { checkEntitlement } from '@/data/entitlements/entitlements-query'
 import { getOrganizations } from '@/data/organizations/organizations-query'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
 import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export type AIDetails = {
   aiOptInLevel: AiOptInLevel
-  hasAccessToAdvanceModel: boolean
   orgId: number | undefined
   orgSlug: string | undefined
   planId: string | undefined
@@ -15,7 +13,7 @@ export type AIDetails = {
   isHighComplianceProject: boolean | undefined
 }
 
-// Resolves the AI opt-in level, model access and tracing inputs for one org/project pair.
+// Resolves the AI opt-in level and tracing inputs for one org/project pair.
 // Both identifiers come from the request body, so an unconfirmed pairing resolves to the
 // most restrictive posture rather than the requested one.
 export const getAIDetails = async ({
@@ -32,9 +30,8 @@ export const getAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, advanceModelAccess, project, projectSettings] = await Promise.all([
+  const [organizations, project, projectSettings] = await Promise.all([
     getOrganizations({ headers }),
-    checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
     // Organization membership can be checked without waking the project.
     getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
     getProjectSettings({ projectRef }, undefined, headers),
@@ -48,7 +45,6 @@ export const getAIDetails = async ({
   if (!isProjectInOrg) {
     return {
       aiOptInLevel: 'disabled',
-      hasAccessToAdvanceModel: false,
       orgId: undefined,
       orgSlug: undefined,
       planId: undefined,
@@ -59,7 +55,6 @@ export const getAIDetails = async ({
 
   return {
     aiOptInLevel: getAiOptInLevel(selectedOrg.opt_in_tags),
-    hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     orgId: selectedOrg.id,
     orgSlug: selectedOrg.slug,
     planId: selectedOrg.plan.id,

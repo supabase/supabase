@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as bedrockModule from './bedrock'
 import { getModel } from './model'
-import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
+import { ASSISTANT_CHAT_MODEL, DEFAULT_COMPLETION_MODEL, LOGS_REWRITE_MODEL } from './model.utils'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
@@ -47,16 +47,16 @@ describe('getModel', () => {
     expect(error).toBeDefined()
   })
 
-  it('returns openai model with default model', async () => {
+  it('returns Luna without an explicit reasoning effort', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
 
     const { modelParams, systemProviderOptions } = await getModel({
       provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+      modelEntry: { id: 'gpt-6-luna' },
     })
 
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(openai).toHaveBeenCalledWith('gpt-6-luna')
     expect(systemProviderOptions).toBeUndefined()
   })
 
@@ -65,35 +65,22 @@ describe('getModel', () => {
 
     const { error } = await getModel({
       provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+      modelEntry: { id: 'gpt-6-luna' },
     })
     expect(error).toEqual(new Error('OPENAI_API_KEY not available'))
   })
 
-  it('returns openai gpt-5.3-codex with reasoning effort', async () => {
+  it.each([
+    ['completion', DEFAULT_COMPLETION_MODEL, 'none'],
+    ['logs rewrite', LOGS_REWRITE_MODEL, 'low'],
+    ['Assistant chat', ASSISTANT_CHAT_MODEL, 'medium'],
+  ])('uses Luna for %s', async (_flow, modelEntry, effort) => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
 
-    const { modelParams, error } = await getModel({
-      provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5.3-codex', reasoningEffort: 'low' }),
-    })
+    const { modelParams, error } = await getModel({ provider: 'openai', modelEntry })
 
     expect(error).toBeUndefined()
-    expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.3-codex')
-    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('low')
-  })
-
-  it('applies reasoningEffort from DEFAULT_COMPLETION_MODEL', async () => {
-    vi.stubEnv('OPENAI_API_KEY', 'test-key')
-
-    const { modelParams, error } = await getModel({
-      provider: 'openai',
-      modelEntry: DEFAULT_COMPLETION_MODEL,
-    })
-
-    expect(error).toBeUndefined()
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
-    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('none')
+    expect(openai).toHaveBeenCalledWith('gpt-6-luna')
+    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe(effort)
   })
 })

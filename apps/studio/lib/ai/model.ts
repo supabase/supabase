@@ -33,13 +33,7 @@ type ModelResponse = ModelSuccess | ModelError
 export type GetModelParams =
   | {
       provider: 'openai'
-      /**
-       * Specifies which OpenAI model to use and its reasoning effort.
-       * Create entries via `openaiModelEntry()` — reasoning effort is validated against the model
-       * at compile time. Use `DEFAULT_COMPLETION_MODEL` for simple endpoints (minimal reasoning).
-       * Callers are responsible for resolving the correct entry (including throttling/entitlement
-       * fallbacks) before calling getModel.
-       */
+      /** Use `DEFAULT_COMPLETION_MODEL` for latency-sensitive completions. */
       modelEntry: OpenAIModelEntry
     }
   | {
@@ -50,8 +44,6 @@ export type GetModelParams =
 
 /**
  * Retrieves a LanguageModel from a specific provider and model entry.
- * Callers are responsible for resolving the correct model entry (including throttling/entitlement
- * fallbacks) before calling this function.
  * Returns systemProviderOptions that callers can attach to the system message.
  */
 export async function getModel(params: GetModelParams): Promise<ModelResponse> {
