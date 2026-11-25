@@ -20,7 +20,6 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
-import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -112,10 +111,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
   const handleNavigation = pipeline
     ? createNavigationHandler(
-        withReplicationCluster(
-          `/project/${projectRef}/database/pipelines/${pipeline.id}`,
-          clusterId
-        ),
+        `/project/${projectRef}/database/pipelines/${pipeline.id}${clusterId ? `?cluster_id=${encodeURIComponent(clusterId)}` : ''}`,
         router
       )
     : undefined
