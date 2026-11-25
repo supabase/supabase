@@ -1,46 +1,31 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { constructHeaders } from '@/lib/api/apiHelpers'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { constructHeaders, parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { PgMetaDatabaseError } from '@/lib/api/self-hosted/types'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { query } = req.body
-  const headers = constructHeaders(req.headers)
-  const { data, error } = await executeQuery({ query, headers })
-
-  if (error) {
-    if (error instanceof PgMetaDatabaseError) {
-      const { statusCode, message, formattedError } = error
-      return res.status(statusCode).json({ message, formattedError })
-    }
-    const { message } = error
-    return res.status(500).json({ message, formattedError: message })
-  } else {
-    return res.status(200).json(data)
-  }
-}
-
-const webHandler = toWebHandler(nextHandler)
-
 export const Route = createFileRoute('/api/platform/pg-meta/$ref/query/')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers(
+      {
+        POST: async ({ request }) => {
+          const { query } = await parseJsonBody<{ query: string }>(request)
+          const headers = constructHeaders(request.headers)
+          const { data, error } = await executeQuery({ query, headers })
+
+          if (error) {
+            if (error instanceof PgMetaDatabaseError) {
+              const { statusCode, message, formattedError } = error
+              return Response.json({ message, formattedError }, { status: statusCode })
+            }
+            const { message } = error
+            return Response.json({ message, formattedError: message }, { status: 500 })
+          }
+          return Response.json(data, { status: 200 })
+        },
+      },
+      { withAuth: true }
+    ),
+  },
 })

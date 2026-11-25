@@ -1,6 +1,5 @@
 import type { IncomingHttpHeaders } from 'node:http'
 import { snakeCase } from 'lodash'
-import type { NextApiRequest } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM, PG_META_URL } from '@/lib/constants'
@@ -173,25 +172,8 @@ export async function parseJsonBody<T = unknown>(request: Request): Promise<T> {
 
 /**
  * Construct the pgMeta redirection url passing along the filtering query params
- * @param req
- * @param endpoint
  */
-export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
-  const query = Object.entries(req.query).reduce((query, entry) => {
-    const [key, value] = entry
-    if (Array.isArray(value)) {
-      for (const v of value) {
-        query.append(key, v)
-      }
-    } else if (value) {
-      query.set(key, value)
-    }
-    return query
-  }, new URLSearchParams())
-
-  let url = `${PG_META_URL}/${endpoint}`
-  if (Object.keys(req.query).length > 0) {
-    url += `?${query}`
-  }
-  return url
+export function getPgMetaRedirectUrl(request: Request, endpoint: string) {
+  const { search } = new URL(request.url)
+  return `${PG_META_URL}/${endpoint}${search}`
 }

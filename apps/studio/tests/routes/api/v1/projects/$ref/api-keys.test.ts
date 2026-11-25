@@ -12,7 +12,7 @@ vi.mock('@/lib/constants', () => ({
 const requestApiKeys = (method = 'GET', search = '') =>
   getRouteHandler(
     Route,
-    'GET'
+    method
   )({
     request: new Request(`http://localhost/api/v1/projects/default/api-keys${search}`, { method }),
     params: { ref: 'default' },

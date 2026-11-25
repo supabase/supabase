@@ -1,44 +1,29 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { getNonPlatformApiKeyById, parseRevealQuery } from '@/lib/api/self-hosted/api-keys'
 
-const apiKeyByIdRoute = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  const idParam = req.query.id
-  const id = Array.isArray(idParam) ? idParam[0] : idParam
-
-  if (!id) {
-    return res.status(404).json({ error: { message: 'API key not found' } })
-  }
-
-  const reveal = parseRevealQuery(req.query.reveal)
-  const apiKey = getNonPlatformApiKeyById(id, reveal)
-
-  if (!apiKey) {
-    return res.status(404).json({ error: { message: 'API key not found' } })
-  }
-
-  return res.status(200).json(apiKey)
-}
-
-const webHandler = toWebHandler(apiKeyByIdRoute)
-
 export const Route = createFileRoute('/api/v1/projects/$ref/api-keys/$id')({
-  server: { handlers: { GET: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: ({ request, params }) => {
+        const { id } = params
+
+        if (!id) {
+          return Response.json({ error: { message: 'API key not found' } }, { status: 404 })
+        }
+
+        const reveal = parseRevealQuery(
+          new URL(request.url).searchParams.get('reveal') ?? undefined
+        )
+        const apiKey = getNonPlatformApiKeyById(id, reveal)
+
+        if (!apiKey) {
+          return Response.json({ error: { message: 'API key not found' } }, { status: 404 })
+        }
+
+        return Response.json(apiKey, { status: 200 })
+      },
+    }),
+  },
 })
