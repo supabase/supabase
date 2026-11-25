@@ -13,6 +13,8 @@ import {
 import { LifecyclePolicySection } from './LifecyclePolicySection'
 import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 interface BucketVersioningFieldsProps {
   form: UseFormReturn<BucketFormValues>
@@ -81,7 +83,15 @@ export const BucketVersioningFields = ({
                   <Badge variant="warning">Public Alpha</Badge>
                 </span>
               }
-              description="Retains previous versions of an object when it is overwritten or deleted"
+              description={
+                <>
+                  Retains previous versions when an object is overwritten or deleted. Retained
+                  versions count toward Storage usage.{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
+                    Storage size and pricing
+                  </InlineLink>
+                </>
+              }
               layout="flex"
             >
               <FormControl>

@@ -1,8 +1,13 @@
 import { useParams } from 'common'
 import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
+import { DocsButton } from '../../../ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 export const StorageVersioningPreview = () => {
   const { ref = '_' } = useParams()
@@ -10,21 +15,24 @@ export const StorageVersioningPreview = () => {
   return (
     <div className="space-y-2">
       <p className="text-sm text-foreground-light mb-4">
-        Object versioning keeps a noncurrent copy of a file every time it's overwritten or archived,
-        so accidental changes and deletes stay recoverable. Preview, compare and restore any earlier
-        version from the file preview panel, and use lifecycle policies to expire noncurrent
-        versions automatically and keep storage costs in check.
+        Storage object versioning keeps a noncurrent copy of a file every time it's overwritten or
+        archived. Preview, compare and restore any earlier version from the file preview panel, and
+        use lifecycle policies to expire noncurrent versions automatically.
       </p>
-
+      <Admonition
+        type="warning"
+        title="Object versioning is in Public Alpha"
+        description="The feature may change as we improve it, avoid relying
+                on it for production workloads during the alpha."
+      />
       <Image
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
         height={900}
         alt="storage object versioning settings and version history preview"
-        className="rounded-sm border"
+        className="rounded-sm border mt-4"
       />
-
-      <div className="space-y-2 mt-4!">
+      <div className="space-y-2 my-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
@@ -44,11 +52,16 @@ export const StorageVersioningPreview = () => {
           </li>
         </ul>
       </div>
-
-      <p className="text-sm text-foreground-light mt-4!">
-        Object versioning is in <em>Public Alpha</em>. It stays off for every bucket until you turn
-        it on, and turning it off later suspends it without removing the versions you already have.
-      </p>
+      <hr />
+      <div className="space-y-2 mt-4!">
+        <h4 className="text-sm">Storage usage and retained versions</h4>
+        <p className="text-sm text-foreground-light">
+          Retained versions count toward Storage usage and may increase your bill. Set a lifecycle
+          policy to expire versions you no longer need. Turning versioning off suspends it without
+          removing versions you already have.
+        </p>
+      </div>
+      <DocsButton href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-versioning`} />
     </div>
   )
 }

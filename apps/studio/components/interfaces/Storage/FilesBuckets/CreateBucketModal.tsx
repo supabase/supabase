@@ -29,6 +29,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { BucketVersioningFields } from './BucketVersioningFields/BucketVersioningFields'
 import { toLifecycleRules } from './BucketVersioningFields/BucketVersioningFields.lifecycle'
+import { EnableVersioningConfirmationModal } from './EnableVersioningConfirmationModal'
 import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
@@ -67,6 +68,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const { ref } = useParams()
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
+  const [pendingEnableValues, setPendingEnableValues] = useState<BucketFormValues | null>(null)
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -93,7 +95,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const isPublicBucket = useWatch({ control: form.control, name: 'public' })
   const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
 
-  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
+  const createBucketFromValues = async (values: BucketFormValues) => {
     if (!ref) return console.error('Project ref is required')
 
     // [Joshen] Should shift this into superRefine in the form schema
@@ -155,6 +157,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
 
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
+      setPendingEnableValues(null)
       onOpenChange(false)
     } catch (error: any) {
       // Handle specific error cases for inline display
@@ -176,9 +179,19 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     }
   }
 
+  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
+    if (isStorageVersioningEnabled && values.enable_versioning) {
+      setPendingEnableValues(values)
+      return
+    }
+
+    await createBucketFromValues(values)
+  }
+
   const handleClose = () => {
     form.reset()
     setSelectedUnit(StorageSizeUnits.MB)
+    setPendingEnableValues(null)
     onOpenChange(false)
   }
 
@@ -399,6 +412,16 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
           </Button>
         </DialogFooter>
       </DialogContent>
+      <EnableVersioningConfirmationModal
+        visible={pendingEnableValues !== null}
+        loading={isSaving}
+        onCancel={() => setPendingEnableValues(null)}
+        onConfirm={() => {
+          const values = pendingEnableValues
+          setPendingEnableValues(null)
+          if (values !== null) void createBucketFromValues(values)
+        }}
+      />
     </Dialog>
   )
 }
