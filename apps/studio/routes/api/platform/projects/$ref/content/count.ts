@@ -1,54 +1,41 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { paths } from 'api-types'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { getSnippets } from '@/lib/api/snippets.utils'
 
-const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-type GetRequestData = paths['/platform/projects/{ref}/content/count']['get']['parameters']['query']
-
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const params = req.query as GetRequestData
-
-  try {
-    const { snippets } = await getSnippets({
-      searchTerm: params?.name,
-      includeContent: false,
-    })
-    if (params?.name) {
-      return res.status(200).json({
-        count: snippets.length,
-      })
-    } else {
-      return res.status(200).json({
-        shared: snippets.filter((s) => s.visibility === 'project').length,
-        favorites: snippets.filter((s) => s.favorite).length,
-        private: snippets.filter((s) => s.visibility === 'user').length,
-      })
-    }
-  } catch (error: any) {
-    console.error('Error fetching snippets:', error)
-    return res.status(500).json({ message: error?.message ?? 'Failed to get count' })
-  }
-}
-
-const webHandler = toWebHandler(wrappedHandler)
-
 export const Route = createFileRoute('/api/platform/projects/$ref/content/count')({
-  server: { handlers: { GET: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async ({ request }) => {
+        const name = new URL(request.url).searchParams.get('name') ?? undefined
+
+        try {
+          const { snippets } = await getSnippets({
+            searchTerm: name,
+            includeContent: false,
+          })
+          if (name) {
+            return Response.json(
+              {
+                count: snippets.length,
+              },
+              { status: 200 }
+            )
+          }
+          return Response.json(
+            {
+              shared: snippets.filter((s) => s.visibility === 'project').length,
+              favorites: snippets.filter((s) => s.favorite).length,
+              private: snippets.filter((s) => s.visibility === 'user').length,
+            },
+            { status: 200 }
+          )
+        } catch (error) {
+          console.error('Error fetching snippets:', error)
+          const message = error instanceof Error ? error.message : undefined
+          return Response.json({ message: message ?? 'Failed to get count' }, { status: 500 })
+        }
+      },
+    }),
+  },
 })

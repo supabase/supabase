@@ -1,11 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { paths } from 'api-types'
 import { compact } from 'lodash'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
   getSnippets,
@@ -13,25 +12,6 @@ import {
   SnippetSchema,
   updateSnippet,
 } from '@/lib/api/snippets.utils'
-
-const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    case 'PUT':
-      return handlePut(req, res)
-
-    case 'DELETE':
-      return handleDelete(req, res)
-    default:
-      res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
 
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
@@ -49,92 +29,95 @@ const getRequestParamsSchema = z.object({
   sort_order: z.enum(['asc', 'desc']).optional(),
 })
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  const result = getRequestParamsSchema.safeParse(req.query)
-
-  if (!result.success) {
-    return res.status(400).json({ data: [] })
-  }
-
-  const params = result.data
-
-  // Platform specific endpoint
-  if (params.visibility === 'project') {
-    return res.status(200).json({ data: [] })
-  }
-
-  try {
-    const { cursor, snippets } = await getSnippets({
-      searchTerm: params.name,
-      limit: params.limit,
-      cursor: params.cursor,
-      sort: params.sort_by,
-      sortOrder: params.sort_order,
-    })
-
-    return res.status(200).json({ data: snippets, cursor })
-  } catch (error) {
-    console.error('Error fetching snippets:', error)
-    return res.status(500).json({ data: [] })
-  }
-}
-
-const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    const updates = req.body
-    const updatedSnippet = await updateSnippet(updates.id, updates)
-    return res.status(200).json(updatedSnippet)
-  } catch (error: any) {
-    if (error instanceof Error && error.message.includes('not found')) {
-      const body = req.body
-      const { data, error: parseError } = SnippetSchema.safeParse(body)
-
-      if (parseError) {
-        console.error('Validation error:', parseError)
-        return res.status(400).json({ error: parseError.message })
-      }
-
-      try {
-        const savedSnippet = await saveSnippet(data)
-        return res.status(200).json(savedSnippet)
-      } catch (error) {
-        console.error('Error creating snippet:', error)
-        return res.status(500).json({ error: 'Failed to create snippet' })
-      }
-    }
-    return res.status(500).json({ error: error?.message ?? 'Failed to update snippet' })
-  }
-}
-
 const snippetIdsSchema = z
   .string()
   .transform((val) => compact(val.split(',').map((id) => id.trim())))
   .pipe(z.array(z.string().uuid()).nonempty())
 
-const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ids } = req.query
-
-  const result = snippetIdsSchema.safeParse(ids)
-  if (!result.success) {
-    return res.status(400).json({ error: 'Snippet IDs are required' })
-  }
-
-  const snippetIds = result.data
-
-  try {
-    for (const id of snippetIds) {
-      await deleteSnippet(id)
-    }
-    res.setHeader('Content-Type', 'application/json')
-    return res.status(200).send(snippetIds.map((id) => ({ id })))
-  } catch (error) {
-    console.error('Error deleting snippets:', error)
-    return res.status(500).json({ error: 'Failed to delete snippets' })
-  }
-}
-
-const webHandler = toWebHandler(wrappedHandler)
-
 export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
-  server: { handlers: { GET: webHandler, PUT: webHandler, DELETE: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async ({ request }) => {
+        const query = Object.fromEntries(new URL(request.url).searchParams.entries())
+        const result = getRequestParamsSchema.safeParse(query)
+
+        if (!result.success) {
+          return Response.json({ data: [] } satisfies GetResponseData, { status: 400 })
+        }
+
+        const params = result.data
+
+        // Platform specific endpoint
+        if (params.visibility === 'project') {
+          return Response.json({ data: [] } satisfies GetResponseData, { status: 200 })
+        }
+
+        try {
+          const { cursor, snippets } = await getSnippets({
+            searchTerm: params.name,
+            limit: params.limit,
+            cursor: params.cursor,
+            sort: params.sort_by,
+            sortOrder: params.sort_order,
+          })
+
+          return Response.json({ data: snippets, cursor } satisfies GetResponseData, {
+            status: 200,
+          })
+        } catch (error) {
+          console.error('Error fetching snippets:', error)
+          return Response.json({ data: [] } satisfies GetResponseData, { status: 500 })
+        }
+      },
+      PUT: async ({ request }) => {
+        const body = await parseJsonBody<Record<string, unknown> & { id: string }>(request)
+        try {
+          const updatedSnippet = await updateSnippet(body.id, body)
+          return Response.json(updatedSnippet, { status: 200 })
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('not found')) {
+            const { data, error: parseError } = SnippetSchema.safeParse(body)
+
+            if (parseError) {
+              console.error('Validation error:', parseError)
+              return Response.json({ error: parseError.message }, { status: 400 })
+            }
+
+            try {
+              const savedSnippet = await saveSnippet(data)
+              return Response.json(savedSnippet, { status: 200 })
+            } catch (createError) {
+              console.error('Error creating snippet:', createError)
+              return Response.json({ error: 'Failed to create snippet' }, { status: 500 })
+            }
+          }
+          const message = error instanceof Error ? error.message : undefined
+          return Response.json({ error: message ?? 'Failed to update snippet' }, { status: 500 })
+        }
+      },
+      DELETE: async ({ request }) => {
+        const ids = new URL(request.url).searchParams.get('ids') ?? undefined
+
+        const result = snippetIdsSchema.safeParse(ids)
+        if (!result.success) {
+          return Response.json({ error: 'Snippet IDs are required' }, { status: 400 })
+        }
+
+        const snippetIds = result.data
+
+        try {
+          for (const id of snippetIds) {
+            await deleteSnippet(id)
+          }
+          return Response.json(
+            snippetIds.map((id) => ({ id })),
+            { status: 200 }
+          )
+        } catch (error) {
+          console.error('Error deleting snippets:', error)
+          return Response.json({ error: 'Failed to delete snippets' }, { status: 500 })
+        }
+      },
+    }),
+  },
 })
