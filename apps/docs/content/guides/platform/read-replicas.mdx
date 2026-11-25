@@ -80,6 +80,10 @@ Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't
 
 A shared [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) connection is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/database/settings) under **Connection String**.
 
+### Promotion
+
+To make a Read Replica in the same region as your primary database the new Primary, promote it with the experimental [Management API](https://api.supabase.com/api/v0#tag/database/POST/v0/projects/%7Bref%7D/read-replicas/promote). Promotion sets your project to read-only and flushes all write-ahead log (WAL), so committed writes carry over. For the steps, downtime, and what changes afterward, see [Promote a Read Replica](/docs/guides/platform/read-replicas/promote).
+
 ### API load balancer
 
 A load balancer automatically balances requests between your Primary database and Read Replicas. Find its endpoint on the [**API Settings page**](/dashboard/project/_/settings/api).

@@ -1,0 +1,66 @@
+---
+title: 'Promote a Read Replica'
+description: 'Promote a Read Replica to the primary database of your Supabase project with the experimental Management API, then confirm the promoted database accepts writes.'
+---
+
+Make a Read Replica the new primary database of your project. When the promotion finishes, the promoted database accepts reads and writes.
+
+## Overview
+
+Promotion sets your project to read-only and flushes all write-ahead log (WAL) to the Read Replica, so committed writes carry over. The project is unavailable for 1-2 minutes while DNS records update. The whole process takes about 10 minutes.
+
+The promoted Read Replica is not re-created. If you had only one Read Replica, the API load balancer is removed. You can add a new Read Replica at any time.
+
+## Prerequisites
+
+Before you promote, make sure you have the following:
+
+- A Read Replica in the same region as your primary database. See [Getting started with Read Replicas](/docs/guides/platform/read-replicas/getting-started).
+- A Management API [access token](/dashboard/account/tokens).
+
+## Promote a Read Replica
+
+To promote a Read Replica with the experimental Management API, send one request:
+
+1. Set your access token, project reference, and the identifier of the Read Replica to promote:
+
+   ```bash
+   export SUPABASE_ACCESS_TOKEN="YOUR_ACCESS_TOKEN"
+   export PROJECT_REF="YOUR_PROJECT_REF"
+   export REPLICA_IDENTIFIER="YOUR_REPLICA_IDENTIFIER"
+   ```
+
+2. Send the promote request. A `201` response means the promotion started:
+
+   ```bash
+   curl -X POST "https://api.supabase.com/v0/projects/$PROJECT_REF/read-replicas/promote" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d "{\"database_identifier\": \"$REPLICA_IDENTIFIER\"}"
+   ```
+
+## Verify
+
+To confirm the promotion finished, check that the promoted database accepts writes:
+
+1. Wait for your project to come back online. Check its status on the [Infrastructure settings page](/dashboard/project/_/settings/infrastructure).
+2. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+   ```sql
+   select pg_is_in_recovery();
+   ```
+
+3. Check that the result is `false`. A primary database isn't in recovery.
+
+## Next steps
+
+To keep going, use these pages:
+
+- [Getting started with Read Replicas](/docs/guides/platform/read-replicas/getting-started): add a new Read Replica to replace the one you promoted.
+- [Upgrading](/docs/guides/platform/upgrading): upgrade Postgres with minimal downtime by promoting a Read Replica.
+
+## Related resources
+
+To read more about how Read Replicas work, see this page:
+
+- [Read Replicas](/docs/guides/platform/read-replicas): endpoints, the API load balancer, and replication.

@@ -2706,6 +2706,10 @@ export const platform: NavMenuConstant = {
               name: 'Getting started',
               url: '/guides/platform/read-replicas/getting-started' as `/${string}`,
             },
+            {
+              name: 'Promote a Read Replica',
+              url: '/guides/platform/read-replicas/promote' as `/${string}`,
+            },
           ],
         },
       ],

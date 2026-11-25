@@ -226,6 +226,7 @@ export const database: NavMenuConstant = {
           items: [
             { name: 'Overview', url: '/guides/platform/read-replicas' },
             { name: 'Getting started', url: '/guides/platform/read-replicas/getting-started' },
+            { name: 'Promote a Read Replica', url: '/guides/platform/read-replicas/promote' },
           ],
         },
       ],
