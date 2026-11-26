@@ -24,7 +24,7 @@ import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/Pipe
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionReview } from './PipelineConnectionReview'
 import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
-import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
@@ -59,7 +59,7 @@ export const PipelineDestinationReview = ({
   onEditConnection?: () => void
   validationFailures?: ValidationFailure[]
 }) => {
-  const { hasMultipleRegions } = useReplicationClusterGroups()
+  const { hasMultipleRegions } = useReplicationClusters()
   const [
     name,
     projectId,

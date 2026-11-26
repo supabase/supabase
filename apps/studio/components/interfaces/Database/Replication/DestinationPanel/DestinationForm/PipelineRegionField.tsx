@@ -1,3 +1,4 @@
+import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { useQuery } from '@tanstack/react-query'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
@@ -6,9 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { DestinationType } from '../DestinationPanel.types'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import {
-  getReplicationRegionLabel,
   replicationClustersQueryOptions,
-  toRequestClusterId,
   type ReplicationRegion,
 } from '@/data/replication/clusters-query'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
@@ -108,7 +107,9 @@ const PipelineRegionSelect = ({
     </SelectTrigger>
     <SelectContent>
       {regions.map((region) => {
-        const label = getReplicationRegionLabel(region)
+        const label = region.region_code
+          ? `${region.region_name} (${region.region_code})`
+          : region.region_name
         return (
           <SelectItem key={region.cluster_id} value={region.cluster_id} textValue={label}>
             <span className="flex items-center gap-x-2">

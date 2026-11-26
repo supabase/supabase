@@ -1,6 +1,6 @@
 import { useQueries } from '@tanstack/react-query'
 
-import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 
@@ -12,7 +12,7 @@ export const usePipelineCreationSourceAvailability = ({
   enabled: boolean
 }) => {
   const canQuerySources = !!projectRef && enabled
-  const { groups, isDiscovering } = useReplicationClusterGroups({ enabled: canQuerySources })
+  const { groups, isDiscovering } = useReplicationClusters({ enabled: canQuerySources })
   const sources = useQueries({
     queries: groups.map(({ clusterId }) => ({
       ...replicationSourcesQueryOptions({ projectRef, clusterId }),

@@ -1,3 +1,4 @@
+import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
@@ -40,7 +41,6 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
-import { toRequestClusterId } from '@/data/replication/clusters-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
 import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
