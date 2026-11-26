@@ -7,6 +7,7 @@ import { apiAuthenticate, authenticateRequest } from './apiAuthenticate'
 import { InvalidJsonError } from './apiHelpers'
 import { apiWrapper, createApiHandlers } from './apiWrapper'
 import { classifyResponseError } from '@/data/error-classification'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: true,
@@ -180,5 +181,34 @@ describe('createApiHandlers', () => {
       data: null,
       error: { message: 'Method GET Not Allowed' },
     })
+  })
+
+  it('returns 405 for a HEAD request dispatched to a GET-only handler', async () => {
+    const handler = vi.fn(() => Response.json({ ok: true }))
+    const route = { options: { server: { handlers: createApiHandlers({ GET: handler }) } } }
+
+    const response = await callRoute(
+      route,
+      new Request('http://localhost/api/test', { method: 'HEAD' })
+    )
+
+    expect(response.status).toBe(405)
+    expect(response.headers.get('Allow')).toBe('GET')
+    expect(handler).not.toHaveBeenCalled()
+  })
+
+  it('calls an explicitly registered HEAD handler', async () => {
+    const handlers = createApiHandlers({
+      GET: () => Response.json({ ok: true }),
+      HEAD: () => new Response(null),
+    })
+    const route = { options: { server: { handlers } } }
+
+    const response = await callRoute(
+      route,
+      new Request('http://localhost/api/test', { method: 'HEAD' })
+    )
+
+    expect(response.status).toBe(200)
   })
 })

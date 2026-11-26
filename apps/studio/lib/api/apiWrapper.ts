@@ -41,8 +41,9 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
 
 /**
  * Wrap native TanStack Start API route handlers with optional platform JWT authentication,
- * malformed-JSON 400 handling, Sentry error reporting, and an `ANY` fallback that returns
- * 405 Method Not Allowed with an `Allow` header derived from the registered methods.
+ * malformed-JSON 400 handling, Sentry error reporting, and 405 Method Not Allowed (with an
+ * `Allow` header derived from the registered methods) for any other method, via `ANY` and
+ * for a HEAD request dispatched to a GET-only handler.
  */
 export function createApiHandlers<M extends ApiMethod>(
   handlers: Record<M, ApiHandler>,
@@ -51,9 +52,18 @@ export function createApiHandlers<M extends ApiMethod>(
   const allowedMethods = Object.keys(handlers) as M[]
   const wrapped = {} as Record<M | 'ANY', ServerRouteHandler>
 
+  const methodNotAllowed = (request: Request) =>
+    Response.json(
+      { data: null, error: { message: `Method ${request.method} Not Allowed` } },
+      { status: 405, headers: { Allow: allowedMethods.join(', ') } }
+    )
+
   for (const method of allowedMethods) {
     const handler = handlers[method]
     wrapped[method] = async ({ request, params = {} }) => {
+      // TanStack Start dispatches HEAD to GET when no HEAD handler is registered.
+      if (request.method !== method) return methodNotAllowed(request)
+
       try {
         let claims: JwtPayload | undefined
 
@@ -79,11 +89,7 @@ export function createApiHandlers<M extends ApiMethod>(
     }
   }
 
-  wrapped.ANY = async ({ request }) =>
-    Response.json(
-      { data: null, error: { message: `Method ${request.method} Not Allowed` } },
-      { status: 405, headers: { Allow: allowedMethods.join(', ') } }
-    )
+  wrapped.ANY = async ({ request }) => methodNotAllowed(request)
 
   return wrapped
 }
