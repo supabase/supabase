@@ -10,7 +10,8 @@
 #   sh tests/test-functions-codes.sh              # Uses http://localhost:8000
 #   sh tests/test-functions-codes.sh <base_url>   # Custom URL
 #
-# Prerequisites: curl, jq and Docker access to the running functions service.
+# Prerequisites: curl, jq and Docker access to the running stack.
+# With VERIFY_JWT enabled, configure the gateway's publishable key and Functions JWKS.
 # Temporary functions and response files are removed on exit.
 #
 
@@ -42,10 +43,18 @@ if ! VERIFY_JWT=$(docker exec "$container_id" printenv VERIFY_JWT); then
     echo "Error: cannot read VERIFY_JWT from the functions service."
     exit 1
 fi
-ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
-if [ "$VERIFY_JWT" = true ] && [ -z "$ANON_KEY" ]; then
-    echo "Error: ANON_KEY is required when VERIFY_JWT is enabled."
-    exit 1
+if [ "$VERIFY_JWT" = true ]; then
+    gateway_container_id=$(docker compose ps -q api-gw)
+    if [ -z "$gateway_container_id" ]; then
+        echo "Error: the api-gw service is not running."
+        exit 1
+    fi
+    # Compose has already resolved quoting and environment overrides in this value.
+    if ! SUPABASE_PUBLISHABLE_KEY=$(docker exec "$gateway_container_id" printenv SUPABASE_PUBLISHABLE_KEY) \
+        || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
+        echo "Error: SUPABASE_PUBLISHABLE_KEY must be configured on api-gw when VERIFY_JWT is enabled."
+        exit 1
+    fi
 fi
 
 fn_dir=""
@@ -183,7 +192,7 @@ fetch() {
 
 invoke() {
     if [ "$VERIFY_JWT" = true ]; then
-        fetch "$1" -H "Authorization: Bearer $ANON_KEY"
+        fetch "$1" -H "apikey: $SUPABASE_PUBLISHABLE_KEY"
     else
         fetch "$1"
     fi
