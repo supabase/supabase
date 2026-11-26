@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -11,9 +10,8 @@ import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { DOCS_URL } from '@/lib/constants'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
@@ -194,14 +192,7 @@ const renderWizard = (
 
 describe('PipelineCreationFlow', () => {
   it('keeps header navigation pending until dirty changes are discarded', async () => {
-    const testRouter = createRouter({
-      routeTree: createRootRoute(),
-      history: createMemoryHistory({
-        initialEntries: ['/project/default/database/pipelines/new'],
-      }),
-      parseSearch,
-      stringifySearch,
-    })
+    const testRouter = createTestRouter('/project/default/database/pipelines/new')
     const navigateSpy = vi.spyOn(testRouter, 'navigate')
     customRender(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,

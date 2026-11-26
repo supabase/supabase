@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
@@ -13,7 +12,6 @@ import { z } from 'zod'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { miscKeys } from '@/data/misc/keys'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { AiAssistantStateContext, createAiAssistantState } from '@/state/ai-assistant-state'
 import { sidebarManagerState } from '@/state/sidebar-manager-state'
 import { customRender } from '@/tests/lib/custom-render'
@@ -141,16 +139,12 @@ const renderErrors = () => {
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>
   )
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/functions/hello-world'] }),
-    parseSearch,
-    stringifySearch,
+  const rendered = customRender(content('fn-1'), {
+    queryClient,
+    initialUrl: '/project/default/functions/hello-world',
   })
-  const rendered = customRender(content('fn-1'), { queryClient, router })
   return {
     ...rendered,
-    router,
     renderFunction: (functionId: string) => rendered.rerender(content(functionId)),
   }
 }
@@ -208,9 +202,7 @@ describe('EdgeFunctionRecentErrors', () => {
 
     await userEvent.click(await screen.findByText('TypeError: failure 1'))
 
-    await waitFor(() =>
-      expect((router.state.location.search as Record<string, unknown>).id).toBe('log-1')
-    )
+    await waitFor(() => expect(router.state.location.search).toMatchObject({ id: 'log-1' }))
     const url = new URL(router.state.location.href, 'http://localhost')
     expect(url.pathname).toBe('/project/default/functions/hello-world/logs')
     expect(url.searchParams.get('filter')).toBe('level:eq:error')
@@ -234,7 +226,6 @@ describe('EdgeFunctionRecentErrors', () => {
       expect(router.state.location.pathname).toBe('/project/default/functions/hello-world/logs')
     )
     const runtimeUrl = new URL(router.state.location.href, 'http://localhost')
-    expect(runtimeUrl.pathname).toBe('/project/default/functions/hello-world/logs')
     expect(runtimeUrl.searchParams.get('log')).toBe('log-0')
     expect(runtimeUrl.searchParams.get('its')).toBeTruthy()
     expect(runtimeUrl.searchParams.get('ite')).toBeTruthy()
@@ -246,7 +237,6 @@ describe('EdgeFunctionRecentErrors', () => {
       )
     )
     const invocationUrl = new URL(router.state.location.href, 'http://localhost')
-    expect(invocationUrl.pathname).toBe('/project/default/functions/hello-world/invocations')
     expect(invocationUrl.searchParams.get('log')).toBe('log-1')
   })
 

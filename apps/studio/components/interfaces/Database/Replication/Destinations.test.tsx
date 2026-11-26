@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -9,8 +8,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
@@ -136,12 +134,7 @@ beforeEach(() => {
 })
 const renderList = async (waitForSources = true) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines'] }),
-    parseSearch,
-    stringifySearch,
-  })
+  const router = createTestRouter('/project/default/database/pipelines')
   navigateSpy = vi.spyOn(router, 'navigate')
   const view = customRender(<Destinations />, { queryClient, router, nuqs: { hasMemory: true } })
   await screen.findByRole('heading', { name: 'Add a pipeline' })

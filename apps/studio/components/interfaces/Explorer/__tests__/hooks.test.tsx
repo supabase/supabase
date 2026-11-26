@@ -1,10 +1,8 @@
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { act } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateChat, useCreateQuery } from '../hooks'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { customRenderHook } from '@/tests/lib/custom-render'
+import { createTestRouter, customRenderHook } from '@/tests/lib/custom-render'
 
 const { mockCreateChat, mockCreateDraft, mockSelectChat, mockSetContext, mockWhenInitialized } =
   vi.hoisted(() => ({
@@ -38,14 +36,6 @@ vi.mock('@/state/ai-assistant-state', () => ({
   whenAiAssistantInitialized: () => mockWhenInitialized(),
 }))
 
-const createTestRouter = () =>
-  createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/explorer'] }),
-    parseSearch,
-    stringifySearch,
-  })
-
 beforeEach(() => vi.clearAllMocks())
 
 describe('useCreateChat', () => {
@@ -54,7 +44,7 @@ describe('useCreateChat', () => {
   })
 
   it('creates and opens Explorer chats without changing the sidebar selection', async () => {
-    const router = createTestRouter()
+    const router = createTestRouter('/project/default/explorer')
     const navigateSpy = vi.spyOn(router, 'navigate')
     const { result } = customRenderHook(() => useCreateChat(), { router })
 
@@ -104,7 +94,7 @@ describe('useCreateChat', () => {
         })
     )
 
-    const router = createTestRouter()
+    const router = createTestRouter('/project/default/explorer')
     const navigateSpy = vi.spyOn(router, 'navigate')
     const { result } = customRenderHook(() => useCreateChat(), { router })
 
@@ -136,7 +126,7 @@ describe('useCreateChat', () => {
 
 describe('useCreateQuery', () => {
   it('replaces the start route when opening the preferred query on startup', () => {
-    const router = createTestRouter()
+    const router = createTestRouter('/project/default/explorer')
     const navigateSpy = vi.spyOn(router, 'navigate')
     const { result } = customRenderHook(() => useCreateQuery(), { router })
 
@@ -158,7 +148,7 @@ describe('useCreateQuery', () => {
   })
 
   it('creates a draft and opens it as an Explorer query tab', () => {
-    const router = createTestRouter()
+    const router = createTestRouter('/project/default/explorer')
     const navigateSpy = vi.spyOn(router, 'navigate')
     const { result } = customRenderHook(() => useCreateQuery(), { router })
 
@@ -181,8 +171,9 @@ describe('useCreateQuery', () => {
   })
 
   it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
-    const router = createTestRouter()
-    const { result } = customRenderHook(() => useCreateQuery(), { router })
+    const { result } = customRenderHook(() => useCreateQuery(), {
+      initialUrl: '/project/default/explorer',
+    })
 
     result.current.createQuery({ sql: 'select 1', autoRun: true })
     expect(mockCreateDraft).toHaveBeenCalledWith({

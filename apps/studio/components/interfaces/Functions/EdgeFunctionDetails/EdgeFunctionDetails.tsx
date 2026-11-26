@@ -114,7 +114,7 @@ export const EdgeFunctionDetails = () => {
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
-      void navigate({ to: '/project/$ref/functions', params: { ref: projectRef ?? '' } })
+      if (projectRef) void navigate({ to: '/project/$ref/functions', params: { ref: projectRef } })
     },
   })
 

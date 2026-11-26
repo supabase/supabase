@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 
@@ -14,18 +14,12 @@ const LEGACY_READ_REPLICA_DESTINATION_TYPE = 'Read Replica'
  */
 export const useRedirectLegacyReadReplicaDestination = () => {
   const navigate = useNavigate()
-  const destinationType = useLocation({
-    select: (location) =>
-      (location.search as Record<string, string | string[] | undefined>).destinationType,
-  })
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, destinationType } = useParams()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   useEffect(() => {
     if (!infrastructureReadReplicas || !projectRef) return
-
-    const legacyType = Array.isArray(destinationType) ? destinationType[0] : destinationType
-    if (legacyType !== LEGACY_READ_REPLICA_DESTINATION_TYPE) return
+    if (destinationType !== LEGACY_READ_REPLICA_DESTINATION_TYPE) return
 
     void navigateToUrl(navigate, getAddReadReplicaPath(projectRef), { replace: true })
   }, [destinationType, infrastructureReadReplicas, navigate, projectRef])

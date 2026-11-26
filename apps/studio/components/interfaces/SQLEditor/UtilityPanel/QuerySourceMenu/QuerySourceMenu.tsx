@@ -90,7 +90,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   const switchSource = (target: SqlSnippetSource) => {
     const next = resolveSourceSwitch({ ref, target, currentSource, isBlankNewTab })
     if (next === null) return
-    void navigateToUrl(navigate, next.url, { replace: next.method === 'replace' })
+    void navigateToUrl(navigate, next.url, { replace: next.replace })
   }
 
   const updateDatabaseIdentifier = (identifier: string) => {

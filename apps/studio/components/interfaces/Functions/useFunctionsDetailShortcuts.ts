@@ -39,40 +39,27 @@ export function useFunctionsDetailShortcuts({
   const ready = Boolean(projectRef && functionSlug)
   const shortcutsEnabled = ready && canReadFunctions
   const base = `/project/${projectRef}/functions/${functionSlug}`
+  const goTo = (path: string) => () => void navigateToUrl(navigate, `${base}${path}`)
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, () => void navigateToUrl(navigate, base), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, goTo(''), {
     enabled: shortcutsEnabled && isPlatform,
   })
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS,
-    () => void navigateToUrl(navigate, `${base}/invocations`),
-    { enabled: shortcutsEnabled && isPlatform && hasInvocationsTab }
-  )
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS, goTo('/invocations'), {
+    enabled: shortcutsEnabled && isPlatform && hasInvocationsTab,
+  })
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS,
-    () => void navigateToUrl(navigate, `${base}/logs`),
-    {
-      enabled: shortcutsEnabled && isPlatform,
-    }
-  )
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, goTo('/logs'), {
+    enabled: shortcutsEnabled && isPlatform,
+  })
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE,
-    () => void navigateToUrl(navigate, `${base}/code`),
-    {
-      enabled: shortcutsEnabled,
-    }
-  )
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE, goTo('/code'), {
+    enabled: shortcutsEnabled,
+  })
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS,
-    () => void navigateToUrl(navigate, `${base}/details`),
-    {
-      enabled: shortcutsEnabled,
-    }
-  )
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS, goTo('/details'), {
+    enabled: shortcutsEnabled,
+  })
 
   useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST, onOpenTest, {
     enabled: shortcutsEnabled,

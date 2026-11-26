@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { useEffect, useEffectEvent } from 'react'
 
@@ -26,9 +26,6 @@ import { useTabsStateSnapshot } from '@/state/tabs'
  */
 export function useSnippetEditor({ id, snippetName }: { id: string; snippetName: string }) {
   const navigate = useNavigate()
-  const hasContentQueryParam = useLocation({
-    select: (location) => (location.search as Record<string, unknown>).content !== undefined,
-  })
   const { profile } = useProfile()
   const { ref, content, source } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -60,7 +57,7 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
       // one-shot URL); replacing collapses it out of history so Back returns to
       // the originating page instead of a wasted step that re-seeds the snippet.
       void navigateToUrl(navigate, `/project/${ref}/sql/${newSnippet.id}`, {
-        replace: hasContentQueryParam,
+        replace: content !== undefined,
       })
     }
 

@@ -1,11 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  useLocation,
-  useNavigate,
-} from '@tanstack/react-router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
@@ -20,7 +14,6 @@ import { useFunctionsDetailShortcuts } from './useFunctionsDetailShortcuts'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { navigateToUrl } from '@/lib/navigation'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { Route as FunctionInvocationsRoute } from '@/routes/project/$ref/functions/$functionSlug/invocations'
 import { Route as FunctionLogsRoute } from '@/routes/project/$ref/functions/$functionSlug/logs'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
@@ -41,14 +34,6 @@ const removeRouteParser = routerMock.useParser(
   ])
 )
 afterAll(removeRouteParser)
-
-const createTestRouter = (initialUrl: string) =>
-  createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
 
 const featureFlags = {
   configcat: {
@@ -150,39 +135,34 @@ function FunctionLogNavigation({ isEnabled = true, isLoading = false }) {
 
 it('waits for preview initialization and leaves preview opt-outs on their original bookmark', async () => {
   const bookmark = '/project/default/functions/send-email/logs?log=legacy-log'
-  const router = createTestRouter(bookmark)
-  const { rerender } = customRender(<FunctionLogNavigation isLoading />, { router })
+  const { router, rerender } = customRender(<FunctionLogNavigation isLoading />, {
+    initialUrl: bookmark,
+  })
   expect(router.state.location.href).toBe(bookmark)
   rerender(<FunctionLogNavigation isEnabled={false} />)
   expect(router.state.location.href).toBe(bookmark)
   rerender(<FunctionLogNavigation />)
-  await waitFor(() =>
-    expect((router.state.location.search as Record<string, unknown>).id).toBe('legacy-log')
-  )
+  await waitFor(() => expect(router.state.location.search).toMatchObject({ id: 'legacy-log' }))
 })
 
 it('migrates a new legacy Logs bookmark during client-side navigation', async () => {
-  const router = createTestRouter('/project/default/functions/send-email/logs')
-  customRender(<FunctionLogNavigation />, { router })
+  const { router } = customRender(<FunctionLogNavigation />, {
+    initialUrl: '/project/default/functions/send-email/logs',
+  })
   await act(async () => {
     await navigateToUrl(router.navigate, '/project/default/functions/send-email/logs?log=first')
   })
-  await waitFor(() =>
-    expect((router.state.location.search as Record<string, unknown>).id).toBe('first')
-  )
+  await waitFor(() => expect(router.state.location.search).toMatchObject({ id: 'first' }))
   await act(async () => {
     await navigateToUrl(router.navigate, '/project/default/functions/send-email/logs?log=second')
   })
-  await waitFor(() =>
-    expect((router.state.location.search as Record<string, unknown>).id).toBe('second')
-  )
+  await waitFor(() => expect(router.state.location.search).toMatchObject({ id: 'second' }))
 })
 
 it('retains the old function log filters when their meaning cannot migrate to unified filters', () => {
   const filter = encodeURIComponent(JSON.stringify({ severity: { error: true } }))
   const bookmark = `/project/default/functions/send-email/logs?f=${filter}`
-  const router = createTestRouter(bookmark)
-  customRender(<FunctionLogNavigation />, { router })
+  const { router } = customRender(<FunctionLogNavigation />, { initialUrl: bookmark })
   expect(screen.getByText('Legacy logs')).toBeVisible()
   expect(router.state.location.href).toBe(bookmark)
 })
@@ -203,10 +183,10 @@ function FunctionDetailNavigation({ hasInvocationsTab }: { hasInvocationsTab: bo
 
 it('disables the hidden Invocations shortcut while preserving Logs navigation', async () => {
   const user = userEvent.setup()
-  const router = createTestRouter('/project/default/functions/send-email')
-  const { rerender } = customRender(<FunctionDetailNavigation hasInvocationsTab={false} />, {
-    router,
-  })
+  const { router, rerender } = customRender(
+    <FunctionDetailNavigation hasInvocationsTab={false} />,
+    { initialUrl: '/project/default/functions/send-email' }
+  )
   await user.keyboard('2')
   expect(router.state.location.href).toBe('/project/default/functions/send-email')
   await user.keyboard('3')

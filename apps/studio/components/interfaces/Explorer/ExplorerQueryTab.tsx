@@ -108,9 +108,9 @@ export const ExplorerQueryTab = () => {
         </div>
         <Button
           variant="primary"
-          onClick={() =>
-            void navigate({ to: '/project/$ref/explorer', params: { ref: ref ?? '' } })
-          }
+          onClick={() => {
+            if (ref) void navigate({ to: '/project/$ref/explorer', params: { ref } })
+          }}
         >
           Back to Explorer
         </Button>

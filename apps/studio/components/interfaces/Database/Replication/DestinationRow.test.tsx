@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -12,7 +11,6 @@ import { DestinationRow as DestinationRowComponent } from './DestinationRow'
 import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import type { DestinationWireResponse } from '@/data/replication/api-types'
 import { API_URL } from '@/lib/constants'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -361,14 +359,9 @@ describe('DestinationRow', () => {
 
   test('navigates to the pipeline when the row is clicked', async () => {
     addAllMocks()
-    const router = createRouter({
-      routeTree: createRootRoute(),
-      history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines'] }),
-      parseSearch,
-      stringifySearch,
+    const { router } = customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      initialUrl: '/project/default/database/pipelines',
     })
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />, { router })
 
     const row = (await screen.findByText('supabase_realtime')).closest('tr')
     expect(row).not.toBeNull()
@@ -381,14 +374,9 @@ describe('DestinationRow', () => {
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
-    const router = createRouter({
-      routeTree: createRootRoute(),
-      history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines'] }),
-      parseSearch,
-      stringifySearch,
+    const { router } = customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      initialUrl: '/project/default/database/pipelines',
     })
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />, { router })
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))

@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
@@ -8,7 +7,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -118,13 +116,9 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    const router = createRouter({
-      routeTree: createRootRoute(),
-      history: createMemoryHistory({ initialEntries: [`/project/default/storage/files`] }),
-      parseSearch,
-      stringifySearch,
+    const { router } = customRender(<Page onClose={onClose} />, {
+      initialUrl: `/project/default/storage/files`,
     })
-    customRender(<Page onClose={onClose} />, { router })
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
@@ -143,14 +137,8 @@ describe(`DeleteBucketModal`, () => {
   it(`navigates from the deleted bucket's page to the buckets list`, async () => {
     const bucketUrl = `/project/default/storage/files/buckets/${bucket.id}?action=delete`
     routerMock.setCurrentUrl(bucketUrl)
-    const router = createRouter({
-      routeTree: createRootRoute(),
-      history: createMemoryHistory({ initialEntries: [bucketUrl] }),
-      parseSearch,
-      stringifySearch,
-    })
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />, { router })
+    const { router } = customRender(<Page onClose={onClose} />, { initialUrl: bucketUrl })
 
     await userEvent.click(screen.getByRole(`button`, { name: `Open` }))
     await screen.findByRole(`dialog`)

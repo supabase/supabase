@@ -40,32 +40,14 @@ export const StorageMenuV2 = () => {
   const showAnalytics = isPlatform && storageAnalytics
   const showVectors = (isPlatform && storageVectors) || isCli
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_STORAGE_FILES,
-    () => void navigateToUrl(navigate, `/project/${ref}/storage/files`)
-  )
-  useShortcut(
-    SHORTCUT_IDS.NAV_STORAGE_ANALYTICS,
-    () => void navigateToUrl(navigate, `/project/${ref}/storage/analytics`),
-    { enabled: showAnalytics }
-  )
-  useShortcut(
-    SHORTCUT_IDS.NAV_STORAGE_VECTORS,
-    () => void navigateToUrl(navigate, `/project/${ref}/storage/vectors`),
-    { enabled: showVectors }
-  )
-  useShortcut(
-    SHORTCUT_IDS.NAV_STORAGE_S3,
-    () => void navigateToUrl(navigate, `/project/${ref}/storage/s3`),
-    {
-      enabled: isPlatform,
-    }
-  )
-  useShortcut(
-    SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS,
-    () => void navigateToUrl(navigate, `/project/${ref}/storage/signing-keys`),
-    { enabled: isPlatform }
-  )
+  const goTo = (path: string) => () =>
+    void navigateToUrl(navigate, `/project/${ref}/storage/${path}`)
+
+  useShortcut(SHORTCUT_IDS.NAV_STORAGE_FILES, goTo('files'))
+  useShortcut(SHORTCUT_IDS.NAV_STORAGE_ANALYTICS, goTo('analytics'), { enabled: showAnalytics })
+  useShortcut(SHORTCUT_IDS.NAV_STORAGE_VECTORS, goTo('vectors'), { enabled: showVectors })
+  useShortcut(SHORTCUT_IDS.NAV_STORAGE_S3, goTo('s3'), { enabled: isPlatform })
+  useShortcut(SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS, goTo('signing-keys'), { enabled: isPlatform })
 
   const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key]) => {
     if (key === 'analytics') return showAnalytics
