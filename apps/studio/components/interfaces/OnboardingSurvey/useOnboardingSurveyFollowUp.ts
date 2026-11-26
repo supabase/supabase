@@ -12,6 +12,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
+import type { Organization } from '@/types'
 
 const UNKNOWN_STORAGE_KEY = 'supabase-onboarding-survey-follow-up-unknown'
 
@@ -40,26 +41,13 @@ export function useOnboardingSurveyFollowUp() {
     useLocalStorageQuery<unknown>(storageKey, null)
   const followUpState = parseFollowUpState(storedState)
 
-  // An answer or skip may fail to persist (storage blocked or full); this keeps
-  // the card away for the rest of the page's life instead of asking again at once
+  // An answer or skip also counts in memory: storage can refuse the write (blocked or full)
   const [resolvedOrgSlug, setResolvedOrgSlug] = useState<string>()
+  const isUnasked = isStoredStateLoaded && followUpState === null && orgSlug !== resolvedOrgSlug
 
-  // Until storage has been read, "no state" is only the default and can't count as never asked
-  const isUnaskedVercelOwner =
-    isStoredStateLoaded &&
-    followUpState === null &&
-    orgSlug !== resolvedOrgSlug &&
-    !!profileId &&
-    organization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE &&
-    organization.is_owner
-  const { data: vercelOrgCreatedAt } = useOrganizationQuery(
-    { slug: orgSlug },
-    { enabled: isUnaskedVercelOwner, select: (org) => org.created_at }
-  )
-  const isNewVercelOrg =
-    !!vercelOrgCreatedAt &&
-    Date.parse(vercelOrgCreatedAt) >= Date.parse(VERCEL_MARKETPLACE_SURVEY_START)
-  const isVercelOwnerToAsk = isUnaskedVercelOwner && isNewVercelOrg
+  const newVercelOrgCreatedAt = useNewVercelOrgCreatedAt(organization, {
+    enabled: !!profileId && isUnasked,
+  })
   const pendingOrgCreatedAt =
     followUpState?.status === 'pending' ? followUpState.orgCreatedAt : undefined
 
@@ -70,7 +58,7 @@ export function useOnboardingSurveyFollowUp() {
     !!pendingOrgCreatedAt &&
     (expiredOrgCreatedAt === pendingOrgCreatedAt ||
       getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now()) <= 0)
-  const isEligible = (!!pendingOrgCreatedAt && !hasExpired) || isVercelOwnerToAsk
+  const isEligible = (!!pendingOrgCreatedAt && !hasExpired) || !!newVercelOrgCreatedAt
 
   useEffect(() => {
     if (!pendingOrgCreatedAt) return
@@ -87,10 +75,10 @@ export function useOnboardingSurveyFollowUp() {
       setStoredState((previous: unknown) => {
         const previousState = parseFollowUpState(previous)
         if (previousState) return { ...previousState, status }
-        return isVercelOwnerToAsk ? { status, orgCreatedAt: vercelOrgCreatedAt } : previous
+        return newVercelOrgCreatedAt ? { status, orgCreatedAt: newVercelOrgCreatedAt } : previous
       })
     },
-    [isVercelOwnerToAsk, orgSlug, setStoredState, vercelOrgCreatedAt]
+    [newVercelOrgCreatedAt, orgSlug, setStoredState]
   )
 
   // Undoes a dismissal whose save failed, keeping the original org details and
@@ -113,4 +101,23 @@ export function useOnboardingSurveyFollowUp() {
     resolveFollowUp,
     reopenFollowUp,
   }
+}
+
+function useNewVercelOrgCreatedAt(
+  organization: Organization | undefined,
+  { enabled }: { enabled: boolean }
+) {
+  const isOwnedVercelOrg =
+    organization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE && organization.is_owner
+  const shouldCheck = enabled && isOwnedVercelOrg
+  const { data: createdAt } = useOrganizationQuery(
+    { slug: organization?.slug },
+    { enabled: shouldCheck, select: (org) => org.created_at }
+  )
+
+  // A disabled query still returns cached data
+  if (!shouldCheck || !createdAt) return undefined
+
+  const isSinceSurveyStart = Date.parse(createdAt) >= Date.parse(VERCEL_MARKETPLACE_SURVEY_START)
+  return isSinceSurveyStart ? createdAt : undefined
 }
