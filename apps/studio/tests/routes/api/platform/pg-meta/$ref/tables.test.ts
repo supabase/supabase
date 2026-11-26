@@ -1,3 +1,4 @@
+import type { PGTable } from '@supabase/pg-meta'
 import { http, HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -5,6 +6,22 @@ import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
 const PG_META_URL = 'http://meta.test'
+
+const mockTable: PGTable = {
+  id: 1,
+  schema: 'public',
+  name: 'users',
+  rls_enabled: true,
+  rls_forced: false,
+  replica_identity: 'DEFAULT',
+  bytes: 8192,
+  size: '8 kB',
+  live_rows_estimate: 10,
+  dead_rows_estimate: 0,
+  comment: null,
+  primary_keys: [],
+  relationships: [],
+}
 
 describe('/api/platform/pg-meta/$ref/tables', () => {
   let Route: typeof import('@/routes/api/platform/pg-meta/$ref/tables').Route
@@ -28,7 +45,7 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
     mswServer.use(
       http.get(`${PG_META_URL}/tables`, ({ request }) => {
         includedSchemas = new URL(request.url).searchParams.get('included_schemas')
-        return HttpResponse.json([{ id: 1, name: 'users' }])
+        return HttpResponse.json<PGTable[]>([mockTable])
       })
     )
 
@@ -44,7 +61,7 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
 
     expect(includedSchemas).toBe('public')
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual([{ id: 1, name: 'users' }])
+    expect(await response.json()).toEqual([mockTable])
   })
 
   it('falls back to 500 when the upstream error has no status code', async () => {

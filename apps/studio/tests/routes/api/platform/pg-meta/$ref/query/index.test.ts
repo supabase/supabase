@@ -1,8 +1,12 @@
 import { http, HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import type { z } from 'zod/v4'
 
+import type { databaseErrorSchema } from '@/lib/api/self-hosted/types'
 import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
+
+type PgMetaDatabaseErrorBody = z.infer<typeof databaseErrorSchema>
 
 const PG_META_URL = 'http://meta.test'
 
@@ -32,7 +36,7 @@ describe('/api/platform/pg-meta/$ref/query', () => {
         capturedBody = await request.json()
         capturedContentType = request.headers.get('content-type')
         capturedEncryptedConnection = request.headers.get('x-connection-encrypted')
-        return HttpResponse.json([{ one: 1 }])
+        return HttpResponse.json<Array<{ one: number }>>([{ one: 1 }])
       })
     )
 
@@ -58,7 +62,7 @@ describe('/api/platform/pg-meta/$ref/query', () => {
   it('preserves PgMetaDatabaseError status codes', async () => {
     mswServer.use(
       http.post(`${PG_META_URL}/query`, () =>
-        HttpResponse.json(
+        HttpResponse.json<PgMetaDatabaseErrorBody>(
           {
             message: 'syntax error',
             code: '42601',
