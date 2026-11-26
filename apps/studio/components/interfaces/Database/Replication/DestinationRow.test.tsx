@@ -229,9 +229,8 @@ describe('DestinationRow', () => {
 
     await act(async () => finishPipelineRequest())
 
-    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
     expect(row).toHaveAttribute('tabindex', '0')
-    expect(screen.getByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
   })
 
   test('starts only the selected cluster when two rows share a pipeline ID', async () => {
@@ -362,7 +361,7 @@ describe('DestinationRow', () => {
       </ReplicationClusterProvider>
     )
     const { rerender } = customRender(renderRow(originalClusterId))
-    await screen.findByText('supabase_realtime')
+    await screen.findByRole('button', { name: 'Pipeline options' })
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
     await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
@@ -433,7 +432,7 @@ describe('DestinationRow', () => {
     })
     const queryClient = new QueryClient()
     customRender(<DestinationRow destinationId={DESTINATION_ID} />, { queryClient })
-    await screen.findByText('supabase_realtime')
+    await screen.findByRole('button', { name: 'Pipeline options' })
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
     await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
@@ -461,8 +460,9 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    const row = (await screen.findByText('supabase_realtime')).closest('tr')
+    const row = (await screen.findByRole('button', { name: 'Pipeline options' })).closest('tr')
     expect(row).not.toBeNull()
+    expect(screen.queryByText(`#${PIPELINE_ID}`)).not.toBeInTheDocument()
     await userEvent.click(row!)
 
     expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
@@ -474,7 +474,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    await screen.findByText('supabase_realtime')
+    await screen.findByRole('button', { name: 'Pipeline options' })
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     expect(routerMock.asPath).toBe('/project/default/database/pipelines')
