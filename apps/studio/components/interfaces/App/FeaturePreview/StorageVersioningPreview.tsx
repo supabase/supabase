@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 import { Admonition } from 'ui-patterns/Admonition'
 import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
@@ -21,7 +20,7 @@ export const StorageVersioningPreview = () => {
         title="Object versioning is in public alpha"
         description="This feature may change during development and is not recommended for production workloads."
       />
-      <Image
+      <img
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
         height={900}
