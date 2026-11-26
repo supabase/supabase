@@ -1,12 +1,5 @@
 upstream api_gw_upstream {
     server api-gw:8000;
-    keepalive 2;
-}
-
-# Edge Functions serve both WebSocket and regular requests on the same location.
-map $http_upgrade $connection_upgrade {
-    default upgrade;
-    '' close;
 }
 
 server {
@@ -101,7 +94,7 @@ server {
         proxy_set_header X-Forwarded-Port $server_port;
 
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Connection "upgrade";
 
         # Send streamed responses (e.g., SSE) to the client as they arrive.
         proxy_buffering off;
