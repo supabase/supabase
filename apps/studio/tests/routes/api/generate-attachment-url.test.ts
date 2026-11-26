@@ -19,12 +19,6 @@ const { GOTRUE_URL } = vi.hoisted(() => {
   return { GOTRUE_URL: url }
 })
 
-// Authentication comes from the platform-only `withAuth` wrapper.
-vi.mock('@/lib/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/constants')>()),
-  IS_PLATFORM: true,
-}))
-
 const SUPPORT_API_URL = 'https://support.example.test'
 const SUPPORT_SECRET_KEY = 'sb_secret_test_key'
 
@@ -133,6 +127,14 @@ describe('/api/generate-attachment-url', () => {
 
     const response = await postAttachmentUrl({
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
+    })
+
+    expect(response.status).toBe(401)
+  })
+
+  it('returns 401 when the Authorization header is missing', async () => {
+    const response = await postAttachmentUrl({
       body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
     })
 

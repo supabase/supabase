@@ -5,6 +5,7 @@ import z from 'zod'
 import { DASHBOARD_LOG_BUCKET } from '@/components/interfaces/Support/dashboard-logs'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
+import { getUserClaims } from '@/lib/gotrue'
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
@@ -13,8 +14,11 @@ const GenerateAttachmentUrlSchema = z.object({
     .default('support-attachments'),
 })
 
-async function handlePost({ request, claims }: ApiHandlerContext) {
-  if (!claims) {
+async function handlePost({ request }: ApiHandlerContext) {
+  const { claims, error: userClaimsError } = await getUserClaims(
+    request.headers.get('authorization')!
+  )
+  if (userClaimsError || !claims) {
     return Response.json({ error: { message: 'Unauthorized' } }, { status: 401 })
   }
   const userId = claims.sub
