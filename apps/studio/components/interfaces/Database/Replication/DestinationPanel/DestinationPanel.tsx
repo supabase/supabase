@@ -294,7 +294,7 @@ export const DestinationPanel = () => {
                   checkIsDirtyRef={checkIsDirtyRef}
                   onClose={onClose}
                   onCancel={confirmOnClose}
-                  isPreparingRegion={isCreatingSource}
+                  isPreparingRegion={isCreatingSource || regionSourceError !== null}
                 />
               </ReplicationClusterProvider>
             )}

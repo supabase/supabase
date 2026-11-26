@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -174,30 +174,56 @@ test('uses the default region when the project region lookup fails', async () =>
   expect(await screen.findByText('Singapore')).toBeVisible()
 })
 
-test('prepares the source in the preferred region before loading its publications', async () => {
-  mockRegions()
-  mockProject(FRANKFURT.region_code)
-  const enabledClusters = new Set<string | null>([null])
-  mockPanelResources(enabledClusters)
-  const writes: (string | null)[] = []
-  addAPIMock({
-    method: 'post',
-    path: '/platform/replication/:ref/tenants-sources',
-    response: ({ request }) => {
-      const cluster = clusterFrom(request)
-      writes.push(cluster)
-      enabledClusters.add(cluster)
-      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
-        tenant_id: 'default',
-        source_id: 1,
-      })
-    },
-  })
-  renderPanel()
+test.each(['success', 'creation failure', 'refresh failure'])(
+  'prepares the preferred region and loads publications after %s',
+  async (scenario) => {
+    mockRegions()
+    mockProject(FRANKFURT.region_code)
+    const enabledClusters = new Set<string | null>([null])
+    const unavailableClusters = new Set<string | null>()
+    mockPanelResources(enabledClusters, unavailableClusters)
+    const writes: (string | null)[] = []
+    let shouldFail = scenario !== 'success'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        const cluster = clusterFrom(request)
+        writes.push(cluster)
+        if (shouldFail && scenario === 'creation failure') {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Source creation unavailable' },
+            { status: 503 }
+          )
+        }
+        enabledClusters.add(cluster)
+        if (shouldFail) unavailableClusters.add(cluster)
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          tenant_id: 'default',
+          source_id: 1,
+        })
+      },
+    })
+    renderPanel()
 
-  expect(await screen.findByText('Frankfurt')).toBeVisible()
-  await userEvent.click(await screen.findByText('Select publication'))
-  expect(await screen.findByText('frankfurt')).toBeVisible()
-  expect(writes).toEqual([FRANKFURT.cluster_id])
-  expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
-})
+    expect(await screen.findByText('Frankfurt')).toBeVisible()
+    if (shouldFail) {
+      expect(await screen.findByText('Failed to prepare pipeline region')).toBeVisible()
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+      shouldFail = false
+      unavailableClusters.clear()
+      await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      await waitFor(() =>
+        expect(screen.queryByText('Failed to prepare pipeline region')).not.toBeInTheDocument()
+      )
+    }
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('frankfurt')).toBeVisible()
+    expect(writes).toEqual(
+      scenario === 'creation failure'
+        ? [FRANKFURT.cluster_id, FRANKFURT.cluster_id]
+        : [FRANKFURT.cluster_id]
+    )
+    expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
+  }
+)
