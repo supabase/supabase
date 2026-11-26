@@ -579,32 +579,7 @@ See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide f
 
 ### Using file backend in Storage on macOS
 
-By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. For example, uploads fail with `The file system does not support extended attributes or has the feature disabled`.
-
-Use a named Docker volume instead. The `imgproxy` service reads the same files to transform images, so replace the bind mount in both the `storage` and `imgproxy` services:
-
-```yaml name=docker-compose.yml
-services:
-  storage:
-    # ...
-    volumes:
-      - storage-data:/var/lib/storage
-
-  imgproxy:
-    # ...
-    volumes:
-      - storage-data:/var/lib/storage
-
-volumes:
-  # ...
-  storage-data:
-```
-
-Recreate both services to apply the change:
-
-```sh
-sh run.sh recreate storage imgproxy
-```
+By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly, for example uploads failing with `The file system does not support extended attributes or has the feature disabled`. Use a named Docker volume instead, and mount it in both the `storage` and `imgproxy` services, since `imgproxy` reads the same files to transform images.
 
 ### Configuring Supabase AI Assistant
 
