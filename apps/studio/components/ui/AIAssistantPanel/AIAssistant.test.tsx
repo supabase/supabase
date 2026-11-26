@@ -1,11 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
+import { createRootRoute, createRoute, RouterContextProvider } from '@tanstack/react-router'
 import { render, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -15,7 +9,7 @@ import {
   storeAssistantHandoff,
 } from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
+import { createTestRouter } from '@/tests/lib/custom-render'
 
 // Every hook this component depends on is mocked directly below (no React Query hooks,
 // no network calls) — this targets the handoff effect's internal logic, not data fetching,
@@ -93,19 +87,13 @@ const supportRequest: SubmittedSupportRequest = {
   frontConversationId: 'front-conversation-1',
 }
 
-const renderAssistant = async (initialUrl = '/project/project-a') => {
+const renderAssistant = (initialUrl = '/project/project-a') => {
   const rootRoute = createRootRoute()
   const projectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/project/$ref',
   })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([projectRoute]),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
-  await router.load()
+  const router = createTestRouter(initialUrl, rootRoute.addChildren([projectRoute]))
   const navigateSpy = vi.spyOn(router, 'navigate')
   const view = render(
     <RouterContextProvider router={router}>
@@ -134,7 +122,7 @@ describe('AIAssistant handoff', () => {
   it('creates and selects the chat when the handoff project matches the route', async () => {
     storeAssistantHandoff('token-1', supportRequest)
 
-    const { router } = await renderAssistant(
+    const { router } = renderAssistant(
       `/project/project-a?${ASSISTANT_HANDOFF_QUERY_PARAM}=token-1`
     )
 
@@ -156,7 +144,7 @@ describe('AIAssistant handoff', () => {
     routeRef.current = 'project-b'
     storeAssistantHandoff('token-1', supportRequest)
 
-    const { router } = await renderAssistant(
+    const { router } = renderAssistant(
       `/project/project-b?${ASSISTANT_HANDOFF_QUERY_PARAM}=token-1`
     )
 
@@ -172,14 +160,14 @@ describe('AIAssistant handoff', () => {
   })
 
   it('does nothing when there is no handoff param', async () => {
-    const { navigateSpy } = await renderAssistant('/project/project-a')
+    const { navigateSpy } = renderAssistant('/project/project-a')
 
     expect(mockNewChat).not.toHaveBeenCalled()
     expect(navigateSpy).not.toHaveBeenCalled()
   })
 
   it('cleans up the URL and falls back to a new chat with a toast when the token has no matching sessionStorage entry (e.g. link opened in a new tab)', async () => {
-    const { router } = await renderAssistant(
+    const { router } = renderAssistant(
       `/project/project-a?${ASSISTANT_HANDOFF_QUERY_PARAM}=token-never-stored`
     )
 

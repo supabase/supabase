@@ -251,31 +251,11 @@ export const ResourceExhaustionWarningBanner = () => {
     routePattern.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
-  // these take precedence over each other, so there's only one active warning to check
-  const activeWarning = RESOURCE_WARNING_MESSAGES[activeWarnings[0]]
-  const restrictToRoutes = activeWarning?.restrictToRoutes
-
-  const isVisible =
-    restrictToRoutes === undefined ||
-    restrictToRoutes.some((route: string) => {
-      // check for exact match with /project/$ref (project home) first
-      // doing this let's us avoid checking with regex, keeping it simple
-      if (route === '/project/$ref') {
-        const isExactMatch = routePattern === '/project/$ref'
-        return isExactMatch
-      }
-
-      // For other routes, use the original startsWith logic
-      const isMatch = routePattern.startsWith(route)
-      return isMatch
-    })
-
   if (
     hasNoWarnings ||
     hasNoWarningContent ||
     onUsageOrInfraAndNotInReadOnlyMode ||
-    shouldSuppressOnInfrastructurePage ||
-    !isVisible
+    shouldSuppressOnInfrastructurePage
   ) {
     return null
   }

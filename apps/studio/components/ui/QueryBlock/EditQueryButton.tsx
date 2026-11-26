@@ -1,4 +1,3 @@
-import { useLocation } from '@tanstack/react-router'
 import { EditIcon } from 'lucide-react'
 import { ComponentProps } from 'react'
 import {
@@ -15,6 +14,7 @@ import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Prefer
 import { useNewQuery } from '@/components/interfaces/SQLEditor/hooks'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -35,14 +35,14 @@ export const EditQueryButton = ({
   className,
   variant = 'text',
 }: EditQueryButtonProps) => {
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const routePattern = useRoutePattern()
   const { newQuery } = useNewQuery()
 
   const diffRequest = useSqlEditorDiffRequestSnapshot()
   const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
-  const isInSQLEditor = pathname.includes('/sql')
-  const isInNewSnippet = pathname.endsWith('/sql')
+  const isInSQLEditor = routePattern.includes('/sql')
+  const isInNewSnippet = routePattern.endsWith('/sql')
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const tooltip: { content: ComponentProps<typeof TooltipContent> & { text: string } } = {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },

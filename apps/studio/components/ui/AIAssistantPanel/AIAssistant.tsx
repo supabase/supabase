@@ -1,5 +1,5 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
-import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common/hooks'
 import { useEffect, useEffectEvent } from 'react'
 import { toast } from 'sonner'
@@ -38,7 +38,6 @@ const isSameSnippet = (snippet: SqlSnippet, currentQuery: CurrentQuerySnippet) =
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const navigate = useNavigate()
   const routePattern = useRoutePattern()
-  const currentPathname = useLocation({ select: (location) => location.pathname })
   const handoffToken = useLocation({
     select: (location) => (location.search as SearchRecord)[ASSISTANT_HANDOFF_QUERY_PARAM],
   })
@@ -110,8 +109,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       toast.error("Couldn't load your ticket context here — started a new chat instead.")
     }
 
-    void navigate<AnyRouter, string>({
-      to: currentPathname,
+    void navigate({
+      to: '.',
       search: (prev: Record<string, unknown>) => {
         const { [ASSISTANT_HANDOFF_QUERY_PARAM]: _handledParam, ...restSearch } = prev
         return restSearch

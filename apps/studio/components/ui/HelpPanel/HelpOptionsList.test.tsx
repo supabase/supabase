@@ -1,11 +1,9 @@
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HelpOptionsList } from './HelpOptionsList'
 import { DOCS_URL } from '@/lib/constants'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 
 const { takeBreadcrumbSnapshotMock } = vi.hoisted(() => ({
@@ -21,14 +19,6 @@ vi.mock('@/lib/breadcrumbs', () => ({
   takeBreadcrumbSnapshot: takeBreadcrumbSnapshotMock,
 }))
 
-const createTestRouter = (initialUrl = '/') =>
-  createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
-
 describe('HelpOptionsList', () => {
   beforeEach(() => {
     takeBreadcrumbSnapshotMock.mockReset()
@@ -37,16 +27,14 @@ describe('HelpOptionsList', () => {
 
   it('navigates to support after invoking the click callback by default', async () => {
     const onSupportClick = vi.fn()
-    const router = createTestRouter()
 
-    customRender(
+    const { router } = customRender(
       <HelpOptionsList
         isPlatform
         projectRef="project-1"
         supportLinkQueryParams={{ projectRef: 'project-1' }}
         onSupportClick={onSupportClick}
-      />,
-      { router }
+      />
     )
 
     await userEvent.click(screen.getByRole('button', { name: /contact support/i }))
@@ -59,16 +47,13 @@ describe('HelpOptionsList', () => {
   })
 
   it('allows the support callback to suppress navigation', async () => {
-    const router = createTestRouter()
-
-    customRender(
+    const { router } = customRender(
       <HelpOptionsList
         isPlatform
         projectRef="project-1"
         supportLinkQueryParams={{ projectRef: 'project-1' }}
         onSupportClick={() => false}
-      />,
-      { router }
+      />
     )
 
     await userEvent.click(screen.getByRole('button', { name: /contact support/i }))

@@ -1,5 +1,4 @@
 import { useHotkeyRegistrations, type SequenceRegistrationView } from '@tanstack/react-hotkeys'
-import { useLocation } from '@tanstack/react-router'
 import { useFlag } from 'common'
 import { CircleXIcon } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
@@ -15,6 +14,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import {
   SHORTCUT_REFERENCE_GROUP_LABELS,
@@ -182,8 +182,8 @@ const ShortcutSequence = ({ sequence }: Pick<ActiveShortcutDefinition, 'sequence
 
 function ShortcutsReferenceSheetContent() {
   const isIssuesInboxEnabled = useFlag('issuesInbox')
-  const pathname = useLocation({ select: (location) => location.pathname })
-  const isLegacyAdvisors = !isIssuesInboxEnabled && pathname.includes('/advisors')
+  const routePattern = useRoutePattern()
+  const isLegacyAdvisors = !isIssuesInboxEnabled && routePattern.includes('/advisors')
   const [search, setSearch] = useState('')
   const activeShortcuts = useActiveShortcuts()
   const shortcutGroups = groupDefinitions(activeShortcuts).map((group) => {

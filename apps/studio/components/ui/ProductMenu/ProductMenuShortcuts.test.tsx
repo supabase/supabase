@@ -1,16 +1,10 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
-import { act, render, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { ProductMenuGroup } from './ProductMenu.types'
 import { ProductMenuShortcuts } from './ProductMenuShortcuts'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { customRender } from '@/tests/lib/custom-render'
 
 const { mockUseShortcut } = vi.hoisted(() => ({
   mockUseShortcut: vi.fn(),
@@ -53,20 +47,8 @@ const menu: ProductMenuGroup[] = [
   },
 ]
 
-const renderShortcuts = (items: ProductMenuGroup[]) => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/'] }),
-    parseSearch,
-    stringifySearch,
-  })
-  const view = render(
-    <RouterContextProvider router={router}>
-      <ProductMenuShortcuts menu={items} />
-    </RouterContextProvider>
-  )
-  return { ...view, router }
-}
+const renderShortcuts = (items: ProductMenuGroup[]) =>
+  customRender(<ProductMenuShortcuts menu={items} />)
 
 describe('ProductMenuShortcuts', () => {
   it('registers visible enabled internal shortcut items', () => {
@@ -84,9 +66,7 @@ describe('ProductMenuShortcuts', () => {
     const { router } = renderShortcuts(menu)
 
     const callback = mockUseShortcut.mock.calls[0][1]
-    await act(async () => {
-      callback()
-    })
+    callback()
 
     await waitFor(() => {
       expect(router.state.location.href).toBe('/project/ref/database/tables')
