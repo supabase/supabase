@@ -66,6 +66,13 @@ const renderHistory = (props: Partial<ComponentProps<typeof VersionHistory>> = {
     />
   )
 
+const mockPublicUrl = () =>
+  addAPIMock({
+    method: 'post',
+    path: '/platform/storage/:ref/buckets/:id/objects/public-url',
+    response: () => Response.json({ publicUrl: 'https://example.com/photo.png' }),
+  })
+
 describe('VersionHistory', () => {
   it('refreshes the listing after a restore, so the row stops showing the old size', async () => {
     addAPIMock({
@@ -78,11 +85,7 @@ describe('VersionHistory', () => {
       path: '/platform/storage/:ref/buckets/:id/objects/move',
       response: () => Response.json({ message: 'ok' }),
     })
-    addAPIMock({
-      method: 'post',
-      path: '/platform/storage/:ref/buckets/:id/objects/public-url',
-      response: () => Response.json({ publicUrl: 'https://example.com/photo.png' }),
-    })
+    mockPublicUrl()
 
     renderHistory()
 
@@ -135,6 +138,7 @@ describe('VersionHistory', () => {
           { ...VERSIONS[1], created_at: '2020-01-01T00:00:00Z', archived_at: archivedAt },
         ]),
     })
+    mockPublicUrl()
 
     renderHistory({ lifecyclePolicy: { expiryDays: 30, maxVersions: null } })
 
@@ -145,8 +149,8 @@ describe('VersionHistory', () => {
     await userEvent.unhover(countdown)
     await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
 
-    expect(await screen.findByText('Archived')).toBeInTheDocument()
-    expect(screen.getByText('Created')).toBeInTheDocument()
+    expect(await screen.findByText('Archived at')).toBeInTheDocument()
+    expect(screen.getByText('Created at')).toBeInTheDocument()
     expect(screen.getByText('Lifecycle')).toBeInTheDocument()
     expect(screen.getByText('Expires in 28 days.')).toBeInTheDocument()
   })
@@ -157,6 +161,7 @@ describe('VersionHistory', () => {
       path: '/platform/storage/:ref/buckets/:id/objects/list',
       response: () => Response.json(VERSIONS),
     })
+    mockPublicUrl()
 
     renderHistory()
     await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
@@ -176,6 +181,7 @@ describe('VersionHistory', () => {
           { ...VERSIONS[1], version: 'v-oldest', archived_at: archivedAt },
         ]),
     })
+    mockPublicUrl()
 
     renderHistory({
       lifecyclePolicy: { expiryDays: 30, maxVersions: 1 },
@@ -196,6 +202,7 @@ describe('VersionHistory', () => {
         path: '/platform/storage/:ref/buckets/:id/objects/list',
         response: () => Response.json(VERSIONS),
       })
+      mockPublicUrl()
       renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
 
       expect(
@@ -209,6 +216,7 @@ describe('VersionHistory', () => {
         path: '/platform/storage/:ref/buckets/:id/objects/list',
         response: () => Response.json(VERSIONS),
       })
+      mockPublicUrl()
       renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
 
       // The versions already listed are still restorable, so the notice has to say so.

@@ -9,7 +9,7 @@ import {
   UploadIcon,
   XIcon,
 } from 'lucide-react'
-import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
