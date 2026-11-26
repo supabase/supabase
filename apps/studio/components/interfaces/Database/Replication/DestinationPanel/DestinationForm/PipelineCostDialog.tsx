@@ -33,12 +33,12 @@ import type { TableSyncCopyConfig } from '@/data/replication/types'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const MAX_VISIBLE_TABLES = 10
 
 interface PipelineCostDialogProps {
   open: boolean
+  clusterId?: string
   isConfirming: boolean
   publicationName?: string
   publicationTables: ReplicationTableIdentity[]
@@ -56,6 +56,7 @@ interface PipelineCostDialogProps {
  */
 export const PipelineCostDialog = ({
   open,
+  clusterId,
   isConfirming,
   publicationName,
   publicationTables,
@@ -64,7 +65,6 @@ export const PipelineCostDialog = ({
   onConfirm,
 }: PipelineCostDialogProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const onConfirmRef = useLatest(onConfirm)

@@ -14,10 +14,12 @@ export const AdvancedSettings = ({
   type,
   form,
   group = 'all',
+  clusterId,
   revealInvalidSettings = false,
   showLoadError = true,
 }: {
   group?: 'all' | 'connection' | 'data'
+  clusterId?: string
   revealInvalidSettings?: boolean
   showLoadError?: boolean
   type: DestinationType
@@ -83,7 +85,11 @@ export const AdvancedSettings = ({
                         destination table is first created or reset.
                       </p>
                     </div>
-                    <TableOptions control={form.control} showLoadError={showLoadError} />
+                    <TableOptions
+                      control={form.control}
+                      clusterId={clusterId}
+                      showLoadError={showLoadError}
+                    />
                   </div>
                 )}
               </>

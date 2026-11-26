@@ -8,21 +8,21 @@ import {
   getConnectionValidationIssues,
 } from './PipelineConnectionValidation.utils'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const usePipelineConnectionValidation = ({
   projectRef,
+  clusterId,
   type,
   form,
 }: {
   projectRef?: string
+  clusterId?: string
   type: Parameters<typeof getConnectionFieldNames>[0]
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const names = getConnectionFieldNames(type)
-  const clusterId = useReplicationClusterId()
   const values = useWatch({ control: form.control, name: names })
-  const snapshot = JSON.stringify([type, ...values])
+  const snapshot = JSON.stringify([clusterId, type, ...values])
   const currentSnapshotRef = useRef(snapshot)
   const [result, setResult] = useState<{
     snapshot: string

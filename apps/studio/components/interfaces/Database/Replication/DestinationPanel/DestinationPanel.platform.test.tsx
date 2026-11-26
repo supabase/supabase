@@ -39,6 +39,12 @@ const mockPanelResources = (
 ) => {
   addAPIMock({
     method: 'get',
+    path: '/platform/replication/:ref/destinations',
+    response: () =>
+      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({ destinations: [] }),
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/replication/:ref/pipelines',
     response: { pipelines: [] },
   })
@@ -92,7 +98,7 @@ const renderPanel = () => {
       }}
     >
       <PipelineRequestStatusProvider>
-        <DestinationPanel />
+        <DestinationPanel clusterId={undefined} />
       </PipelineRequestStatusProvider>
     </FeatureFlagContext.Provider>,
     { queryClient, nuqs: { hasMemory: true, searchParams: '?destinationType=BigQuery' } }

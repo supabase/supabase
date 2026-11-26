@@ -51,7 +51,6 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -465,15 +464,12 @@ export const Destinations = () => {
                 </TableHeader>
                 <TableBody>
                   {sortedDestinations.map(({ cluster, destination }) => (
-                    <ReplicationClusterProvider
+                    <DestinationRow
                       key={`${cluster.clusterId ?? 'default'}:${destination.id}`}
+                      destinationId={destination.id}
                       clusterId={cluster.clusterId}
-                    >
-                      <DestinationRow
-                        destinationId={destination.id}
-                        pipelineRegion={cluster.regionName}
-                      />
-                    </ReplicationClusterProvider>
+                      pipelineRegion={cluster.regionName}
+                    />
                   ))}
                   {pendingRegions.length > 0 && (
                     <TableRow>
@@ -521,9 +517,7 @@ export const Destinations = () => {
         )}
       </div>
 
-      <ReplicationClusterProvider clusterId={edit === null ? undefined : editClusterId}>
-        <DestinationPanel />
-      </ReplicationClusterProvider>
+      <DestinationPanel clusterId={edit === null ? undefined : editClusterId} />
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}

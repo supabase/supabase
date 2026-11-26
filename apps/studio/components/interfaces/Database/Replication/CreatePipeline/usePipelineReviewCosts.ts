@@ -10,7 +10,6 @@ import {
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type PipelineReviewCostsState = { isInitialCostEstimateLoading: boolean } & (
   | { status: 'missing-publication' }
@@ -36,15 +35,16 @@ const getTableSyncCopy = (
 
 export const usePipelineReviewCosts = ({
   control,
+  clusterId,
   publication,
   enabled = true,
 }: {
   control: Control<DestinationPanelSchemaType>
+  clusterId?: string
   publication?: ReplicationPublicationData
   enabled?: boolean
 }): PipelineReviewCostsState => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const [publicationName, mode, ids] = useWatch({
     control,
