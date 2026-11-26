@@ -15,7 +15,6 @@ export const Route = createFileRoute('/api/v1/projects/$ref/functions/')({
           const store = getFunctionsArtifactStore()
 
           const functionsArtifacts = await store.getFunctions()
-          if (functionsArtifacts.length === 0) return Response.json([], { status: 200 })
 
           const functions = functionsArtifacts.map(
             (func) =>
@@ -31,7 +30,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/functions/')({
               }) satisfies EdgeFunctionsResponse
           )
 
-          return Response.json(functions, { status: 200 })
+          return Response.json(functions)
         },
       },
       { withAuth: true }

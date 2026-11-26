@@ -38,7 +38,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/functions/$slug/')({
             updated_at: functionsArtifact.updated_at,
           } satisfies EdgeFunctionsResponse
 
-          return Response.json(functionResponse, { status: 200 })
+          return Response.json(functionResponse)
         },
       },
       { withAuth: true }

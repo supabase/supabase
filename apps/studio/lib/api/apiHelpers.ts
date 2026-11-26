@@ -2,7 +2,7 @@ import type { IncomingHttpHeaders } from 'node:http'
 import { snakeCase } from 'lodash'
 import z from 'zod'
 
-import { IS_PLATFORM, PG_META_URL } from '@/lib/constants'
+import { IS_PLATFORM } from '@/lib/constants'
 
 /**
  * Construct headers for api request.
@@ -168,12 +168,4 @@ export async function parseJsonBody<T = unknown>(request: Request): Promise<T> {
   } catch {
     throw new InvalidJsonError()
   }
-}
-
-/**
- * Construct the pgMeta redirection url passing along the filtering query params
- */
-export function getPgMetaRedirectUrl(request: Request, endpoint: string) {
-  const { search } = new URL(request.url)
-  return `${PG_META_URL}/${endpoint}${search}`
 }

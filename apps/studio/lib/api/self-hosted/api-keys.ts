@@ -19,11 +19,6 @@ export type NonPlatformApiKey = {
  */
 const SECRET_KEY_VISIBLE_PREFIX_LENGTH = 15
 
-export function parseRevealQuery(value: string | string[] | undefined): boolean {
-  const raw = Array.isArray(value) ? value[0] : value
-  return raw === 'true'
-}
-
 export function getNonPlatformApiKeys(): NonPlatformApiKey[] {
   assertSelfHosted()
 

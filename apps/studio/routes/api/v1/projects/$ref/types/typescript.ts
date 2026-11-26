@@ -18,7 +18,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/types/typescript')({
             return Response.json({ message: response.message }, { status: response.code ?? 500 })
           }
 
-          return Response.json({ types: response }, { status: 200 })
+          return Response.json({ types: response })
         },
       },
       { withAuth: true }

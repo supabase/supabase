@@ -1,25 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { fetchGet } from '@/data/fetchers'
-import { constructHeaders, getPgMetaRedirectUrl } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createPgMetaProxyHandlers } from '@/lib/api/self-hosted/pg-meta'
 
 export const Route = createFileRoute('/api/platform/pg-meta/$ref/views')({
-  server: {
-    handlers: createApiHandlers(
-      {
-        GET: async ({ request }) => {
-          const headers = constructHeaders(Object.fromEntries(request.headers))
-          const response = await fetchGet(getPgMetaRedirectUrl(request, 'views'), { headers })
-
-          if (response.error) {
-            const { code, message } = response.error
-            return Response.json({ message }, { status: code ?? 500 })
-          }
-          return Response.json(response, { status: 200 })
-        },
-      },
-      { withAuth: true }
-    ),
-  },
+  server: { handlers: createPgMetaProxyHandlers('views') },
 })
