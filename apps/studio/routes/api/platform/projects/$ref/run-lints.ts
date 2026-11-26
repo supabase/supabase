@@ -10,7 +10,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/run-lints')({
     handlers: createApiHandlers({
       GET: async ({ request }) => {
         const { data, error } = await getLints({
-          headers: constructHeaders(request.headers),
+          headers: constructHeaders(Object.fromEntries(request.headers)),
           exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
         })
 
