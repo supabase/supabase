@@ -95,8 +95,6 @@ If you need to tell values apart, derive a category (`public` / `protected` / `c
 
 This section takes precedence over "match similar events" guidance elsewhere in this skill: if a similar event carries a user-defined name, don't copy that property.
 
-`data-attr` attributes are not tracked while PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`). Keep their values static strings, and never build them from user-defined names, in case autocapture is enabled later.
-
 ## Privacy: Secrets, Project Content and URL State
 
 Telemetry only runs for visitors who accepted analytics. Consent does not make it acceptable to collect secrets or the data customers keep in their projects.
@@ -146,6 +144,12 @@ const MyComponent = () => {
   return <button onClick={handleClick}>Click me</button>
 }
 ```
+
+Where the `track()` call goes:
+
+- **`data-attr` is not tracking.** PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`), so the attribute sends nothing. A click that matters gets a `track()` call. Keep any `data-attr` value a static string, never built from user-defined names, in case autocapture is enabled later.
+- **Mutation outcomes** go in the mutation hook's `onSuccess` option, not the per-call `mutate()` callback, which is skipped if the component unmounts first. Take the project from the mutation variables and pass it as the third argument to `track()`.
+- **One event, one trigger.** An event fired from more than one component fires on the same user action in each. A native `onCopy` handler also fires on keyboard and partial-selection copies; a Copy button's callback does not.
 
 ## Feature Flag Measurement
 
@@ -206,6 +210,7 @@ When reviewing a PR, flag these as **required changes:**
 5. **Unmeasured feature flags** — a PostHog flag gates new behavior but its value is not captured in any `track()` call, or there is no outcome tracking for the gated behavior
 6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, raw error messages, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one (feature flag values excepted). Required even when the value looks harmless; ask for a count, enum, boolean or category instead
 7. **Secrets, project content, URL state or consent** — a property that can carry a secret or content read from a project; new query-string or hash state holding tokens, user input or row values with no redaction; a send path that bypasses the consent check; analytics storage written before consent
+8. **Tracking placement** — a `track()` call or a `data-attr` that breaks one of the placement rules under [Required Pattern](#required-pattern)
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
