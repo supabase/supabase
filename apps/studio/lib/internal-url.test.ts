@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { isAbsoluteUrl, splitInternalUrl, toRoutePattern } from './internal-url'
 
-describe('splitInternalUrl (compat shim URL splitting)', () => {
+describe('splitInternalUrl', () => {
   it('splits pathname, search, and hash', () => {
     expect(splitInternalUrl('/project/abc/editor/123?schema=public#section')).toEqual({
       to: '/project/abc/editor/123',
@@ -155,9 +155,9 @@ describe('splitInternalUrl with a configured basePath', () => {
   })
 
   it('passes already basepath-relative inputs through unchanged', async () => {
-    // The router shim strips origin + basePath *before* splitting, so the
-    // input here is already relative. Double-stripping must be a no-op for
-    // every real studio route (none starts with the basePath segment).
+    // Callers may pass a target that is already basepath-relative. Stripping
+    // again must be a no-op for every real studio route (none starts with the
+    // basePath segment).
     vi.stubEnv('NEXT_PUBLIC_BASE_PATH', '/dashboard')
     vi.resetModules()
     const { splitInternalUrl: split } = await import('./internal-url')

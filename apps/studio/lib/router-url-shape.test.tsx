@@ -1,15 +1,10 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  type AnyRouter,
-} from '@tanstack/react-router'
+import { createRootRoute, createRoute, type AnyRouter } from '@tanstack/react-router'
 import { describe, expect, it } from 'vitest'
 
 import { splitInternalUrl } from './internal-url'
 import { buildSearchUpdateArgs } from './nuqs-tanstack-adapter'
-import { parseSearch, stringifySearch, type SearchRecord } from './router-search-params'
+import { parseSearch, type SearchRecord } from './router-search-params'
+import { createTestRouter } from '@/tests/lib/custom-render'
 
 // The `<AnyRouter, string>` type arguments mirror `navigateToUrl` and the
 // Link shim: producers emit free-form runtime strings that can't satisfy the
@@ -37,12 +32,7 @@ describe('URL shape end-to-end against a real router', () => {
       '/org',
     ].map((p) => createRoute({ getParentRoute: () => rootRoute, path: p }))
     rootRoute.addChildren(routes)
-    return createRouter({
-      routeTree: rootRoute,
-      history: createMemoryHistory({ initialEntries: [initialEntry] }),
-      parseSearch,
-      stringifySearch,
-    })
+    return createTestRouter(initialEntry, rootRoute)
   }
 
   it('produces Next-shaped URLs for every fixed producer', async () => {
@@ -128,7 +118,9 @@ describe('URL shape end-to-end against a real router', () => {
     // The href itself keeps the %0A escapes and re-parses losslessly.
     expect(router.state.location.searchStr).toContain('%0A')
     expect(parseSearch(router.state.location.searchStr)).toEqual({ s: sql, its: 'PREVIOUS' })
-    expect((router.state.location.search as { s: string }).s).toContain('desc\nlimit 5')
+    expect(router.state.location.search).toMatchObject({
+      s: expect.stringContaining('desc\nlimit 5'),
+    })
   })
 
   it('round-trips newlines in query values through splitInternalUrl', async () => {
@@ -145,7 +137,9 @@ describe('URL shape end-to-end against a real router', () => {
 
     expect(router.state.location.pathname).toBe('/project/abc/logs/explorer')
     expect(router.state.location.search).toEqual({ s: sql, its: 'PREVIOUS' })
-    expect((router.state.location.search as { s: string }).s).toContain('desc\nlimit 5')
+    expect(router.state.location.search).toMatchObject({
+      s: expect.stringContaining('desc\nlimit 5'),
+    })
   })
 
   it('clears the previous query when navigating without one', async () => {

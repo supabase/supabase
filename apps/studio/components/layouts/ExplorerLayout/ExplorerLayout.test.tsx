@@ -2,7 +2,6 @@ import { QueryClient } from '@tanstack/react-query'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import mockRouter from 'next-router-mock'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -36,10 +35,6 @@ describe('Explorer Home tab navigation', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     localStorage.clear()
-    mockRouter.setCurrentUrl({
-      pathname: '/project/[ref]/explorer/query/[id]',
-      query: { ref: 'default', id: 'query-1' },
-    })
   })
 
   it.each(['mouse', 'keyboard'] as const)(

@@ -1,15 +1,10 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { StorageBucketsLayout } from './StorageBucketsLayout'
 import { customRender } from '@/tests/lib/custom-render'
-import { routerMock } from '@/tests/lib/route-mock'
 
 describe('StorageBucketsLayout', () => {
-  beforeEach(() => {
-    routerMock.setCurrentUrl('/project/default/storage/files/policies')
-  })
-
   it('marks only the nested tab as the current page on child files routes', () => {
     customRender(
       <StorageBucketsLayout>
@@ -28,8 +23,6 @@ describe('StorageBucketsLayout', () => {
   })
 
   it('keeps the buckets tab marked as current when query params are present', () => {
-    routerMock.setCurrentUrl('/project/default/storage/files?new=true')
-
     customRender(
       <StorageBucketsLayout>
         <div>Buckets content</div>

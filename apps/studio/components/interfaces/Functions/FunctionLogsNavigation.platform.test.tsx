@@ -4,10 +4,8 @@ import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
-import routerMock from 'next-router-mock'
-import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useCallback } from 'react'
-import { afterAll, afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 import { useFunctionLogsMigration } from './useFunctionLogsMigration'
 import { useFunctionsDetailShortcuts } from './useFunctionsDetailShortcuts'
@@ -25,15 +23,6 @@ vi.unmock('common')
 vi.mock('@/components/interfaces/UnifiedLogs/UnifiedLogs', () => ({
   UnifiedLogs: () => <div>Unified logs</div>,
 }))
-
-const removeRouteParser = routerMock.useParser(
-  createDynamicRouteParser([
-    '/project/[ref]/functions/[functionSlug]',
-    '/project/[ref]/functions/[functionSlug]/logs',
-    '/project/[ref]/functions/[functionSlug]/invocations',
-  ])
-)
-afterAll(removeRouteParser)
 
 const featureFlags = {
   configcat: {
@@ -64,13 +53,11 @@ const FunctionPageProviders = ({
 )
 
 beforeEach(() => {
-  routerMock.setCurrentUrl('/project/default/functions/send-email/invocations')
   localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, 'true')
 })
 
 afterEach(() => {
   localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  act(() => routerMock.setCurrentUrl('/'))
 })
 
 it('forwards an invocation bookmark with its selected log, message, and time range to Logs', async () => {
@@ -80,7 +67,6 @@ it('forwards an invocation bookmark with its selected log, message, and time ran
     log: 'selected-invocation',
     s: 'delivery failed',
   })
-  routerMock.setCurrentUrl(`/project/default/functions/send-email/invocations?${legacy}`)
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/functions/:function_slug',
@@ -206,7 +192,6 @@ it('opens a selected log from an old Logs bookmark using the unified time range'
     ite: '2026-03-20T11:00:00Z',
     log: 'runtime-message',
   })
-  routerMock.setCurrentUrl(`/project/default/functions/send-email/logs?${legacy}`)
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/functions/:function_slug',

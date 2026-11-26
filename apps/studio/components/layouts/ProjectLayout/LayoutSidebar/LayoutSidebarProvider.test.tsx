@@ -11,7 +11,6 @@ import { projectKeys } from '@/data/projects/keys'
 import { sidebarManagerState } from '@/state/sidebar-manager-state'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 
@@ -106,7 +105,6 @@ describe('LayoutSidebarProvider sidebar deep link', () => {
 
   beforeEach(() => {
     resetSidebarManagerState()
-    routerMock.setCurrentUrl(`/project/${PROJECT_REF}`)
     localStorage.clear()
     releaseProject = () => {}
   })

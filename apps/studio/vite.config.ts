@@ -26,9 +26,9 @@ const compatRoot = path.resolve(rootDir, 'compat/next')
 // lodash-es (ui, common) would fail to resolve the bare specifier.
 const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-es/package.json'))
 
-// Map of Next imports we've shimmed to their TanStack-backed replacement.
-// Add an entry here + a file under compat/next/ when a new Next surface is
-// needed by app source.
+// The remaining Next imports shimmed to a TanStack-backed replacement. New
+// code uses TanStack Router (or framework-agnostic) APIs instead of adding
+// shims here.
 const nextShims: Record<string, string> = {
   'next/link': path.join(compatRoot, 'link.tsx'),
   'next/script': path.join(compatRoot, 'script.tsx'),
@@ -38,7 +38,7 @@ const nextShims: Record<string, string> = {
 // - If app source imports a shimmed `next/*` id, resolve it to the local
 //   shim (acts like resolve.alias).
 // - Otherwise, if app source imports from `next` or `next/*`, fail the
-//   build so we catch unshimmed usage at build time during the migration.
+//   build so unshimmed usage is caught at build time.
 // - node_modules imports pass through untouched.
 function nextCompat(): Plugin {
   return {
@@ -50,8 +50,8 @@ function nextCompat(): Plugin {
       if (id === 'next' || id.startsWith('next/')) {
         throw new Error(
           `[next-compat] "${id}" imported from ${importer}.\n` +
-            `Add a shim under apps/studio/compat/next/ and register it in vite.config.ts, ` +
-            `or use a framework-agnostic equivalent.`
+            `Use the TanStack Router (or framework-agnostic) equivalent instead; ` +
+            `only next/link and next/script are shimmed.`
         )
       }
     },

@@ -7,7 +7,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { IntegrationDefinition } from '../../Landing/Integrations.constants'
 import { InstallIntegrationSheet } from './InstallIntegrationSheet/InstallIntegrationSheet'
 import { customRender } from '@/tests/lib/custom-render'
-import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -70,7 +69,6 @@ const getInstallButton = () => {
 
 describe('InstallIntegrationSheet', () => {
   beforeEach(() => {
-    routerMock.setCurrentUrl('/project/default/integrations/test-integration/overview')
     mockExecuteSql.mockReset()
   })
 

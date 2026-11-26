@@ -40,9 +40,9 @@
 // Forwarding the BASE_PATH-prefixed pathname as `to` makes TanStack
 // double-prefix it (`/dashboard/dashboard/project/...`). Strip the
 // basePath when we see it, so what we hand TanStack is always
-// basepath-relative. (Inputs that are *already* basepath-relative — like
-// the router shim's pre-stripped targets — pass through unchanged, since
-// no studio route pathname itself starts with the basePath segment.)
+// basepath-relative. (Inputs that are *already* basepath-relative pass
+// through unchanged, since no studio route pathname itself starts with the
+// basePath segment.)
 
 import { BASE_PATH } from './constants'
 import { searchParamsToRecord, type SearchRecord } from './router-search-params'

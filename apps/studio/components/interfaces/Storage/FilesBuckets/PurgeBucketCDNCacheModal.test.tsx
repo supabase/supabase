@@ -15,7 +15,6 @@ import { createMockAuthContext } from '@/tests/lib/auth-helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
@@ -60,8 +59,6 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 describe('PurgeBucketCDNCacheModal', () => {
   beforeEach(() => {
     toast.dismiss()
-    // useParams
-    routerMock.setCurrentUrl('/project/default/storage/files/buckets/test')
     // useProjectContext
     addAPIMock({
       method: 'get',

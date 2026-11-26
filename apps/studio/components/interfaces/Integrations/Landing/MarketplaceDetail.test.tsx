@@ -7,7 +7,6 @@ import { type APIKey } from '@/data/api-keys/api-keys-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
@@ -140,7 +139,6 @@ const mockProjectResources = () => {
 describe('MarketplaceDetail', () => {
   test('a permission-denied resource does not put the page into an endless refetch loop', async () => {
     mockProjectResources()
-    routerMock.setCurrentUrl('/project/default/integrations/grafana/overview')
 
     customRender(<MarketplaceDetail />)
 

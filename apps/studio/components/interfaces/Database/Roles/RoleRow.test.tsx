@@ -10,7 +10,6 @@ import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/Proje
 import type { PgRole } from '@/data/database-roles/database-roles-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -38,7 +37,6 @@ describe('RoleRow', () => {
 
   beforeEach(() => {
     queries = []
-    routerMock.setCurrentUrl('/project/default/database/roles')
     // useSelectedProjectQuery
     addAPIMock({
       method: 'get',

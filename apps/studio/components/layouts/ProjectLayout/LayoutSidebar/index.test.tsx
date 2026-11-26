@@ -7,7 +7,6 @@ import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { MobileSheetProvider } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { sidebarManagerState } from '@/state/sidebar-manager-state'
 import { render } from '@/tests/helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('@/components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -92,10 +91,6 @@ const resetSidebarManagerState = () => {
 }
 
 describe('LayoutSidebar', () => {
-  beforeEach(() => {
-    routerMock.setCurrentUrl('/projects/default')
-  })
-
   afterEach(() => {
     resetSidebarManagerState()
     localStorage.clear()
@@ -138,7 +133,6 @@ describe('LayoutSidebar', () => {
 
   describe('at organization level', () => {
     beforeEach(() => {
-      routerMock.setCurrentUrl('/org/default')
       // Set project to undefined to simulate org-level (no project)
       mockProjectData = undefined
     })
@@ -178,7 +172,6 @@ describe('LayoutSidebar', () => {
 
   // [Joshen] JFYI temporarily commented this one out - I'm struggling to figure out the mocking to get this to work
   // it('auto-opens when sidebar query param matches a registered sidebar', async () => {
-  //   routerMock.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
   //   renderSidebar()
   //   await screen.findByTestId('ai-assistant-sidebar')
   // })

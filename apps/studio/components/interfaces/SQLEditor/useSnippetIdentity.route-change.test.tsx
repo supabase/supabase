@@ -12,8 +12,8 @@ import {
 // `common`'s `useParams` is globally stubbed (see tests/vitestSetup.ts) to a
 // constant `{ ref: 'default' }` so most tests don't have to think about
 // routing. This suite is specifically about behavior across route changes, so
-// it swaps in the real implementation (still backed by the `next-router-mock`
-// router the rest of the app is wired to in tests).
+// it swaps in the real implementation, which the test `FrameworkProvider` in
+// tests/lib/custom-render.tsx feeds from `next-router-mock`.
 vi.mock('common', async (importOriginal) => {
   const actual = (await importOriginal()) as object
   return { ...actual }
@@ -40,7 +40,7 @@ describe('useSnippetIdentity across route changes', () => {
     expect(firstNewTabId).not.toEqual('existing-tab')
 
     // Typing in the new tab creates its snippet and shallow-navigates to it
-    // (mirrors the `router.push` inside `useSnippetEditor.handleEditorChange`).
+    // (mirrors the `navigateToUrl` call inside `useSnippetEditor.handleEditorChange`).
     seedSnippet({ id: firstNewTabId, sql: 'select typed content;' })
     await act(async () => {
       await mockRouter.push(`/project/default/sql/${firstNewTabId}`)

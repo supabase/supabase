@@ -8,7 +8,6 @@ import { EnableCleanupButton } from './CronJobsTab.EnableCleanupButton'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -42,8 +41,6 @@ describe('EnableCleanupButton', () => {
     lookupCount = 0
     scheduleQueries = []
 
-    // useSelectedProjectQuery -> useParams
-    routerMock.setCurrentUrl('/project/default/integrations/cron/jobs')
     // useSelectedProjectQuery
     addAPIMock({
       method: 'get',
