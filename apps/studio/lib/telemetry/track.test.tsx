@@ -41,7 +41,7 @@ describe('useTrack', () => {
       path: '/platform/telemetry/event',
       response: async ({ request }) => {
         telemetryRequests.push(await request.json())
-        return new HttpResponse(null, { status: 201 })
+        return HttpResponse.json<Record<string, never>>({}, { status: 201 })
       },
     })
     addAPIMock({
