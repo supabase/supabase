@@ -95,18 +95,24 @@ at hand — they cite each other where context matters.
 
 ## How to use during a chat
 
-1. **Start by reading** `adding-features.md` and `app-map.md` if the
+1. **Check for drift.** For each reference file the answer uses, find its
+   `Verified at` commit and run
+   `git log --oneline <commit>..HEAD -- apps/docs ':!apps/docs/content'`.
+   If a commit touches code the answer depends on, read that code before
+   you answer. A file with no `Verified at` line isn't verified yet:
+   check each claim you use against the code.
+2. **Start by reading** `adding-features.md` and `app-map.md` if the
    question touches design choices or unfamiliar code paths. They're
    small on purpose — read both, don't skim.
-2. **Verify before recommending.** Reference content may lag behind the
+3. **Verify before recommending.** Reference content may lag behind the
    live code. Confirm with the actual files (`apps/docs/...`) before
    acting on remembered claims about file paths, function names, or
    behavior.
-3. **Cite the principle**, not just the rule. "Per `adding-features.md`
+4. **Cite the principle**, not just the rule. "Per `adding-features.md`
    § 'Reuse pipelines, don't fork them', this routes through the
    existing markdown-schema handler rather than introducing a side
    path."
-4. **Reach for Mermaid** when explaining architecture, flows, or
+5. **Reach for Mermaid** when explaining architecture, flows, or
    relationships — see [Answering with diagrams](#answering-with-diagrams).
 
 ## Updating the librarian
@@ -116,6 +122,11 @@ When something in `apps/docs` changes in a way that makes a reference
 file inaccurate, or a generally-applicable lesson emerges from a PR
 review, open a pull request against this repo to update the relevant
 file, same as any other in-repo change.
+
+When an answer finds a stale fact, list it under a "Skill corrections"
+heading at the end of the answer. Edit the reference file only after the
+user approves. When you check the whole file, add or move its
+`Verified at` line to the commit you checked.
 
 Keep each canonical file under ~250 lines; split before they bloat.
 Capture only what a future contributor would benefit from knowing — if
