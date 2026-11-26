@@ -218,9 +218,9 @@ export const Destinations = () => {
   const warningTitle = getWarningTitle()
   const unavailableInformation = [
     isRegionsError && 'Available regions',
-    isSourcesError && 'Pipelines enablement status',
+    isSourcesError && 'setup details',
     hasClusterErrors &&
-      `pipeline results from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
+      `results from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
   ].filter((item): item is string => Boolean(item))
   const getWarningDescription = () => {
     if (!hasGeneralErrors) {
@@ -232,7 +232,7 @@ export const Destinations = () => {
       unavailableInformation.length > 1
         ? `${unavailableInformation.slice(0, -1).join(', ')}${unavailableInformation.length > 2 ? ',' : ''} and ${unavailableInformation.at(-1)}`
         : (unavailableInformation[0] ?? 'Pipeline information')
-    return `${information.charAt(0).toUpperCase()}${information.slice(1)} ${unavailableInformation.length > 1 || isRegionsError || hasClusterErrors ? 'are' : 'is'} unavailable.`
+    return `Some pipeline information could not be loaded. ${information.charAt(0).toUpperCase()}${information.slice(1)} are unavailable.`
   }
   const pipelineListStatus = hasListErrors ? `Warning: ${warningTitle}` : ''
 
