@@ -689,10 +689,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key` |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key`. Each key is a 256-bit key, base64-RawURL-encoded (unpadded); any other value stops Auth from starting. With encryption enabled, it must include the key for `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | boolean |  | Enable column-level encryption for new writes. |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. |  |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true`; an invalid key stops Auth from starting |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true` |
 | `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED` | boolean | CLI | Allow admins to link identities manually. | Default: `false` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALGORITHM_VERSION` | integer (count) |  | Refresh token algorithm version (0, 1 or 2). |  |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALLOW_REUSE` | boolean |  | Allow refresh-token reuse without rotation. |  |
