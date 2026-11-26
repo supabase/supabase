@@ -58,6 +58,7 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -110,6 +111,7 @@ export const Destinations = () => {
   const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const { data: organization } = useSelectedOrganizationQuery()
 
   useRedirectLegacyReadReplicaDestination()
@@ -142,6 +144,7 @@ export const Destinations = () => {
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
     projectRef,
+    clusterId,
   })
   const destinations = useMemo(
     () => destinationsData?.destinations ?? [],
@@ -160,6 +163,7 @@ export const Destinations = () => {
 
   const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
+    clusterId,
   })
   const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
 
@@ -167,7 +171,7 @@ export const Destinations = () => {
   // the rows' query keys, so each status is still only fetched once.
   const statusByPipelineId = useQueries({
     queries: pipelines.map((pipeline) =>
-      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id, clusterId })
     ),
     combine: combinePipelineStatuses,
   })
@@ -214,6 +218,7 @@ export const Destinations = () => {
     refetch: refetchSources,
   } = useReplicationSourcesQuery({
     projectRef,
+    clusterId,
   })
   const externalReplicationSource = useMemo(
     () => sourcesData?.sources.find((source) => source.name === projectRef),
@@ -304,14 +309,14 @@ export const Destinations = () => {
       pipelinesData.pipelines.forEach((p) => {
         if (!p?.id) return
         queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, clusterId),
           queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id, clusterId }, signal),
           staleTime: Infinity,
         })
       })
     }
-  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
+  }, [projectRef, clusterId, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
     <div className="w-full space-y-4">

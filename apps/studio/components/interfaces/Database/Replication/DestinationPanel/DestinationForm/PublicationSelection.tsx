@@ -10,6 +10,7 @@ import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -23,20 +24,21 @@ export const PublicationSelection = ({
   showLoadError = true,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const {
     data: sourcesData,
     isError: isSourcesError,
     isSuccess: isSourcesSuccess,
-  } = useReplicationSourcesQuery({ projectRef })
+  } = useReplicationSourcesQuery({ projectRef, clusterId })
   const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
   const isSourceUnavailable = isSourcesError || (isSourcesSuccess && sourceId === undefined)
 
   const { data: publications, isSuccess: isSuccessPublications } =
-    useReplicationPublicationNamesQuery({ projectRef, sourceId })
+    useReplicationPublicationNamesQuery({ projectRef, clusterId, sourceId })
   const { data: selectedPublication, isError: isPublicationError } = useReplicationPublicationQuery(
-    { projectRef, sourceId, publicationName }
+    { projectRef, clusterId, sourceId, publicationName }
   )
   const isSelectedPublicationMissing =
     isSuccessPublications &&

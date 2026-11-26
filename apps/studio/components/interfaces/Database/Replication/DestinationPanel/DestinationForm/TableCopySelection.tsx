@@ -20,6 +20,7 @@ import {
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface TableCopySelectionProps {
   showLoadError?: boolean
@@ -38,7 +39,8 @@ export const TableCopySelection = ({
   showLoadError = true,
 }: TableCopySelectionProps) => {
   const { ref: projectRef } = useParams()
-  const sourceId = useReplicationSourceId({ projectRef })
+  const clusterId = useReplicationClusterId()
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const [publicationName, tableSyncCopyMode, tableSyncCopyTableIds] = useWatch({
     control: form.control,
@@ -52,7 +54,7 @@ export const TableCopySelection = ({
     isError: isErrorPublications,
     isSuccess: isSuccessPublication,
     refetch: refetchPublication,
-  } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  } = useReplicationPublicationQuery({ projectRef, clusterId, sourceId, publicationName })
   const isLoadingPublicationTables =
     !!publicationName && isMetadataValueLoading(isPending || isFetching, selectedPublication)
   const { handleOpenChange: handleRefreshPublicationOnOpen } = useRefreshOnOpen({
@@ -77,7 +79,7 @@ export const TableCopySelection = ({
       ? 0
       : tableSyncCopyTableIds.filter((id) => !publicationTableIds.has(id)).length
   const { data: sourceTables = [] } = useReplicationTablesQuery(
-    { projectRef, sourceId },
+    { projectRef, clusterId, sourceId },
     { enabled: staleSelectedCount > 0 }
   )
   const sourceTableLabelsById = new Map(

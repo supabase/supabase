@@ -63,6 +63,7 @@ import { useReplicationPublicationNamesQuery } from '@/data/replication/publicat
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const formId = 'destination-editor'
 
@@ -86,6 +87,7 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
   const {
     isPending: isProjectPending,
@@ -115,10 +117,10 @@ export const DestinationForm = ({
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
-  const sourceId = useReplicationSourceId({ projectRef })
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const { data: publicationNames = [], isSuccess: isSuccessPublicationNames } =
-    useReplicationPublicationNamesQuery({ projectRef, sourceId })
+    useReplicationPublicationNamesQuery({ projectRef, clusterId, sourceId })
 
   const {
     data: destinationData,
@@ -126,6 +128,7 @@ export const DestinationForm = ({
     isSuccess: isSuccessDestination,
   } = useReplicationDestinationByIdQuery({
     projectRef,
+    clusterId,
     destinationId: existingDestination?.destinationId,
   })
 
@@ -135,6 +138,7 @@ export const DestinationForm = ({
     isSuccess: isSuccessPipeline,
   } = useReplicationPipelineByIdQuery({
     projectRef,
+    clusterId,
     pipelineId: existingDestination?.pipelineId,
   })
   const isErrorExistingConfig = editMode && (isErrorDestination || isErrorPipeline)
@@ -219,7 +223,7 @@ export const DestinationForm = ({
   const isManagedDuckLake = selectedType === 'DuckLake' && ducklakeMode === DUCKLAKE_MODE_SUPABASE
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
-    useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+    useReplicationPublicationQuery({ projectRef, clusterId, sourceId, publicationName })
 
   const isSelectedPublicationMissing =
     isSuccessPublicationNames &&

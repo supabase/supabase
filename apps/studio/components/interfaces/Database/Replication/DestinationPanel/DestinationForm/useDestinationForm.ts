@@ -21,6 +21,7 @@ import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -28,6 +29,7 @@ import {
 
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const { runWithRequestStatus } = usePipelineRequestStatus()
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
@@ -38,7 +40,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     []
   )
 
-  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
+  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef, clusterId })
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
   const { validateDestination, isValidatingDestination } = useDestinationValidation({

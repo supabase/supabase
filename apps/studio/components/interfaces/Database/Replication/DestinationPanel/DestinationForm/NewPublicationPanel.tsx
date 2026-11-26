@@ -35,6 +35,7 @@ import { useCreatePublicationMutation } from '@/data/replication/publication-cre
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -63,7 +64,8 @@ const defaultValues: FormValues = {
 
 export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const sourceId = useReplicationSourceId({ projectRef })
+  const clusterId = useReplicationClusterId()
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const [shouldLoadTables, setShouldLoadTables] = useState(false)
 
   const {
@@ -72,7 +74,10 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
     isFetching,
     isError,
     refetch: refetchTables,
-  } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible && shouldLoadTables })
+  } = useReplicationTablesQuery(
+    { projectRef, clusterId, sourceId },
+    { enabled: visible && shouldLoadTables }
+  )
   const isLoadingTables = isMetadataListLoading(isPending || isFetching, tables.length)
   const { handleOpenChange: handleRefreshTablesOnOpen } = useRefreshOnOpen({
     isEnabled: shouldLoadTables,

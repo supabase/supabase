@@ -5,16 +5,23 @@ import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationDestinationByIdParams = { projectRef?: string; destinationId?: number | null }
+type ReplicationDestinationByIdParams = {
+  projectRef?: string
+  destinationId?: number | null
+  clusterId?: string
+}
 
 async function fetchReplicationDestinationById(
-  { projectRef, destinationId }: ReplicationDestinationByIdParams,
+  { projectRef, destinationId, clusterId }: ReplicationDestinationByIdParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!destinationId) throw new Error('destinationId is required')
   const { data, error } = await get('/platform/replication/{ref}/destinations/{destination_id}', {
-    params: { path: { ref: projectRef, destination_id: destinationId } },
+    params: {
+      path: { ref: projectRef, destination_id: destinationId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
   if (error) {
@@ -29,15 +36,17 @@ export type ReplicationDestinationByIdData = Awaited<
 >
 
 export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinationByIdData>(
-  { projectRef, destinationId }: ReplicationDestinationByIdParams,
+  variables: ReplicationDestinationByIdParams,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ReplicationDestinationByIdData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationDestinationByIdData, StudioError, TData>({
-    queryKey: replicationKeys.destinationById(projectRef, destinationId),
-    queryFn: ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
+) => {
+  const { projectRef, destinationId, clusterId } = variables
+  return useQuery<ReplicationDestinationByIdData, StudioError, TData>({
+    queryKey: replicationKeys.destinationById(projectRef, destinationId, clusterId),
+    queryFn: ({ signal }) =>
+      fetchReplicationDestinationById({ projectRef, destinationId, clusterId }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
@@ -45,3 +54,4 @@ export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinatio
       destinationId !== null,
     ...options,
   })
+}
