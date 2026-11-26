@@ -445,7 +445,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_NOTION_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Notion. |  |
 | `GOTRUE_EXTERNAL_NOTION_URL` | URL |  | Override Notion OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_OIDC_PROVIDER_CACHE_TTL` | string (duration) |  | Cache lifetime for OIDC discovery documents. | Default: `1h` |
-| `GOTRUE_EXTERNAL_REDIRECTURL` | URL |  | Global override of OAuth redirect URL. | No underscore between `REDIRECT` and `URL` (the field isn't split into words) |
+| `GOTRUE_EXTERNAL_REDIRECTURL` | URL |  | Where users are sent after an OAuth sign-in completes or fails. When set, it's used instead of the request's `redirect_to` and `SITE_URL`. | No underscore between `REDIRECT` and `URL` (the field isn't split into words) |
 | `GOTRUE_EXTERNAL_SKIP_NONCE_CHECK` | string | Self-hosted | Listed (commented) in compose but does not map to a configuration field. | Commented out in compose; no effect - use per-provider `*_SKIP_NONCE_CHECK` |
 | `GOTRUE_EXTERNAL_SLACK_API_URL` | URL |  | Override Slack API endpoint. |  |
 | `GOTRUE_EXTERNAL_SLACK_CLIENT_ID` | string |  | Legacy Slack OAuth client ID. |  |
