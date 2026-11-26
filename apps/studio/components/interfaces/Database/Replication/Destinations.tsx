@@ -46,9 +46,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import {
-  replicationClustersQueryOptions,
-} from '@/data/replication/clusters-query'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -338,7 +336,9 @@ export const Destinations = () => {
           >
             <ButtonTooltip
               tooltip={{
-                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+                content: {
+                  text: isSourcesError && !canCreate ? sourceErrorTitle : undefined,
+                },
               }}
               variant="primary"
               icon={<PlusIcon />}
@@ -496,7 +496,9 @@ export const Destinations = () => {
           >
             <ButtonTooltip
               tooltip={{
-                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+                content: {
+                  text: isSourcesError && !canCreate ? sourceErrorTitle : undefined,
+                },
               }}
               variant="default"
               icon={<PlusIcon />}

@@ -18,7 +18,7 @@ import { ReplicationDiagram } from '@/components/interfaces/Database/Replication
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/project/$ref/database/pipelines/')({
 
 function DatabasePipelinesPage() {
   const { ref: projectRef } = useParams()
-  const { hasMultipleRegions } = useReplicationClusterGroups()
+  const { hasMultipleRegions } = useReplicationClusters()
   const { isHighAvailability, isPending } = useHighAvailability()
   const showPipelines = useIsFeatureEnabled('database:replication')
 

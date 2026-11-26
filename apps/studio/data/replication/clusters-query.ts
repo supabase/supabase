@@ -6,7 +6,9 @@ import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
 async function getReplicationClusters(signal?: AbortSignal) {
-  const { data, error } = await get('/platform/replication/regions', { signal })
+  const { data, error } = await get('/platform/replication/regions', {
+    signal,
+  })
   if (error) handleError(error)
   return data
 }
