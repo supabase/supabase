@@ -35,7 +35,12 @@ interface DestinationTypeGroup {
   options: DestinationTypeOption[]
 }
 
-export const DestinationTypeSelection = () => {
+interface DestinationTypeSelectionProps {
+  /** The cluster of the destination being edited. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}
+
+export const DestinationTypeSelection = ({ clusterId }: DestinationTypeSelectionProps) => {
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
   const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
@@ -61,7 +66,7 @@ export const DestinationTypeSelection = () => {
   )
   const editMode = edit !== null
 
-  const { type: existingDestinationType } = useDestinationInformation({ id: edit })
+  const { type: existingDestinationType } = useDestinationInformation({ id: edit, clusterId })
   const destinationType =
     existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
 

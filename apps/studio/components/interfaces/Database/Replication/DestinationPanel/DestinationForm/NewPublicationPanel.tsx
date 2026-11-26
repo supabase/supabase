@@ -35,10 +35,10 @@ import { useCreatePublicationMutation } from '@/data/replication/publication-cre
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface NewPublicationPanelProps {
   visible: boolean
+  clusterId?: string
   onClose: (newPublication?: string) => void
 }
 
@@ -62,9 +62,8 @@ const defaultValues: FormValues = {
   publishViaPartitionRoot: true,
 }
 
-export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
+export const NewPublicationPanel = ({ visible, clusterId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const [shouldLoadTables, setShouldLoadTables] = useState(false)
 

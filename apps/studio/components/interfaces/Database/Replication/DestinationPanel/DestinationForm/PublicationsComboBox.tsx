@@ -26,21 +26,21 @@ import {
   useRefreshOnOpen,
 } from './useRefreshOnOpen'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface PublicationsComboBoxProps {
   sourceId?: number
+  clusterId?: string
   field: ControllerRenderProps<DestinationPanelSchemaType, 'publicationName'>
   onNewPublicationClick: () => void
 }
 
 export const PublicationsComboBox = ({
   sourceId,
+  clusterId,
   field,
   onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

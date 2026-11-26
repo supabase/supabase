@@ -37,11 +37,14 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 
-export const DestinationPanel = () => {
+interface DestinationPanelProps {
+  /** The cluster of the destination being added or edited. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}
+
+export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
@@ -80,7 +83,7 @@ export const DestinationPanel = () => {
     replicationNotEnabled: isEditSourceMissing,
     type: existingDestinationType,
     destinationFetcher,
-  } = useDestinationInformation({ id: edit })
+  } = useDestinationInformation({ id: edit, clusterId })
   const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
   const destinationType =
     existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
@@ -123,7 +126,6 @@ export const DestinationPanel = () => {
 
   const checkIsDirtyRef = useRef<() => boolean>(() => false)
 
-  const contextClusterId = useReplicationClusterId()
   // `null` until creation initializes a region. `undefined` is the API default.
   const [chosenClusterId, setChosenClusterId] = useState<string | undefined | null>(null)
   const creationClusterId = chosenClusterId === null ? preferredCluster.clusterId : chosenClusterId
@@ -153,6 +155,11 @@ export const DestinationPanel = () => {
     ensureRegionSource,
   ])
 
+  let sourceStatus = ''
+  if (isSourceAvailabilityPending) sourceStatus = 'Checking pipeline sources'
+  else if (isCreatingSource) sourceStatus = 'Preparing pipeline region'
+  else if (chosenClusterId !== null && !regionSourceError) sourceStatus = 'Pipeline region is ready'
+
   const onClose = () => {
     checkIsDirtyRef.current = () => false
     setDestinationType(null)
@@ -181,7 +188,7 @@ export const DestinationPanel = () => {
 
   const typeSelection = (
     <>
-      <DestinationTypeSelection />
+      <DestinationTypeSelection clusterId={clusterId} />
       <DialogSectionSeparator />
     </>
   )
@@ -222,7 +229,7 @@ export const DestinationPanel = () => {
             </SheetHeader>
 
             <p role="status" aria-live="polite" className="sr-only">
-              {isSourceAvailabilityPending ? 'Checking pipeline sources' : ''}
+              {sourceStatus}
             </p>
             {(isAccessLoading || isEditLoading || isCreationLoading) && (
               <SheetSection>
@@ -264,14 +271,12 @@ export const DestinationPanel = () => {
               <div className="grow overflow-auto min-h-0">
                 {pipelinesTypeSelection}
                 <SheetSection>
-                  <EnablePipelinesCallout type={destinationType} />
+                  <EnablePipelinesCallout type={destinationType} clusterId={clusterId} />
                 </SheetSection>
               </div>
             )}
             {showDestinationForm && (
-              <ReplicationClusterProvider
-                clusterId={editMode ? contextClusterId : creationClusterId}
-              >
+              <>
                 {regionSourceError && (
                   <SheetSection>
                     <AlertError
@@ -290,6 +295,7 @@ export const DestinationPanel = () => {
                   </SheetSection>
                 )}
                 <DestinationForm
+                  clusterId={editMode ? clusterId : creationClusterId}
                   visible={visible}
                   selectedType={destinationType ?? 'BigQuery'}
                   existingDestination={existingDestination}
@@ -299,7 +305,7 @@ export const DestinationPanel = () => {
                   onCancel={confirmOnClose}
                   isPreparingRegion={isCreatingSource || regionSourceError !== null}
                 />
-              </ReplicationClusterProvider>
+              </>
             )}
           </div>
         </SheetContent>

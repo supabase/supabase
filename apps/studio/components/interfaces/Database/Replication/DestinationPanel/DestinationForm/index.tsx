@@ -63,12 +63,13 @@ import { useReplicationPublicationNamesQuery } from '@/data/replication/publicat
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const formId = 'destination-editor'
 
 interface DestinationFormProps {
   selectedType: DestinationType
+  /** The cluster this destination belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   visible: boolean
   existingDestination?: ExistingDestination
   typeSelection?: ReactNode
@@ -80,6 +81,7 @@ interface DestinationFormProps {
 
 export const DestinationForm = ({
   selectedType,
+  clusterId,
   visible,
   existingDestination,
   typeSelection,
@@ -89,7 +91,6 @@ export const DestinationForm = ({
   isPreparingRegion = false,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
   const {
     isPending: isProjectPending,
@@ -155,7 +156,7 @@ export const DestinationForm = ({
     destinationValidationFailures,
     pipelineValidationFailures,
     resetValidation,
-  } = useDestinationForm({ selectedType })
+  } = useDestinationForm({ selectedType, clusterId })
 
   const defaultValues = useMemo(
     () =>
@@ -488,7 +489,7 @@ export const DestinationForm = ({
             <fieldset disabled={!isExistingConfigReady || isPreparingRegion} className="contents">
               {shouldShowConnectionSection && (
                 <>
-                  <PipelineConnectionSection type={selectedType} form={form}>
+                  <PipelineConnectionSection type={selectedType} form={form} clusterId={clusterId}>
                     {destinationFields}
                   </PipelineConnectionSection>
                   <DialogSectionSeparator />
@@ -496,6 +497,7 @@ export const DestinationForm = ({
               )}
               {shouldShowConnectionSection ? (
                 <PipelineDataSection
+                  clusterId={clusterId}
                   type={selectedType}
                   form={form}
                   onSelectNewPublication={() => setPublicationPanelVisible(true)}
@@ -517,10 +519,11 @@ export const DestinationForm = ({
                       <DestinationNameInput form={form} destinationType={selectedType} />
                       <PublicationSelection
                         form={form}
+                        clusterId={clusterId}
                         onSelectNewPublication={() => setPublicationPanelVisible(true)}
                       />
-                      <TableCopySelection form={form} editMode={editMode} />
-                      <PipelineRegionField destinationType={selectedType} />
+                      <TableCopySelection form={form} editMode={editMode} clusterId={clusterId} />
+                      <PipelineRegionField destinationType={selectedType} clusterId={clusterId} />
                     </div>
                   </div>
 
@@ -529,14 +532,23 @@ export const DestinationForm = ({
 
                   <DialogSectionSeparator />
 
-                  <AdvancedSettings type={selectedType} form={form} group="all" />
+                  <AdvancedSettings
+                    type={selectedType}
+                    form={form}
+                    group="all"
+                    clusterId={clusterId}
+                  />
                 </>
               )}
 
               {shouldShowConnectionSection && (
                 <>
                   <DialogSectionSeparator />
-                  <PipelineDestinationReview type={selectedType} control={form.control} />
+                  <PipelineDestinationReview
+                    type={selectedType}
+                    control={form.control}
+                    clusterId={clusterId}
+                  />
                   <DialogSectionSeparator />
                   <PipelineDataReview
                     type={selectedType}
@@ -544,7 +556,11 @@ export const DestinationForm = ({
                     publication={selectedPublication}
                   />
                   <DialogSectionSeparator />
-                  <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                  <PipelineReviewCosts
+                    control={form.control}
+                    publication={selectedPublication}
+                    clusterId={clusterId}
+                  />
                 </>
               )}
 
@@ -607,6 +623,7 @@ export const DestinationForm = ({
 
       <NewPublicationPanel
         visible={publicationPanelVisible}
+        clusterId={clusterId}
         onClose={(newPublication?: string) => {
           if (newPublication) {
             form.setValue('tableSyncCopyMode', 'include_all_tables', {
@@ -640,6 +657,7 @@ export const DestinationForm = ({
 
       <PipelineCostDialog
         open={showCostDialog}
+        clusterId={clusterId}
         isConfirming={isSaving}
         publicationName={pendingFormValues?.publicationName}
         publicationTables={pendingPublicationTables}

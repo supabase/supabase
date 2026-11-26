@@ -21,16 +21,21 @@ import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 
-export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
+export const useDestinationForm = ({
+  selectedType,
+  clusterId,
+}: {
+  selectedType: DestinationType
+  /** The cluster this destination belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
-  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus({ clusterId })
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
   const [destinationValidationFailures, setDestinationValidationFailures] = useState<

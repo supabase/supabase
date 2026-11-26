@@ -756,6 +756,33 @@ describe('PipelineCreationFlow', () => {
     expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
   })
 
+  it('rechecks the connection when the creation cluster changes', async () => {
+    const validationClusters: Array<string | null> = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: ({ request }) => {
+        validationClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    const onClose = vi.fn()
+    const view = renderWizard(
+      <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />
+    )
+    await next('?step=connection')
+    fillConnection()
+    await next('?step=data')
+    view.rerender(
+      <PipelineCreationFlow clusterId="2" availableDestinations={['BigQuery']} onClose={onClose} />
+    )
+    await waitFor(() => expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument())
+    await next('?step=data')
+    expect(validationClusters).toEqual([null, '2'])
+  })
+
   it('uses browser Back and Forward to revisit steps without losing values', async () => {
     window.history.replaceState(null, '', '/project/default/database/pipelines/new')
     customRender(

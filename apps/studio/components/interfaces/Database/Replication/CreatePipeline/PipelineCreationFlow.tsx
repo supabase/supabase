@@ -38,7 +38,6 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const getDocsUrl = (step: string, destination: DestinationType) => {
   if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
@@ -53,9 +52,11 @@ const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
 
 export const PipelineCreationFlow = ({
   availableDestinations,
+  clusterId,
   onClose,
 }: {
   availableDestinations: DestinationType[]
+  clusterId?: string
   onClose: () => void
 }) => {
   const router = useRouter()
@@ -78,9 +79,8 @@ export const PipelineCreationFlow = ({
     if (!isSubmitting) requestNavigation(onClose)
   }
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
-    usePipelineConnectionValidation({ projectRef, type, form })
+    usePipelineConnectionValidation({ projectRef, clusterId, type, form })
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const {
     validateData,
@@ -89,7 +89,7 @@ export const PipelineCreationFlow = ({
     dataError,
     hasPublicationLoadError,
     publication,
-  } = usePipelineDataValidation({ projectRef, sourceId, type, form })
+  } = usePipelineDataValidation({ projectRef, clusterId, sourceId, type, form })
   const {
     handleSubmit,
     isSubmitting,
@@ -98,6 +98,7 @@ export const PipelineCreationFlow = ({
     submitLabel,
   } = usePipelineCreationSubmission({
     type,
+    clusterId,
     form,
     validateData,
     onCreated: () => completeNavigation(onClose),
@@ -122,6 +123,7 @@ export const PipelineCreationFlow = ({
   })()
   const costs = usePipelineReviewCosts({
     control: form.control,
+    clusterId,
     publication,
     enabled: accessibleStep === 'review',
   })
@@ -196,7 +198,12 @@ export const PipelineCreationFlow = ({
               )}
               {accessibleStep === 'connection' && (
                 <>
-                  <PipelineConnectionSection type={type} form={form} revealInvalidSettings>
+                  <PipelineConnectionSection
+                    revealInvalidSettings
+                    type={type}
+                    form={form}
+                    clusterId={clusterId}
+                  >
                     {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
                     {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
                     {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
@@ -210,6 +217,7 @@ export const PipelineCreationFlow = ({
                   <PipelineDataSection
                     type={type}
                     form={form}
+                    clusterId={clusterId}
                     onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                     revealInvalidSettings
                     showLoadError={false}
@@ -235,6 +243,7 @@ export const PipelineCreationFlow = ({
                   <PipelineDestinationReview
                     type={type}
                     control={form.control}
+                    clusterId={clusterId}
                     onEditDestination={() => void setStep('destination')}
                     onEditConnection={() => void setStep('connection')}
                     validationFailures={destinationValidationFailures}
@@ -248,7 +257,11 @@ export const PipelineCreationFlow = ({
                     validationFailures={pipelineValidationFailures}
                   />
                   <Separator />
-                  <PipelineReviewCosts control={form.control} publication={publication} />
+                  <PipelineReviewCosts
+                    control={form.control}
+                    publication={publication}
+                    clusterId={clusterId}
+                  />
                   <div role="status" aria-label="Pipeline validation status">
                     {submissionFailures.length > 0 && (
                       <Admonition
@@ -266,6 +279,7 @@ export const PipelineCreationFlow = ({
       </main>
       <NewPublicationPanel
         visible={isPublicationPanelVisible}
+        clusterId={clusterId}
         onClose={(name) => {
           if (name) {
             form.setValue('publicationName', name, { shouldDirty: true, shouldValidate: true })
