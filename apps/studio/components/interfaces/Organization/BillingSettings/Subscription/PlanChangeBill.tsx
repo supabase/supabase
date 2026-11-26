@@ -266,7 +266,6 @@ export const PlanChangeBill = ({
               <HourlyBillingPanel
                 perProjectMonthlyPrice={perProjectMonthlyPrice}
                 onOpen={onHourlyBillingOpen}
-                onComputeDocsClick={() => onDocsLinkClick('compute')}
               />
             </div>
           )}

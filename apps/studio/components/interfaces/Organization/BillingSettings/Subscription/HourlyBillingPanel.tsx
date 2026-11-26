@@ -38,13 +38,11 @@ export const HourlyBillingPanel = ({
   perProjectMonthlyPrice,
   hourlyRate = ILLUSTRATIVE_HOURLY_RATE,
   onOpen,
-  onComputeDocsClick,
 }: {
   perProjectMonthlyPrice: number | null
   /** Hourly compute rate the copy and chart use. Defaults to an illustrative rate. */
   hourlyRate?: number
   onOpen?: () => void
-  onComputeDocsClick?: () => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [tick, setTick] = useState(0)
