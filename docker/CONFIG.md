@@ -1,4 +1,4 @@
-Last updated: 2026-05-23
+Last updated: 2026-11-26
 
 # Self-hosted Supabase configuration reference
 
@@ -42,7 +42,7 @@ A few caveats:
 
 - **"Set by = blank" does not mean "unusable in self-hosted".** It only means the default `docker-compose.yml` does not pass the variable through. You can almost always try to add it under the service's `environment:` block.
 - **Defaults shown are from the upstream service code.** Some defaults are overridden by `docker-compose.yml`; where that happens it is called out in Notes.
-- **The CLI does not run Supavisor** as part of `supabase start`, so every Supavisor variable's `Set by` is either `Self-hosted` or blank - never `Both` or `CLI`.
+- **The CLI runs Supavisor only when the pooler is enabled** in `config.toml` (`[db.pooler] enabled = true`). Supavisor rows marked `Both` or `CLI` apply to `supabase start` only in that case.
 - **Auth/gotrue env vars are programmatically derived** from a Go config struct (envconfig), so most fields are reachable via two names: a prefixed form (`GOTRUE_API_API_EXTERNAL_URL`) and a bare-name alias (`API_EXTERNAL_URL`). Both are documented.
 
 ## Upstream repositories
@@ -103,6 +103,10 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `AUTH_JWT_SECRET` | string | Both | HS256 JWT secret used to mint/verify legacy API keys; surfaced to the UI for "JWT settings" and PostgREST config. | Mapped from `JWT_SECRET` in `.env.example`. Must be at least 32 characters. |
 | `SUPABASE_ANON_KEY` | string | Both | Anon API key surfaced in the Project API Settings page and used by in-dashboard clients. | Mapped from `ANON_KEY`. Supports `_FILE` suffix for Docker secrets. |
 | `SUPABASE_SERVICE_KEY` | string | Both | Service-role API key surfaced in the Project API Settings page. | Mapped from `SERVICE_ROLE_KEY`. Supports `_FILE` suffix for Docker secrets. Keep secret. |
+| `SUPABASE_PUBLISHABLE_KEY` | string | Both | Publishable API key listed on the API Keys page. Studio's self-hosted MCP endpoint also uses it. | Listed only when set |
+| `SUPABASE_SECRET_KEY` | string | Both | Secret API key listed on the API Keys page. | Listed only when set. Keep secret. |
+| `S3_PROTOCOL_ACCESS_KEY_ID` | string | CLI | S3 access key ID returned by Studio's `/api/get-s3-keys` route for the S3 connection settings. | The self-hosted compose passes it to the `storage` container only, not to Studio |
+| `S3_PROTOCOL_ACCESS_KEY_SECRET` | string | CLI | S3 secret access key returned by Studio's `/api/get-s3-keys` route. | The self-hosted compose passes it to the `storage` container only, not to Studio. Keep secret. |
 
 ### PG Meta
 
@@ -124,11 +128,11 @@ These mirror the running PostgREST configuration so the dashboard can display co
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_API_KEY` | string | Self-hosted | Legacy alias for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | Deprecated. Declared in `apps/studio/turbo.jsonc` but not read by Studio code; kept only for backward compatibility with older deployments. |
+| `LOGFLARE_API_KEY` | string | | Legacy alias for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | Deprecated. Declared in `apps/studio/turbo.jsonc` but not read by Studio code; kept only for backward compatibility with older deployments. |
 | `LOGFLARE_PRIVATE_ACCESS_TOKEN` | string | Both | Private API token Studio uses server-side to query Logflare endpoints (logs, charts). | Required for logs/analytics features to work on self-hosted. |
 | `LOGFLARE_URL` | URL | Both | Base URL of the Logflare/analytics service. | E.g. `http://analytics:4000`. Used to build the `PROJECT_ANALYTICS_URL`. |
-| `NEXT_ANALYTICS_BACKEND_PROVIDER` | enum | Both | Historically intended to select the analytics container's backend (`postgres` or `bigquery`). | No-op today: not read by Studio code, and the `analytics` (supabase/logflare) container chooses its backend via `POSTGRES_BACKEND_URL` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` instead. Safe to ignore. |
-| `NEXT_PUBLIC_ENABLE_LOGS` | boolean | Both | Historically intended to toggle visibility of log explorer pages. | Not read by Studio code today, and not declared in `apps/studio/turbo.jsonc`. Use `ENABLED_FEATURES_LOGS_ALL` (see Feature flags below) for runtime control of the logs section. |
+| `NEXT_ANALYTICS_BACKEND_PROVIDER` | enum | CLI | Historically intended to select the analytics container's backend (`postgres` or `bigquery`). | No-op today: not read by Studio code, and the `analytics` (supabase/logflare) container chooses its backend via `POSTGRES_BACKEND_URL` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` instead. Safe to ignore. |
+| `NEXT_PUBLIC_ENABLE_LOGS` | boolean | | Historically intended to toggle visibility of log explorer pages. | Not read by Studio code today, and not declared in `apps/studio/turbo.jsonc`. Use `ENABLED_FEATURES_LOGS_ALL` (see Feature flags below) for runtime control of the logs section. |
 
 ### Feature flags (runtime overrides)
 
@@ -137,7 +141,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLED_FEATURES_*` | boolean | | Per-flag runtime override. Set to `true` or `false` (case-insensitive); other values are logged and ignored. | One env var per flag. Full key list: `packages/common/enabled-features/enabled-features.json`. No-op when `NEXT_PUBLIC_IS_PLATFORM=true`. |
-| `ENABLED_FEATURES_LOGS_ALL` | boolean | Self-hosted | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
+| `ENABLED_FEATURES_LOGS_ALL` | boolean | Both | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
 
 ### AI features
 
@@ -159,7 +163,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `CURRENT_CLI_VERSION` | string | CLI | Version string set when Studio is started by the Supabase CLI. | Renames the default project to "Supabase Studio (CLI)" when set. Exposed to client via Next.js passthrough. |
 | `NEXT_PUBLIC_IS_PLATFORM` | boolean | | Master switch: `"true"` runs Studio in hosted (multi-project) mode, anything else runs in self-hosted single-project mode. | Self-hosted images are **built** with this unset/`false`. Exposed to client. Setting this to `true` in a self-hosted deployment will break the dashboard. |
 | `NEXT_PUBLIC_NODE_ENV` | string | | Marks the build as a test build (used by E2E setup). | Set to `test` only by `generateLocalEnv.js`. Exposed to client. |
-| `NODE_ENV` | enum | Both | Standard Node.js environment (`development` / `production` / `test`). | Set automatically by Next.js. |
+| `NODE_ENV` | enum | | Standard Node.js environment (`development` / `production` / `test`). | Set automatically by Next.js. |
 
 ---
 
@@ -179,7 +183,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_API_HOST` | string | Both | Bind address for the API server. |  |
 | `GOTRUE_API_MAX_REQUEST_DURATION` | string (duration) |  | Maximum total duration of a single API request. | Default: `10s` |
 | `GOTRUE_API_PORT` | integer | Both | TCP port for the API server. | Default: `8081`. Alias of `PORT` |
-| `PORT` | integer (count) |  | TCP port for the API server (bare alias). | Default: `8081` |
+| `PORT` | integer |  | TCP port for the API server (bare alias). | Default: `8081` |
 | `GOTRUE_API_REQUEST_ID_HEADER` | string |  | HTTP header name to read the request ID from. | Alias of `REQUEST_ID_HEADER` |
 | `REQUEST_ID_HEADER` | string |  | HTTP header name to read the request ID from (bare alias). |  |
 
@@ -200,9 +204,9 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `DB_NAMESPACE` | string |  | Database schema to use (bare alias). | Default: `auth` |
 | `GOTRUE_DB_DRIVER` | string | Both | Database driver name. | Required. Typically `postgres` |
 | `GOTRUE_DB_HEALTH_CHECK_PERIOD` | string (duration) |  | Interval between DB connection health checks. |  |
-| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) |  | Maximum number of idle DB connections. |  |
-| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) |  | Maximum total DB connections (0 = unlimited). |  |
-| `GOTRUE_DB_MIGRATIONS_PATH` | path | CLI | Filesystem path containing migration SQL files. | Default: `./migrations` |
+| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | CLI | Maximum number of idle DB connections. |  |
+| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | CLI | Maximum total DB connections (0 = unlimited). |  |
+| `GOTRUE_DB_MIGRATIONS_PATH` | path | | Filesystem path containing migration SQL files. | Default: `./migrations` |
 
 ### JWT
 
@@ -218,7 +222,6 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_JWT_KEYS` | JWKS | Both | JSON array of JWKs used for signing/verification. | Required when using the new API keys and new auth. |
 | `GOTRUE_JWT_SECRET` | string | Both | Symmetric HS256 signing secret. | Required |
 | `GOTRUE_JWT_VALID_METHODS` | string (CSV) | CLI | Allowed JWT signing methods (e.g. `HS256,RS256`). |  |
-| `GOTRUE_JWT_VALIDMETHODS` | string (CSV) | CLI | Alternate spelling seen in CLI; same field. | Alias artifact; prefer `GOTRUE_JWT_VALID_METHODS` |
 
 ### Site / Redirect
 
@@ -253,10 +256,10 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_SMTP_HOST` | string | Both | SMTP relay hostname. |  |
 | `GOTRUE_SMTP_LOGGING_ENABLED` | boolean |  | Verbose SMTP debug logging. | Default: `false` |
 | `GOTRUE_SMTP_MAX_FREQUENCY` | string (duration) | Both | Minimum interval between emails per address. | Default: `1m`, commented out in compose |
-| `GOTRUE_SMTP_PASS` | string | Self-hosted | SMTP password. |  |
+| `GOTRUE_SMTP_PASS` | string | Both | SMTP password. |  |
 | `GOTRUE_SMTP_PORT` | integer | Both | SMTP relay port. | Default: `587` |
 | `GOTRUE_SMTP_SENDER_NAME` | string | Both | From name displayed on emails. Falls back to `GOTRUE_SMTP_ADMIN_EMAIL` when unset. |  |
-| `GOTRUE_SMTP_USER` | string | Self-hosted | SMTP username. |  |
+| `GOTRUE_SMTP_USER` | string | Both | SMTP username. |  |
 
 ### Mailer notifications / subjects / templates / URL paths
 
@@ -317,7 +320,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `GOTRUE_EXTERNAL_ALLOWED_ID_TOKEN_ISSUERS` | string (CSV) |  | Additional issuers accepted when verifying external ID tokens. | Defaults include `https://appleid.apple.com`, `https://accounts.google.com` |
 | `GOTRUE_EXTERNAL_APPLE_API_URL` | URL |  | Override Apple OAuth API endpoint. |  |
-| `GOTRUE_EXTERNAL_APPLE_CLIENT_ID` | string (CSV) | CLI | Apple OAuth client ID(s) (comma-separated). |  |
+| `GOTRUE_EXTERNAL_APPLE_CLIENT_ID` | string (CSV) | CLI | Apple OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_APPLE_EMAIL_OPTIONAL` | boolean | CLI | Allow accounts without an email from Apple. |  |
 | `GOTRUE_EXTERNAL_APPLE_ENABLED` | boolean | CLI | Enable the Apple provider. |  |
 | `GOTRUE_EXTERNAL_APPLE_REDIRECT_URI` | URL | CLI | Override redirect URI for Apple. |  |
@@ -325,7 +328,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_APPLE_SKIP_NONCE_CHECK` | boolean | CLI | Skip OIDC nonce check for Apple. |  |
 | `GOTRUE_EXTERNAL_APPLE_URL` | URL |  | Override Apple OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_AZURE_API_URL` | URL |  | Override Azure API endpoint. |  |
-| `GOTRUE_EXTERNAL_AZURE_CLIENT_ID` | string (CSV) | Self-hosted | Azure OAuth client ID. | Commented out in compose |
+| `GOTRUE_EXTERNAL_AZURE_CLIENT_ID` | string (CSV) | Self-hosted | Azure OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences. Commented out in compose |
 | `GOTRUE_EXTERNAL_AZURE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Azure. |  |
 | `GOTRUE_EXTERNAL_AZURE_ENABLED` | boolean | Self-hosted | Enable the Azure provider. | Commented out in compose |
 | `GOTRUE_EXTERNAL_AZURE_REDIRECT_URI` | URL | Self-hosted | Override redirect URI for Azure. | Commented out in compose |
@@ -352,7 +355,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_EMAIL_ENABLED` | boolean | Both | Enable email/password authentication. When disabled, OAuth providers can still be used to sign up / sign in. | Default: `true` |
 | `GOTRUE_EXTERNAL_EMAIL_MAGIC_LINK_ENABLED` | boolean |  | Enable email magic links. | Default: `true` |
 | `GOTRUE_EXTERNAL_FACEBOOK_API_URL` | URL |  | Override Facebook API endpoint. |  |
-| `GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID` | string |  | Facebook OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID` | string (CSV) |  | Facebook OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_FACEBOOK_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Facebook. |  |
 | `GOTRUE_EXTERNAL_FACEBOOK_ENABLED` | boolean |  | Enable the Facebook provider. |  |
 | `GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI` | URL |  | Override redirect URI for Facebook. |  |
@@ -393,7 +396,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_GITLAB_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for GitLab. |  |
 | `GOTRUE_EXTERNAL_GITLAB_URL` | URL |  | Override GitLab OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_GOOGLE_API_URL` | URL |  | Override Google API endpoint. |  |
-| `GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID` | string | Self-hosted | Google OAuth client ID. | Commented out in compose |
+| `GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID` | string (CSV) | Self-hosted | Google OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences. Commented out in compose |
 | `GOTRUE_EXTERNAL_GOOGLE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Google. |  |
 | `GOTRUE_EXTERNAL_GOOGLE_ENABLED` | boolean | Self-hosted | Enable the Google provider. | Commented out in compose |
 | `GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI` | URL | Self-hosted | Override redirect URI for Google. | Commented out in compose |
@@ -402,7 +405,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_GOOGLE_URL` | URL |  | Override Google OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_IOS_BUNDLE_ID` | string |  | Apple iOS bundle ID for the Apple provider. |  |
 | `GOTRUE_EXTERNAL_KAKAO_API_URL` | URL |  | Override Kakao API endpoint. |  |
-| `GOTRUE_EXTERNAL_KAKAO_CLIENT_ID` | string |  | Kakao OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_KAKAO_CLIENT_ID` | string (CSV) |  | Kakao OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_KAKAO_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Kakao. |  |
 | `GOTRUE_EXTERNAL_KAKAO_ENABLED` | boolean |  | Enable the Kakao provider. |  |
 | `GOTRUE_EXTERNAL_KAKAO_REDIRECT_URI` | URL |  | Override redirect URI for Kakao. |  |
@@ -410,7 +413,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_KAKAO_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Kakao. |  |
 | `GOTRUE_EXTERNAL_KAKAO_URL` | URL |  | Override Kakao OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_API_URL` | URL |  | Override Keycloak API endpoint. |  |
-| `GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID` | string |  | Keycloak OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID` | string (CSV) |  | Keycloak OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Keycloak. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_ENABLED` | boolean |  | Enable the Keycloak provider. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_REDIRECT_URI` | URL |  | Override redirect URI for Keycloak. |  |
@@ -442,7 +445,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_NOTION_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Notion. |  |
 | `GOTRUE_EXTERNAL_NOTION_URL` | URL |  | Override Notion OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_OIDC_PROVIDER_CACHE_TTL` | string (duration) |  | Cache lifetime for OIDC discovery documents. | Default: `1h` |
-| `GOTRUE_EXTERNAL_REDIRECT_URL` | URL |  | Global override of OAuth redirect URL. |  |
+| `GOTRUE_EXTERNAL_REDIRECTURL` | URL |  | Where users are sent after an OAuth sign-in completes or fails. When set, it's used instead of the request's `redirect_to` and `SITE_URL`. | No underscore between `REDIRECT` and `URL` (the field isn't split into words) |
 | `GOTRUE_EXTERNAL_SKIP_NONCE_CHECK` | string | Self-hosted | Listed (commented) in compose but does not map to a configuration field. | Commented out in compose; no effect - use per-provider `*_SKIP_NONCE_CHECK` |
 | `GOTRUE_EXTERNAL_SLACK_API_URL` | URL |  | Override Slack API endpoint. |  |
 | `GOTRUE_EXTERNAL_SLACK_CLIENT_ID` | string |  | Legacy Slack OAuth client ID. |  |
@@ -461,7 +464,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_SLACK_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Slack. |  |
 | `GOTRUE_EXTERNAL_SLACK_URL` | URL |  | Override Slack OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_API_URL` | URL |  | Override Snapchat API endpoint. |  |
-| `GOTRUE_EXTERNAL_SNAPCHAT_CLIENT_ID` | string |  | Snapchat OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_SNAPCHAT_CLIENT_ID` | string (CSV) |  | Snapchat OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_SNAPCHAT_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Snapchat. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_ENABLED` | boolean |  | Enable the Snapchat provider. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_REDIRECT_URI` | URL |  | Override redirect URI for Snapchat. |  |
@@ -493,7 +496,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_TWITTER_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Twitter. |  |
 | `GOTRUE_EXTERNAL_TWITTER_URL` | URL |  | Override Twitter OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_API_URL` | URL |  | Override Vercel Marketplace API endpoint. |  |
-| `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_CLIENT_ID` | string |  | Vercel Marketplace OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_CLIENT_ID` | string (CSV) |  | Vercel Marketplace OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Vercel Marketplace. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_ENABLED` | boolean |  | Enable the Vercel Marketplace provider. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_REDIRECT_URI` | URL |  | Override redirect URI for Vercel Marketplace. |  |
@@ -536,12 +539,13 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_CUSTOM_OAUTH_ENABLED` | boolean |  | Enable user-defined custom OAuth/OIDC providers. | Default: `true` |
+| `GOTRUE_CUSTOM_OAUTH_EXTERNAL_URL` | URL |  | Base URL for the callback of custom OAuth/OIDC providers (`<url>/callback`). | Default: `API_EXTERNAL_URL`. An invalid URL stops Auth from starting |
 | `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | integer (count) |  | Maximum number of custom providers allowed. | Default: `0` (unlimited) |
-| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Self-hosted | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
-| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Self-hosted | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Both | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Both | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
 | `GOTRUE_OAUTH_SERVER_AUTHORIZATION_TTL` | string (duration) |  | How long an authorization request stays valid, from the redirect until the client exchanges the code. | Default: `10m` |
 | `GOTRUE_OAUTH_SERVER_DEFAULT_SCOPE` | string |  | Scope used when a client doesn't request one. | Default: `email` |
-| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean | Self-hosted | Enable the OAuth 2.1 server. See [Configure the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server). | Default: `false`. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean | Both | Enable the OAuth 2.1 server. See [Configure the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server). | Default: `false`. Commented out in compose |
 
 ### Phone / SMS
 
@@ -550,26 +554,26 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_PHONE_ENABLED` | boolean | Both | Enable phone-based authentication. | Default: `false` |
 | `GOTRUE_SMS_AUTOCONFIRM` | boolean | Both | Skip phone verification flow. |  |
 | `GOTRUE_SMS_MAX_FREQUENCY` | string (duration) | Both | Minimum interval between SMS messages per phone. | Default: `1m`, commented out in compose |
-| `GOTRUE_SMS_MESSAGEBIRD_ACCESS_KEY` | string |  | Messagebird API access key. |  |
-| `GOTRUE_SMS_MESSAGEBIRD_ORIGINATOR` | string |  | Messagebird originator (sender ID). |  |
+| `GOTRUE_SMS_MESSAGEBIRD_ACCESS_KEY` | string | CLI | Messagebird API access key. |  |
+| `GOTRUE_SMS_MESSAGEBIRD_ORIGINATOR` | string | CLI | Messagebird originator (sender ID). |  |
 | `GOTRUE_SMS_OTP_EXP` | integer (seconds) | Both | SMS OTP expiry in seconds. | Default: `60`, commented out in compose |
 | `GOTRUE_SMS_OTP_LENGTH` | integer (count) | Both | SMS OTP code length (6-10). | Default: `6`, commented out in compose |
-| `GOTRUE_SMS_PROVIDER` | string | Self-hosted | SMS provider name (`twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`). | Commented out in compose |
+| `GOTRUE_SMS_PROVIDER` | string | Both | SMS provider name (`twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`). | Commented out in compose |
 | `GOTRUE_SMS_TEMPLATE` | string | Both | Message template for SMS OTP. | Commented out in compose |
-| `GOTRUE_SMS_TEST_OTP` | JSON | Both | JSON map of phone-to-OTP overrides for testing. | Commented out in compose |
-| `GOTRUE_SMS_TEST_OTP_VALID_UNTIL` | string |  | Cutoff time after which test OTPs stop being accepted. |  |
-| `GOTRUE_SMS_TEXTLOCAL_API_KEY` | string |  | Textlocal API key. |  |
-| `GOTRUE_SMS_TEXTLOCAL_SENDER` | string |  | Textlocal sender ID. |  |
-| `GOTRUE_SMS_TWILIO_ACCOUNT_SID` | string | Self-hosted | Twilio account SID. | Commented out in compose |
-| `GOTRUE_SMS_TWILIO_AUTH_TOKEN` | string | Self-hosted | Twilio auth token. | Commented out in compose |
+| `GOTRUE_SMS_TEST_OTP` | string (CSV) | Both | Comma-separated `phone:code` pairs of OTP overrides for testing. | Commented out in compose |
+| `GOTRUE_SMS_TEST_OTP_VALID_UNTIL` | string |  | Cutoff time after which test OTPs stop being accepted. | RFC 3339, e.g. `2026-12-31T23:59:59Z`. A date-only value stops Auth from starting |
+| `GOTRUE_SMS_TEXTLOCAL_API_KEY` | string | CLI | Textlocal API key. |  |
+| `GOTRUE_SMS_TEXTLOCAL_SENDER` | string | CLI | Textlocal sender ID. |  |
+| `GOTRUE_SMS_TWILIO_ACCOUNT_SID` | string | Both | Twilio account SID. | Commented out in compose |
+| `GOTRUE_SMS_TWILIO_AUTH_TOKEN` | string | Both | Twilio auth token. | Commented out in compose |
 | `GOTRUE_SMS_TWILIO_CONTENT_SID` | string |  | Twilio content SID (template). |  |
-| `GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID` | string | Self-hosted | Twilio message service SID / phone number. | Commented out in compose |
-| `GOTRUE_SMS_TWILIO_VERIFY_ACCOUNT_SID` | string |  | Twilio Verify account SID. |  |
-| `GOTRUE_SMS_TWILIO_VERIFY_AUTH_TOKEN` | string |  | Twilio Verify auth token. |  |
-| `GOTRUE_SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID` | string |  | Twilio Verify message service SID. |  |
-| `GOTRUE_SMS_VONAGE_API_KEY` | string |  | Vonage API key. |  |
-| `GOTRUE_SMS_VONAGE_API_SECRET` | string |  | Vonage API secret. |  |
-| `GOTRUE_SMS_VONAGE_FROM` | string |  | Vonage `from` parameter (sender). |  |
+| `GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID` | string | Both | Twilio message service SID / phone number. | Commented out in compose |
+| `GOTRUE_SMS_TWILIO_VERIFY_ACCOUNT_SID` | string | CLI | Twilio Verify account SID. |  |
+| `GOTRUE_SMS_TWILIO_VERIFY_AUTH_TOKEN` | string | CLI | Twilio Verify auth token. |  |
+| `GOTRUE_SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID` | string | CLI | Twilio Verify message service SID. |  |
+| `GOTRUE_SMS_VONAGE_API_KEY` | string | CLI | Vonage API key. |  |
+| `GOTRUE_SMS_VONAGE_API_SECRET` | string | CLI | Vonage API secret. |  |
+| `GOTRUE_SMS_VONAGE_FROM` | string | CLI | Vonage `from` parameter (sender). |  |
 
 ### MFA
 
@@ -580,27 +584,33 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_MFA_MAX_ENROLLED_FACTORS` | integer (count) | Both | Maximum factors a user may enroll. | Default: `10`, commented out in compose |
 | `GOTRUE_MFA_MAX_VERIFIED_FACTORS` | integer (count) |  | Maximum verified factors per user. | Default: `10` |
 | `GOTRUE_MFA_PHONE_ENROLL_ENABLED` | boolean | Both | Allow enrolling a phone MFA factor. | Default: `false`, commented out in compose |
-| `GOTRUE_MFA_PHONE_MAX_FREQUENCY` | string (duration) |  | Minimum interval between MFA phone OTPs. | Default: `1m` |
-| `GOTRUE_MFA_PHONE_OTP_LENGTH` | integer (count) |  | Phone MFA OTP code length. | Default: `6` |
-| `GOTRUE_MFA_PHONE_TEMPLATE` | string |  | Template string for MFA phone OTP messages. |  |
+| `GOTRUE_MFA_PHONE_MAX_FREQUENCY` | string (duration) | CLI | Minimum interval between MFA phone OTPs. | Default: `1m` |
+| `GOTRUE_MFA_PHONE_OTP_LENGTH` | integer (count) | CLI | Phone MFA OTP code length. | Default: `6` |
+| `GOTRUE_MFA_PHONE_TEMPLATE` | string | CLI | Template string for MFA phone OTP messages. |  |
 | `GOTRUE_MFA_PHONE_VERIFY_ENABLED` | boolean | Both | Allow verifying a phone MFA factor. | Default: `false`, commented out in compose |
 | `GOTRUE_MFA_RATE_LIMIT_CHALLENGE_AND_VERIFY` | number |  | Rate limit for MFA challenge + verify. | Default: `15` |
+| `GOTRUE_MFA_RECOVERY_CODES_CODE_LENGTH` | integer |  | Length of each MFA recovery code (characters). | Default: `16`. Range 13-32, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_COUNT` | integer (count) |  | Number of recovery codes generated per set. | Default: `10`. Range 4-16, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_ENROLL_ENABLED` | boolean |  | Allow generating MFA recovery codes. | Default: `false` |
+| `GOTRUE_MFA_RECOVERY_CODES_LOCKOUT_DURATION` | string (duration) |  | How long recovery code verification stays locked after too many failed attempts. | Default: `15m`. Range 1m-24h, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_MAX_VERIFY_ATTEMPTS` | integer (count) |  | Failed recovery code attempts before verification is locked. | Default: `5`. Range 3-15, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_VERIFY_ENABLED` | boolean |  | Allow verifying an MFA recovery code. | Default: `false` |
 | `GOTRUE_MFA_TOTP_ENROLL_ENABLED` | boolean | Both | Allow enrolling a TOTP MFA factor. | Default: `true`, commented out in compose |
 | `GOTRUE_MFA_TOTP_VERIFY_ENABLED` | boolean | Both | Allow verifying a TOTP MFA factor. | Default: `true`, commented out in compose |
-| `GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED` | string | CLI | Allow enrolling a WebAuthn MFA factor. | Default: `false` |
-| `GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED` | string | CLI | Allow verifying a WebAuthn MFA factor. | Default: `false` |
+| `GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED` | boolean | CLI | Allow enrolling a WebAuthn MFA factor. | Default: `false` |
+| `GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED` | boolean | CLI | Allow verifying a WebAuthn MFA factor. | Default: `false` |
 
 ### WebAuthn / Passkey
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_PASSKEY_ENABLED` | boolean |  | Enable passkey (passwordless WebAuthn) authentication. | Default: `false` |
+| `GOTRUE_PASSKEY_ENABLED` | boolean | CLI | Enable passkey (passwordless WebAuthn) authentication. | Default: `false` |
 | `GOTRUE_PASSKEY_MAX_PASSKEYS_PER_USER` | integer (count) |  | Maximum passkeys a user may register. | Default: `10` |
 | `GOTRUE_WEBAUTHN_CHALLENGE_EXPIRY_DURATION` | string (duration) |  | Lifetime of a WebAuthn challenge. | Default: `5m` |
-| `GOTRUE_WEBAUTHN_RP_DISPLAY_NAME` | string |  | WebAuthn relying party display name. | Required when WebAuthn/Passkey is enabled |
-| `GOTRUE_WEBAUTHN_RP_ID` | string |  | WebAuthn relying party ID (host). | Required when WebAuthn/Passkey is enabled. Alias of `RP_ID` |
+| `GOTRUE_WEBAUTHN_RP_DISPLAY_NAME` | string | CLI | WebAuthn relying party display name. | Required when WebAuthn/Passkey is enabled |
+| `GOTRUE_WEBAUTHN_RP_ID` | string | CLI | WebAuthn relying party ID (host). | Required when WebAuthn/Passkey is enabled. Alias of `RP_ID` |
 | `RP_ID` | string |  | WebAuthn relying party ID (bare alias). |  |
-| `GOTRUE_WEBAUTHN_RP_ORIGINS` | string (CSV) |  | Allowed WebAuthn origins (https or http://localhost). | Required when WebAuthn/Passkey is enabled |
+| `GOTRUE_WEBAUTHN_RP_ORIGINS` | string (CSV) | CLI | Allowed WebAuthn origins (https or http://localhost). | Required when WebAuthn/Passkey is enabled |
 
 ### SAML
 
@@ -610,6 +620,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SAML_ENABLED` | boolean | Self-hosted | Enable SAML SSO. | Commented out in compose |
 | `GOTRUE_SAML_EXTERNAL_URL` | URL | Self-hosted | External URL used in SAML metadata (defaults to `API_EXTERNAL_URL`). | Commented out in compose |
 | `GOTRUE_SAML_PRIVATE_KEY` | string | Self-hosted | Base64-encoded PKCS#1 RSA private key (>= 2048 bits). | Commented out in compose |
+| `GOTRUE_SAML_PRIVATE_KEY_NEXT` | string |  | Next SAML key for key rotation, in the same format as `GOTRUE_SAML_PRIVATE_KEY`. Its certificate is published in the SAML metadata next to the current one, and it's tried when decrypting encrypted assertions. | While set, the metadata cache lifetime drops to 60 seconds |
 | `GOTRUE_SAML_RATE_LIMIT_ASSERTION` | number | Self-hosted | Rate limit for SAML assertion submissions. | Default: `15`, commented out in compose |
 | `GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD` | string (duration) | Self-hosted | Lifetime of SAML RelayState. | Default: `2m`, commented out in compose |
 
@@ -618,25 +629,25 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_HOOK_AFTER_USER_CREATED_ENABLED` | boolean |  | Enable the after-user-created hook. |  |
-| `GOTRUE_HOOK_AFTER_USER_CREATED_SECRETS` | string |  | Standard webhook secrets (pipe-separated) for after-user-created hook. |  |
+| `GOTRUE_HOOK_AFTER_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for after-user-created hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_AFTER_USER_CREATED_URI` | string |  | URI of the after-user-created hook (pg-functions or https). |  |
 | `GOTRUE_HOOK_BEFORE_USER_CREATED_ENABLED` | boolean |  | Enable the before-user-created hook. |  |
-| `GOTRUE_HOOK_BEFORE_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for the before-user-created hook. |  |
+| `GOTRUE_HOOK_BEFORE_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for the before-user-created hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_BEFORE_USER_CREATED_URI` | string |  | URI of the before-user-created hook. |  |
 | `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED` | boolean | Self-hosted | Enable the custom access token hook. | Commented out in compose |
-| `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_SECRETS` | string | Self-hosted | Standard webhook secrets for the custom access token hook. | Commented out in compose |
+| `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_SECRETS` | string | Self-hosted | Standard webhook secrets for the custom access token hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI` | string | Self-hosted | URI of the custom access token hook. | Commented out in compose |
 | `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED` | boolean | Self-hosted | Enable the MFA verification attempt hook. | Commented out in compose |
-| `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the MFA verification attempt hook. |  |
+| `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the MFA verification attempt hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI` | string | Self-hosted | URI of the MFA verification attempt hook. | Commented out in compose |
 | `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED` | boolean | Self-hosted | Enable the password verification attempt hook. | Commented out in compose |
-| `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the password verification attempt hook. |  |
+| `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the password verification attempt hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI` | string | Self-hosted | URI of the password verification attempt hook. | Commented out in compose |
 | `GOTRUE_HOOK_SEND_EMAIL_ENABLED` | boolean | Self-hosted | Enable the send-email hook. | Commented out in compose |
-| `GOTRUE_HOOK_SEND_EMAIL_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-email hook. | Commented out in compose |
+| `GOTRUE_HOOK_SEND_EMAIL_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-email hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_SEND_EMAIL_URI` | string | Self-hosted | URI of the send-email hook. | Commented out in compose |
 | `GOTRUE_HOOK_SEND_SMS_ENABLED` | boolean | Self-hosted | Enable the send-SMS hook. | Commented out in compose |
-| `GOTRUE_HOOK_SEND_SMS_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-SMS hook. | Commented out in compose |
+| `GOTRUE_HOOK_SEND_SMS_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-SMS hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_SEND_SMS_URI` | string | Self-hosted | URI of the send-SMS hook. | Commented out in compose |
 
 ### Rate limits
@@ -660,10 +671,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_SESSIONS_ALLOW_LOW_AAL` | string (duration) |  | Time during which a low-AAL session is still accepted. |  |
-| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout. |  |
+| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) | CLI | Session inactivity timeout. |  |
 | `GOTRUE_SESSIONS_SINGLE_PER_USER` | boolean |  | Allow only one active session per user. |  |
 | `GOTRUE_SESSIONS_TAGS` | string (CSV) |  | Tags attached to created sessions. |  |
-| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime. |  |
+| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) | CLI | Absolute session lifetime. |  |
 
 ### Web3
 
@@ -678,8 +689,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of `key_id:base64-key` used to decrypt previously encrypted columns. |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | string |  | Enable column-level encryption for new writes. |  |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key` |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | boolean |  | Enable column-level encryption for new writes. |  |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). |  |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. |  |
 | `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED` | boolean | CLI | Allow admins to link identities manually. | Default: `false` |
@@ -689,16 +700,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED` | boolean | CLI | Rotate refresh tokens on use; detects malicious reuse and revokes the offending token's descendants. | Default: `true` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_UPGRADE_PERCENTAGE` | integer (percent) |  | Percentage of users to upgrade to a newer refresh-token format (0-100). |  |
 | `GOTRUE_SECURITY_SB_FORWARDED_FOR_ENABLED` | boolean |  | Trust the `Sb-Forwarded-For` header. Auth parses the leftmost value as an IP address and uses it for IP tracking and rate limiting. | Default: `false` |
-| `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | boolean |  | Require the current password to change a password. |  |
+| `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | boolean | CLI | Require the current password to change a password. |  |
 | `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION` | boolean | CLI | Require reauthentication before changing a password. |  |
 
 ### CAPTCHA
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_CAPTCHA_ENABLED` | boolean |  | Enable CAPTCHA protection. | Default: `false` |
-| `GOTRUE_SECURITY_CAPTCHA_PROVIDER` | string |  | CAPTCHA provider (`hcaptcha` or `turnstile`). | Default: `hcaptcha` |
-| `GOTRUE_SECURITY_CAPTCHA_SECRET` | string |  | CAPTCHA provider secret. |  |
+| `GOTRUE_SECURITY_CAPTCHA_ENABLED` | boolean | CLI | Enable CAPTCHA protection. | Default: `false` |
+| `GOTRUE_SECURITY_CAPTCHA_PROVIDER` | string | CLI | CAPTCHA provider (`hcaptcha` or `turnstile`). | Default: `hcaptcha` |
+| `GOTRUE_SECURITY_CAPTCHA_SECRET` | string | CLI | CAPTCHA provider secret. |  |
 | `GOTRUE_SECURITY_CAPTCHA_TIMEOUT` | string (duration) |  | HTTP timeout for the CAPTCHA verify call. | Default: `10s` |
 
 ### Password
@@ -726,7 +737,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_LOG_DISABLE_COLORS` | boolean |  | Disable ANSI color in log output. |  |
-| `GOTRUE_LOG_FIELDS` | JSON |  | Static log fields (JSON object) attached to every log line. |  |
 | `GOTRUE_LOG_FILE` | path |  | Path to a file to write logs to. |  |
 | `GOTRUE_LOG_LEVEL` | string |  | Logger level (`panic`, `fatal`, `error`, `warn`, `info`, `debug`). |  |
 | `GOTRUE_LOG_QUOTE_EMPTY_FIELDS` | boolean |  | Quote empty log field values. |  |
@@ -751,7 +761,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_TRACING_OTEL_EXPORTER_OTLP_PROTOCOL` | string |  | OTLP protocol for tracing. | Default: `http/protobuf`. Alias of `OTEL_EXPORTER_OTLP_PROTOCOL` |
 | `GOTRUE_TRACING_PORT` | string |  | OpenTelemetry collector port. |  |
 | `GOTRUE_TRACING_SERVICE_NAME` | string |  | Service name reported in traces. | Default: `gotrue` |
-| `GOTRUE_TRACING_TAGS` | JSON |  | Comma-separated `k=v` pairs attached to all spans. |  |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | string |  | OTLP protocol (bare alias, applies to metrics and tracing). | Default: `http/protobuf` |
 | `OTEL_EXPORTER_PROMETHEUS_HOST` | string |  | Prometheus host (bare alias). | Default: `0.0.0.0` |
 | `OTEL_EXPORTER_PROMETHEUS_PORT` | string |  | Prometheus port (bare alias). | Default: `9100` |
@@ -763,7 +772,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_RELOADING_GRACE_PERIOD_INTERVAL` | string (duration) |  | Idle period before processing a config reload (debounce). | Default: `5s` |
 | `GOTRUE_RELOADING_NOTIFY_ENABLED` | boolean |  | Use filesystem notifications to detect config changes. | Default: `true` |
 | `GOTRUE_RELOADING_POLLER_INTERVAL` | string (duration) |  | Polling interval when notifications are disabled. | Default: `10s` |
-| `GOTRUE_RELOADING_POLLERENABLED` | string |  | Enable filesystem polling for config changes (name is intentionally unsplit). | Default: `false` |
+| `GOTRUE_RELOADING_POLLERENABLED` | boolean |  | Enable filesystem polling for config changes (name is intentionally unsplit). | Default: `false` |
 | `GOTRUE_RELOADING_SIGNAL_ENABLED` | boolean |  | Trigger a config reload on receiving a Unix signal. | Default: `false` |
 | `GOTRUE_RELOADING_SIGNAL_NUMBER` | integer (count) |  | Unix signal number to listen for. | Default: `10` (SIGUSR1) |
 
@@ -771,7 +780,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_EXPERIMENTAL_PROVIDERS_WITH_OWN_LINKING_DOMAIN` | string |  | Providers that do not participate in email-similarity identity linking. | Experimental |
 | `GOTRUE_INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST` | boolean |  | Always create user-search indexes on startup. | Default: `false` |
 | `GOTRUE_INDEX_WORKER_MAX_USERS_THRESHOLD` | integer (count) |  | Create user-search indexes only if user count is at or below this threshold. | Default: `0` (disabled) |
 | `GOTRUE_INTERNAL_HTTP_TIMEOUT` | string (duration) |  | HTTP client timeout used by external OAuth and SMS provider calls. | Read via `os.Getenv`, not envconfig |
@@ -789,57 +797,52 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_ADMIN_SERVER_HOST` | string | Self-hosted | Hostname for the PostgREST admin server. | Defaults to `server-host` value |
 | `PGRST_ADMIN_SERVER_PORT` | integer | Both | Port for the PostgREST admin server. The admin server is disabled unless a port is set, and it must differ from `PGRST_SERVER_PORT`. | No default (admin server disabled when unset) |
 | `PGRST_APP_SETTINGS_*` | string | Self-hosted | Arbitrary settings exposed to PostgreSQL via `current_setting('app.settings.<name>')`. The suffix after `PGRST_APP_SETTINGS_` becomes the setting name (case-insensitive). | Used for `PGRST_APP_SETTINGS_JWT_EXP` in self-hosted |
-| `PGRST_CLIENT_ERROR_VERBOSITY` | enum | Self-hosted | Controls verbosity of client-facing error responses. | Default: `verbose` (other value: `minimal`) |
-| `PGRST_DB_AGGREGATES_ENABLED` | boolean | Self-hosted | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. Disabled by default due to potential performance risks. | Default: `false` |
+| `PGRST_DB_AGGREGATES_ENABLED` | boolean | | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. Disabled by default due to potential performance risks. | Default: `false` |
 | `PGRST_DB_ANON_ROLE` | string | Both | Database role used for unauthenticated requests. When unset, anonymous access is blocked. | No default |
-| `PGRST_DB_CHANNEL` | string | Self-hosted | Postgres `NOTIFY` channel name used for schema cache and config reloading. | Default: `pgrst` |
-| `PGRST_DB_CHANNEL_ENABLED` | boolean | Self-hosted | Enables the Postgres `NOTIFY` listener channel. Disable when running behind a transaction-pooling connection pooler. | Default: `true` |
-| `PGRST_DB_CONFIG` | boolean | Self-hosted | Enables loading in-database configuration via `db-pre-config` and role settings. | Default: `true` |
+| `PGRST_DB_CHANNEL` | string | | Postgres `NOTIFY` channel name used for schema cache and config reloading. | Default: `pgrst` |
+| `PGRST_DB_CHANNEL_ENABLED` | boolean | | Enables the Postgres `NOTIFY` listener channel. Disable when running behind a transaction-pooling connection pooler. | Default: `true` |
+| `PGRST_DB_CONFIG` | boolean | | Enables loading in-database configuration via `db-pre-config` and role settings. | Default: `true` |
 | `PGRST_DB_EXTRA_SEARCH_PATH` | string (CSV) | Both | Comma-separated list of extra schemas added to the `search_path` of every request. Schemas listed here do not get API endpoints. | Default: `public` |
-| `PGRST_DB_HOISTED_TX_SETTINGS` | string (CSV) | Self-hosted | Comma-separated list of settings allowed to be applied as transaction-scoped function settings. | Default: `statement_timeout,plan_filter.statement_cost_limit,default_transaction_isolation` |
+| `PGRST_DB_HOISTED_TX_SETTINGS` | string (CSV) | | Comma-separated list of settings allowed to be applied as transaction-scoped function settings. | Default: `statement_timeout,plan_filter.statement_cost_limit,default_transaction_isolation` |
 | `PGRST_DB_MAX_ROWS` | integer (count) | Both | Hard limit on the number of rows PostgREST returns for any table, view, or function; bounds payload size against accidental or malicious queries. | No default (unlimited); alias `PGRST_MAX_ROWS` |
-| `PGRST_DB_PLAN_ENABLED` | boolean | Self-hosted | Allows clients to request the query execution plan with `Accept: application/vnd.pgrst.plan`. | Default: `false` |
-| `PGRST_DB_POOL` | integer (count) | Self-hosted | Maximum number of database connections kept open in PostgREST's pool. | Default: `10` |
-| `PGRST_DB_POOL_ACQUISITION_TIMEOUT` | integer (seconds) | Self-hosted | Time in seconds a request waits for a free connection from the pool. | Default: `10` |
-| `PGRST_DB_POOL_AUTOMATIC_RECOVERY` | boolean | Self-hosted | Enables automatic retrying on connection loss. When disabled, PostgREST terminates after losing the database connection. | Default: `true` |
-| `PGRST_DB_POOL_MAX_IDLETIME` | integer (seconds) | Self-hosted | Time in seconds after which idle pool connections are closed. | Default: `30`; alias `PGRST_DB_POOL_TIMEOUT` |
-| `PGRST_DB_POOL_MAX_LIFETIME` | integer (seconds) | Self-hosted | Maximum lifetime in seconds of a connection in the pool before it is recycled. | Default: `1800` |
-| `PGRST_DB_POOL_TIMEOUT` | integer (seconds) | Self-hosted | Deprecated alias for `PGRST_DB_POOL_MAX_IDLETIME`. | Deprecated; use `PGRST_DB_POOL_MAX_IDLETIME` |
-| `PGRST_DB_PRE_CONFIG` | string | Self-hosted | Schema-qualified function name used for in-database configuration. | No default |
-| `PGRST_DB_PRE_REQUEST` | string | Self-hosted | Schema-qualified function executed right after transaction settings are set, on every request. | No default; alias `PGRST_PRE_REQUEST` |
-| `PGRST_DB_PREPARED_STATEMENTS` | boolean | Self-hosted | Enables prepared statements. Disable only when running behind an external connection pooler in transaction pooling mode. | Default: `true` |
-| `PGRST_DB_ROOT_SPEC` | string | Self-hosted | Schema-qualified function used to override the OpenAPI response at the API root. | No default; alias `PGRST_ROOT_SPEC` |
-| `PGRST_DB_SCHEMA` | string (CSV) | Self-hosted | Deprecated alias for `PGRST_DB_SCHEMAS`. | Deprecated; use `PGRST_DB_SCHEMAS` |
+| `PGRST_DB_PLAN_ENABLED` | boolean | | Allows clients to request the query execution plan with `Accept: application/vnd.pgrst.plan`. | Default: `false` |
+| `PGRST_DB_POOL` | integer (count) | CLI | Maximum number of database connections kept open in PostgREST's pool. | Default: `10` |
+| `PGRST_DB_POOL_ACQUISITION_TIMEOUT` | integer (seconds) | | Time in seconds a request waits for a free connection from the pool. | Default: `10` |
+| `PGRST_DB_POOL_AUTOMATIC_RECOVERY` | boolean | | Enables automatic retrying on connection loss. When disabled, PostgREST terminates after losing the database connection. | Default: `true` |
+| `PGRST_DB_POOL_MAX_IDLETIME` | integer (seconds) | | Time in seconds after which idle pool connections are closed. | Default: `30`; alias `PGRST_DB_POOL_TIMEOUT` |
+| `PGRST_DB_POOL_MAX_LIFETIME` | integer (seconds) | | Maximum lifetime in seconds of a connection in the pool before it is recycled. | Default: `1800` |
+| `PGRST_DB_POOL_TIMEOUT` | integer (seconds) | | Deprecated alias for `PGRST_DB_POOL_MAX_IDLETIME`. | Deprecated; use `PGRST_DB_POOL_MAX_IDLETIME` |
+| `PGRST_DB_PRE_CONFIG` | string | | Schema-qualified function name used for in-database configuration. | No default |
+| `PGRST_DB_PRE_REQUEST` | string | | Schema-qualified function executed right after transaction settings are set, on every request. | No default; alias `PGRST_PRE_REQUEST` |
+| `PGRST_DB_PREPARED_STATEMENTS` | boolean | | Enables prepared statements. Disable only when running behind an external connection pooler in transaction pooling mode. | Default: `true` |
+| `PGRST_DB_ROOT_SPEC` | string | | Schema-qualified function used to override the OpenAPI response at the API root. | No default; alias `PGRST_ROOT_SPEC` |
+| `PGRST_DB_SCHEMA` | string (CSV) | | Deprecated alias for `PGRST_DB_SCHEMAS`. | Deprecated; use `PGRST_DB_SCHEMAS` |
 | `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of database schemas exposed by the REST API. `pg_catalog` and `information_schema` are not allowed. | Default: `public` |
-| `PGRST_DB_TIMEZONE_ENABLED` | boolean | Self-hosted | Enables the `Prefer: timezone` header for querying `pg_timezone_names`. | Default: `true` |
-| `PGRST_DB_TX_END` | enum | Self-hosted | Controls how database transactions are terminated. Allowed values: `commit`, `commit-allow-override`, `rollback`, `rollback-allow-override`. | Default: `commit` |
+| `PGRST_DB_TX_END` | enum | | Controls how database transactions are terminated. Allowed values: `commit`, `commit-allow-override`, `rollback`, `rollback-allow-override`. | Default: `commit` |
 | `PGRST_DB_URI` | URL | Both | PostgreSQL connection string (URI or key/value). Prefix with `@` to load from a file. Defaults read libpq env vars. | Default: `postgresql://`; required |
 | `PGRST_DB_USE_LEGACY_GUCS` | boolean | Self-hosted | Toggles legacy text-based GUCs versus JSON GUCs for request context. | Deprecated; removed in PostgREST v12 (still set in self-hosted docker-compose) |
-| `PGRST_INTERNAL_SCHEMA_CACHE_LOAD_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted while loading the schema cache. | Internal; no default |
-| `PGRST_INTERNAL_SCHEMA_CACHE_QUERY_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted during schema cache query. | Internal; no default |
-| `PGRST_INTERNAL_SCHEMA_CACHE_RELATIONSHIP_LOAD_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted while loading schema cache relationships. | Internal; no default |
-| `PGRST_JWT_AUD` | string | Self-hosted | Expected value of the `aud` claim in JWTs. Must be a string or valid URI. | No default |
-| `PGRST_JWT_CACHE_MAX_ENTRIES` | integer (count) | Self-hosted | Maximum entries in the JWT validation cache. Set to `0` to disable caching. | Default: `1000` |
-| `PGRST_JWT_ROLE_CLAIM_KEY` | string | Self-hosted | JSPath expression locating the role claim inside the JWT. | Default: `.role`; alias `PGRST_ROLE_CLAIM_KEY` |
+| `PGRST_JWT_AUD` | string | | Expected value of the `aud` claim in JWTs. Must be a string or valid URI. | No default |
+| `PGRST_JWT_CACHE_MAX_ENTRIES` | integer (count) | | Maximum entries in the JWT validation cache. Set to `0` to disable caching. | Default: `1000` |
+| `PGRST_JWT_ROLE_CLAIM_KEY` | string | | JSPath expression locating the role claim inside the JWT. | Default: `.role`; alias `PGRST_ROLE_CLAIM_KEY` |
 | `PGRST_JWT_SECRET` | string | Both | Secret, JWK, or JWKS used to verify JWTs. Must be at least 32 characters for symmetric secrets. Prefix with `@` to load from a file. | No default |
-| `PGRST_JWT_SECRET_IS_BASE64` | boolean | Self-hosted | Treats `PGRST_JWT_SECRET` as base64-encoded. | Default: `false`; alias `PGRST_SECRET_IS_BASE64` |
-| `PGRST_LOG_LEVEL` | enum | Self-hosted | Logging level. Allowed values: `crit`, `error`, `warn`, `info`, `debug`. | Default: `error` |
-| `PGRST_LOG_QUERY` | boolean | Self-hosted | Logs the SQL query for each request at the current log level. | Default: `false` |
-| `PGRST_MAX_ROWS` | integer (count) | Self-hosted | Deprecated alias for `PGRST_DB_MAX_ROWS`. | Deprecated; use `PGRST_DB_MAX_ROWS` |
-| `PGRST_OPENAPI_MODE` | enum | Self-hosted | Controls OpenAPI output. Allowed values: `follow-privileges`, `ignore-privileges`, `disabled`. | Default: `follow-privileges` |
-| `PGRST_OPENAPI_SECURITY_ACTIVE` | boolean | Self-hosted | Includes security definitions in the OpenAPI output. | Default: `false` |
-| `PGRST_OPENAPI_SERVER_PROXY_URI` | URL | Self-hosted | Overrides the base URL in the OpenAPI self-documentation (useful behind a proxy). | No default |
-| `PGRST_PRE_REQUEST` | string | Self-hosted | Deprecated alias for `PGRST_DB_PRE_REQUEST`. | Deprecated; use `PGRST_DB_PRE_REQUEST` |
-| `PGRST_ROLE_CLAIM_KEY` | string | Self-hosted | Deprecated alias for `PGRST_JWT_ROLE_CLAIM_KEY`. | Deprecated; use `PGRST_JWT_ROLE_CLAIM_KEY` |
-| `PGRST_ROOT_SPEC` | string | Self-hosted | Deprecated alias for `PGRST_DB_ROOT_SPEC`. | Deprecated; use `PGRST_DB_ROOT_SPEC` |
-| `PGRST_SECRET_IS_BASE64` | boolean | Self-hosted | Deprecated alias for `PGRST_JWT_SECRET_IS_BASE64`. | Deprecated; use `PGRST_JWT_SECRET_IS_BASE64` |
-| `PGRST_SERVER_CORS_ALLOWED_ORIGINS` | string (CSV) | Self-hosted | Comma-separated list of allowed CORS origins. When empty or unset, all origins are accepted. | No default |
-| `PGRST_SERVER_HOST` | string | Self-hosted | Address the PostgREST web server binds to. Special values: `*` (any), `*4` (IPv4-preferred), `!4` (IPv4-only), `*6` (IPv6-preferred), `!6` (IPv6-only). | Default: `!4` |
-| `PGRST_SERVER_PORT` | integer | Self-hosted | TCP port the PostgREST web server binds to. Use `0` to auto-assign. | Default: `3000` |
-| `PGRST_SERVER_TIMING_ENABLED` | boolean | Self-hosted | Enables the `Server-Timing` HTTP response header. | Default: `false` |
-| `PGRST_SERVER_TRACE_HEADER` | string | Self-hosted | HTTP header name used to trace requests (e.g. `X-Request-Id`). | No default |
-| `PGRST_SERVER_UNIX_SOCKET` | path | Self-hosted | Path to a Unix domain socket the server binds to. Takes precedence over `PGRST_SERVER_PORT` when set. | No default |
-| `PGRST_SERVER_UNIX_SOCKET_MODE` | string | Self-hosted | Octal file mode applied to the Unix socket. Must be between `600` and `777`. | Default: `660` |
+| `PGRST_JWT_SECRET_IS_BASE64` | boolean | | Treats `PGRST_JWT_SECRET` as base64-encoded. | Default: `false`; alias `PGRST_SECRET_IS_BASE64` |
+| `PGRST_LOG_LEVEL` | enum | | Logging level. Allowed values: `crit`, `error`, `warn`, `info`, `debug`. | Default: `error` |
+| `PGRST_LOG_QUERY` | boolean | | Logs the SQL query for each request at the current log level. | Default: `false` |
+| `PGRST_MAX_ROWS` | integer (count) | | Deprecated alias for `PGRST_DB_MAX_ROWS`. | Deprecated; use `PGRST_DB_MAX_ROWS` |
+| `PGRST_OPENAPI_MODE` | enum | | Controls OpenAPI output. Allowed values: `follow-privileges`, `ignore-privileges`, `disabled`. | Default: `follow-privileges` |
+| `PGRST_OPENAPI_SECURITY_ACTIVE` | boolean | | Includes security definitions in the OpenAPI output. | Default: `false` |
+| `PGRST_OPENAPI_SERVER_PROXY_URI` | URL | | Overrides the base URL in the OpenAPI self-documentation (useful behind a proxy). | No default |
+| `PGRST_PRE_REQUEST` | string | | Deprecated alias for `PGRST_DB_PRE_REQUEST`. | Deprecated; use `PGRST_DB_PRE_REQUEST` |
+| `PGRST_ROLE_CLAIM_KEY` | string | | Deprecated alias for `PGRST_JWT_ROLE_CLAIM_KEY`. | Deprecated; use `PGRST_JWT_ROLE_CLAIM_KEY` |
+| `PGRST_ROOT_SPEC` | string | | Deprecated alias for `PGRST_DB_ROOT_SPEC`. | Deprecated; use `PGRST_DB_ROOT_SPEC` |
+| `PGRST_SECRET_IS_BASE64` | boolean | | Deprecated alias for `PGRST_JWT_SECRET_IS_BASE64`. | Deprecated; use `PGRST_JWT_SECRET_IS_BASE64` |
+| `PGRST_SERVER_CORS_ALLOWED_ORIGINS` | string (CSV) | | Comma-separated list of allowed CORS origins. When empty or unset, all origins are accepted. | No default |
+| `PGRST_SERVER_HOST` | string | | Address the PostgREST web server binds to. Special values: `*` (any), `*4` (IPv4-preferred), `!4` (IPv4-only), `*6` (IPv6-preferred), `!6` (IPv6-only). | Default: `!4` |
+| `PGRST_SERVER_PORT` | integer | | TCP port the PostgREST web server binds to. Use `0` to auto-assign. | Default: `3000` |
+| `PGRST_SERVER_TIMING_ENABLED` | boolean | | Enables the `Server-Timing` HTTP response header. | Default: `false` |
+| `PGRST_SERVER_TRACE_HEADER` | string | | HTTP header name used to trace requests (e.g. `X-Request-Id`). | No default |
+| `PGRST_SERVER_UNIX_SOCKET` | path | | Path to a Unix domain socket the server binds to. Takes precedence over `PGRST_SERVER_PORT` when set. | No default |
+| `PGRST_SERVER_UNIX_SOCKET_MODE` | string | | Octal file mode applied to the Unix socket. Must be between `600` and `777`. | Default: `660` |
 
 ---
 
@@ -849,93 +852,104 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `ACCESS_TOKEN_THROTTLE_MS` | integer (ms) | | Minimum interval (ms) between applying `access_token` refresh messages on a channel. A refresh that arrives sooner is held and applied when the interval ends; if several arrive, the latest one is applied. | Default: `10000` (10 seconds). Only set in production builds. |
 | `API_JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
-| `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. |
-| `API_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
+| `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. The API also accepts `API_JWT_SECRET_NEXT`. When unset, the self-host seed uses `super-secret-jwt-token-with-at-least-32-characters-long` for the tenant. |
+| `API_JWT_SECRET_NEXT` | string | | Second HS256 secret accepted by the tenant management API. A token signed with either `API_JWT_SECRET` or this secret is accepted. | No default. Not used by the self-host seed: the seeded tenant's JWT secret is `API_JWT_SECRET`. |
+| `API_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
 | `APP_NAME` | string | Both | Application/node name. Used to build the Phoenix endpoint URL host, libcluster DNS basename, and Erlang `RELEASE_NODE`. | Required - raises `APP_NAME not available` if empty. Default: empty (build) / `realtime` (Erlang release script). |
-| `BROADCAST_POOL_SIZE` | integer (count) | Self-hosted | Number of processes used to relay Phoenix.PubSub messages across the cluster. | Default: `10`. |
-| `CHANNEL_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a channel join error to the client. Slows down reconnect storms. | Default: `5000` (5 seconds). |
-| `CLIENT_PRESENCE_MAX_CALLS` | integer (count) | Self-hosted | Maximum presence calls allowed per client (per WebSocket) within the time window. | Default: `5`. |
-| `CLIENT_PRESENCE_WINDOW_MS` | integer (ms) | Self-hosted | Time window (ms) for per-client presence rate limiting. | Default: `30000`. |
-| `CLUSTER` | string | Self-hosted | Cluster name added to log metadata. | No default. Read by `Realtime.Application.start/2`. |
-| `CLUSTER_SECRET_ID` | string | Self-hosted | AWS Secrets Manager secret ID holding the cluster CA cert/key. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
-| `CLUSTER_SECRET_REGION` | string | Self-hosted | AWS region for `CLUSTER_SECRET_ID`. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
+| `BROADCAST_POOL_SIZE` | integer (count) | | Number of processes used to relay Phoenix.PubSub messages across the cluster. | Default: `10`. |
+| `CHANNEL_ERROR_BACKOFF_MS` | integer (ms) | | Delay (ms) before returning a channel join error to the client. Slows down reconnect storms. | Default: `5000` (5 seconds). |
+| `CLIENT_PRESENCE_MAX_CALLS` | integer (count) | | Maximum presence calls allowed per client (per WebSocket) within the time window. | Default: `5`. |
+| `CLIENT_PRESENCE_WINDOW_MS` | integer (ms) | | Time window (ms) for per-client presence rate limiting. | Default: `30000`. |
+| `CLUSTER` | string | | Cluster name added to log metadata. | No default. Read by `Realtime.Application.start/2`. |
 | `CLUSTER_STRATEGIES` | string (CSV) | Self-hosted | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. An empty value disables cluster discovery. | Default: `POSTGRES`. The self-hosted compose sets it empty, since a single node has no peers to discover. |
-| `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a WebSocket connection error to the client. Slows down reconnect storms. | Default: `2000` (2 seconds). |
-| `CONNECT_PARTITION_SLOTS` | integer (count) | Self-hosted | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | Default: `System.schedulers_online() * 2`. |
-| `DASHBOARD_AUTH` | enum | Self-hosted | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth` (requires `DASHBOARD_USER` and `DASHBOARD_PASSWORD`) or `zta` (requires `CF_TEAM_DOMAIN`). | Default: `basic_auth`. |
-| `DASHBOARD_PASSWORD` | string | Self-hosted | Password for admin dashboard basic auth. | Default: random hex string generated at boot. |
-| `DASHBOARD_USER` | string | Self-hosted | Username for admin dashboard basic auth. | Default: random hex string generated at boot. |
+| `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | | Delay (ms) before returning a WebSocket connection error to the client. Slows down reconnect storms. | Default: `2000` (2 seconds). |
+| `CONNECT_PARTITION_SLOTS` | integer (count) | | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | Default: `System.schedulers_online() * 2`. |
+| `DASHBOARD_AUTH` | enum | | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth` (requires `DASHBOARD_USER` and `DASHBOARD_PASSWORD`) or `zta` (requires `CF_TEAM_DOMAIN`). | Default: `basic_auth`. |
+| `DASHBOARD_PASSWORD` | string | | Password for admin dashboard basic auth. | Default: random hex string generated at boot. |
+| `DASHBOARD_USER` | string | | Username for admin dashboard basic auth. | Default: random hex string generated at boot. |
 | `DB_AFTER_CONNECT_QUERY` | string | Both | SQL query executed after every Postgres connection is established. | No default. Self-host sets `SET search_path TO _realtime`. |
-| `DB_ENC_KEY` | string | Both | Key used to encrypt sensitive fields in the `_realtime.tenants` and `_realtime.extensions` tables. | Recommended: 16 characters. Required (consumed as `db_enc_key` by the app config). |
+| `DB_ENC_KEY` | string | Both | AES-128-ECB key used to encrypt sensitive fields in the `_realtime.tenants` and `_realtime.extensions` tables. | Required. Must be 16 bytes (AES-128 key). Still needed after enabling `DB_ENC_WRITE_GCM`, to decrypt values not yet re-encrypted to GCM. |
+| `DB_ENC_KEY_GCM` | string | | AES-256-GCM key for the tenant secrets stored in `_realtime` (tenant JWT secret and the `postgres_cdc_rls` connection settings). Used for new writes when `DB_ENC_WRITE_GCM=true`, and to decrypt any value already stored as GCM (`g1:` prefix). | No default. Must be exactly 32 bytes or boot fails. Once values are stored as GCM, they can't be decrypted without this key. |
+| `DB_ENC_WRITE_GCM` | boolean | | When `true` and `DB_ENC_KEY_GCM` is set, new writes of tenant secrets use AES-256-GCM instead of the legacy AES-128-ECB cipher (`DB_ENC_KEY`). Existing ECB values are re-encrypted to GCM in the background when a tenant is loaded, if the `gcm_encryption_backfill` feature flag is on (the self-host seed enables it). | Default: `false`. Accepts `true`/`false`/`1`/`0`. If `true` without `DB_ENC_KEY_GCM`, Realtime logs a warning at boot and keeps using ECB. |
 | `DB_HOST` | string | Both | Primary Postgres host. | Default: `127.0.0.1`. |
-| `DB_IP_VERSION` | enum | Self-hosted | Forces the IP version for Postgres connections. Accepted: `ipv4`, `ipv6`. | When unset, IP version is auto-detected from `DB_HOST`. |
-| `DB_MASTER_REGION` | string | Self-hosted | Overrides the primary region for region-aware routing and tenant placement. | When unset, the current `REGION` is used. |
+| `DB_IP_VERSION` | enum | | Forces the IP version for Postgres connections. Accepted: `ipv4`, `ipv6`. | When unset, IP version is auto-detected from `DB_HOST`. |
+| `DB_MASTER_REGION` | string | | Overrides the primary region for region-aware routing and tenant placement. | When unset, the current `REGION` is used. |
 | `DB_NAME` | string | Both | Postgres database name. | Default: `postgres`. |
 | `DB_PASSWORD` | string | Both | Postgres password. | Default: `postgres`. |
-| `DB_POOL_SIZE` | integer (count) | Self-hosted | Number of connections in the primary Postgres pool. | Default: `5`. |
+| `DB_POOL_SIZE` | integer (count) | | Number of connections in the primary Postgres pool. | Default: `5`. |
 | `DB_PORT` | string | Both | Postgres port. | Default: `5432`. |
-| `DB_QUEUE_INTERVAL` | integer (ms) | Self-hosted | Ecto pool queue interval in ms. | Default: `5000`. |
-| `DB_QUEUE_TARGET` | integer (ms) | Self-hosted | Ecto pool queue target in ms. | Default: `5000`. |
-| `DB_REPLICA_HOST` | string | Self-hosted | Hostname for the main replica Postgres pool. | When set, enables the `Realtime.Repo.Replica` connection pool. |
-| `DB_REPLICA_POOL_SIZE` | integer (count) | Self-hosted | Number of connections in the replica pool(s). | Default: `5`. |
-| `DB_SSL` | boolean | Self-hosted | Enable SSL for Postgres connections. | Default: `false`. Accepts `true`/`false`/`1`/`0`. |
-| `DB_SSL_CA_CERT` | path | Self-hosted | Path to a CA trust store used when `DB_SSL=true`. Enables server certificate verification. | When unset and `DB_SSL=true`, falls back to `verify: :verify_none`. |
+| `DB_QUEUE_INTERVAL` | integer (ms) | | Ecto pool queue interval in ms. | Default: `5000`. |
+| `DB_QUEUE_TARGET` | integer (ms) | | Ecto pool queue target in ms. | Default: `5000`. |
+| `DB_REPLICA_HOST` | string | | Hostname for the main replica Postgres pool. | When set, enables the `Realtime.Repo.Replica` connection pool. |
+| `DB_REPLICA_POOL_SIZE` | integer (count) | | Number of connections in the replica pool(s). | Default: `5`. |
+| `DB_SSL` | boolean | | Enable SSL for Postgres connections. | Default: `false`. Accepts `true`/`false`/`1`/`0`. The self-host seed also uses it for the tenant's `ssl_enforced` setting. |
+| `DB_SSL_CA_CERT` | path | | Path to a CA trust store used when `DB_SSL=true`. Enables server certificate verification. | When unset and `DB_SSL=true`, falls back to `verify: :verify_none`. |
 | `DB_USER` | string | Both | Postgres user. | Default: `supabase_admin`. |
 | `DISABLE_HEALTHCHECK_LOGGING` | boolean | Self-hosted | Disables request logging for `/healthcheck` and `/api/tenants/:tenant_id/health`. | Default: `false`. |
-| `DNS_NODES` | string | CLI | DNS query used by the libcluster `DNS` strategy. | No default. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `DNS_NODES` | string | CLI | DNS query used by the libcluster `DNS` strategy. | No default. Empty, `''` and `""` count as unset, which skips the `DNS` strategy. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `ERL_AFLAGS` | string | Both | Extra flags for the Erlang VM, read by the Erlang runtime. Compose and the CLI use it to choose the distribution protocol: `-proto_dist inet_tcp` (IPv4) or `-proto_dist inet6_tcp` (IPv6). | Image default: `-proto_dist inet6_tcp`. The self-hosted compose sets `-proto_dist inet_tcp`. `run.sh` appends TLS distribution flags when `GENERATE_CLUSTER_CERTS` is set. |
 | `GEN_RPC_SOCKET_IP` | string | Self-hosted | IP address the internal gen_rpc listener binds to. | Default: `0.0.0.0`. Must be a valid IPv4/IPv6 address or the service refuses to start. The self-hosted compose sets `127.0.0.1` so the listener is not reachable from other containers on a single node. |
-| `HTTP_DYNAMIC_BUFFER_MAX` | integer (bytes) | Self-hosted | Maximum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MIN`. |
-| `HTTP_DYNAMIC_BUFFER_MIN` | integer (bytes) | Self-hosted | Minimum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MAX`. |
-| `JANITOR_CHILDREN_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for each janitor child task. | Default: `5000`. Only used when `RUN_JANITOR=true`. |
-| `JANITOR_CHUNK_SIZE` | integer (count) | Self-hosted | Number of tenants processed per chunk per janitor task. | Default: `10`. |
-| `JANITOR_MAX_CHILDREN` | integer (count) | Self-hosted | Maximum number of concurrent janitor task children. | Default: `5`. |
-| `JANITOR_RUN_AFTER_IN_MS` | integer (ms) | Self-hosted | Delay (ms) before the janitor first runs after boot. | Default: 10 minutes. |
-| `JANITOR_SCHEDULE_RANDOMIZE` | boolean | Self-hosted | Add a random offset to the janitor schedule. | Default: `true`. |
-| `JANITOR_SCHEDULE_TIMER_IN_MS` | integer (ms) | Self-hosted | Interval (ms) between janitor runs. | Default: 4 hours. |
-| `JWT_CLAIM_VALIDATORS` | JSON | Self-hosted | JSON object of claim validators applied to incoming JWTs (e.g. `{"iss":"Issuer"}`). | Default: `{}`. Must be valid JSON object or boot fails. |
-| `LOG_LEVEL` | enum | Self-hosted | Logger level. One of `info`, `emergency`, `alert`, `critical`, `error`, `warning`, `notice`, `debug`. | Default: `info`. |
-| `LOG_THROTTLE_JANITOR_INTERVAL_IN_MS` | integer (ms) | Self-hosted | Cachex expiration interval (ms) for the log-throttle cache. | Default: 10 minutes. |
-| `LOGFLARE_API_KEY` | string | Self-hosted | Logflare API key. | Required when `LOGS_ENGINE=logflare`. |
-| `LOGFLARE_LOGGER_BACKEND_URL` | URL | Self-hosted | Endpoint for the Logflare logger backend. | Default: `https://api.logflare.app`. |
-| `LOGFLARE_SOURCE_ID` | string | Self-hosted | Logflare source ID. | Required when `LOGS_ENGINE=logflare`. |
-| `LOGS_ENGINE` | string | Self-hosted | Log backend selector. Set to `logflare` to enable the Logflare HTTP backend. | When unset, standard logger output is used. |
-| `MAX_CONNECTIONS` | integer (count) | Self-hosted | Soft maximum number of WebSocket connections. | Default: `16384`. |
+| `GEN_RPC_TCP_CLIENT_PORT` | integer | | TCP port gen_rpc connects to on peer nodes for inter-node RPC. | Default: `5369`. Should match the peers' `GEN_RPC_TCP_SERVER_PORT`. Ignored when `GEN_RPC_SSL_SERVER_PORT` is set. |
+| `GEN_RPC_TCP_SERVER_PORT` | integer | | TCP port the internal gen_rpc listener binds to (on `GEN_RPC_SOCKET_IP`) for inter-node RPC. | Default: `5369`. Ignored when `GEN_RPC_SSL_SERVER_PORT` is set. |
+| `HTTP_DYNAMIC_BUFFER_MAX` | integer (bytes) | | Maximum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | No default. Must be set together with `HTTP_DYNAMIC_BUFFER_MIN`, or boot fails. |
+| `HTTP_DYNAMIC_BUFFER_MIN` | integer (bytes) | | Minimum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | No default. Must be set together with `HTTP_DYNAMIC_BUFFER_MAX`, or boot fails. |
+| `JANITOR_CHILDREN_TIMEOUT` | integer (ms) | | Timeout (ms) for each janitor child task. | Default: `5000`. Only used when `RUN_JANITOR=true`. |
+| `JANITOR_CHUNK_SIZE` | integer (count) | | Number of tenants processed per chunk per janitor task. | Default: `10`. |
+| `JANITOR_MAX_CHILDREN` | integer (count) | | Maximum number of concurrent janitor task children. | Default: `5`. |
+| `JANITOR_RUN_AFTER_IN_MS` | integer (ms) | | Delay (ms) before the janitor first runs after boot. | Default: 10 minutes. |
+| `JANITOR_SCHEDULE_RANDOMIZE` | boolean | | Add a random offset to the janitor schedule. | Default: `true`. |
+| `JANITOR_SCHEDULE_TIMER_IN_MS` | integer (ms) | | Interval (ms) between janitor runs. | Default: 4 hours. |
+| `JWT_CLAIM_VALIDATORS` | JSON | | JSON object of claim validators applied to incoming JWTs (e.g. `{"iss":"Issuer"}`). | Default: `{}`. Must be valid JSON object or boot fails. |
+| `LOG_LEVEL` | enum | | Logger level. One of `info`, `emergency`, `alert`, `critical`, `error`, `warning`, `notice`, `debug`. | Default: `info`. |
+| `LOG_THROTTLE_JANITOR_INTERVAL_IN_MS` | integer (ms) | | Cachex expiration interval (ms) for the log-throttle cache. | Default: 10 minutes. |
+| `LOGFLARE_API_KEY` | string | | Logflare API key. | Required when `LOGS_ENGINE=logflare`. |
+| `LOGFLARE_LOGGER_BACKEND_URL` | URL | | Endpoint for the Logflare logger backend. | Default: `https://api.logflare.app`. |
+| `LOGFLARE_SOURCE_ID` | string | | Logflare source ID. | Required when `LOGS_ENGINE=logflare`. |
+| `LOGS_ENGINE` | string | | Log backend selector. Set to `logflare` to enable the Logflare HTTP backend. | When unset, standard logger output is used. |
+| `MAX_CONNECTIONS` | integer (count) | | Soft maximum number of WebSocket connections. | Default: `1000`. |
 | `MAX_HEADER_LENGTH` | integer (bytes) | CLI | Maximum HTTP header value length (bytes). | Default: `4096`. |
-| `METRICS_CLEANER_SCHEDULE_TIMER_IN_MS` | integer (ms) | Self-hosted | Interval (ms) between metrics cleaner runs. | Default: 30 minutes. |
+| `METRICS_CLEANER_SCHEDULE_TIMER_IN_MS` | integer (ms) | | Interval (ms) between metrics cleaner runs. | Default: 30 minutes. |
 | `METRICS_JWT_SECRET` | string | Both | Secret used to sign JWTs for the metrics endpoints. | Required - the app raises an exception if unset. |
-| `METRICS_PUSHER_AUTH` | string | Self-hosted | Password used for Basic auth on metrics pushes. Used together with `METRICS_PUSHER_USER`. | When unset, requests are sent without authorization. |
-| `METRICS_PUSHER_COMPRESS` | boolean | Self-hosted | Enable gzip compression for metrics payloads. | Default: `true`. |
-| `METRICS_PUSHER_ENABLED` | boolean | Self-hosted | Enable periodic push of Prometheus metrics. | Default: `false`. Requires `METRICS_PUSHER_URL`. |
-| `METRICS_PUSHER_EXTRA_LABELS` | string (CSV) | Self-hosted | Comma-separated `key=value` pairs appended as `extra_label` query parameters on every push. | Default: empty. |
-| `METRICS_PUSHER_INTERVAL_MS` | integer (ms) | Self-hosted | Interval (ms) between metrics pushes. | Default: 30 seconds. |
-| `METRICS_PUSHER_TIMEOUT_MS` | integer (ms) | Self-hosted | HTTP timeout (ms) for metrics push requests. | Default: 15 seconds. |
-| `METRICS_PUSHER_URL` | URL | Self-hosted | Full URL endpoint to push metrics in Prometheus exposition format. | Required when `METRICS_PUSHER_ENABLED=true`. |
-| `METRICS_PUSHER_USER` | string | Self-hosted | Username used for Basic auth on metrics pushes. | Default: `realtime`. |
-| `METRICS_RPC_TIMEOUT_IN_MS` | integer (ms) | Self-hosted | Timeout (ms) for RPC calls that fetch metrics from other nodes. | Default: 15 seconds. |
-| `METRICS_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from accessing the metrics endpoints. | Default: empty list. |
+| `METRICS_PUSHER_AUTH` | string | | Password used for Basic auth on metrics pushes. Used together with `METRICS_PUSHER_USER`. | When unset, requests are sent without authorization. |
+| `METRICS_PUSHER_COMPRESS` | boolean | | Enable gzip compression for metrics payloads. | Default: `true`. |
+| `METRICS_PUSHER_ENABLED` | boolean | | Enable periodic push of Prometheus metrics. | Default: `false`. Requires `METRICS_PUSHER_URL`. |
+| `METRICS_PUSHER_EXTRA_LABELS` | string (CSV) | | Comma-separated `key=value` pairs appended as `extra_label` query parameters on every push. | Default: empty. |
+| `METRICS_PUSHER_INTERVAL_MS` | integer (ms) | | Interval (ms) between metrics pushes. | Default: 30 seconds. |
+| `METRICS_PUSHER_TIMEOUT_MS` | integer (ms) | | HTTP timeout (ms) for metrics push requests. | Default: 15 seconds. |
+| `METRICS_PUSHER_URL` | URL | | Full URL endpoint to push metrics in Prometheus exposition format. | Required when `METRICS_PUSHER_ENABLED=true`. |
+| `METRICS_PUSHER_USER` | string | | Username used for Basic auth on metrics pushes. | Default: `realtime`. |
+| `METRICS_RPC_TIMEOUT_IN_MS` | integer (ms) | | Timeout (ms) for RPC calls that fetch metrics from other nodes. | Default: 15 seconds. |
+| `METRICS_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of tokens blocked from accessing the metrics endpoints. | Default: empty list. |
+| `NO_CHANNEL_TIMEOUT_IN_MS` | integer (ms) | | Time (ms) a WebSocket can stay connected without any joined channel before Realtime closes it (close code `1001`, `No channels joined`). The timer starts on connect and restarts when the socket leaves its last channel. | Default: 10 minutes. |
+| `NODE_NAME` | string | | Name part of the Erlang node name (`RELEASE_NODE=<NODE_NAME>@<ip>`), set by the release script `rel/env.sh.eex`. | Default: `APP_NAME`, then `realtime`. |
+| `POD_IP` | string | | IP address used as the host part of the Erlang node name (`RELEASE_NODE=<name>@<POD_IP>`), set by the release script `rel/env.sh.eex`. Other cluster nodes reach this node at that address. | Default: `127.0.0.1`. Ignored when `AWS_EXECUTION_ENV=AWS_ECS_FARGATE`. |
 | `PORT` | integer | Both | HTTP listener port. | Default: `4000`. |
-| `PROM_POLL_RATE` | integer (ms) | Self-hosted | Poll interval (ms) for PromEx metrics collection. | Default: `5000`. |
-| `REALTIME_IP_VERSION` | enum | Self-hosted | Forces the HTTP listener IP version. Accepted: `ipv4`, `ipv6`. | When unset, IPv6 is preferred when available. |
-| `REBALANCE_CHECK_INTERVAL_IN_MS` | integer (ms) | Self-hosted | Interval (ms) used to check whether a process is in the right region. | Default: 10 minutes. |
-| `REGION` | string | Self-hosted | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | No default. Also rendered in the admin dashboard layout. |
-| `REGION_MAPPING` | JSON | Self-hosted | Custom mapping of platform regions to tenant regions, as a JSON object with string keys and values. | When unset, the hardcoded default mapping is used. Must be a JSON object or boot fails. |
+| `PROM_POLL_RATE` | integer (ms) | | Poll interval (ms) for PromEx metrics collection. | Default: `5000`. |
+| `REALTIME_IP_VERSION` | enum | | Forces the HTTP listener IP version. Accepted: `ipv4`, `ipv6`. | When unset, IPv6 is preferred when available. |
+| `REBALANCE_CHECK_INTERVAL_IN_MS` | integer (ms) | | Interval (ms) used to check whether a process is in the right region. | Default: 10 minutes. |
+| `REGION` | string | | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | Default: `local`. Log metadata and the admin dashboard layout read the variable directly, so they show nothing when it's unset. |
+| `REGION_MAPPING` | JSON | | Custom mapping of platform regions to tenant regions, as a JSON object with string keys and values. | When unset, the hardcoded default mapping is used. Must be a JSON object or boot fails. |
 | `RELEASE_COOKIE` | string | Self-hosted | Erlang distribution cookie: the shared secret cluster nodes use to trust each other. | When unset, the self-hosted Realtime entrypoint (`volumes/realtime/docker-entrypoint.sh`) generates a random ephemeral cookie on start. Set it explicitly (same value on every node, 63 characters or fewer) only for a multi-node cluster; when discovery is enabled it also serves as the libcluster Postgres `LISTEN` channel name, which Postgres caps at 63 bytes. |
-| `REQUEST_ID_BAGGAGE_KEY` | string | Self-hosted | OTEL Baggage key used as the request ID. | Default: `request-id`. |
-| `RPC_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for generic RPC calls. | Default: 30 seconds. |
+| `REQUEST_ID_BAGGAGE_KEY` | string | | OTEL Baggage key used as the request ID. | Default: `request-id`. |
+| `RLIMIT_NOFILE` | integer (count) | Both | Soft limit for open file descriptors, which `run.sh` applies with `ulimit -Sn` before starting the server. | No default: unset or empty keeps the container's limit. The self-hosted compose sets `10000`. The container runs as `nobody`, so the value can't go above the container's hard limit. |
+| `RPC_TIMEOUT` | integer (ms) | | Timeout (ms) for generic RPC calls. | Default: 30 seconds. |
 | `RUN_JANITOR` | boolean | Both | Enable the tenant janitor and metrics cleaner tasks. | Default: `false`. |
 | `SECRET_KEY_BASE` | string | Both | Secret used by Phoenix to sign cookies and tokens. | Required - recommended length: 64 characters. |
-| `SEED_SELF_HOST` | boolean | Both | If `true`, `run.sh` runs `Realtime.Release.seeds/1` to create the default tenant. | Default: not set (no seeding). Self-host enables this on first boot. |
-| `SELF_HOST_TENANT_NAME` | string | Self-hosted | Tenant external_id used by the self-host seed script. | Default: `realtime-dev`. Must be URL-safe. |
-| `SLOT_NAME_SUFFIX` | string | CLI | Suffix appended to the default replication slot name `supabase_realtime_replication_slot`. | Allowed: lowercase letters, numbers, underscore. Combined name must be 64 characters or fewer. |
-| `TENANT_CACHE_EXPIRATION_IN_MS` | integer (ms) | Self-hosted | TTL (ms) for the in-process tenant cache. | Default: 30 seconds. |
-| `TENANT_MAX_BYTES_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum bytes per second (used when a tenant is first created). | Default: `100000`. |
-| `TENANT_MAX_CHANNELS_PER_CLIENT` | integer (count) | Self-hosted | Default per-tenant maximum channels per client (used when a tenant is first created). | Default: `100`. |
-| `TENANT_MAX_CONCURRENT_USERS` | integer (count) | Self-hosted | Default per-tenant maximum concurrent users per channel (used when a tenant is first created). | Default: `200`. |
-| `TENANT_MAX_EVENTS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum events per second (used when a tenant is first created). | Default: `100`. |
-| `TENANT_MAX_JOINS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum channel joins per second (used when a tenant is first created). | Default: `100`. |
-| `USERS_SCOPE_SHARDS` | integer (count) | Self-hosted | Number of partitions used by the Beacon `users` scope. | Default: `5`. |
-| `WEBSOCKET_MAX_HEAP_SIZE` | integer (bytes) | Self-hosted | Maximum heap (bytes) for each WebSocket transport process; the process is killed if exceeded. | Default: `50000000` (50 MB). |
+| `SEED_SELF_HOST` | boolean | Both | If `true`, `run.sh` runs `Realtime.Release.seeds/1` to create the default tenant. | Default: unset (no seeding). Only the exact value `true` enables it. The self-hosted compose sets it, so the seed runs on every start: it deletes and re-creates the tenant, and globally enables the `gcm_encryption_backfill` and `broadcast_persistence` feature flags. |
+| `SELF_HOST_TENANT_DB_HOST` | string | | Database host stored in the seeded self-host tenant's `postgres_cdc_rls` settings: the database Realtime connects to for that tenant. | Default: `DB_HOST`, then `host.docker.internal`. Used only by the seed script (`SEED_SELF_HOST=true`). |
+| `SELF_HOST_TENANT_DB_PORT` | string | | Database port stored in the seeded self-host tenant's `postgres_cdc_rls` settings. | Default: `DB_PORT`, then `5433`. Used only by the seed script (`SEED_SELF_HOST=true`). |
+| `SELF_HOST_TENANT_NAME` | string | | Tenant external_id used by the self-host seed script. | Default: `realtime-dev`. Must be URL-safe. |
+| `SLOT_NAME_SUFFIX` | string | | Suffix appended to Realtime's replication slot names: `supabase_realtime_replication_slot_<suffix>` (Postgres Changes) and `supabase_realtime_messages_replication_slot_<suffix>` (Broadcast from Database). | No default. Allowed: lowercase letters, numbers, underscore. Postgres caps slot names at 63 characters, so the suffix can be at most 19 characters. |
+| `TENANT_CACHE_EXPIRATION_IN_MS` | integer (ms) | | TTL (ms) for the in-process tenant cache. | Default: 30 seconds. |
+| `TENANT_MAX_BYTES_PER_SECOND` | integer (count) | | Default per-tenant maximum bytes per second (used when a tenant is first created). | Default: `100000`. |
+| `TENANT_MAX_CHANNELS_PER_CLIENT` | integer (count) | | Default per-tenant maximum channels per client (used when a tenant is first created). | Default: `100`. |
+| `TENANT_MAX_CONCURRENT_USERS` | integer (count) | | Default per-tenant maximum concurrent users per channel (used when a tenant is first created). | Default: `200`. |
+| `TENANT_MAX_EVENTS_PER_SECOND` | integer (count) | | Default per-tenant maximum events per second (used when a tenant is first created). | Default: `100`. |
+| `TENANT_MAX_JOINS_PER_SECOND` | integer (count) | | Default per-tenant maximum channel joins per second (used when a tenant is first created). | Default: `100`. |
+| `USERS_SCOPE_SHARDS` | integer (count) | | Number of partitions used by the `Forum.Census` `users` scope. | Default: `5`. |
+| `WEBSOCKET_MAX_HEAP_SIZE` | integer (bytes) | | Maximum heap (bytes) for each WebSocket transport process; the process is killed if exceeded. | Default: `50000000` (50 MB). |
 
 ---
 
@@ -945,8 +959,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `ADMIN_API_KEYS` | string |  | Comma-separated API keys accepted on the admin port. Legacy alias for `SERVER_ADMIN_API_KEYS`. | Default: empty |
-| `ADMIN_PORT` | integer |  | Port the admin HTTP server listens on. Legacy alias for `SERVER_ADMIN_PORT`. | Default: `5001` |
 | `EXPOSE_DOCS` | boolean |  | Expose `/docs` Swagger UI. | Default: `true` |
 | `HOST` | string |  | Host the public server binds to. Legacy alias for `SERVER_HOST`. | Default: `0.0.0.0` |
 | `NODE_ENV` | enum |  | Node.js runtime mode. When `production`, sets `isProduction` and forces HTTPS in TUS link generation. | Default: unset |
@@ -954,24 +966,24 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PROJECT_REF` | string |  | Single-tenant project reference; used as `tenantId` when set. | Optional (single-tenant) |
 | `REGION` | string | Self-hosted | Region label exposed in responses and used as fallback for `STORAGE_S3_REGION` / `SERVER_REGION`. | Default: `not-specified` |
 | `REQUEST_ADMIN_TRACE_HEADER` | string |  | Header carrying the admin request trace id. Legacy fallback for `REQUEST_TRACE_HEADER`. | Optional |
-| `REQUEST_ALLOW_X_FORWARDED_PATH` | boolean | Self-hosted | Honor the `X-Forwarded-Path` header when computing public URLs. | Default: `false` |
+| `REQUEST_ALLOW_X_FORWARDED_PATH` | boolean | Self-hosted | Honor the `X-Forwarded-Prefix` header as a path prefix when building TUS upload URLs and verifying S3 SigV4 signatures. | Default: `false` |
 | `REQUEST_ETAG_HEADERS` | string (CSV) |  | Comma-separated list of request headers that carry an ETag for conditional GETs. | Default: `if-none-match` |
+| `REQUEST_HARD_LIMITS_ENABLED` | boolean |  | Reject bulk delete requests (`DELETE /object/{bucket}` with `prefixes`, S3 `DeleteObjects`) that list more than 1000 objects. | Default: `false` (no cap) |
 | `REQUEST_ID_HEADER` | string |  | Legacy alias for `REQUEST_TRACE_HEADER`. | Optional |
 | `REQUEST_TRACE_HEADER` | string |  | Header name used to propagate the request trace id. | Default: unset |
-| `REQUEST_URL_LENGTH_LIMIT` | integer |  | Maximum object key URL length. | Default: `7500` |
 | `REQUEST_X_FORWARDED_HOST_REGEXP` | string (regex) |  | Regex applied to `X-Forwarded-Host` to derive the tenant id. | Optional |
-| `RESPONSE_S_MAXAGE` | integer (seconds) |  | `s-maxage` (CDN) cache lifetime added to public responses (seconds). | Default: `0` |
-| `SERVER_ADMIN_API_KEYS` | string |  | Comma-separated API keys accepted on the admin port. | Default: empty |
-| `SERVER_ADMIN_PORT` | integer |  | Port the admin HTTP server listens on. | Default: `5001` |
+| `RESPONSE_STALE_IF_ERROR` | integer (seconds) |  | `stale-if-error` lifetime added to the `Cache-Control` of object responses. `0` adds nothing. | Default: `0`; negative or non-numeric values fall back to `0` |
+| `RESPONSE_STALE_WHILE_REVALIDATE` | integer (seconds) |  | `stale-while-revalidate` lifetime added to the `Cache-Control` of object responses. | Default: `0`. With `0`, `stale-while-revalidate=30` is still added when the request's ETag differs from the object's; negative or non-numeric values fall back to `0` |
+| `RESPONSE_S_MAXAGE` | integer (seconds) |  | `s-maxage` (CDN) cache lifetime added to the `Cache-Control` of object responses when the request carries an ETag header (`REQUEST_ETAG_HEADERS`). | Default: `0` |
 | `SERVER_HEADERS_TIMEOUT` | integer (seconds) |  | Node `headersTimeout` (seconds) for the HTTP server. | Default: `65` |
 | `SERVER_HOST` | string |  | Host the public server binds to. | Default: `0.0.0.0` |
 | `SERVER_KEEP_ALIVE_TIMEOUT` | integer (seconds) |  | Node `keepAliveTimeout` (seconds) for the HTTP server. | Default: `61` |
 | `SERVER_PORT` | integer |  | Port the public HTTP server listens on. | Default: `5000` |
 | `SERVER_REGION` | string |  | Region label exposed in responses; falls back to `REGION`. | Default: `not-specified` |
 | `STORAGE_PUBLIC_URL` | URL | Self-hosted | Public base URL prepended to generated object URLs. | Optional |
-| `TENANT_ID` | string | Self-hosted | Single-tenant tenant id (fallback after `PROJECT_REF`). | Default: `storage-single-tenant` |
-| `URL_LENGTH_LIMIT` | integer |  | Legacy alias for `REQUEST_URL_LENGTH_LIMIT`. | Default: `7500` |
-| `VERSION` | string |  | Build version reported in logs and the default DB application name. | Default: `0.0.0` |
+| `STORAGE_VERSIONING_ENABLED` | boolean |  | Enable object versioning and bucket lifecycle configuration in single-tenant mode. | Default: `false`. When unset, setting a bucket's versioning to `ENABLED` or writing a lifecycle configuration returns 409 `FeatureNotEnabled` |
+| `TENANT_ID` | string | Both | Single-tenant tenant id (fallback after `PROJECT_REF`). | Default: `storage-single-tenant` |
+| `VERSION` | string |  | Build version reported in logs and the default DB application name. | Default: `0.0.0` in code; the image sets it to the release version |
 | `WORKERS_NUM` | integer |  | Number of cluster workers to spawn. | Default: `1` |
 | `X_FORWARDED_HOST_REGEXP` | string (regex) |  | Legacy alias for `REQUEST_X_FORWARDED_HOST_REGEXP`. | Optional |
 
@@ -979,13 +991,12 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `DATABASE_APPLICATION_NAME` | string |  | Postgres `application_name` for the API connection pool. | Default: `Supabase Storage API ${VERSION}` |
+| `DATABASE_APPLICATION_NAME` | string |  | Postgres `application_name` for Storage's connection pools. | Default: `Supabase Storage API ${VERSION}` (`Supabase Storage API Worker ${VERSION}` in worker processes) |
 | `DATABASE_CONNECTION_TIMEOUT` | integer (ms) |  | Postgres connection acquire timeout (ms). | Default: `3000` |
 | `DATABASE_ENABLE_QUERY_CANCELLATION` | boolean |  | Issue a Postgres cancel on request abort. | Default: `false` |
 | `DATABASE_FREE_POOL_AFTER_INACTIVITY` | integer (ms) |  | Time (ms) after which an idle tenant pool is released. | Default: `60000` |
-| `DATABASE_MAX_CONNECTIONS` | integer |  | Max connections per tenant pool. Ignored when `DATABASE_POOL_URL` is set. | Default: `20` |
-| `DATABASE_POOL_MODE` | enum |  | `single_use` or `recycle`. | Optional |
-| `DATABASE_POOL_URL` | URL |  | External pooler (Supavisor/PgBouncer) connection string. When set, `DATABASE_MAX_CONNECTIONS` is ignored. | Optional |
+| `DATABASE_MAX_CONNECTIONS` | integer |  | Max connections in the tenant's connection pool, also when `DATABASE_POOL_URL` is set; split across `WORKERS_NUM` worker processes. | Default: `20` |
+| `DATABASE_POOL_URL` | URL |  | External pooler (Supavisor/PgBouncer) connection string, used instead of `DATABASE_URL` for request queries. `DATABASE_SEARCH_PATH` isn't applied to it. | Optional |
 | `DATABASE_POSTGRES_VERSION` | string |  | Override the detected Postgres version string. | Optional |
 | `DATABASE_SEARCH_PATH` | string (CSV) |  | Comma-separated `search_path` prepended to every session. | Default: empty |
 | `DATABASE_SSL_ROOT_CERT` | path |  | PEM bundle used to verify the Postgres server certificate. | Optional |
@@ -999,19 +1010,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DB_SEARCH_PATH` | string (CSV) |  | Legacy alias for `DATABASE_SEARCH_PATH`. | Default: empty |
 | `DB_SERVICE_ROLE` | string |  | Postgres role used by the service-role key. | Default: `service_role` |
 | `DB_SUPER_USER` | string |  | Postgres superuser used for migrations. | Default: `postgres` |
-| `TENANT_POOL_CACHE_HIT_LOG_SAMPLE_RATE` | number (ratio) |  | Sample rate (0-1) for logging tenant-pool cache hits. | Default: `0` |
-| `TENANT_POOL_CACHE_MISS_LOG_SAMPLE_RATE` | number (ratio) |  | Sample rate (0-1) for logging tenant-pool cache misses. | Default: `0` |
-| `TENANT_POOL_CACHE_TTL_MS` | integer (ms) |  | TTL (ms) for the per-tenant connection-pool cache. | Default: `10000` |
 
 ### JWT
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `AUTH_JWT_ALGORITHM` | enum |  | JWT algorithm used to verify tokens. | Default: `HS256` |
+| `AUTH_JWT_ALGORITHM` | enum |  | HMAC algorithm used with `AUTH_JWT_SECRET`: `HS256`, `HS384` or `HS512`. | Default: `HS256`; any other value fails at startup |
 | `AUTH_JWT_SECRET` | string | Both | HS256 secret used to verify the legacy `ANON_KEY` / `SERVICE_KEY`. | Required (single-tenant) |
 | `JWT_CACHING_ENABLED` | boolean |  | Cache decoded JWTs in memory to reduce verification cost. | Default: `false` |
 | `JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify asymmetric JWTs (e.g. ES256). | Required when using the new API keys and new auth. |
-| `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256` |
+| `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256`; same values as `AUTH_JWT_ALGORITHM` |
 | `PGRST_JWT_SECRET` | string |  | JWT secret used by Storage to verify Postgres-issued tokens; legacy alias for `AUTH_JWT_SECRET`. | Required (single-tenant) |
 
 ### Auth
@@ -1042,14 +1050,15 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_BACKEND` | enum | Both | Object backend driver: `s3` or `file`. | Default: `file` (compose) / unset (code) |
 | `STORAGE_EMPTY_BUCKET_MAX` | integer |  | Max objects deletable in a single empty-bucket call. | Default: `200000` |
 | `STORAGE_S3_BUCKET` | string |  | Bucket name used by the S3 backend. | Required when `STORAGE_BACKEND=s3` |
-| `STORAGE_S3_CLIENT_TIMEOUT` | integer (ms) |  | Per-request timeout (ms) for S3 SDK calls; `0` disables. | Default: `0` |
-| `STORAGE_S3_DISABLE_CHECKSUM` | boolean |  | Disable S3 SDK request checksums. | Default: `false` |
+| `STORAGE_S3_CLIENT_TIMEOUT` | integer (ms) |  | Socket timeout (ms) for the S3 backend's SDK calls and the TUS upload S3 clients; `0` disables. | Default: `0` (backend), `60000` (TUS S3 clients); range `0`-`2147483647`, out-of-range values fall back to the default |
 | `STORAGE_S3_ENABLED_METRICS` | boolean |  | Enable internal S3 client tracing/metrics. | Default: `false` |
 | `STORAGE_S3_ENDPOINT` | URL |  | Custom S3 endpoint (e.g. MinIO). | Optional |
 | `STORAGE_S3_FORCE_PATH_STYLE` | boolean |  | Use path-style S3 addressing. | Default: `false` |
 | `STORAGE_S3_MAX_SOCKETS` | integer |  | Max concurrent sockets for the S3 HTTP agent. | Default: `200` |
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
+| `STORAGE_S3_REQUEST_CHECKSUM_CALCULATION` | enum |  | AWS SDK `requestChecksumCalculation` for the S3 backend client: `WHEN_SUPPORTED` or `WHEN_REQUIRED`. | Default: unset (AWS SDK default). Case-insensitive; any other value fails at startup. Replaces `STORAGE_S3_DISABLE_CHECKSUM` (removed in v1.60.28) |
+| `STORAGE_S3_RESPONSE_CHECKSUM_VALIDATION` | enum |  | AWS SDK `responseChecksumValidation` for the S3 backend client: `WHEN_SUPPORTED` or `WHEN_REQUIRED`. | Default: unset (AWS SDK default). Case-insensitive; any other value fails at startup |
 | `STORAGE_S3_UPLOAD_PART_SIZE` | integer (bytes) |  | Multipart upload part size in bytes. Values below the 5 MiB S3 minimum are clamped up. | Default: `16777216` (16 MiB); minimum: `5242880` (5 MiB) |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
 
@@ -1066,7 +1075,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLE_IMAGE_TRANSFORMATION` | boolean | Both | Legacy alias for `IMAGE_TRANSFORMATION_ENABLED`. | Default: `false` |
-| `IMAGE_TRANSFORMATION_ENABLED` | boolean |  | Enable image rendering via imgproxy. | Default: `false` |
+| `IMAGE_TRANSFORMATION_ENABLED` | boolean | CLI | Enable image rendering via imgproxy. | Default: `false` |
 | `IMAGE_TRANSFORMATION_LIMIT_MAX_SIZE` | integer |  | Max requested dimension (px) for transformations. | Default: `2000` |
 | `IMAGE_TRANSFORMATION_LIMIT_MIN_SIZE` | integer |  | Min requested dimension (px) for transformations. | Default: `1` |
 | `IMGPROXY_HTTP_KEEP_ALIVE_TIMEOUT` | integer (seconds) |  | Keep-alive timeout (seconds) for the imgproxy HTTP agent. | Default: `61` |
@@ -1084,6 +1093,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `FILE_SIZE_LIMIT_STANDARD_UPLOAD` | integer (bytes) |  | Legacy alias for `UPLOAD_FILE_SIZE_LIMIT_STANDARD`. | Default: `0` (disabled) |
 | `SIGNED_UPLOAD_URL_EXPIRATION_TIME` | integer (seconds) | CLI | Legacy alias for `UPLOAD_SIGNED_URL_EXPIRATION_TIME`. | Default: `60` |
 | `TUS_ALLOW_S3_TAGS` | boolean |  | Propagate user metadata as S3 tags during TUS uploads. | Default: `true` |
+| `TUS_BODY_IDLE_TIMEOUT_MS` | integer (ms) |  | Abort a TUS upload request (408) when no body bytes arrive for this long. `0` disables. | Default: `60000`; range `0`-`2147483647`, out-of-range values fall back to the default |
 | `TUS_LOCK_TYPE` | enum |  | TUS upload lock backend: `postgres` or `s3`. | Default: `postgres` |
 | `TUS_MAX_CONCURRENT_UPLOADS` | integer |  | Max concurrent TUS upload sessions. | Default: `500` |
 | `TUS_PART_SIZE` | integer (MB) |  | TUS multipart part size (MB). | Default: `50` |
@@ -1107,18 +1117,28 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RATE_LIMITER_RENDER_PATH_MAX_REQ_SEC` | integer |  | Max requests per second on render paths. | Default: `5` |
 | `RATE_LIMITER_SKIP_ON_ERROR` | boolean |  | Allow requests through when the rate limiter errors. | Default: `false` |
 
+### Queue
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `ENABLE_QUEUE_EVENTS` | boolean |  | Legacy alias for `PG_QUEUE_ENABLE`. | Default: `false` |
+| `PG_QUEUE_CONNECTION_URL` | URL |  | Postgres connection string for the queue. | Default: `DATABASE_URL` |
+| `PG_QUEUE_ENABLE` | boolean |  | Run background event handlers (e.g. object and bucket deletes, webhooks) through a persistent pg-boss queue. When `false`, they run inline in the request. | Default: `false` |
+| `PG_QUEUE_MAX_CONNECTIONS` | integer |  | Max connections in the queue's Postgres pool. | Default: `4` |
+
 ### Webhook
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `WEBHOOK_API_KEY` | string |  | Bearer key sent with outbound webhooks. | Optional |
-| `WEBHOOK_QUEUE_PULL_INTERVAL` | integer (ms) |  | Polling interval (ms) for the webhook queue. | Default: `700` |
+| `WEBHOOK_QUEUE_PULL_INTERVAL` | integer (ms) |  | Polling interval (ms) for the webhook queue. | Default: `700`; only used when `PG_QUEUE_ENABLE=true` |
 | `WEBHOOK_URL` | URL |  | Endpoint that receives object events. | Optional |
 
 ### Logging
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `LOGFLARE_API_BASE_URL` | URL |  | Logflare API base URL that logs are sent to. | Default: `https://api.logflare.app` (`pino-logflare` default) |
 | `LOGFLARE_API_KEY` | string |  | Logflare ingest API key. | Required when `LOGFLARE_ENABLED=true` |
 | `LOGFLARE_BATCH_SIZE` | integer |  | Max records per Logflare batch. | Default: `200` |
 | `LOGFLARE_ENABLED` | boolean |  | Forward logs to Logflare. | Default: `false` |
@@ -1128,14 +1148,14 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `OTEL_EXPORTER_OTLP_COMPRESSION` | enum |  | OTLP exporter compression algorithm (`gzip`, `none`). | Optional |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | URL |  | OTLP endpoint used when a metrics-specific endpoint is not set. | Optional |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | URL |  | OTLP endpoint for metrics export. | Optional |
-| `OTEL_EXPORTER_OTLP_METRICS_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP metric requests. | Optional |
+| `OTEL_EXPORTER_OTLP_METRICS_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP metric requests. | Optional; read by the OTel exporter SDK |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | URL |  | OTLP endpoint for trace export. | Optional |
-| `OTEL_EXPORTER_OTLP_TRACES_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP trace requests. | Optional |
+| `OTEL_EXPORTER_OTLP_TRACES_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP trace requests. | Optional; read by the OTel exporter SDK |
 | `OTEL_METRICS_ENABLED` | boolean |  | Enable the OpenTelemetry metrics SDK. | Default: `false` |
 | `OTEL_METRICS_EXPORT_INTERVAL_MS` | integer (ms) |  | OTLP metrics export interval (ms). | Default: `60000` |
 | `OTEL_METRICS_TEMPORALITY` | enum |  | OTLP metrics temporality: `DELTA` or `CUMULATIVE`. | Default: `CUMULATIVE` |
-| `PROMETHEUS_METRICS_ENABLED` | boolean |  | Expose Prometheus metrics on the admin port. | Default: `false` |
-| `PROMETHEUS_METRICS_INCLUDE_TENANT` | boolean |  | Include the tenant id label on Prometheus metrics. | Default: `false` |
+| `PROMETHEUS_METRICS_ENABLED` | boolean |  | Expose Prometheus metrics at `/metrics` on the main port (on the admin port in multi-tenant mode). Requires `OTEL_METRICS_ENABLED=true`. | Default: `false` |
+| `SERVICE_NAME` | string |  | OpenTelemetry `service.name` for metrics and traces, and the Prometheus metric name prefix. | Default: `storage_api` |
 | `TRACING_ENABLED` | boolean |  | Enable OpenTelemetry tracing. | Default: `false` |
 | `TRACING_FEATURE_UPLOAD` | boolean |  | Emit detailed spans for the upload pipeline. | Default: `false` |
 | `TRACING_MODE` | enum |  | Tracing verbosity, e.g. `basic`, `debug`. | Default: `basic` |
@@ -1146,26 +1166,15 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `VECTOR_BUCKET_REGION` | string |  | AWS region for vector buckets. | Optional |
-| `VECTOR_ENABLED` | boolean |  | Enable vector bucket support. | Default: `false` |
+| `VECTOR_BUCKET_PROVIDER` | enum | CLI | Vector index backend: `s3` (Amazon S3 Vectors) or `pgvector` (Postgres). | Default: `s3`. Not validated: other values leave the vector API disabled (`FeatureNotEnabled`) |
+| `VECTOR_BUCKET_REGION` | string |  | AWS region for the S3 Vectors client (`VECTOR_BUCKET_PROVIDER=s3`). | Optional; falls back to `STORAGE_S3_REGION` |
+| `VECTOR_DATABASE_CREATE` | boolean |  | With `pgvector`, create a dedicated `storage_vectors` database on the `VECTOR_DATABASE_URL` server and use it. When `false`, use the database in `VECTOR_DATABASE_URL` directly. | Default: `true` |
+| `VECTOR_DATABASE_URL` | URL | CLI | Postgres connection string for the `pgvector` provider (the maintenance URL when `VECTOR_DATABASE_CREATE=true`). | Required when `VECTOR_BUCKET_PROVIDER=pgvector` and `VECTOR_ENABLED` or `VECTOR_STORE_MIGRATIONS_ENABLED` is `true`; startup fails otherwise |
+| `VECTOR_ENABLED` | boolean | CLI | Enable the vector bucket API in single-tenant mode. | Default: `false` |
 | `VECTOR_MAX_BUCKETS` | integer |  | Max vector buckets per tenant. | Default: `10` |
 | `VECTOR_MAX_INDEXES` | integer |  | Max indexes per vector bucket. | Default: `20` |
-| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 buckets backing vector indexes. | Optional |
-
-### Other (tooling)
-
-| Variable | Type | Set by | Description | Notes |
-|---|---|---|---|---|
-| `ADMIN_API_KEY` | string |  | API key used by the bundled `pprof-client` script. | Optional (tooling) |
-| `ADMIN_URL` | URL |  | Admin server URL used by the bundled `pprof-client` script. | Optional (tooling) |
-| `FLAME_SOURCEMAPS_DIRS` | string |  | Sourcemap directories used by the flamegraph tool. | Default: `dist` |
-| `PPROF_FLAME_MD_FORMAT` | boolean |  | Markdown format flag for the pprof flamegraph script. | Optional (tooling) |
-| `PPROF_GENERATE_FLAME` | boolean |  | Generate a flamegraph from a captured pprof profile. | Optional (tooling) |
-| `PPROF_NODE_MODULES_SOURCE_MAPS` | boolean |  | Include `node_modules` sourcemaps in flame output. | Optional (tooling) |
-| `PPROF_OUTPUT` | path |  | Output path for the pprof script. | Optional (tooling) |
-| `PPROF_SECONDS` | integer |  | Profile duration (seconds) for the pprof script. | Optional (tooling) |
-| `PPROF_SOURCE_MAPS` | boolean |  | Use sourcemaps when symbolicating pprof output. | Optional (tooling) |
-| `PPROF_WORKER_ID` | string |  | Worker id targeted by the pprof script. | Optional (tooling) |
+| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 Vectors buckets backing vector indexes. | Required when `VECTOR_BUCKET_PROVIDER=s3`; single-tenant mode uses the first entry |
+| `VECTOR_STORE_MIGRATIONS_ENABLED` | boolean | CLI | Run the `pgvector` vector-store migrations at startup. | Default: `false`; only with `VECTOR_BUCKET_PROVIDER=pgvector` |
 
 ---
 
@@ -1193,11 +1202,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `EDGE_RUNTIME_INCLUDE_MALLOCED_MEMORY_ON_MEMCHECK` | boolean | | If truthy, include `malloced_memory` in the per-worker memory limit check. | Read at startup via `cli/src/env.rs` |
 | `EDGE_RUNTIME_MAIN_WORKER_INITIAL_HEAP_SIZE_MIB` | integer (MB) | | V8 initial heap size (MiB) for the main worker. | Read at startup via `cli/src/env.rs` |
 | `EDGE_RUNTIME_MAIN_WORKER_MAX_HEAP_SIZE_MIB` | integer (MB) | | V8 max heap size (MiB) for the main worker. | Read at startup via `cli/src/env.rs` |
-| `EDGE_RUNTIME_PORT` | integer | Both | Port to listen on. | Wired to `--port`/`-p` flag; default `9000` |
+| `EDGE_RUNTIME_PORT` | integer | | Port to listen on. | Wired to `--port`/`-p` flag; default `9000` |
 | `EDGE_RUNTIME_PRIMARY_WORKER_POOL_SIZE` | integer (count) | | Tokio LocalPool size for the main + event workers. | Default: `1` |
-| `EDGE_RUNTIME_TLS` | integer | Both | TLS listening port (presence enables TLS). | Wired to `--tls` flag; default-missing-value `443` |
-| `EDGE_RUNTIME_TLS_CERT_PATH` | path | Both | Path to PEM X.509 certificate (when TLS enabled). | Wired to `--cert` flag |
-| `EDGE_RUNTIME_TLS_KEY_PATH` | path | Both | Path to PEM-encoded private key (when TLS enabled). | Wired to `--key` flag |
+| `EDGE_RUNTIME_TLS` | integer | | TLS listening port (presence enables TLS). | Wired to `--tls` flag; default-missing-value `443` |
+| `EDGE_RUNTIME_TLS_CERT_PATH` | path | | Path to PEM X.509 certificate (when TLS enabled). | Wired to `--cert` flag |
+| `EDGE_RUNTIME_TLS_KEY_PATH` | path | | Path to PEM-encoded private key (when TLS enabled). | Wired to `--key` flag |
 | `EDGE_RUNTIME_WORKER_POOL_SIZE` | integer (count) | | Tokio LocalPool size for the user worker pool. | Default: `available_parallelism()` in release |
 | `EXT_AI_CACHE_DIR` | path | | Directory used to cache ONNX model files downloaded by `Supabase.ai`. | Defaults to OS cache dir |
 | `FUNCTIONS_MEMORY_LIMIT` | string | Self-hosted | Total memory limit for the functions container, shared by all workers. | Default: `2g` (2 GiB). Accepts Docker Compose memory sizes, such as `512m` or `4g`. Used by Compose to set `mem_limit`; not passed to the runtime as an environment variable. |
@@ -1221,12 +1230,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RUST_LOG` | string | | Filter directive for the Rust logger (e.g. `info`, `base=debug`, `trace`). | Read by `env_logger` / `tracing-subscriber` |
 | `SUPABASE_ANON_KEY` | JWT | Both | Public ("anonymous") Supabase API key. Injected for user functions to call the public API. | Injected for user functions |
 | `SUPABASE_DB_URL` | URL | Both | Postgres connection string. Injected for user functions that connect directly to Postgres. | Injected for user functions |
-| `SUPABASE_INTERNAL_FUNCTIONS_CONFIG` | JSON | CLI | JSON map of per-function options (e.g. `verify_jwt`, `import_map_path`) consumed by the CLI's bundled main service. | Set by CLI; consumed by main service |
-| `SUPABASE_INTERNAL_HOST_PORT` | integer | CLI | Local API port the CLI's bundled main service forwards requests to. | Set by CLI |
-| `SUPABASE_INTERNAL_JWT_SECRET` | JWT | CLI | HS256 secret used by the CLI's bundled main service to verify JWTs from the local stack. | Set by CLI |
-| `SUPABASE_INTERNAL_PUBLISHABLE_KEY` | string | CLI | Opaque API key (publishable) used internally by the CLI's bundled main service. | Set by CLI |
-| `SUPABASE_INTERNAL_SECRET_KEY` | string | CLI | Opaque API key (secret) used internally by the CLI's bundled main service. | Set by CLI |
-| `SUPABASE_JWKS` | JWKS | CLI | JSON Web Key Set (asymmetric + legacy symmetric) used by the bundled main service to verify user JWTs. | Self-hosted can derive this from `SUPABASE_URL`'s `/auth/v1/.well-known/jwks.json`. |
+| `SUPABASE_JWKS` | JWKS | Both | JSON Web Key Set (asymmetric + legacy symmetric) used by the bundled main service to verify user JWTs. | Self-hosted can derive this from `SUPABASE_URL`'s `/auth/v1/.well-known/jwks.json`. |
 | `SUPABASE_PUBLIC_URL` | URL | Self-hosted | External/public URL of the Supabase project. Injected for user functions. | Injected for user functions |
 | `SUPABASE_PUBLISHABLE_KEYS` | JSON | Self-hosted | JSON map of opaque publishable API keys (new asymmetric-key format). | Injected for user functions |
 | `SUPABASE_SECRET_KEYS` | JSON | Self-hosted | JSON map of opaque secret API keys (new asymmetric-key format). Never expose to client code. | Injected for user functions |
@@ -1239,7 +1243,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Analytics
 
-> The `analytics` container runs [logflare/logflare](https://github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
+> The `analytics` container runs [logflare/logflare](https://github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.logs.yml`, the optional override that adds the `analytics` and `vector` containers. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
 > **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) **are reachable by default**. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them.
 >
@@ -1251,11 +1255,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_SINGLE_TENANT` | boolean | Both | Run Logflare in single-tenant mode (no per-tenant isolation, no signup flow). | Default: `true`. Self-hosted: `true` |
+| `LOGFLARE_SINGLE_TENANT` | boolean | Both | Run Logflare in single-tenant mode (no per-tenant isolation, no signup flow). | Default: `false`. Self-hosted: `true` |
 | `LOGFLARE_SUPABASE_MODE` | boolean | Both | Enable the Supabase preset: auto-creates the default source, wires the `analytics` container to the Supabase stack. | Default: `false`. Self-hosted: `true` |
-| `LOGFLARE_PUBLIC_ACCESS_TOKEN` | string | Both | Public API token used by ingestion clients (e.g. the `vector` container) to push log events. Falls back to `LOGFLARE_API_KEY`. | Required in single-tenant mode |
+| `LOGFLARE_PUBLIC_ACCESS_TOKEN` | string | Self-hosted | Public API token used by ingestion clients (e.g. the `vector` container) to push log events. Falls back to `LOGFLARE_API_KEY`. | Required in single-tenant mode |
 | `LOGFLARE_PRIVATE_ACCESS_TOKEN` | string | Both | Private API token used by Studio server-side (and the management API) to query logs and run analytics endpoints. | Required in single-tenant mode |
-| `LOGFLARE_FEATURE_FLAG_OVERRIDE` | string | Both | Comma-separated `key=value` pairs overriding feature flags at boot. Self-hosted sets `multibackend=true` so the Postgres backend is reachable. | E.g. `multibackend=true` |
+| `LOGFLARE_FEATURE_FLAG_OVERRIDE` | string | Both | Comma-separated `key=value` pairs overriding feature flags at boot (lowercased). Self-hosted sets `multibackend=true`, which shows the backend management UI in Logflare's own web pages; the Postgres backend itself is selected by `POSTGRES_BACKEND_URL`. | E.g. `multibackend=true` |
 | `LOGFLARE_NODE_HOST` | string | Both | Hostname used to form the Erlang `RELEASE_NODE` (`<name>@<host>`). The single-node default is fine for most self-hosted setups. | Default: `127.0.0.1`. |
 | `LOGFLARE_API_KEY` | string | | Legacy fallback name for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | Deprecated; prefer `LOGFLARE_PUBLIC_ACCESS_TOKEN` |
 
@@ -1266,85 +1270,92 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `DB_HOSTNAME` | string | Both | Hostname for Logflare's metadata Postgres. | Self-hosted: from `POSTGRES_HOST` |
-| `DB_PORT` | integer | Both | Port for Logflare's metadata Postgres. | Self-hosted: from `POSTGRES_PORT` |
+| `DB_PORT` | integer | Both | Port for Logflare's metadata Postgres. | Default: `5432`. Self-hosted: from `POSTGRES_PORT` |
 | `DB_DATABASE` | string | Both | Database name for Logflare's metadata Postgres. | Self-hosted: `_supabase` |
 | `DB_SCHEMA` | string | Both | Postgres schema used for Logflare metadata tables (set as `search_path`). | Self-hosted: `_analytics` |
 | `DB_USERNAME` | string | Both | Postgres user for Logflare's metadata connection. | Self-hosted: `supabase_admin` |
 | `DB_PASSWORD` | string | Both | Postgres password for the metadata connection. | Self-hosted: from `POSTGRES_PASSWORD` |
-| `DB_POOL_SIZE` | integer (count) | Self-hosted | Ecto connection pool size for the metadata Postgres. | Default: `10` |
-| `DB_SSL` | boolean | Self-hosted | Enable SSL/TLS for the metadata Postgres connection (requires cert files). | Default: `false` |
+| `DB_URL` | URL | | Connection URI for Logflare's metadata Postgres (`postgres://user:pass@host:port/db`). Values in the URI override the matching `DB_HOSTNAME`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE`; variables the URI omits stay in effect. | Query params: `ssl`, `pool_size`, `auth` (`password` or `aws_iam`), `aws_region`. Self-hosted uses the individual `DB_*` variables instead |
+| `DB_POOL_SIZE` | integer (count) | | Ecto connection pool size for the metadata Postgres. | Default: `10` |
+| `DB_SSL` | boolean | | Enable TLS 1.2/1.3 with server certificate verification for the metadata Postgres connection. Takes effect only if the files at `DB_SSL_CA_CERT_PATH`, `DB_SSL_CLIENT_CERT_PATH` and `DB_SSL_CLIENT_KEY_PATH` all exist; otherwise the connection stays unencrypted. | Default: `false` |
+| `DB_SSL_CA_CERT_PATH` | path | | CA certificate used to verify the metadata Postgres server when `DB_SSL=true`. | Default: `db-server-ca.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `DB_SSL_CLIENT_CERT_PATH` | path | | Client certificate presented to the metadata Postgres when `DB_SSL=true`. | Default: `db-client-cert.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `DB_SSL_CLIENT_KEY_PATH` | path | | Private key for `DB_SSL_CLIENT_CERT_PATH`. | Default: `db-client-key.pem` (relative to `/opt/app/rel/logflare/bin`) |
 
 ### Postgres backend (log storage)
 
-> When `LOGFLARE_FEATURE_FLAG_OVERRIDE=multibackend=true`, Logflare stores log events in a separate Postgres backend rather than BigQuery. Self-hosted points this at the same `db` container, schema `_analytics`.
+> With `LOGFLARE_SINGLE_TENANT=true` and `POSTGRES_BACKEND_URL` set, Logflare stores log events in a Postgres backend rather than BigQuery. Self-hosted points this at the same `db` container, database `_supabase`, schema `_analytics`.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `POSTGRES_BACKEND_URL` | URL | Both | Connection URL for the Postgres log-storage backend. | Required when `multibackend=true` |
+| `POSTGRES_BACKEND_URL` | URL | Both | Connection URL for the Postgres log-storage backend. Setting it selects the Postgres backend over BigQuery. | Read only when `LOGFLARE_SINGLE_TENANT=true` |
 | `POSTGRES_BACKEND_SCHEMA` | string | Both | Schema in the Postgres backend that holds log tables. | Self-hosted: `_analytics` |
 
 ### BigQuery backend (log storage)
 
-> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` / `POSTGRES_BACKEND_SCHEMA` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` in `docker-compose.yml`, mount a `gcloud.json` service-account key, and set `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` in the `.env` file.
+> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` and `POSTGRES_BACKEND_SCHEMA` in `docker-compose.logs.yml`, uncomment `GOOGLE_PROJECT_ID`, `GOOGLE_PROJECT_NUMBER` and the `gcloud.json` service-account key volume there, and set both IDs in the `.env` file. Logflare reads the Google credentials only when the Postgres backend isn't configured.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOOGLE_PROJECT_ID` | string | Self-hosted | Google Cloud project ID hosting the BigQuery dataset. | Commented out in compose |
-| `GOOGLE_PROJECT_NUMBER` | string | Self-hosted | Numeric Google Cloud project number. | Commented out in compose |
-| `GOOGLE_DATASET_ID_APPEND` | string | Self-hosted | Suffix appended to BigQuery dataset IDs. | Default: `_default` |
-| `GOOGLE_DATASET_LOCATION` | string | Self-hosted | BigQuery dataset location (e.g. `US`, `EU`). | Default: `US` |
-| `GOOGLE_SERVICE_ACCOUNT` | string | Self-hosted | Service-account email used for BigQuery operations. | |
-| `LOGFLARE_BIGQUERY_MANAGED_SA_POOL` | integer (count) | Self-hosted | Number of managed service accounts in the BigQuery SA pool. | Default: `0` |
-| `LOGFLARE_BQ_WRITE_API_POOL_SIZE` | integer (count) | Self-hosted | Connection pool size for the BigQuery Write API. | Default: `10` |
+| `GOOGLE_PROJECT_ID` | string | Both | Google Cloud project ID hosting the BigQuery dataset. | Commented out in compose. CLI: with the BigQuery backend only |
+| `GOOGLE_PROJECT_NUMBER` | string | Both | Numeric Google Cloud project number. | Commented out in compose. CLI: with the BigQuery backend only |
+| `GOOGLE_APPLICATION_CREDENTIALS` | path | | Path to the Google service-account key file used for BigQuery. | Default: `gcloud.json` (relative to `/opt/app/rel/logflare/bin`, where the commented-out compose volume mounts it). Ignored when `GOOGLE_APPLICATION_CREDENTIALS_JSON` is set |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | JSON | | Google service-account key as inline JSON, used for BigQuery instead of a key file. | Takes precedence over `GOOGLE_APPLICATION_CREDENTIALS` |
+| `GOOGLE_DATASET_ID_APPEND` | string | CLI | Suffix appended to BigQuery dataset IDs. | Default: `_default`. CLI: `_prod` (BigQuery backend only) |
+| `GOOGLE_DATASET_LOCATION` | string | | BigQuery dataset location (e.g. `US`, `EU`). | Default: `US` |
+| `GOOGLE_SERVICE_ACCOUNT` | string | | Service-account email used for BigQuery operations. | |
+| `LOGFLARE_BIGQUERY_MANAGED_SA_POOL` | integer (count) | | Number of managed service accounts in the BigQuery SA pool. | Default: `0` |
+| `LOGFLARE_BQ_WRITE_API_POOL_SIZE` | integer (count) | | Connection pool size for the BigQuery Write API. | Default: `10` |
 
 ### Server / Phoenix endpoint
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `PHX_HTTP_PORT` | integer | Self-hosted | HTTP port the Phoenix endpoint binds to. | Default: `4000` |
-| `PHX_HTTP_IP` | string | Self-hosted | Bind IP for the HTTP endpoint. | |
-| `PHX_URL_HOST` | string | Self-hosted | External host used to build absolute URLs. | |
-| `PHX_URL_SCHEME` | string | Self-hosted | URL scheme (`http`/`https`). | |
-| `PHX_URL_PORT` | integer | Self-hosted | External URL port. | |
-| `PHX_SECRET_KEY_BASE` | string | Self-hosted | Phoenix session signing/encryption key. | Required in production; baked into the image for self-host |
-| `PHX_CHECK_ORIGIN` | string (CSV) | Self-hosted | Comma-separated list of allowed origins for CSRF check. | |
-| `PHX_LIVE_VIEW_SIGNING_SALT` | string | Self-hosted | Salt used for Phoenix LiveView token signing. | |
-| `LOGFLARE_GRPC_PORT` | integer | Self-hosted | Port for the gRPC server (used for trace ingestion / OTLP). | Default: `50051` |
-| `LOGFLARE_ENABLE_GRPC_SSL` | boolean | Self-hosted | Enable TLS for the gRPC server. | Default: `false` |
-| `LOGFLARE_ENABLE_LIVE_DASHBOARD` | boolean | Self-hosted | Expose Phoenix LiveDashboard at `/admin`. | Default: `false` |
-| `LOGFLARE_HTTP_CONNECTION_POOLS` | string (CSV) | Self-hosted | Comma-separated list of HTTP pool providers to enable. | Default: `all` |
-| `LOGFLARE_PUBSUB_POOL_SIZE` | integer (count) | Self-hosted | PubSub connection pool size. | Default: `56` |
-| `LOGFLARE_NODE_SHUTDOWN_CODE` | string | Self-hosted | Shutdown identifier code. | |
+| `PHX_HTTP_PORT` | integer | | HTTP port the Phoenix endpoint binds to. | Default: `4000` |
+| `PHX_HTTP_IP` | string | | Bind IP for the HTTP endpoint. | |
+| `PHX_URL_HOST` | string | | External host used to build absolute URLs. | |
+| `PHX_URL_SCHEME` | string | | URL scheme (`http`/`https`). | |
+| `PHX_URL_PORT` | integer | | External URL port. | |
+| `PHX_SECRET_KEY_BASE` | string | | Phoenix session signing/encryption key. | Required in production; baked into the image for self-host |
+| `PHX_CHECK_ORIGIN` | string (CSV) | | Comma-separated list of allowed origins for CSRF check. | |
+| `PHX_LIVE_VIEW_SIGNING_SALT` | string | | Salt used for Phoenix LiveView token signing. | |
+| `LOGFLARE_GRPC_PORT` | integer | | Port for the gRPC server (used for trace ingestion / OTLP). | Default: `50051` |
+| `LOGFLARE_ENABLE_GRPC_SSL` | boolean | | Enable TLS for the gRPC server. Takes effect only if the files at `LOGFLARE_TLS_CERT_PATH` and `LOGFLARE_TLS_KEY_PATH` both exist; otherwise the server stays plaintext. | Default: `false` |
+| `LOGFLARE_TLS_CERT_PATH` | path | | TLS certificate for the gRPC server when `LOGFLARE_ENABLE_GRPC_SSL=true`. | Default: `cert.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `LOGFLARE_TLS_KEY_PATH` | path | | Private key for `LOGFLARE_TLS_CERT_PATH`. | Default: `cert.key` (relative to `/opt/app/rel/logflare/bin`) |
+| `LOGFLARE_HTTP_CONNECTION_POOLS` | string (CSV) | | Comma-separated list of HTTP pool providers to enable. | Default: `all` |
+| `LOGFLARE_PUBSUB_POOL_SIZE` | integer (count) | | PubSub connection pool size. | Default: `56` |
+| `LOGFLARE_NODE_SHUTDOWN_CODE` | string | | Shared secret for `PUT /admin/shutdown`: a request whose `lf-shutdown-code` header matches it shuts down a Logflare node. | Unset: every shutdown request is rejected (401) |
 
 ### Logging
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_LOG_LEVEL` | enum | CLI | Logger level (`debug`, `info`, `warning`, `error`). | Default: `info` |
-| `LOGFLARE_LOGGER_JSON` | boolean | Self-hosted | Emit JSON-formatted log lines instead of plain text. | Default: `false` |
-| `LOGFLARE_LOGGER_BACKEND_URL` | URL | Self-hosted | URL of a remote Logflare logger backend (forwards Logflare's own logs there). | |
-| `LOGFLARE_LOGGER_BACKEND_API_KEY` | string | Self-hosted | API key for the remote logger backend. | |
-| `LOGFLARE_LOGGER_BACKEND_SOURCE_ID` | string | Self-hosted | Source ID for the remote logger backend. | |
+| `LOGFLARE_LOG_LEVEL` | enum | CLI | Logger level (`debug`, `info`, `warning`, `error`). | Default: `info`. `warn` is accepted as `warning`; other values keep the default. The image compiles out `debug` log calls |
+| `LOGFLARE_LOGGER_JSON` | boolean | | Emit JSON-formatted log lines instead of plain text. | Default: `false` |
+| `LOGFLARE_LOGGER_BACKEND_URL` | URL | | URL of a remote Logflare logger backend (forwards Logflare's own logs there). | |
+| `LOGFLARE_LOGGER_BACKEND_API_KEY` | string | | API key for the remote logger backend. | |
+| `LOGFLARE_LOGGER_BACKEND_SOURCE_ID` | string | | Source ID for the remote logger backend. | |
 
 ### Telemetry / Observability
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_OTEL_ENDPOINT` | URL | Self-hosted | OTLP collector endpoint. Presence enables tracing. | |
-| `LOGFLARE_OTEL_SAMPLE_RATIO` | number (ratio) | Self-hosted | Default sampling ratio (0.0-1.0) for OTel traces. | Default: `1.0` |
-| `LOGFLARE_OTEL_INGEST_SAMPLE_RATIO` | number (ratio) | Self-hosted | Sampling ratio for ingest-path traces (falls back to default). | |
-| `LOGFLARE_OTEL_ENDPOINT_SAMPLE_RATIO` | number (ratio) | Self-hosted | Sampling ratio for endpoint-path traces (falls back to default). | |
-| `LOGFLARE_OTEL_SOURCE_UUID` | string | Self-hosted | Source UUID header attached to OTel exports. | |
-| `LOGFLARE_OTEL_ACCESS_TOKEN` | string | Self-hosted | Access token header attached to OTel exports. | |
-| `LOGFLARE_HEALTH_MAX_MEMORY_UTILIZATION` | number (ratio) | Self-hosted | Memory utilization threshold (0.0-1.0) reported by the health check. | Default: `0.80` |
-| `LOGFLARE_ALERTS_ENABLED` | boolean | Self-hosted | Enable the alerting subsystem. | Default: `true` |
+| `LOGFLARE_OTEL_ENDPOINT` | URL | | OTLP collector endpoint. Presence enables tracing. | |
+| `LOGFLARE_OTEL_SAMPLE_RATIO` | number (ratio) | | Default sampling ratio (0.0-1.0) for OTel traces. | Default: `1.0`. Other values fail at boot |
+| `LOGFLARE_OTEL_INGEST_SAMPLE_RATIO` | number (ratio) | | Sampling ratio for ingest-path traces (falls back to default). | Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_OTEL_ENDPOINT_SAMPLE_RATIO` | number (ratio) | | Sampling ratio for endpoint-path traces (falls back to default). | Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_OTEL_SOURCE_UUID` | string | | Source UUID header attached to OTel exports. | |
+| `LOGFLARE_OTEL_ACCESS_TOKEN` | string | | Access token header attached to OTel exports. | |
+| `LOGFLARE_HEALTH_MAX_MEMORY_UTILIZATION` | number (ratio) | | Memory threshold for `/health` and `/ready`: once the BEAM's memory use divided by the host's total memory reaches it, they return 503. | Default: `0.95`. Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_ALERTS_ENABLED` | boolean | | Enable the alerting subsystem. | Default: `true` |
 
 ### Encryption
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_DB_ENCRYPTION_KEY` | string | Self-hosted | Primary base64 key used to encrypt sensitive columns. | Image fallback baked in |
-| `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` | string | Self-hosted | Previously-active key, kept for decryption during rotation. | |
+| `LOGFLARE_DB_ENCRYPTION_KEY` | string | | Primary base64 key used to encrypt sensitive columns. | Image fallback baked in |
+| `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` | string | | Previously-active key, kept for decryption during rotation. | |
 
 ---
 
@@ -1357,14 +1368,14 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `POSTGRES_PASSWORD` | string | Both | Password for the `POSTGRES_USER` superuser. Set on first boot during `initdb`. | Required unless `POSTGRES_HOST_AUTH_METHOD=trust` |
-| `POSTGRES_USER` | string | CLI | Username for the initial superuser. The Supabase image overrides this. | Default: `supabase_admin` (Supabase image) |
-| `POSTGRES_DB` | string | Both | Name of the first database to create. | Default: `postgres` |
+| `POSTGRES_USER` | string | | Username for the initial superuser. The Supabase image overrides this. | Default: `supabase_admin` (Supabase image) |
+| `POSTGRES_DB` | string | Self-hosted | Name of the first database to create. | Default: `postgres` |
 | `POSTGRES_HOST` | string | Both | Unix socket directory or hostname Postgres listens on. The Supabase image hardcodes the socket path. | Default: `/var/run/postgresql` (Supabase image) |
 | `POSTGRES_PORT` | integer | Self-hosted | TCP port Postgres listens on (Supabase migration scripts also read this). | Default: `5432` |
 | `POSTGRES_INITDB_ARGS` | string | CLI | Extra arguments passed to `initdb` (locale, encoding, etc.). | Default in CLI: `--allow-group-access --locale-provider=icu --encoding=UTF-8 --icu-locale=en_US.UTF-8` |
 | `POSTGRES_INITDB_WALDIR` | path | | Separate filesystem path used by `initdb` for the WAL directory. | When unset, WAL lives inside `PGDATA` |
 | `POSTGRES_HOST_AUTH_METHOD` | enum | | Default `pg_hba.conf` authentication method (e.g. `trust`, `scram-sha-256`). | Defaults to `scram-sha-256` (Postgres 14+) |
-| `PGDATA` | path | CLI | Data directory used by Postgres. | Default: `/var/lib/postgresql/data` |
+| `PGDATA` | path | | Data directory used by Postgres. | Default: `/var/lib/postgresql/data` |
 
 ### libpq client variables (read by Supabase migration scripts on init)
 
@@ -1383,7 +1394,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `JWT_SECRET` | string | Both | HS256 secret used by GoTrue, PostgREST, and other services to sign and verify JWTs. Not exposed to SQL; store it in [Vault](https://supabase.com/docs/guides/database/vault) if a database function needs it. | Required. Sourced from `JWT_SECRET` in `.env.example` |
+| `JWT_SECRET` | string | CLI | HS256 secret used by GoTrue, PostgREST, and other services to sign and verify JWTs. Not exposed to SQL; store it in [Vault](https://supabase.com/docs/guides/database/vault) if a database function needs it. | Required. Sourced from `JWT_SECRET` in `.env.example` |
 | `JWT_EXP` | integer (seconds) | Both | Default JWT expiry (seconds) stored as `app.settings.jwt_exp` on the `postgres` database. Read by `volumes/db/jwt.sql`. | Sourced from `JWT_EXPIRY` in `.env.example` |
 
 ---
@@ -1395,13 +1406,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ADDR_TYPE` | enum | | Socket address family for the HTTP endpoint. Must be `inet` or `inet6`. | Default: `inet` |
-| `API_JWT_SECRET` | string | Self-hosted | JWT secret used to authenticate requests to Supavisor's management API. | Self-hosted sets this to `JWT_SECRET` |
+| `API_JWT_SECRET` | string | Both | JWT secret used to authenticate requests to Supavisor's management API. | Self-hosted sets this to `JWT_SECRET` |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of API JWTs to reject. | Default: empty |
+| `APP_NAME_METRIC_ENABLED` | boolean | | Feature flag adding the client's `application_name` as an `app_name` label on the client connection metrics. | Default: `false`. Accepts `true`/`false`/`1`/`0`. A tenant's `feature_flags` overrides it |
 | `CACHE_BYPASS_USERS` | string (CSV) | | Comma-separated list of DB users that bypass the auth-query cache. | Default: empty |
+| `CHECK_SIMPLE_QUERY_PREPARE_ENABLED` | boolean | | Feature flag rejecting `PREPARE`, `EXECUTE` and `DEALLOCATE` sent over the simple query protocol in transaction mode, which supports prepared statements only through the extended query protocol. | Default: `false`. Accepts `true`/`false`/`1`/`0`. Parses every simple query, so it adds latency proportional to query size. A tenant's `feature_flags` overrides it |
+| `CLEARTEXT_AUTH_OVER_TLS_ENABLED` | boolean | | Feature flag making non-JIT clients connected over TLS authenticate with a cleartext password instead of SCRAM-SHA-256. | Default: `false` (SCRAM over TLS). Accepts `true`/`false`/`1`/`0`. Only relevant when downstream TLS is configured (`GLOBAL_DOWNSTREAM_*` / `DOWNSTREAM_SERVER_ECDSA_*`). A tenant's `feature_flags` overrides it |
 | `CLUSTER_ID` | string | | Region identifier used in the libcluster Postgres channel name. First of `CLUSTER_ID`, `LOCATION_ID`, `REGION` wins. | Only used when `CLUSTER_POSTGRES` is set |
 | `CLUSTER_NODES` | string (CSV) | | Comma-separated list of Erlang node names for static EPMD clustering. | Optional |
-| `CLUSTER_POSTGRES` | boolean | Self-hosted | Enables libcluster Postgres strategy (heartbeats via `pg_notify`). | Set to `true` to enable. Self-hosted: `true` |
-| `DATABASE_URL` | URL | Self-hosted | Ecto URL for Supavisor's metadata database (tenants, users). Also used by the Postgres clustering strategy. | Default: `ecto://postgres:postgres@localhost:6432/postgres` |
+| `CLUSTER_POSTGRES` | boolean | Both | Enables libcluster Postgres strategy (heartbeats via `pg_notify`). | Set to `true` to enable. Self-hosted: `true` |
+| `DATABASE_URL` | URL | Both | Ecto URL for Supavisor's metadata database (tenants, users). Also used by the Postgres clustering strategy. | Default: `ecto://postgres:postgres@localhost:6432/postgres` |
 | `DB_POOL_SIZE` | integer (count) | Self-hosted | Pool size for Supavisor's internal metadata Ecto repo. | Default: `25`. Self-hosted: from `POOLER_DB_POOL_SIZE` (default `5`) |
 | `DEBUG_LOAD_RUNTIME_CONFIG` | boolean | | If set, hot-upgrade loads `config/runtime.exs` from CWD instead of the release dir. | Debug only |
 | `DNS_POLL` | string | | DNS name to poll for libcluster `DNSPoll` strategy. | Optional |
@@ -1418,15 +1432,14 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `LOGFLARE_SOURCE_ID` | string | | Logflare source ID. Required when `LOGS_ENGINE=logflare`. | Required when `LOGS_ENGINE=logflare`; optional otherwise |
 | `LOGS_ENGINE` | string | | Logging backend. Set to `logflare` to enable the Logflare HTTP logger backend. | Optional |
 | `MAX_CONNECTIONS` | integer (count) | | Max concurrent connections accepted by the HTTP endpoint and Ranch proxy listeners. | Default: `1000` (HTTP), `:infinity` (proxy listeners) |
-| `METRICS_DISABLED` | boolean | | If `true`, disables Prometheus metrics children (PromEx, TenantsMetrics, MetricsCleaner). | Default: `false` |
-| `METRICS_JWT_SECRET` | string | Self-hosted | JWT secret used to authenticate requests to the metrics endpoint. | Self-hosted sets this to `JWT_SECRET` |
+| `METRICS_JWT_SECRET` | string | Both | JWT secret used to authenticate requests to the metrics endpoint. | Self-hosted sets this to `JWT_SECRET` |
 | `METRICS_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of metrics JWTs to reject. | Default: empty |
-| `NAMED_PREPARED_STATEMENTS_ENABLED` | boolean | | Feature flag enabling named prepared statement support in transaction mode. | Default: `false`. Accepts `true`/`false`/`1`/`0` |
+| `NAMED_PREPARED_STATEMENTS_ENABLED` | boolean | | Feature flag enabling named prepared statement support in transaction mode. | Default: `false`. Accepts `true`/`false`/`1`/`0`. A tenant's `feature_flags` overrides it |
 | `NODE_IP` | string | | IP address used to build the Erlang `RELEASE_NODE` (`<name>@<ip>`). Also stored as `node_host` in app config. | Default: `127.0.0.1`. In Fly, falls back to the `fly-local-6pn` entry in `/etc/hosts` |
 | `NODE_NAME` | string | | Erlang node basename. Used as `<name>@<ip>` for the release node. | Falls back to `FLY_APP_NAME`, then `supavisor` |
 | `NO_WARM_POOL_USERS` | string (CSV) | | Comma-separated list of DB users for which Supavisor should not pre-warm a pool. | Default: empty |
 | `NUM_ACCEPTORS` | integer (count) | | Number of acceptor processes per Ranch listener (HTTP endpoint and proxy listeners). | Default: `100` |
-| `PORT` | integer | Self-hosted | HTTP port for the Phoenix endpoint (health, metrics, management API). | Default: `4000`. Self-hosted: `4000` |
+| `PORT` | integer | Both | HTTP port for the Phoenix endpoint (health, metrics, management API). | Default: `4000`. Self-hosted: `4000` |
 | `POOLER_DEFAULT_POOL_SIZE` | integer (count) | Self-hosted | Default upstream pool size for the bootstrapped tenant. Read by the self-hosted `pooler.exs` provisioning script. | Configured via pooler.exs |
 | `POOLER_MAX_CLIENT_CONN` | integer (count) | Self-hosted | Maximum client connections for the bootstrapped tenant. Read by the self-hosted `pooler.exs` provisioning script. | Configured via pooler.exs |
 | `POOLER_POOL_MODE` | enum | Self-hosted | Pool mode for the bootstrapped tenant's user (`transaction` or `session`). Read by the self-hosted `pooler.exs` provisioning script. | Configured via pooler.exs. Self-hosted hard-codes `transaction` |
@@ -1436,21 +1449,21 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `POSTGRES_PASSWORD` | string | Self-hosted | Tenant Postgres password for the `pgbouncer` auth user. Read by the self-hosted `pooler.exs` provisioning script. | Configured via pooler.exs |
 | `POSTGRES_PORT` | integer | Self-hosted | Tenant Postgres port. Read by the self-hosted `pooler.exs` provisioning script and used to map the session-mode listener port. | Configured via pooler.exs |
 | `PROM_POLL_RATE` | integer (ms) | | Prometheus metrics poll interval in milliseconds. | Default: `15000` |
-| `PROXY_PORT` | integer | | Generic Postgres proxy listener port (mode: `proxy`). | Default: `5412` |
-| `PROXY_PORT_SESSION` | integer | | Postgres session-mode proxy listener port. | Default: `5432` |
-| `PROXY_PORT_TRANSACTION` | integer | | Postgres transaction-mode proxy listener port. | Default: `6543` |
-| `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset (Supavisor builds `supavisor_<region>_<maj>_<min>`). | Falls back to `FLY_REGION`. Self-hosted: `local` |
+| `PROXY_PORT_SESSION` | integer | CLI | Postgres session-mode proxy listener port. | Default: `5432` |
+| `PROXY_PORT_TRANSACTION` | integer | CLI | Postgres transaction-mode proxy listener port. | Default: `6543` |
+| `REGION` | string | Both | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset (Supavisor builds `supavisor_<region>_<maj>_<min>`). | Falls back to `FLY_REGION`. Self-hosted: `local` |
 | `RELEASE_COOKIE` | string | | Erlang distribution cookie. Read by the release scripts. | Optional |
 | `RELEASE_DISTRIBUTION` | string | | Erlang release distribution mode. Set to `name` by `rel/env.sh.eex`. | Default: `name` |
 | `RELEASE_NODE` | string | | Erlang release node name (`<NODE_NAME>@<NODE_IP>`). Set by `rel/env.sh.eex`. | Computed at startup |
 | `RELEASE_ROOT` | path | | Release root directory. Used to locate `runtime.exs` during hot upgrades. | Set by the release scripts |
-| `RLIMIT_NOFILE` | integer (count) | | Open-file descriptor limit applied by the container entrypoint (`limits.sh`). | Default: `100000` (baked into image) |
-| `SECRET_KEY_BASE` | string | Self-hosted | Phoenix endpoint secret used to sign/encrypt session and CSRF tokens. | Required in non-dev/test envs |
+| `RLIMIT_NOFILE` | integer (count) | CLI | Open-file descriptor limit applied by the container entrypoint (`limits.sh`). | Default: `100000` (baked into image) |
+| `SECRET_KEY_BASE` | string | Both | Phoenix endpoint secret used to sign/encrypt session and CSRF tokens. | Required in non-dev/test envs |
 | `SESSION_PROXY_PORTS` | string (CSV) | | Comma-separated list of additional internal session-mode proxy listener ports. | Default: `12100,12101,12102,12103` |
-| `SUBSCRIBE_RETRIES` | integer (count) | | Number of retries when subscribing to a tenant pool. | Default: `20` |
-| `SUPAVISOR_DB_IP_VERSION` | enum | | Socket family for upstream Postgres connections. Set to `ipv6` to use `inet6`. | Default: `ipv4` (`inet`) |
+| `SUPAVISOR_DB_IP_VERSION` | enum | | Socket family for the connection to Supavisor's metadata database (`DATABASE_URL`) and for the libcluster Postgres strategy. `ipv6` uses `inet6`, `ipv4` uses `inet`. | Default: auto-detected from the `DATABASE_URL` host (IPv4 literal or a hostname that resolves over IPv4: `inet`; otherwise `inet6`). Any other value also auto-detects. Tenant upstream connections use the tenant's own `ip_version` instead |
+| `SUPAVISOR_LOG_BURST_LIMIT_ENABLE` | boolean | | Enables burst-limit overload protection on the default logger handler: log events beyond `SUPAVISOR_LOG_BURST_LIMIT_MAX_COUNT` per `SUPAVISOR_LOG_BURST_LIMIT_WINDOW_TIME` are dropped. | Default: `true`. Only `true`/`1` enable it; any other set value disables it |
+| `SUPAVISOR_LOG_BURST_LIMIT_MAX_COUNT` | integer (count) | | Max log events the default logger handler writes per burst-limit window. | Default: `500` |
+| `SUPAVISOR_LOG_BURST_LIMIT_WINDOW_TIME` | integer (ms) | | Length of the logger burst-limit window. | Default: `1000` |
 | `SUPAVISOR_LOG_FILE_PATH` | path | | If set, the default logger writes logs to this file (rotated, 8 MiB each, 5 files). | Optional |
 | `SUPAVISOR_LOG_FORMAT` | enum | | Set to `json` to emit logs in Logflare JSON format. | Optional |
-| `SWITCH_ACTIVE_COUNT` | integer (count) | | Number of activity ticks before a pool is switched out. | Default: `100` |
 | `TRANSACTION_PROXY_PORTS` | string (CSV) | | Comma-separated list of additional internal transaction-mode proxy listener ports. | Default: `12104,12105,12106,12107` |
-| `VAULT_ENC_KEY` | string | Self-hosted | AES.GCM encryption key for the Cloak vault used to encrypt tenant credentials at rest. | Required |
+| `VAULT_ENC_KEY` | string | Both | AES.GCM encryption key for the Cloak vault used to encrypt tenant credentials at rest. | Required |
