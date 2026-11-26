@@ -61,6 +61,8 @@ const rewrites = [
     source: '/migrate/instantdb/:path*',
     destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
   },
+  // Builder Day: the event site runs as its own Next.js app with basePath '/builderday'
+  ...zoneRewrites('/builderday', 'https://hackday-seven.vercel.app/builderday'),
 
   {
     source: '/new-docs',
