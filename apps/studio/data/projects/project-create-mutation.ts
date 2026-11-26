@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
