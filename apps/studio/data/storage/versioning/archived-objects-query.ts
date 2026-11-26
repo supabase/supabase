@@ -3,6 +3,7 @@ import { components } from 'api-types'
 
 import { storageKeys } from '../keys'
 import type { ObjectVersionAction } from './object-versions-query'
+import { compareNewestVersionFirst } from './version-order'
 import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -67,7 +68,7 @@ export const toArchivedObjects = (objects: StorageObjectV2[]): ArchivedObject[] 
   const archived: ArchivedObject[] = []
 
   for (const [path, rows] of byPath) {
-    const sorted = [...rows].sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    const sorted = [...rows].sort(compareNewestVersionFirst)
     const current = sorted.find((row) => !row.archived_at)
     if (!current?.is_delete_marker) continue
 

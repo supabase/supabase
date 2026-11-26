@@ -51,7 +51,7 @@ describe('toObjectVersions', () => {
 
   it('labels delete markers and does not count them as the initial upload', () => {
     const versions = toObjectVersions([
-      object({ version: 'upload', created_at: '2026-01-01T00:00:00Z' }),
+      object({ version: 'upload', created_at: '2026-01-01T00:00:00Z', archived_at: '2026-02-01' }),
       object({
         version: 'marker',
         created_at: '2026-02-01T00:00:00Z',
