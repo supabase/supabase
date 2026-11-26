@@ -102,6 +102,12 @@ to authenticated
 using ( (select auth.jwt()->>'sub') = owner_id );
 ```
 
+<Admonition type="caution">
+
+The two examples above compare the JWT `sub` claim directly. If you trust more than one issuer, see the multi-issuer caveat in [Ownership](/docs/guides/storage/security/ownership#access-control).
+
+</Admonition>
+
 Allow anyone to access objects in the `avatars` bucket via publishable key. The `allow_any_operation()` filter is critical here as without it users would be able to list the bucket contents.
 
 <Admonition type="note">
