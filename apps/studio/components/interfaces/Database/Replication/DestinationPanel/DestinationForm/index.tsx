@@ -486,7 +486,7 @@ export const DestinationForm = ({
             <fieldset disabled={!isExistingConfigReady} className="contents">
               {shouldShowConnectionSection && (
                 <>
-                  <PipelineConnectionSection type={selectedType} form={form}>
+                  <PipelineConnectionSection type={selectedType} form={form} clusterId={clusterId}>
                     {destinationFields}
                   </PipelineConnectionSection>
                   <DialogSectionSeparator />
@@ -494,6 +494,7 @@ export const DestinationForm = ({
               )}
               {shouldShowConnectionSection ? (
                 <PipelineDataSection
+                  clusterId={clusterId}
                   type={selectedType}
                   form={form}
                   onSelectNewPublication={() => setPublicationPanelVisible(true)}
@@ -540,7 +541,11 @@ export const DestinationForm = ({
               {shouldShowConnectionSection && (
                 <>
                   <DialogSectionSeparator />
-                  <PipelineDestinationReview type={selectedType} control={form.control} />
+                  <PipelineDestinationReview
+                    type={selectedType}
+                    control={form.control}
+                    clusterId={clusterId}
+                  />
                   <DialogSectionSeparator />
                   <PipelineDataReview
                     type={selectedType}
@@ -548,7 +553,11 @@ export const DestinationForm = ({
                     publication={selectedPublication}
                   />
                   <DialogSectionSeparator />
-                  <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                  <PipelineReviewCosts
+                    control={form.control}
+                    publication={selectedPublication}
+                    clusterId={clusterId}
+                  />
                 </>
               )}
 

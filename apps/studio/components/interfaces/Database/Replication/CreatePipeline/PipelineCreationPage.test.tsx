@@ -114,7 +114,12 @@ const renderPage = ({
     url: `/project/default/database/pipelines/new${clusterId ? `?cluster_id=${clusterId}` : ''}`,
     renderOptions: {
       wrapper: ({ children }) => (
-        <CustomWrapper queryClient={queryClient}>{children}</CustomWrapper>
+        <CustomWrapper
+          queryClient={queryClient}
+          nuqs={{ searchParams: clusterId ? { cluster_id: clusterId } : undefined }}
+        >
+          {children}
+        </CustomWrapper>
       ),
     },
   })
@@ -198,8 +203,27 @@ it('returns through the shared router without reloading the toast host', async (
 })
 
 it('returns to the combined list when closing a regional wizard', async () => {
+  const requestedClusters: Array<string | null> = []
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: ({ request }) => {
+      requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+      return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+        sources: [
+          {
+            id: 42,
+            name: 'default',
+            tenant_id: 'tenant',
+            config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
+          },
+        ],
+      })
+    },
+  })
   await renderPage({ clusterId: 'eu-west-1' })
   fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
+  expect(requestedClusters).toContain('eu-west-1')
   expect(state.navigate).toHaveBeenCalledWith({
     ...pipelinesList,
   })

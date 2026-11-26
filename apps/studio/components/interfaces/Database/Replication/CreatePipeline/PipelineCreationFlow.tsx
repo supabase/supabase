@@ -257,7 +257,11 @@ export const PipelineCreationFlow = ({
                     validationFailures={pipelineValidationFailures}
                   />
                   <Separator />
-                  <PipelineReviewCosts control={form.control} publication={publication} />
+                  <PipelineReviewCosts
+                    control={form.control}
+                    publication={publication}
+                    clusterId={clusterId}
+                  />
                   <div role="status" aria-label="Pipeline validation status">
                     {submissionFailures.length > 0 && (
                       <Admonition
