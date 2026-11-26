@@ -1,4 +1,4 @@
-import { RouterContextProvider } from '@tanstack/react-router'
+import { createRootRoute, createRoute, RouterContextProvider } from '@tanstack/react-router'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useState, type ReactNode } from 'react'
@@ -12,10 +12,7 @@ import { createTestRouter } from '@/tests/lib/custom-render'
 
 const { mockRoute, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
   () => ({
-    mockRoute: {
-      pattern: '/project/$ref/observability/query-performance',
-      url: '/project/default/observability/query-performance',
-    },
+    mockRoute: { url: '/project/default/observability/query-performance' },
     mockSetSelectedDatabaseId: vi.fn(),
     mockSetMobileMenuOpen: vi.fn(),
     mockViewport: { isMobile: false },
@@ -47,10 +44,6 @@ const {
   },
   mockBannerDismissedState: { current: false },
   mockUseLocalStorageQuery: vi.fn(),
-}))
-
-vi.mock('@/hooks/misc/useRoutePattern', () => ({
-  useRoutePattern: () => mockRoute.pattern,
 }))
 
 vi.mock('common', () => ({
@@ -268,8 +261,20 @@ const ResourceMenuHarness = () => {
   )
 }
 
-const renderWithRouter = (ui: ReactNode) => {
-  const router = createTestRouter(mockRoute.url)
+const createProjectRouter = async () => {
+  const rootRoute = createRootRoute()
+  const routes = [
+    '/project/$ref',
+    '/project/$ref/branches',
+    '/project/$ref/observability/query-performance',
+  ].map((path) => createRoute({ getParentRoute: () => rootRoute, path }))
+  const router = createTestRouter(mockRoute.url, rootRoute.addChildren(routes))
+  await router.load()
+  return router
+}
+
+const renderWithRouter = async (ui: ReactNode) => {
+  const router = await createProjectRouter()
   return render(<RouterContextProvider router={router}>{ui}</RouterContextProvider>)
 }
 
@@ -285,7 +290,6 @@ const renderLayout = () =>
 describe('ProjectLayout title', () => {
   beforeEach(() => {
     mockViewport.isMobile = false
-    mockRoute.pattern = '/project/$ref/observability/query-performance'
     mockRoute.url = '/project/default/observability/query-performance'
     document.title = ''
     mockProjectState.current = {
@@ -308,9 +312,9 @@ describe('ProjectLayout title', () => {
     document.title = ''
   })
 
-  it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
+  it('updates the open mobile menu when resource navigation changes without replacing other sheets', async () => {
     mockViewport.isMobile = true
-    renderWithRouter(
+    await renderWithRouter(
       <MobileSheetProvider>
         <ResourceMenuHarness />
         <MobileSheetHarness />
@@ -330,8 +334,8 @@ describe('ProjectLayout title', () => {
 
   it.each([false, true])(
     'keeps sidebar navigation enabled with resizableSidebar=%s and preserves handle availability',
-    (resizableSidebar) => {
-      renderWithRouter(
+    async (resizableSidebar) => {
+      await renderWithRouter(
         <MobileSheetProvider>
           <ProjectLayout
             product="Database"
@@ -361,7 +365,7 @@ describe('ProjectLayout title', () => {
   )
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
-    renderWithRouter(
+    await renderWithRouter(
       <MobileSheetProvider>
         <ProjectLayout browserTitle={{ section: 'Settings' }} product="Settings" isBlocking={false}>
           <div>Page Content</div>
@@ -377,7 +381,7 @@ describe('ProjectLayout title', () => {
   })
 
   it('prefers entity-first browserTitle metadata when provided', async () => {
-    renderWithRouter(
+    await renderWithRouter(
       <MobileSheetProvider>
         <ProjectLayout
           product="Database"
@@ -398,13 +402,13 @@ describe('ProjectLayout title', () => {
     })
   })
 
-  it('renders the Stripe project banner with a project-specific dismiss key when the selected project is Stripe-connected', () => {
+  it('renders the Stripe project banner with a project-specific dismiss key when the selected project is Stripe-connected', async () => {
     mockProjectState.current = {
       ...mockProjectState.current,
       integration_source: 'stripe_projects',
     }
 
-    renderLayout()
+    await renderLayout()
 
     expect(screen.getByText('This project is connected to Stripe')).toBeInTheDocument()
     expect(
@@ -417,20 +421,19 @@ describe('ProjectLayout title', () => {
     )
   })
 
-  it('renders the paused state for a paused project', () => {
+  it('renders the paused state for a paused project', async () => {
     mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
 
-    renderLayout()
+    await renderLayout()
 
     expect(screen.getByText('Project paused')).toBeInTheDocument()
   })
 
-  it('renders the branches page instead of the paused state for a paused project', () => {
+  it('renders the branches page instead of the paused state for a paused project', async () => {
     mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
-    mockRoute.pattern = '/project/$ref/branches'
     mockRoute.url = '/project/default/branches'
 
-    renderLayout()
+    await renderLayout()
 
     expect(screen.queryByText('Project paused')).not.toBeInTheDocument()
   })
@@ -438,7 +441,6 @@ describe('ProjectLayout title', () => {
 
 describe('FREE_MICRO_UPGRADE banner', () => {
   beforeEach(() => {
-    mockRoute.pattern = '/project/$ref'
     mockRoute.url = '/project/default'
     mockProjectState.current = {
       ref: 'default',
@@ -452,7 +454,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   afterEach(() => {
-    mockRoute.pattern = '/project/$ref/observability/query-performance'
     mockRoute.url = '/project/default/observability/query-performance'
     mockProjectState.current = {
       ref: 'default',
@@ -467,7 +468,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   it('calls addBanner when a paid-plan project is nano', async () => {
-    renderLayout()
+    await renderLayout()
 
     await waitFor(() => {
       expect(mockAddBanner).toHaveBeenCalledWith(
@@ -504,7 +505,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   ])('calls dismissBanner instead of addBanner when %s', async (_, arrange) => {
     arrange()
 
-    renderLayout()
+    await renderLayout()
 
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { getAccessToken } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -20,6 +20,7 @@ import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
@@ -70,7 +71,7 @@ export const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const routePattern = useRoutePattern()
   const queryClient = useQueryClient()
   const statusBanner = useStatusBanner({ signedOut: true })
   const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
@@ -117,11 +118,11 @@ export const SignInLayout = ({
 
           if (data) {
             // we're already where we need to be
-            if (pathname === '/sign-in-recovery-code') {
+            if (routePattern === '/sign-in-recovery-code') {
               return
             }
             // we're already where we need to be
-            if (pathname === '/sign-in-mfa') {
+            if (routePattern === '/sign-in-mfa') {
               return
             }
             if (data.currentLevel !== data.nextLevel) {
