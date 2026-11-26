@@ -5,6 +5,9 @@ import { Route } from '@/routes/api/platform/storage/$ref/vector-buckets/index'
 import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
+type CreateVectorBucketResponse = Record<string, never>
+type StorageVectorsErrorResponse = { message: string; code: string }
+
 const SUPABASE_URL = 'http://supabase.test'
 
 describe('/api/platform/storage/$ref/vector-buckets', () => {
@@ -22,7 +25,7 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
     mswServer.use(
       http.post(`${SUPABASE_URL}/storage/v1/vector/CreateVectorBucket`, async ({ request }) => {
         receivedBodies.push(await request.json())
-        return HttpResponse.json({ vectorBucketName: 'embeddings' })
+        return HttpResponse.json<CreateVectorBucketResponse>({})
       })
     )
 
@@ -40,13 +43,13 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
 
     expect(receivedBodies).toEqual([{ vectorBucketName: 'embeddings' }])
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ vectorBucketName: 'embeddings' })
+    expect(await response.json()).toEqual({})
   })
 
   it('returns 400 when upstream createBucket fails', async () => {
     mswServer.use(
       http.post(`${SUPABASE_URL}/storage/v1/vector/CreateVectorBucket`, () =>
-        HttpResponse.json(
+        HttpResponse.json<StorageVectorsErrorResponse>(
           { message: 'Bucket already exists', code: 'ConflictException' },
           { status: 409 }
         )
@@ -78,7 +81,7 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
     mswServer.use(
       http.post(`${SUPABASE_URL}/storage/v1/vector/CreateVectorBucket`, () => {
         upstreamSpy()
-        return HttpResponse.json({})
+        return HttpResponse.json<CreateVectorBucketResponse>({})
       })
     )
 
