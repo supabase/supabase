@@ -56,6 +56,26 @@ describe('api/self-hosted/generate-types', () => {
       expect(callUrl).not.toContain('excluded_schemas=')
     })
 
+    it('should request types for the given schemas instead of the configured exposed schemas', async () => {
+      mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
+
+      await generateTypescriptTypes({ headers: {}, schemas: ['public', 'private'] })
+
+      const callUrl = new URL(mockFetchGet.mock.lastCall![0])
+      expect(callUrl.origin + callUrl.pathname).toBe('http://localhost:8080/generators/typescript')
+      expect(callUrl.searchParams.get('included_schemas')).toBe('public,private')
+    })
+
+    it('should not let a schema name add or alter query parameters', async () => {
+      mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
+
+      await generateTypescriptTypes({ headers: {}, schemas: ['a&excluded_schemas=public'] })
+
+      const { searchParams } = new URL(mockFetchGet.mock.lastCall![0])
+      expect(searchParams.get('included_schemas')).toBe('a&excluded_schemas=public')
+      expect(searchParams.has('excluded_schemas')).toBe(false)
+    })
+
     it('should pass headers to fetchGet', async () => {
       mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
 
