@@ -81,7 +81,11 @@ export const StorageBucketsLayout = ({
             <NavMenu>
               {navigationItems.map((item) => (
                 <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link to={item.to} params={{ ref: ref ?? '' }}>
+                  <Link
+                    to={item.to}
+                    params={{ ref: ref ?? '' }}
+                    activeOptions={{ exact: true, includeSearch: false }}
+                  >
                     {item.label}
                   </Link>
                 </NavMenuItem>

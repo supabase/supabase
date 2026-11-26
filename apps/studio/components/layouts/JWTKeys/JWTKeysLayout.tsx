@@ -47,7 +47,11 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
         <NavMenu>
           {navigationItems.map((item) => (
             <NavMenuItem key={item.id} active={pathname === item.href}>
-              <Link to={item.to} params={{ ref: projectRef ?? '' }}>
+              <Link
+                to={item.to}
+                params={{ ref: projectRef ?? '' }}
+                activeOptions={{ exact: true, includeSearch: false }}
+              >
                 {item.label}
               </Link>
             </NavMenuItem>
