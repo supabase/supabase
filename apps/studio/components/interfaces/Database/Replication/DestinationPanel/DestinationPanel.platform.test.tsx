@@ -12,7 +12,6 @@ import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
-import { createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -44,7 +43,17 @@ const mockProject = (region?: string) =>
             { status: 500 }
           )
         : HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
-            ...createMockProject({ ref: 'default', region }),
+            cloud_provider: 'AWS',
+            id: 1,
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            is_branch_enabled: false,
+            is_physical_backups_enabled: false,
+            name: 'Project',
+            organization_id: 1,
+            ref: 'default',
+            region,
+            status: 'ACTIVE_HEALTHY',
+            subscription_id: 'subscription-1',
             connectionString: null,
             db_host: 'db.default.supabase.co',
             high_availability: false,
