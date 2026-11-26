@@ -22,7 +22,7 @@ export function DirectDatabaseAccessPreview({
         <p className="text-sm text-foreground">Table data</p>
         <p className="text-xs text-foreground-light">
           {isDisabled
-            ? 'Only organization-bound apps can request direct database access.'
+            ? 'Direct database access needs approval from an organization owner. Create an app with “Use the permissions of the person who connects” turned off.'
             : 'Connect directly to Postgres to access table data using your app’s access token.'}
         </p>
       </div>
