@@ -67,7 +67,7 @@ describe('DestinationTypeSelection', () => {
     mockCreationPreview.mockReturnValue(true)
     mockBigQueryEnabled.mockReturnValue(true)
     mockDucklakeEnabled.mockReturnValue(true)
-    customRender(<DestinationTypeSelection />)
+    customRender(<DestinationTypeSelection clusterId={undefined} />)
     expect(await screen.findByRole('radiogroup', { name: 'Destination type' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('DestinationTypeSelection', () => {
   })
 
   test('shows placeholder when no type is selected', async () => {
-    customRender(<DestinationTypeSelection />)
+    customRender(<DestinationTypeSelection clusterId={undefined} />)
 
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
   })
@@ -87,7 +87,7 @@ describe('DestinationTypeSelection', () => {
     mockSnowflakeEnabled.mockReturnValue(true)
     mockClickHouseEnabled.mockReturnValue(true)
 
-    customRender(<DestinationTypeSelection />)
+    customRender(<DestinationTypeSelection clusterId={undefined} />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
@@ -101,7 +101,7 @@ describe('DestinationTypeSelection', () => {
   })
 
   test('hides destinations behind disabled feature flags', async () => {
-    customRender(<DestinationTypeSelection />)
+    customRender(<DestinationTypeSelection clusterId={undefined} />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
@@ -116,7 +116,7 @@ describe('DestinationTypeSelection', () => {
       mockSnowflakeEnabled.mockReturnValue(true)
       mockClickHouseEnabled.mockReturnValue(true)
 
-      customRender(<DestinationTypeSelection />)
+      customRender(<DestinationTypeSelection clusterId={undefined} />)
 
       fireEvent.click(await screen.findByRole('combobox'))
       fireEvent.click(await screen.findByText(destination))
@@ -154,7 +154,9 @@ describe('DestinationTypeSelection', () => {
       })
 
       // ?edit=1 locks the type to the existing destination
-      customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
+      customRender(<DestinationTypeSelection clusterId={undefined} />, {
+        nuqs: { searchParams: { edit: '1' } },
+      })
 
       expect(await screen.findByRole('combobox')).toBeDisabled()
     }

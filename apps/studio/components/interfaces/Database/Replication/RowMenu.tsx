@@ -38,7 +38,6 @@ import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -46,6 +45,8 @@ import {
 
 interface RowMenuProps {
   destinationId: number
+  /** The cluster this pipeline belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   destinationType: ReplicationDestinationType | undefined
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
@@ -59,6 +60,7 @@ interface RowMenuProps {
 
 export const RowMenu = ({
   destinationId,
+  clusterId,
   destinationType,
   pipeline,
   pipelineStatus,
@@ -70,7 +72,6 @@ export const RowMenu = ({
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const statusName = getStatusName(pipelineStatus)
 
   const [, setEdit] = useQueryState(
@@ -83,7 +84,9 @@ export const RowMenu = ({
   const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
   const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
   const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
-  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus({
+    clusterId,
+  })
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None

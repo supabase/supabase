@@ -15,7 +15,6 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface DisablePipelinesDialogProps {
   canConfirm?: boolean
@@ -29,7 +28,6 @@ export const DisablePipelinesDialog = ({
   canConfirm = true,
 }: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const [error, setError] = useState<string | null>(null)
 
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
@@ -47,7 +45,7 @@ export const DisablePipelinesDialog = ({
 
     try {
       if (!projectRef) throw new Error('Project ref is required')
-      await deleteReplicationTenant({ projectRef, clusterId })
+      await deleteReplicationTenant({ projectRef })
     } catch (error) {
       setError(
         error instanceof Error

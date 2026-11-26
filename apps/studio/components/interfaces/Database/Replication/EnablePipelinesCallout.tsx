@@ -21,19 +21,25 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type EnablePipelinesModalProps =
   | { open: boolean; onOpenChange: (open: boolean) => void; onSuccess?: () => void }
   | { open?: never; onOpenChange?: never; onSuccess?: () => void }
 
+// [Joshen] Open question - why does enable pipelines modal need cluster ID?
+// We show this UI in either the Destinations list or within the Destination Panel
+// both of which pass clusterId differently (undefined for the former). Why is this so?
+
 export const EnablePipelinesModal = ({
   open: extOpen,
+  clusterId,
   onOpenChange,
   onSuccess,
-}: EnablePipelinesModalProps) => {
+}: EnablePipelinesModalProps & {
+  /** The cluster to enable Pipelines on. `undefined` (the default) means the default cluster. */
+  clusterId?: string
+}) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const [_open, _setOpen] = useState(false)
 
   const open = extOpen ?? _open
@@ -122,7 +128,14 @@ export const EnablePipelinesModal = ({
   )
 }
 
-export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null }) => {
+export const EnablePipelinesCallout = ({
+  type,
+  clusterId,
+}: {
+  type?: DestinationType | null
+  /** The cluster to enable Pipelines on. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}) => {
   const { hasAccess } = useCheckEntitlements('replication.etl')
 
   return (
@@ -137,7 +150,7 @@ export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null
       }
       actions={
         hasAccess ? (
-          <EnablePipelinesModal />
+          <EnablePipelinesModal clusterId={clusterId} />
         ) : (
           <UpgradePlanButton source="replication" featureProposition="use replication" />
         )

@@ -6,11 +6,16 @@ import { useReplicationDestinationByIdQuery } from '@/data/replication/destinati
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
-export const useDestinationInformation = ({ id }: { id?: number | null }) => {
+export const useDestinationInformation = ({
+  id,
+  clusterId,
+}: {
+  id?: number | null
+  /** The cluster this destination belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,

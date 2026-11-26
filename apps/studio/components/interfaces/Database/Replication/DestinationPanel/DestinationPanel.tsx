@@ -33,11 +33,14 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
-export const DestinationPanel = () => {
+interface DestinationPanelProps {
+  /** The cluster of the destination being added or edited. `undefined` means the default cluster. */
+  clusterId: string | undefined
+}
+
+export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
@@ -76,7 +79,7 @@ export const DestinationPanel = () => {
     replicationNotEnabled,
     type: existingDestinationType,
     destinationFetcher,
-  } = useDestinationInformation({ id: edit })
+  } = useDestinationInformation({ id: edit, clusterId })
   const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
   const destinationType =
     existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
@@ -130,7 +133,7 @@ export const DestinationPanel = () => {
 
   const typeSelection = (
     <>
-      <DestinationTypeSelection />
+      <DestinationTypeSelection clusterId={clusterId} />
       <DialogSectionSeparator />
     </>
   )
@@ -198,12 +201,13 @@ export const DestinationPanel = () => {
               <div className="grow overflow-auto min-h-0">
                 {pipelinesTypeSelection}
                 <SheetSection>
-                  <EnablePipelinesCallout type={destinationType} />
+                  <EnablePipelinesCallout type={destinationType} clusterId={clusterId} />
                 </SheetSection>
               </div>
             )}
             {showDestinationForm && (
               <DestinationForm
+                clusterId={clusterId}
                 visible={visible}
                 selectedType={destinationType ?? 'BigQuery'}
                 existingDestination={existingDestination}
