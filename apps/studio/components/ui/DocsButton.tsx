@@ -1,5 +1,8 @@
 import { BookOpenIcon } from 'lucide-react'
+import type { MouseEvent } from 'react'
 import { Button } from 'ui'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 interface DocsButtonProps {
   href: string
@@ -8,28 +11,25 @@ interface DocsButtonProps {
   topic?: string
   /** Custom button text, e.g. to distinguish multiple docs buttons side by side. */
   label?: string
-  /** PostHog autocapture identifier for this link */
-  'data-attr'?: string
 }
 
-export const DocsButton = ({
-  href,
-  abbrev = true,
-  className,
-  topic,
-  label,
-  'data-attr': dataAttr,
-}: DocsButtonProps) => {
+export const DocsButton = ({ href, abbrev = true, className, topic, label }: DocsButtonProps) => {
+  const track = useTrack()
+
+  const handleClick = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation()
+    track('docs_button_clicked', { ...(topic && { topic }) })
+  }
+
   return (
     <Button
       asChild
       variant="default"
       className={className}
       icon={<BookOpenIcon />}
-      onClick={(e) => e.stopPropagation()}
+      onClick={handleClick}
     >
       <a
-        data-attr={dataAttr}
         target="_blank"
         rel="noopener noreferrer"
         href={href}

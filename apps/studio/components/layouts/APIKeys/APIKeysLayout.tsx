@@ -24,7 +24,7 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton href={`${DOCS_URL}/guides/api/api-keys`} data-attr="api-keys-docs" />
+            <DocsButton href={`${DOCS_URL}/guides/api/api-keys`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
