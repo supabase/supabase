@@ -79,14 +79,14 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: async () => {
+    response: async ({ request }) => {
       await waitForResponse
       return HttpResponse.json<ReplicationPipelinesResponse>({
         pipelines: [
           {
             id: PIPELINE_ID,
             tenant_id: 't',
-            cluster_id: 'c',
+            cluster_id: new URL(request.url).searchParams.get('cluster_id') ?? 'c',
             source_id: 1,
             source_name: 'main-db',
             destination_id: DESTINATION_ID,
@@ -301,20 +301,22 @@ describe('DestinationRow', () => {
     }
   })
 
-  test('waits for asynchronous shutdown before deleting the pipeline', async () => {
+  test('waits for shutdown and deletes from the original cluster after switching clusters', async () => {
     addAllMocks()
     routerMock.setCurrentUrl('/project/default/database/pipelines')
+    const originalClusterId = 'original-cluster'
+    const otherClusterId = 'other-cluster'
     let isStopping = false
-    let completeShutdown: () => void = () => {}
-    const shutdown = new Promise<void>((resolve) => {
-      completeShutdown = resolve
-    })
+    const shutdown = Promise.withResolvers<void>()
     const shutdownStatusRequested = vi.fn()
+    const otherClusterStatusRequested = vi.fn()
+    const stopRequested = vi.fn()
     const deleted = vi.fn()
     addAPIMock({
       method: 'post',
       path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
-      response: () => {
+      response: ({ request, params }) => {
+        stopRequested(new URL(request.url).searchParams.get('cluster_id'), params.pipeline_id)
         isStopping = true
         return HttpResponse.json<Record<string, never>>({}, { status: 202 })
       },
@@ -322,28 +324,44 @@ describe('DestinationRow', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
-      response: async () => {
-        if (isStopping) {
+      response: async ({ request, params }) => {
+        const clusterId = new URL(request.url).searchParams.get('cluster_id')
+        const isShuttingDown = isStopping && clusterId === originalClusterId
+        if (isShuttingDown) {
           shutdownStatusRequested()
-          await shutdown
+          await shutdown.promise
         }
+        if (clusterId === otherClusterId) otherClusterStatusRequested(params.pipeline_id)
         return HttpResponse.json<ReplicationPipelineStatusResponse>({
           pipeline_id: PIPELINE_ID,
-          status: { name: isStopping ? 'stopped' : 'started' },
+          status: { name: isShuttingDown ? 'stopped' : 'started' },
         })
       },
     })
     addAPIMock({
       method: 'delete',
       path: '/platform/replication/:ref/destinations-pipelines/:destination_id/:pipeline_id',
-      response: () => {
-        deleted()
+      response: ({ request, params }) => {
+        deleted(
+          new URL(request.url).searchParams.get('cluster_id'),
+          params.destination_id,
+          params.pipeline_id
+        )
         return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
           { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
         )
       },
     })
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+    const renderRow = (clusterId: string) => (
+      <ReplicationClusterProvider clusterId={clusterId}>
+        <Table>
+          <TableBody>
+            <DestinationRow destinationId={DESTINATION_ID} />
+          </TableBody>
+        </Table>
+      </ReplicationClusterProvider>
+    )
+    const { rerender } = customRender(renderRow(originalClusterId))
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
@@ -354,13 +372,25 @@ describe('DestinationRow', () => {
     )
     // jsdom does not reliably submit portalled forms through button activation.
     fireEvent.submit(screen.getByRole('dialog').querySelector('form')!)
-    await waitFor(() => expect(shutdownStatusRequested).toHaveBeenCalledOnce())
-    expect(deleted).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Deleting…' })).toBeDisabled()
-    await act(async () => {
-      completeShutdown()
-    })
-    await waitFor(() => expect(deleted).toHaveBeenCalledOnce())
+    try {
+      await waitFor(() => expect(shutdownStatusRequested).toHaveBeenCalledOnce())
+      expect(stopRequested).toHaveBeenCalledExactlyOnceWith(originalClusterId, PIPELINE_ID)
+      expect(screen.getByRole('button', { name: 'Deleting…' })).toBeDisabled()
+
+      rerender(renderRow(otherClusterId))
+      await waitFor(() => expect(otherClusterStatusRequested).toHaveBeenCalledWith(PIPELINE_ID))
+      expect(deleted).not.toHaveBeenCalled()
+    } finally {
+      await act(async () => shutdown.resolve())
+    }
+
+    await waitFor(() =>
+      expect(deleted).toHaveBeenCalledExactlyOnceWith(
+        originalClusterId,
+        String(DESTINATION_ID),
+        PIPELINE_ID
+      )
+    )
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'Deleting…' })).not.toBeInTheDocument()
     )

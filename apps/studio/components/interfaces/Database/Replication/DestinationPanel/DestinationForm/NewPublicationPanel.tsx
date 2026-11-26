@@ -123,6 +123,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
 
     createPublication({
       projectRef,
+      clusterId,
       sourceId,
       name: data.name,
       tableIds: data.tableIds.map(Number),

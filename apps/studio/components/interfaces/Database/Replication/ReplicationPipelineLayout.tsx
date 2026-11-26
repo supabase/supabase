@@ -212,20 +212,16 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const onDeleteDestination = async () => {
     if (!projectRef || !pipeline) return
 
+    const pipelineTarget = { projectRef, pipelineId: pipeline.id, clusterId }
+
     try {
       setIsDeleting(true)
       if (statusName !== PipelineStatusName.STOPPED) {
-        await stopPipeline({
-          projectRef,
-          pipelineId: pipeline.id,
-          clusterId,
-          waitUntilStopped: true,
-        })
+        await stopPipeline({ ...pipelineTarget, waitUntilStopped: true })
       }
       await deleteDestinationPipeline({
-        projectRef,
+        ...pipelineTarget,
         destinationId: pipeline.destination_id,
-        pipelineId: pipeline.id,
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)

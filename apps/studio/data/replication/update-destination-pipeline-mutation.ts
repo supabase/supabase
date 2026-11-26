@@ -146,6 +146,7 @@ export type UpdateDestinationPipelineParams = {
   destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: PipelineConfig
+  clusterId?: string
 }
 
 async function updateDestinationPipeline(
@@ -157,6 +158,7 @@ async function updateDestinationPipeline(
     destinationConfig,
     pipelineConfig,
     sourceId,
+    clusterId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
 ) {
@@ -169,7 +171,10 @@ async function updateDestinationPipeline(
   const { data, error } = await post(
     '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
     {
-      params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
+      params: {
+        path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId },
+        query: { cluster_id: clusterId },
+      },
       body: {
         destination_config,
         source_id: sourceId,
@@ -206,8 +211,10 @@ export const useUpdateDestinationPipelineMutation = ({
       const { projectRef } = variables
       // These prefixes include list, editor, pipeline status, and table metrics caches.
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-        invalidateReplicationPipelineQueries(queryClient, projectRef),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.destinations(projectRef, variables.clusterId),
+        }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef, variables.clusterId),
       ])
 
       await onSuccess?.(data, variables, context)
@@ -216,9 +223,13 @@ export const useUpdateDestinationPipelineMutation = ({
       // Settings may commit before runtime recreation fails.
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: replicationKeys.destinations(variables.projectRef),
+          queryKey: replicationKeys.destinations(variables.projectRef, variables.clusterId),
         }),
-        invalidateReplicationPipelineQueries(queryClient, variables.projectRef),
+        invalidateReplicationPipelineQueries(
+          queryClient,
+          variables.projectRef,
+          variables.clusterId
+        ),
       ])
       if (onError === undefined) {
         toast.error(`Failed to update destination or pipeline: ${data.message}`)
