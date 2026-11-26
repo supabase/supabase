@@ -13,7 +13,7 @@ Using OAuth2.0 you can retrieve an access and refresh token that grant your appl
 2. In the upper-right section of the page, click **Add application**.
 3. Fill in the required details and click **Confirm**.
 
-To limit what your app can access, turn on scoped access in your app's settings. Any member can then authorize your app with their own role, or people can choose which projects it can reach. For details, see [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access).
+To help users control what your app can access, turn on scoped access in your app's settings. Any member can then authorize your app with their own role, and people can choose which projects it can reach. For details, see [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access).
 
 ## Show a "Connect Supabase" button
 
@@ -33,8 +33,8 @@ Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/a
 - `redirect_uri`: The URL where Supabase will redirect the user to after providing consent.
 - `response_type`: Set this to `code`.
 - `state`: Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
-- `organization_slug`: The slug of the organization you want to connect to. This is optional, but if provided, it will pre-select the organization for the user.
-- `project_ref`: The ref of a project to preselect on the consent screen. This is optional, and applies only if your app asks for specific projects.
+- `organization_slug`: The slug of the organization you want to connect to. This is optional, but if provided, it will pre-select the organization for the user. You can omit it if you set `project_ref`.
+- `project_ref`: The ref of a project to preselect on the consent screen. This is optional, and applies only if your app allows people to select specific projects. If you set it, Supabase preselects the project's organization.
 - [Recommended] PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
 - [Deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes) for more details.
 
@@ -121,7 +121,7 @@ You can use the [`POST /v1/oauth/token`](https://api.supabase.com/api/v1#tag/oau
 
 If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
 
-If your app uses member permissions, refreshing also fails when the member who authorized your app leaves the organization.
+If your app uses member permissions and the member who authorized your app leaves the organization, the grant stays in place but loses all access to the organization's resources. For other cases where a grant loses access, see [When a grant ends on its own](/docs/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access#when-a-grant-ends-on-its-own).
 
 ## Calling the Management API
 
@@ -175,3 +175,11 @@ Once authorization is complete, we will sends the `state` value back to your app
 ## Current limitations
 
 Only some features are available until we roll out fine-grained access control.
+
+## Resources
+
+- [Scopes for your OAuth App](/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes)
+- [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access)
+- [Update your app for scoped access](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access)
+- [Test scoped access on a staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access)
+- [Manage OAuth app access](/docs/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access)

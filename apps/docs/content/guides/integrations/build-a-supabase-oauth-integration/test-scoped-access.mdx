@@ -37,27 +37,27 @@ Create an organization with enough members and projects to cover each scenario:
 
 ## Test each scenario
 
-Authorize your staging app as different members and check each result.
+Authorize your staging app as different members and check each result. Run only the scenarios for the settings you turned on, plus the scenarios marked **Any**. The Developer row applies only when every scope your app requests has a lowest role of Developer or lower. See [Request only the scopes you need](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access#request-only-the-scopes-you-need). The Read-only row applies only when your app requests at least one write scope.
 
-| Scenario                                                              | Setting            | Expected result                                                                                |
-| --------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| A Developer authorizes the app                                        | Member permissions | Authorization succeeds. Your app stores a connection for that member.                          |
-| A Read-only member authorizes an app that requests write scopes       | Member permissions | The consent screen shows a warning and the member can't approve. No redirect reaches your app. |
-| A member's role is lowered after they authorize                       | Member permissions | Requests the role no longer covers return `403`. Your app prompts the person.                  |
-| A member is removed from the organization                             | Member permissions | The grant ends. Your app detects it and asks the person to connect again.                      |
-| A member chooses **All current and future projects**                  | Project selection  | Your app works with every project, as it does without the setting.                             |
-| A project is created after an all-projects authorization              | Project selection  | Your app can reach the new project without re-authorization.                                   |
-| A member selects one of three projects                                | Project selection  | Your app shows and changes only that project.                                                  |
-| A member selects a project where their role doesn't cover your scopes | Both               | The consent screen flags that project. The member deselects it to approve.                     |
-| A project is created after a specific-projects authorization          | Project selection  | Your app doesn't show the project and offers to re-authorize.                                  |
-| A member re-authorizes to add a project                               | Project selection  | The new selection replaces the old one. Your app keeps its state for kept projects.            |
-| Your app requests a branch                                            | Project selection  | The request uses the parent project's grant.                                                   |
-| A person cancels on the consent screen                                | Any                | Your redirect URL receives `error=access_denied`. Your app lets them try again.                |
-| An administrator revokes the app for the organization                 | Any                | All member grants end. Your app handles the revoked tokens.                                    |
+| Scenario                                                              | Setting            | Expected result                                                                                                                          |
+| --------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| A Developer authorizes the app                                        | Member permissions | Authorization succeeds. Your app stores a connection for that member.                                                                    |
+| A Read-only member authorizes an app that requests write scopes       | Member permissions | The consent screen shows a warning and the member can't approve. No redirect reaches your app.                                           |
+| A member's role is lowered after they authorize                       | Member permissions | Requests the role no longer covers return `403`. Your app prompts the person.                                                            |
+| A member is removed from the organization                             | Member permissions | Requests return `403`. Your app tells the person to ask an administrator to restore their membership, or to have another member connect. |
+| A member chooses **All current and future projects**                  | Project selection  | Your app works with every project, as it does without the setting.                                                                       |
+| A project is created after an all-projects authorization              | Project selection  | Your app can reach the new project without re-authorization.                                                                             |
+| A member selects one of three projects                                | Project selection  | Your app shows and changes only that project.                                                                                            |
+| A member selects a project where their role doesn't cover your scopes | Both               | The consent screen flags that project. The member deselects it to approve.                                                               |
+| A project is created after a specific-projects authorization          | Project selection  | Your app doesn't show the project and offers to re-authorize.                                                                            |
+| A member re-authorizes to add a project                               | Project selection  | The new selection replaces the old one. Your app keeps its state for kept projects.                                                      |
+| Your app requests a branch                                            | Project selection  | The request uses the parent project's grant.                                                                                             |
+| A person cancels on the consent screen                                | Any                | Your redirect URL receives `error=access_denied`. Your app lets them try again.                                                          |
+| An administrator revokes the app for the organization                 | Any                | All member grants end. Your app handles the revoked tokens.                                                                              |
 
 ## Turn on scoped access for production
 
-After every scenario passes, turn on the same settings for your production app. Grants created before the change keep working, and the settings apply the next time a person authorizes your app.
+After every scenario for the settings you turned on passes, turn on the same settings for your production app. Grants created before the change keep working, and the settings apply the next time a person authorizes your app.
 
 Access is granted per app, so your production app needs its own request. If the settings don't appear on your production app, [open a support ticket](/dashboard/support/new) and include your production app's client ID.
 

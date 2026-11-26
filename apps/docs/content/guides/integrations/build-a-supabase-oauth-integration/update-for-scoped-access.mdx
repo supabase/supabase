@@ -48,6 +48,7 @@ The following table lists the lowest role that can authorize each scope. Higher 
 | `environment:read`       | Read-only     |                                                                      |
 | `environment:write`      | Developer     | Developers get `403` when they create or delete a production branch. |
 | `organizations:read`     | Read-only     |                                                                      |
+| `organizations:write`    | Owner         |                                                                      |
 | `projects:read`          | Read-only     |                                                                      |
 | `projects:write`         | Administrator | Administrators get `403` when they transfer a project.               |
 | `rest:read`              | Read-only     |                                                                      |
@@ -63,7 +64,7 @@ If your app must work for members whose role can't grant some of its scopes, tur
 
 ### Handle scopes missing from the grant
 
-With [partial grants](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access#partial-grants) turned on, a grant can include fewer scopes than your app requests. You can't turn on partial grants in the dashboard. Set `allow_partial_grants` to `true` when you create or update your app with the [Management API](/docs/reference/api/introduction).
+With [partial grants](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access#partial-grants) turned on, a grant can include fewer scopes than your app requests. You can't turn on partial grants in the Supabase Dashboard or the public Management API. To turn them on, [open a support ticket](/dashboard/support/new) and include your app's client ID.
 
 Compare the `scope` field in the token response with the scopes your app needs, and hide or disable features that need a missing scope.
 
@@ -78,10 +79,11 @@ Don't call endpoints that need a missing scope. They return `403 Forbidden`, and
 
 The token has the access of the member's current role. Handle these responses on every Management API call:
 
-| Response                             | Cause                                                       | What to do                                                           |
-| ------------------------------------ | ----------------------------------------------------------- | -------------------------------------------------------------------- |
-| `403 Forbidden`                      | The member's role no longer covers the request.             | Show a message that names the missing access. Offer to re-authorize. |
-| `401 Unauthorized`, or refresh fails | The member left the organization, or the grant was revoked. | Delete the stored connection and ask the person to connect again.    |
+| Response           | Cause                                                                                                                                                                           | What to do                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `403 Forbidden`    | The member's role no longer covers the request, the member left the organization, an administrator removed the project from the member's roles, or the project was transferred. | Show a message that names the missing access. Offer to re-authorize. |
+| `401 Unauthorized` | The access token expired, or the grant was revoked.                                                                                                                             | Refresh the access token and retry the request.                      |
+| Refresh fails      | The grant was revoked.                                                                                                                                                          | Delete the stored connection and ask the person to connect again.    |
 
 ## Project selection
 
@@ -117,7 +119,7 @@ For a specific-project grant, only call project endpoints for the stored refs. `
 
 ### Preselect a project
 
-If a person starts the connection from a specific project, pass its ref as `project_ref` when you [redirect to the authorize URL](/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url). The consent screen selects that project for them. You can pass `organization_slug` as well to preselect the organization.
+If a person starts the connection from a specific project, pass its ref as `project_ref` when you [redirect to the authorize URL](/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url). The consent screen selects that project for them and preselects the project's organization, so you can omit `organization_slug`.
 
 ```ts
 const url = new URL('https://api.supabase.com/v1/oauth/authorize')
