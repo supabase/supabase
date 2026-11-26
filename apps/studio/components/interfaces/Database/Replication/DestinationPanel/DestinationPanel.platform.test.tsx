@@ -22,15 +22,17 @@ const SINGAPORE = { cluster_id: '1', region_code: 'ap-southeast-1', region_name:
 const FRANKFURT = { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' }
 const clusterFrom = (request: Request) => new URL(request.url).searchParams.get('cluster_id')
 
-const mockRegions = (regions = [SINGAPORE, FRANKFURT]) =>
+const mockRegions = (isUnavailable = () => false) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/regions',
     response: () =>
-      HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
-        default_cluster_id: SINGAPORE.cluster_id,
-        regions,
-      }),
+      isUnavailable()
+        ? HttpResponse.json<APIErrorBody>({ message: 'Regions unavailable' }, { status: 503 })
+        : HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+            default_cluster_id: SINGAPORE.cluster_id,
+            regions: [SINGAPORE, FRANKFURT],
+          }),
   })
 
 const mockProject = (region?: string) =>
@@ -147,22 +149,29 @@ const choosePublication = async (name: string) => {
   await userEvent.click(await screen.findByText(name))
 }
 
-test('retries source discovery and opens creation when only another region is enabled', async () => {
-  mockRegions()
-  mockProject(FRANKFURT.region_code)
-  const unavailableClusters = new Set([FRANKFURT.cluster_id])
-  mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
-  renderPanel()
+test.each(['regions', 'sources'])(
+  'retries %s discovery and uses the source in its own cluster',
+  async (failure) => {
+    let isRegionsUnavailable = failure === 'regions'
+    mockRegions(() => isRegionsUnavailable)
+    mockProject(FRANKFURT.region_code)
+    const unavailableClusters = new Set(failure === 'sources' ? [FRANKFURT.cluster_id] : [])
+    mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
+    renderPanel()
 
-  expect(await screen.findByText('Failed to retrieve pipeline sources')).toBeVisible()
-  expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
-  expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
+    expect(await screen.findByText('Failed to retrieve pipeline sources')).toBeVisible()
+    expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
 
-  unavailableClusters.clear()
-  await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
-  expect(await screen.findByLabelText('Pipeline name')).toBeVisible()
-  expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
-})
+    unavailableClusters.clear()
+    isRegionsUnavailable = false
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await screen.findByLabelText('Pipeline name')).toBeVisible()
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('frankfurt')).toBeVisible()
+    expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+  }
+)
 
 test('opens the panel with a source only in a non-default region', async () => {
   mockRegions()
@@ -301,29 +310,55 @@ test('locks the region selector while saving the pipeline', async () => {
   }
 })
 
-test('prepares the source in the preferred region before loading its publications', async () => {
-  mockRegions()
-  mockProject(FRANKFURT.region_code)
-  const enabledClusters = new Set<string | null>([null])
-  mockPanelResources(enabledClusters)
-  const writes: (string | null)[] = []
-  addAPIMock({
-    method: 'post',
-    path: '/platform/replication/:ref/tenants-sources',
-    response: ({ request }) => {
-      const cluster = clusterFrom(request)
-      writes.push(cluster)
-      enabledClusters.add(cluster)
-      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
-        tenant_id: 'default',
-        source_id: 1,
-      })
-    },
-  })
-  renderPanel()
+test.each(['success', 'creation failure', 'refresh failure'])(
+  'prepares the preferred region and loads publications after %s',
+  async (scenario) => {
+    mockRegions()
+    mockProject(FRANKFURT.region_code)
+    const enabledClusters = new Set<string | null>([null])
+    const unavailableClusters = new Set<string | null>()
+    mockPanelResources(enabledClusters, unavailableClusters)
+    const writes: (string | null)[] = []
+    let shouldFail = scenario !== 'success'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        const cluster = clusterFrom(request)
+        writes.push(cluster)
+        if (shouldFail && scenario === 'creation failure') {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Source creation unavailable' },
+            { status: 503 }
+          )
+        }
+        enabledClusters.add(cluster)
+        if (shouldFail) unavailableClusters.add(cluster)
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          tenant_id: 'default',
+          source_id: 1,
+        })
+      },
+    })
+    renderPanel()
 
-  expect(await findRegionSelector()).toHaveTextContent('Frankfurt (eu-central-1)')
-  await userEvent.click(await screen.findByText('Select publication'))
-  expect(await screen.findByText('frankfurt')).toBeVisible()
-  expect(writes).toEqual([FRANKFURT.cluster_id])
-})
+    expect(await findRegionSelector()).toHaveTextContent('Frankfurt (eu-central-1)')
+    if (shouldFail) {
+      expect(await screen.findByText('Failed to prepare pipeline region')).toBeVisible()
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+      shouldFail = false
+      unavailableClusters.clear()
+      await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      await waitFor(() =>
+        expect(screen.queryByText('Failed to prepare pipeline region')).not.toBeInTheDocument()
+      )
+    }
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('frankfurt')).toBeVisible()
+    expect(writes).toEqual(
+      scenario === 'creation failure'
+        ? [FRANKFURT.cluster_id, FRANKFURT.cluster_id]
+        : [FRANKFURT.cluster_id]
+    )
+  }
+)

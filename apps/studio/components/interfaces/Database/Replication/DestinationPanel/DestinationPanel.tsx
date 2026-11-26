@@ -226,6 +226,9 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
+            <p role="status" aria-live="polite" className="sr-only">
+              {isSourceAvailabilityPending ? 'Checking pipeline sources' : ''}
+            </p>
             {(isAccessLoading || isEditLoading || isCreationLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
@@ -301,7 +304,7 @@ export const DestinationPanel = () => {
                   onCancel={confirmOnClose}
                   preferredClusterId={preferredCluster.clusterId}
                   onRegionChange={handleRegionChange}
-                  isPreparingRegion={isCreatingSource}
+                  isPreparingRegion={isCreatingSource || regionSourceError !== null}
                 />
               </ReplicationClusterProvider>
             )}

@@ -68,21 +68,25 @@ export const PipelineCreationFlow = (props: PipelineCreationFlowProps) => {
   )
   const preferred = usePreferredPipelineClusterId()
   const defaultClusterId = preferred.clusters?.default_cluster_id
-  const clusterId =
-    urlClusterId === null ? preferred.clusterId : toRequestClusterId(urlClusterId, defaultClusterId)
+  const requestedCluster = preferred.clusters?.regions.find(
+    ({ cluster_id }) => cluster_id === urlClusterId
+  )
+  const clusterId = requestedCluster
+    ? toRequestClusterId(requestedCluster.cluster_id, defaultClusterId)
+    : preferred.clusterId
 
   useEffect(() => {
-    if (urlClusterId === null && preferred.isReady && defaultClusterId !== undefined) {
+    if (!requestedCluster && preferred.isReady && defaultClusterId !== undefined) {
       void setClusterId(preferred.clusterId ?? defaultClusterId)
     }
-  }, [urlClusterId, preferred.isReady, preferred.clusterId, defaultClusterId, setClusterId])
+  }, [requestedCluster, preferred.isReady, preferred.clusterId, defaultClusterId, setClusterId])
 
   return (
     <ReplicationClusterProvider clusterId={clusterId}>
       <PipelineCreationSteps
         {...props}
         preferredClusterId={preferred.clusterId}
-        isRegionReady={preferred.isReady || urlClusterId !== null}
+        isRegionReady={preferred.isReady}
         onRegionChange={(id) => void setClusterId(id ?? defaultClusterId ?? null)}
       />
     </ReplicationClusterProvider>
