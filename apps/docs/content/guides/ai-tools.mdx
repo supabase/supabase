@@ -21,6 +21,7 @@ To set up an agent in your project, follow these steps or ask your agent to foll
 
    ```bash
    npm install supabase --save-dev
+   # or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
    ```
 
    For Homebrew, Scoop, and Linux packages, see [Install the Supabase CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli).
@@ -33,7 +34,7 @@ To set up an agent in your project, follow these steps or ask your agent to foll
 
    To install it for one agent by hand, see [manual installation](/docs/guides/ai-tools/plugins#manual-installation).
 
-4. Check whether your project has a `supabase/config.toml` file. If it doesn't, initialize Supabase:
+4. Check whether your project has a `supabase` directory with a `config.jsonc`, `config.json`, or `config.toml` file. If it doesn't, initialize Supabase:
 
    ```bash
    npx supabase init
