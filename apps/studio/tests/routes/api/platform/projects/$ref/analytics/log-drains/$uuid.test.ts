@@ -79,7 +79,7 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
       http.put('http://logflare:4000/api/backends/1', async ({ request }) => {
         forwardedAuth = request.headers.get('authorization')
         forwardedBody = await request.json()
-        return HttpResponse.json({ id: 1, name: 'updated' })
+        return HttpResponse.json<{ id: number; name: string }>({ id: 1, name: 'updated' })
       })
     )
 

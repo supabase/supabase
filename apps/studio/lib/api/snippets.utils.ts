@@ -69,6 +69,22 @@ export const folderQueryParamsSchema = z.object({
   sort_order: z.enum(['asc', 'desc']).optional(),
 })
 
+export function getSearchParamsRecord(
+  searchParams: URLSearchParams
+): Record<string, string | string[]> {
+  const record: Record<string, string | string[]> = {}
+  for (const [key, value] of searchParams.entries()) {
+    const existing = record[key]
+    record[key] =
+      existing === undefined
+        ? value
+        : Array.isArray(existing)
+          ? [...existing, value]
+          : [existing, value]
+  }
+  return record
+}
+
 export type Snippet = z.infer<typeof SnippetSchema>
 export type Folder = z.infer<typeof FolderSchema>
 

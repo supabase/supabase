@@ -8,6 +8,7 @@ import {
   deleteFolder,
   folderQueryParamsSchema,
   getFolders,
+  getSearchParamsRecord,
   getSnippets,
 } from '@/lib/api/snippets.utils'
 
@@ -20,7 +21,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/folder
   server: {
     handlers: createApiHandlers({
       GET: async ({ request }) => {
-        const query = Object.fromEntries(new URL(request.url).searchParams.entries())
+        const query = getSearchParamsRecord(new URL(request.url).searchParams)
         const result = folderQueryParamsSchema.safeParse(query)
 
         if (!result.success) {

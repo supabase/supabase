@@ -7,6 +7,7 @@ import { parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers } from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
+  getSearchParamsRecord,
   getSnippets,
   saveSnippet,
   SnippetSchema,
@@ -38,7 +39,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
   server: {
     handlers: createApiHandlers({
       GET: async ({ request }) => {
-        const query = Object.fromEntries(new URL(request.url).searchParams.entries())
+        const query = getSearchParamsRecord(new URL(request.url).searchParams)
         const result = getRequestParamsSchema.safeParse(query)
 
         if (!result.success) {

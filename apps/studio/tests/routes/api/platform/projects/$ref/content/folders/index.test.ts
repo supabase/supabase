@@ -67,38 +67,45 @@ describe('/api/platform/projects/$ref/content/folders', () => {
     expect(body.cursor).toBe(body.data.contents[0].id)
   })
 
-  it.each(['?limit=invalid', '?limit=0', '?sort_by=invalid', '?sort_order=invalid'])(
-    'returns 400 on GET when query params are invalid (%s)',
+  it.each([
+    '?limit=invalid',
+    '?limit=0',
+    '?sort_by=invalid',
+    '?sort_order=invalid',
+    '?limit=1&limit=2',
+    '?sort_by=name&sort_by=inserted_at',
+  ])('returns 400 on GET when query params are invalid or repeated (%s)', async (query) => {
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request(
+        `http://localhost/api/platform/projects/default/content/folders${query}`
+      ),
+      params: { ref: 'default' },
+    })
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ data: { folders: [], contents: [] } })
+  })
+
+  it.each(['?limit=invalid', '?limit=1&limit=2'])(
+    'returns 400 on folder-by-id GET when query params are invalid or repeated (%s)',
     async (query) => {
       const response = await getRouteHandler(
-        Route,
+        FolderRoute,
         'GET'
       )({
         request: new Request(
-          `http://localhost/api/platform/projects/default/content/folders${query}`
+          `http://localhost/api/platform/projects/default/content/folders/folder-1${query}`
         ),
-        params: { ref: 'default' },
+        params: { ref: 'default', id: 'folder-1' },
       })
 
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({ data: { folders: [], contents: [] } })
     }
   )
-
-  it('returns 400 on folder-by-id GET when limit is invalid', async () => {
-    const response = await getRouteHandler(
-      FolderRoute,
-      'GET'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/content/folders/folder-1?limit=invalid'
-      ),
-      params: { ref: 'default', id: 'folder-1' },
-    })
-
-    expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({ data: { folders: [], contents: [] } })
-  })
 
   it('deletes comma-separated folder IDs from disk on DELETE', async () => {
     const folderA = await createFolder(Route, 'Folder A')

@@ -64,6 +64,57 @@ describe('/api/platform/projects/$ref/content', () => {
     await fs.rm(tempDir, { recursive: true, force: true })
   })
 
+  it('lists user snippets on GET and returns empty list for visibility=project', async () => {
+    await createSnippet(Route, { name: 'My Query' })
+
+    const userResponse = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request(
+        'http://localhost/api/platform/projects/default/content?visibility=user&limit=10'
+      ),
+      params: { ref: 'default' },
+    })
+
+    expect(userResponse.status).toBe(200)
+    expect(await userResponse.json()).toEqual({
+      data: [expect.objectContaining({ name: 'My Query' })],
+    })
+
+    const projectResponse = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request(
+        'http://localhost/api/platform/projects/default/content?visibility=project'
+      ),
+      params: { ref: 'default' },
+    })
+
+    expect(projectResponse.status).toBe(200)
+    expect(await projectResponse.json()).toEqual({ data: [] })
+  })
+
+  it.each([
+    '?visibility=project&visibility=user',
+    '?limit=1&limit=2',
+    '?sort_by=name&sort_by=inserted_at',
+  ])('returns 400 on GET when query params are repeated (%s)', async (query) => {
+    await createSnippet(Route, { name: 'My Query' })
+
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request(`http://localhost/api/platform/projects/default/content${query}`),
+      params: { ref: 'default' },
+    })
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ data: [] })
+  })
+
   it('creates and persists a snippet on disk when PUT update reports not found', async () => {
     const { response, snippet } = await createSnippet(Route, {
       name: 'My Query',

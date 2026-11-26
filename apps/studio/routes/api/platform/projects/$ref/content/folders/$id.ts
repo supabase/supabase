@@ -2,7 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { paths } from 'api-types'
 
 import { createApiHandlers } from '@/lib/api/apiWrapper'
-import { folderQueryParamsSchema, getFolders, getSnippets } from '@/lib/api/snippets.utils'
+import {
+  folderQueryParamsSchema,
+  getFolders,
+  getSearchParamsRecord,
+  getSnippets,
+} from '@/lib/api/snippets.utils'
 
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
@@ -11,7 +16,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/folder
   server: {
     handlers: createApiHandlers({
       GET: async ({ request, params: routeParams }) => {
-        const query = Object.fromEntries(new URL(request.url).searchParams.entries())
+        const query = getSearchParamsRecord(new URL(request.url).searchParams)
         const result = folderQueryParamsSchema.safeParse(query)
 
         if (!result.success) {
