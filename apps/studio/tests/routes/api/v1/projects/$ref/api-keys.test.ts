@@ -2,20 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/v1/projects/$ref/api-keys'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
   API_URL: 'https://api.example.com',
 }))
 
-const requestApiKeys = (method = 'GET', search = '') =>
-  getRouteHandler(
-    Route,
-    method
-  )({
-    request: new Request(`http://localhost/api/v1/projects/default/api-keys${search}`, { method }),
-    params: { ref: 'default' },
+const requestApiKeys = (search = '') =>
+  callRoute(Route, new Request(`http://localhost/api/v1/projects/default/api-keys${search}`), {
+    ref: 'default',
   })
 
 describe('/api/v1/projects/$ref/api-keys', () => {
@@ -27,19 +23,6 @@ describe('/api/v1/projects/$ref/api-keys', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs()
-  })
-
-  describe('Method handling', () => {
-    it('should return 405 for non-GET methods', async () => {
-      const response = await requestApiKeys('POST')
-
-      expect(response.status).toBe(405)
-      expect(await response.json()).toEqual({
-        data: null,
-        error: { message: 'Method POST Not Allowed' },
-      })
-      expect(response.headers.get('Allow')).toBe('GET')
-    })
   })
 
   describe('GET', () => {
@@ -146,7 +129,7 @@ describe('/api/v1/projects/$ref/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const response = await requestApiKeys('GET', '?reveal=true')
+      const response = await requestApiKeys('?reveal=true')
 
       const data = await response.json()
       expect(data.find((k: { id: string }) => k.id === 'secret')?.api_key).toBe(

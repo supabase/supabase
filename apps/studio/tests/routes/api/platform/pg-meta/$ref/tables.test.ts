@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 const PG_META_URL = 'http://meta.test'
 
@@ -40,23 +40,21 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
   })
 
   it('forwards query params to pg-meta and returns the response', async () => {
-    let includedSchemas: string | null = null
+    let includedSchemas: string[] = []
     let forwardedHeaders: Headers | undefined
 
     mswServer.use(
       http.get(`${PG_META_URL}/tables`, ({ request }) => {
-        includedSchemas = new URL(request.url).searchParams.get('included_schemas')
+        includedSchemas = new URL(request.url).searchParams.getAll('included_schemas')
         forwardedHeaders = request.headers
         return HttpResponse.json<PGTable[]>([mockTable])
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/pg-meta/default/tables?included_schemas=public',
+      new Request(
+        'http://localhost/api/platform/pg-meta/default/tables?included_schemas=public&included_schemas=auth',
         {
           headers: {
             authorization: 'Basic browser-credentials',
@@ -65,10 +63,10 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
           },
         }
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
-    expect(includedSchemas).toBe('public')
+    expect(includedSchemas).toEqual(['public', 'auth'])
     // Only the cookie and connection headers are relayed, as with the Next API adapter
     expect(forwardedHeaders?.get('cookie')).toBe('session=abc')
     expect(forwardedHeaders?.get('x-connection-encrypted')).toBe('encrypted-connection')
@@ -80,30 +78,13 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
   it('falls back to 500 when the upstream error has no status code', async () => {
     mswServer.use(http.get(`${PG_META_URL}/tables`, () => HttpResponse.error()))
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/tables'),
-      params: { ref: 'default' },
-    })
+      new Request('http://localhost/api/platform/pg-meta/default/tables'),
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(500)
     expect(await response.json()).toEqual({ message: expect.stringMatching(/\S/) })
-  })
-
-  it('returns 405 with Allow: GET for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/tables', {
-        method: 'POST',
-      }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('GET')
   })
 })

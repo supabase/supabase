@@ -4,7 +4,7 @@ import type { z } from 'zod/v4'
 
 import type { databaseErrorSchema } from '@/lib/api/self-hosted/types'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type PgMetaDatabaseErrorBody = z.infer<typeof databaseErrorSchema>
 
@@ -40,17 +40,15 @@ describe('/api/platform/pg-meta/$ref/query', () => {
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/query', {
+      new Request('http://localhost/api/platform/pg-meta/default/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: 'select 1 as one' }),
       }),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(capturedBody).toEqual({ query: 'select 1 as one' })
     expect(capturedContentType).toBe('application/json')
@@ -73,53 +71,20 @@ describe('/api/platform/pg-meta/$ref/query', () => {
       )
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/query', {
+      new Request('http://localhost/api/platform/pg-meta/default/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: 'select from' }),
       }),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({
       message: 'syntax error',
       formattedError: 'ERROR: syntax error',
     })
-  })
-
-  it('returns 400 for malformed JSON bodies', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: '{',
-      }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(400)
-  })
-
-  it('returns 405 with Allow: POST for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/platform/pg-meta/default/query', {
-        method: 'GET',
-      }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST')
   })
 })

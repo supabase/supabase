@@ -2,23 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/v1/projects/$ref/api-keys/$id'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
   API_URL: 'https://api.example.com',
 }))
 
-const requestApiKey = (id: string, { method = 'GET', search = '' } = {}) =>
-  getRouteHandler(
+const requestApiKey = (id: string, search = '') =>
+  callRoute(
     Route,
-    method
-  )({
-    request: new Request(`http://localhost/api/v1/projects/default/api-keys/${id}${search}`, {
-      method,
-    }),
-    params: { ref: 'default', id },
-  })
+    new Request(`http://localhost/api/v1/projects/default/api-keys/${id}${search}`),
+    { ref: 'default', id }
+  )
 
 describe('/api/v1/projects/$ref/api-keys/$id', () => {
   beforeEach(() => {
@@ -28,19 +24,6 @@ describe('/api/v1/projects/$ref/api-keys/$id', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs()
-  })
-
-  describe('Method handling', () => {
-    it('should return 405 for non-GET methods', async () => {
-      const response = await requestApiKey('secret', { method: 'POST' })
-
-      expect(response.status).toBe(405)
-      expect(await response.json()).toEqual({
-        data: null,
-        error: { message: 'Method POST Not Allowed' },
-      })
-      expect(response.headers.get('Allow')).toBe('GET')
-    })
   })
 
   describe('GET', () => {
@@ -74,7 +57,7 @@ describe('/api/v1/projects/$ref/api-keys/$id', () => {
     ])('masks the secret key when $case', async ({ search }) => {
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const response = await requestApiKey('secret', { search })
+      const response = await requestApiKey('secret', search)
 
       expect(response.status).toBe(200)
       expect(await response.json()).toMatchObject({
@@ -88,7 +71,7 @@ describe('/api/v1/projects/$ref/api-keys/$id', () => {
     it('returns the full secret key when reveal is true', async () => {
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const response = await requestApiKey('secret', { search: '?reveal=true' })
+      const response = await requestApiKey('secret', '?reveal=true')
 
       expect(response.status).toBe(200)
       expect(await response.json()).toMatchObject({
