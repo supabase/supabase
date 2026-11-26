@@ -34,7 +34,7 @@ const setup = (
     pipeline_id: pipelineId,
     status: { name: initialStatus },
   })
-  const hook = renderHook(usePipelineRequestStatus, {
+  const hook = renderHook(() => usePipelineRequestStatus(), {
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient}>
         <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>

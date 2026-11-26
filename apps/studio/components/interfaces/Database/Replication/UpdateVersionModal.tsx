@@ -7,7 +7,6 @@ import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-s
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -15,14 +14,20 @@ import {
 
 interface UpdateVersionModalProps {
   visible: boolean
+  /** The cluster this pipeline belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   pipeline?: Pipeline
   onClose: () => void
 }
 
-export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersionModalProps) => {
+export const UpdateVersionModal = ({
+  visible,
+  clusterId,
+  pipeline,
+  onClose,
+}: UpdateVersionModalProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
-  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus({ clusterId })
 
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
     projectRef,

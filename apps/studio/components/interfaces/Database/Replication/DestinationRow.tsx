@@ -27,7 +27,6 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { createNavigationHandler } from '@/lib/navigation'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -35,11 +34,16 @@ import {
 
 interface DestinationRowProps {
   destinationId: number
+  /** The cluster this destination belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   pipelineRegion?: string
 }
 
-export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRowProps) => {
-  const clusterId = useReplicationClusterId()
+export const DestinationRow = ({
+  destinationId,
+  clusterId,
+  pipelineRegion,
+}: DestinationRowProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
@@ -49,6 +53,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
   const { type, statusName, destination, pipeline, pipelineStatus, pipelineFetcher } =
     useDestinationInformation({
       id: destinationId,
+      clusterId,
     })
   const {
     error: pipelineError,
@@ -67,7 +72,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
     clusterId,
     pipelineId: pipeline?.id,
   })
-  const { getRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus } = usePipelineRequestStatus({ clusterId })
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
@@ -246,6 +251,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
                   >
                     <RowMenu
                       destinationId={destinationId}
+                      clusterId={clusterId}
                       destinationType={type}
                       pipeline={pipeline}
                       pipelineStatus={pipelineStatus?.status}
@@ -284,6 +290,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
       />
 
       <UpdateVersionModal
+        clusterId={clusterId}
         visible={canModifyDestination(type) && showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}

@@ -17,7 +17,6 @@ import { RestartCostEstimate } from './RestartCostEstimate'
 import { shouldCopyTable, type ReplicationTableIdentity } from './TableSyncCopy.utils'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -25,6 +24,8 @@ import {
 
 interface RestartTableDialogProps {
   pipelineStatusName?: PipelineStatusName
+  /** The cluster this pipeline belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   open: boolean
   onOpenChange: (open: boolean) => void
   table: ReplicationTableIdentity
@@ -36,6 +37,7 @@ interface RestartTableDialogProps {
 }
 
 export const RestartTableDialog = ({
+  clusterId,
   open,
   onOpenChange,
   table,
@@ -47,8 +49,7 @@ export const RestartTableDialog = ({
   onResetComplete,
 }: RestartTableDialogProps) => {
   const { ref: projectRef, pipelineId } = useParams()
-  const clusterId = useReplicationClusterId()
-  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus({ clusterId })
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const tableName = `${table.schema}.${table.name}`
   const willCopyTable = shouldCopyTable(tableSyncCopy, table.id)

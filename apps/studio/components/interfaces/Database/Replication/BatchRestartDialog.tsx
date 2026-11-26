@@ -19,7 +19,6 @@ import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -27,6 +26,8 @@ import {
 
 interface BatchRestartDialogProps {
   pipelineStatusName?: PipelineStatusName
+  /** The cluster this pipeline belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'all' | 'errored'
@@ -39,6 +40,7 @@ interface BatchRestartDialogProps {
 }
 
 export const BatchRestartDialog = ({
+  clusterId,
   open,
   onOpenChange,
   mode,
@@ -51,8 +53,7 @@ export const BatchRestartDialog = ({
   onResetComplete,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId } = useParams()
-  const clusterId = useReplicationClusterId()
-  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus({ clusterId })
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const affectedTables = useMemo(() => {
     if (mode === 'all') {

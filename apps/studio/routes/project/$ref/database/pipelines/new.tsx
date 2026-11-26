@@ -20,7 +20,6 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/new')({
   staticData: { skipProjectLayout: true, skipDatabaseLayout: true },
@@ -50,7 +49,6 @@ function PipelineCreationPage() {
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
   const {
     hasSource,
-    clusterId: sourceClusterId,
     isPending: isSourceAvailabilityPending,
     error: sourceAvailabilityError,
     retry: retrySourceAvailability,
@@ -130,17 +128,15 @@ function PipelineCreationPage() {
     <>
       {status}
       <title>New Pipeline | Supabase</title>
-      <ReplicationClusterProvider clusterId={sourceClusterId}>
-        <PipelineCreationFlow
-          availableDestinations={[
-            ...(bigQuery ? ['BigQuery' as const] : []),
-            ...(duckLake ? ['DuckLake' as const] : []),
-            ...(snowflake ? ['Snowflake' as const] : []),
-            ...(clickHouse ? ['ClickHouse' as const] : []),
-          ]}
-          onClose={handleClose}
-        />
-      </ReplicationClusterProvider>
+      <PipelineCreationFlow
+        availableDestinations={[
+          ...(bigQuery ? ['BigQuery' as const] : []),
+          ...(duckLake ? ['DuckLake' as const] : []),
+          ...(snowflake ? ['Snowflake' as const] : []),
+          ...(clickHouse ? ['ClickHouse' as const] : []),
+        ]}
+        onClose={handleClose}
+      />
     </>
   )
 }

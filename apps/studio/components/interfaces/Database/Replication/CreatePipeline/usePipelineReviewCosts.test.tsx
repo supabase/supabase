@@ -50,12 +50,12 @@ const sources: components['schemas']['SourcesResponse_Output'] = {
   ],
 }
 
-const ReviewCosts = () => {
+const ReviewCosts = ({ clusterId }: { clusterId?: string }) => {
   const { control } = useForm<DestinationPanelSchemaType>({ defaultValues })
-  const costs = usePipelineReviewCosts({ control, publication })
+  const costs = usePipelineReviewCosts({ control, clusterId, publication })
   return (
     <>
-      <PipelineReviewCosts control={control} publication={publication} />
+      <PipelineReviewCosts control={control} publication={publication} clusterId={clusterId} />
       <button tabIndex={0} disabled={costs.isInitialCostEstimateLoading}>
         Start pipeline
       </button>
@@ -166,4 +166,31 @@ test('keeps starting available while refetching an estimate that previously fail
     unmount()
     queryClient.clear()
   }
+})
+
+test('shows the selected cluster source cost estimate', async () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: ({ request }) =>
+      HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+        sources: sources.sources.map((source) => ({
+          ...source,
+          id: new URL(request.url).searchParams.get('cluster_id') === '2' ? 99 : 42,
+        })),
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: ({ params }) =>
+      HttpResponse.json<ReplicationCostEstimateData>({
+        currency: 'usd',
+        pipeline: { hourly_cost: params.source_id === '99' ? 0.11 : 0.01, monthly_cost: 80.3 },
+        streaming: { rate_per_gb: 3 },
+        table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+      }),
+  })
+  customRender(<ReviewCosts clusterId="2" />)
+  expect(await screen.findByText('$0.11/hour')).toBeInTheDocument()
 })

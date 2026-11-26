@@ -43,7 +43,6 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
-import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 
 const getDocsUrl = (step: string, destination: DestinationType) => {
   if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
@@ -82,24 +81,25 @@ export const PipelineCreationFlow = (props: PipelineCreationFlowProps) => {
   }, [requestedCluster, preferred.isReady, preferred.clusterId, defaultClusterId, setClusterId])
 
   return (
-    <ReplicationClusterProvider clusterId={clusterId}>
-      <PipelineCreationSteps
-        {...props}
-        preferredClusterId={preferred.clusterId}
-        isRegionReady={preferred.isReady}
-        onRegionChange={(id) => void setClusterId(id ?? defaultClusterId ?? null)}
-      />
-    </ReplicationClusterProvider>
+    <PipelineCreationSteps
+      {...props}
+      clusterId={clusterId}
+      preferredClusterId={preferred.clusterId}
+      isRegionReady={preferred.isReady}
+      onRegionChange={(id) => void setClusterId(id ?? defaultClusterId ?? null)}
+    />
   )
 }
 
 const PipelineCreationSteps = ({
+  clusterId,
   availableDestinations,
   onClose,
   isRegionReady,
   preferredClusterId,
   onRegionChange,
 }: PipelineCreationFlowProps & {
+  clusterId: string | undefined
   isRegionReady: boolean
   preferredClusterId?: string
   onRegionChange: (clusterId: string | undefined) => void
@@ -124,9 +124,8 @@ const PipelineCreationSteps = ({
     if (!isSubmitting) requestNavigation(onClose)
   }
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
-    usePipelineConnectionValidation({ projectRef, type, form })
+    usePipelineConnectionValidation({ projectRef, clusterId, type, form })
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const {
     ensureRegionSource,
@@ -141,7 +140,7 @@ const PipelineCreationSteps = ({
     dataError,
     hasPublicationLoadError,
     publication,
-  } = usePipelineDataValidation({ projectRef, sourceId, type, form })
+  } = usePipelineDataValidation({ projectRef, clusterId, sourceId, type, form })
   const {
     handleSubmit,
     isSubmitting,
@@ -150,6 +149,7 @@ const PipelineCreationSteps = ({
     submitLabel,
   } = usePipelineCreationSubmission({
     type,
+    clusterId,
     form,
     validateData,
     onCreated: () => completeNavigation(onClose),
@@ -174,6 +174,7 @@ const PipelineCreationSteps = ({
   })()
   const costs = usePipelineReviewCosts({
     control: form.control,
+    clusterId,
     publication,
     enabled: accessibleStep === 'review',
   })
@@ -257,12 +258,14 @@ const PipelineCreationSteps = ({
               {accessibleStep === 'connection' && (
                 <>
                   <PipelineConnectionSection
+                    clusterId={clusterId}
                     type={type}
                     form={form}
                     revealInvalidSettings
                     regionField={
                       <>
                         <PipelineRegionField
+                          clusterId={clusterId}
                           destinationType={type}
                           preferredClusterId={preferredClusterId}
                           onRegionChange={(clusterId) => {
@@ -300,6 +303,7 @@ const PipelineCreationSteps = ({
                   <PipelineDataSection
                     type={type}
                     form={form}
+                    clusterId={clusterId}
                     onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                     revealInvalidSettings
                     showLoadError={false}
@@ -325,6 +329,7 @@ const PipelineCreationSteps = ({
                   <PipelineDestinationReview
                     type={type}
                     control={form.control}
+                    clusterId={clusterId}
                     onEditDestination={() => void setStep('destination')}
                     onEditConnection={() => void setStep('connection')}
                     validationFailures={destinationValidationFailures}
@@ -338,7 +343,11 @@ const PipelineCreationSteps = ({
                     validationFailures={pipelineValidationFailures}
                   />
                   <Separator />
-                  <PipelineReviewCosts control={form.control} publication={publication} />
+                  <PipelineReviewCosts
+                    control={form.control}
+                    publication={publication}
+                    clusterId={clusterId}
+                  />
                   <div role="status" aria-label="Pipeline validation status">
                     {submissionFailures.length > 0 && (
                       <Admonition
@@ -356,6 +365,7 @@ const PipelineCreationSteps = ({
       </main>
       <NewPublicationPanel
         visible={isPublicationPanelVisible}
+        clusterId={clusterId}
         onClose={(name) => {
           if (name) {
             form.setValue('publicationName', name, { shouldDirty: true, shouldValidate: true })

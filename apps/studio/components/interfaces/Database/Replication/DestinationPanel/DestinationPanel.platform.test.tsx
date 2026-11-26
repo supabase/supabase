@@ -11,7 +11,6 @@ import { DestinationPanel } from './DestinationPanel'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -132,11 +131,9 @@ const renderPanel = (clusterId?: string) => {
         posthog: {},
       }}
     >
-      <ReplicationClusterProvider clusterId={clusterId}>
-        <PipelineRequestStatusProvider>
-          <DestinationPanel />
-        </PipelineRequestStatusProvider>
-      </ReplicationClusterProvider>
+      <PipelineRequestStatusProvider>
+        <DestinationPanel clusterId={clusterId} />
+      </PipelineRequestStatusProvider>
     </FeatureFlagContext.Provider>,
     { queryClient, nuqs: { hasMemory: true, searchParams: '?destinationType=BigQuery' } }
   )

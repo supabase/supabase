@@ -7,12 +7,14 @@ import type { ReplicationPublicationData } from '@/data/replication/publication-
 
 export const PipelineReviewCosts = ({
   control,
+  clusterId,
   publication,
 }: {
   control: Control<DestinationPanelSchemaType>
+  clusterId?: string
   publication?: ReplicationPublicationData
 }) => {
-  const costs = usePipelineReviewCosts({ control, publication })
+  const costs = usePipelineReviewCosts({ control, clusterId, publication })
   if (costs.status === 'missing-publication')
     return (
       <div className="p-5 text-sm text-foreground-light">

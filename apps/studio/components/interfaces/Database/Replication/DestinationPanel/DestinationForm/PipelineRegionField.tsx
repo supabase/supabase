@@ -11,7 +11,6 @@ import {
   type ReplicationRegion,
 } from '@/data/replication/clusters-query'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
   ? AWS_REGIONS.SOUTHEAST_ASIA
@@ -31,12 +30,14 @@ export const getPipelineRegionDescription = (destinationType?: DestinationType) 
 
 export const PipelineRegionField = ({
   destinationType,
+  clusterId,
   className,
   onRegionChange,
   preferredClusterId,
   disabled,
 }: {
   destinationType?: DestinationType
+  clusterId?: string
   className?: string
   /** Makes the region selectable when there is more than one region. */
   onRegionChange?: (clusterId: string | undefined) => void
@@ -45,7 +46,6 @@ export const PipelineRegionField = ({
 }) => {
   const { data } = useQuery(replicationClustersQueryOptions())
   const hasMultipleRegions = (data?.regions.length ?? 0) > 1
-  const clusterId = useReplicationClusterId()
   const canSelectRegion = hasMultipleRegions && onRegionChange !== undefined && data !== undefined
   const regions = data?.regions ?? []
   const firstRegion = regions.find(
@@ -73,7 +73,7 @@ export const PipelineRegionField = ({
           }
         />
       ) : (
-        <PipelineRegionReadonly className={className} />
+        <PipelineRegionReadonly clusterId={clusterId} className={className} />
       )}
     </FormItemLayout>
   )
@@ -121,8 +121,13 @@ const PipelineRegionSelect = ({
   </Select>
 )
 
-export const PipelineRegionReadonly = ({ className }: { className?: string }) => {
-  const selectedClusterId = useReplicationClusterId()
+export const PipelineRegionReadonly = ({
+  clusterId: selectedClusterId,
+  className,
+}: {
+  clusterId?: string
+  className?: string
+}) => {
   const { data } = useQuery(replicationClustersQueryOptions())
   const clusterId = selectedClusterId ?? data?.default_cluster_id
   const cluster = data?.regions.find((item) => item.cluster_id === clusterId)
