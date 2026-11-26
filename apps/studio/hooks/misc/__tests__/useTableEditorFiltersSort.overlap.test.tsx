@@ -62,12 +62,10 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
     sortHook.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
     filterHook.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Green'] }))
 
-    expect(ctx.navigateSpy.mock.lastCall?.[0]).toMatchObject({
-      search: {
-        schema: 'public',
-        filter: ['name:eq:Green'],
-        sort: ['id:desc'],
-      },
+    expect(ctx.navigateSpy.mock.lastCall?.[0]?.search).toEqual({
+      schema: 'public',
+      filter: ['name:eq:Green'],
+      sort: ['id:desc'],
     })
     await ctx.settleAll()
     expect(ctx.router.state.location.href).toContain('filter=name%3Aeq%3AGreen&sort=id%3Adesc')
@@ -80,12 +78,10 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
     filterHook.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Blue'] }))
     sortHook.current.setParams((prev) => ({ ...prev, sort: ['id:asc'] }))
 
-    expect(ctx.navigateSpy.mock.lastCall?.[0]).toMatchObject({
-      search: {
-        schema: 'public',
-        filter: ['name:eq:Blue'],
-        sort: ['id:asc'],
-      },
+    expect(ctx.navigateSpy.mock.lastCall?.[0]?.search).toEqual({
+      schema: 'public',
+      filter: ['name:eq:Blue'],
+      sort: ['id:asc'],
     })
   })
 
@@ -102,11 +98,10 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
     })
     result.current.setParams((prev) => ({ ...prev, filter: [] }))
 
-    expect(ctx.navigateSpy.mock.lastCall?.[0]).toMatchObject({
-      search: {
-        schema: 'other',
-        sort: ['id:desc'],
-      },
+    expect(ctx.navigateSpy.mock.lastCall?.[0]?.search).toEqual({
+      schema: 'other',
+      filter: [],
+      sort: ['id:desc'],
     })
   })
 
@@ -117,11 +112,10 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
     await ctx.navigateImmediately({ schema: 'public' })
     result.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Green'] }))
 
-    expect(ctx.navigateSpy.mock.lastCall?.[0]).toMatchObject({
-      search: {
-        schema: 'public',
-        filter: ['name:eq:Green'],
-      },
+    expect(ctx.navigateSpy.mock.lastCall?.[0]?.search).toEqual({
+      schema: 'public',
+      filter: ['name:eq:Green'],
+      sort: [],
     })
   })
 
@@ -133,11 +127,10 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
     window.dispatchEvent(new PopStateEvent('popstate'))
     result.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Green'] }))
 
-    expect(ctx.navigateSpy.mock.lastCall?.[0]).toMatchObject({
-      search: {
-        schema: 'public',
-        filter: ['name:eq:Green'],
-      },
+    expect(ctx.navigateSpy.mock.lastCall?.[0]?.search).toEqual({
+      schema: 'public',
+      filter: ['name:eq:Green'],
+      sort: [],
     })
   })
 })
