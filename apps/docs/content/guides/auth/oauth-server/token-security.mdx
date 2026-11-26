@@ -337,7 +337,7 @@ USING (
 Track and review which clients have access:
 
 ```sql
--- View OAuth clients and their active users in the last 30 days
+-- View OAuth clients and the users with a session refreshed in the last 30 days
 SELECT
   oc.id AS client_id,
   oc.client_name,
@@ -346,7 +346,7 @@ SELECT
 FROM auth.oauth_clients oc
 LEFT JOIN auth.sessions s
   ON s.oauth_client_id = oc.id
-  AND s.created_at > NOW() - INTERVAL '30 days'
+  AND coalesce(s.refreshed_at, s.created_at) > NOW() - INTERVAL '30 days'
 GROUP BY oc.id, oc.client_name, oc.created_at;
 ```
 
