@@ -91,20 +91,20 @@ select
     name,
     bucket_id as bucket,
     case
-        when (metadata->>'size')::int >= 1073741824 then
-            ((metadata->>'size')::int / 1073741824.0)::numeric(10, 2) || ' GB'
-        when (metadata->>'size')::int >= 1048576 then
-            ((metadata->>'size')::int / 1048576.0)::numeric(10, 2) || ' MB'
-        when (metadata->>'size')::int >= 1024 then
-            ((metadata->>'size')::int / 1024.0)::numeric(10, 2) || ' KB'
+        when (metadata->>'size')::bigint >= 1073741824 then
+            ((metadata->>'size')::bigint / 1073741824.0)::numeric(10, 2) || ' GB'
+        when (metadata->>'size')::bigint >= 1048576 then
+            ((metadata->>'size')::bigint / 1048576.0)::numeric(10, 2) || ' MB'
+        when (metadata->>'size')::bigint >= 1024 then
+            ((metadata->>'size')::bigint / 1024.0)::numeric(10, 2) || ' KB'
         else
-            (metadata->>'size')::int || ' bytes'
+            (metadata->>'size')::bigint || ' bytes'
         end as size
 from
     storage.objects
 where
-    (metadata->>'size')::int > 1048576 * 5
-order by (metadata->>'size')::int desc
+    (metadata->>'size')::bigint > 1048576 * 5
+order by (metadata->>'size')::bigint desc
 ```
 
 List buckets with their total size:
@@ -112,13 +112,32 @@ List buckets with their total size:
 ```sql
 select
     bucket_id,
-    (sum((metadata->>'size')::int) / 1048576.0)::numeric(10, 2) as total_size_megabyte
+    (sum((metadata->>'size')::bigint) / 1048576.0)::numeric(10, 2) as total_size_megabyte
 from
     storage.objects
 group by
     bucket_id
 order by
     total_size_megabyte desc;
+```
+
+In a bucket with [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, noncurrent versions count toward your storage size, and these queries include them. To count only current versions, add `archived_at is null` to the `where` clause.
+
+List buckets with their total size, split into current and noncurrent versions:
+
+```sql
+select
+    bucket_id,
+    case when archived_at is null then 'current' else 'noncurrent' end as version_status,
+    (sum((metadata->>'size')::bigint) / 1048576.0)::numeric(10, 2) as total_size_megabyte
+from
+    storage.objects
+group by
+    bucket_id,
+    version_status
+order by
+    bucket_id,
+    version_status;
 ```
 
 ## Optimize usage

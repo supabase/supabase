@@ -41,7 +41,8 @@ const mockApiKeys = [
  */
 const ApiKeysTableIllustration = () => {
   return (
-    <Card className="w-full overflow-hidden opacity-60 pointer-events-none bg-surface-100">
+    // inert: the sample keys are decoration, so their Copy and Reveal buttons must not work or track
+    <Card inert className="w-full overflow-hidden opacity-60 pointer-events-none bg-surface-100">
       <CardContent className="p-0">
         <Table className="p-5">
           <TableHeader>

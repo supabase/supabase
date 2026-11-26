@@ -1,11 +1,10 @@
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import { Badge } from 'ui'
+import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
-import Table from '@/components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -62,30 +61,36 @@ export const RPC = ({ language }: ContentProps) => {
       </div>
       <div className="space-y-2 px-4 py-4">
         <p className="text-sm text-foreground-light">Function arguments</p>
-        <Table
-          head={[
-            <Table.th key="name">Name</Table.th>,
-            <Table.th key="format">Format</Table.th>,
-            <Table.th key="type">Type</Table.th>,
-            <Table.th key="required"></Table.th>,
-          ]}
-          body={parameters.map((parameter) => (
-            <Table.tr key={parameter.name}>
-              <Table.td title={parameter.name}>
-                <p className="font-mono text-xs text-foreground truncate">{parameter.name}</p>
-              </Table.td>
-              <Table.td title={parameter.format}>{parameter.format}</Table.td>
-              <Table.td title={parameter.type}>{parameter.type}</Table.td>
-              <Table.td>
-                {parameter.required ? (
-                  <Badge variant="warning">Required</Badge>
-                ) : (
-                  <Badge variant="default">Optional</Badge>
-                )}
-              </Table.td>
-            </Table.tr>
-          ))}
-        />
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead key="name">Name</TableHead>
+                <TableHead key="format">Format</TableHead>
+                <TableHead key="type">Type</TableHead>
+                <TableHead key="required"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {parameters.map((parameter) => (
+                <TableRow key={parameter.name}>
+                  <TableCell title={parameter.name}>
+                    <p className="font-mono text-xs text-foreground truncate">{parameter.name}</p>
+                  </TableCell>
+                  <TableCell title={parameter.format}>{parameter.format}</TableCell>
+                  <TableCell title={parameter.type}>{parameter.type}</TableCell>
+                  <TableCell>
+                    {parameter.required ? (
+                      <Badge variant="warning">Required</Badge>
+                    ) : (
+                      <Badge variant="default">Optional</Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
       <ResourceContent
         selectedLanguage={language}

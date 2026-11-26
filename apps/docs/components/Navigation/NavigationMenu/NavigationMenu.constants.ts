@@ -224,6 +224,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      icon: 'reference',
       menuItems: [
         [
           {
@@ -433,6 +434,11 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
+        },
+        {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
         },
         {
           name: 'Flask (Python)',
@@ -2099,6 +2105,14 @@ export const storage: NavMenuConstant = {
           url: '/guides/storage/buckets/creating-buckets' as `/${string}`,
         },
         {
+          name: 'Object Versioning',
+          url: '/guides/storage/buckets/object-versioning' as `/${string}`,
+        },
+        {
+          name: 'Lifecycle Policies',
+          url: '/guides/storage/buckets/lifecycle-policies' as `/${string}`,
+        },
+        {
           name: 'Security',
           url: '/guides/storage/security',
           items: [
@@ -2586,6 +2600,11 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/cli/config',
           enabled: localDevelopmentEnabled,
         },
+        {
+          name: 'Config file formats',
+          url: '/guides/local-development/cli/config-formats',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -2755,9 +2774,39 @@ export const platform: NavMenuConstant = {
           ],
         },
         {
-          name: 'Transfer Project',
+          name: 'Project transfers',
           url: '/guides/platform/project-transfer' as `/${string}`,
           enabled: fullPlatformEnabled,
+          items: [
+            {
+              name: 'Transfer a project',
+              url: '/guides/platform/project-transfer' as `/${string}`,
+            },
+            {
+              name: 'Requirements',
+              url: '/guides/platform/project-transfer/requirements' as `/${string}`,
+            },
+            {
+              name: 'Changes after a transfer',
+              url: '/guides/platform/project-transfer/what-changes' as `/${string}`,
+            },
+            {
+              name: 'Transfer project ownership',
+              url: '/guides/platform/project-transfer/transfer-ownership' as `/${string}`,
+            },
+            {
+              name: 'Transfer a Vercel-managed project',
+              url: '/guides/platform/project-transfer/vercel-marketplace' as `/${string}`,
+            },
+            {
+              name: 'Pause a Pro or Team Plan project',
+              url: '/guides/platform/project-transfer/pause-project' as `/${string}`,
+            },
+            {
+              name: 'Troubleshooting',
+              url: '/guides/platform/project-transfer/troubleshooting' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Restore to a new project',
@@ -3136,6 +3185,10 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
+        {
+          name: 'Configure OAuth 2.1 Server',
+          url: '/guides/self-hosting/self-hosted-oauth-server',
+        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
@@ -3548,6 +3601,17 @@ export const reference_swift_v1 = {
 }
 
 export const reference_swift_v2 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase-swift',
+    repo: 'https://github.com/supabase/supabase-swift',
+  },
+}
+
+export const reference_swift_v3 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',

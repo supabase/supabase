@@ -1,6 +1,7 @@
+import { DASHBOARD_SIGN_UP_URL } from 'common/constants/dashboard-urls'
+
+export { DASHBOARD_SIGN_IN_URL, DASHBOARD_SIGN_UP_URL } from 'common/constants/dashboard-urls'
 export const DASHBOARD_URL = 'https://supabase.com/dashboard'
-export const DASHBOARD_SIGN_IN_URL = 'https://supabase.com/dashboard/sign-in'
-export const DASHBOARD_SIGN_UP_URL = 'https://supabase.com/dashboard/sign-up'
 
 /** Homepage/product "Start your project" CTA: sign-up for guests, dashboard for signed-in users. */
 export function getDashboardCtaHref(isLoggedIn: boolean): string {

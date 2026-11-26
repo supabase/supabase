@@ -1,8 +1,7 @@
+import { Link, useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
 import { ChevronDownIcon, CopyIcon, DownloadIcon, SettingsIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -52,8 +51,8 @@ export const DownloadResultsButton = ({
   onCopyAsCSV,
 }: DownloadResultsButtonProps) => {
   const { ref } = useParams()
-  const pathname = usePathname()
-  const isLogs = pathname?.includes?.('/logs') ?? false
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const isLogs = pathname.includes('/logs')
   const isEmpty = useMemo(() => results.length === 0, [results])
 
   const downloadAsCSV = () => {
@@ -147,7 +146,7 @@ export const DownloadResultsButton = ({
       <DropdownMenuContent align={align} className={enableCopyShortcuts ? 'w-60' : 'w-44'}>
         {isLogs && IS_PLATFORM && (
           <DropdownMenuItem asChild className="gap-x-2">
-            <Link href={`/project/${ref}/settings/log-drains`}>
+            <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '_' }}>
               <SettingsIcon size={14} />
               <p>Add a Log Drain</p>
             </Link>

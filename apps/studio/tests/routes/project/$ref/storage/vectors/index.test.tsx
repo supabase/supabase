@@ -20,7 +20,6 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
-    useParams: () => ({ ref: 'default' }),
     get IS_PLATFORM() {
       return mockIsPlatform.value
     },

@@ -125,6 +125,7 @@ module.exports = defineConfig([
       'react/display-name': 'warn',
       'react/no-unstable-nested-components': 'warn',
       'react/jsx-key': 'error',
+      'import/no-anonymous-default-export': 'error',
       'no-restricted-imports': [
         'error',
         {

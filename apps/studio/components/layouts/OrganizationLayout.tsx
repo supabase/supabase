@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ExternalLinkIcon, XIcon } from 'lucide-react'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
@@ -132,10 +131,10 @@ const OrganizationLayoutContent = ({
   return (
     <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
       {pageTitle && (
-        <Head>
+        <>
           <title>{pageTitle}</title>
           <meta name="description" content="Supabase Studio" />
-        </Head>
+        </>
       )}
       {selectedOrganization && bannerConfig && !isBannerDismissed && (
         <Alert

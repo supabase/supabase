@@ -7,12 +7,13 @@ import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import { getLastUsedAPIKeys, getLegacyApiKeyType } from './DisplayApiSettings.utils'
 import Panel from '@/components/ui/Panel'
 import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -24,6 +25,7 @@ export const DisplayApiSettings = ({
   showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const {
     data: settings,
@@ -204,6 +206,16 @@ export const DisplayApiSettings = ({
                         : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
                 onChange={() => {}}
+                // Only the Copy button counts, to match the new API keys page. Keyboard copies don't.
+                onCopied={() => {
+                  const keyType = getLegacyApiKeyType(x.tags)
+                  if (keyType) track('api_key_copied', { keyType })
+                }}
+                onReveal={() => {
+                  if (getLegacyApiKeyType(x.tags) === 'legacy_service_role') {
+                    track('api_key_reveal_clicked', { keyType: 'legacy_service_role' })
+                  }
+                }}
               />
             </FormLayout>
 

@@ -2,15 +2,30 @@
 
 This directory contains the [Astro](https://astro.build) app for the Supabase Knowledge Base, served at [supabase.com/kb](https://supabase.com/kb).
 
-Content is organized into three collections under `src/content/`:
+Content is organized into 4 collections:
 
-- `guides/`: hand-written guides in Markdown or MDX, grouped by topic.
-- `faqs/`: short answers to common questions.
-- `troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
+- `src/content/guides/`: hand-written guides in Markdown or MDX, grouped by topic.
+- `src/content/faqs/`: short answers to common questions.
+- `src/data/community-guides.json`: Highlights other valuable, written resources from our Supabase community. Includes metadata on other written resources (URLs, titles, descriptions, and topics) so we can list these on `topics` pages.
+- `src/content/troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
 
 At build time, every page is also exported as a plain `.md` file, so the content can be read by LLM crawlers and other tools. Requests that send `Accept: text/markdown` receive these files directly.
 
 Search is served by an API route in `api/search/`, backed by content indexed with `pnpm search:ingest`.
+
+## What belongs in `/kb` versus `/docs`
+
+- **`/kb` owns applied decisions and applied experience.** If the answer depends on factors outside the product (scale, budget, the existing stack, or the alternatives), it belongs in `/kb`.
+- **`/docs` owns product truth.** If Supabase alone determines the answer, it belongs in `/docs`. This includes API and SDK reference, configuration, product concepts, quickstarts, supported behavior and limits, and setup for a single integration.
+
+| Content type       | Include                                                                                                                                          | Exclude                                                                                                   |
+| :----------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| `guides`           | Comparisons, migrations from other platforms, decision guides, and tutorials where the cross-stack choice is the point                           | Single-product setup or reference that `/docs` already covers. Link to `/docs` for that material instead. |
+| `faqs`             | Short answers to "Can I use Supabase for X?" or "Can I use X with Supabase?" questions, where the answer depends on the user's stack or workload | Yes/no product facts (supported SDKs, limits, pricing). Answer these in `/docs`.                          |
+| `community-guides` | Useful external write-ups from the community that we only link to.                                                                               | Any content that we host ourselves.                                                                       |
+| `troubleshooting`  | Fixes for problems, for example in response to Support tickets                                                                                   | N/A                                                                                                       |
+
+**Tip:** Before you add a page, search `/docs`, `/kb`, and `/blog` for an existing answer. If one exists, improve it and then decide if it should move or you should link to it. Avoid duplicating content.
 
 ## Development
 
@@ -47,6 +62,19 @@ review process before they're published.
 > "Go to the GitHub discussion"), or [open an issue](https://github.com/supabase/supabase/issues/new/choose) that
 > links the article and describes the change. Pull requests for other `/kb` content, such as `src/content/guides/`,
 > are welcome.
+
+## Style guide
+
+In general, follow all the existing guidelines in the [Docs Style Guide](https://github.com/supabase/supabase/blob/master/apps/docs/style-guide/README.md).
+
+Additionally, stick to plain GitHub-Flavored Markdown:
+
+- No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
+  component wouldn't survive that export.
+- For callouts, use GitHub's native alert syntax (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`,
+  `> [!CAUTION]`) — the build renders these into the `Admonition` component for you
+  (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
+- Frontmatter requires `title`, but see `src/content.config.ts` for the full schema.
 
 ## Workflows
 

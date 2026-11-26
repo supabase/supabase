@@ -1,5 +1,4 @@
 import { User } from 'icons'
-import Image from 'next/image'
 import { ReactNode, useState } from 'react'
 import { cn } from 'ui'
 
@@ -14,11 +13,11 @@ export const ProfileImage = ({ alt, src, placeholder, className }: ProfileImageP
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
   return !!src && !hasInvalidImg ? (
-    <Image
+    <img
       alt={alt ?? ''}
       src={src}
-      width="24"
-      height="24"
+      width={24}
+      height={24}
       className={cn('aspect-square bg-foreground rounded-full object-cover', className)}
       onError={() => setHasInvalidImg(true)}
     />

@@ -1,6 +1,5 @@
 upstream api_gw_upstream {
     server api-gw:8000;
-    keepalive 2;
 }
 
 server {
@@ -10,6 +9,9 @@ server {
 
     server_name ${PROXY_DOMAIN};
     server_tokens off;
+
+    client_max_body_size 0;
+    proxy_request_buffering off;
 
     proxy_http_version 1.1;
 
@@ -83,6 +85,19 @@ server {
 
     location /functions {
         proxy_pass http://api_gw_upstream;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Port $server_port;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Send streamed responses (e.g., SSE) to the client as they arrive.
+        proxy_buffering off;
 
         # Outlast the runtime's 150s request idle timeout, matching the API gateway.
         proxy_read_timeout 160s;

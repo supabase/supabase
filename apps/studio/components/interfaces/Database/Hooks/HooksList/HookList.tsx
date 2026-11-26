@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes } from 'lodash'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
-import Image from 'next/legacy/image'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
   Badge,
@@ -12,12 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 
-import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -69,44 +69,44 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       {filteredHooks.map((x) => {
         const [url, method] = x.function_args
         const isEdgeFunction = isEdgeFunctionUrl(url, ref ?? '', restUrl)
+        const hookTypeLabel = isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td>
+          <TableRow key={x.id}>
+            <TableCell>
               <div className="flex items-center space-x-4">
                 <div>
-                  <Image
+                  <img
                     src={
                       isEdgeFunction
                         ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
                         : `${BASE_PATH}/img/function-providers/http-request.png`
                     }
-                    alt="hook-type"
-                    layout="fixed"
-                    width="20"
-                    height="20"
-                    title={isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'}
+                    alt={hookTypeLabel}
+                    width={20}
+                    height={20}
+                    title={hookTypeLabel}
                   />
                 </div>
                 <p title={x.name} className="truncate">
                   {x.name}
                 </p>
               </div>
-            </Table.td>
-            <Table.td className="hidden space-x-2 lg:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-2 lg:table-cell">
               <p title={x.table}>{x.table}</p>
-            </Table.td>
-            <Table.td className="hidden space-x-1 xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden space-x-1 xl:table-cell">
               {x.events.map((event: string) => (
                 <Badge key={event}>{event}</Badge>
               ))}
-            </Table.td>
-            <Table.td className="hidden xl:table-cell">
+            </TableCell>
+            <TableCell className="hidden xl:table-cell">
               <p className="truncate" title={url}>
                 <code>{method}</code>: {url}
               </p>
-            </Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
@@ -157,8 +157,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   />
                 )}
               </div>
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

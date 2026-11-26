@@ -17,7 +17,7 @@ import {
   usePrivilegesState,
 } from '@/components/interfaces/Database/Privileges/Privileges.utils'
 import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
-import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
+import { PrivilegesTable } from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'

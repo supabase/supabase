@@ -66,3 +66,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
   </Tooltip>
 </TooltipProvider>
 ```
+
+## Inline text
+
+Use a dotted underline and a help cursor (`cursor-help`) for a term with a short definition. Hover over the term or press Tab to focus it.
+
+<ComponentPreview name="tooltip-inline-demo" peekCode wide />
+
+By default, the tooltip opens above the term. The tooltip automatically flips below the term when there isn’t enough room above it in the viewport.
+
+In Studio, apply `TOOLTIP_UNDERLINE_CLASS_NAME` from `@/components/ui/tooltip-styles` to the trigger. Keep information people need to make a decision visible on the page.

@@ -196,8 +196,8 @@ To use the Google provider in local development:
    ```dotenv
    SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
    ```
-2. Configure the provider in `supabase/config.toml`:
-   ```toml
+2. Add this to your config file:
+   ```toml supabase/config.toml
    [auth.external.google]
    enabled = true
    client_id = "<client-id>"
@@ -302,7 +302,7 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
      data-context="signin"
      data-ux_mode="popup"
      data-callback="handleSignInWithGoogle"
-     data-nonce=""
+     data-nonce="<HASHED_NONCE>"
      data-auto_select="true"
      data-itp_support="true"
      data-use_fedcm_for_prompt="true"
@@ -319,6 +319,8 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    ></div>
    ```
 
+   If you configure a nonce, as described in the following _Configure a nonce_ step, keep the `data-nonce` attribute. Otherwise, remove it. Supabase Auth rejects the sign-in when the ID token has a nonce and `signInWithIdToken` doesn't pass one, unless the `Skip nonce check` option is enabled.
+
 1. Create a `handleSignInWithGoogle` function that takes the `CredentialResponse` and passes the included token to Supabase. The function needs to be available in the global scope for Google's code to find it.
 
    ```ts
@@ -330,7 +332,7 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    }
    ```
 
-1. _(Optional)_ Configure a nonce. The use of a nonce is recommended for extra security, but optional. The nonce should be generated randomly each time, and it must be provided in both the `data-nonce` attribute of the HTML code and the options of the callback function.
+1. _(Optional)_ Configure a nonce. A nonce is recommended for extra security. Generate a new random nonce for each sign-in. Pass the hashed nonce in the `data-nonce` attribute, and the raw nonce in the `nonce` option of `signInWithIdToken`.
 
    ```ts
    async function handleSignInWithGoogle(response) {
@@ -342,9 +344,7 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    }
    ```
 
-   Note that the nonce should be the same in both places, but because Supabase Auth expects the provider to hash it (SHA-256, hexadecimal representation), you need to provide a hashed version to Google and a non-hashed version to `signInWithIdToken`.
-
-   You can get both versions by using the in-built `crypto` library:
+   Both values come from the same nonce. Supabase Auth hashes the raw nonce (SHA-256, lowercase hexadecimal representation) and compares it with the nonce in Google's ID token. You can get both versions with the built-in `crypto` library:
 
    ```js
    // Adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
@@ -360,6 +360,8 @@ Most web apps and websites can use Google's [personalized sign-in buttons](https
    // Use 'hashedNonce' when making the authentication request to Google
    // Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
    ```
+
+   Because the nonce changes on every sign-in, generate the `data-nonce` value in your page's code. To keep the HTML data attributes, have that code write the `g_id_onload` element with its `data-nonce` value. Then load the Google client script from that code, in place of the `<script>` tag from the first step. To use the JavaScript API instead, pass the hashed nonce to `google.accounts.id.initialize`, as in [One-tap with Next.js](#one-tap-with-nextjs).
 
 ### One-tap with Next.js
 
@@ -695,7 +697,7 @@ fun GoogleSignInButton() {
 
 ### Using Google sign-in with Kotlin Multiplatform
 
-When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
+When using [Compose Multiplatform](https://kotlinlang.org/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
 
 - On Android it uses the system's [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager-siwg). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-android)
 - On iOS it uses the [`GoogleSignIn-iOS` library](https://github.com/google/GoogleSignIn-iOS). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-ios)
@@ -749,7 +751,7 @@ Button(onClick = { authState.startFlow() }) {
 
 ### Using native sign in for Chrome extensions
 
-Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/identity/) to launch an authentication flow.
+Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/api/identity) to launch an authentication flow.
 
 First, you need to configure your `manifest.json` file like so:
 

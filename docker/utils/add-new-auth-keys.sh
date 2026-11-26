@@ -43,12 +43,12 @@ else
         exit 1
     fi
 
-    if ! ${DOCKER:-docker} image inspect node:22-alpine >/dev/null 2>&1; then
-        echo "Pulling node:22-alpine (first-run only)..."
-        ${DOCKER:-docker} pull node:22-alpine
+    if ! ${DOCKER:-docker} image inspect node:26-alpine >/dev/null 2>&1; then
+        echo "Pulling node:26-alpine (first-run only)..."
+        ${DOCKER:-docker} pull node:26-alpine
     fi
 
-    node_runner="${DOCKER:-docker} run --rm node:22-alpine node"
+    node_runner="${DOCKER:-docker} run --rm node:26-alpine node"
 fi
 
 # Read JWT_SECRET from .env

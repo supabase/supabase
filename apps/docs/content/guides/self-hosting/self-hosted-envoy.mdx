@@ -116,6 +116,10 @@ Routes are matched in the order declared. The first matching prefix wins. Protec
 | `/.well-known/oauth-authorization-server/auth/v1` | auth      | `/.well-known/oauth-authorization-server` | Open           | OAuth 2.0 Authorization Server Metadata at the RFC 8414 path for the `/auth/v1` issuer                     |
 | `/auth/v1/sso/saml/acs`                           | auth      | `/sso/saml/acs`                           | Open           | SAML assertion consumer                                                                                    |
 | `/auth/v1/sso/saml/metadata`                      | auth      | `/sso/saml/metadata`                      | Open           | SAML metadata                                                                                              |
+| `/auth/v1/oauth/authorize`                        | auth      | `/oauth/authorize`                        | Open           | OAuth 2.1 server authorization endpoint (exact path)                                                       |
+| `/auth/v1/oauth/token`                            | auth      | `/oauth/token`                            | Open           | OAuth 2.1 server token endpoint (exact path)                                                               |
+| `/auth/v1/oauth/userinfo`                         | auth      | `/oauth/userinfo`                         | Open           | OpenID Connect UserInfo endpoint (exact path)                                                              |
+| `/auth/v1/oauth/clients/register`                 | auth      | `/oauth/clients/register`                 | Open           | OAuth 2.1 dynamic client registration (exact path)                                                         |
 | `/functions/v1/`                                  | functions | `/`                                       | `sb_` keys     | Rejects invalid and conflicting `sb_` keys; others pass; 160s idle timeout, 410s upstream response timeout |
 | `/storage/v1/`                                    | storage   | `/`                                       | Bypass         | Storage performs its own authorization                                                                     |
 | `/auth/v1/`                                       | auth      | `/`                                       | API key        | Protected Auth endpoints                                                                                   |
@@ -139,6 +143,8 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Timeout errors](/docs/guides/self-hosting/self-hosted-functions#timeout-errors) for the runtime settings.
 
+Other routes have no total timeout. Envoy closes a request after 5 minutes without data in either direction, set by `stream_idle_timeout` in `volumes/api/envoy/lds.template.yaml`.
+
 ## Authentication
 
 The gateway handles three authentication-related steps: dashboard basic auth on the catch-all route, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.
@@ -159,7 +165,7 @@ A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RB
 
 ### Opaque key translation
 
-When the new API keys (`sb_publishable_*`, `sb_secret_*`) are configured, a chain of Lua filters translates opaque keys into the corresponding pre-signed internal JWTs before the request reaches API key enforcement and upstream services. **The chain is skipped on `/functions/v1/`**, which has its own filter. See [Edge Functions](#edge-functions).
+When the new API keys (`sb_publishable_*`, `sb_secret_*`) are configured, a chain of Lua filters translates opaque keys into the corresponding pre-signed internal JWTs before the request reaches API key enforcement and upstream services. **The chain is skipped on `/functions/v1/`**, which has its own filter. See [Edge Functions](#edge-functions). It's also skipped on the open OAuth 2.1 server routes, so a client's own `Authorization` header (for example, `Basic` client credentials on `/auth/v1/oauth/token`) reaches Auth unchanged.
 
 The chain operates in this order:
 
@@ -220,6 +226,8 @@ The gateway applies a permissive CORS policy at the virtual-host level:
 This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
 
 The `/functions/v1/` route is an exception: the CORS filter is disabled there, as on the platform. Preflight requests reach your function, and its CORS headers pass through unchanged. See [CORS errors in the browser](/docs/guides/self-hosting/self-hosted-functions#cors-errors-in-the-browser).
+
+The Studio routes, `/` and the MCP routes `/mcp` and `/api/mcp`, are an exception too: the CORS filter is also disabled there. These routes are called only by Studio's own pages, from the same origin, and by MCP clients, which aren't browsers, so the gateway doesn't approve preflights or add CORS headers on these routes.
 
 The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is another exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
 

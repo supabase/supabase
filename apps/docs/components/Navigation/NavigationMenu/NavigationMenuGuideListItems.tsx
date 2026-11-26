@@ -121,7 +121,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               aria-current={activeItem ? 'page' : undefined}
               className={[
                 'flex items-center gap-2 w-full layout-v2:min-h-8 layout-v2:py-1.5',
-                'cursor-pointer transition text-sm',
+                'cursor-pointer transition layout-v2:transition-none text-sm text-left',
                 'focus-inset rounded-md',
                 activeItem
                   ? 'text-primary font-medium layout-v2:text-foreground layout-v2:[font-weight:inherit]'
@@ -140,7 +140,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                   )}
                   {props.subItem.name}
                 </div>
-                <NavSectionCaret />
+                <NavSectionCaret className="layout-v2:h-lh layout-v2:self-start" />
               </span>
             </Accordion.Trigger>
             <Accordion.Content asChild>
@@ -157,9 +157,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                           href={child.url}
                           aria-current={child.url === pathname ? 'page' : undefined}
                           className={[
-                            'relative block py-1.25 pl-1 -ml-1 cursor-pointer transition text-sm',
-                            'layout-v2:py-1.5 layout-v2:pl-3 layout-v2:-ml-3 layout-v2:pr-2',
-                            'focus-inset rounded-md layout-v2:rounded-l-none layout-v2:hover:bg-surface-200',
+                            'relative block py-1.25 pl-1 -ml-1 cursor-pointer transition layout-v2:transition-none text-sm',
+                            'layout-v2:py-1.5 layout-v2:pl-3 layout-v2:-ml-3 layout-v2:-mr-0.5 layout-v2:pr-2.5',
+                            'focus-inset rounded-md layout-v2:rounded-l-none',
                             child.url === pathname
                               ? 'text-primary layout-v2:text-foreground'
                               : 'hover:text-primary text-foreground-lighter layout-v2:hover:text-foreground',
@@ -194,9 +194,9 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           isCurrent={activeItem}
           className={[
             'flex items-center gap-2',
-            'layout-v2:min-h-8 layout-v2:-ml-2 layout-v2:px-2 layout-v2:py-1.5',
-            'cursor-pointer transition text-sm',
-            'focus-inset rounded-md layout-v2:hover:bg-surface-200',
+            'layout-v2:min-h-8 layout-v2:-ml-2.5 layout-v2:-mr-0.5 layout-v2:px-2.5 layout-v2:py-1.5',
+            'cursor-pointer transition layout-v2:transition-none text-sm',
+            'focus-inset rounded-md',
             activeItem
               ? 'text-primary font-medium layout-v2:text-foreground layout-v2:[font-weight:inherit]'
               : 'hover:text-foreground text-foreground-lighter',
@@ -230,9 +230,9 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         aria-current={props.url === pathname ? 'page' : undefined}
         className={[
           'layout-v2:flex layout-v2:min-h-8 layout-v2:items-center layout-v2:gap-2',
-          'layout-v2:-ml-2 layout-v2:px-2 layout-v2:py-1.5',
-          'cursor-pointer transition text-sm',
-          'focus-inset rounded-md layout-v2:hover:bg-surface-200',
+          'layout-v2:-ml-2.5 layout-v2:-mr-0.5 layout-v2:px-2.5 layout-v2:py-1.5',
+          'cursor-pointer transition layout-v2:transition-none text-sm',
+          'focus-inset rounded-md',
           props.url === pathname
             ? 'text-primary layout-v2:text-foreground'
             : 'hover:text-foreground text-foreground-lighter',

@@ -35,20 +35,21 @@ function ProductIcon({ icon, color }: ProductIcon) {
   return (
     <div
       className={[
-        'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
+        'inline-flex shrink-0 items-center justify-center',
+        color === 'green' ? 'size-6 rounded-sm' : 'h-8 w-8 rounded-md',
         !color || color === 'black' ? 'bg-foreground text-background-alternative' : '',
         color && color === 'gray' ? 'bg-border-strong text-foreground-light' : '',
-        color && color === 'green' ? 'bg-brand-default text-brand-100' : '',
+        color && color === 'green' ? 'bg-primary/10 text-primary' : '',
         color && color === 'alt' ? 'bg-alternative text-primary' : '',
         // color && color === 'alt' ? 'bg-surface-300 text-primary' : '',
       ].join(' ')}
     >
       <svg
         className={[
-          'h-5 w-5',
+          color === 'green' ? 'size-4' : 'h-5 w-5',
           !color || color === 'black' ? 'stroke-background' : '',
           color && color === 'gray' ? 'stroke-foreground-light' : '',
-          color && color === 'green' ? 'stroke-brand-200' : '',
+          color && color === 'green' ? 'stroke-primary' : '',
           color && color === 'alt' ? 'stroke-brand-default' : '',
         ].join(' ')}
         xmlns="http://www.w3.org/2000/svg"

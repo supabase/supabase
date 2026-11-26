@@ -1,6 +1,6 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import OrganizationLayout from './OrganizationLayout'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -65,6 +65,7 @@ const renderLayout = () =>
 
 describe('OrganizationLayout', () => {
   beforeEach(() => {
+    document.title = ''
     mockUseLocalStorageQuery.mockReturnValue([
       false,
       mockSetIsBannerDismissed,
@@ -73,6 +74,22 @@ describe('OrganizationLayout', () => {
     mockUseCustomContent.mockReturnValue({ appTitle: 'Supabase' })
     mockUseVercelRedirectQuery.mockReturnValue({ data: undefined, isSuccess: false })
     mockUseAwsRedirectQuery.mockReturnValue({ data: undefined, isSuccess: false })
+  })
+
+  afterEach(() => {
+    document.title = ''
+  })
+
+  it('sets the document title with the section, organization name, and brand', async () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ name: 'Acme Org' }),
+    })
+
+    renderLayout()
+
+    await waitFor(() => {
+      expect(document.title).toBe('General | Acme Org | Supabase')
+    })
   })
 
   it('renders the exact Vercel banner copy and manage URL', () => {

@@ -2,44 +2,27 @@
 
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { DatabaseIcon } from 'lucide-react'
-import dynamic from 'next/dynamic'
+import { lazy, Suspense } from 'react'
 
 import { EmptyState, SkeletonResults } from './ContextSearchResults.shared'
 import type { SearchContextValue } from './SearchContext.types'
 
-const TableSearchResults = dynamic(
-  () => import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults })),
-  {
-    loading: () => <SkeletonResults />,
-    ssr: false,
-  }
+const TableSearchResults = lazy(() =>
+  import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults }))
 )
 
-const PolicySearchResults = dynamic(
-  () => import('./PolicySearchResults').then((mod) => ({ default: mod.PolicySearchResults })),
-  {
-    loading: () => <SkeletonResults />,
-    ssr: false,
-  }
+const PolicySearchResults = lazy(() =>
+  import('./PolicySearchResults').then((mod) => ({ default: mod.PolicySearchResults }))
 )
 
-const EdgeFunctionSearchResults = dynamic(
-  () =>
-    import('./EdgeFunctionSearchResults').then((mod) => ({
-      default: mod.EdgeFunctionSearchResults,
-    })),
-  {
-    loading: () => <SkeletonResults />,
-    ssr: false,
-  }
+const EdgeFunctionSearchResults = lazy(() =>
+  import('./EdgeFunctionSearchResults').then((mod) => ({
+    default: mod.EdgeFunctionSearchResults,
+  }))
 )
 
-const StorageSearchResults = dynamic(
-  () => import('./StorageSearchResults').then((mod) => ({ default: mod.StorageSearchResults })),
-  {
-    loading: () => <SkeletonResults />,
-    ssr: false,
-  }
+const StorageSearchResults = lazy(() =>
+  import('./StorageSearchResults').then((mod) => ({ default: mod.StorageSearchResults }))
 )
 
 interface ContextSearchResultsProps {
@@ -88,7 +71,9 @@ export function ContextSearchResults({
   if (context === 'database-tables') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <TableSearchResults debouncedFilterString={debouncedFilterString} />
+        <Suspense fallback={<SkeletonResults />}>
+          <TableSearchResults debouncedFilterString={debouncedFilterString} />
+        </Suspense>
       </div>
     )
   }
@@ -96,7 +81,9 @@ export function ContextSearchResults({
   if (context === 'auth-policies') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <PolicySearchResults query={query} />
+        <Suspense fallback={<SkeletonResults />}>
+          <PolicySearchResults query={query} />
+        </Suspense>
       </div>
     )
   }
@@ -104,7 +91,9 @@ export function ContextSearchResults({
   if (context === 'edge-functions') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <EdgeFunctionSearchResults query={query} />
+        <Suspense fallback={<SkeletonResults />}>
+          <EdgeFunctionSearchResults query={query} />
+        </Suspense>
       </div>
     )
   }
@@ -112,7 +101,9 @@ export function ContextSearchResults({
   if (context === 'storage') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <StorageSearchResults query={query} />
+        <Suspense fallback={<SkeletonResults />}>
+          <StorageSearchResults query={query} />
+        </Suspense>
       </div>
     )
   }

@@ -33,7 +33,7 @@ import warpIcon from '../assets/warp-icon.svg'
 import windsurfDarkIcon from '../assets/windsurf-icon-dark.svg'
 import windsurfIcon from '../assets/windsurf-icon.svg'
 
-type ImportedAssetModule = string | { src: string }
+export type ImportedAssetModule = string | { src: string }
 
 type McpClientIconAsset = {
   light: ImportedAssetModule
@@ -64,7 +64,7 @@ const MCP_CLIENT_ICON_ASSETS = {
 
 export type McpClientIconName = keyof typeof MCP_CLIENT_ICON_ASSETS
 
-function normalizeAssetUrl(asset: ImportedAssetModule): string {
+export function normalizeAssetUrl(asset: ImportedAssetModule): string {
   return typeof asset === 'string' ? asset : asset.src
 }
 

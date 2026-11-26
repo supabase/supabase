@@ -20,7 +20,6 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { ForeignTable } from '@/data/table-editor/table-editor-types'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
-vi.mock('next/navigation', () => import('@/compat/next/navigation'))
 vi.mock('nuqs', async (importOriginal) => ({
   ...(await importOriginal<typeof import('nuqs')>()),
   useQueryStates: () => [{}, vi.fn()],

@@ -39,7 +39,7 @@ export const plans: PricingInformation[] = [
       '1 GB file storage',
       'Community support',
     ],
-    footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
+    footer: 'Free projects are paused after 1 week of inactivity.\nLimit of 2 active projects.',
     cta: 'Start for Free',
   },
   {
@@ -65,6 +65,7 @@ export const plans: PricingInformation[] = [
       ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
     preface: 'Everything in the Free Plan, plus:',
+    footer: 'First project included. Additional projects from $10/mo.',
     cta: 'Get Started',
   },
   {
@@ -83,11 +84,14 @@ export const plans: PricingInformation[] = [
       'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
+      'Supports AWS PrivateLink',
       'Priority email support & SLAs',
+      'Supports AWS PrivateLink',
       'Daily backups stored for 14 days',
       '28-day log retention',
     ],
     preface: 'Everything in the Pro Plan, plus:',
+    footer: 'First project included. Additional projects from $10/mo.',
     cta: 'Get Started',
   },
   {
@@ -99,14 +103,13 @@ export const plans: PricingInformation[] = [
     features: [
       'Technical Account Management',
       'Uptime SLAs',
-      'Supports AWS PrivateLink',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
       'Custom Security Questionnaires',
     ],
     priceLabel: '',
     priceMonthly: 'Custom',
-    preface: '',
+    preface: 'Everything in the Team Plan, plus:',
     cta: 'Contact us',
   },
 ] as const

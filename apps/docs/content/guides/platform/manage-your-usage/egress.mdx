@@ -23,11 +23,11 @@ There are various ways to interact with your database, such as through the Postg
 
 Data sent from Supabase Auth to the client while managing your application's users. This includes actions like signing in, signing out, or creating new users, e.g. via the JavaScript Client SDK.
 
-**Example:** A user signs in to an online shop. The client application requests the Supabase Auth service to authenticate and authorize the user. The session data, including authentication tokens and user profile details, is sent back to the client, contributing to Auth Egress.
+**Example:** A user signs in to an online shop. The client application requests the [Supabase Auth](/docs/guides/auth) service to authenticate and authorize the user. The session data, including authentication tokens and user profile details, is sent back to the client, contributing to Auth Egress.
 
 ### Storage Egress
 
-Data sent from Supabase Storage to the client when retrieving assets. This includes actions like downloading files, images, or other stored content, e.g. via the JavaScript Client SDK.
+Data sent from [Supabase Storage](/docs/guides/storage) to the client when retrieving assets. This includes actions like downloading files, images, or other stored content, e.g. via the JavaScript Client SDK.
 
 **Example:** A user downloads an invoice from an online shop. The client application requests [Supabase Storage](/docs/guides/storage/quickstart) to retrieve the PDF file from the storage bucket. The file is sent back to the client, contributing to Storage Egress.
 
@@ -35,11 +35,11 @@ Data sent from Supabase Storage to the client when retrieving assets. This inclu
 
 Data sent to the client when executing Edge Functions.
 
-**Example:** A user completes a checkout process in an online shop. The client application triggers an Edge Function to process the payment and confirm the order. The confirmation response, along with any necessary details, is sent back to the client, contributing to Edge Functions Egress.
+**Example:** A user completes a checkout process in an online shop. The client application triggers an Edge Function to process the payment and confirm the order. The confirmation response, along with any necessary details, is sent back to the client, contributing to [Edge Functions](/docs/guides/functions) Egress.
 
 ### Realtime Egress
 
-Data pushed to clients via Supabase Realtime for subscribed events.
+Data pushed to clients via [Supabase Realtime](/docs/guides/realtime) for subscribed events.
 
 **Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, [Supabase Realtime](/docs/guides/realtime/concepts) pushes updates to all subscribed clients, contributing to Realtime Egress.
 

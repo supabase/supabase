@@ -331,25 +331,26 @@ export const NewPaymentMethodElement = forwardRef(
     return (
       <div className="space-y-2">
         <p className="text-sm text-foreground-lighter">
-          Please ensure CVC and postal codes match what’s on file for your card.
+          Ensure CVC and postal code match your card’s records.
         </p>
 
         <PaymentElement
           options={{
             layout: 'tabs',
+            wallets: { link: 'never' }, // prevent Stripe Link from auto-registering
             defaultValues: { billingDetails: { email: email ?? undefined } },
             readOnly,
           }}
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2 py-4">
+          <div className="flex items-center space-x-2 py-2 mt-4">
             <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground text-sm leading-none">
+            <label htmlFor="business" className="text-foreground text-xs leading-none">
               I’m purchasing as a business
             </label>
             <Tooltip>
@@ -367,6 +368,17 @@ export const NewPaymentMethodElement = forwardRef(
               </TooltipContent>
             </Tooltip>
           </div>
+        )}
+
+        {/*
+          Stripe renders the AddressElement's "Full name" label inside its iframe and exposes
+          no option to reword it (display.name only toggles full/split/organization), so the
+          business-name case is spelled out here instead.
+        */}
+        {!purchasingAsBusiness && (
+          <p className="text-sm text-foreground-lighter">
+            Enter your full name or your business name
+          </p>
         )}
 
         <AddressElement

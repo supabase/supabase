@@ -1,21 +1,19 @@
 import { LogOutIcon } from 'lucide-react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
+import { OAuthAppsAuthorizeRequestData } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+
+/** Shown only for member-bound grants. Exported so previews of this screen stay in step with it. */
+export const MEMBER_BOUND_GRANT_NOTICE =
+  'This grant acts as you, it can never do more than your role in this organization allows.'
 
 export interface AuthorizingAsCardProps {
   email: string
-  request: OAuthAppsAuthorizeRequest
-  organizationSlug: string
+  request: Pick<OAuthAppsAuthorizeRequestData, 'project_scoping_mode' | 'grant_kind'>
   onSignOut: () => void
 }
 
-export const AuthorizingAsCard = ({
-  email,
-  request,
-  organizationSlug,
-  onSignOut,
-}: AuthorizingAsCardProps) => {
+export const AuthorizingAsCard = ({ email, request, onSignOut }: AuthorizingAsCardProps) => {
   return (
     <section className="flex flex-col gap-2">
       <div className="divide-y rounded-md border bg-surface-75 px-4">
@@ -35,10 +33,6 @@ export const AuthorizingAsCard = ({
             />
           </span>
         </div>
-        <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
-          <span className="shrink-0 text-foreground-light">Organization</span>
-          <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
-        </div>
         {!request.project_scoping_mode && (
           <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
             <span className="shrink-0 text-foreground-light">Projects</span>
@@ -49,9 +43,7 @@ export const AuthorizingAsCard = ({
         )}
       </div>
       {request.grant_kind === 'member_bound' && (
-        <p className="text-xs text-foreground-lighter">
-          This grant acts as you, it can never do more than your role in this organization allows.
-        </p>
+        <p className="text-xs text-foreground-lighter">{MEMBER_BOUND_GRANT_NOTICE}</p>
       )}
     </section>
   )

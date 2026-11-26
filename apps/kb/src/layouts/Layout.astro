@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
+import { SIGNED_IN_HINT_SCRIPT } from 'common/gotrue'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
@@ -42,14 +43,14 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		{description && <meta name="description" content={description} />}
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
-			// the wrong theme while this loads. Defaults to dark, and "system" follows the
+			// the wrong theme while this loads. Defaults to "system", which follows the
 			// OS preference, including changes mid-session (choices come from components/HeaderMenu.tsx).
 			;(function () {
 				var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
 				var applyTheme = function () {
 					try {
 						var stored = localStorage.getItem('theme')
-						var theme = stored === 'system' ? (systemDark.matches ? 'dark' : 'light') : stored === 'light' ? 'light' : 'dark'
+						var theme = stored === 'light' || stored === 'dark' ? stored : systemDark.matches ? 'dark' : 'light'
 						document.documentElement.setAttribute('data-theme', theme)
 					} catch (_) {}
 				}
@@ -57,6 +58,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 				systemDark.addEventListener('change', applyTheme)
 			})()
 		</script>
+		<script is:inline set:html={SIGNED_IN_HINT_SCRIPT} />
 		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
 		<link rel="manifest" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${faviconRoute}/manifest.json`} />
 		<meta name="generator" content={Astro.generator} />
@@ -82,6 +84,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		<meta name="twitter:creator" content="@supabase" />
 		<meta name="twitter:image" content={ogImage} />
 		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
+		<slot name="head" />
 	</head>
 	<body class="flex min-h-dvh flex-col">
 		<div class="sticky top-0 z-40">

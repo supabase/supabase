@@ -44,6 +44,34 @@ describe('DefaultCommandList', () => {
     )
   })
 
+  it('renders a separator after "New filter group" when it leads the properties', () => {
+    const { container, getByText } = renderList([
+      { value: '__new_group__', label: 'New filter group' },
+      { value: 'project', label: 'Project' },
+      { value: 'date', label: 'Date range' },
+    ])
+
+    const separators = getSeparators(container)
+    expect(separators).toHaveLength(1)
+    expect(separators[0].previousElementSibling).toBe(
+      getByText('New filter group').closest('[cmdk-item], div')
+    )
+  })
+
+  it('does not separate "New filter group" from a freeform search item above it', () => {
+    const { container } = renderList([
+      {
+        value: '__freeform_search__',
+        label: 'Search message: "x"',
+        isFreeformSearch: true,
+        freeformPropertyName: 'event_message',
+        freeformValue: 'x',
+      },
+      { value: '__new_group__', label: 'New filter group' },
+    ])
+    expect(getSeparators(container)).toHaveLength(0)
+  })
+
   it('does not render a separator when "New filter group" is the only item', () => {
     const { container } = renderList([{ value: '__new_group__', label: 'New filter group' }])
     expect(getSeparators(container)).toHaveLength(0)
