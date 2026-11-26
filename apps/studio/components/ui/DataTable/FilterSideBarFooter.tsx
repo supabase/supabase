@@ -67,6 +67,9 @@ export function FilterSideBarFooter() {
           />
         ))}
       </div>
+      <p aria-live="polite" className="sr-only">
+        {activeItem.title}. {activeItem.description}
+      </p>
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeItem.id}
