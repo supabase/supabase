@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Admonition } from 'ui-patterns/Admonition'
 import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
-import { DocsButton } from '../../../ui/DocsButton'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -19,7 +19,7 @@ export const StorageVersioningPreview = () => {
       </p>
       <Admonition
         type="warning"
-        title="Object versioning is in Public Alpha"
+        title="Storage Object Versioning and Lifecycle Policies are in Public Alpha"
         description="This feature may change during development and is not recommended for production workloads."
       />
       <Image
