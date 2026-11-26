@@ -148,10 +148,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
 
-    const showUpgradeBanner = isEligibleForFreeMicroUpgrade({
-      planId: selectedOrganization?.plan?.id,
-      computeSize: selectedProject?.infra_compute_size,
-    })
+    const showUpgradeBanner =
+      selectedProject?.status === 'ACTIVE_HEALTHY' &&
+      isEligibleForFreeMicroUpgrade({
+        planId: selectedOrganization?.plan?.id,
+        computeSize: selectedProject?.infra_compute_size,
+      })
 
     const isExplorerEnabled = useFlag('explorer')
 
