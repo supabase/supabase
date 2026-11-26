@@ -1,3 +1,4 @@
+import type { AuthMFAAdminDeleteFactorResponse, Factor } from '@supabase/auth-js'
 import { http, HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -5,10 +6,23 @@ import { Route } from '@/routes/api/platform/auth/$ref/users/$id/factors'
 import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
+type DeleteFactorResponse = NonNullable<AuthMFAAdminDeleteFactorResponse['data']>
+type GoTrueErrorResponse = { msg: string }
+
 const SUPABASE_URL = 'http://supabase.test'
 const USER_ID = '11111111-1111-4111-8111-111111111111'
 const FACTOR_1_ID = '22222222-2222-4222-8222-222222222222'
 const FACTOR_2_ID = '33333333-3333-4333-8333-333333333333'
+
+function makeFactor(id: string): Factor {
+  return {
+    id,
+    factor_type: 'totp',
+    status: 'verified',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  }
+}
 
 function createDeferred() {
   let resolve!: () => void
@@ -37,7 +51,7 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
 
     mswServer.use(
       http.get(`${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors`, () =>
-        HttpResponse.json([{ id: FACTOR_1_ID }, { id: FACTOR_2_ID }])
+        HttpResponse.json<Factor[]>([makeFactor(FACTOR_1_ID), makeFactor(FACTOR_2_ID)])
       ),
       http.delete(
         `${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors/:factorId`,
@@ -51,7 +65,7 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
             await secondDelete.promise
           }
           deletedFactorIds.push(factorId)
-          return HttpResponse.json({ id: factorId })
+          return HttpResponse.json<DeleteFactorResponse>({ id: factorId })
         }
       )
     )
@@ -96,15 +110,15 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
   it('returns 400 when any factor deletion fails', async () => {
     mswServer.use(
       http.get(`${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors`, () =>
-        HttpResponse.json([{ id: FACTOR_1_ID }, { id: FACTOR_2_ID }])
+        HttpResponse.json<Factor[]>([makeFactor(FACTOR_1_ID), makeFactor(FACTOR_2_ID)])
       ),
-      http.delete(
+      http.delete<{ factorId: string }, never, DeleteFactorResponse | GoTrueErrorResponse>(
         `${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors/:factorId`,
         ({ params }) => {
           if (params.factorId === FACTOR_2_ID) {
-            return HttpResponse.json({ msg: 'Delete failed' }, { status: 400 })
+            return HttpResponse.json<GoTrueErrorResponse>({ msg: 'Delete failed' }, { status: 400 })
           }
-          return HttpResponse.json({ id: String(params.factorId) })
+          return HttpResponse.json<DeleteFactorResponse>({ id: String(params.factorId) })
         }
       )
     )

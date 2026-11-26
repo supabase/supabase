@@ -5,7 +5,7 @@ import { Route as InviteRoute } from '@/routes/api/platform/auth/$ref/invite'
 import { Route as MagicLinkRoute } from '@/routes/api/platform/auth/$ref/magiclink'
 import { Route as OtpRoute } from '@/routes/api/platform/auth/$ref/otp'
 import { Route as RecoverRoute } from '@/routes/api/platform/auth/$ref/recover'
-import { mswServer } from '@/tests/lib/msw'
+import { mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
 
 const SUPABASE_URL = 'http://supabase.test'
@@ -56,7 +56,7 @@ describe('self-hosted auth sender routes', () => {
       mswServer.use(
         http.post(`${SUPABASE_URL}/auth/v1/${name}`, async ({ request }) => {
           receivedBodies.push(await request.json())
-          return HttpResponse.json({ message: 'Rate limited' }, { status: 429 })
+          return HttpResponse.json<APIErrorBody>({ message: 'Rate limited' }, { status: 429 })
         })
       )
 
