@@ -1,17 +1,10 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  RouterContextProvider,
-  type AnyRouter,
-} from '@tanstack/react-router'
-import { act, renderHook } from '@testing-library/react'
-import type { ReactNode } from 'react'
+import { createRootRoute, createRoute, type AnyRouter } from '@tanstack/react-router'
+import { act } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableEditorFiltersSort } from '../useTableEditorFiltersSort'
-import { parseSearch, stringifySearch, type SearchRecord } from '@/lib/router-search-params'
+import type { SearchRecord } from '@/lib/router-search-params'
+import { createTestRouter, customRenderHook } from '@/tests/lib/custom-render'
 
 const initialUrl = '/project/default/editor/1?schema=public&filter=name:eq:Red'
 
@@ -21,12 +14,7 @@ function createDeferredRouter(url = initialUrl) {
     getParentRoute: () => rootRoute,
     path: '/project/$ref/editor/$id',
   })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([editorRoute]),
-    history: createMemoryHistory({ initialEntries: [url] }),
-    parseSearch,
-    stringifySearch,
-  })
+  const router = createTestRouter(url, rootRoute.addChildren([editorRoute]))
   const realNavigate = router.navigate.bind(router)
   const settles: Array<() => Promise<void>> = []
   const navigateSpy = vi
@@ -53,11 +41,10 @@ function createDeferredRouter(url = initialUrl) {
       })
     })
 
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <RouterContextProvider router={router}>{children}</RouterContextProvider>
-  )
+  const renderFiltersSort = () =>
+    customRenderHook(() => useTableEditorFiltersSort(), { router }).result
 
-  return { router, navigateSpy, settleAll, navigateImmediately, wrapper }
+  return { router, navigateSpy, settleAll, navigateImmediately, renderFiltersSort }
 }
 
 describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
@@ -69,12 +56,8 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
   })
 
   it('a filter push after an unsettled sort push keeps the sort', async () => {
-    const sortHook = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: ctx.wrapper,
-    }).result
-    const filterHook = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: ctx.wrapper,
-    }).result
+    const sortHook = ctx.renderFiltersSort()
+    const filterHook = ctx.renderFiltersSort()
 
     sortHook.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
     filterHook.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Green'] }))
@@ -91,12 +74,8 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
   })
 
   it('a sort push after an unsettled filter push keeps the filter edit', async () => {
-    const filterHook = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: ctx.wrapper,
-    }).result
-    const sortHook = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: ctx.wrapper,
-    }).result
+    const filterHook = ctx.renderFiltersSort()
+    const sortHook = ctx.renderFiltersSort()
 
     filterHook.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Blue'] }))
     sortHook.current.setParams((prev) => ({ ...prev, sort: ['id:asc'] }))
@@ -111,7 +90,7 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
   })
 
   it('bases pushes on the router again once the previous push settled', async () => {
-    const { result } = renderHook(() => useTableEditorFiltersSort(), { wrapper: ctx.wrapper })
+    const result = ctx.renderFiltersSort()
     result.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
     await ctx.settleAll()
 
@@ -132,7 +111,7 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
   })
 
   it('ignores an unsettled push once Back/Forward moved the router elsewhere', async () => {
-    const { result } = renderHook(() => useTableEditorFiltersSort(), { wrapper: ctx.wrapper })
+    const result = ctx.renderFiltersSort()
     result.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
 
     await ctx.navigateImmediately({ schema: 'public' })
@@ -147,7 +126,7 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
   })
 
   it('drops an unsettled push on Back/Forward even if it lands on the URL the push started from', async () => {
-    const { result } = renderHook(() => useTableEditorFiltersSort(), { wrapper: ctx.wrapper })
+    const result = ctx.renderFiltersSort()
     result.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
 
     // The router is still on the starting URL, so only the popstate itself marks the push stale

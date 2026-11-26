@@ -8,29 +8,18 @@ type Router = NextRouter | UseNavigateResult<string>
 
 const MIDDLE_MOUSE_BUTTON = 1
 
+/** `url` must be an app-relative absolute path (`/project/...`, optionally with ?query/#hash) or an external URL; bare `?query`/`#hash` targets aren't resolved against the current path. */
 export const navigateToUrl = (
   navigate: UseNavigateResult<string>,
   url: string,
-  options?: { replace?: boolean }
+  { replace }: { replace?: boolean } = {}
 ) => {
   const { to, search, hash } = splitInternalUrl(url)
   if (isAbsoluteUrl(to)) {
-    const href =
-      to.startsWith('//') && typeof window !== 'undefined'
-        ? new URL(to, window.location.href).href
-        : to
-    return navigate({
-      href,
-      reloadDocument: true,
-      ...(options?.replace !== undefined && { replace: options.replace }),
-    })
+    const href = to.startsWith('//') ? new URL(to, window.location.href).href : to
+    return navigate({ href, reloadDocument: true, replace })
   }
-  return navigate<AnyRouter, string>({
-    to,
-    search: search ?? {},
-    hash: hash ?? '',
-    ...(options?.replace !== undefined && { replace: options.replace }),
-  })
+  return navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '', replace })
 }
 
 const navigateWithRouter = (url: string, router: Router) => {

@@ -13,9 +13,7 @@ export function usePrefetchProjectIndexPage() {
     ({ projectRef }: { projectRef?: string }) => {
       // Prefetch code
       if (projectRef) {
-        void router
-          .preloadRoute({ to: '/project/$ref', params: { ref: projectRef } })
-          .catch(() => {})
+        void router.preloadRoute({ to: '/project/$ref', params: { ref: projectRef } })
       }
 
       // Prefetch data

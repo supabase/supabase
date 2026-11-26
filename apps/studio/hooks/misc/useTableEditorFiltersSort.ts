@@ -67,14 +67,10 @@ export const useTableEditorFiltersSort = () => {
       const areSortsUnchanged = !hasSort || isEqual(newParams.sort, prevParams.sort)
       if (areFiltersUnchanged && areSortsUnchanged) return
 
-      const nextSearch: SearchRecord = { ...baseSearch }
-      if (hasFilter) {
-        if (newParams.filter!.length > 0) nextSearch.filter = newParams.filter!
-        else delete nextSearch.filter
-      }
-      if (hasSort) {
-        if (newParams.sort!.length > 0) nextSearch.sort = newParams.sort!
-        else delete nextSearch.sort
+      const nextSearch: SearchRecord = {
+        ...baseSearch,
+        ...(newParams.filter !== undefined && { filter: newParams.filter }),
+        ...(newParams.sort !== undefined && { sort: newParams.sort }),
       }
 
       const push = { fromHref: currentLocation.href, search: nextSearch }

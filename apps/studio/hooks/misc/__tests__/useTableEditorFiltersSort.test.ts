@@ -1,16 +1,10 @@
 // @vitest-environment jsdom
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router'
+import { createRootRoute, createRoute } from '@tanstack/react-router'
 import { act } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { useTableEditorFiltersSort } from '../useTableEditorFiltersSort'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { customRenderHook } from '@/tests/lib/custom-render'
+import { createTestRouter, customRenderHook } from '@/tests/lib/custom-render'
 
 async function renderAt(initialUrl: string) {
   const rootRoute = createRootRoute()
@@ -18,15 +12,10 @@ async function renderAt(initialUrl: string) {
     getParentRoute: () => rootRoute,
     path: '/test',
   })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([testRoute]),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
+  const router = createTestRouter(initialUrl, rootRoute.addChildren([testRoute]))
   await router.load()
 
-  return { router, ...customRenderHook(() => useTableEditorFiltersSort(), { router }) }
+  return customRenderHook(() => useTableEditorFiltersSort(), { router })
 }
 
 describe('useTableEditorFilters', () => {

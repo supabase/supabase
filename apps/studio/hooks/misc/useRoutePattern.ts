@@ -1,4 +1,4 @@
-import { useLocation, useMatches } from '@tanstack/react-router'
+import { useRouterState } from '@tanstack/react-router'
 
 /**
  * Returns the matched leaf route pattern without a trailing slash on index routes
@@ -8,14 +8,11 @@ import { useLocation, useMatches } from '@tanstack/react-router'
  * (such as component tests mounted with a bare root route).
  */
 export function useRoutePattern(): string {
-  const leafFullPath = useMatches({
-    select: (matches) => {
+  return useRouterState({
+    select: ({ matches, location }) => {
       const leaf = matches.at(-1)
-      if (!leaf || leaf.routeId === '__root__') return undefined
+      if (!leaf || leaf.routeId === '__root__') return location.pathname
       return leaf.fullPath.replace(/(.)\/$/, '$1')
     },
   })
-  const pathname = useLocation({ select: (location) => location.pathname })
-
-  return leafFullPath ?? pathname
 }

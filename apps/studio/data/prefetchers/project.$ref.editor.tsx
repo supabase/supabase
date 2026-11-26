@@ -23,9 +23,7 @@ export function usePrefetchEditorIndexPage() {
     if (!project) return
 
     // Prefetch code
-    void router
-      .preloadRoute({ to: '/project/$ref/editor', params: { ref: project.ref } })
-      .catch(() => {})
+    void router.preloadRoute({ to: '/project/$ref/editor', params: { ref: project.ref } })
 
     // Prefetch data
     prefetchSchemas(queryClient, {
