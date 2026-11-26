@@ -18,11 +18,14 @@ export const useEnsurePipelineRegionSource = (projectRef: string | undefined) =>
     mutationFn: async (targetClusterId) => {
       try {
         if (!projectRef) throw new Error('projectRef is required')
-        const { sources } = await queryClient.ensureQueryData(
-          replicationSourcesQueryOptions({ projectRef, clusterId: targetClusterId })
-        )
+        const sourceOptions = {
+          ...replicationSourcesQueryOptions({ projectRef, clusterId: targetClusterId }),
+          staleTime: 0,
+        }
+        const { sources } = await queryClient.fetchQuery(sourceOptions)
         if (!sources.some((source) => source.name === projectRef)) {
           await createTenantSource({ projectRef, clusterId: targetClusterId })
+          await queryClient.fetchQuery(sourceOptions)
         }
       } catch (error) {
         throw classifyError(error)
