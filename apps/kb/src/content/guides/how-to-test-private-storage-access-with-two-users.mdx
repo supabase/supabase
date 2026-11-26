@@ -12,11 +12,15 @@ A failed download by itself does not show whether the object path is wrong or th
 
 Use a non-production project and a disposable private bucket, such as `rls-isolation-test`. Create two throwaway email-and-password Auth users. The first user will upload a test object; the second will attempt to download that same object.
 
-If you are checking an existing policy, use a non-production copy of the policy and an object in the path your app uses. Do not add a second permissive policy to a live bucket as a test: permissive policies can combine to grant access.
+If you are checking an existing policy, use a non-production copy of the policy and an object in the path your app uses. Do not add a second permissive policy to a live bucket as a test: permissive policies can combine to grant access. [PostgreSQL documents how policies combine](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 
 For this example, the object path starts with the uploader's user ID. Add these policies to the disposable bucket in the SQL Editor. They allow each signed-in user to upload, download, and remove files only from their own first-level folder. Supabase's Storage policy examples use the JWT `sub` claim with `storage.foldername(name)` to scope a path to a user. [See the policy examples](https://supabase.com/docs/guides/storage/security/access-control#policy-examples).
 
 ```sql
+drop policy if exists "RLS test: upload to own folder" on storage.objects;
+drop policy if exists "RLS test: download own folder" on storage.objects;
+drop policy if exists "RLS test: remove own test file" on storage.objects;
+
 create policy "RLS test: upload to own folder"
 on storage.objects
 for insert to authenticated
