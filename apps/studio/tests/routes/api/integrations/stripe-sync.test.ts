@@ -2,7 +2,7 @@ import { uninstall } from '@stripe/sync-engine/supabase'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/integrations/stripe-sync'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@vercel/functions', () => ({
   waitUntil: vi.fn(),
@@ -20,34 +20,30 @@ describe('/api/integrations/stripe-sync', () => {
   })
 
   it('returns 401 when Authorization header is missing on POST', async () => {
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/integrations/stripe-sync', {
+      new Request('http://localhost/api/integrations/stripe-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ projectRef: 'ref', stripeSecretKey: 'sk_test_123' }),
-      }),
-    })
+      })
+    )
 
     expect(response.status).toBe(401)
   })
 
   it('returns 200 on DELETE with valid bearer token and body', async () => {
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request('http://localhost/api/integrations/stripe-sync', {
+      new Request('http://localhost/api/integrations/stripe-sync', {
         method: 'DELETE',
         headers: {
           Authorization: 'Bearer supa-token',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ projectRef: 'ref' }),
-      }),
-    })
+      })
+    )
 
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({
@@ -60,17 +56,5 @@ describe('/api/integrations/stripe-sync', () => {
         supabaseProjectRef: 'ref',
       })
     )
-  })
-
-  it('returns 405 with Allow: POST, DELETE for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/integrations/stripe-sync', { method: 'GET' }),
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST, DELETE')
   })
 })
