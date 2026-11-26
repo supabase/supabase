@@ -115,3 +115,5 @@ using (
   and owner_id = (select auth.jwt()->>'sub')
 );
 ```
+
+Both ownership examples on this page compare `owner_id` with the JWT `sub` claim. See the multi-issuer caveat in [Ownership](/docs/guides/storage/security/ownership#access-control).
