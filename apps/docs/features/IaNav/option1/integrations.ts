@@ -41,6 +41,10 @@ export const integrations: NavMenuConstant = {
               name: 'Manage app access',
               url: '/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access',
             },
+            {
+              name: 'MCP with scoped access',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/mcp-scoped-access',
+            },
           ],
         },
         { name: 'Supabase for Platforms', url: '/guides/integrations/supabase-for-platforms' },
