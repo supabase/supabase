@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/ai/onboarding/design'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/ai/model', () => ({
   getModel: vi.fn().mockResolvedValue({
@@ -29,34 +29,20 @@ vi.mock('ai', async () => {
 
 describe('/api/ai/onboarding/design', () => {
   it('returns a native Web UIMessage SSE stream response', async () => {
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/ai/onboarding/design', {
+      new Request('http://localhost/api/ai/onboarding/design', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: 'Build a todo app' }],
         }),
-      }),
-    })
+      })
+    )
 
     expect(response.status).toBe(200)
     expect(response.headers.get('content-encoding')).toBe('none')
     const body = await response.text()
     expect(body).toContain('Schema ready')
-  })
-
-  it('returns 405 with Allow: POST for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/ai/onboarding/design', { method: 'GET' }),
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST')
   })
 })

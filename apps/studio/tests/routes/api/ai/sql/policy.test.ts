@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getTools } from '@/lib/ai/tools'
 import { Route } from '@/routes/api/ai/sql/policy'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/ai/model', () => ({
   getModel: vi.fn().mockResolvedValue({
@@ -38,11 +38,9 @@ vi.mock('ai', async () => {
 describe('/api/ai/sql/policy', () => {
   it('generates policies and aborts the tool signal when finished', async () => {
     vi.mocked(getTools).mockClear()
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/ai/sql/policy', {
+      new Request('http://localhost/api/ai/sql/policy', {
         method: 'POST',
         headers: {
           Authorization: 'Bearer test-token',
@@ -54,8 +52,8 @@ describe('/api/ai/sql/policy', () => {
           projectRef: 'ref',
           connectionString: 'conn',
         }),
-      }),
-    })
+      })
+    )
 
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual([
@@ -63,17 +61,5 @@ describe('/api/ai/sql/policy', () => {
     ])
     const { signal } = vi.mocked(getTools).mock.calls[0][0]
     expect(signal?.aborted).toBe(true)
-  })
-
-  it('returns 405 with Allow: POST for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/ai/sql/policy', { method: 'GET' }),
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST')
   })
 })

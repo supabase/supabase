@@ -1,12 +1,12 @@
 import { safeSql } from '@supabase/pg-meta'
 import { streamText, UIMessage } from 'ai'
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { Route } from '@/routes/api/ai/sql/generate-v4'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
@@ -52,6 +52,17 @@ vi.mock('ai', async () => {
     })),
   }
 })
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+/** Makes the next streamText call return a stream that never ends on its own. */
+function mockOpenStream() {
+  vi.mocked(streamText).mockImplementationOnce(
+    () => ({ stream: new ReadableStream() }) as unknown as ReturnType<typeof streamText>
+  )
+}
 
 async function readSseChunks(response: Response): Promise<unknown[]> {
   const text = await response.text()
@@ -99,21 +110,13 @@ function createRequest() {
 
   return {
     disconnectClient: () => clientConnection.abort(),
-    callGenerateV4: () => getRouteHandler(Route, 'POST')({ request }),
+    callGenerateV4: () => callRoute(Route, request),
   }
 }
 
 test('generateV4 calls the tool sanitizer and aborts MCP tools on client disconnect', async () => {
-  vi.mocked(getTools).mockClear()
   // Keep the stream open so only the client disconnect can release the request.
-  vi.mocked(streamText).mockImplementationOnce(
-    () =>
-      ({
-        stream: new ReadableStream({
-          start() {},
-        }),
-      }) as unknown as ReturnType<typeof streamText>
-  )
+  mockOpenStream()
   const { disconnectClient, callGenerateV4 } = createRequest()
 
   const response = await callGenerateV4()
@@ -135,16 +138,8 @@ test('generateV4 calls the tool sanitizer and aborts MCP tools on client disconn
 })
 
 test('generateV4 aborts MCP tools when the response stream is canceled', async () => {
-  vi.mocked(getTools).mockClear()
   // Keep the stream open so only canceling the response body can release the request.
-  vi.mocked(streamText).mockImplementationOnce(
-    () =>
-      ({
-        stream: new ReadableStream({
-          start() {},
-        }),
-      }) as unknown as ReturnType<typeof streamText>
-  )
+  mockOpenStream()
   const { callGenerateV4 } = createRequest()
 
   const response = await callGenerateV4()
@@ -157,7 +152,6 @@ test('generateV4 aborts MCP tools when the response stream is canceled', async (
 })
 
 test('generateV4 streams a tool result that continues the previous assistant message', async () => {
-  vi.mocked(streamText).mockClear()
   // After an approval, streamText runs the approved tool first and streams its result into the
   // assistant message the client already has, so the tool call never appears in this stream.
   vi.mocked(streamText).mockImplementationOnce(
@@ -189,7 +183,6 @@ test('generateV4 streams a tool result that continues the previous assistant mes
 })
 
 test('generateV4 flags a response the deadline stopped and releases the request', async () => {
-  vi.mocked(streamText).mockClear()
   vi.mocked(streamText).mockImplementationOnce(
     () =>
       ({
