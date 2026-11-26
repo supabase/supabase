@@ -53,10 +53,23 @@ const VersionRowBadge = ({
   if (isComparing) return <Badge variant="success">Comparing</Badge>
   if (!fate || fate.type === 'retained') return null
 
-  const label =
-    fate.type === 'expires-in' || fate.type === 'expires-on-next-upload'
-      ? `${fate.type === 'expires-in' ? fate.days : fate.daysRemaining}d`
-      : 'Queued'
+  let label: string
+  switch (fate.type) {
+    case 'expires-in':
+      label = `${fate.days}d`
+      break
+    case 'expires-on-next-upload':
+      label = `${fate.daysRemaining}d`
+      break
+    case 'cap-expiry-pending':
+      label = `${fate.daysRemaining}d`
+      break
+    case 'expiry-due':
+      label = 'Queued'
+      break
+    case 'retained':
+      return null
+  }
 
   return (
     <Tooltip>
@@ -64,6 +77,7 @@ const VersionRowBadge = ({
         className={cn(
           'shrink-0 text-xs text-foreground-lighter',
           fate.type === 'expires-on-next-upload' && 'text-warning-600',
+          fate.type === 'cap-expiry-pending' && 'text-warning-600',
           fate.type === 'expiry-due' && 'text-destructive'
         )}
       >
@@ -84,13 +98,15 @@ const VersionRowBadge = ({
 const versionFateDescription = (fate: VersionFate) => {
   switch (fate.type) {
     case 'retained':
-      return 'No expiration'
+      return 'Not currently scheduled to expire'
     case 'expires-in':
-      return `Expires in ${fate.days} ${fate.days === 1 ? 'day' : 'days'}`
+      return `Expires in ${fate.days} ${fate.days === 1 ? 'day' : 'days'}.`
     case 'expires-on-next-upload':
-      return `Expires on next upload or in ${fate.daysRemaining} ${fate.daysRemaining === 1 ? 'day' : 'days'}`
+      return `Expires on next upload or in ${fate.daysRemaining} ${fate.daysRemaining === 1 ? 'day' : 'days'}.`
+    case 'cap-expiry-pending':
+      return `This version is beyond the limit of ${fate.cap} kept ${fate.cap === 1 ? 'version' : 'versions'} and becomes eligible to expire in ${fate.daysRemaining} ${fate.daysRemaining === 1 ? 'day' : 'days'}.`
     case 'expiry-due':
-      return 'Queued to expire'
+      return 'Queued to expire.'
   }
 }
 

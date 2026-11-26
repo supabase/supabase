@@ -164,6 +164,31 @@ describe('VersionHistory', () => {
     expect(await screen.findByText('Not currently scheduled to expire')).toBeInTheDocument()
   })
 
+  it('explains that a version beyond the keep limit must reach the count rule age minimum', async () => {
+    const archivedAt = new Date().toISOString()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () =>
+        Response.json([
+          VERSIONS[0],
+          { ...VERSIONS[1], archived_at: archivedAt },
+          { ...VERSIONS[1], version: 'v-oldest', archived_at: archivedAt },
+        ]),
+    })
+
+    renderHistory({
+      lifecyclePolicy: { expiryDays: 30, maxVersions: 1 },
+      expirationMode: 'or',
+    })
+
+    const countdown = await screen.findByText('1d')
+    await userEvent.hover(countdown)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'beyond the limit of 1 kept version and becomes eligible to expire in 1 day'
+    )
+  })
+
   describe('suspended notice', () => {
     it('promises one last retained version for a file that predates the suspension', async () => {
       addAPIMock({
