@@ -124,6 +124,46 @@ describe('VersionHistory', () => {
     })
   })
 
+  it('shows version details and calculates expiration from when it was archived', async () => {
+    const archivedAt = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () =>
+        Response.json([
+          ...VERSIONS.slice(0, 1),
+          { ...VERSIONS[1], created_at: '2020-01-01T00:00:00Z', archived_at: archivedAt },
+        ]),
+    })
+
+    renderHistory({ lifecyclePolicy: { expiryDays: 30, maxVersions: null } })
+
+    expect(await screen.findByText('100 bytes')).toBeInTheDocument()
+    const countdown = await screen.findByText('28d')
+    await userEvent.hover(countdown)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Expires in 28 days')
+    await userEvent.unhover(countdown)
+    await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
+
+    expect(await screen.findByText('Archived')).toBeInTheDocument()
+    expect(screen.getByText('Created')).toBeInTheDocument()
+    expect(screen.getByText('Lifecycle')).toBeInTheDocument()
+    expect(screen.getByText('Expires in 28 days.')).toBeInTheDocument()
+  })
+
+  it('explains when a version is retained by the current lifecycle policy', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () => Response.json(VERSIONS),
+    })
+
+    renderHistory()
+    await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
+
+    expect(await screen.findByText('Not currently scheduled to expire')).toBeInTheDocument()
+  })
+
   describe('suspended notice', () => {
     it('promises one last retained version for a file that predates the suspension', async () => {
       addAPIMock({

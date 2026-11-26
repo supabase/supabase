@@ -15,14 +15,15 @@ const object = (overrides: Partial<StorageObject>): StorageObject => ({
 })
 
 describe('toObjectVersions', () => {
-  it('returns newest first', () => {
+  it('returns the current version first, then archived versions newest first', () => {
     const versions = toObjectVersions([
-      object({ version: 'old', created_at: '2026-01-01T00:00:00Z', archived_at: '2026-02-01' }),
-      object({ version: 'new', created_at: '2026-03-01T00:00:00Z' }),
+      object({ version: 'old', created_at: '2026-03-01T00:00:00Z', archived_at: '2026-02-01' }),
+      object({ version: 'current', created_at: '2026-01-01T00:00:00Z' }),
       object({ version: 'mid', created_at: '2026-02-01T00:00:00Z', archived_at: '2026-03-01' }),
     ])
 
-    expect(versions.map((version) => version.versionId)).toEqual(['new', 'mid', 'old'])
+    expect(versions.map((version) => version.versionId)).toEqual(['current', 'mid', 'old'])
+    expect(versions.find((version) => version.versionId === 'old')?.action).toBe('overwrite')
   })
 
   it('treats a row with no archived_at as the current version', () => {
@@ -33,6 +34,23 @@ describe('toObjectVersions', () => {
 
     expect(versions.find((version) => version.versionId === 'a')?.isCurrent).toBe(true)
     expect(versions.find((version) => version.versionId === 'b')?.isCurrent).toBe(false)
+  })
+
+  it('uses archived_at to order noncurrent versions even when created_at disagrees', () => {
+    const versions = toObjectVersions([
+      object({
+        version: 'older-archive',
+        created_at: '2026-03-01T00:00:00Z',
+        archived_at: '2026-01-01',
+      }),
+      object({
+        version: 'newer-archive',
+        created_at: '2026-01-01T00:00:00Z',
+        archived_at: '2026-02-01',
+      }),
+    ])
+
+    expect(versions.map((version) => version.versionId)).toEqual(['newer-archive', 'older-archive'])
   })
 
   it('labels the oldest upload and treats the rest as overwrites', () => {

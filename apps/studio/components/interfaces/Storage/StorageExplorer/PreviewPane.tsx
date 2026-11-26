@@ -9,7 +9,7 @@ import {
   UploadIcon,
   XIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -269,9 +269,12 @@ export const PreviewPane = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const [, setShowEditBucketModal] = useQueryState(
-    'edit',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  const [, setBucketAction] = useQueryState(
+    'action',
+    parseAsStringLiteral(['edit', 'empty', 'delete', 'purgeCDNCache']).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
   )
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -433,7 +436,7 @@ export const PreviewPane = () => {
                 previewedVersionId={previewedVersion?.versionId}
                 onPreview={handlePreviewVersion}
                 clearPreview={() => setPreviewedVersion(undefined)}
-                onEditBucket={() => setShowEditBucketModal(true)}
+                onEditBucket={() => setBucketAction('edit')}
               />
             </PreviewSection>
           )}
