@@ -65,7 +65,7 @@ export const folderQueryParamsSchema = z.object({
   limit: z
     .string()
     .transform((val) => Number(val))
-    .pipe(z.number().int().positive())
+    .pipe(z.number().int().positive().max(1000))
     .optional(),
   sort_by: z.enum(['name', 'inserted_at']).optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),

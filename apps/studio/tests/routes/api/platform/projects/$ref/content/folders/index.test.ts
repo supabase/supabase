@@ -66,6 +66,7 @@ describe('/api/platform/projects/$ref/content/folders', () => {
   it.each([
     '?limit=invalid',
     '?limit=0',
+    '?limit=1001',
     '?sort_by=invalid',
     '?sort_order=invalid',
     '?limit=1&limit=2',

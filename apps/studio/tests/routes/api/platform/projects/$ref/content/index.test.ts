@@ -89,10 +89,11 @@ describe('/api/platform/projects/$ref/content', () => {
   })
 
   it.each([
+    '?limit=1001',
     '?visibility=project&visibility=user',
     '?limit=1&limit=2',
     '?sort_by=name&sort_by=inserted_at',
-  ])('returns 400 on GET when query params are repeated (%s)', async (query) => {
+  ])('returns 400 on GET when query params are invalid or repeated (%s)', async (query) => {
     await createSnippet(Route, { name: 'My Query' })
 
     const response = await callRoute(
