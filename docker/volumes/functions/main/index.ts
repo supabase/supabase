@@ -317,6 +317,8 @@ Deno.serve({ onError }, async (req: Request) => {
   const path_parts = pathname.split('/')
   const service_name = path_parts[1]
 
+  // Every response this handler returns goes through logResponse, so each request
+  // gets exactly one record. Thrown errors are answered by onError instead.
   const logResponse = (response: Response, executionId?: string): Response => {
     try {
       emitLog({
@@ -324,7 +326,8 @@ Deno.serve({ onError }, async (req: Request) => {
         timestamp: new Date().toISOString(),
         msg: `${req.method} ${pathname} ${response.status}`,
         metadata: {
-          function_id: service_name,
+          // Omitted for the bare root path; Vector then stores null.
+          function_id: service_name || undefined,
           request_id: requestId,
           execution_id: executionId,
           request: { method: req.method, pathname },
@@ -350,11 +353,13 @@ Deno.serve({ onError }, async (req: Request) => {
   }
 
   if (!service_name || service_name === 'main') {
-    return getFunctionErrorResponse({
-      code: RequestErrors.NotFound,
-      message: 'Requested function was not found',
-      status: 404,
-    })
+    return logResponse(
+      getFunctionErrorResponse({
+        code: RequestErrors.NotFound,
+        message: 'Requested function was not found',
+        status: 404,
+      })
+    )
   }
 
   const servicePath = `/home/deno/functions/${service_name}`
@@ -362,26 +367,32 @@ Deno.serve({ onError }, async (req: Request) => {
   try {
     const serviceInfo = await Deno.stat(servicePath)
     if (!serviceInfo.isDirectory) {
-      return getFunctionErrorResponse({
-        code: RequestErrors.NotFound,
-        message: 'Requested function was not found',
-        status: 404,
-      })
+      return logResponse(
+        getFunctionErrorResponse({
+          code: RequestErrors.NotFound,
+          message: 'Requested function was not found',
+          status: 404,
+        })
+      )
     }
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
-      return getFunctionErrorResponse({
-        code: RequestErrors.NotFound,
-        message: 'Requested function was not found',
-        status: 404,
-      })
+      return logResponse(
+        getFunctionErrorResponse({
+          code: RequestErrors.NotFound,
+          message: 'Requested function was not found',
+          status: 404,
+        })
+      )
     }
     logInternal('main', 'error', 'function dispatch failed', e)
-    return getFunctionErrorResponse({
-      code: RequestErrors.BootError,
-      message: 'Function failed to start (please check logs)',
-      status: 503,
-    })
+    return logResponse(
+      getFunctionErrorResponse({
+        code: RequestErrors.BootError,
+        message: 'Function failed to start (please check logs)',
+        status: 503,
+      })
+    )
   }
 
   const memoryLimitMb = 256
