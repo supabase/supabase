@@ -369,7 +369,7 @@ describe('ReplicationPipelineLayout', () => {
     const queryClient = new QueryClient()
     const clusterId = 'eu-west-1'
     const { router } = renderLayout(undefined, queryClient, clusterId)
-    const listHref = '/project/default/database/pipelines?cluster_id=eu-west-1'
+    const listHref = '/project/default/database/pipelines'
     await screen.findByRole('img', { name: 'Unknown destination' })
     expect(requestedClusters).toEqual([clusterId])
     expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
