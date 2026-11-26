@@ -20,7 +20,12 @@ export const useReplicationClusters = () => {
   }))
   clusters.sort((a, b) => Number(b.isDefault) - Number(a.isDefault))
   if (clusters.length === 0) {
-    clusters.push({ clusterId: undefined, regionName: undefined, regionCode: null, isDefault: true })
+    clusters.push({
+      clusterId: undefined,
+      regionName: undefined,
+      regionCode: null,
+      isDefault: true,
+    })
   }
   return { clusters, hasMultipleRegions: clusters.length > 1 }
 }
