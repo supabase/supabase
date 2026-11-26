@@ -103,6 +103,10 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `AUTH_JWT_SECRET` | string | Both | HS256 JWT secret used to mint/verify legacy API keys; surfaced to the UI for "JWT settings" and PostgREST config. | Mapped from `JWT_SECRET` in `.env.example`. Must be at least 32 characters. |
 | `SUPABASE_ANON_KEY` | string | Both | Anon API key surfaced in the Project API Settings page and used by in-dashboard clients. | Mapped from `ANON_KEY`. Supports `_FILE` suffix for Docker secrets. |
 | `SUPABASE_SERVICE_KEY` | string | Both | Service-role API key surfaced in the Project API Settings page. | Mapped from `SERVICE_ROLE_KEY`. Supports `_FILE` suffix for Docker secrets. Keep secret. |
+| `SUPABASE_PUBLISHABLE_KEY` | string | Both | Publishable API key listed on the API Keys page. Studio's self-hosted MCP endpoint also uses it. | Listed only when set |
+| `SUPABASE_SECRET_KEY` | string | Both | Secret API key listed on the API Keys page. | Listed only when set. Keep secret. |
+| `S3_PROTOCOL_ACCESS_KEY_ID` | string | CLI | S3 access key ID returned by Studio's `/api/get-s3-keys` route for the S3 connection settings. | The self-hosted compose passes it to the `storage` container only, not to Studio |
+| `S3_PROTOCOL_ACCESS_KEY_SECRET` | string | CLI | S3 secret access key returned by Studio's `/api/get-s3-keys` route. | The self-hosted compose passes it to the `storage` container only, not to Studio. Keep secret. |
 
 ### PG Meta
 
