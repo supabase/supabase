@@ -171,7 +171,7 @@ export const MenuItem = React.forwardRef<
         ref={ref}
         className={cn(
           'group/menu-item flex items-center gap-2',
-          'w-full flex min-h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md px-2 py-1.5 leading-5 no-underline focus-ring focus-visible:text-foreground',
+          'w-full flex min-h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md px-2 py-1.5 leading-5 no-underline focus-inset focus-visible:text-foreground',
           className
         )}
         {...props}

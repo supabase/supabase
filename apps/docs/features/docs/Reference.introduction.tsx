@@ -1,7 +1,7 @@
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' with { type: 'json' }
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
@@ -47,6 +47,30 @@ export async function ClientLibIntroduction({
     >
       <MDXRemoteRefs source={content} />
     </ReferenceSectionWrapper>
+  )
+}
+
+export function PrereleaseAlert({
+  libPath,
+  stage,
+  className,
+}: {
+  libPath: string
+  stage: string
+  className?: string
+}) {
+  return (
+    <Alert variant="warning" className={cn('not-prose', className)}>
+      <FlaskConical />
+      <AlertTitle className="font-medium">This version is in {stage}</AlertTitle>
+      <AlertDescription>
+        Its API can change before the stable release. For production apps, use the{' '}
+        <Link href={`/reference/${libPath}`} className="underline underline-offset-2">
+          stable version
+        </Link>
+        .
+      </AlertDescription>
+    </Alert>
   )
 }
 

@@ -37,7 +37,7 @@ export function AccessLevelDropdown({
           {label}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="min-w-0 w-max">
         <DropdownMenuRadioGroup
           value={value}
           onValueChange={(next) => {

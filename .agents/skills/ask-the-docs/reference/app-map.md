@@ -134,9 +134,7 @@ pattern in production:
 | Markdown handler  | `apps/docs/internals/markdown-schema/ContentListings.ts`               |
 | MDX registration  | `apps/docs/features/docs/MdxBase.shared.tsx`                           |
 
-MDX usage: `<ContentListings id="storage-get-started" />`. For batch
-overview-page migration, see the `audit-content-listings` skill in
-[`docs-agent-skills`](https://github.com/supabase/docs-agent-skills).
+MDX usage: `<ContentListings id="storage-get-started" />`.
 
 When adding a new component that has a markdown representation:
 
@@ -196,7 +194,7 @@ commands:
 | Tool                                                | Where     | What it catches                                                                                                |
 | --------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
 | `pnpm test:local:unwatch <path>` (from `apps/docs`) | per-test  | Vitest suite for `lib/` and `data/` schemas; needs local Supabase + DB reset first — see `apps/docs/AGENTS.md` |
-| `pnpm format`                                       | repo root | Prettier — run before opening a PR                                                                             |
+| `pnpm format`                                       | repo root | oxfmt — run before opening a PR                                                                                |
 | `pnpm lint --filter=docs`                           | repo root | ESLint over `apps/docs`                                                                                        |
 | `pnpm typecheck`                                    | repo root | TS across packages                                                                                             |
 | `pnpm build --filter=docs`                          | repo root | Includes markdown generation; failures here block release                                                      |
@@ -230,8 +228,6 @@ Wraps the app with:
   changing URL shapes.
 - **www** (`apps/www`) sometimes embeds docs sections.
 - **PostHog** receives `docs_*` events for analytics.
-- **`docs-agent-skills`** repo (https://github.com/supabase/docs-agent-skills)
-  holds batch audit/conversion skills that drive multi-PR docs migrations.
 - **Federated upstream repos** — see [`federated-docs.md`](./federated-docs.md)
   for the full list (pg_graphql, vecs, wrappers, terraform-provider, setup-cli,
   splinter, agent-skills).

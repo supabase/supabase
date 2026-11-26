@@ -1,6 +1,7 @@
 import {
   Boxes,
   Clock,
+  Code,
   Hammer,
   Heart,
   Rocket,
@@ -124,6 +125,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Hammer width={width} height={height} className={className} />
     case 'develop':
       return <Rocket width={width} height={height} className={className} />
+    case 'reference':
+      return <Code width={width} height={height} className={className} />
     case 'manage':
       return <Settings2 width={width} height={height} className={className} />
     default:

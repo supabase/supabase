@@ -8,7 +8,7 @@ import {
   type SyntheticEvent,
 } from 'react'
 
-import { BASE_PATH } from '@/lib/constants'
+import { applyBasePath } from '@/lib/internal-url'
 
 // `next/legacy/image` is the pre-Next-13 Image API. Functionally similar
 // to `next/image` but with `layout` and `objectFit`/`objectPosition`
@@ -43,15 +43,6 @@ interface ImageProps extends Omit<ComponentPropsWithoutRef<'img'>, 'src' | 'alt'
   unoptimized?: boolean
   sizes?: string
   onLoadingComplete?: (img: HTMLImageElement) => void
-}
-
-function applyBasePath(src: string): string {
-  if (!BASE_PATH) return src
-  // Schemes (http:, https:, data:, blob:) and protocol-relative URLs.
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
-  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
-  if (src.startsWith('/')) return `${BASE_PATH}${src}`
-  return src
 }
 
 function resolveSrc(

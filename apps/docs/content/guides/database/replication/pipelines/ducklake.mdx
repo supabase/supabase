@@ -170,7 +170,7 @@ Pipelines supports:
 
 New columns are created as nullable so existing destination rows remain valid. Adding `NOT NULL` keeps an existing destination column nullable. Supported defaults are stored in DuckLake metadata; other defaults are skipped. Postgres still supplies the source values through replication.
 
-For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+After a source type change, Pipelines logs a warning and keeps the existing DuckLake column type. Later writes can fail if the new values are incompatible with that type. Use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the affected table.
 
 ## Troubleshooting
 

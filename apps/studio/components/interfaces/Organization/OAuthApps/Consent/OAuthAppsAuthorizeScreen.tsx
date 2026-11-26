@@ -76,12 +76,19 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
 
+  useEffect(() => {
+    if (request?.approved_organization_slug) {
+      setOrganizationSlug(request.approved_organization_slug)
+    }
+  }, [request])
+
   const {
     data: memberOrg,
     error: memberOrgError,
     isPending: isPendingMemberOrg,
     isError: isErrorMemberOrg,
   } = useMemberOrganization({
+    // for already-approved apps that the user navigates back to after a redirect error, the approved_organization_slug takes precedence
     organizationSlug,
     projectRef,
     request,
@@ -110,7 +117,7 @@ export const OAuthAppsAuthorizeScreen = ({
       search,
     },
     {
-      enabled: memberOrg != null,
+      enabled: !isPendingRequest && memberOrg != null,
     }
   )
 
@@ -157,6 +164,11 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const initialRefs = useMemo(() => {
     const refs = new Set<string>()
+    // for already-approved apps that the user navigates back to after a redirect error, the approved_project_refs takes precedence
+    if (request?.approved_project_refs) {
+      request?.approved_project_refs.forEach((ref) => refs.add(ref))
+      return Array.from(refs)
+    }
     if (preflightData?.existing_grant?.project_refs) {
       preflightData.existing_grant.project_refs.forEach((ref) => refs.add(ref))
     }
@@ -164,7 +176,7 @@ export const OAuthAppsAuthorizeScreen = ({
       refs.add(projectRef)
     }
     return Array.from(refs)
-  }, [preflightData?.existing_grant?.project_refs, projectRef])
+  }, [preflightData?.existing_grant?.project_refs, projectRef, request?.approved_project_refs])
 
   const {
     data: initialProjectsData,
@@ -182,25 +194,49 @@ export const OAuthAppsAuthorizeScreen = ({
   )
 
   useEffect(() => {
-    if (!preflightData || !memberOrg) return
+    if (!preflightData || !memberOrg || !request) return
 
     const grant = preflightData.existing_grant
     const hasAllProjectsGrant =
       grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
-    if (!hasAllProjectsGrant && !initialProjectsData) return
+    if (!hasAllProjectsGrant && !initialProjectsData && !request) return
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
       return
     }
 
+    // for already-approved apps that the user navigates back to after a redirect error, if there's an approved_organization_slug and no project refs
+    if (
+      (request.approved_organization_slug && request.approved_project_refs == null) ||
+      request.approved_project_refs?.length === 0
+    ) {
+      setAllProjectsSelected(true)
+      return
+    }
+
+    let projectRefs = projectRef != undefined ? [projectRef!] : []
+
+    if (grant?.project_refs) {
+      projectRefs = grant.project_refs
+    }
+    if (request.approved_project_refs) {
+      projectRefs = request.approved_project_refs
+    }
+
     const refs = getPreselectedProjectRefs({
-      existingGrant: grant,
-      projectRef,
+      projectRefs,
       liveProjects: initialProjectsData?.pages.flatMap((page) => page.projects) ?? [],
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [preflightData, initialProjectsData, memberOrg, isProjectScopingModeEnabled, projectRef])
+  }, [
+    preflightData,
+    initialProjectsData,
+    memberOrg,
+    isProjectScopingModeEnabled,
+    projectRef,
+    request,
+  ])
 
   const { data: selectedProjectsData } = useOrgProjectsInfiniteQuery(
     {

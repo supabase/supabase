@@ -1,14 +1,11 @@
-'use client'
-
+import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { genFaviconLinks } from './icons'
-
 export const DEFAULT_FAVICON_THEME_COLOR = '1E1E1E'
-export const DEFAULT_FAVICON_ROUTE = '/favicon'
+const DEFAULT_FAVICON_ROUTE = '/favicon'
 
-const MetaFaviconsPagesRouter = ({
+export const MetaFaviconsPagesRouter = ({
   applicationName,
   route = DEFAULT_FAVICON_ROUTE,
   themeColor = DEFAULT_FAVICON_THEME_COLOR,
@@ -41,5 +38,3 @@ const MetaFaviconsPagesRouter = ({
     </Head>
   )
 }
-
-export default MetaFaviconsPagesRouter
