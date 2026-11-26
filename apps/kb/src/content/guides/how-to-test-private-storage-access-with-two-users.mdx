@@ -52,7 +52,7 @@ Create a temporary Node.js folder, install the JavaScript client, and create a l
 
 ```sh
 npm init -y
-npm install @supabase/supabase-js dotenv
+npm install @supabase/supabase-js@2.117.3 dotenv@17.2.3
 ```
 
 Put these values in `.env`:
@@ -107,17 +107,19 @@ try {
   const { error: otherError } = await other.client.storage.from(bucket).download(objectPath)
   if (!otherError) throw new Error('The second user unexpectedly downloaded the test object')
 
-  const deniedStatuses = new Set([400, 403, 404])
-  const statusCode = Number(otherError.statusCode)
-  if (!deniedStatuses.has(statusCode)) {
-    throw new Error(`Unexpected error from the second-user request: ${otherError.statusCode ?? 'no status'}`)
+  const deniedCodes = ['AccessDenied', 'NoSuchKey', 'unauthorized', 'not_found']
+  if (!deniedCodes.includes(otherError.code)) {
+    throw new Error(
+      `Unexpected error from the second-user request: ${otherError.code ?? otherError.message}`
+    )
   }
 
-  console.log(`PASS: owner download succeeded; second-user request was denied (HTTP ${statusCode})`)
+  console.log(`PASS: owner download succeeded; second-user download returned ${otherError.code}`)
 } finally {
   if (uploaded) {
     const { error: cleanupError } = await owner.client.storage.from(bucket).remove([objectPath])
-    if (cleanupError) console.warn('Remove the test object from Storage manually:', cleanupError.message)
+    if (cleanupError)
+      console.warn('Remove the test object from Storage manually:', cleanupError.message)
   }
 }
 ```
@@ -128,6 +130,6 @@ Run it:
 node test-storage-rls.mjs
 ```
 
-Expected result: the owner download succeeds and the second user's download returns a denial response. Storage may report an inaccessible or missing object as `NoSuchKey`; legacy responses can also use a `not_found` status. The script accepts only denial-shaped HTTP statuses (400, 403, or 404), and removes the test object. An error code alone does not identify the cause. The check is valid only for the exact bucket, path, and `download` operation you exercised. Listing objects, creating signed URLs, uploads, and deletes use their own policy checks. [Storage access control](https://supabase.com/docs/guides/storage/security/access-control).
+The owner's download should succeed. The second user's download should return an access or object-not-found code. The script checks the Storage error code and reports unrelated errors separately. It also attempts to remove the test object. The result applies to the exact bucket, path, and `download` operation you tested. Listing objects, creating signed URLs, uploading, and deleting have their own policy checks. [Storage access control](https://supabase.com/docs/guides/storage/security/access-control).
 
 If the owner request also fails, first check the bucket name, exact object path, user session, and test setup. If the owner succeeds but the second user is denied, compare the second user's ID with the path and review the applicable `SELECT` policy. Do not infer the cause from an error code alone; Storage documents `NoSuchKey` as a missing key and notes that an existing key may still be inaccessible to the caller. [Storage error codes](https://supabase.com/docs/guides/storage/debugging/error-codes).
