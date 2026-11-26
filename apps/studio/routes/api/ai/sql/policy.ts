@@ -1,4 +1,3 @@
-import type { JwtPayload } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, isStepCount, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
@@ -14,7 +13,7 @@ import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { withoutApprovalTools } from '@/lib/ai/tool-filter'
 import { getTools } from '@/lib/ai/tools'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { trustedUserEmail } from '@/lib/server/configcat'
 
 const policySchema = z.object({
@@ -45,7 +44,7 @@ const requestBodySchema = z.object({
   message: z.string().optional(),
 })
 
-async function handlePost(request: Request, claims?: JwtPayload): Promise<Response> {
+async function handlePost({ request, claims }: ApiHandlerContext) {
   const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -100,13 +99,7 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
     // if anything below throws, or if the client disconnects mid-generation so the
     // connection isn't held until generateText resolves on its own (mirrors the
     // request-scoped cleanup in generate-v4.ts).
-    const toolsAbortController = new AbortController()
-    const onRequestAbort = () => toolsAbortController.abort()
-    if (request.signal.aborted) {
-      toolsAbortController.abort()
-    } else {
-      request.signal.addEventListener('abort', onRequestAbort, { once: true })
-    }
+    const done = new AbortController()
     try {
       const allTools = await getTools({
         projectRef,
@@ -115,7 +108,7 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
         aiOptInLevel,
         accessToken,
         isExplorerEnabled: explorerEnabled,
-        signal: toolsAbortController.signal,
+        signal: AbortSignal.any([request.signal, done.signal]),
       })
       // One-shot generateText can't answer an approval request
       const tools = withoutApprovalTools(allTools)
@@ -160,8 +153,7 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
 
       return Response.json(policies)
     } finally {
-      request.signal.removeEventListener('abort', onRequestAbort)
-      toolsAbortController.abort()
+      done.abort()
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -177,11 +169,6 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
 
 export const Route = createFileRoute('/api/ai/sql/policy')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request, claims }) => handlePost(request, claims),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

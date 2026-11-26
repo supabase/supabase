@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const codeSchema = z.object({
   sql: z
@@ -18,7 +18,7 @@ const codeSchema = z.object({
   valid: z.boolean().describe('Whether the provided client library code is valid.'),
 })
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const { code } = await parseJsonBody<{ code?: string }>(request)
 
   if (!code) return Response.json({ error: 'Code is required' }, { status: 400 })
@@ -72,11 +72,6 @@ async function handlePost(request: Request): Promise<Response> {
 
 export const Route = createFileRoute('/api/ai/sql/parse-client-code')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

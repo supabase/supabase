@@ -1,5 +1,4 @@
 import pgMeta from '@supabase/pg-meta'
-import type { JwtPayload } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   createUIMessageStreamResponse,
@@ -35,7 +34,7 @@ import {
 import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getBasePathURL } from '@/lib/helpers'
 import { trustedUserEmail } from '@/lib/server/configcat'
@@ -53,7 +52,7 @@ const requestBodySchema = z.object({
   model: z.string().optional(),
 })
 
-async function handlePost(request: Request, claims?: JwtPayload): Promise<Response> {
+async function handlePost({ request, claims }: ApiHandlerContext) {
   const requestStartedAt = Date.now()
   const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
@@ -159,17 +158,11 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
     return Response.json({ error: modelError.message }, { status: 500 })
   }
 
-  const abortController = new AbortController()
-  const onRequestAbort = () => abortController.abort()
-  if (request.signal.aborted) {
-    abortController.abort()
-  } else {
-    request.signal.addEventListener('abort', onRequestAbort, { once: true })
-  }
-  const cleanup = () => {
-    request.signal.removeEventListener('abort', onRequestAbort)
-    abortController.abort()
-  }
+  // request.signal only aborts on client disconnect; `done` also releases the request once the
+  // response stream ends or setup fails.
+  const done = new AbortController()
+  const signal = AbortSignal.any([request.signal, done.signal])
+  const release = () => done.abort()
 
   try {
     const tools = await getTools({
@@ -181,7 +174,7 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
       baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
-      signal: abortController.signal,
+      signal,
     })
 
     // Get a list of all schemas to add to context
@@ -235,7 +228,7 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
       requestedModel,
       effectiveModel,
       systemProviderOptions,
-      abortSignal: abortController.signal,
+      abortSignal: signal,
       timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
       onSpanCreated: (spanId) => {
         braintrustSpanId = spanId
@@ -275,37 +268,18 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
     // in getTools is always released. Abort here rather than in toUIMessageStream's onEnd: that
     // callback rebuilds the response message, which fails on approval continuations without the
     // client's original messages.
-    const reader = stream.getReader()
-    const trackedStream = new ReadableStream<UIMessageChunk>({
-      async pull(controller) {
-        try {
-          const { done, value } = await reader.read()
-          if (done) {
-            controller.close()
-            cleanup()
-            return
-          }
-          controller.enqueue(value)
-        } catch (error) {
-          cleanup()
-          controller.error(error)
-        }
-      },
-      async cancel(reason) {
-        cleanup()
-        await reader.cancel(reason)
-      },
-    })
+    // Bound outside the literal: TS's Transformer type doesn't declare `cancel` yet.
+    const releaseOnEnd = { flush: release, cancel: release }
 
     return createUIMessageStreamResponse({
-      stream: trackedStream,
+      stream: stream.pipeThrough(new TransformStream<UIMessageChunk, UIMessageChunk>(releaseOnEnd)),
       headers: {
         'Content-Encoding': 'none',
         ...(braintrustSpanId && { 'x-braintrust-span-id': braintrustSpanId }),
       },
     })
   } catch (error) {
-    cleanup()
+    release()
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
       return Response.json({ message: error.message }, { status: 500 })
@@ -316,11 +290,6 @@ async function handlePost(request: Request, claims?: JwtPayload): Promise<Respon
 
 export const Route = createFileRoute('/api/ai/sql/generate-v4')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request, claims }) => handlePost(request, claims),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

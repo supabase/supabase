@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const ServiceSchema = z.object({
   name: z.enum(['Auth', 'Storage', 'Database', 'Edge Function', 'Cron', 'Queues', 'Vector']),
@@ -52,7 +52,7 @@ const getTools = () => {
   }
 }
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const { modelParams, error: modelError } = await getModel({
     provider: 'openai',
     modelEntry: DEFAULT_COMPLETION_MODEL,
@@ -100,11 +100,6 @@ async function handlePost(request: Request): Promise<Response> {
 
 export const Route = createFileRoute('/api/ai/onboarding/design')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const titleSchema = z.object({
   title: z
@@ -17,7 +17,7 @@ const titleSchema = z.object({
   description: z.string().describe('The generated description for the SQL snippet.'),
 })
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const { sql } = await parseJsonBody<{ sql?: string }>(request)
 
   if (!sql) {
@@ -74,11 +74,6 @@ async function handlePost(request: Request): Promise<Response> {
 
 export const Route = createFileRoute('/api/ai/sql/title-v2')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

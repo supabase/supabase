@@ -5,7 +5,7 @@ import { source } from 'common-tags'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import {
   filterGroupSchemaForAI,
   requestSchema,
@@ -14,7 +14,7 @@ import {
   validateFilterGroup,
 } from '@/lib/api/filterHelpers'
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const body = await parseJsonBody(request)
   const parseResult = requestSchema.safeParse(body)
 
@@ -105,11 +105,6 @@ async function handlePost(request: Request): Promise<Response> {
 
 export const Route = createFileRoute('/api/ai/sql/filter-v1')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

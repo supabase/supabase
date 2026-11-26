@@ -12,7 +12,7 @@ import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const requestBodySchema = z.object({
   rating: z.enum(['positive', 'negative']),
@@ -24,7 +24,7 @@ const requestBodySchema = z.object({
   spanId: z.string().optional(),
 })
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -160,11 +160,6 @@ Instructions:
 
 export const Route = createFileRoute('/api/ai/feedback/rate')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

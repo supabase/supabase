@@ -23,8 +23,8 @@ import {
   SECURITY_PROMPT,
   SQL_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/prompts'
-import { InvalidJsonError, parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 const pgMetaSchemasList = pgMeta.schemas.list()
@@ -162,26 +162,18 @@ const requestBodySchema = z.object({
   intent: z.enum(['edit', 'rewrite']).optional(),
 })
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
+  const body = await parseJsonBody(request)
+  const { data, error: parseError } = requestBodySchema.safeParse(body)
+
+  if (parseError) {
+    return Response.json(
+      { error: 'Invalid request body', issues: parseError.issues },
+      { status: 400 }
+    )
+  }
+
   try {
-    let body: unknown
-    try {
-      body = await parseJsonBody(request)
-    } catch (error) {
-      if (error instanceof InvalidJsonError) {
-        return Response.json({ error: 'Malformed JSON' }, { status: 400 })
-      }
-      throw error
-    }
-    const { data, error: parseError } = requestBodySchema.safeParse(body)
-
-    if (parseError) {
-      return Response.json(
-        { error: 'Invalid request body', issues: parseError.issues },
-        { status: 400 }
-      )
-    }
-
     const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect, intent } =
       data
     const { textBeforeCursor, textAfterCursor, prompt, selection, availableKeys } =
@@ -348,7 +340,7 @@ async function handlePost(request: Request): Promise<Response> {
           : undefined,
     })
 
-    return Response.json(text, { status: 200 })
+    return Response.json(text)
   } catch (error) {
     console.error('Completion error:', error)
     return Response.json({ error: 'Failed to generate completion' }, { status: 500 })
@@ -357,11 +349,6 @@ async function handlePost(request: Request): Promise<Response> {
 
 export const Route = createFileRoute('/api/ai/code/complete')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })
