@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { VectorBucket as VectorBucketIcon } from 'icons'
 import { ChevronRightIcon, SearchIcon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -27,7 +27,7 @@ import { createNavigationHandler } from '@/lib/navigation'
 
 export const VectorsBuckets = () => {
   const { ref: projectRef } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const [filterString, setFilterString] = useState('')
   const [visible, setVisible] = useQueryState(
@@ -122,7 +122,7 @@ export const VectorsBuckets = () => {
 
                               const handleBucketNavigation = createNavigationHandler(
                                 `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`,
-                                router
+                                navigate
                               )
 
                               return (

@@ -36,9 +36,8 @@ pnpm build:guides-markdown
 
 `pnpm build:guides-markdown` only applies to guides, explainers, and tutorials.
 
-From the repository root, run `pnpm format` to apply Prettier to changed MDX
-files. This enforces repo-wide formatting rules, including lowercase SQL
-keyword casing in code samples.
+From the repository root, run `pnpm format` to apply oxfmt to changed MDX
+files. This enforces repo-wide formatting rules.
 
 Check terminology against [`WORD_LIST.md`](../../../../apps/docs/style-guide/WORD_LIST.md)
 yourself. Treat its replacements as suggestions when context matters: rewrite the

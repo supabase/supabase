@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { NavigationItem } from '@/components/side-navigation-item'
 import { gettingStarted } from '@/config/docs'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '@/config/library'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 
 export function SideNavigation() {
-  const { framework } = useFramework()
+  const { framework } = useFrameworkPreference()
   const { setOpen } = useMobileMenu()
 
   return (

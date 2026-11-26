@@ -1,14 +1,15 @@
 import * as jose from 'jsr:@panva/jose@6'
+import { emitLog, logInternal } from './logging.ts'
 import { startMemoryPressureLoop } from './memory-pressure.ts'
 
-console.log('main function started')
+logInternal('main', 'info', 'main function started')
 startMemoryPressureLoop()
 
 addEventListener('unhandledrejection', (ev) => {
   // Without preventDefault(), a floating rejection destroys the main worker and the process exits.
   // Sync throws inside timer callbacks are still fatal; wrap them in try/catch.
   ev.preventDefault()
-  console.error('unhandled promise rejection in main worker', ev.reason)
+  logInternal('main', 'error', 'unhandled promise rejection in main worker', ev.reason)
 })
 
 const MAX_WORKER_RETRIES = 3
@@ -67,7 +68,7 @@ function getFunctionErrorResponse({ code, message, status }: FunctionFailure): R
 
 function onError(e: unknown): Response {
   const ref = crypto.randomUUID()
-  console.error(`unhandled error in request handler (ref: ${ref})`, e)
+  logInternal('main', 'error', `unhandled error in request handler (ref: ${ref})`, e)
   return getFunctionErrorResponse({
     code: RequestErrors.BootError,
     message: `Internal Server Error (ref: ${ref})`,
@@ -227,7 +228,7 @@ function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
 
 async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   if (!JWT_SECRET) {
-    console.error('JWT_SECRET not available for HS256 token verification')
+    logInternal('main', 'error', 'JWT_SECRET not available for HS256 token verification')
     return { code: RequestErrors.InvalidLegacyJWT }
   }
 
@@ -237,7 +238,7 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   try {
     await jose.jwtVerify(jwt, secretKey);
   } catch (e) {
-    console.error('Symmetric Legacy JWT verification error', e);
+    logInternal('main', 'error', 'Symmetric Legacy JWT verification error', e);
     return { code: RequestErrors.InvalidLegacyJWT }
   }
   return null
@@ -245,14 +246,14 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
 
 async function isValidJWT(jwt: string): Promise<AuthFailure | null> {
   if (!LOCAL_JWKS) {
-    console.error('JWKS not available for ES256/RS256 token verification')
+    logInternal('main', 'error', 'JWKS not available for ES256/RS256 token verification')
     return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
   try {
     await jose.jwtVerify(jwt, LOCAL_JWKS);
   } catch (e) {
-    console.error('Asymmetric JWT verification error', e);
+    logInternal('main', 'error', 'Asymmetric JWT verification error', e);
     return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
@@ -278,7 +279,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   try {
     jwtAlgorithm = jose.decodeProtectedHeader(jwt).alg
   } catch (e) {
-    console.error('JWT format error', e)
+    logInternal('main', 'error', 'JWT format error', e)
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
@@ -293,7 +294,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   }
 
   if (jwtAlgorithm === 'HS256') {
-    console.log(`Legacy token type detected, attempting ${jwtAlgorithm} verification.`)
+    logInternal('main', 'info', `Legacy token type detected, attempting ${jwtAlgorithm} verification.`)
 
     return await isValidLegacyJWT(jwt)
   }
@@ -309,56 +310,89 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
 }
 
 Deno.serve({ onError }, async (req: Request) => {
-  if (req.method !== 'OPTIONS' && VERIFY_JWT) {
-    const token = getAuthToken(req)
-    if (typeof token !== 'string') {
-      return getAuthErrorResponse(token)
-    }
-    const authFailure = await isValidHybridJWT(token)
-    if (authFailure) {
-      return getAuthErrorResponse(authFailure)
-    }
-  }
-
+  const start = performance.now()
+  const requestId = crypto.randomUUID()
   const url = new URL(req.url)
   const { pathname } = url
   const path_parts = pathname.split('/')
   const service_name = path_parts[1]
 
-  if (!service_name || service_name === '') {
-    return getFunctionErrorResponse({
-      code: RequestErrors.NotFound,
-      message: 'Requested function was not found',
-      status: 404,
-    })
+  // Every response this handler returns goes through logResponse, so each request
+  // gets exactly one record. Thrown errors are answered by onError instead.
+  const logResponse = (response: Response, executionId?: string): Response => {
+    try {
+      emitLog({
+        stream: 'request',
+        timestamp: new Date().toISOString(),
+        msg: `${req.method} ${pathname} ${response.status}`,
+        metadata: {
+          // Omitted for the bare root path; Vector then stores null.
+          function_id: service_name || undefined,
+          request_id: requestId,
+          execution_id: executionId,
+          request: { method: req.method, pathname },
+          response: { status_code: response.status },
+          execution_time_ms: Math.round(performance.now() - start),
+        },
+      })
+    } catch (error) {
+      logInternal('main', 'error', 'main worker failed to emit request log', error)
+    }
+    return response
+  }
+
+  if (req.method !== 'OPTIONS' && VERIFY_JWT) {
+    const token = getAuthToken(req)
+    if (typeof token !== 'string') {
+      return logResponse(getAuthErrorResponse(token))
+    }
+    const authFailure = await isValidHybridJWT(token)
+    if (authFailure) {
+      return logResponse(getAuthErrorResponse(authFailure))
+    }
+  }
+
+  if (!service_name || service_name === 'main') {
+    return logResponse(
+      getFunctionErrorResponse({
+        code: RequestErrors.NotFound,
+        message: 'Requested function was not found',
+        status: 404,
+      })
+    )
   }
 
   const servicePath = `/home/deno/functions/${service_name}`
-  console.error(`serving the request with ${servicePath}`)
 
   try {
     const serviceInfo = await Deno.stat(servicePath)
     if (!serviceInfo.isDirectory) {
-      return getFunctionErrorResponse({
-        code: RequestErrors.NotFound,
-        message: 'Requested function was not found',
-        status: 404,
-      })
+      return logResponse(
+        getFunctionErrorResponse({
+          code: RequestErrors.NotFound,
+          message: 'Requested function was not found',
+          status: 404,
+        })
+      )
     }
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
-      return getFunctionErrorResponse({
-        code: RequestErrors.NotFound,
-        message: 'Requested function was not found',
-        status: 404,
-      })
+      return logResponse(
+        getFunctionErrorResponse({
+          code: RequestErrors.NotFound,
+          message: 'Requested function was not found',
+          status: 404,
+        })
+      )
     }
-    console.error(e)
-    return getFunctionErrorResponse({
-      code: RequestErrors.BootError,
-      message: 'Function failed to start (please check logs)',
-      status: 503,
-    })
+    logInternal('main', 'error', 'function dispatch failed', e)
+    return logResponse(
+      getFunctionErrorResponse({
+        code: RequestErrors.BootError,
+        message: 'Function failed to start (please check logs)',
+        status: 503,
+      })
+    )
   }
 
   const memoryLimitMb = 256
@@ -375,7 +409,10 @@ Deno.serve({ onError }, async (req: Request) => {
   const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
+  let executionId: string | undefined
+
   const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
+    executionId = undefined
     // Preserve the body before fetch() can consume it, even on a failed attempt.
     // Must run before `new Request(req)` below, which takes over the body.
     // The unread retry branch can buffer the entire body in main-worker memory,
@@ -392,6 +429,7 @@ Deno.serve({ onError }, async (req: Request) => {
         importMapPath,
         envVars,
       })
+      executionId = worker.key
       // Gateway-minted internal JWT is for this router only; never expose it to user functions.
       const userReq = new Request(req)
       userReq.headers.delete('sb-api-key')
@@ -400,16 +438,37 @@ Deno.serve({ onError }, async (req: Request) => {
     } catch (e) {
       // Retirement rejects before dispatch, so user code has not run yet.
       if (e instanceof Deno.errors.WorkerAlreadyRetired && retryReq) {
-        console.warn(`${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
+        logInternal('main', 'warning', `${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
         // Request.clone() does not copy the tag that connects streaming to the client.
         EdgeRuntime.applySupabaseTag(req, retryReq)
         return await callWorker(retryReq, retriesLeft - 1)
       }
 
-      console.error(e)
+      logInternal('main', 'error', 'function dispatch failed', e)
       return getFunctionErrorResponse(resolveRuntimeError(e))
     }
   }
 
-  return await callWorker(req)
+  let response: Response
+  try {
+    response = await callWorker(req)
+  } catch (error) {
+    // Also account for preparation failures outside callWorker's inner try.
+    logInternal('main', 'error', 'request preparation failed', error)
+    response = getFunctionErrorResponse(resolveRuntimeError(error))
+  }
+
+  // user_workers.js constructs a new Response before returning it.
+  // Its headers are mutable; a response/body rebuild is unnecessary.
+  if (executionId) {
+    response.headers.set('x-deno-execution-id', executionId)
+    const exposed = (response.headers.get('Access-Control-Expose-Headers') ?? '')
+      .split(',').map((name) => name.trim()).filter(Boolean)
+    if (!exposed.some((name) => name.toLowerCase() === 'x-deno-execution-id')) {
+      exposed.push('x-deno-execution-id')
+    }
+    response.headers.set('Access-Control-Expose-Headers', exposed.join(', '))
+  }
+
+  return logResponse(response, executionId)
 })

@@ -1,5 +1,4 @@
 import { useFlag } from 'common'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
@@ -131,10 +130,8 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
 
   return (
     <>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content="Supabase Studio" />
-      </Head>
+      <title>{pageTitle}</title>
+      <meta name="description" content="Supabase Studio" />
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
         <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
           {children}

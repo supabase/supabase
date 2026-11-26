@@ -59,7 +59,7 @@ function Content({ children, className }: { children: ReactNode; className?: str
 function Footer({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('bg-surface-100 border-t border-default', className)}>
-      <div className="flex h-12 items-center px-card">{children}</div>
+      <div className="flex min-h-12 items-center px-card">{children}</div>
     </div>
   )
 }
