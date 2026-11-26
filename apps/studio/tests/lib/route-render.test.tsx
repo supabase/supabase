@@ -2,7 +2,6 @@ import { createRootRoute, createRoute } from '@tanstack/react-router'
 import { act, screen } from '@testing-library/react'
 import { useParams } from 'common'
 import { useRouter as useCompatRouter } from 'next/compat/router'
-import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { expect, it } from 'vitest'
 
@@ -12,14 +11,12 @@ function Probe() {
   const params = useParams()
   const router = useRouter()
   const compatRouter = useCompatRouter()
-  const pathname = usePathname()
   return (
     <>
       <output aria-label="params">{JSON.stringify(params)}</output>
       <output aria-label="router">{JSON.stringify(router.query)}</output>
       <output aria-label="compat router">{JSON.stringify(compatRouter?.query)}</output>
       <output aria-label="as path">{router.asPath}</output>
-      <output aria-label="pathname">{pathname}</output>
     </>
   )
 }
@@ -53,5 +50,4 @@ it('exposes path and search params from the route URL to Next-style router hooks
   expect(readOutput('router')).toEqual(nextQuery)
   expect(readOutput('compat router')).toEqual(nextQuery)
   expect(screen.getByLabelText('as path')).toHaveTextContent('/project/xyz/probe?query-tab=sql')
-  expect(screen.getByLabelText('pathname')).toHaveTextContent('/project/xyz/probe')
 })

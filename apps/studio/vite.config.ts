@@ -32,7 +32,6 @@ const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-
 const nextShims: Record<string, string> = {
   'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
   'next/link': path.join(compatRoot, 'link.tsx'),
-  'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
 }

@@ -1,3 +1,9 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  type AnyRouter,
+} from '@tanstack/react-router'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -11,11 +17,11 @@ import { markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveyFollowUpCard } from './OnboardingSurveyFollowUpCard'
 import { BannerStack } from '@/components/ui/BannerStack/BannerStack'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
@@ -58,7 +64,7 @@ const mockSurveyEndpoint = (status: 204 | 500) => {
   return requests
 }
 
-const renderCard = () => {
+const renderCard = (initialUrl = `/org/${ORG_SLUG}`) => {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
@@ -68,18 +74,28 @@ const renderCard = () => {
       ]),
   })
 
-  return customRender(
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
+
+  const result = customRender(
     <BannerStackProvider>
       <OnboardingSurveyFollowUpCard />
       <BannerStack />
       <Toaster />
     </BannerStackProvider>,
     {
+      router,
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
       }),
     }
   )
+
+  return { ...result, router }
 }
 
 const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
@@ -97,7 +113,6 @@ describe('OnboardingSurveyFollowUpCard', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     vi.setSystemTime(new Date('2026-10-30T10:00:00.000Z'))
     track.mockClear()
-    routerMock.setCurrentUrl(`/org/${ORG_SLUG}`)
   })
 
   afterEach(() => {
@@ -146,13 +161,14 @@ describe('OnboardingSurveyFollowUpCard', () => {
   it('stays out of the way on project creation pages', async () => {
     markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'PERSONAL' })
     const requests = mockSurveyEndpoint(204)
-    routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
 
-    renderCard()
+    const { router } = renderCard(`/new/${ORG_SLUG}`)
     await advance(1000)
     expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
 
-    act(() => routerMock.setCurrentUrl(`/org/${ORG_SLUG}`))
+    await act(async () => {
+      await router.navigate<AnyRouter, string>({ to: `/org/${ORG_SLUG}` })
+    })
     expect(await screen.findByRole('button', { name: 'Answer' })).toBeInTheDocument()
     expect(requests).toEqual([])
   })

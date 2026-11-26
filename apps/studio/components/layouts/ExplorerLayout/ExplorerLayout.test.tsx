@@ -10,10 +10,6 @@ import { ExplorerLayout } from './ExplorerLayout'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
 
-vi.mock('next/navigation', () => ({
-  usePathname: () => mockRouter.asPath,
-}))
-
 vi.mock('../ProjectLayout', () => ({
   ProjectLayoutWithAuth: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
@@ -79,7 +75,7 @@ describe('Explorer Home tab navigation', () => {
         <TabsStateContext.Provider value={tabs}>
           <ExplorerLayout>Explorer content</ExplorerLayout>
         </TabsStateContext.Provider>,
-        { queryClient }
+        { queryClient, initialUrl: '/project/default/explorer/query/query-1' }
       )
 
       if (input === 'mouse') {
