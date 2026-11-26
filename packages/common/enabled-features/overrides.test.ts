@@ -23,6 +23,12 @@ describe('getEnabledFeaturesOverrideDisabledList', () => {
     ).toEqual(['logs:templates'])
   })
 
+  it('maps ENABLED_FEATURES_PROJECT_STORAGE_ALL to project_storage:all', () => {
+    expect(
+      getEnabledFeaturesOverrideDisabledList({ ENABLED_FEATURES_PROJECT_STORAGE_ALL: 'false' })
+    ).toEqual(['project_storage:all'])
+  })
+
   it('does not disable features whose env var is "true"', () => {
     expect(
       getEnabledFeaturesOverrideDisabledList({ ENABLED_FEATURES_LOGS_TEMPLATES: 'true' })
