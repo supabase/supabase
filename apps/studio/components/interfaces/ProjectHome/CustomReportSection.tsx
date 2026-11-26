@@ -345,6 +345,7 @@ export function CustomReportSection() {
   const onRefreshReport = () => {
     if (!ref) return
 
+    track('home_custom_report_refresh_clicked')
     setIsRefreshing(true)
     const monitoringCharts = editableReport?.layout.filter(
       (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'

@@ -1,3 +1,4 @@
+import type { HomeActivityStatClickedEvent } from 'common/telemetry-constants'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
@@ -11,10 +12,7 @@ type SingleStatProps = {
   className?: string
   href?: string
   onClick?: () => void
-  trackingProperties?: {
-    stat_type: 'migrations' | 'backups' | 'branches'
-    stat_value: number
-  }
+  trackingProperties?: HomeActivityStatClickedEvent['properties']
 }
 
 export const SingleStat = ({
