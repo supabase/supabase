@@ -312,7 +312,7 @@ Before adding the check logic, review [Request information](#request-information
    ```
 
 Because the search path is empty, schema-qualify every custom table, view, and function referenced in your pre-request function (for example, `public.my_table`).
-PostgreSQL built-in functions, types, and operators continue to resolve through `pg_catalog`.
+Postgres built-in functions, types, and operators continue to resolve through `pg_catalog`.
 
 For more information, see [Security definer vs. invoker](/docs/guides/database/functions#security-definer-vs-invoker).
 
