@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { AlertTriangleIcon, GitBranchIcon, XIcon } from 'lucide-react'
+import { AlertTriangleIcon, GitBranchIcon, GitMergeIcon, XIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,6 +27,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageNav } from 'ui-patterns/PageNav'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -38,7 +40,6 @@ import { EdgeFunctionsDiffPanel } from '@/components/interfaces/BranchManagement
 import { OutOfDateNotice } from '@/components/interfaces/BranchManagement/OutOfDateNotice'
 import { WorkflowLogsCard } from '@/components/interfaces/BranchManagement/WorkflowLogsCard'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
-import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -389,14 +390,14 @@ function MergePage() {
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
-      <PageContainer size={LAYOUT_SIZE}>
-        <div className="flex items-center flex-col justify-center w-full py-16">
-          <ProductEmptyState title="Merge Request">
-            <p className="text-sm text-foreground-light">
-              You can only review changes when on a preview branch
-            </p>
-          </ProductEmptyState>
-        </div>
+      <PageContainer size={LAYOUT_SIZE} className="h-full">
+        <PageSection className="flex items-center justify-center h-full">
+          <EmptyStatePresentational
+            icon={GitMergeIcon}
+            title="Merge requests are only available on preview branches"
+            description="Switch to a preview branch to review and merge its changes."
+          />
+        </PageSection>
       </PageContainer>
     )
   }
