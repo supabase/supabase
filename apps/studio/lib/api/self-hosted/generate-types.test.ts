@@ -76,6 +76,18 @@ describe('api/self-hosted/generate-types', () => {
       expect(searchParams.has('excluded_schemas')).toBe(false)
     })
 
+    it('should reject a schema name containing a comma without calling fetchGet', async () => {
+      mockFetchGet.mockClear()
+      mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
+
+      // pg-meta splits included_schemas on commas, so this name would be read as two schemas.
+      await expect(
+        generateTypescriptTypes({ headers: {}, schemas: ['public', 'tenant,archive'] })
+      ).rejects.toThrow('tenant,archive')
+
+      expect(mockFetchGet).not.toHaveBeenCalled()
+    })
+
     it('should pass headers to fetchGet', async () => {
       mockFetchGet.mockResolvedValue({ types: 'export type User = {}' })
 

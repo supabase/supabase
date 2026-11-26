@@ -25,6 +25,12 @@ export async function generateTypescriptTypes({
 }: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | StudioError> {
   assertSelfHosted()
 
+  // pg-meta splits `included_schemas` on commas, so a name with a comma would select other schemas.
+  const invalidSchema = schemas?.find((schema) => schema.includes(','))
+  if (invalidSchema !== undefined) {
+    throw new Error(`Schema names cannot contain a comma: "${invalidSchema}"`)
+  }
+
   // Default to the schemas actually exposed via PostgREST (PGRST_DB_SCHEMAS) so generated
   // types match the Data API surface, instead of a hardcoded include/exclude list.
   // Note the param is `included_schemas` (plural) — pg-meta treats a non-empty list
