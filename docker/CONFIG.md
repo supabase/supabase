@@ -1,4 +1,4 @@
-Last updated: 2026-05-23
+Last updated: 2026-11-26
 
 # Self-hosted Supabase configuration reference
 
