@@ -175,7 +175,7 @@ const PipelineCreationSteps = ({
   })
   const handleNext = async () => {
     if (
-      accessibleStep === 'destination' &&
+      accessibleStep === 'connection' &&
       (!isRegionReady || !(await ensureRegionSource(clusterId)))
     )
       return
@@ -218,7 +218,8 @@ const PipelineCreationSteps = ({
               navigationDisabled={isBusy}
               nextLabel="Continue"
               nextDisabled={
-                accessibleStep === 'destination' && (!canSelectDestination || !isRegionReady)
+                (accessibleStep === 'destination' && !canSelectDestination) ||
+                (accessibleStep === 'connection' && !isRegionReady)
               }
               onCancel={handleClose}
               finalAction={{
@@ -247,33 +248,41 @@ const PipelineCreationSteps = ({
                     }}
                     renderLogo={(value) => <DestinationLogo type={value} />}
                   />
-                  <PipelineRegionField
-                    destinationType={type}
-                    preferredClusterId={preferredClusterId}
-                    onRegionChange={(clusterId) => {
-                      onRegionChange(clusterId)
-                      resetValidation()
-                      resetRegionError()
-                    }}
-                    disabled={isBusy || !isRegionReady}
-                  />
-                  {regionError && (
-                    <AlertError
-                      error={regionError}
-                      subject="Failed to prepare pipeline region"
-                      projectRef={projectRef}
-                      additionalActions={
-                        <Button disabled={isBusy} onClick={() => void handleNext()}>
-                          Retry
-                        </Button>
-                      }
-                    />
-                  )}
                 </div>
               )}
               {accessibleStep === 'connection' && (
                 <>
-                  <PipelineConnectionSection type={type} form={form} revealInvalidSettings>
+                  <PipelineConnectionSection
+                    type={type}
+                    form={form}
+                    revealInvalidSettings
+                    regionField={
+                      <>
+                        <PipelineRegionField
+                          destinationType={type}
+                          preferredClusterId={preferredClusterId}
+                          onRegionChange={(clusterId) => {
+                            onRegionChange(clusterId)
+                            resetValidation()
+                            resetRegionError()
+                          }}
+                          disabled={isBusy || !isRegionReady}
+                        />
+                        {regionError && (
+                          <AlertError
+                            error={regionError}
+                            subject="Failed to prepare pipeline region"
+                            projectRef={projectRef}
+                            additionalActions={
+                              <Button disabled={isBusy} onClick={() => void handleNext()}>
+                                Retry
+                              </Button>
+                            }
+                          />
+                        )}
+                      </>
+                    }
+                  >
                     {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
                     {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
                     {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
