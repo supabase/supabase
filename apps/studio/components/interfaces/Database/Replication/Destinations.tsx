@@ -1,4 +1,3 @@
-import { useReplicationClusters } from './useReplicationClusters'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
@@ -40,15 +39,14 @@ import {
   useIsPipelinesSnowflakeEnabled,
 } from './useIsPipelinesEnabled'
 import { usePipelineList } from './usePipelineList'
+import { useReplicationClusters } from './useReplicationClusters'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import {
-  replicationClustersQueryOptions,
-} from '@/data/replication/clusters-query'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
