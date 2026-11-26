@@ -1398,7 +1398,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `ADDR_TYPE` | enum | | Socket address family for the HTTP endpoint. Must be `inet` or `inet6`. | Default: `inet` |
 | `API_JWT_SECRET` | string | Self-hosted | JWT secret used to authenticate requests to Supavisor's management API. | Self-hosted sets this to `JWT_SECRET` |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of API JWTs to reject. | Default: empty |
+| `APP_NAME_METRIC_ENABLED` | boolean | | Feature flag adding the client's `application_name` as an `app_name` label on the client connection metrics. | Default: `false`. Accepts `true`/`false`/`1`/`0`. A tenant's `feature_flags` overrides it |
 | `CACHE_BYPASS_USERS` | string (CSV) | | Comma-separated list of DB users that bypass the auth-query cache. | Default: empty |
+| `CHECK_SIMPLE_QUERY_PREPARE_ENABLED` | boolean | | Feature flag rejecting `PREPARE`, `EXECUTE` and `DEALLOCATE` sent over the simple query protocol in transaction mode, which supports prepared statements only through the extended query protocol. | Default: `false`. Accepts `true`/`false`/`1`/`0`. Parses every simple query, so it adds latency proportional to query size. A tenant's `feature_flags` overrides it |
+| `CLEARTEXT_AUTH_OVER_TLS_ENABLED` | boolean | | Feature flag making non-JIT clients connected over TLS authenticate with a cleartext password instead of SCRAM-SHA-256. | Default: `false` (SCRAM over TLS). Accepts `true`/`false`/`1`/`0`. Only relevant when downstream TLS is configured (`GLOBAL_DOWNSTREAM_*` / `DOWNSTREAM_SERVER_ECDSA_*`). A tenant's `feature_flags` overrides it |
 | `CLUSTER_ID` | string | | Region identifier used in the libcluster Postgres channel name. First of `CLUSTER_ID`, `LOCATION_ID`, `REGION` wins. | Only used when `CLUSTER_POSTGRES` is set |
 | `CLUSTER_NODES` | string (CSV) | | Comma-separated list of Erlang node names for static EPMD clustering. | Optional |
 | `CLUSTER_POSTGRES` | boolean | Self-hosted | Enables libcluster Postgres strategy (heartbeats via `pg_notify`). | Set to `true` to enable. Self-hosted: `true` |
@@ -1419,10 +1422,9 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `LOGFLARE_SOURCE_ID` | string | | Logflare source ID. Required when `LOGS_ENGINE=logflare`. | Required when `LOGS_ENGINE=logflare`; optional otherwise |
 | `LOGS_ENGINE` | string | | Logging backend. Set to `logflare` to enable the Logflare HTTP logger backend. | Optional |
 | `MAX_CONNECTIONS` | integer (count) | | Max concurrent connections accepted by the HTTP endpoint and Ranch proxy listeners. | Default: `1000` (HTTP), `:infinity` (proxy listeners) |
-| `METRICS_DISABLED` | boolean | | If `true`, disables Prometheus metrics children (PromEx, TenantsMetrics, MetricsCleaner). | Default: `false` |
 | `METRICS_JWT_SECRET` | string | Self-hosted | JWT secret used to authenticate requests to the metrics endpoint. | Self-hosted sets this to `JWT_SECRET` |
 | `METRICS_TOKEN_BLOCKLIST` | string (CSV) | | Comma-separated list of metrics JWTs to reject. | Default: empty |
-| `NAMED_PREPARED_STATEMENTS_ENABLED` | boolean | | Feature flag enabling named prepared statement support in transaction mode. | Default: `false`. Accepts `true`/`false`/`1`/`0` |
+| `NAMED_PREPARED_STATEMENTS_ENABLED` | boolean | | Feature flag enabling named prepared statement support in transaction mode. | Default: `false`. Accepts `true`/`false`/`1`/`0`. A tenant's `feature_flags` overrides it |
 | `NODE_IP` | string | | IP address used to build the Erlang `RELEASE_NODE` (`<name>@<ip>`). Also stored as `node_host` in app config. | Default: `127.0.0.1`. In Fly, falls back to the `fly-local-6pn` entry in `/etc/hosts` |
 | `NODE_NAME` | string | | Erlang node basename. Used as `<name>@<ip>` for the release node. | Falls back to `FLY_APP_NAME`, then `supavisor` |
 | `NO_WARM_POOL_USERS` | string (CSV) | | Comma-separated list of DB users for which Supavisor should not pre-warm a pool. | Default: empty |
@@ -1437,7 +1439,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `POSTGRES_PASSWORD` | string | Self-hosted | Tenant Postgres password for the `pgbouncer` auth user. Read by the self-hosted `pooler.exs` provisioning script. | Configured via pooler.exs |
 | `POSTGRES_PORT` | integer | Self-hosted | Tenant Postgres port. Read by the self-hosted `pooler.exs` provisioning script and used to map the session-mode listener port. | Configured via pooler.exs |
 | `PROM_POLL_RATE` | integer (ms) | | Prometheus metrics poll interval in milliseconds. | Default: `15000` |
-| `PROXY_PORT` | integer | | Generic Postgres proxy listener port (mode: `proxy`). | Default: `5412` |
 | `PROXY_PORT_SESSION` | integer | | Postgres session-mode proxy listener port. | Default: `5432` |
 | `PROXY_PORT_TRANSACTION` | integer | | Postgres transaction-mode proxy listener port. | Default: `6543` |
 | `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset (Supavisor builds `supavisor_<region>_<maj>_<min>`). | Falls back to `FLY_REGION`. Self-hosted: `local` |
@@ -1448,10 +1449,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RLIMIT_NOFILE` | integer (count) | | Open-file descriptor limit applied by the container entrypoint (`limits.sh`). | Default: `100000` (baked into image) |
 | `SECRET_KEY_BASE` | string | Self-hosted | Phoenix endpoint secret used to sign/encrypt session and CSRF tokens. | Required in non-dev/test envs |
 | `SESSION_PROXY_PORTS` | string (CSV) | | Comma-separated list of additional internal session-mode proxy listener ports. | Default: `12100,12101,12102,12103` |
-| `SUBSCRIBE_RETRIES` | integer (count) | | Number of retries when subscribing to a tenant pool. | Default: `20` |
-| `SUPAVISOR_DB_IP_VERSION` | enum | | Socket family for upstream Postgres connections. Set to `ipv6` to use `inet6`. | Default: `ipv4` (`inet`) |
+| `SUPAVISOR_DB_IP_VERSION` | enum | | Socket family for the connection to Supavisor's metadata database (`DATABASE_URL`) and for the libcluster Postgres strategy. `ipv6` uses `inet6`, `ipv4` uses `inet`. | Default: auto-detected from the `DATABASE_URL` host (IPv4 literal or a hostname that resolves over IPv4: `inet`; otherwise `inet6`). Any other value also auto-detects. Tenant upstream connections use the tenant's own `ip_version` instead |
+| `SUPAVISOR_LOG_BURST_LIMIT_ENABLE` | boolean | | Enables burst-limit overload protection on the default logger handler: log events beyond `SUPAVISOR_LOG_BURST_LIMIT_MAX_COUNT` per `SUPAVISOR_LOG_BURST_LIMIT_WINDOW_TIME` are dropped. | Default: `true`. Only `true`/`1` enable it; any other set value disables it |
+| `SUPAVISOR_LOG_BURST_LIMIT_MAX_COUNT` | integer (count) | | Max log events the default logger handler writes per burst-limit window. | Default: `500` |
+| `SUPAVISOR_LOG_BURST_LIMIT_WINDOW_TIME` | integer (ms) | | Length of the logger burst-limit window. | Default: `1000` |
 | `SUPAVISOR_LOG_FILE_PATH` | path | | If set, the default logger writes logs to this file (rotated, 8 MiB each, 5 files). | Optional |
 | `SUPAVISOR_LOG_FORMAT` | enum | | Set to `json` to emit logs in Logflare JSON format. | Optional |
-| `SWITCH_ACTIVE_COUNT` | integer (count) | | Number of activity ticks before a pool is switched out. | Default: `100` |
 | `TRANSACTION_PROXY_PORTS` | string (CSV) | | Comma-separated list of additional internal transaction-mode proxy listener ports. | Default: `12104,12105,12106,12107` |
 | `VAULT_ENC_KEY` | string | Self-hosted | AES.GCM encryption key for the Cloak vault used to encrypt tenant credentials at rest. | Required |
