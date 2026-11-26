@@ -152,7 +152,6 @@ export const Destinations = () => {
   const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
   const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
 
-
   const {
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
@@ -201,12 +200,7 @@ export const Destinations = () => {
     : 'Failed to retrieve pipeline enablement status'
 
   const failedRegionName = failedRegions[0]?.cluster.regionName ?? 'the default region'
-  const hasVisibleOtherRegions =
-    hasClusterErrors &&
-    sortedDestinations.some(
-      ({ cluster }) =>
-        !failedRegions.some((failed) => failed.cluster.clusterId === cluster.clusterId)
-    )
+
   const hasGeneralErrors = isRegionsError || isSourcesError
   const getWarningTitle = () => {
     if (hasGeneralErrors) return 'Could not load pipeline information'

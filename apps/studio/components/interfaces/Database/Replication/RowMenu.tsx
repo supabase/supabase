@@ -87,8 +87,12 @@ export const RowMenu = ({
   // Destination IDs are only unique within a cluster, so the edit panel needs the row's cluster.
   const [, setEditClusterId] = useQueryState('cluster_id', parseAsString)
 
-  const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: startPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
   const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
@@ -209,7 +213,10 @@ export const RowMenu = ({
             <DropdownMenuItem asChild className="gap-x-2">
               <Link
                 href={(isUnifiedLogsEnabled ? getPipelineUnifiedLogsUrl : getPipelineLegacyLogsUrl)(
-                  { projectRef, pipelineId: pipeline.id }
+                  {
+                    projectRef,
+                    pipelineId: pipeline.id,
+                  }
                 )}
               >
                 <ListIcon size={14} />

@@ -44,7 +44,13 @@ export function OverviewFlowEdge(props: EdgeProps<OverviewEdge>) {
     )
   const sourceX = props.sourceX + (props.data?.isFinalConnection ? 0 : 4)
   const targetX = props.targetX - (props.data?.isConverging ? 0 : 4)
-  const [smoothPath] = getSmoothStepPath({ ...props, sourceX, targetX, offset: 0, borderRadius: 6 })
+  const [smoothPath] = getSmoothStepPath({
+    ...props,
+    sourceX,
+    targetX,
+    offset: 0,
+    borderRadius: 6,
+  })
   const distance = props.targetY - props.sourceY
   const radius = Math.min(6, Math.abs(distance), Math.abs(targetX - sourceX))
   const direction = Math.sign(distance)

@@ -231,7 +231,11 @@ export const ReplicationPipelineStatus = () => {
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const canResetErroredTables = hasErroredTables && !showDisabledState
   const isNoticeAboveOverview = useContext(PipelineNoticeContext)
-  const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
+  const stateNotice = getPipelineStateNotice({
+    requestStatus,
+    statusName,
+    tableStatuses,
+  })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
 
@@ -316,7 +320,7 @@ export const ReplicationPipelineStatus = () => {
               />
             )}
 
-            {isStatusError && (
+            {isStatusError && statusName !== PipelineStatusName.STOPPED && (
               <Admonition
                 type="warning"
                 title="Live updates paused"

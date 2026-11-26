@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import { useQueries } from '@tanstack/react-query'
 import { Background, MarkerType, ReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
@@ -5,6 +7,7 @@ import { useTheme } from 'next-themes'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 
+import { useReplicationClusters } from '../useReplicationClusters'
 import { getOverviewDestination } from './Overview.utils'
 import { OverviewFlowEdge, type OverviewEdge } from './OverviewEdge'
 import {
@@ -17,12 +20,9 @@ import {
   PipelineLink,
   type OverviewNode,
 } from './OverviewNodes'
-import { useReplicationClusters } from '../useReplicationClusters'
 import { replicationDestinationsQueryOptions } from '@/data/replication/destinations-query'
 import { replicationPipelinesQueryOptions } from '@/data/replication/pipelines-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-import '@xyflow/react/dist/style.css'
 
 const MAX_VISIBLE_PIPELINES = 4
 const nodeTypes = {
@@ -125,7 +125,11 @@ export const ReplicationDiagram = ({
         content: (
           <>
             <OverviewRegion
-              name={sourceRegion?.displayName ?? project?.region}
+              name={
+                sourceRegion?.displayName.match(/\(([^)]+)\)$/)?.[1] ??
+                sourceRegion?.displayName ??
+                project?.region
+              }
               code={project?.region}
             />
             <div className="border-t border-muted pt-3 text-sm">Primary database</div>
@@ -206,7 +210,10 @@ export const ReplicationDiagram = ({
             ])
           ).values(),
         ]
-      : entries.map(({ destination, pipeline }) => ({ destination, pipelineId: pipeline.id }))
+      : entries.map(({ destination, pipeline }) => ({
+          destination,
+          pipelineId: pipeline.id,
+        }))
     connections.forEach(({ destination, pipelineId }) => {
       edges.push({
         id: `${id}:${pipelineId ?? 'all'}:${destination.id}`,
@@ -277,7 +284,14 @@ export const ReplicationDiagram = ({
   })
 
   const columns = [
-    { id: 'source-group', label: 'Source', kind: 'source', x: 0, width: 250, height: 88 },
+    {
+      id: 'source-group',
+      label: 'Source',
+      kind: 'source',
+      x: 0,
+      width: 250,
+      height: 88,
+    },
     {
       id: 'region-group',
       label: pipelineCount === 1 ? 'Pipeline' : 'Pipelines',

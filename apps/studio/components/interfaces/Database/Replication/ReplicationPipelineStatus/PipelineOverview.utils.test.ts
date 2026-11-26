@@ -8,9 +8,14 @@ import {
 } from './PipelineOverview.utils'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-const disabledStateConfig = { title: 'Starting pipeline', message: 'This can take a moment.' }
+const disabledStateConfig = {
+  title: 'Starting pipeline',
+  message: 'This can take a moment.',
+}
 const liveTables = (count: number) =>
-  Array.from({ length: count }, () => ({ state: { name: 'following_wal' as const } }))
+  Array.from({ length: count }, () => ({
+    state: { name: 'following_wal' as const },
+  }))
 
 describe('getTableStatusEmptyState', () => {
   test.each([
@@ -98,21 +103,35 @@ test.each(['lost', 'unreserved'])(
   'surfaces confirmed WAL problem %s above the overview',
   (wal_status) => {
     expect(
-      getPipelineHealthNotice({ statusName: 'started', metrics: { wal_status }, isError: false })
-        ?.type
+      getPipelineHealthNotice({
+        statusName: 'started',
+        metrics: { wal_status },
+        isError: false,
+      })?.type
     ).toBe('warning')
   }
 )
 
 test('does not treat cached or stopped slot state as a live disconnection', () => {
   expect(
-    getPipelineHealthNotice({ statusName: 'started', metrics: { active: false }, isError: true })
+    getPipelineHealthNotice({
+      statusName: 'started',
+      metrics: { active: false },
+      isError: true,
+    })
   ).toBeUndefined()
   expect(
-    getPipelineHealthNotice({ statusName: 'stopped', metrics: { active: false }, isError: false })
+    getPipelineHealthNotice({
+      statusName: 'stopped',
+      metrics: { active: false },
+      isError: false,
+    })
   ).toBeUndefined()
   expect(
-    getPipelineHealthNotice({ statusName: 'started', metrics: { active: false }, isError: false })
-      ?.title
+    getPipelineHealthNotice({
+      statusName: 'started',
+      metrics: { active: false },
+      isError: false,
+    })?.title
   ).toBe('Pipeline disconnected')
 })

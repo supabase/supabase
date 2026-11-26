@@ -4,7 +4,10 @@ import { getReplicationDestinationType } from './Nodes.utils'
 import type { ReplicationDestinationsData } from '@/data/replication/destinations-query'
 
 const bigQueryDatasetSchema = z.object({
-  big_query: z.object({ project_id: z.string().min(1), dataset_id: z.string().min(1) }),
+  big_query: z.object({
+    project_id: z.string().min(1),
+    dataset_id: z.string().min(1),
+  }),
 })
 
 export function getOverviewDestination({
@@ -29,7 +32,12 @@ export function getOverviewDestination({
     }
   }
   const clickhouse = z
-    .object({ clickhouse: z.object({ url: z.string().url(), database: z.string().min(1) }) })
+    .object({
+      clickhouse: z.object({
+        url: z.string().url(),
+        database: z.string().min(1),
+      }),
+    })
     .safeParse(destination?.config)
   if (clickhouse.success) {
     const { url, database } = clickhouse.data.clickhouse

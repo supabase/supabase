@@ -13,8 +13,18 @@ import { renderRoute } from '@/tests/lib/route-render'
 
 test.each([
   { selected: false, count: 1, shared: false, mode: 'separate datasets' },
-  { selected: false, count: 2, shared: true, mode: 'four named pipelines sharing a dataset' },
-  { selected: false, count: 3, shared: true, mode: 'region counts sharing a dataset' },
+  {
+    selected: false,
+    count: 2,
+    shared: true,
+    mode: 'four named pipelines sharing a dataset',
+  },
+  {
+    selected: false,
+    count: 3,
+    shared: true,
+    mode: 'region counts sharing a dataset',
+  },
   { selected: true, count: 3, shared: false, mode: 'one selected pipeline' },
 ])(
   'shows $mode across clusters while editing a nondefault cluster',
@@ -73,8 +83,16 @@ test.each([
         HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
           default_cluster_id: '1',
           regions: [
-            { cluster_id: '1', region_code: 'ap-southeast-1', region_name: 'Singapore' },
-            { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' },
+            {
+              cluster_id: '1',
+              region_code: 'ap-southeast-1',
+              region_name: 'Singapore',
+            },
+            {
+              cluster_id: '2',
+              region_code: 'eu-central-1',
+              region_name: 'Frankfurt',
+            },
           ],
         }),
     })
@@ -112,9 +130,14 @@ test.each([
         </ReplicationClusterProvider>
       ),
     })
-    await renderRoute(route, { routeId, url: '/project/default/database/pipelines' })
+    await renderRoute(route, {
+      routeId,
+      url: '/project/default/database/pipelines',
+    })
 
-    const overview = await screen.findByRole('region', { name: 'Pipeline overview' })
+    const overview = await screen.findByRole('region', {
+      name: 'Pipeline overview',
+    })
     expect(within(overview).getByText('Primary database')).toBeVisible()
     expect(await within(overview).findByText('North Virginia')).toBeVisible()
     if (selected) {
@@ -135,10 +158,14 @@ test.each([
     } else {
       for (let index = 0; index < count; index++) {
         expect(
-          await screen.findByRole('link', { name: `Singapore warehouse ${index + 1}` })
+          await screen.findByRole('link', {
+            name: `Singapore warehouse ${index + 1}`,
+          })
         ).toHaveAttribute('href', `/project/default/database/pipelines/${42 + index}`)
         expect(
-          await screen.findByRole('link', { name: `Frankfurt warehouse ${index + 1}` })
+          await screen.findByRole('link', {
+            name: `Frankfurt warehouse ${index + 1}`,
+          })
         ).toHaveAttribute('href', `/project/default/database/pipelines/${42 + index}?cluster_id=2`)
       }
     }

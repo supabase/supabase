@@ -84,7 +84,14 @@ export function getPipelinesMockResponse(
   request: Request,
   scenario = 'busy'
 ): Response | undefined {
-  const counts: Record<string, number> = { one: 1, two: 2, small: 3, four: 4, uneven: 5, busy: 8 }
+  const counts: Record<string, number> = {
+    one: 1,
+    two: 2,
+    small: 3,
+    four: 4,
+    uneven: 5,
+    busy: 8,
+  }
   const pipelines = allPipelines
     .slice(0, counts[scenario] ?? counts.busy)
     .map((pipeline) => (scenario === 'four' ? { ...pipeline, cluster_id: '1' } : pipeline))
@@ -134,7 +141,12 @@ export function getPipelinesMockResponse(
           id: 1,
           name: projectRef,
           tenant_id: projectRef,
-          config: { host: 'preview.invalid', port: 5432, name: 'postgres', username: 'postgres' },
+          config: {
+            host: 'preview.invalid',
+            port: 5432,
+            name: 'postgres',
+            username: 'postgres',
+          },
         },
       ],
     })
@@ -156,11 +168,16 @@ export function getPipelinesMockResponse(
           status: { name: statuses[pipeline.destination_id - 1] },
         })
       if (action === 'version')
-        return Response.json({ pipeline_id: id, version: { id: 1, name: 'v0.2.0' } })
+        return Response.json({
+          pipeline_id: id,
+          version: { id: 1, name: 'v0.2.0' },
+        })
       if (action === 'replication-status') {
         return Response.json({
           pipeline_id: id,
-          apply_lag: { confirmed_flush_lsn_bytes: pipeline.destination_id % 3 === 1 ? 0 : 4096 },
+          apply_lag: {
+            confirmed_flush_lsn_bytes: pipeline.destination_id % 3 === 1 ? 0 : 4096,
+          },
           table_statuses: ['orders', 'customers', 'events'].map((name, index) => ({
             id: index + 1,
             table_id: index + 1,

@@ -113,9 +113,21 @@ type LifecycleAction = 'start' | 'stop' | 'restart'
 const LIFECYCLE_BY_STATUS: Partial<
   Record<PipelineStatusName, { label: string; action: LifecycleAction; icon: ReactNode }>
 > = {
-  [PipelineStatusName.STOPPED]: { label: 'Start', action: 'start', icon: <PlayIcon /> },
-  [PipelineStatusName.STARTED]: { label: 'Stop', action: 'stop', icon: <CircleStopIcon /> },
-  [PipelineStatusName.FAILED]: { label: 'Restart', action: 'restart', icon: <RotateCcwIcon /> },
+  [PipelineStatusName.STOPPED]: {
+    label: 'Start',
+    action: 'start',
+    icon: <PlayIcon />,
+  },
+  [PipelineStatusName.STARTED]: {
+    label: 'Stop',
+    action: 'stop',
+    icon: <CircleStopIcon />,
+  },
+  [PipelineStatusName.FAILED]: {
+    label: 'Restart',
+    action: 'restart',
+    icon: <RotateCcwIcon />,
+  },
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
@@ -223,9 +235,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const stateNotice =
     healthNotice ?? (statusName === PipelineStatusName.STARTED ? undefined : pipelineStateNotice)
   const regionName =
-    region?.region_name ?? (clusterId === undefined ? PIPELINE_REGION.displayName : 'Unknown')
+    region?.regionName ?? (clusterId === undefined ? PIPELINE_REGION.displayName : 'Unknown')
   const regionCode =
-    region?.region_code ?? (clusterId === undefined ? PIPELINE_REGION.code : undefined)
+    region?.regionCode ?? (clusterId === undefined ? PIPELINE_REGION.code : undefined)
   const destinationType = getReplicationDestinationType(destination?.config)
   const destinationIdentity = getOverviewDestination({
     destination,
@@ -347,7 +359,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-auto">
               <DropdownMenuItem asChild>
-                <Link href={logsUrl}>
+                <Link {...splitInternalUrl(logsUrl)}>
                   <ListIcon size={14} className="mr-2" aria-hidden />
                   <span>View logs</span>
                 </Link>
@@ -358,7 +370,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       )
     return (
       <Button asChild variant="default" icon={<ListIcon />}>
-        <Link href={logsUrl}>Logs</Link>
+        <Link {...splitInternalUrl(logsUrl)}>Logs</Link>
       </Button>
     )
   }

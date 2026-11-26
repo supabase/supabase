@@ -3,7 +3,7 @@ import { ChevronRightIcon, MinusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn, TableCell, TableRow } from 'ui'
+import { cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -63,7 +63,11 @@ export const DestinationRow = ({
     isError: isPipelineError,
   } = pipelineFetcher
   const destinationName = destination?.name ?? pipeline?.destination_name ?? ''
-  const destinationIdentity = getOverviewDestination({ destination, destinationId, clusterId })
+  const destinationIdentity = getOverviewDestination({
+    destination,
+    destinationId,
+    clusterId,
+  })
 
   const {
     error: pipelineStatusError,
@@ -80,7 +84,9 @@ export const DestinationRow = ({
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
     onError: () => {},
   })
@@ -230,7 +236,8 @@ export const DestinationRow = ({
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : <span>s</span>}
+                          {errorCount} table error
+                          {errorCount === 1 ? '' : <span>s</span>}
                         </span>
                       </>
                     )}
@@ -264,7 +271,14 @@ export const DestinationRow = ({
                 <RegionFlag className="w-4 shrink-0" region={pipelineRegionCode} />
               )}
               <div>
-                <span className="block">{pipelineRegion ?? 'Region unavailable'}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={pipelineRegionCode ? 0 : undefined} className="block">
+                      {pipelineRegion ?? 'Region unavailable'}
+                    </span>
+                  </TooltipTrigger>
+                  {pipelineRegionCode && <TooltipContent>{pipelineRegionCode}</TooltipContent>}
+                </Tooltip>
               </div>
             </div>
           </TableCell>

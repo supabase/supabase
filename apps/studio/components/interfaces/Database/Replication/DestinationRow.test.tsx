@@ -50,7 +50,12 @@ const addSourcesMock = () =>
             tenant_id: 't',
             id: 1,
             name: 'default',
-            config: { host: 'db.internal', port: 5432, name: 'main-db', username: 'etl_user' },
+            config: {
+              host: 'db.internal',
+              port: 5432,
+              name: 'main-db',
+              username: 'etl_user',
+            },
           },
         ],
       }),
@@ -249,7 +254,9 @@ describe('DestinationRow', () => {
         const clusterId = getClusterId(request)
         return HttpResponse.json<ReplicationPipelineStatusResponse>({
           pipeline_id: PIPELINE_ID,
-          status: { name: startedClusters.has(clusterId) ? 'started' : 'stopped' },
+          status: {
+            name: startedClusters.has(clusterId) ? 'started' : 'stopped',
+          },
         })
       },
     })
@@ -348,7 +355,11 @@ describe('DestinationRow', () => {
           params.pipeline_id
         )
         return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
-          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+          {
+            destination_deleted: true,
+            destination_id: DESTINATION_ID,
+            pipeline_id: PIPELINE_ID,
+          }
         )
       },
     })
@@ -427,12 +438,18 @@ describe('DestinationRow', () => {
       response: () => {
         deleted()
         return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
-          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+          {
+            destination_deleted: true,
+            destination_id: DESTINATION_ID,
+            pipeline_id: PIPELINE_ID,
+          }
         )
       },
     })
     const queryClient = new QueryClient()
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />, { queryClient })
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      queryClient,
+    })
     await screen.findByRole('button', { name: 'Pipeline options' })
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
@@ -696,7 +713,11 @@ describe('DestinationRow', () => {
         name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
-        state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
+        state: {
+          name: 'error',
+          reason: 'table not found',
+          retry_policy: { policy: 'no_retry' },
+        },
       },
     ])
     addVersionMock()
@@ -720,7 +741,11 @@ describe('DestinationRow', () => {
         name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
-        state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
+        state: {
+          name: 'error',
+          reason: 'table not found',
+          retry_policy: { policy: 'no_retry' },
+        },
       },
     ])
     addVersionMock()
@@ -743,7 +768,9 @@ describe('DestinationRow', () => {
     })
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
-      queryClient: new QueryClient({ defaultOptions: { queries: { retryDelay: 0 } } }),
+      queryClient: new QueryClient({
+        defaultOptions: { queries: { retryDelay: 0 } },
+      }),
     })
 
     expect(await screen.findByText('Failed to retrieve pipeline information')).toBeInTheDocument()

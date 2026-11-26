@@ -87,11 +87,10 @@ export function OverviewCard({ data }: NodeProps<OverviewNode>) {
 export function OverviewRegion({ name, code }: { name?: string; code?: string }) {
   const displayName = Object.values(AWS_REGIONS).find((region) => region.code === code)?.displayName
   const regionName = name ?? displayName
-  const shortName = regionName?.match(/\(([^)]+)\)$/)?.[1] ?? regionName
   return (
     <div className="flex items-center gap-2">
       {code && <RegionFlag className="w-4 shrink-0" region={code} />}
-      <span title={code}>{shortName ?? 'Region unavailable'}</span>
+      <span title={code}>{regionName ?? 'Region unavailable'}</span>
     </div>
   )
 }
@@ -160,7 +159,11 @@ export function OverviewPipelineStatus({
 }) {
   const { ref: projectRef } = useParams()
   const result = useQuery(
-    replicationPipelineStatusQueryOptions({ projectRef, pipelineId, clusterId })
+    replicationPipelineStatusQueryOptions({
+      projectRef,
+      pipelineId,
+      clusterId,
+    })
   )
   const { getRequestStatus } = usePipelineRequestStatus()
   return (

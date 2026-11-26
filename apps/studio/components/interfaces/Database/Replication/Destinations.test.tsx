@@ -60,7 +60,10 @@ vi.mock('./useIsPipelinesEnabled', () => ({
   useIsPipelinesClickHouseEnabled: () => false,
 }))
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
-  useCheckEntitlements: () => ({ hasAccess: options.hasAccess, isLoading: options.isLoading }),
+  useCheckEntitlements: () => ({
+    hasAccess: options.hasAccess,
+    isLoading: options.isLoading,
+  }),
 }))
 vi.mock('./DestinationPanel/DestinationPanel', () => ({
   DestinationPanel: () => {
@@ -68,8 +71,16 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
     return type ? <h2>Creation sheet: {type}</h2> : null
   },
 }))
-const SINGAPORE = { cluster_id: '1', region_code: 'ap-southeast-1', region_name: 'Singapore' }
-const FRANKFURT = { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' }
+const SINGAPORE = {
+  cluster_id: '1',
+  region_code: 'ap-southeast-1',
+  region_name: 'Singapore',
+}
+const FRANKFURT = {
+  cluster_id: '2',
+  region_code: 'eu-central-1',
+  region_name: 'Frankfurt',
+}
 const regionsResponse = (regions: (typeof SINGAPORE)[]) =>
   HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
     default_cluster_id: '1',
@@ -91,7 +102,12 @@ const sourcesResponse = (enabled: boolean) =>
             id: 42,
             name: 'default',
             tenant_id: 'tenant',
-            config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
+            config: {
+              host: 'localhost',
+              port: 5432,
+              name: 'postgres',
+              username: 'postgres',
+            },
           },
         ]
       : [],
@@ -112,7 +128,9 @@ beforeEach(() => {
   options.failEnable = false
   mswServer.use(
     http.get('http://localhost:3000/api/enabled-features-overrides', () =>
-      HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
+      HttpResponse.json<{ disabled_features: string[] }>({
+        disabled_features: [],
+      })
     )
   )
   mockRegions([SINGAPORE])
@@ -125,13 +143,17 @@ beforeEach(() => {
     method: 'get',
     path: '/platform/replication/:ref/destinations',
     response: () =>
-      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({ destinations: [] }),
+      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+        destinations: [],
+      }),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
     response: () =>
-      HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({ pipelines: [] }),
+      HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+        pipelines: [],
+      }),
   })
   addAPIMock({
     method: 'get',
@@ -376,7 +398,11 @@ test('keeps request-access creation in the sheet when no wizard destination is a
 describe('regions', () => {
   const clusterOf = (request: Request) =>
     new URL(request.url).searchParams.get('cluster_id') ?? 'omitted'
-  const regionNames: Record<string, string> = { '2': 'Frankfurt', '3': 'Sydney', '4': 'Virginia' }
+  const regionNames: Record<string, string> = {
+    '2': 'Frankfurt',
+    '3': 'Sydney',
+    '4': 'Virginia',
+  }
   const regionName = (cluster: string) => regionNames[cluster] ?? 'Singapore'
 
   const regionDestination = (cluster: string) => ({
@@ -537,7 +563,9 @@ describe('regions', () => {
       'href',
       '/project/default/database/pipelines/frankfurtpipeline?cluster_id=2'
     )
-    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    fireEvent.keyDown(document.activeElement ?? document.body, {
+      key: 'Escape',
+    })
     fireEvent.pointerDown(within(singapore!).getByRole('button', { name: 'Pipeline options' }), {
       button: 0,
       ctrlKey: false,
@@ -593,7 +621,10 @@ describe('regions', () => {
     const pendingRegion = new Promise<void>((resolve) => {
       finishRegion = resolve
     })
-    mockRegionResources({ pendingFrankfurt: pendingRegion, hasDestinations: false })
+    mockRegionResources({
+      pendingFrankfurt: pendingRegion,
+      hasDestinations: false,
+    })
     renderRegions()
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add pipeline' })).toBeEnabled())
@@ -788,11 +819,15 @@ describe('regions', () => {
       button: 0,
       ctrlKey: false,
     })
-    const menuItem = await screen.findByRole('menuitem', { name: 'Disable Pipelines' })
+    const menuItem = await screen.findByRole('menuitem', {
+      name: 'Disable Pipelines',
+    })
     expect(menuItem).not.toHaveAttribute('aria-disabled', 'true')
     fireEvent.click(menuItem)
 
-    return await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
+    return await screen.findByRole('alertdialog', {
+      name: 'Disable Pipelines',
+    })
   }
 
   test('opens creation directly when only a non-default region has a source', async () => {
@@ -863,7 +898,7 @@ describe('regions', () => {
     const { requests } = mockRegionalDisable()
     renderRegions()
 
-    expect(await screen.findByText('Failed to retrieve pipeline regions')).toBeInTheDocument()
+    expect(await screen.findByText('Could not load pipeline information')).toBeInTheDocument()
     await screen.findByRole('heading', { name: 'Add a pipeline' })
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
       button: 0,
@@ -873,7 +908,9 @@ describe('regions', () => {
       'aria-disabled',
       'true'
     )
-    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    fireEvent.keyDown(document.activeElement ?? document.body, {
+      key: 'Escape',
+    })
     expect(requests).toEqual([])
 
     canDiscoverRegions = true
@@ -911,11 +948,15 @@ describe('regions', () => {
       ctrlKey: false,
     })
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Disable Pipelines' }))
-    const dialog = await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Disable Pipelines',
+    })
     expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeEnabled()
     mockRegionResources()
     await act(() =>
-      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines('default') })
+      queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelines('default'),
+      })
     )
     await waitFor(() =>
       expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeDisabled()
@@ -937,7 +978,9 @@ test('sorts populated pipeline rows by name and status and filters them by name'
     method: 'get',
     path: '/platform/replication/:ref/destinations',
     response: () =>
-      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({ destinations }),
+      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+        destinations,
+      }),
   })
   addAPIMock({
     method: 'get',
@@ -996,16 +1039,20 @@ test('sorts populated pipeline rows by name and status and filters them by name'
   })
 
   mountList(createListRouter())
-  const alpha = await screen.findByRole('row', { name: /Alpha export.*Running/ })
+  const alpha = await screen.findByRole('row', {
+    name: /Alpha export.*Running/,
+  })
   const zulu = await screen.findByRole('row', { name: /Zulu sync.*Failed/ })
   const pipelineRows = () => screen.getAllByRole('row').slice(1)
   expect(pipelineRows()).toEqual([alpha, zulu])
-  fireEvent.click(screen.getByRole('button', { name: 'Name' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Pipeline' }))
   expect(pipelineRows()).toEqual([zulu, alpha])
   fireEvent.click(screen.getByRole('button', { name: 'Status' }))
   expect(pipelineRows()).toEqual([zulu, alpha])
   fireEvent.click(screen.getByRole('button', { name: 'Status' }))
   expect(pipelineRows()).toEqual([alpha, zulu])
-  fireEvent.change(screen.getByPlaceholderText('Search pipelines'), { target: { value: 'ZULU' } })
+  fireEvent.change(screen.getByPlaceholderText('Search pipelines'), {
+    target: { value: 'ZULU' },
+  })
   expect(pipelineRows()).toEqual([zulu])
 })

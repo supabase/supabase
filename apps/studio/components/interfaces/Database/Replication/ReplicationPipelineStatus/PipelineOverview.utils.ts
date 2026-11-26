@@ -89,8 +89,7 @@ export const getPipelineStateNotice = ({
     return {
       type: 'destructive',
       title: displayState.title,
-      description:
-        'Replication has stopped. Restart the pipeline to resume from its last checkpoint. Table states below are from before it failed.',
+      description: `Replication has stopped. Restart the pipeline to resume from its last checkpoint.${tableStatuses.length > 0 ? ' Table states below show the last reported status.' : ''}`,
       showLogsLink: true,
     }
   }
@@ -100,7 +99,9 @@ export const getPipelineStateNotice = ({
       type: 'note',
       title: displayState.title,
       description:
-        'Changes to your source tables wait in Postgres until you start the pipeline again. Table states below are from before it stopped.',
+        tableStatuses.length > 0
+          ? 'Start the pipeline to resume replication. Table states below show the last reported status.'
+          : 'Start the pipeline to replicate changes and view table status.',
       showLogsLink: false,
     }
   }

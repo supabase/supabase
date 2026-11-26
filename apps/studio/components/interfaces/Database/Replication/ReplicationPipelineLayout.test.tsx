@@ -55,7 +55,9 @@ const renderWithRouter = (
 ) => {
   const router = createRouter({
     routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines/42'] }),
+    history: createMemoryHistory({
+      initialEntries: ['/project/default/database/pipelines/42'],
+    }),
     parseSearch,
     stringifySearch,
   })
@@ -73,7 +75,10 @@ const renderLayout = (children?: ReactNode, queryClient?: QueryClient, clusterId
     <PipelineClusterScope>
       <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
     </PipelineClusterScope>,
-    { queryClient, nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined } }
+    {
+      queryClient,
+      nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined },
+    }
   )
 
 const TableResetFixture = () => {
@@ -182,7 +187,10 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () => HttpResponse.json<PipelinesResponse>({ pipelines: [{ ...PIPELINE, id }] }),
+    response: () =>
+      HttpResponse.json<PipelinesResponse>({
+        pipelines: [{ ...PIPELINE, id }],
+      }),
   })
   addAPIMock({
     method: 'get',
@@ -194,7 +202,12 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
             tenant_id: 'default',
             id: 2,
             name: 'default',
-            config: { host: 'db.internal', port: 5432, name: 'main-db', username: 'etl_user' },
+            config: {
+              host: 'db.internal',
+              port: 5432,
+              name: 'main-db',
+              username: 'etl_user',
+            },
           },
         ],
       }),
@@ -207,7 +220,10 @@ const mockStatus = (name: PipelineStatusResponse['status']['name'], id: string |
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
     response: () =>
-      HttpResponse.json<PipelineStatusResponse>({ pipeline_id: id, status: { name } }),
+      HttpResponse.json<PipelineStatusResponse>({
+        pipeline_id: id,
+        status: { name },
+      }),
   })
 
 const mockVersion = (hasUpdate: boolean, id: string | number = 42) =>
@@ -245,7 +261,11 @@ describe('ReplicationPipelineLayout', () => {
     mockVersion(false)
   })
 
-  test.each<{ status: Parameters<typeof mockStatus>[0]; bytes: number; label: string }>([
+  test.each<{
+    status: Parameters<typeof mockStatus>[0]
+    bytes: number
+    label: string
+  }>([
     { status: 'started', bytes: 4096, label: 'Lag: 4 KB' },
     { status: 'started', bytes: 0, label: 'Caught up' },
     { status: 'failed', bytes: 4096, label: 'Last reported lag: 4 KB' },
@@ -299,7 +319,9 @@ describe('ReplicationPipelineLayout', () => {
       expect(screen.queryByLabelText('Replication lag')).not.toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'Overview' })).toBeVisible()
       expect(
-        screen.queryByRole('button', { name: `Copy pipeline ID ${pipelineId}` })
+        screen.queryByRole('button', {
+          name: `Copy pipeline ID ${pipelineId}`,
+        })
       ).not.toBeInTheDocument()
     }
   )
@@ -402,7 +424,10 @@ describe('ReplicationPipelineLayout', () => {
   })
 
   test('deletes an unknown pipeline and returns to its cluster', async () => {
-    const requestedClusters = mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+    const requestedClusters = mockPipeline('42', {
+      ...DESTINATION,
+      config: { unknown: {} },
+    })
     mockStatus('started', '42')
     mockVersion(false, '42')
     addAPIMock({
@@ -479,7 +504,10 @@ describe('ReplicationPipelineLayout', () => {
       })
 
       const queryClient = new QueryClient()
-      queryClient.setQueryData(replicationKeys.clusters(), { default_cluster_id: '1', regions: [] })
+      queryClient.setQueryData(replicationKeys.clusters(), {
+        default_cluster_id: '1',
+        regions: [],
+      })
       renderLayout(undefined, queryClient, '1')
 
       expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
@@ -544,7 +572,9 @@ describe('ReplicationPipelineLayout', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     // Primary button is Stop while running, so the menu carries Restart instead
-    const restartAction = await screen.findByRole('menuitem', { name: 'Restart pipeline' })
+    const restartAction = await screen.findByRole('menuitem', {
+      name: 'Restart pipeline',
+    })
     expect(restartAction).toBeVisible()
     expect(restartAction).toHaveAccessibleDescription('Unfinished initial syncs restart.')
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()

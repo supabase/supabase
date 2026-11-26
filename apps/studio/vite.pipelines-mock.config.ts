@@ -26,7 +26,9 @@ const mockPipelinesApi: Plugin = {
     server.middlewares.use(async (req, res, next) => {
       if (!req.url?.startsWith('/api/platform/')) return next()
       const response = getPipelinesMockResponse(
-        new Request(new URL(req.url, 'http://localhost'), { method: req.method }),
+        new Request(new URL(req.url, 'http://localhost'), {
+          method: req.method,
+        }),
         getScenario()
       )
       if (!response) return next()
@@ -43,7 +45,10 @@ export default defineConfig(async (env) => {
   return {
     ...config,
     server: { ...config.server, host: '127.0.0.1' },
-    define: { ...config.define, 'import.meta.env.STUDIO_PIPELINES_MOCK': 'true' },
+    define: {
+      ...config.define,
+      'import.meta.env.STUDIO_PIPELINES_MOCK': 'true',
+    },
     plugins: [mockPipelinesApi, ...(config.plugins ?? [])],
   }
 })

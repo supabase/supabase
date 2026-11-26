@@ -11,7 +11,10 @@ const destination = (projectId: string, datasetId: string) => ({
 
 test('merges the same BigQuery dataset configured in different clusters', () => {
   const target = destination('warehouse', 'events')
-  const singapore = getOverviewDestination({ destination: target, destinationId: 7 })
+  const singapore = getOverviewDestination({
+    destination: target,
+    destinationId: 7,
+  })
   const frankfurt = getOverviewDestination({
     destination: { ...target, id: 9 },
     destinationId: 9,
@@ -37,7 +40,10 @@ test.each([
 
 test('does not merge destinations when their external identity is unavailable', () => {
   const singapore = getOverviewDestination({ destinationId: 7 })
-  const frankfurt = getOverviewDestination({ destinationId: 7, clusterId: '2' })
+  const frankfurt = getOverviewDestination({
+    destinationId: 7,
+    clusterId: '2',
+  })
   expect(singapore.id).not.toBe(frankfurt.id)
 })
 
