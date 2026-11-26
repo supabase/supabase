@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocation, useNavigate } from '@tanstack/react-router'
-import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -47,24 +46,21 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref ?? 'default'
 
-  // Preserve date range query parameters when navigating to new report
-  const preservedQueryParams = useMemo(() => {
-    const currentParams = new URLSearchParams(searchStr)
-    const params = new URLSearchParams()
-
-    for (const key of ['its', 'ite', 'isHelper', 'helperText'] as const) {
-      const value = currentParams.get(key)
-      if (value) params.set(key, value)
-    }
-
-    const queryString = params.toString()
-    return queryString ? `?${queryString}` : ''
-  }, [searchStr])
-
   const { mutate: upsertContent, isPending: isCreating } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
       const newReportId = vars.payload.id
+
+      // Preserve date range query parameters when navigating to new report
+      const currentParams = new URLSearchParams(searchStr)
+      const params = new URLSearchParams()
+      for (const key of ['its', 'ite', 'isHelper', 'helperText'] as const) {
+        const value = currentParams.get(key)
+        if (value) params.set(key, value)
+      }
+      const queryString = params.toString()
+      const preservedQueryParams = queryString ? `?${queryString}` : ''
+
       navigateToUrl(navigate, `/project/${ref}/observability/${newReportId}${preservedQueryParams}`)
       afterSubmit()
     },

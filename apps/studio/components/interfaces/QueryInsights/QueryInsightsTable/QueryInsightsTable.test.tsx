@@ -1,15 +1,9 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router'
+import { createRootRoute, createRoute } from '@tanstack/react-router'
 import { act, waitFor } from '@testing-library/react'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { QueryInsightsTable } from './QueryInsightsTable'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 class MockIntersectionObserver implements IntersectionObserver {
@@ -33,7 +27,7 @@ afterAll(() => {
   vi.unstubAllGlobals()
 })
 
-function createTestRouter(initialEntry: string) {
+function createQueryInsightsRouter(initialEntry: string) {
   const rootRoute = createRootRoute()
   const queryInsightsRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -44,12 +38,10 @@ function createTestRouter(initialEntry: string) {
     path: '/project/$ref/logs/postgres-logs',
   })
 
-  return createRouter({
-    routeTree: rootRoute.addChildren([queryInsightsRoute, postgresLogsRoute]),
-    history: createMemoryHistory({ initialEntries: [initialEntry] }),
-    parseSearch,
-    stringifySearch,
-  })
+  return createTestRouter(
+    initialEntry,
+    rootRoute.addChildren([queryInsightsRoute, postgresLogsRoute])
+  )
 }
 
 function mockProjectEndpoint() {
@@ -83,7 +75,9 @@ describe('QueryInsightsTable route change handling', () => {
     mockProjectEndpoint()
     const onCurrentSelectQuery = vi.fn()
     const onUrlUpdate = vi.fn()
-    const router = createTestRouter('/project/default/observability/query-insights?search=select')
+    const router = createQueryInsightsRouter(
+      '/project/default/observability/query-insights?search=select'
+    )
     await router.load()
 
     customRender(

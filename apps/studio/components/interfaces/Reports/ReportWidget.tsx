@@ -1,4 +1,4 @@
-import { type AnyRouter, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
 import { ReactNode } from 'react'
@@ -62,18 +62,23 @@ const ReportWidget = (props: ReportWidgetProps) => {
                   icon={<ExternalLinkIcon />}
                   className="px-1"
                   onClick={() => {
-                    const isDbQueryType = props.queryType === 'db'
-                    const to = isDbQueryType
-                      ? `/project/${projectRef}/sql/new`
-                      : `/project/${projectRef}/logs/explorer`
-                    const search: Record<string, string | undefined> = isDbQueryType
-                      ? { content: props.resolvedSql }
-                      : {
+                    if (props.queryType === 'db') {
+                      navigate({
+                        to: '/project/$ref/sql/$id',
+                        params: { ref: projectRef, id: 'new' },
+                        search: { content: props.resolvedSql },
+                      })
+                    } else {
+                      navigate({
+                        to: '/project/$ref/logs/explorer',
+                        params: { ref: projectRef },
+                        search: {
                           q: props.params?.sql,
                           its: props.params?.iso_timestamp_start || '',
                           ite: props.params?.iso_timestamp_end || '',
-                        }
-                    navigate<AnyRouter, string>({ to, search })
+                        },
+                      })
+                    }
                   }}
                 />
               </TooltipTrigger>

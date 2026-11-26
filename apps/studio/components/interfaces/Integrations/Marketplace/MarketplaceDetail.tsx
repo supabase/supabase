@@ -24,7 +24,6 @@ export const MarketplaceDetail = () => {
     isKnownRoute,
     layout,
     tabs,
-    isReady,
     isWrapperBlocked,
     pageTitle,
     pageSubTitle,
@@ -39,7 +38,6 @@ export const MarketplaceDetail = () => {
     Component,
   } = useIntegrationDetail()
 
-  if (!isReady) return null
   if (isWrapperBlocked) return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
 
   if (isAvailableLoading || isInstalledLoading || isIntegrationStatusLoading) {

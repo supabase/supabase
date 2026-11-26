@@ -81,7 +81,6 @@ export const useIntegrationDetail = () => {
     [integration, isInstalled]
   )
 
-  const isReady = true
   const isWrapperBlocked = !integrationsWrappers && !!id?.endsWith('_wrapper')
 
   const pageTitle = integration?.name ?? 'Integration not found'
@@ -104,7 +103,6 @@ export const useIntegrationDetail = () => {
     isKnownRoute,
     layout,
     tabs,
-    isReady,
     isWrapperBlocked,
     pageTitle,
     pageSubTitle,

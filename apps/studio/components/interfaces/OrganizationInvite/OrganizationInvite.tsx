@@ -52,7 +52,6 @@ export const OrganizationInvite = () => {
     isLoadingInvitation,
     isLoadingProfile,
     isLoggedIn,
-    isRouterReady: true,
     isSuccessInvitation,
     profileExists: !!profile,
   })

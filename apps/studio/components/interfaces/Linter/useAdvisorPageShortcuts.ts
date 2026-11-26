@@ -1,4 +1,4 @@
-import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 
 import { LINTER_LEVELS } from './Linter.constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -18,12 +18,11 @@ export function useAdvisorPageShortcuts({
   isRefreshDisabled,
 }: UseAdvisorPageShortcutsParams) {
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
 
   const switchTab = (level: LINTER_LEVELS) => {
     setCurrentTab(level)
     navigate<AnyRouter, string>({
-      to: pathname,
+      to: '.',
       search: (prev: Record<string, unknown>) => {
         const { sort: _sort, search: _search, id: _id, ...rest } = prev
         return { ...rest, preset: level }
@@ -44,7 +43,7 @@ export function useAdvisorPageShortcuts({
     SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL,
     () => {
       navigate<AnyRouter, string>({
-        to: pathname,
+        to: '.',
         search: (prev: Record<string, unknown>) => {
           const { id: _id, ...rest } = prev
           return rest

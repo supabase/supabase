@@ -39,9 +39,7 @@ export const RedeemCreditsScreen = () => {
       return typeof value === 'string' ? value : null
     },
   })
-  const currentRoute = useLocation({
-    select: (location) => `${location.pathname}${location.searchStr}${location.hash}`,
-  })
+  const currentRoute = useLocation({ select: (location) => location.href })
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { hasLoaded } = useContext(FeatureFlagContext)
 

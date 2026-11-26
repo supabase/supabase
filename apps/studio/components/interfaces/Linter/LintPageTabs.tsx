@@ -1,5 +1,5 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { MessageSquareMoreIcon } from 'lucide-react'
 import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -56,7 +56,6 @@ const LintCountLabel = ({
 
 const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
 
   return (
     <Tabs
@@ -66,7 +65,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
         if (!level) return
         setCurrentTab(level)
         navigate<AnyRouter, string>({
-          to: pathname,
+          to: '.',
           search: (prev: Record<string, unknown>) => {
             const { sort: _sort, search: _search, id: _id, ...rest } = prev
             return { ...rest, preset: value }

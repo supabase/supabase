@@ -1,4 +1,4 @@
-import { useLocation } from '@tanstack/react-router'
+import { useParams } from 'common'
 import { CheckIcon, MailIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -16,9 +16,7 @@ export function LinkSupportTicketPage() {
 }
 
 function LinkSupportTicketPageContent() {
-  const conversationId = useLocation({
-    select: (location) => (location.search as Record<string, string | undefined>).conversationId,
-  })
+  const { conversationId } = useParams()
   const [isSuccess, setIsSuccess] = useState(false)
 
   if (!conversationId) {

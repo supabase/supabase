@@ -1,4 +1,4 @@
-import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import { useRef } from 'react'
@@ -77,7 +77,6 @@ export const LinterDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
   const track = useTrack()
 
   const columns = lintCols.map((col) => {
@@ -117,7 +116,7 @@ export const LinterDataGrid = ({
 
   function handleSidepanelClose() {
     navigate<AnyRouter, string>({
-      to: pathname,
+      to: '.',
       search: (prev: Record<string, unknown>) => {
         const { id: _id, ...otherParams } = prev
         return otherParams
@@ -159,7 +158,7 @@ export const LinterDataGrid = ({
                     if (typeof idx === 'number' && idx >= 0) {
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       navigate<AnyRouter, string>({
-                        to: pathname,
+                        to: '.',
                         search: (prev: Record<string, unknown>) => ({
                           ...prev,
                           id: props.row.cache_key,

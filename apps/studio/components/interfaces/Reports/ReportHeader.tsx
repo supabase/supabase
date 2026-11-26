@@ -1,4 +1,4 @@
-import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
@@ -10,7 +10,6 @@ interface ReportHeaderProps {
 
 export const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
 
   return (
@@ -20,7 +19,7 @@ export const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps)
         <DatabaseSelector
           onSelectId={(db) => {
             navigate<AnyRouter, string>({
-              to: pathname,
+              to: '.',
               search: (prev: Record<string, unknown>) => {
                 const { db: _db, chart: _chart, ...params } = prev
                 return db !== ref ? { ...params, db } : params

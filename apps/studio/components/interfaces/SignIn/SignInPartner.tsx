@@ -1,4 +1,4 @@
-import { type AnyRouter, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { Loader2Icon } from 'lucide-react'
 import { useEffect } from 'react'
 
@@ -42,11 +42,7 @@ export const SignInPartner = () => {
           }
         } finally {
           if (isMounted) {
-            navigate<AnyRouter, string>({
-              to: '/sign-in-mfa',
-              search: { method },
-              replace: true,
-            })
+            navigate({ to: '/sign-in-mfa', search: { method }, replace: true })
           }
         }
       } else {

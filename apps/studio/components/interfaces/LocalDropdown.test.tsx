@@ -1,15 +1,10 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LocalDropdown } from './LocalDropdown'
+import { customRender } from '@/tests/lib/custom-render'
 
 const {
   mockSetTheme,
@@ -38,17 +33,8 @@ const {
   })),
 }))
 
-const renderLocalDropdown = (initialUrl = '/project/default/editor') => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-  })
-  return render(
-    <RouterContextProvider router={router}>
-      <LocalDropdown />
-    </RouterContextProvider>
-  )
-}
+const renderLocalDropdown = (initialUrl = '/project/default/editor') =>
+  customRender(<LocalDropdown />, { initialUrl })
 
 vi.mock('next/link', () => ({
   default: ({
@@ -95,10 +81,11 @@ vi.mock('dev-tools', () => ({
   useDevToolbar: () => mockUseDevToolbar(),
 }))
 
-vi.mock('ui', async () => {
+vi.mock('ui', async (importOriginal) => {
   const React = await import('react')
 
   return {
+    ...(await importOriginal<typeof import('ui')>()),
     Button: ({
       children,
       ...props
@@ -206,7 +193,7 @@ describe('LocalDropdown', () => {
   it('shows Preferences, removes Command menu, and keeps theme controls wired', async () => {
     const user = userEvent.setup()
 
-    renderLocalDropdown()
+    renderLocalDropdown('/project/default/editor?schema=public#keys')
 
     expect(screen.getByText('Preferences')).toBeInTheDocument()
     expect(screen.queryByText('Command menu')).not.toBeInTheDocument()
@@ -214,7 +201,7 @@ describe('LocalDropdown', () => {
     expect(screen.queryByText('Dev toolbar')).not.toBeInTheDocument()
 
     await user.click(screen.getByText('Preferences'))
-    expect(mockSetLastRoute).toHaveBeenCalledWith('/project/default/editor')
+    expect(mockSetLastRoute).toHaveBeenCalledWith('/project/default/editor?schema=public#keys')
 
     await user.click(screen.getByText('Feature previews'))
     expect(mockToggleFeaturePreviewModal).toHaveBeenCalledWith(true)

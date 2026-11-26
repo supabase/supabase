@@ -31,9 +31,7 @@ export const LocalDropdown = ({
   contentClassName?: string
 }) => {
   const pathname = useLocation({ select: (location) => location.pathname })
-  const currentRoute = useLocation({
-    select: (location) => `${location.pathname}${location.searchStr}${location.hash}`,
-  })
+  const currentRoute = useLocation({ select: (location) => location.href })
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()

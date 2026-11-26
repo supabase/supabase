@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type AnyRouter, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -58,9 +58,9 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       setIsLoading(false)
       toast.error(`Failed to verify code: ${error.message}`)
     } else {
-      await navigate<AnyRouter, string>({
+      await navigate({
         to: user?.factors?.length ? '/forgot-password-mfa' : '/reset-password',
-        search: (prev: Record<string, unknown>) => prev,
+        search: true,
       })
     }
   }

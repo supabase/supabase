@@ -1,4 +1,3 @@
-import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ArrowUpRightIcon, BookOpenIcon, LayoutGridIcon, PlusSquareIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -56,18 +55,12 @@ const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> 
 
 export const MarketplaceProductMenu = () => {
   const routePattern = useRoutePattern()
-  const hasFilter = useLocation({
-    select: (location) => {
-      const search = location.search as Record<string, unknown>
-      return Boolean(search.type) || Boolean(search.source)
-    },
-  })
-  const { ref, id: activeIntegrationId } = useParams()
+  const { ref, id: activeIntegrationId, type, source } = useParams()
 
   const { installedIntegrations, isLoading } = useInstalledIntegrations()
 
   const baseHref = `/project/${ref}/integrations`
-  const isDiscoverActive = routePattern === '/project/$ref/integrations' && !hasFilter
+  const isDiscoverActive = routePattern === '/project/$ref/integrations' && !type && !source
 
   return (
     <div className="flex flex-col gap-y-0.5 overflow-y-auto my-4 md:px-3 w-full">

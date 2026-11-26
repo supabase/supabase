@@ -1,4 +1,4 @@
-import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
+import { type AnyRouter, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RewindIcon } from 'lucide-react'
@@ -66,15 +66,7 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const navigate = useNavigate()
   const routePattern = useRoutePattern()
-  const pathname = useLocation({ select: (location) => location.pathname })
-  const initialIsoTimestampStart = useLocation({
-    select: (location) =>
-      (location.search as Record<string, string | undefined>).iso_timestamp_start,
-  })
-  const initialIsoTimestampEnd = useLocation({
-    select: (location) => (location.search as Record<string, string | undefined>).iso_timestamp_end,
-  })
-  const { db } = useParams()
+  const { db, iso_timestamp_start, iso_timestamp_end } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -103,9 +95,6 @@ export const LogsPreviewer = ({
 
   // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
   function getDefaultDatePickerValue() {
-    const iso_timestamp_start = initialIsoTimestampStart
-    const iso_timestamp_end = initialIsoTimestampEnd
-
     if (iso_timestamp_start && iso_timestamp_end) {
       return {
         to: iso_timestamp_end,
@@ -213,7 +202,7 @@ export const LogsPreviewer = ({
     } else if (state.selectedDatabaseId !== undefined && state.selectedDatabaseId !== projectRef) {
       if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(routePattern)) {
         navigate<AnyRouter, string>({
-          to: pathname,
+          to: '.',
           search: (prev: Record<string, unknown>) => ({
             ...prev,
             db: state.selectedDatabaseId,
@@ -249,7 +238,7 @@ export const LogsPreviewer = ({
     onSelectedDatabaseChange: (id: string) => {
       setFilters({ ...filters, database: id !== projectRef ? id : undefined })
       navigate<AnyRouter, string>({
-        to: pathname,
+        to: '.',
         search: (prev: Record<string, unknown>) => {
           const { db: _db, ...params } = prev
           return id !== projectRef ? { ...params, db: id } : params

@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLocation } from '@tanstack/react-router'
+import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -49,10 +49,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const returnTo = useLocation({
-    select: (location) =>
-      (location.search as Record<string, string | string[] | undefined>).returnTo,
-  })
+  const { returnTo } = useParams()
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },

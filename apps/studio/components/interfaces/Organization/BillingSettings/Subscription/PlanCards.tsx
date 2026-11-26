@@ -1,4 +1,4 @@
-import { useLocation } from '@tanstack/react-router'
+import { useParams } from 'common'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
@@ -35,12 +35,7 @@ export function PlanCards({
   showAwsMarketplacePurchase = false,
   onSelectTier,
 }: PlanCardsProps) {
-  const source = useLocation({
-    select: (location) => {
-      const rawSource = (location.search as Record<string, string | string[] | undefined>).source
-      return Array.isArray(rawSource) ? rawSource[0] : rawSource
-    },
-  })
+  const { source } = useParams()
   const track = useTrack()
 
   const currentPlanIndex = subscriptionsPlans.findIndex(

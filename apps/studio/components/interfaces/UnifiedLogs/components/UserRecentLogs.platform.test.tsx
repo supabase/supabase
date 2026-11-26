@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
@@ -14,7 +13,6 @@ import { UserRecentLogs } from './UserRecentLogs'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { miscKeys } from '@/data/misc/keys'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -69,18 +67,14 @@ function renderRecentLogs(
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>
   )
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/logs'] }),
-    parseSearch,
-    stringifySearch,
+  const rendered = customRender(content(USER_ID), {
+    queryClient,
+    initialUrl: '/project/default/logs',
   })
-  const rendered = customRender(content(USER_ID), { queryClient, router })
   return {
     ...rendered,
     queries,
     queryClient,
-    router,
     selectUser: (userId: string) => rendered.rerender(content(userId)),
   }
 }

@@ -1,4 +1,3 @@
-import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
 import { Edit3Icon, ListIcon } from 'lucide-react'
@@ -36,10 +35,7 @@ import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-quer
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const CronJobPage = () => {
-  const { ref, id, pageId, childId } = useParams()
-  const childLabel = useLocation({
-    select: (location) => (location.search as Record<string, string | undefined>)['child-label'],
-  })
+  const { ref, id, pageId, childId, childLabel } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false)

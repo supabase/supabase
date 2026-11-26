@@ -411,12 +411,13 @@ export const NewOrgForm = ({
         url.searchParams.set('token', searchParams.token)
       }
 
-      navigateToUrl(navigate, url.toString())
+      navigateToUrl(navigate, `${url.pathname}${url.search}${url.hash}`)
     } else {
-      navigateToUrl(
-        navigate,
-        `/new/${org.slug}?projectName=${encodeURIComponent(prefilledProjectName)}`
-      )
+      navigate({
+        to: '/new/$slug',
+        params: { slug: org.slug },
+        search: { projectName: prefilledProjectName },
+      })
     }
   }
 

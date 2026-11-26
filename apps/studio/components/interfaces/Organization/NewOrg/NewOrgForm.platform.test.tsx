@@ -1,4 +1,3 @@
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -8,7 +7,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { NewOrgForm } from './NewOrgForm'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -83,27 +81,19 @@ const FollowUpStatus = () => {
   return <p>{`Follow-up: ${state?.status ?? 'none'}`}</p>
 }
 
-const renderForm = () => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/new'] }),
-    parseSearch,
-    stringifySearch,
-  })
-  const rendered = customRender(
+const renderForm = () =>
+  customRender(
     <>
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
       <FollowUpStatus />
     </>,
     {
-      router,
+      initialUrl: '/new',
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
       }),
     }
   )
-  return { ...rendered, router }
-}
 
 const user = userEvent.setup()
 

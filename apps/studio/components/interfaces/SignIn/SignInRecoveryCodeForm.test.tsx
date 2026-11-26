@@ -1,5 +1,4 @@
 import { AuthApiError } from '@supabase/auth-js'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
 import { renderToString } from 'react-dom/server'
@@ -7,8 +6,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { SignInRecoveryCodeForm } from './SignInRecoveryCodeForm'
 import { auth } from '@/lib/gotrue'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender, CustomWrapper } from '@/tests/lib/custom-render'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
@@ -26,14 +24,7 @@ beforeEach(() => {
 })
 
 const renderForm = () => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({
-      initialEntries: [`${window.location.pathname}${window.location.search}`],
-    }),
-    parseSearch,
-    stringifySearch,
-  })
+  const router = createTestRouter(`${window.location.pathname}${window.location.search}`)
   const navigateSpy = vi.spyOn(router, 'navigate')
   const rendered = customRender(
     <FeatureFlagContext.Provider
@@ -43,7 +34,7 @@ const renderForm = () => {
     </FeatureFlagContext.Provider>,
     { router }
   )
-  return { ...rendered, router, navigateSpy }
+  return { ...rendered, navigateSpy }
 }
 
 test('verification returns to the selected authenticator without removing it', async () => {

@@ -47,7 +47,6 @@ import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectUpgradeMutation } from '@/data/projects/project-upgrade-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
-import { navigateToUrl } from '@/lib/navigation'
 
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`
@@ -80,10 +79,11 @@ export const ProjectUpgradeAlert = () => {
     onSuccess: (res, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
       toast.success('Upgrading project')
-      navigateToUrl(
-        navigate,
-        `/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`
-      )
+      navigate({
+        to: '/project/$ref',
+        params: { ref: variables.ref },
+        search: { upgradeInitiated: 'true', trackingId: res.tracking_id },
+      })
     },
   })
 
