@@ -12,6 +12,35 @@ See how these tools perform on real Supabase tasks in [Supabase Evals](/evals), 
 
 </Admonition>
 
+## Set up your agent
+
+To set up an agent in your project, follow these steps or ask your agent to follow them.
+
+1. Open a terminal in your project directory.
+2. Install the Supabase CLI. In a Node.js project, install it as a dev dependency so the version is pinned per project:
+
+   ```bash
+   npm install supabase --save-dev
+   ```
+
+   For Homebrew, Scoop, and Linux packages, see [Install the Supabase CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli).
+
+3. Install the Supabase Plugin. It bundles the MCP server and Agent Skills, and it detects the agents you have installed:
+
+   ```bash
+   npx plugins add supabase-community/supabase-plugin
+   ```
+
+   To install it for one agent by hand, see [manual installation](/docs/guides/ai-tools/plugins#manual-installation).
+
+4. Check whether your project has a `supabase/config.toml` file. If it doesn't, initialize Supabase:
+
+   ```bash
+   npx supabase init
+   ```
+
+   If you installed the CLI with Homebrew, Scoop, or a Linux package, run `supabase init`.
+
 ## Pick your agent
 
 <ContentListings id="ai-tools-supported-agents" />
