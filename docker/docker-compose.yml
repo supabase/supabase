@@ -434,9 +434,14 @@ services:
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
-      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_USE_ETAG: "false"
       IMGPROXY_AUTO_WEBP: ${IMGPROXY_AUTO_WEBP}
+      IMGPROXY_JPEG_PROGRESSIVE: "true"
+      IMGPROXY_FORMAT_QUALITY: jpeg=80,avif=62,webp=80
+      # Source limits. All frames of an animation count toward the resolution
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
+      IMGPROXY_MAX_SRC_FILE_SIZE: 50000000
+      IMGPROXY_MAX_ANIMATION_FRAMES: 150
 
   meta:
     container_name: supabase-meta
