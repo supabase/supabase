@@ -6,6 +6,7 @@ import {
   constructHeaders,
   fromNodeHeaders,
   getBearerToken,
+  getSearchParamsRecord,
   InvalidJsonError,
   parseJsonBody,
   toSnakeCase,
@@ -174,6 +175,17 @@ describe('apiHelpers', () => {
       expect(() => schema.parse(true)).toThrow()
       expect(() => schema.parse(false)).toThrow()
       expect(() => schema.parse(123)).toThrow()
+    })
+  })
+
+  describe('getSearchParamsRecord', () => {
+    it('maps single params to strings and repeated params to arrays', () => {
+      const searchParams = new URLSearchParams('name=foo&ids=a&ids=b&empty=')
+      expect(getSearchParamsRecord(searchParams)).toEqual({
+        name: 'foo',
+        ids: ['a', 'b'],
+        empty: '',
+      })
     })
   })
 

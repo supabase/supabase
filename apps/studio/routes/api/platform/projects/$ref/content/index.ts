@@ -3,11 +3,11 @@ import { paths } from 'api-types'
 import { compact } from 'lodash'
 import { z } from 'zod'
 
-import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { getSearchParamsRecord, parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers } from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
-  getSearchParamsRecord,
+  folderQueryParamsSchema,
   getSnippets,
   saveSnippet,
   SnippetSchema,
@@ -17,17 +17,8 @@ import {
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 
-const getRequestParamsSchema = z.object({
+const getRequestParamsSchema = folderQueryParamsSchema.extend({
   visibility: z.enum(['project', 'user']).optional(),
-  name: z.string().optional(),
-  limit: z
-    .string()
-    .transform((val) => Number(val))
-    .pipe(z.number().int().positive())
-    .optional(),
-  cursor: z.string().optional(),
-  sort_by: z.enum(['name', 'inserted_at']).optional(),
-  sort_order: z.enum(['asc', 'desc']).optional(),
 })
 
 const snippetIdsSchema = z
@@ -39,9 +30,9 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
   server: {
     handlers: createApiHandlers({
       GET: async ({ request }) => {
-        const query = getSearchParamsRecord(new URL(request.url).searchParams)
-        const result = getRequestParamsSchema.safeParse(query)
-
+        const result = getRequestParamsSchema.safeParse(
+          getSearchParamsRecord(new URL(request.url).searchParams)
+        )
         if (!result.success) {
           return Response.json({ data: [] } satisfies GetResponseData, { status: 400 })
         }
@@ -50,7 +41,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
 
         // Platform specific endpoint
         if (params.visibility === 'project') {
-          return Response.json({ data: [] } satisfies GetResponseData, { status: 200 })
+          return Response.json({ data: [] } satisfies GetResponseData)
         }
 
         try {
@@ -62,9 +53,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
             sortOrder: params.sort_order,
           })
 
-          return Response.json({ data: snippets, cursor } satisfies GetResponseData, {
-            status: 200,
-          })
+          return Response.json({ data: snippets, cursor } satisfies GetResponseData)
         } catch (error) {
           console.error('Error fetching snippets:', error)
           return Response.json({ data: [] } satisfies GetResponseData, { status: 500 })
@@ -74,7 +63,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
         const body = await parseJsonBody<Record<string, unknown> & { id: string }>(request)
         try {
           const updatedSnippet = await updateSnippet(body.id, body)
-          return Response.json(updatedSnippet, { status: 200 })
+          return Response.json(updatedSnippet)
         } catch (error) {
           if (error instanceof Error && error.message.includes('not found')) {
             const { data, error: parseError } = SnippetSchema.safeParse(body)
@@ -86,7 +75,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
 
             try {
               const savedSnippet = await saveSnippet(data)
-              return Response.json(savedSnippet, { status: 200 })
+              return Response.json(savedSnippet)
             } catch (createError) {
               console.error('Error creating snippet:', createError)
               return Response.json({ error: 'Failed to create snippet' }, { status: 500 })
@@ -97,12 +86,8 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
         }
       },
       DELETE: async ({ request }) => {
-        const idsValues = new URL(request.url).searchParams.getAll('ids')
-        if (idsValues.length > 1) {
-          return Response.json({ error: 'Snippet IDs are required' }, { status: 400 })
-        }
-
-        const result = snippetIdsSchema.safeParse(idsValues[0])
+        const { ids } = getSearchParamsRecord(new URL(request.url).searchParams)
+        const result = snippetIdsSchema.safeParse(ids)
         if (!result.success) {
           return Response.json({ error: 'Snippet IDs are required' }, { status: 400 })
         }
@@ -113,10 +98,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/')({
           for (const id of snippetIds) {
             await deleteSnippet(id)
           }
-          return Response.json(
-            snippetIds.map((id) => ({ id })),
-            { status: 200 }
-          )
+          return Response.json(snippetIds.map((id) => ({ id })))
         } catch (error) {
           console.error('Error deleting snippets:', error)
           return Response.json({ error: 'Failed to delete snippets' }, { status: 500 })

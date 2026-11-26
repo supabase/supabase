@@ -1,72 +1,32 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { paths } from 'api-types'
 
-import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { getSearchParamsRecord, parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers } from '@/lib/api/apiWrapper'
-import {
-  createFolder,
-  deleteFolder,
-  folderQueryParamsSchema,
-  getFolders,
-  getSearchParamsRecord,
-  getSnippets,
-} from '@/lib/api/snippets.utils'
+import { createFolder, deleteFolder, listFolderContents } from '@/lib/api/snippets.utils'
 
-type GetResponseData =
-  paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
 type PostRequestData =
   paths['/platform/projects/{ref}/content/folders']['post']['requestBody']['content']['application/json']
 
 export const Route = createFileRoute('/api/platform/projects/$ref/content/folders/')({
   server: {
     handlers: createApiHandlers({
-      GET: async ({ request }) => {
-        const query = getSearchParamsRecord(new URL(request.url).searchParams)
-        const result = folderQueryParamsSchema.safeParse(query)
-
-        if (!result.success) {
-          return Response.json({ data: { folders: [], contents: [] } } satisfies GetResponseData, {
-            status: 400,
-          })
-        }
-
-        const params = result.data
-
-        const folders = await getFolders()
-        // Folder listings return metadata only (no SQL body) to match the Management API contract; the
-        // editor loads each snippet's content on demand via the item endpoint.
-        const { cursor, snippets } = await getSnippets({
-          searchTerm: params.name,
-          limit: params.limit,
-          cursor: params.cursor,
-          sort: params.sort_by,
-          sortOrder: params.sort_order,
-          includeContent: false,
-        })
-
-        return Response.json(
-          { data: { folders, contents: snippets }, cursor } satisfies GetResponseData,
-          { status: 200 }
-        )
-      },
+      GET: ({ request }) => listFolderContents(request),
       POST: async ({ request }) => {
         const { name } = await parseJsonBody<PostRequestData>(request)
-
         const folder = await createFolder(name)
-
         return Response.json(folder, { status: 201 })
       },
       DELETE: async ({ request }) => {
-        const idsValues = new URL(request.url).searchParams.getAll('ids')
-
-        if (idsValues.length !== 1 || !idsValues[0]) {
+        const { ids } = getSearchParamsRecord(new URL(request.url).searchParams)
+        if (!ids || typeof ids !== 'string') {
           return Response.json({ error: 'Folder IDs are required' }, { status: 400 })
         }
-        const folderIds = idsValues[0].split(',').map((id) => id.trim())
 
+        const folderIds = ids.split(',').map((id) => id.trim())
         await Promise.all(folderIds.map((id) => deleteFolder(id)))
 
-        return Response.json({}, { status: 200 })
+        return Response.json({})
       },
     }),
   },

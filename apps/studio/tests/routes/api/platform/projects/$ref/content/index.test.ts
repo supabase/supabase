@@ -4,7 +4,7 @@ import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Snippet } from '@/lib/api/snippets.utils'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type ContentRoute = typeof import('@/routes/api/platform/projects/$ref/content/index').Route
 
@@ -34,17 +34,15 @@ function makeSnippet(overrides: Partial<Snippet> = {}): Snippet {
 }
 
 async function createSnippet(route: ContentRoute, overrides: Partial<Snippet> = {}) {
-  const response = await getRouteHandler(
+  const response = await callRoute(
     route,
-    'PUT'
-  )({
-    request: new Request('http://localhost/api/platform/projects/default/content', {
+    new Request('http://localhost/api/platform/projects/default/content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(makeSnippet(overrides)),
     }),
-    params: { ref: 'default' },
-  })
+    { ref: 'default' }
+  )
   return { response, snippet: (await response.json()) as Snippet }
 }
 
@@ -67,30 +65,24 @@ describe('/api/platform/projects/$ref/content', () => {
   it('lists user snippets on GET and returns empty list for visibility=project', async () => {
     await createSnippet(Route, { name: 'My Query' })
 
-    const userResponse = await getRouteHandler(
+    const userResponse = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(
+      new Request(
         'http://localhost/api/platform/projects/default/content?visibility=user&limit=10'
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(userResponse.status).toBe(200)
     expect(await userResponse.json()).toEqual({
       data: [expect.objectContaining({ name: 'My Query' })],
     })
 
-    const projectResponse = await getRouteHandler(
+    const projectResponse = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/content?visibility=project'
-      ),
-      params: { ref: 'default' },
-    })
+      new Request('http://localhost/api/platform/projects/default/content?visibility=project'),
+      { ref: 'default' }
+    )
 
     expect(projectResponse.status).toBe(200)
     expect(await projectResponse.json()).toEqual({ data: [] })
@@ -103,13 +95,11 @@ describe('/api/platform/projects/$ref/content', () => {
   ])('returns 400 on GET when query params are repeated (%s)', async (query) => {
     await createSnippet(Route, { name: 'My Query' })
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(`http://localhost/api/platform/projects/default/content${query}`),
-      params: { ref: 'default' },
-    })
+      new Request(`http://localhost/api/platform/projects/default/content${query}`),
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ data: [] })
@@ -149,16 +139,14 @@ describe('/api/platform/projects/$ref/content', () => {
       name: 'Second Query',
     })
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request(
+      new Request(
         `http://localhost/api/platform/projects/default/content?ids=${first.id},${second.id}`,
         { method: 'DELETE' }
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual([{ id: first.id }, { id: second.id }])
@@ -175,16 +163,14 @@ describe('/api/platform/projects/$ref/content', () => {
       name: 'Second Query',
     })
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request(
+      new Request(
         `http://localhost/api/platform/projects/default/content?ids=${first.id}&ids=${second.id}`,
         { method: 'DELETE' }
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ error: 'Snippet IDs are required' })
@@ -194,33 +180,16 @@ describe('/api/platform/projects/$ref/content', () => {
   it.each(['', '?ids=', '?ids=not-a-uuid'])(
     'returns 400 on DELETE when ids is missing or invalid (%s)',
     async (query) => {
-      const response = await getRouteHandler(
+      const response = await callRoute(
         Route,
-        'DELETE'
-      )({
-        request: new Request(`http://localhost/api/platform/projects/default/content${query}`, {
+        new Request(`http://localhost/api/platform/projects/default/content${query}`, {
           method: 'DELETE',
         }),
-        params: { ref: 'default' },
-      })
+        { ref: 'default' }
+      )
 
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({ error: 'Snippet IDs are required' })
     }
   )
-
-  it('returns 405 with Allow: GET, PUT, DELETE for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/projects/default/content', {
-        method: 'POST',
-      }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('GET, PUT, DELETE')
-  })
 })

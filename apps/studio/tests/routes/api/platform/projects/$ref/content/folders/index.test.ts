@@ -4,24 +4,22 @@ import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Folder } from '@/lib/api/snippets.utils'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type FoldersRoute = typeof import('@/routes/api/platform/projects/$ref/content/folders/index').Route
 type FolderByIdRoute =
   typeof import('@/routes/api/platform/projects/$ref/content/folders/$id').Route
 
 async function createFolder(route: FoldersRoute, name: string): Promise<Folder> {
-  const response = await getRouteHandler(
+  const response = await callRoute(
     route,
-    'POST'
-  )({
-    request: new Request('http://localhost/api/platform/projects/default/content/folders', {
+    new Request('http://localhost/api/platform/projects/default/content/folders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     }),
-    params: { ref: 'default' },
-  })
+    { ref: 'default' }
+  )
   return (await response.json()) as Folder
 }
 
@@ -49,15 +47,13 @@ describe('/api/platform/projects/$ref/content/folders', () => {
     await fs.writeFile(path.join(tempDir, 'alpha.sql'), 'select 1;', 'utf-8')
     await fs.writeFile(path.join(tempDir, 'beta.sql'), 'select 2;', 'utf-8')
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(
+      new Request(
         'http://localhost/api/platform/projects/default/content/folders?limit=1&sort_by=name&sort_order=asc'
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(200)
     const body = await response.json()
@@ -75,15 +71,11 @@ describe('/api/platform/projects/$ref/content/folders', () => {
     '?limit=1&limit=2',
     '?sort_by=name&sort_by=inserted_at',
   ])('returns 400 on GET when query params are invalid or repeated (%s)', async (query) => {
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'GET'
-    )({
-      request: new Request(
-        `http://localhost/api/platform/projects/default/content/folders${query}`
-      ),
-      params: { ref: 'default' },
-    })
+      new Request(`http://localhost/api/platform/projects/default/content/folders${query}`),
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ data: { folders: [], contents: [] } })
@@ -92,15 +84,13 @@ describe('/api/platform/projects/$ref/content/folders', () => {
   it.each(['?limit=invalid', '?limit=1&limit=2'])(
     'returns 400 on folder-by-id GET when query params are invalid or repeated (%s)',
     async (query) => {
-      const response = await getRouteHandler(
+      const response = await callRoute(
         FolderRoute,
-        'GET'
-      )({
-        request: new Request(
+        new Request(
           `http://localhost/api/platform/projects/default/content/folders/folder-1${query}`
         ),
-        params: { ref: 'default', id: 'folder-1' },
-      })
+        { ref: 'default', id: 'folder-1' }
+      )
 
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({ data: { folders: [], contents: [] } })
@@ -111,16 +101,14 @@ describe('/api/platform/projects/$ref/content/folders', () => {
     const folderA = await createFolder(Route, 'Folder A')
     const folderB = await createFolder(Route, 'Folder B')
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request(
+      new Request(
         `http://localhost/api/platform/projects/default/content/folders?ids=${folderA.id},${folderB.id}`,
         { method: 'DELETE' }
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(200)
     expect(await fs.readdir(tempDir)).toEqual([])
@@ -130,16 +118,14 @@ describe('/api/platform/projects/$ref/content/folders', () => {
     const folderA = await createFolder(Route, 'Folder A')
     const folderB = await createFolder(Route, 'Folder B')
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request(
+      new Request(
         `http://localhost/api/platform/projects/default/content/folders?ids=${folderA.id}&ids=${folderB.id}`,
         { method: 'DELETE' }
       ),
-      params: { ref: 'default' },
-    })
+      { ref: 'default' }
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ error: 'Folder IDs are required' })
@@ -149,16 +135,13 @@ describe('/api/platform/projects/$ref/content/folders', () => {
   it.each(['', '?ids='])(
     'returns 400 on DELETE when ids is missing or empty (%s)',
     async (query) => {
-      const response = await getRouteHandler(
+      const response = await callRoute(
         Route,
-        'DELETE'
-      )({
-        request: new Request(
-          `http://localhost/api/platform/projects/default/content/folders${query}`,
-          { method: 'DELETE' }
-        ),
-        params: { ref: 'default' },
-      })
+        new Request(`http://localhost/api/platform/projects/default/content/folders${query}`, {
+          method: 'DELETE',
+        }),
+        { ref: 'default' }
+      )
 
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({ error: 'Folder IDs are required' })

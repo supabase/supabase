@@ -8,9 +8,9 @@ export const Route = createFileRoute('/api/platform/projects/$ref/content/item/$
     handlers: createApiHandlers({
       GET: async ({ params }) => {
         try {
-          const snippet = await getSnippet(params.id as string)
+          const snippet = await getSnippet(params.id)
 
-          return Response.json(snippet, { status: 200 })
+          return Response.json(snippet)
         } catch (error) {
           if (error instanceof Error && error.message.includes('not found')) {
             return Response.json({ message: 'Content not found.' }, { status: 404 })

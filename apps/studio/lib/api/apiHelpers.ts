@@ -121,6 +121,19 @@ export function commaSeparatedStringIntoArray(value: string): string[] {
     .filter(Boolean)
 }
 
+/**
+ * Collect URL search params into a record. A key that appears more than once maps to an array of
+ * its values, so zod string schemas reject repeated params.
+ */
+export function getSearchParamsRecord(searchParams: URLSearchParams) {
+  const record: Record<string, string | string[]> = {}
+  for (const key of new Set(searchParams.keys())) {
+    const values = searchParams.getAll(key)
+    record[key] = values.length === 1 ? values[0] : values
+  }
+  return record
+}
+
 const BEARER_SCHEME = 'bearer'
 
 /**

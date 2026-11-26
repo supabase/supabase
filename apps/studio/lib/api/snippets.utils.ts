@@ -1,9 +1,11 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { paths } from 'api-types'
 import { compact, sortBy } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
+import { getSearchParamsRecord } from './apiHelpers'
 import { generateDeterministicUuid } from './snippets.browser'
 import { SNIPPETS_DIR } from './snippets.constants'
 
@@ -68,22 +70,6 @@ export const folderQueryParamsSchema = z.object({
   sort_by: z.enum(['name', 'inserted_at']).optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
 })
-
-export function getSearchParamsRecord(
-  searchParams: URLSearchParams
-): Record<string, string | string[]> {
-  const record: Record<string, string | string[]> = {}
-  for (const [key, value] of searchParams.entries()) {
-    const existing = record[key]
-    record[key] =
-      existing === undefined
-        ? value
-        : Array.isArray(existing)
-          ? [...existing, value]
-          : [existing, value]
-  }
-  return record
-}
 
 export type Snippet = z.infer<typeof SnippetSchema>
 export type Folder = z.infer<typeof FolderSchema>
@@ -525,4 +511,42 @@ export async function deleteFolder(id: string): Promise<void> {
     // If folder doesn't exist, still throw the original error
     throw new Error(`Folder with id ${id} not found`)
   }
+}
+
+type FolderContentsResponseData =
+  paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
+
+/**
+ * Handles the folder listing GET for the root (`folderId` null) or a single folder: validates the
+ * query params and returns the folders plus a page of snippet metadata.
+ */
+export async function listFolderContents(request: Request, folderId: string | null = null) {
+  const result = folderQueryParamsSchema.safeParse(
+    getSearchParamsRecord(new URL(request.url).searchParams)
+  )
+  if (!result.success) {
+    return Response.json(
+      { data: { folders: [], contents: [] } } satisfies FolderContentsResponseData,
+      { status: 400 }
+    )
+  }
+
+  const params = result.data
+  const folders = await getFolders(folderId)
+  // Folder listings return metadata only (no SQL body) to match the Management API contract; the
+  // editor loads each snippet's content on demand via the item endpoint.
+  const { cursor, snippets } = await getSnippets({
+    searchTerm: params.name,
+    limit: params.limit,
+    cursor: params.cursor,
+    sort: params.sort_by,
+    sortOrder: params.sort_order,
+    folderId,
+    includeContent: false,
+  })
+
+  return Response.json({
+    data: { folders, contents: snippets },
+    cursor,
+  } satisfies FolderContentsResponseData)
 }
