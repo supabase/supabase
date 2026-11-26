@@ -86,8 +86,9 @@ const VersionRowBadge = ({
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-64">
         {versionFateDescription(fate)}
-        {fate.type === 'expiry-due' &&
-          'It matches the lifecycle policy and can take up to 24 hours to delete.'}
+        {fate.type === 'expiry-due' && (
+          <span>It matches the lifecycle policy and can take up to 24 hours to delete.</span>
+        )}
       </TooltipContent>
     </Tooltip>
   )
