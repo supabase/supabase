@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { AnimatePresence } from 'motion/react'
+import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Badge,
@@ -8,9 +9,9 @@ import {
   DialogSectionSeparator,
   FormControl,
   FormField,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -181,19 +182,22 @@ export const BucketVersioningFields = ({
 
 const StorageVersioningAlphaPopover = () => {
   const { selectFeaturePreview } = useFeaturePreviewModal()
+  const [open, setOpen] = useState(false)
 
   return (
-    <HoverCard openDelay={100}>
-      <HoverCardTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <button
           type="button"
           aria-label="Public Alpha feature details"
+          tabIndex={0}
           className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          onMouseEnter={() => setOpen(true)}
         >
           <Badge variant="warning">Public Alpha</Badge>
         </button>
-      </HoverCardTrigger>
-      <HoverCardContent side="bottom" align="start" className="w-80 space-y-2">
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" className="w-80 space-y-2">
         <div className="space-y-1">
           <p className="text-sm font-medium text-foreground">
             Storage object versioning is in public alpha
@@ -215,7 +219,7 @@ const StorageVersioningAlphaPopover = () => {
         >
           Review feature
         </Button>
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   )
 }

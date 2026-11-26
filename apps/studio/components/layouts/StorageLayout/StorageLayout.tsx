@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { ReactNode } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -11,13 +12,15 @@ export interface StorageLayoutProps {
 }
 
 const StorageLayout = ({ title, children }: StorageLayoutProps) => {
+  const { ref } = useParams()
+
   return (
     <ProjectLayout
       product="Storage"
       browserTitle={{ section: title }}
       productMenu={<StorageMenuV2 />}
     >
-      <BannerStorageVersioningManager />
+      <BannerStorageVersioningManager key={ref ?? '_'} />
       {children}
     </ProjectLayout>
   )

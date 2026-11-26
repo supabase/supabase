@@ -11,6 +11,8 @@ const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const
 export const BannerStack = () => {
   const { banners } = useBannerStack()
   const [isHovered, setIsHovered] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const isExpanded = isHovered || isFocused
   const reduceMotion = useReducedMotion()
 
   const activeBanners = banners.filter((b) => !b.isDismissed)
@@ -28,12 +30,19 @@ export const BannerStack = () => {
       className="fixed bottom-4 right-4 z-50 flex flex-col-reverse items-end gap-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      animate={{ y: isHovered ? -8 : 0 }}
+      onFocus={() => setIsFocused(true)}
+      onBlur={(event) => {
+        const nextTarget = event.relatedTarget
+        if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+          setIsFocused(false)
+        }
+      }}
+      animate={{ y: isExpanded ? -8 : 0 }}
       transition={transition}
     >
       <div className="relative w-full max-w-80">
         <AnimatePresence>
-          {!isHovered &&
+          {!isExpanded &&
             peeks.map((depth) => (
               <motion.div
                 key={`peek-${depth}`}
@@ -59,7 +68,7 @@ export const BannerStack = () => {
       </div>
 
       <AnimatePresence>
-        {isHovered &&
+        {isExpanded &&
           extraBanners.map((banner, index) => (
             <motion.div
               key={banner.id}

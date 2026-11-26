@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CircleHelpIcon, FileIcon, MoreVerticalIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Badge, Button } from 'ui'
 
@@ -17,8 +17,8 @@ import { useProjectStorageConfigQuery } from '@/data/config/project-storage-conf
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export const BannerStorageVersioningManager = () => {
-  const router = useRouter()
   const { ref } = useParams()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { isInitialized } = useFeaturePreviewContext()
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
   const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
@@ -33,7 +33,7 @@ export const BannerStorageVersioningManager = () => {
     dismissBanner(BANNER_ID.STORAGE_VERSIONING)
   }, [dismissBanner, setIsDismissed])
 
-  const isStorageFilesPage = router.pathname.startsWith('/project/[ref]/storage/files')
+  const isStorageFilesPage = pathname.startsWith(`/project/${ref}/storage/files`)
   const canShowBanner =
     isStorageFilesPage && isInitialized && isObjectVersioningAvailable && !isDismissed
 
@@ -202,7 +202,9 @@ const VersionHistoryPreview = () => {
           <span className="text-[8px] text-foreground-lighter">{versions.length}</span>
         </div>
         <div className="mb-2 flex items-center gap-1 text-[8px] font-mono text-foreground-lighter">
-          <BroomSparklesIcon size={14} className="shrink-0 text-foreground-lighter" />
+          <span aria-hidden="true">
+            <BroomSparklesIcon size={14} className="shrink-0 text-foreground-lighter" />
+          </span>
           <span className="rounded-sm border bg-surface-200 px-1.5 py-0.5">2d</span>
           <span className="rounded-sm border border-dashed px-1.5 py-0.5 uppercase">Either</span>
           <span className="rounded-sm border bg-surface-200 px-1.5 py-0.5">
