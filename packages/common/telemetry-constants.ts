@@ -5175,8 +5175,15 @@ export interface WebVitalEvaluatedEvent {
     metricRating: 'good' | 'needs-improvement' | 'poor'
     /** Unique id of the metric instance, shared by repeat reports for the same page load */
     metricId: string
-    /** How the page load was initiated (e.g. navigate, reload, back-forward) */
-    navigationType: string
+    /** How the page load was initiated */
+    navigationType:
+      | 'navigate'
+      | 'reload'
+      | 'back-forward'
+      | 'back-forward-cache'
+      | 'prerender'
+      | 'restore'
+      | 'soft-navigation'
   }
 }
 
