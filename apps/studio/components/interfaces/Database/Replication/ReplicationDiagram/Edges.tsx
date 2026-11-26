@@ -1,4 +1,10 @@
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  getSmoothStepPath,
+  type Edge,
+  type EdgeProps,
+} from '@xyflow/react'
 import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
 
@@ -8,20 +14,36 @@ import {
   getEdgeVisual,
   type ReplicationState,
 } from '@/components/ui/ReactFlow/EdgeVisual'
+import { RegionFlag } from '@/components/ui/RegionFlag'
+import type { ReplicationRegion } from '@/data/replication/clusters-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
+import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 
 type EdgeData = {
-  identifier: string
+  destinationId: number
+  clusterId: string | undefined
+  region?: ReplicationRegion
   shiftEdgeEnd: boolean
 }
 
-export const SmoothstepEdge = ({
+type ReplicationEdgeProps = EdgeProps<Edge<EdgeData, 'smoothstep'>>
+
+export const SmoothstepEdge = (props: ReplicationEdgeProps) => {
+  if (!props.data) return null
+
+  return (
+    <ReplicationClusterProvider clusterId={props.data.clusterId}>
+      <ScopedSmoothstepEdge {...props} data={props.data} />
+    </ReplicationClusterProvider>
+  )
+}
+
+const ScopedSmoothstepEdge = ({
   sourceX,
   sourceY,
   targetX,
@@ -31,16 +53,14 @@ export const SmoothstepEdge = ({
   style = {},
   markerEnd,
   data,
-}: EdgeProps) => {
+}: ReplicationEdgeProps & { data: EdgeData }) => {
   const { ref: projectRef = 'default' } = useParams()
   const clusterId = useReplicationClusterId()
   const prefersReducedMotion = useReducedMotion()
-  const { identifier, shiftEdgeEnd } = (data || {}) as EdgeData
+  const { destinationId, region, shiftEdgeEnd } = data
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef, clusterId })
-  const pipeline = (pipelinesData?.pipelines ?? []).find(
-    (p) => p.destination_id.toString() === identifier
-  )
+  const pipeline = pipelinesData?.pipelines.find((p) => p.destination_id === destinationId)
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
     { projectRef, clusterId, pipelineId: pipeline?.id },
     { enabled: !!pipeline?.id }
@@ -102,6 +122,13 @@ export const SmoothstepEdge = ({
           className="nodrag nopan"
         >
           <EdgeVisualChip visual={visual} />
+          {region && (
+            <div className="absolute top-full left-1/2 mt-1 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap text-xs text-foreground-light">
+              <span>Pipeline region:</span>
+              {region.region_code && <RegionFlag className="w-4" region={region.region_code} />}
+              <span>{region.region_name}</span>
+            </div>
+          )}
         </div>
       </EdgeLabelRenderer>
     </>

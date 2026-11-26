@@ -15,7 +15,6 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
-import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -30,7 +29,6 @@ export const Route = createFileRoute('/project/$ref/database/pipelines/')({
 
 function DatabasePipelinesPage() {
   const { ref: projectRef } = useParams()
-  const { hasMultipleRegions } = useReplicationClusters()
   const { isHighAvailability, isPending } = useHighAvailability()
   const showPipelines = useIsFeatureEnabled('database:replication')
 
@@ -110,15 +108,7 @@ function DatabasePipelinesPage() {
               </>
             ) : (
               <ReplicationClusterProvider clusterId={undefined}>
-                <div className="space-y-2">
-                  {hasMultipleRegions && (
-                    <p className="text-xs text-foreground-light">
-                      The diagram shows pipelines in the default region. The list includes all
-                      regions.
-                    </p>
-                  )}
-                  <ReplicationDiagram />
-                </div>
+                <ReplicationDiagram />
                 <Destinations />
               </ReplicationClusterProvider>
             )}

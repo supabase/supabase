@@ -57,9 +57,11 @@ import {
 } from './ReplicationDiagram/Nodes.utils'
 import { UnknownDestinationNotice } from './UnknownDestinationNotice'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { useReplicationClusters } from './useReplicationClusters'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -90,6 +92,10 @@ const LIFECYCLE_BY_STATUS: Partial<
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
   const clusterId = useReplicationClusterId()
+  const { clusters, hasMultipleRegions } = useReplicationClusters()
+  const region = clusters.find(
+    (cluster) => (cluster.isDefault ? undefined : cluster.clusterId) === clusterId
+  )
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const navigate = useNavigate()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -326,6 +332,24 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>
                   )}
                 </span>
+                {hasMultipleRegions && region && (
+                  <>
+                    <span aria-hidden className="text-foreground-lighter">
+                      &middot;
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-foreground-light">
+                      <span>Pipeline region:</span>
+                      {region.regionCode && (
+                        <RegionFlag className="w-4" region={region.regionCode} />
+                      )}
+                      <span>
+                        {region.regionCode
+                          ? `${region.regionName} (${region.regionCode})`
+                          : region.regionName}
+                      </span>
+                    </span>
+                  </>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 
