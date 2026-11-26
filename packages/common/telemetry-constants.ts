@@ -2042,10 +2042,6 @@ export interface StudioPricingPlanCtaClickedEvent {
      */
     currentPlan?: string
     /**
-     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
-     */
-    planUpdateRedesignEnabled: boolean
-    /**
      * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
      */
     origin?: string
