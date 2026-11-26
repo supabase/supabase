@@ -88,9 +88,9 @@ The environment variable takes precedence over the config file. Set `SUPABASE_EX
 
 ## Remove fixed ports from the config file [#remove-fixed-ports-from-configtoml]
 
-`supabase init` writes fixed ports into `config.toml`. The CLI treats a port in the file as an exact request. Two local projects that both request port `54321` can't run at the same time.
+`supabase init` writes fixed ports into the config file. The CLI treats a port in the file as an exact request. Two local projects that both request port `54321` can't run at the same time.
 
-For a new app, run `init` with the setting turned on. The CLI writes `stack = true` under `[experimental]` in `config.toml` and leaves the port keys out:
+For a new app, run `init` with the setting turned on. The CLI sets `stack` to `true` under `experimental` in `config.jsonc` and leaves the port keys out:
 
 ```bash
 SUPABASE_EXPERIMENTAL_STACK=1 supabase init

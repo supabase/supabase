@@ -1,6 +1,6 @@
 /**
- * Recovery for failed lazy-loaded JS/CSS chunks (route chunks, `next/dynamic`,
- * `React.lazy`, Monaco, …), which happen on flaky or mobile networks and after
+ * Recovery for failed lazy-loaded JS/CSS chunks (route chunks, `React.lazy`,
+ * Monaco, …), which happen on flaky or mobile networks and after
  * deploys that remove old chunks.
  *
  * A page reload is the only reliable recovery: WebKit caches a failed module

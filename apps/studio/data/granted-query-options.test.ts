@@ -1,3 +1,4 @@
+import { QueryClient, skipToken } from '@tanstack/react-query'
 import { describe, expect, expectTypeOf, test } from 'vitest'
 
 import { grantedQueryOptions } from './granted-query-options'
@@ -16,8 +17,15 @@ describe('grantedQueryOptions', () => {
     expect(grantedQueryOptions({ queryKey, queryFn: undefined }).enabled).toBe(false)
   })
 
-  test('without a queryFn, queryFn stays undefined rather than skipToken', () => {
-    expect(grantedQueryOptions({ queryKey, queryFn: undefined }).queryFn).toBeUndefined()
+  test('without a queryFn, uses a stable fallback function rather than undefined or skipToken', async () => {
+    const first = grantedQueryOptions({ queryKey, queryFn: undefined })
+    const second = grantedQueryOptions({ queryKey, queryFn: undefined })
+    expect(first.queryFn).toBeTypeOf('function')
+    expect(first.queryFn).not.toBe(skipToken)
+    expect(first.queryFn).toBe(second.queryFn)
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    await expect(queryClient.fetchQuery(first)).rejects.toThrow(`Missing queryFn: '["things"]'`)
   })
 
   test("with a queryFn, the caller's enabled passes through", () => {

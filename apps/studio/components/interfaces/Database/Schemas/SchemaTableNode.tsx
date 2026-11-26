@@ -36,6 +36,7 @@ import { getTableDefinition } from '@/data/database/table-definition-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { useTrack } from '@/lib/telemetry/track'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
@@ -59,6 +60,7 @@ const TableNodeComponent = ({
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const router = useRouter()
+  const track = useTrack()
   const itemHeight = 'h-[22px]'
 
   const hasEdgesSelected =
@@ -129,13 +131,20 @@ const TableNodeComponent = ({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" align="end" className="w-40">
                         <DropdownMenuItem
+                          data-attr="schema-visualizer-node-edit"
                           className="flex items-center space-x-2 whitespace-nowrap"
-                          onClick={() => schemaGraphContext.onEditTable(data.id)}
+                          onClick={() => {
+                            track('database_schema_visualizer_node_menu_clicked', {
+                              action: 'edit_table',
+                            })
+                            schemaGraphContext.onEditTable(data.id)
+                          }}
                         >
                           <EditIcon size={12} />
                           <p>Edit table</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                          data-attr="schema-visualizer-node-open-editor"
                           className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={() =>
                             router.push(
@@ -152,10 +161,12 @@ const TableNodeComponent = ({
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
+                          data-attr="schema-visualizer-node-copy"
                           className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={(e) => {
                             e.stopPropagation()
                             copyToClipboard(data.name)
+                            track('database_schema_visualizer_copied', { content: 'table_name' })
                           }}
                         >
                           <CopyIcon size={12} />
@@ -163,9 +174,11 @@ const TableNodeComponent = ({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           key="copy-schema-sql"
+                          data-attr="schema-visualizer-node-copy"
                           className="space-x-2"
                           onClick={async (e) => {
                             e.stopPropagation()
+                            track('database_schema_visualizer_copied', { content: 'table_sql' })
                             const toastId = toast.loading('Getting table schema...')
 
                             const formattedSchema = getTableDefinition({
@@ -198,9 +211,13 @@ const TableNodeComponent = ({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           key="copy-schema-markdown"
+                          data-attr="schema-visualizer-node-copy"
                           className="space-x-2"
                           onClick={async (e) => {
                             e.stopPropagation()
+                            track('database_schema_visualizer_copied', {
+                              content: 'table_markdown',
+                            })
                             const markdown = getTableDefinitionAsMarkdown(data)
 
                             try {
@@ -317,8 +334,14 @@ const TableNodeComponent = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <DropdownMenuItem
+                        data-attr="schema-visualizer-node-edit"
                         disabled={!canUpdateColumns}
-                        onClick={() => schemaGraphContext.onEditColumn(data.id, column.id)}
+                        onClick={() => {
+                          track('database_schema_visualizer_node_menu_clicked', {
+                            action: 'edit_column',
+                          })
+                          schemaGraphContext.onEditColumn(data.id, column.id)
+                        }}
                         className="space-x-2"
                       >
                         <EditIcon size={12} />
@@ -333,10 +356,12 @@ const TableNodeComponent = ({
                   </Tooltip>
 
                   <DropdownMenuItem
+                    data-attr="schema-visualizer-node-copy"
                     className="space-x-2"
                     onClick={(e) => {
                       e.stopPropagation()
                       copyToClipboard(column.name)
+                      track('database_schema_visualizer_copied', { content: 'column_name' })
                     }}
                   >
                     <CopyIcon size={12} />

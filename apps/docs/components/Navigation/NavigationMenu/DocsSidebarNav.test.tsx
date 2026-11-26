@@ -58,20 +58,18 @@ describe('DocsSidebarNav', () => {
     renderSidebar(MenuId.Contributing)
 
     expect(screen.getByText('depth 1')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: /back to/i })).toBeNull()
-    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/')
+    expect(screen.queryByRole('navigation', { name: 'Sidebar levels' })).toBeNull()
   })
 
-  it('follows the page levels again when Home links the current page', () => {
+  it('lists Reference with the other sections and opens it with a way back', () => {
     navigation.pathname = '/'
+    vi.mocked(useNavItems).mockReturnValue(option1NavItems)
 
-    renderSidebar()
-    fireEvent.click(screen.getByRole('button', { name: /back to Home/ }))
-    expect(screen.getByText('depth 1')).toBeTruthy()
+    renderSidebar(MenuId.Contributing)
+    fireEvent.click(screen.getByRole('button', { name: 'Reference' }))
 
-    fireEvent.click(screen.getByRole('link', { name: 'Home' }))
-
-    expect(screen.getByText('depth 2')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Reference, back to Home' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'JavaScript' })).toBeTruthy()
   })
 
   it('opens the levels of the page from the option-1 nav, with a getting started link its tree leaves out', () => {
@@ -201,14 +199,22 @@ describe('DocsSidebarNav', () => {
     expect(screen.getByRole('link', { name: 'Password-based' })).toBeTruthy()
   })
 
-  it('starts reference pages at the reference list with no way back to the docs levels', () => {
+  it('opens reference pages on the reference list with a way back to the sections', () => {
     navigation.pathname = '/reference/javascript'
 
     renderSidebar()
 
-    expect(screen.getByText('depth 1')).toBeTruthy()
+    expect(screen.getByText('depth 2')).toBeTruthy()
     expect(screen.getByRole('link', { name: 'JavaScript' })).toBeTruthy()
-    expect(screen.queryByRole('navigation', { name: 'Sidebar levels' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Reference, back to Home' })).toBeTruthy()
+  })
+
+  it('puts the knowledge base first in the footer and leaves out the changelog', () => {
+    render(<DocsSidebarResources />)
+
+    const footerLinks = screen.getAllByRole('link')
+    expect(footerLinks[0].getAttribute('href')).toBe('https://supabase.com/kb')
+    expect(footerLinks.map((link) => link.textContent)).not.toContain('Changelog')
   })
 
   it.each([

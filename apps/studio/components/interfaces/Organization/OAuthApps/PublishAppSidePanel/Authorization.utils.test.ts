@@ -1,83 +1,105 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  AuthorizationToggleState,
-  getAuthorizationPreviewExplanation,
+  getAllProjectsRowLabel,
+  getAuthorizationChangeDescriptions,
+  getAuthorizationChanges,
   getResultingGrantDescription,
-  isAuthorizationConfirmationPending,
+  hasAuthorizationChanges,
 } from './Authorization.utils'
 
-describe('getAuthorizationPreviewExplanation', () => {
-  test('returns null when both toggles are off', () => {
-    expect(getAuthorizationPreviewExplanation(false, false)).toBeNull()
-  })
-
-  test('describes per-member grants when only that toggle is on', () => {
-    expect(getAuthorizationPreviewExplanation(true, false)).toContain('each member approves')
-  })
-
-  test('describes project selection when only that toggle is on', () => {
-    expect(getAuthorizationPreviewExplanation(false, true)).toContain(
-      'an organization owner approves'
-    )
-  })
-
-  test('describes both when both toggles are on', () => {
-    expect(getAuthorizationPreviewExplanation(true, true)).toContain(
-      'each member approves your app and picks'
-    )
-  })
-})
-
 describe('getResultingGrantDescription', () => {
-  test('returns legacy behaviour when both toggles are off', () => {
+  test('describes a single organization-wide grant by default', () => {
     expect(getResultingGrantDescription(false, false)).toEqual(
-      'Legacy behaviour, unchanged from today.'
+      'One grant for the organization, every project in it'
     )
   })
 
-  test('returns per-member org-wide grant when only member-bound is on', () => {
+  test('describes per-member grants when only the approver is member-bound', () => {
     expect(getResultingGrantDescription(true, false)).toEqual(
-      'One grant per member, organization-wide.'
+      'One grant per member, every project that member can access'
     )
   })
 
-  test('returns single scoped grant when only project scoping is on', () => {
+  test('describes chosen projects when only project scoping is on', () => {
     expect(getResultingGrantDescription(false, true)).toEqual(
-      'One organization grant, limited to chosen projects.'
+      'One grant for the organization, projects chosen when connecting'
     )
   })
 
-  test('returns per-member scoped grant when both are on', () => {
+  test('describes per-member scoped grants when both are strict', () => {
     expect(getResultingGrantDescription(true, true)).toEqual(
-      'One grant per member, limited to chosen projects.'
+      'One grant per member, projects chosen when connecting'
     )
   })
 })
 
-describe('isAuthorizationConfirmationPending', () => {
-  const off: AuthorizationToggleState = { checked: false, locked: false, confirmed: false }
-
-  test('is false when both toggles are off', () => {
-    expect(isAuthorizationConfirmationPending(off, off)).toBe(false)
+describe('getAllProjectsRowLabel', () => {
+  test('names the organization for an organization-bound grant', () => {
+    expect(getAllProjectsRowLabel(false, 'Acme')).toEqual('All projects in Acme')
   })
 
-  test('is true when a toggle is newly enabled but not confirmed', () => {
-    const newlyEnabled: AuthorizationToggleState = {
-      checked: true,
-      locked: false,
-      confirmed: false,
-    }
-    expect(isAuthorizationConfirmationPending(newlyEnabled, off)).toBe(true)
+  test('falls back when the organization name is unknown', () => {
+    expect(getAllProjectsRowLabel(false)).toEqual('All projects in your organization')
   })
 
-  test('is false when a newly enabled toggle has been confirmed', () => {
-    const confirmed: AuthorizationToggleState = { checked: true, locked: false, confirmed: true }
-    expect(isAuthorizationConfirmationPending(confirmed, off)).toBe(false)
+  test('scopes to the member for a member-bound grant', () => {
+    expect(getAllProjectsRowLabel(true, 'Acme')).toEqual('All projects you can access')
+  })
+})
+
+describe('getAuthorizationChanges', () => {
+  const defaults = { member_bound_grant: false, project_scoping: false }
+
+  test('reports no changes when nothing moved', () => {
+    const changes = getAuthorizationChanges(defaults, defaults)
+    expect(changes).toEqual({ isApproverChanged: false, isProjectReachChanged: false })
+    expect(hasAuthorizationChanges(changes)).toBe(false)
   })
 
-  test('is false when an enabled toggle is locked, regardless of confirmation', () => {
-    const locked: AuthorizationToggleState = { checked: true, locked: true, confirmed: false }
-    expect(isAuthorizationConfirmationPending(locked, off)).toBe(false)
+  test('reports each field that became stricter', () => {
+    const changes = getAuthorizationChanges(defaults, {
+      member_bound_grant: true,
+      project_scoping: true,
+    })
+    expect(changes).toEqual({ isApproverChanged: true, isProjectReachChanged: true })
+    expect(hasAuthorizationChanges(changes)).toBe(true)
+  })
+
+  test('ignores a field that is already saved as strict', () => {
+    const changes = getAuthorizationChanges(
+      { member_bound_grant: true, project_scoping: false },
+      { member_bound_grant: true, project_scoping: true }
+    )
+    expect(changes).toEqual({ isApproverChanged: false, isProjectReachChanged: true })
+  })
+
+  test('does not report a move back to a looser value as a change', () => {
+    const changes = getAuthorizationChanges(
+      { member_bound_grant: true, project_scoping: true },
+      defaults
+    )
+    expect(hasAuthorizationChanges(changes)).toBe(false)
+  })
+})
+
+describe('getAuthorizationChangeDescriptions', () => {
+  test('returns nothing when there are no changes', () => {
+    expect(
+      getAuthorizationChangeDescriptions({
+        isApproverChanged: false,
+        isProjectReachChanged: false,
+      })
+    ).toEqual([])
+  })
+
+  test('returns one bullet per change', () => {
+    const descriptions = getAuthorizationChangeDescriptions({
+      isApproverChanged: true,
+      isProjectReachChanged: true,
+    })
+    expect(descriptions).toHaveLength(2)
+    expect(descriptions[0]).toContain('their own access')
+    expect(descriptions[1]).toContain('403s')
   })
 })

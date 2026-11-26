@@ -13,7 +13,7 @@ import {
   libraryCategories,
   type LibraryBlock,
 } from '@/config/library'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 
 function LibraryCard({ block, framework }: { block: LibraryBlock; framework: string }) {
   return (
@@ -57,7 +57,7 @@ export function LibraryOverview() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const activeCategory =
     libraryCategories.find((category) => category.name === selectedCategory)?.name ?? 'All'
-  const { framework } = useFramework()
+  const { framework } = useFrameworkPreference()
 
   const filtered = libraryBlocks.filter(
     (block) => activeCategory === 'All' || block.category === activeCategory

@@ -16,11 +16,14 @@ services:
     container_name: supabase-studio
     image: supabase/studio:2026.11.23-sha-4a73166
     restart: unless-stopped
+    init: true
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          "node -e \"fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})\""
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
         ]
       timeout: 10s
       interval: 5s
@@ -280,7 +283,6 @@ services:
       # PGRST_JWT_SECRET: ${JWT_JWKS}
       PGRST_JWT_SECRET: ${JWT_JWKS:-${JWT_SECRET}}
 
-      PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
     command:
       [
@@ -439,6 +441,19 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.100.1
     restart: unless-stopped
+    init: true
+    # Defined here because Podman ignores the healthcheck embedded in the image.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:8080/health').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -491,6 +506,8 @@ services:
         "start",
         "--user-worker-request-idle-timeout",
         "150000",
+        "--event-worker",
+        "/home/deno/functions/main/events",
         "--main-service",
         "/home/deno/functions/main"
       ]

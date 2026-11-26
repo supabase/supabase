@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 import { componentPages, frameworkTitles, oauthBlocks } from '@/config/docs'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 
 const frameworks = Object.keys(frameworkTitles)
 
@@ -18,7 +18,7 @@ export function FrameworkSelector() {
   const framework = pathParts[pathParts.length - 2]
 
   const router = useRouter()
-  const { setFramework: setPreferredFramework } = useFramework()
+  const { setFramework: setPreferredFramework } = useFrameworkPreference()
   const selectedFramework = frameworks.includes(framework) ? framework : 'nextjs'
 
   if (!framework) {

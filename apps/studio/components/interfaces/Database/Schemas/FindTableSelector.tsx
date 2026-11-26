@@ -105,6 +105,7 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
                           <CommandItem
                             key={table.id}
                             value={String(table.id)}
+                            data-attr="schema-visualizer-find-table-item"
                             className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                             onSelect={() => {
                               onSelect(table)

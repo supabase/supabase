@@ -1,3 +1,7 @@
+'use client'
+
+import { useSyncExternalStore } from 'react'
+
 import { cn } from '../../lib/utils'
 
 const getIsMac = () => {
@@ -46,14 +50,25 @@ const formatShortcutLabel = (keys: string[]) => {
   return keys.every((key) => key.length === 1) ? keys.join('') : keys.join(' ')
 }
 
+const subscribeToNothing = () => () => {}
+
 export const KeyboardShortcut = ({ keys, variant = 'pill', className }: KeyboardShortcutProps) => {
-  const isMac = getIsMac()
-  const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac))
+  // the server cannot know the platform, so a mismatch would make react rebuild the page root
+  const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, () => null)
+  const isPlatformPending =
+    isMac === null && keys.some((key) => typeof KEY_SYMBOLS[key] === 'function')
+  const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac ?? false))
   const shortcutLabel = formatShortcutLabel(resolvedKeys)
 
   if (variant === 'keycaps') {
     return (
-      <span className={cn('inline-flex shrink-0 items-center gap-0.5', className)}>
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center gap-0.5',
+          isPlatformPending && 'invisible',
+          className
+        )}
+      >
         {resolvedKeys.map((key) => (
           <kbd
             key={key}
@@ -70,6 +85,7 @@ export const KeyboardShortcut = ({ keys, variant = 'pill', className }: Keyboard
     <span
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
+        isPlatformPending && 'invisible',
         variant === 'pill'
           ? 'items-center text-[11px] leading-none tracking-[-0.025em] text-foreground-light bg-surface-200/50 dark:bg-surface-100/50 rounded px-[5px] py-[3px] border border-border-muted'
           : 'items-baseline text-[11px] leading-[inherit]',

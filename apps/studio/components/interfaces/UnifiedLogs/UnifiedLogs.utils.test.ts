@@ -13,6 +13,7 @@ import {
   getLogTypeVisibility,
   getRawLogData,
   getUniqueLogRows,
+  isOfferedColumnFilter,
   isOfferedFilter,
   parseMultigresEventMessage,
   toQuerySearchParams,
@@ -482,5 +483,34 @@ describe('wrapIlikePattern', () => {
     ['fo_bar', 'fo_bar'],
   ])('wraps %s only when it has no %% or _ wildcard', (value, expected) => {
     expect(wrapIlikePattern(value)).toBe(expected)
+  })
+})
+
+describe('isOfferedColumnFilter', () => {
+  const builtIn = ['level', 'status', 'log_type']
+  const offered = ['level']
+  const orGroup = (...columns: string[]) => ({
+    group: 'or',
+    filters: columns.map((column) => ({ column, operator: '=', value: 'x' })),
+  })
+
+  it('requires built-in columns to be offered but always allows other columns', () => {
+    expect(isOfferedColumnFilter({ id: 'level', value: null }, builtIn, offered)).toBe(true)
+    expect(isOfferedColumnFilter({ id: 'status', value: null }, builtIn, offered)).toBe(false)
+    expect(isOfferedColumnFilter({ id: 'attribute.status', value: null }, builtIn, offered)).toBe(
+      true
+    )
+  })
+
+  it('offers everything when the view does not restrict filters', () => {
+    expect(isOfferedColumnFilter({ id: 'status', value: null }, builtIn)).toBe(true)
+    expect(isOfferedColumnFilter({ id: 'group.0', value: orGroup('status') }, builtIn)).toBe(true)
+  })
+
+  it('offers a group only when every column in it is offered', () => {
+    const offeredGroup = { id: 'group.0', value: orGroup('level', 'attribute.status') }
+    const mixedGroup = { id: 'group.1', value: orGroup('level', 'status') }
+    expect(isOfferedColumnFilter(offeredGroup, builtIn, offered)).toBe(true)
+    expect(isOfferedColumnFilter(mixedGroup, builtIn, offered)).toBe(false)
   })
 })
