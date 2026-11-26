@@ -4,10 +4,8 @@ import { parseAsString, useQueryState } from 'nuqs'
 import type { PropsWithChildren } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  replicationClustersQueryOptions,
-  toRequestClusterId,
-} from '@/data/replication/clusters-query'
+import { toRequestClusterId } from './PipelineClusterScope.utils'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
