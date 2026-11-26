@@ -212,7 +212,6 @@ services:
 
       # Test OTP mappings for development
       # GOTRUE_SMS_TEST_OTP: ${SMS_TEST_OTP}
-      # GOTRUE_SMS_TEST_OTP_VALID_UNTIL: ${SMS_TEST_OTP_VALID_UNTIL}
 
       # Uncomment to configure multi-factor authentication (MFA).
       # GOTRUE_MFA_TOTP_ENROLL_ENABLED: ${MFA_TOTP_ENROLL_ENABLED}
