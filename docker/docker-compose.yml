@@ -393,6 +393,7 @@ services:
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: 7200
       STORAGE_BACKEND: file
       # S3 bucket when using S3 backend, directory name when using 'file'
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
@@ -432,9 +433,14 @@ services:
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
-      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_USE_ETAG: "false"
       IMGPROXY_AUTO_WEBP: ${IMGPROXY_AUTO_WEBP}
+      IMGPROXY_JPEG_PROGRESSIVE: "true"
+      IMGPROXY_FORMAT_QUALITY: jpeg=80,avif=62,webp=80
+      # Source limits. All frames of an animation count toward the resolution
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
+      IMGPROXY_MAX_SRC_FILE_SIZE: 52428800
+      IMGPROXY_MAX_ANIMATION_FRAMES: 150
 
   meta:
     container_name: supabase-meta
