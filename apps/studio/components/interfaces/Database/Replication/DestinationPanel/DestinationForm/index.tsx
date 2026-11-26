@@ -79,6 +79,7 @@ interface DestinationFormProps {
   onCancel?: () => void
   onRegionChange?: (clusterId: string | undefined) => void
   isPreparingRegion?: boolean
+  hasRegionPreparationError?: boolean
   preferredClusterId?: string
 }
 
@@ -93,6 +94,7 @@ export const DestinationForm = ({
   onCancel = onClose,
   onRegionChange,
   isPreparingRegion = false,
+  hasRegionPreparationError = false,
   preferredClusterId,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
@@ -264,6 +266,7 @@ export const DestinationForm = ({
     isSaving ||
     (isManagedDuckLake && isDuckLakeProjectBlocked) ||
     isPreparingRegion ||
+    hasRegionPreparationError ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -296,6 +299,7 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
+    if (isPreparingRegion || hasRegionPreparationError) return
     if (rawData.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
 
     if (!isSuccessPublication || !selectedPublication) {

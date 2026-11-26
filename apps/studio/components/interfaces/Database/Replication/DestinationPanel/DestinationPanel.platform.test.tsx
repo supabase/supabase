@@ -359,3 +359,31 @@ test.each(['success', 'creation failure', 'refresh failure'])(
     )
   }
 )
+
+test('allows another region after preparation fails while keeping submission blocked', async () => {
+  mockRegions()
+  mockProject(FRANKFURT.region_code)
+  mockPanelResources(new Set([null]))
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/tenants-sources',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Source creation unavailable' }, { status: 503 }),
+  })
+  renderPanel()
+
+  expect(await screen.findByText('Failed to prepare pipeline region')).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+  const selector = await findRegionSelector()
+  expect(selector).toBeEnabled()
+  await userEvent.click(selector)
+  await userEvent.click(
+    within(await screen.findByRole('listbox')).getByRole('option', { name: /Singapore/ })
+  )
+  await waitFor(() =>
+    expect(screen.queryByText('Failed to prepare pipeline region')).not.toBeInTheDocument()
+  )
+  await userEvent.click(await screen.findByText('Select publication'))
+  expect(await screen.findByText('singapore')).toBeVisible()
+  expect(selector).toHaveTextContent('Singapore (ap-southeast-1)')
+})

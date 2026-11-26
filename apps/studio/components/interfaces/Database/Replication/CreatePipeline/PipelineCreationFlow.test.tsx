@@ -5,6 +5,7 @@ import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
 import router from 'next-router-mock'
+import { parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -912,6 +913,63 @@ describe('PipelineCreationFlow', () => {
     await waitFor(() => expect(footerButton('Continue')).toBeEnabled())
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
+  })
+
+  it('rechecks the connection when the creation cluster changes', async () => {
+    const validationClusters: Array<string | null> = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: ({ request }) => {
+        validationClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+      default_cluster_id: '1',
+      regions: [
+        { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+        { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+      ],
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    const ChangeRegionInUrl = () => {
+      const [, setClusterId] = useQueryState('cluster_id', parseAsString)
+      return (
+        <button tabIndex={0} onClick={() => void setClusterId('2')}>
+          Change URL region
+        </button>
+      )
+    }
+    renderWizard(
+      <>
+        <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
+        <ChangeRegionInUrl />
+      </>,
+      { queryClient, rateLimitFactor: 1 }
+    )
+    clickContinue()
+    await screen.findByText(/Step 2 of 4/)
+    fillConnection()
+    clickContinue()
+    await screen.findByText(/Step 3 of 4/)
+    fireEvent.click(screen.getByRole('button', { name: 'Change URL region' }))
+    await waitFor(() => expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument())
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: expect.stringContaining('step=connection') })
+      )
+    )
+    clickContinue()
+    await screen.findByText(/Step 3 of 4/)
+    expect(validationClusters).toEqual([null, '2'])
   })
 
   it('uses browser Back and Forward to revisit steps without losing values', async () => {
