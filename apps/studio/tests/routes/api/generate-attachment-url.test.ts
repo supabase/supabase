@@ -1,9 +1,17 @@
+import type { User } from '@supabase/auth-js'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/generate-attachment-url'
 import { mswServer } from '@/tests/lib/msw'
 import { getRouteHandler } from '@/tests/lib/server-route'
+
+type GoTrueErrorResponse = { msg: string }
+type CreateSignedUrlsResponse = Array<{
+  error: string | null
+  path: string | null
+  signedURL: string | null
+}>
 
 const { GOTRUE_URL } = vi.hoisted(() => {
   const url = 'https://auth.example.test'
@@ -30,11 +38,17 @@ function createJwt(sub: string): string {
 
 function mockGoTrueUser(token: string, userId: string) {
   mswServer.use(
-    http.get(`${GOTRUE_URL}/user`, ({ request }) => {
+    http.get<never, never, User | GoTrueErrorResponse>(`${GOTRUE_URL}/user`, ({ request }) => {
       if (request.headers.get('authorization') !== `Bearer ${token}`) {
-        return HttpResponse.json({ msg: 'Invalid JWT' }, { status: 401 })
+        return HttpResponse.json<GoTrueErrorResponse>({ msg: 'Invalid JWT' }, { status: 401 })
       }
-      return HttpResponse.json({ id: userId, aud: 'authenticated' })
+      return HttpResponse.json<User>({
+        id: userId,
+        aud: 'authenticated',
+        app_metadata: {},
+        user_metadata: {},
+        created_at: '2026-01-01T00:00:00Z',
+      })
     })
   )
 }
@@ -63,7 +77,7 @@ describe('/api/generate-attachment-url', () => {
             apikey: request.headers.get('apikey'),
             body: await request.json(),
           }
-          return HttpResponse.json([
+          return HttpResponse.json<CreateSignedUrlsResponse>([
             {
               error: null,
               path: 'user-1/screenshot.png',
@@ -106,7 +120,7 @@ describe('/api/generate-attachment-url', () => {
     const token = createJwt('user-1')
     mswServer.use(
       http.get(`${GOTRUE_URL}/user`, () =>
-        HttpResponse.json({ msg: 'Invalid JWT' }, { status: 401 })
+        HttpResponse.json<GoTrueErrorResponse>({ msg: 'Invalid JWT' }, { status: 401 })
       )
     )
 
