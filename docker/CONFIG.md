@@ -780,13 +780,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_EXPERIMENTAL_CREATE_EMAIL_IDENTITY_ON_PASSWORD_SET_ENABLED` | boolean |  | Create the missing `email` identity when a password is added to a user that has none (e.g. one who signed up with an OAuth provider). | Default: `false`. Experimental |
-| `GOTRUE_EXPERIMENTAL_CURSOR_PAGINATION_ENABLED` | boolean |  | Use cursor-based (keyset) pagination for `GET /admin/users` when no `page` query parameter is given. | Default: `false`. Experimental |
-| `GOTRUE_EXPERIMENTAL_ENABLE_OTT_AS_SOURCE_OF_TRUTH` | boolean |  | Verify typed OTPs against `auth.one_time_tokens` instead of the token columns in `auth.users`, with no fallback. | Default: `false`. Experimental |
-| `GOTRUE_EXPERIMENTAL_ONE_TIME_TOKEN_EXPIRES_AT_WRITE_ENABLED` | boolean |  | Set `expires_at` on `auth.one_time_tokens` rows when a one-time token is created. | Default: `false`. Experimental; nothing reads the column yet (v2.198.0) |
-| `GOTRUE_EXPERIMENTAL_PROVIDER_LINKING_DOMAINS` | string (CSV) |  | Map providers to account-linking domains. Providers in the same domain link to each other by email, separately from the default email-linked pool and from SSO. | Format: `provider=domain,provider=domain` (`=`, since custom provider names contain `:`). Experimental |
-| `GOTRUE_EXPERIMENTAL_PROVIDERS_WITH_OWN_LINKING_DOMAIN` | string (CSV) |  | Providers that do not participate in email-similarity identity linking. | Experimental. Deprecated: use `GOTRUE_EXPERIMENTAL_PROVIDER_LINKING_DOMAINS`; each listed provider is mapped to a domain of its own name |
-| `GOTRUE_EXPERIMENTAL_SCIM_ENABLED` | boolean |  | Enable the `/scim/v2` routes. | Default: `false`. Experimental; no per-provider SCIM setup yet (v2.198.0) |
 | `GOTRUE_INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST` | boolean |  | Always create user-search indexes on startup. | Default: `false` |
 | `GOTRUE_INDEX_WORKER_MAX_USERS_THRESHOLD` | integer (count) |  | Create user-search indexes only if user count is at or below this threshold. | Default: `0` (disabled) |
 | `GOTRUE_INTERNAL_HTTP_TIMEOUT` | string (duration) |  | HTTP client timeout used by external OAuth and SMS provider calls. | Read via `os.Getenv`, not envconfig |
