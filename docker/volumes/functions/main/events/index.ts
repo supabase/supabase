@@ -26,8 +26,11 @@ const MAX_LOGS_PER_FUNCTION_PER_WINDOW = 100
 const THROTTLE_WINDOW_MS = 1_000
 
 // Strip terminal CSI sequences (including colors) and OSC sequences (including links).
+// An OSC body stops at the next ESC, so each OSC attempt scans only up to the next
+// escape and the scan stays linear. Allowing ESC inside the body made a message of
+// repeated unterminated `ESC ]` prefixes take quadratic time and stall the event worker.
 // deno-lint-ignore no-control-regex
-const ANSI_PATTERN = /(?:\x1b\](?:[^\x07\x1b]|\x1b(?!\\))*(?:\x07|\x1b\\))|(?:(?:\x1b\[|\x9b)[0-?]*[ -/]*[@-~])/g
+const ANSI_PATTERN = /(?:\x1b\][^\x07\x1b]*(?:\x07|\x1b\\))|(?:(?:\x1b\[|\x9b)[0-?]*[ -/]*[@-~])/g
 
 function sanitize(msg: string): string {
   const message = msg.replace(ANSI_PATTERN, '')
