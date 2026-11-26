@@ -91,6 +91,13 @@ jobs:
           cd docker
           sh tests/test-functions-cors.sh
 
+      - name: Run Edge Functions error code tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-functions-codes.sh
+
       - name: Run response sandbox tests
         shell: bash
         run: |
