@@ -1,9 +1,8 @@
 import type { PGColumn } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { AlertTriangleIcon, CodeIcon, Loader2Icon, Table2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -33,9 +32,11 @@ import {
   usePrefetchTables,
   type TablesData,
 } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -76,7 +77,7 @@ export function useSnippetCommands() {
       {
         id: 'run-snippet',
         name: 'Run snippet...',
-        icon: () => <Code />,
+        icon: () => <CodeIcon />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
     ],
@@ -101,13 +102,11 @@ function RunSnippetPage() {
 
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
-  const { profile } = useProfile()
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 
@@ -135,7 +134,7 @@ function LoadingState() {
   return (
     <div className="p-6">
       <p className="text-center">
-        <Loader2 className="inline-block mr-2 animate-spin" />
+        <Loader2Icon className="inline-block mr-2 animate-spin" />
         Loading...
       </p>
     </div>
@@ -146,7 +145,7 @@ function ErrorState() {
   return (
     <div className="p-6">
       <p className="text-center">
-        <AlertTriangle className="inline-block mr-2" />
+        <AlertTriangleIcon className="inline-block mr-2" />
         Couldn&apos;t load snippets
       </p>
     </div>
@@ -160,7 +159,7 @@ function EmptyState({
   projectRef: string | undefined
   canCreateNew: boolean
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   return (
     <div className="p-6">
@@ -170,7 +169,12 @@ function EmptyState({
           <CommandItem
             id="create-snippet"
             className={generateCommandClassNames(false)}
-            onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
+            onSelect={() =>
+              void navigate({
+                to: '/project/$ref/sql/$id',
+                params: { ref: projectRef ?? '_', id: 'new' },
+              })
+            }
           >
             {canCreateNew ? 'Create new snippet' : 'Run new SQL'}
           </CommandItem>
@@ -189,7 +193,7 @@ function SnippetSelector({
   snippets: Array<SnippetWithContent> | undefined
   canCreateNew: boolean
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const selectedValue = useCommandFilterState((state) => state.value)
   const selectedSnippet = snippets?.find((snippet) => snippetValue(snippet) === selectedValue)
@@ -211,7 +215,12 @@ function SnippetSelector({
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}
-                onSelect={() => void router.push(`/project/${projectRef ?? '_'}/sql/${snippet.id}`)}
+                onSelect={() =>
+                  void navigate({
+                    to: '/project/$ref/sql/$id',
+                    params: { ref: projectRef ?? '_', id: snippet.id },
+                  })
+                }
               >
                 {snippet.name}
               </CommandItem>
@@ -225,7 +234,12 @@ function SnippetSelector({
               <CommandItem
                 id="create-snippet"
                 className={generateCommandClassNames(false)}
-                onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
+                onSelect={() =>
+                  void navigate({
+                    to: '/project/$ref/sql/$id',
+                    params: { ref: projectRef ?? '_', id: 'new' },
+                  })
+                }
                 forceMount={true}
               >
                 Create new snippet
@@ -259,19 +273,30 @@ export function useQueryTableCommands(options?: CommandOptions) {
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
-  const commandMenuPreviouslyOpen = useRef(commandMenuOpen)
-  const commandMenuJustOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
-  commandMenuPreviouslyOpen.current = commandMenuOpen
+  // the ref prefetched for this open. unset until that prefetch runs, so a
+  // menu that mounts already open still prefetches once the project exists.
+  // a new ref prefetches while the menu stays open. cleared on close.
+  const prefetchedProjectRef = useRef<string | undefined>(undefined)
 
   const prefetchTables = usePrefetchTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   useEffect(() => {
-    if (project && commandMenuJustOpened) {
-      prefetchTables(undefined, true)
+    if (!commandMenuOpen) {
+      prefetchedProjectRef.current = undefined
+      return
     }
-  }, [project, prefetchTables, commandMenuJustOpened])
+
+    const shouldPrefetch = prefetchedProjectRef.current !== project?.ref && !!project
+
+    if (!shouldPrefetch) {
+      return
+    }
+
+    prefetchedProjectRef.current = project?.ref
+    prefetchTables(undefined, true)
+  }, [commandMenuOpen, project, prefetchTables])
 
   useRegisterPage(
     QUERY_TABLE_PAGE_NAME,
@@ -288,7 +313,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
       {
         id: 'query-table',
         name: 'Query a table...',
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
     ],
@@ -297,7 +322,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
 }
 
 function TableSelector() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
@@ -353,7 +378,7 @@ function TableSelector() {
           onValueChange={setFilterString}
         />
       </CommandHeader>
-      <CommandList className="pb-9">
+      <CommandList className="flex-1 min-h-0">
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
@@ -365,9 +390,11 @@ function TableSelector() {
                   className={generateCommandClassNames(false)}
                   value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
                   onSelect={() => {
-                    router.push(
-                      `/project/${project?.ref ?? '_'}/sql/new?content=${encodeURIComponent(generateSelectStatement(table))}`
-                    )
+                    void navigate({
+                      to: '/project/$ref/sql/$id',
+                      params: { ref: project?.ref ?? '_', id: 'new' },
+                      search: { content: generateSelectStatement(table) },
+                    })
                   }}
                 >
                   {`${table.schema}.${table.name}`}
@@ -379,28 +406,35 @@ function TableSelector() {
                 No tables found based on your search
               </p>
             )}
-            {tables.length > 0 && (
-              <>
-                <div ref={sentinelRef} />
-                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
-                  <div className="flex items-center gap-x-2">
-                    {isFetchingNextTablesPage ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 size={14} className="animate-spin" /> Loading...
-                      </span>
-                    ) : (
-                      <span>
-                        Total: {tables.length} {tables.length === 1 ? 'table' : 'tables'}
-                        {hasNextTablesPage ? ' loaded' : ''}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+            {tables.length > 0 && <div ref={sentinelRef} />}
           </>
         )}
       </CommandList>
+      <div
+        role="status"
+        className={
+          isSuccess && tables.length > 0
+            ? 'shrink-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light'
+            : 'sr-only'
+        }
+      >
+        {isSuccess && tables.length > 0 && (
+          <div className="flex items-center gap-x-2">
+            {isFetchingNextTablesPage ? (
+              <span className="flex items-center gap-2">
+                <Loader2Icon size={14} className="motion-safe:animate-spin" aria-hidden />{' '}
+                Loading...
+              </span>
+            ) : (
+              <span>
+                Total: {tables.length}{' '}
+                {tables.length === 1 ? <span>table</span> : <span>tables</span>}
+                {hasNextTablesPage ? <span>{' loaded'}</span> : ''}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </CommandWrapper>
   )
 }

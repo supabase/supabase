@@ -2,6 +2,7 @@
 id: 'auth-jwts'
 title: 'JSON Web Token (JWT)'
 subtitle: 'Information on how best to use JSON Web Tokens with Supabase'
+tocVideo: 'Ufx6fdRMxjU'
 ---
 
 A [JSON Web Token](https://jwt.io/introduction) is a type of data structure, represented as a string, that usually contains identity and authorization information about a user. It encodes information about its lifetime and is signed with a cryptographic key to make it tamper-resistant.
@@ -55,7 +56,7 @@ Provides identifying information (called "claims") about the user (or other enti
 | `iss`                                              | Identifies the server which issued the token. If you append `/.well-known/jwks.json` to this URL you'll get access to the public keys with which you can verify the token. |
 | `exp`                                              | Sets a time limit after which the token should not be trusted and is considered expired, even if it is properly signed.                                                    |
 | `sub`                                              | Means _subject_, is the unique ID of the user represented by the token.                                                                                                    |
-| <span className="whitespace-nowrap!">`role`</span> | The Postgres role to use when applying Row Level Security policies.                                                                                                        |
+| <span className="whitespace-nowrap!">`role`</span> | The [Postgres role](/docs/guides/database/postgres/roles) to use when applying Row Level Security policies.                                                                |
 | ...                                                | All other claims are useful for quick access to profile information without having to query the database or send a request to the Auth server.                             |
 
 **Signature**
@@ -208,6 +209,8 @@ This endpoint is served directly from the Auth server, but is also additionally 
 
 Make sure that you do not cache this data for longer in your application, as it might make revocation difficult. If you do, make sure to provide a way to purge this cache when rotating signing keys to avoid unintentionally rejecting valid user access tokens.
 
+If your backend can't reach this endpoint, see [Public key discovery and caching](/docs/guides/auth/signing-keys#public-key-discovery-and-caching) to copy the public keys into your app.
+
 Below is an example of how to use the [jose TypeScript JWT verification library](https://github.com/panva/jose) with Supabase JWTs:
 
 ```typescript
@@ -237,7 +240,7 @@ Authorization: Bearer <JWT>
 
 If the server responds with HTTP 200 OK, the JWT is valid, otherwise it is not.
 
-Because the Auth server runs only in your project's specified region and is not globally distributed, doing this check can be quite slow depending on where you're performing the check. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project.
+This check can be slow, depending on where you perform it. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project. For why, see the limits in [Auth architecture](/docs/guides/auth/architecture#limits).
 
 If you are using a shared secret (HS256) signing key, you may wish to verify using the shared secret. **We strongly recommend against this approach.**
 

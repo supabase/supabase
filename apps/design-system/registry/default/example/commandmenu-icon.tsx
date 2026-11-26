@@ -1,5 +1,4 @@
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Github } from 'lucide-react'
+import { Button, GithubIcon } from 'ui'
 import {
   CommandMenu,
   CommandMenuInput,
@@ -15,7 +14,7 @@ function Commands() {
       id: 'github',
       name: 'Go to repo',
       route: 'https://github.com/supabase/supabase',
-      icon: () => <Github />,
+      icon: () => <GithubIcon />,
     },
   ])
 

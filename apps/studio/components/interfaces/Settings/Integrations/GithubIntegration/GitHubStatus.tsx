@@ -1,14 +1,15 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertCircle, ArrowUpRight, CheckCircle2 } from 'lucide-react'
-import Image from 'next/image'
+import { AlertCircleIcon, ArrowUpRightIcon, CheckCircle2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const GitHubStatus = () => {
   const { ref: projectRef } = useParams()
@@ -21,9 +22,14 @@ export const GitHubStatus = () => {
     { enabled: !!selectedOrganization?.id }
   )
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    { enabled: !!parentProjectRef }
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: !!parentProjectRef }
+    )
   )
 
   const githubConnection = connections?.find(
@@ -45,17 +51,18 @@ export const GitHubStatus = () => {
         >
           <div className="w-full flex items-center justify-between">
             <h3 className="text-sm">GitHub connection</h3>
-            <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+            <ArrowUpRightIcon strokeWidth={1} className="h-4 w-4" />
           </div>
           <p className="mt-0.5 text-xs text-foreground-lighter flex items-center gap-2">
             {isConnected ? (
               <>
-                <Image
+                <img
                   className="dark:invert"
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={16}
                   height={16}
-                  alt="GitHub"
+                  alt=""
+                  aria-hidden="true"
                 />
                 {githubConnection?.repository.name}
               </>
@@ -68,7 +75,7 @@ export const GitHubStatus = () => {
 
       <HoverCardContent side="right" align="start" className="w-80 p-4 space-y-2">
         <div className="flex items-center gap-2 text-sm">
-          <Image
+          <img
             className="dark:invert"
             src={`${BASE_PATH}/img/icons/github-icon.svg`}
             width={20}
@@ -84,9 +91,9 @@ export const GitHubStatus = () => {
           <div className="flex flex-col gap-2 text-xs text-foreground-light">
             <div className="flex items-center gap-2">
               {hasGitBranchSync ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasGitBranchSync
@@ -96,9 +103,9 @@ export const GitHubStatus = () => {
             </div>
             <div className="flex items-center gap-2">
               {hasAutomaticBranching ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasAutomaticBranching

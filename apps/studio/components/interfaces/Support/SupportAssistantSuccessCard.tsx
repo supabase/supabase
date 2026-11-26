@@ -1,5 +1,5 @@
-import { ArrowUpRight } from 'lucide-react'
-import dynamic from 'next/dynamic'
+import { ArrowUpRightIcon } from 'lucide-react'
+import { lazy, Suspense } from 'react'
 import {
   AiIconAnimation,
   Card,
@@ -19,14 +19,10 @@ interface SupportAssistantSuccessCardProps {
   className?: string
 }
 
-const SupportAssistantSuccessCardContent = dynamic<SupportAssistantSuccessCardProps>(
-  () =>
-    import('@/components/ui/AIAssistantPanel/AIAssistant').then(
-      (mod) => mod.SupportAssistantSuccessCardContent
-    ),
-  {
-    loading: () => <SupportAssistantSuccessCardLoadingShell />,
-  }
+const SupportAssistantSuccessCardContent = lazy(() =>
+  import('@/components/ui/AIAssistantPanel/AIAssistant').then((mod) => ({
+    default: mod.SupportAssistantSuccessCardContent,
+  }))
 )
 
 function hasProjectScopedAssistantContext(projectRef: string | undefined) {
@@ -36,7 +32,11 @@ function hasProjectScopedAssistantContext(projectRef: string | undefined) {
 export function SupportAssistantSuccessCard(props: SupportAssistantSuccessCardProps) {
   if (!hasProjectScopedAssistantContext(props.request.projectRef)) return null
 
-  return <SupportAssistantSuccessCardContent {...props} />
+  return (
+    <Suspense fallback={<SupportAssistantSuccessCardLoadingShell className={props.className} />}>
+      <SupportAssistantSuccessCardContent {...props} />
+    </Suspense>
+  )
 }
 
 function SupportAssistantSuccessCardLoadingShell({ className }: { className?: string }) {
@@ -60,7 +60,7 @@ function SupportAssistantSuccessCardLoadingShell({ className }: { className?: st
             <CardDescription>Assistant may be able to help</CardDescription>
           </div>
         </div>
-        <ArrowUpRight
+        <ArrowUpRightIcon
           size={14}
           strokeWidth={1.5}
           className="shrink-0 text-foreground-lighter transition-colors group-hover:text-foreground"

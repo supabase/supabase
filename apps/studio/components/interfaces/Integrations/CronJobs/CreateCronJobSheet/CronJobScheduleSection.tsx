@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Accordion,
   AccordionContent,
@@ -69,7 +69,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])
 
-  const schedule = form.watch('schedule')
+  const schedule = useWatch({ control: form.control, name: 'schedule' })
   const scheduleString = formatScheduleString(schedule)
 
   return (
@@ -161,7 +161,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
               </div>
               <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
-                  Schedule {timezone ? `(${timezone})` : ''}
+                  Schedule {timezone ? <span>{`(${timezone})`}</span> : ''}
                 </h4>
                 <span
                   className={cn(

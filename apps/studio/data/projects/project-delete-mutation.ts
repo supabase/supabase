@@ -4,8 +4,10 @@ import { toast } from 'sonner'
 import { projectKeys } from './keys'
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 import { del, handleError } from '@/data/fetchers'
+import { useInvalidateFreeProjectLimitChecks } from '@/data/organizations/free-project-limit-check-query'
 import { organizationKeys } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectDeleteVariables = {
   projectRef: string
@@ -28,27 +30,19 @@ export const useProjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
+  UseCustomMutationOptions<ProjectDeleteData, StudioError, ProjectDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
 
-  return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>({
+  return useMutation<ProjectDeleteData, StudioError, ProjectDeleteVariables>({
     mutationFn: (vars) => deleteProject(vars),
     async onSuccess(data, variables, context) {
-      // Free project limits are shared across all of a user's orgs, so clear the cached
-      // check for every org, not just the one the deleted project belonged to.
-      const freeProjectLimitCheckQueries = queryClient
-        .getQueryCache()
-        .findAll({ queryKey: ['organizations'] })
-        .filter((query) => query.queryKey[2] === 'free-project-limit-check')
-
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
-        ...freeProjectLimitCheckQueries.map((query) =>
-          queryClient.invalidateQueries({ queryKey: query.queryKey })
-        ),
+        invalidateFreeProjectLimitChecks(),
       ])
 
       if (variables.organizationSlug) {

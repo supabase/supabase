@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -7,8 +7,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -24,21 +25,16 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
       title="Set up custom SMTP to edit templates"
       description="Emails will be sent using the default templates. Set up custom SMTP to edit their subject and body."
       actions={
-        <div className="flex w-full @lg:w-auto">
-          <Button
-            asChild
-            variant="default"
-            className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10"
-          >
+        <SplitButtonGroup className="w-full @lg:w-auto">
+          <Button asChild className="flex-1 px-3 @lg:flex-none">
             <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
                 aria-label="More email template editing options"
-                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
-                icon={<ChevronDown />}
+                className="shrink-0 px-1 py-1.25"
+                icon={<ChevronDownIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
@@ -66,7 +62,7 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </SplitButtonGroup>
       }
     />
   )

@@ -49,7 +49,7 @@ const Index = () => {
       <DefaultLayout className="min-h-fit!">
         <div className="bg-alternative">
           <SectionContainerWithCn className="space-y-2 text-center">
-            <h1 className="text-brand font-mono text-base uppercase tracking-widest">
+            <h1 className="text-primary font-mono text-base uppercase tracking-widest">
               {data.hero.h1}
             </h1>
             <p className="h1 tracking-[-1px]">{data.hero.title}</p>

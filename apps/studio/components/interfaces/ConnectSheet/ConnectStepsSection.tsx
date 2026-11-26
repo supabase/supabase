@@ -1,9 +1,15 @@
 import { useParams } from 'common'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useMemo, useRef, type ComponentType } from 'react'
+import {
+  lazy,
+  Suspense,
+  useMemo,
+  useRef,
+  type ComponentType,
+  type LazyExoticComponent,
+} from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
@@ -35,6 +41,8 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsAwsCloudProvider, useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -50,10 +58,18 @@ interface ConnectStepsSectionProps {
 function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
-  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+  // Multigres has no pooler, so the pooler config endpoints don't apply
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
@@ -113,8 +129,16 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
         connectionStringsShared,
         connectionStringsDedicated,
         ipv4Addon: !!ipv4Addon,
+        isHighAvailability,
       }),
-    [deploymentMode, connectionInfo, connectionStringsShared, connectionStringsDedicated, ipv4Addon]
+    [
+      deploymentMode,
+      connectionInfo,
+      connectionStringsShared,
+      connectionStringsDedicated,
+      ipv4Addon,
+      isHighAvailability,
+    ]
   )
 }
 
@@ -139,6 +163,36 @@ if (!import.meta.env?.SSR) {
 
 type StepContentModule = { default: ComponentType<StepContentProps> }
 
+const stepContentComponents = new Map<
+  string,
+  LazyExoticComponent<ComponentType<StepContentProps>>
+>()
+
+function getStepContentComponent(
+  filePath: string
+): LazyExoticComponent<ComponentType<StepContentProps>> {
+  const cached = stepContentComponents.get(filePath)
+  if (cached) return cached
+
+  const viteLoader =
+    contentModules[`./content/${filePath}/content.tsx`] ??
+    contentModules[`./content/${filePath}/content.ts`]
+
+  const loader = viteLoader
+    ? (viteLoader as () => Promise<StepContentModule>)
+    : () => import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
+
+  const Component = lazy(loader)
+  stepContentComponents.set(filePath, Component)
+  return Component
+}
+
+const stepContentFallback = (
+  <div className="p-4 min-h-[200px]">
+    <GenericSkeletonLoader />
+  </div>
+)
+
 /**
  * Dynamically loads and renders a content component from the content directory.
  * All step content uses this unified loader - no built-in component registry needed.
@@ -158,42 +212,31 @@ function StepContent({
 }) {
   // Resolve any template placeholders in the content path
   const filePath = useMemo(() => resolveContentPath(contentId, state), [contentId, state])
-
-  // Dynamically import the content component
-  const ContentComponent = useMemo(() => {
-    const viteLoader =
-      contentModules[`./content/${filePath}/content.tsx`] ??
-      contentModules[`./content/${filePath}/content.ts`]
-
-    const loader = viteLoader
-      ? (viteLoader as () => Promise<StepContentModule>)
-      : () =>
-          import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
-
-    return dynamic<StepContentProps>(loader, {
-      loading: () => (
-        <div className="p-4 min-h-[200px]">
-          <GenericSkeletonLoader />
-        </div>
-      ),
-    })
-  }, [filePath])
+  const ContentComponent = getStepContentComponent(filePath)
 
   return (
-    <ContentComponent
-      state={state}
-      projectKeys={projectKeys}
-      connectionStringPooler={connectionStringPooler}
-      deploymentMode={deploymentMode}
-    />
+    <Suspense fallback={stepContentFallback}>
+      <ContentComponent
+        state={state}
+        projectKeys={projectKeys}
+        connectionStringPooler={connectionStringPooler}
+        deploymentMode={deploymentMode}
+      />
+    </Suspense>
   )
 }
 
 export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsSectionProps) {
   const { ref } = useParams()
+  const isAws = useIsAwsCloudProvider()
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const deploymentMode = useDeploymentMode()
+  const isHighAvailability = useIsHighAvailability()
   const connectionStringPooler = useConnectionStringPooler(deploymentMode)
+
+  const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_addons:dedicated_ipv4_address',
+  ])
 
   const { data: ipv4Addon } = useProjectAddonsQuery(
     { projectRef: ref },
@@ -205,11 +248,14 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     }
   )
   const showIpv4AddonNotice = shouldShowIpv4AddonNotice({
+    isAws,
     isPlatform: deploymentMode.isPlatform,
+    isIpv4Enabled: projectAddonsDedicatedIpv4Address,
     mode: state.mode,
     connectionMethod: state.connectionMethod,
     useSharedPooler: state.useSharedPooler,
     hasIpv4Addon: !!ipv4Addon,
+    isHighAvailability,
   })
   const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
     isPlatform: deploymentMode.isPlatform,
@@ -255,7 +301,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             title="Database access requires the Data API"
             description="Client library database queries will not work until the Data API is enabled."
             actions={[
-              <Button asChild key="enable" variant="default">
+              <Button asChild key="enable">
                 <Link href={`/project/${ref}/integrations/data_api`}>Enable Data API</Link>
               </Button>,
             ]}
@@ -276,7 +322,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
               </>
             }
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link>
               </Button>
             }

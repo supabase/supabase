@@ -5,14 +5,7 @@ import { useEffect, useMemo } from 'react'
 import { useProjectOAuthIntegrationData } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
-import {
-  areRequiredExtensionsInstalledFor,
-  getFilteredNavItems,
-  getInstallActionType,
-  type InstallActionType,
-} from './useIntegrationDetail.utils'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { getInstallActionType, type InstallActionType } from './useIntegrationDetail.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -27,13 +20,8 @@ export const useIntegrationDetail = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const { data: allIntegrations, isPending: isAvailableLoading } = useAvailableIntegrations()
   const { installedIntegrations, isLoading: isInstalledLoading } = useInstalledIntegrations()
@@ -55,21 +43,7 @@ export const useIntegrationDetail = () => {
 
   const isInstalled = !!integration && !!installation
 
-  const areRequiredExtensionsInstalled = useMemo(
-    () => areRequiredExtensionsInstalledFor(integration, extensions),
-    [integration, extensions]
-  )
-
-  const navItems = useMemo(
-    () =>
-      getFilteredNavItems({
-        integration,
-        isInstalled,
-        isMarketplaceEnabled,
-        areRequiredExtensionsInstalled,
-      }),
-    [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled]
-  )
+  const navItems = useMemo(() => integration?.navigation ?? [], [integration])
 
   const activeRoute = pageId ?? 'overview'
 
@@ -102,14 +76,8 @@ export const useIntegrationDetail = () => {
   )
 
   const installActionType: InstallActionType = useMemo(
-    () =>
-      getInstallActionType({
-        integration,
-        isMarketplaceEnabled,
-        areRequiredExtensionsInstalled,
-        isInstalled,
-      }),
-    [integration, isMarketplaceEnabled, areRequiredExtensionsInstalled, isInstalled]
+    () => getInstallActionType({ integration, isInstalled }),
+    [integration, isInstalled]
   )
 
   const isReady = !!router?.isReady
@@ -151,7 +119,6 @@ export const useIntegrationDetail = () => {
     installation,
     integrationStatus,
     isInstalled,
-    areRequiredExtensionsInstalled,
     installActionType,
     wrappersTabHref,
     isAvailableLoading,

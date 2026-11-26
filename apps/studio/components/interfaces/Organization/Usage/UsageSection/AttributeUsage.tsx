@@ -1,4 +1,4 @@
-import { AlertTriangle, BarChart2 } from 'lucide-react'
+import { AlertTriangleIcon, BarChart2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -19,7 +19,7 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface AttributeUsageProps {
   slug: string
@@ -30,7 +30,7 @@ export interface AttributeUsageProps {
   chartMeta: ChartMeta
   subscription?: OrgSubscription
 
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
@@ -104,7 +104,7 @@ const AttributeUsage = ({
                             <TooltipTrigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                  <AlertTriangle
+                                  <AlertTriangleIcon
                                     size={14}
                                     strokeWidth={2}
                                     className={exceededLimitStyle}
@@ -114,7 +114,7 @@ const AttributeUsage = ({
                               ) : (
                                 usageRatio >= USAGE_APPROACHING_THRESHOLD && (
                                   <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                    <AlertTriangle
+                                    <AlertTriangleIcon
                                       size={14}
                                       strokeWidth={2}
                                       className="text-amber-900"
@@ -172,7 +172,7 @@ const AttributeUsage = ({
                           ) : (
                             <p className="text-xs">
                               {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
-                                ? `${usageMeta.pricing_free_units ?? 0} GB`
+                                ? `${usageMeta.pricing_free_units?.toLocaleString() ?? 0} GB`
                                 : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
                             </p>
                           )}
@@ -181,7 +181,7 @@ const AttributeUsage = ({
                       {currentBillingCycleSelected && usageMeta && (
                         <div className="flex items-center justify-between py-1">
                           <p className="text-xs text-foreground-light">
-                            {attribute.chartPrefix || 'Used '} in period
+                            {attribute.chartPrefix || <span>{'Used '}</span>} <span>in period</span>
                           </p>
                           <p className="text-xs">
                             {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
@@ -211,7 +211,7 @@ const AttributeUsage = ({
                 <div className="space-y-1">
                   <p className="text-sm">
                     {attribute.chartPrefix || ''} {attribute.name}{' '}
-                    {attribute.chartSuffix || 'per day'}
+                    {attribute.chartSuffix || <span>per day</span>}
                   </p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                     <p key={`para-${idx}`} className="text-sm text-foreground-light">
@@ -239,7 +239,7 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <BarChart2 className="text-foreground-light mb-2" />
+                        <BarChart2Icon className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
                         <p className="text-sm text-foreground-light">
                           May take up to 24 hours to show

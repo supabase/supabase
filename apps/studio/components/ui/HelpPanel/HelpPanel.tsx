@@ -1,10 +1,10 @@
 import { IS_PLATFORM } from 'common'
-import { ChevronLeft, X } from 'lucide-react'
-import Image from 'next/image'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button } from 'ui'
+import { useSnapshot } from 'valtio'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
@@ -16,6 +16,7 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { helpPanelState } from '@/state/help-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const HelpPanel = ({
@@ -30,7 +31,16 @@ export const HelpPanel = ({
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar, closeSidebar } = useSidebarManagerSnapshot()
   const router = useRouter()
-  const [view, setView] = useState<'home' | 'support'>('home')
+  const helpSnap = useSnapshot(helpPanelState)
+  const [view, setView] = useState<'home' | 'support'>(() => helpPanelState.requestedView)
+
+  useEffect(() => {
+    if (helpSnap.requestedView !== 'home') {
+      setView(helpSnap.requestedView)
+      helpPanelState.requestedView = 'home'
+    }
+  }, [helpSnap.requestedView])
+
   const isSupportView = view === 'support'
   const openAssistant = () => {
     onClose()
@@ -47,7 +57,7 @@ export const HelpPanel = ({
               variant="text"
               className="h-7 w-7"
               onClick={() => setView('home')}
-              icon={<ChevronLeft strokeWidth={1.5} />}
+              icon={<ChevronLeftIcon strokeWidth={1.5} />}
               tooltip={{ content: { side: 'bottom', text: 'Back' } }}
             />
           )}
@@ -59,7 +69,7 @@ export const HelpPanel = ({
             variant="text"
             className="w-7 h-7"
             onClick={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             tooltip={{ content: { side: 'bottom', text: 'Close' } }}
           />
         </div>
@@ -99,11 +109,9 @@ export const HelpPanel = ({
                     rel="noreferrer"
                     className="group dark block cursor-pointer"
                   >
-                    <Image
-                      className="absolute left-0 top-0 opacity-50 transition-opacity group-hover:opacity-40"
+                    <img
+                      className="absolute inset-0 h-full w-full object-cover opacity-50 transition-opacity group-hover:opacity-40"
                       src={`${router.basePath}/img/support/discord-bg-small.jpg`}
-                      layout="fill"
-                      objectFit="cover"
                       alt="Discord illustration"
                     />
                     <Button

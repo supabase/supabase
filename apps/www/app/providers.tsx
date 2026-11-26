@@ -9,6 +9,7 @@ import {
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
+import { WwwAppFrameworkProvider } from 'components/WwwAppFrameworkProvider'
 import { WwwCommandMenu } from 'components/CommandMenu'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { API_URL } from 'lib/constants'
@@ -24,30 +25,33 @@ function Providers({ children }: { children: React.ReactNode }) {
   const { hasAcceptedConsent } = useConsentToast()
 
   return (
-    <NuqsAdapter>
-      <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
-          <DevToolbarProvider apiUrl={API_URL}>
-            <ThemeProvider>
-              <TooltipProvider delayDuration={0}>
-                <CommandProvider>
-                  <TelemetryTagManager />
-                  <Toaster />
-                  {children}
-                  <WwwCommandMenu />
-                  <PageTelemetry
-                    API_URL={API_URL}
-                    hasAcceptedConsent={hasAcceptedConsent}
-                    enabled={IS_PLATFORM}
-                  />
-                  <DevToolbar />
-                </CommandProvider>
-              </TooltipProvider>
-            </ThemeProvider>
-          </DevToolbarProvider>
-        </FeatureFlagProvider>
-      </AuthProvider>
-    </NuqsAdapter>
+    <WwwAppFrameworkProvider>
+      <NuqsAdapter>
+        <AuthProvider>
+          <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
+            <DevToolbarProvider apiUrl={API_URL}>
+              <ThemeProvider>
+                <TooltipProvider delayDuration={0}>
+                  <CommandProvider>
+                    <TelemetryTagManager />
+                    <Toaster />
+                    {children}
+                    <WwwCommandMenu />
+                    <PageTelemetry
+                      API_URL={API_URL}
+                      platform="www"
+                      hasAcceptedConsent={hasAcceptedConsent}
+                      enabled={IS_PLATFORM}
+                    />
+                    <DevToolbar />
+                  </CommandProvider>
+                </TooltipProvider>
+              </ThemeProvider>
+            </DevToolbarProvider>
+          </FeatureFlagProvider>
+        </AuthProvider>
+      </NuqsAdapter>
+    </WwwAppFrameworkProvider>
   )
 }
 

@@ -1,4 +1,4 @@
-import { AlertCircle, ChevronsUpDown } from 'lucide-react'
+import { AlertCircleIcon, ChevronsUpDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, type ReactNode } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
@@ -10,7 +10,7 @@ interface AppLayoutDropdownErrorProps {
 export function AppLayoutDropdownError({ message }: AppLayoutDropdownErrorProps) {
   return (
     <div className="flex items-center space-x-2 text-amber-900">
-      <AlertCircle size={16} strokeWidth={1.5} />
+      <AlertCircleIcon size={16} strokeWidth={1.5} />
       <p className="text-sm">{message}</p>
     </div>
   )
@@ -28,7 +28,7 @@ export const AppLayoutDropdownTriggerButton = forwardRef<
     ref={ref}
     size="tiny"
     className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
-    iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+    iconRight={<ChevronsUpDownIcon strokeWidth={1.5} />}
     {...props}
     variant="text"
   />
@@ -39,6 +39,12 @@ export interface AppLayoutDropdownWithPopoverProps {
   linkHref: string
   linkContent: ReactNode
   linkClassName?: string
+  /**
+   * Optional content rendered as a sibling of (i.e. outside) the navigation link. Use this
+   * for interactive elements that need their own link/handler, since nesting them inside
+   * `linkContent` would render an `<a>` within an `<a>` (invalid markup).
+   */
+  trailingContent?: ReactNode
   commandContent: ReactNode
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -49,6 +55,7 @@ export function AppLayoutDropdownWithPopover({
   linkHref,
   linkContent,
   linkClassName = 'flex items-center gap-2 shrink-0 text-sm',
+  trailingContent,
   commandContent,
   open,
   onOpenChange,
@@ -60,6 +67,7 @@ export function AppLayoutDropdownWithPopover({
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
+        {trailingContent}
         <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
       </div>
       <PopoverContent className="p-0" side="bottom" align="start">

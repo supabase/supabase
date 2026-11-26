@@ -168,6 +168,10 @@ function create({
   } else {
     if (defaultOptions.default_value === undefined) {
       // skip
+    } else if (defaultOptions.default_value === null) {
+      // NULL is the same literal regardless of format, and safeSql would
+      // otherwise silently drop a raw `null` expression fragment.
+      defaultValueClause = safeSql`DEFAULT ${literal(null)}`
     } else if (defaultOptions.default_value_format === 'expression') {
       defaultValueClause = safeSql`DEFAULT ${defaultOptions.default_value}`
     } else {
@@ -262,8 +266,14 @@ function update(
   } else if (default_value === undefined) {
     defaultValueSql = safeSql``
   } else {
+    // NULL is the same literal regardless of format, and safeSql would
+    // otherwise silently drop a raw `null` expression fragment.
     const defaultValue: SafeSqlFragment =
-      default_value_format === 'expression' ? default_value : literal(default_value)
+      default_value === null
+        ? literal(null)
+        : default_value_format === 'expression'
+          ? default_value
+          : literal(default_value)
     defaultValueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} SET DEFAULT ${defaultValue};`
   }
   // What identitySql does vary depending on the old and new values of

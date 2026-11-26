@@ -1,0 +1,57 @@
+/* Keep block renderers and displays with their own code styling independent. */
+@layer base {
+  code:not(
+    :where(
+      pre *,
+      [data-code-style='plain'],
+      [data-code-style='plain'] *,
+      [data-rehype-pretty-code-figure] *,
+      .ch-codeblock *,
+      .code-block *,
+      .code *,
+      .monaco-editor *,
+      .cm-editor *
+    )
+  ) {
+    @apply bg-surface-200 border border-muted rounded-sm px-1 py-0.25;
+
+    word-break: normal;
+    overflow-wrap: anywhere;
+    font-size: max(0.75rem, calc(0.75em + 2px), calc(1em - 2px));
+    line-height: inherit;
+    font-weight: inherit;
+    color: var(--foreground);
+  }
+}
+
+/* Match prose typography while keeping local utility overrides effective. */
+@utility prose {
+  :where(code):not(
+    :where(
+      pre *,
+      [data-code-style='plain'],
+      [data-code-style='plain'] *,
+      [data-rehype-pretty-code-figure] *,
+      .ch-codeblock *,
+      .code-block *,
+      .code *,
+      .monaco-editor *,
+      .cm-editor *,
+      .not-prose *
+    )
+  ) {
+    @apply bg-surface-200 border border-muted rounded-sm px-1 py-0.25;
+
+    word-break: normal;
+    overflow-wrap: anywhere;
+    font-size: max(0.75rem, calc(0.75em + 2px), calc(1em - 2px));
+    line-height: inherit;
+    font-weight: inherit;
+    color: var(--foreground);
+
+    &::before,
+    &::after {
+      content: none;
+    }
+  }
+}

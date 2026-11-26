@@ -1,6 +1,30 @@
 import { PipelineStatusName } from './Replication.constants'
+import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
+
+export const getPipelineUnifiedLogsUrl = ({
+  projectRef = '_',
+  pipelineId,
+}: {
+  projectRef?: string
+  pipelineId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: ['log_type:eq:pipelines', ...(pipelineId ? [`pipeline_id:eq:${pipelineId}`] : [])],
+  })
+
+export const getPipelineLegacyLogsUrl = ({
+  projectRef = '_',
+  pipelineId,
+}: {
+  projectRef?: string
+  pipelineId?: string
+}) => {
+  const path = `/project/${projectRef}/logs/pipelines-logs`
+  if (!pipelineId) return path
+  return `${path}?${new URLSearchParams({ f: JSON.stringify({ pipeline_id: pipelineId }) })}`
+}
 
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
@@ -15,21 +39,9 @@ export const normalizePipelineStatusName = (statusName?: string): PipelineStatus
     ? (statusName as PipelineStatusName)
     : undefined
 
-export const PIPELINE_ENABLE_ALLOWED_FROM: PipelineStatusName[] = [PipelineStatusName.STOPPED]
-export const PIPELINE_DISABLE_ALLOWED_FROM: PipelineStatusName[] = [
-  PipelineStatusName.STARTED,
-  PipelineStatusName.FAILED,
-]
-export const PIPELINE_ACTIONABLE_STATES: PipelineStatusName[] = [
-  PipelineStatusName.FAILED,
-  PipelineStatusName.STARTED,
-  PipelineStatusName.STOPPED,
-]
-
 export type PipelineDisplayStateKey =
   | 'starting'
   | 'stopping'
-  | 'restarting'
   | 'failed'
   | 'stopped'
   | 'running'
@@ -63,19 +75,11 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     badge: 'Stopping',
     type: 'loading',
   },
-  restarting: {
-    key: 'restarting',
-    label: 'Restarting',
-    title: 'Restarting pipeline',
-    message: 'Applying settings and restarting the pipeline.',
-    badge: 'Restarting',
-    type: 'loading',
-  },
   failed: {
     key: 'failed',
     label: 'Failed',
     title: 'Pipeline failed',
-    message: 'Replication has encountered an error.',
+    message: 'Replication has encountered an error',
     badge: 'Failed',
     type: 'failure',
   },
@@ -91,7 +95,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'running',
     label: 'Running',
     title: 'Pipeline running',
-    message: 'Replication is active and processing changes.',
+    message: 'Replication is active and processing changes',
     badge: 'Running',
     type: 'success',
   },
@@ -99,7 +103,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'unknown',
     label: 'Unknown',
     title: 'Pipeline status unknown',
-    message: 'Unable to determine pipeline status.',
+    message: 'Unable to determine pipeline status',
     badge: 'Unknown',
     type: 'idle',
   },
@@ -109,9 +113,6 @@ export const getPipelineDisplayState = (
   requestStatus?: PipelineStatusRequestStatus,
   statusName?: PipelineStatusName
 ): PipelineDisplayState => {
-  if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
-    return PIPELINE_DISPLAY_STATES.restarting
-  }
   if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
     return PIPELINE_DISPLAY_STATES.starting
   }
@@ -134,4 +135,12 @@ export const getPipelineDisplayState = (
     default:
       return PIPELINE_DISPLAY_STATES.unknown
   }
+}
+
+/** Resetting tables or applying settings must not imply starting an inactive pipeline. */
+export const getRestartRequestStatus = (statusName?: PipelineStatusName) => {
+  if (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED) {
+    return PipelineStatusRequestStatus.StopRequested
+  }
+  return PipelineStatusRequestStatus.None
 }

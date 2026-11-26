@@ -1,7 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from './fetchWrappers'
-import type { components } from 'api-types'
 import type { ResponseError } from '~/types/fetch'
+import type { components } from 'api-types'
+
+import { get } from './fetchWrappers'
 
 const organizationKeys = {
   list: () => ['organizations'] as const,
@@ -12,7 +13,7 @@ async function getOrganizations(signal?: AbortSignal) {
   // but the actual response should be typed as OrganizationResponse.
   const { data, error } = await get('/platform/organizations', { signal })
   if (error) throw error
-  return data as unknown as components['schemas']['OrganizationResponse'][]
+  return data as unknown as components['schemas']['OrganizationResponse_Output'][]
 }
 
 export type OrganizationsData = Awaited<ReturnType<typeof getOrganizations>>

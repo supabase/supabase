@@ -14,6 +14,8 @@ import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { useDatabaseEntitySearchCommands } from './DatabaseEntitySearchCommands'
+import { useFeaturePreviewCommands } from './FeaturePreviews'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
@@ -37,7 +39,7 @@ export function CommandMenuInnerContent() {
   )
 }
 
-export default function StudioCommandMenu() {
+export function StudioCommandMenu() {
   useCreateCommands()
   useApiKeysCommands()
   useApiUrlCommand()
@@ -59,6 +61,8 @@ export default function StudioCommandMenu() {
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
   useContextSearchCommands()
+  useDatabaseEntitySearchCommands()
+  useFeaturePreviewCommands()
 
   return (
     <CommandMenu>

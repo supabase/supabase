@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -21,7 +20,7 @@ import {
   SelectValue,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -38,6 +37,7 @@ import {
   convertFromBytes,
   convertToBytes,
   encodeBucketLimitErrorMessage,
+  isFileSizeReducedBySpendCap,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
 import { AlertError } from '@/components/ui/AlertError'
@@ -48,7 +48,7 @@ import { useProjectStorageConfigQuery } from '@/data/config/project-storage-conf
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useLargestBucketSizeLimitsCheck } from '@/data/storage/buckets-max-size-limit-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -56,23 +56,14 @@ import { formatBytes } from '@/lib/helpers'
 
 const formId = 'storage-settings-form'
 
-interface StorageSettingsState {
-  fileSizeLimit: number
-  unit: StorageSizeUnits
-  imageTransformationEnabled: boolean
-}
-
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
-  )
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ)
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const {
@@ -106,17 +97,10 @@ export const StorageSettings = () => {
     isLoading: isLoadingImageTransformationEntitlement,
   } = useCheckEntitlements('storage.image_transformations')
 
-  const isSpendCapOn =
-    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
   const hasLimitedStorageAccess =
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
-  const [initialValues, setInitialValues] = useState<StorageSettingsState>({
-    fileSizeLimit: 0,
-    unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: false,
-  })
 
   const maxBytes = useMemo(() => {
     if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
@@ -125,6 +109,13 @@ export const StorageSettings = () => {
       return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
+
+  const showSpendCapBanner = isFileSizeReducedBySpendCap({
+    planId: organization?.plan.id,
+    isUsageBillingEnabled: organization?.usage_billing_enabled,
+    entitledMaxBytes: getEntitlementNumericValue(),
+    isEntitlementUnlimited: isEntitlementUnlimited(),
+  })
 
   const isLoading =
     isLoadingProjectStorageConfig ||
@@ -153,12 +144,15 @@ export const StorageSettings = () => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: initialValues,
+    defaultValues: {
+      fileSizeLimit: 0,
+      unit: StorageSizeUnits.MB,
+      imageTransformationEnabled: false,
+    },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
 
-  const { unit: storageUnit } = form.watch()
   const fileSizeLimitError = form.formState.errors.fileSizeLimit
 
   const { mutate: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation({
@@ -225,27 +219,17 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config && !isLoading) {
-      const { fileSizeLimit, features } = config
-      const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled =
-        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
+    if (!isSuccess || !config || isLoading) return
 
-      setInitialValues({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
+    const { value, unit } = convertFromBytes(config.fileSizeLimit ?? 0)
 
-      // Reset the form values when the config values load
-      form.reset({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
+    form.reset({
+      fileSizeLimit: value,
+      unit,
+      imageTransformationEnabled:
+        config.features?.imageTransformation?.enabled ?? hasAccessToImageTransformations,
+    })
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations, form])
 
   return (
     <PageContainer>
@@ -327,7 +311,7 @@ export const StorageSettings = () => {
                                     Learn more
                                   </InlineLink>
                                   .
-                                  {!shouldAutoValidateBucketLimits && (
+                                  {!isBucketEstimatePending && !shouldAutoValidateBucketLimits && (
                                     <p>
                                       Ensure that the global limit is greater than that of
                                       individual buckets
@@ -355,6 +339,7 @@ export const StorageSettings = () => {
                                     name="unit"
                                     render={({ field: unitField }) => (
                                       <Select
+                                        key={unitField.value}
                                         value={unitField.value}
                                         onValueChange={(val) => {
                                           unitField.onChange(val)
@@ -366,9 +351,7 @@ export const StorageSettings = () => {
                                         }
                                       >
                                         <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                          <SelectValue placeholder="Choose a prefix">
-                                            {storageUnit}
-                                          </SelectValue>
+                                          <SelectValue placeholder="Choose a prefix" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           {Object.values(StorageSizeUnits).map((unit: string) => (
@@ -417,7 +400,7 @@ export const StorageSettings = () => {
                           )} and unlock image transformations.`}
                         />
                       )}
-                      {isSpendCapOn && (
+                      {showSpendCapBanner && (
                         <UpgradeToPro
                           fullWidth
                           addon="spendCap"
@@ -425,7 +408,7 @@ export const StorageSettings = () => {
                           source="storageSizeLimit"
                           featureProposition="increase the file upload size limits in Storage"
                           buttonText="Disable spend cap"
-                          primaryText="Reduced max upload file size limit due to spend cap"
+                          primaryText={`Max upload file size limit reduced to ${formatBytes(maxBytes)} due to spend cap`}
                           secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                             STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                           )}.`}
@@ -443,7 +426,6 @@ export const StorageSettings = () => {
                       <CardFooter className="justify-end space-x-2">
                         {form.formState.isDirty && (
                           <Button
-                            variant="default"
                             type="reset"
                             onClick={() => form.reset()}
                             disabled={

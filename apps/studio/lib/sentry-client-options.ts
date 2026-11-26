@@ -1,34 +1,23 @@
-// Shared Sentry client-side configuration for BOTH Studio builds:
-//
-//   - Next (pages router): `instrumentation-client.ts` — a Next convention
-//     file, auto-loaded by Next only — calls `Sentry.init` with these options.
-//   - TanStack Start (Vite): `sentry.tanstack.ts` calls `Sentry.init`
-//     with these options from `getRouter()` (router.tsx). TanStack Start does
-//     not load Next's convention files, so without its own init every
-//     `Sentry.captureException` there would be a silent no-op.
-//
-// Keep every shared option in this builder so the two runtimes cannot drift.
-//
-// `@sentry/react` is what `@sentry/nextjs` wraps on the client (same 10.x
-// version, same module instance under pnpm), so building the options against
-// it works for both `Sentry.init`s.
+// Sentry client-side configuration. `sentry.tanstack.ts` calls `Sentry.init`
+// with these options from `getRouter()` (router.tsx).
 import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
+import {
+  BROWSER_NOISE_IGNORE_ERRORS,
+  BROWSER_TRANSLATION_SAMPLE_RATE,
+  filterSentryEvent,
+  isBrowserTranslationDomError,
+  isPageTranslated,
+  isSentryErrorBoundaryCrash,
+} from 'common/sentry'
 
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
+import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0]
-
-const DEFAULT_ERROR_SAMPLE_RATE = 1.0
-const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
-const CHUNK_LOAD_ERROR_PATTERNS = [
-  /ChunkLoadError/i,
-  /Loading chunk [\d]+ failed/i,
-  /Loading CSS chunk [\d]+ failed/i,
-]
 
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
@@ -90,20 +79,9 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
   return message.includes('challenge-expired')
 }
 
-function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
-  const errorMessage = error instanceof Error ? error.message : ''
-  const eventMessage = event.message || ''
-  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
-  const combinedMessages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
-
-  return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) =>
-    combinedMessages.some((message) => pattern.test(message))
-  )
-}
-
 // Tag errors whose stack trace only contains third-party frames (browser extensions,
-// injected scripts, etc.). This uses build-time code annotation via the applicationKey
-// in next.config.ts to reliably distinguish our code from third-party code.
+// injected scripts, etc.). This relies on build-time code annotation via the
+// `supabase-studio` applicationKey to reliably distinguish our code from third-party code.
 // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
 // crashes — these may originate in third-party code but are caused by first-party bugs.
 function buildThirdPartyErrorFilterIntegration(): Integration {
@@ -118,8 +96,7 @@ export interface SentryClientOptionsParams {
    * Whether to include `thirdPartyErrorFilterIntegration`.
    *
    * Only enable this on builds whose bundler annotates stack frames with the
-   * `supabase-studio` applicationKey (the Next build does, via
-   * `withSentryConfig` in next.config.ts). On a build WITHOUT the annotation
+   * `supabase-studio` applicationKey. On a build WITHOUT the annotation
    * no frame carries first-party metadata, so the integration tags EVERY
    * event `third_party_code: true` and `beforeSend` would then drop all
    * non-error-boundary events.
@@ -134,13 +111,40 @@ export interface SentryClientOptionsParams {
    * (`Client.sendSession` early-returns), so a build without a release sends
    * no Release Health traffic at all — errors and traces still flow.
    *
-   * The Next build must NOT pass this: `withSentryConfig` injects the release
-   * (`SENTRY_RELEASE` ?? the Vercel commit SHA) into the bundle at build time,
-   * and an explicit `release` key — even `undefined` — would override it.
-   * The TanStack/Vite build runs no Sentry bundler plugin, so it passes the
-   * commit SHA here instead (see sentry.tanstack.ts).
+   * The build runs no Sentry bundler plugin to inject one, so
+   * sentry.tanstack.ts passes the commit SHA.
    */
   release?: string
+}
+
+/**
+ * Applies the `sample_rate` tag set by `reportStudioError`: events tagged with a rate below 1 are
+ * dropped with probability `1 - rate`. Events without the tag are never dropped.
+ */
+export function shouldDropForSampleRate(
+  event: Pick<Sentry.Event, 'tags'>,
+  random: () => number = Math.random
+): boolean {
+  const rate = Number(event.tags?.sample_rate)
+  if (event.tags?.sample_rate === undefined || !Number.isFinite(rate) || rate >= 1) return false
+  return random() >= rate
+}
+
+/**
+ * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
+ * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
+ * `page_translated` is best-effort and only looked up for matching events. Keeps a `sample_rate`
+ * that is already set, such as an explicit `1`.
+ */
+export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?: boolean): void {
+  if (!isBrowserTranslationDomError(event)) return
+  event.tags = {
+    ...event.tags,
+    // After the spread: an explicit `sample_rate: undefined` must not replace the default
+    sample_rate: event.tags?.sample_rate ?? BROWSER_TRANSLATION_SAMPLE_RATE,
+    browser_translation: true,
+    page_translated: pageTranslated ?? isPageTranslated(),
+  }
 }
 
 export function buildSentryClientOptions({
@@ -153,14 +157,15 @@ export function buildSentryClientOptions({
     ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
       environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     }),
-    // Conditional spread: see the `release` doc comment above — the key must
-    // be ABSENT (not `undefined`) so the Next build's injected release wins.
     ...(release && { release }),
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
     // Enable performance monitoring
     tracesSampleRate: 0.02,
+
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
+    // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
 
     // Function form so Sentry's default integrations (browserSession,
     // globalHandlers, breadcrumbs, dedupe, …) are explicitly preserved — this
@@ -194,52 +199,18 @@ export function buildSentryClientOptions({
       MIRRORED_BREADCRUMBS.pushBack(cleanedBreadcrumb)
       return cleanedBreadcrumb
     },
-    beforeSend(event, hint) {
-      const consent = hasConsented()
+    beforeSend(rawEvent, hint) {
+      const event = applyStudioErrorPolicy(rawEvent, hint.originalException)
+      if (!event) return null
 
-      if (!consent) {
+      // Must run before `filterSentryEvent`, which skips its 1% sampling for tagged events.
+      tagBrowserTranslationError(event)
+
+      if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
       }
 
-      if (!IS_PLATFORM) {
-        return null
-      }
-
-      const isErrorBoundaryCrash =
-        event.tags?.globalErrorBoundary === true || event.tags?.globalErrorBoundary === 'true'
-      const isThirdPartyOnly =
-        event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
-
-      // Drop third-party-only errors UNLESS they crashed the page via the global error boundary.
-      // This preserves noise reduction for browser extensions and injected scripts,
-      // while ensuring page-crashing errors from third-party libs (caused by first-party bugs)
-      // are always reported.
-      if (isThirdPartyOnly && !isErrorBoundaryCrash) {
-        return null
-      }
-
-      // Downsample only known high-noise classes; keep all other errors at full rate.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
-        'Session error detected'
-      )
-      const isChunkLoadFailure = isChunkLoadError(hint.originalException, event)
-
-      const codeSampleRate =
-        isInvalidUrlEvent || isSessionTimeoutEvent || isChunkLoadFailure
-          ? LOW_PRIORITY_ERROR_SAMPLE_RATE
-          : DEFAULT_ERROR_SAMPLE_RATE
-
-      if (Math.random() > codeSampleRate) {
-        return null
-      }
-
-      event.tags = {
-        ...event.tags,
-        codeSampleRate: codeSampleRate.toString(),
-      }
+      const isErrorBoundaryCrash = isSentryErrorBoundaryCrash(event)
 
       if (isHCaptchaRelatedError(event)) {
         return null
@@ -247,9 +218,12 @@ export function buildSentryClientOptions({
 
       // Drop events where every exception has no stack trace — these are not debuggable.
       // Exempt error boundary crashes: even without stack frames, a page crash is always worth reporting.
+      // Also exempt browser-translation errors: they only need counting, and dropping them here
+      // would skip the sample.
       const exceptions = event.exception?.values ?? []
       if (
         !isErrorBoundaryCrash &&
+        event.tags?.browser_translation !== true &&
         exceptions.length > 0 &&
         exceptions.every((ex) => !ex.stacktrace?.frames?.length)
       ) {
@@ -274,6 +248,10 @@ export function buildSentryClientOptions({
         return null
       }
       if (isChallengeExpiredError(hint.originalException, event)) {
+        return null
+      }
+
+      if (shouldDropForSampleRate(event)) {
         return null
       }
 
@@ -314,34 +292,7 @@ export function buildSentryClientOptions({
       // sql-formatter lexer on invalid SQL input
       /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
 
-      // === Network / infrastructure (not actionable on FE) ===
-      /504 Gateway Time-out/,
-      'Network request failed',
-      'Failed to fetch',
-      'Load failed',
-      'AbortError',
-      'TypeError: cancelled',
-      'TypeError: Cancelled',
-
-      // === Browser extensions & Google Translate DOM manipulation ===
-      'Node.insertBefore: Child to insert before is not a child of this node',
-      'Node.removeChild: The node to be removed is not a child of this node',
-      "NotFoundError: Failed to execute 'removeChild' on 'Node'",
-      "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
-      'NotFoundError: The object can not be found here.',
-      "Cannot read properties of null (reading 'parentNode')",
-      "Cannot read properties of null (reading 'removeChild')",
-      "TypeError: can't access dead object",
-      /^NS_ERROR_/,
-
-      // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
-      'Non-Error exception captured',
-      'Non-Error promise rejection captured',
-      /^Object captured as exception with keys:/,
-
-      // === Cross-origin script errors (no useful info) ===
-      'Script error.',
-      'Script error',
+      ...BROWSER_NOISE_IGNORE_ERRORS,
 
       // === React hydration mismatches caused by extensions modifying DOM ===
       // Note: we only suppress the generic browser messages, NOT "Hydration failed because..."

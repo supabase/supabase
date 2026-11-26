@@ -2,12 +2,9 @@ import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM } from 'ui-pattern
 
 import type { ConnectSchema, StepDefinition } from './Connect.types'
 
-/**
- * MCP feature groups enabled by default on platform (Storage is excluded to keep
- * tool counts manageable).
- */
+/** MCP feature groups enabled by default on platform. */
 export const DEFAULT_MCP_FEATURES = FEATURE_GROUPS_PLATFORM.filter(
-  (group) => group.id !== 'storage'
+  (group) => !group.defaultDisabled
 ).map((group) => group.id)
 
 const NON_PLATFORM_MCP_FEATURE_IDS = new Set(FEATURE_GROUPS_NON_PLATFORM.map((group) => group.id))
@@ -34,9 +31,9 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
-  supabaseswift:
-    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
+  supabasedotnet: 'dotnet add package Supabase',
 }
 
 /**
@@ -78,6 +75,22 @@ const frameworkConfigureStep: StepDefinition = {
   content: '{{framework}}/{{frameworkVariant}}/{{library}}',
 }
 
+const dotnetUnityInstallStep: StepDefinition = {
+  id: 'install',
+  title: 'Install package',
+  description: 'Add the Supabase SDK to your Unity project.',
+  content: 'dotnet/unity/install',
+}
+
+// ASP.NET Core also needs the dependency injection extension package, so it
+// gets its own install step instead of the shared single-package one.
+const dotnetAspnetInstallStep: StepDefinition = {
+  id: 'install',
+  title: 'Install packages',
+  description: 'Run these commands to install the required dependencies.',
+  content: 'dotnet/aspnetcore/install',
+}
+
 const frameworkNextJsFilesStep: StepDefinition = {
   id: 'configure-nextjs',
   title: 'Add files',
@@ -95,8 +108,8 @@ const frameworkReactFilesStep: StepDefinition = {
 
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
-  title: 'Add Supabase UI components',
-  description: 'Install Supabase UI components via the shadcn registry.',
+  title: 'Add Supabase Library blocks',
+  description: 'Install Supabase Library blocks via the shadcn registry.',
   content: 'steps/shadcn/command',
 }
 
@@ -289,6 +302,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'Analytical endpoint',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------
@@ -298,8 +317,13 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'select',
+      type: 'combobox',
       label: 'Framework',
+      combobox: {
+        placeholder: 'Select framework',
+        searchPlaceholder: 'Search frameworks...',
+        emptyMessage: 'No frameworks found',
+      },
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
     },
@@ -309,7 +333,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Variant',
       options: { source: 'frameworkVariants' },
       defaultValue: 'app',
-      dependsOn: { framework: ['nextjs', 'react'] }, // Only show for frameworks with multiple variants
+      dependsOn: { framework: ['nextjs', 'react', 'dotnet'] }, // Only show for frameworks with multiple variants
     },
     library: {
       id: 'library',
@@ -322,7 +346,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Install Supabase UI components with shadcn.',
+      description: 'Install Supabase Library blocks with shadcn.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },
@@ -371,9 +395,14 @@ export const connectSchema: ConnectSchema = {
     // MCP fields
     mcpClient: {
       id: 'mcpClient',
-      type: 'select',
+      type: 'combobox',
       label: 'Client',
       description: 'The MCP client you are using.',
+      combobox: {
+        placeholder: 'Select client',
+        searchPlaceholder: 'Search clients...',
+        emptyMessage: 'No clients found',
+      },
       options: { source: 'mcpClients' },
       defaultValue: 'claude-code',
     },
@@ -445,6 +474,13 @@ export const connectSchema: ConnectSchema = {
             },
           },
           remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
+          dotnet: {
+            frameworkVariant: {
+              aspnetcore: [dotnetAspnetInstallStep, frameworkConfigureStep, skillsInstallStep],
+              unity: [dotnetUnityInstallStep, frameworkConfigureStep, skillsInstallStep],
+              DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
+            },
+          },
           DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
         },
       },
@@ -467,6 +503,9 @@ export const connectSchema: ConnectSchema = {
         },
       },
       server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
+      // Warehouse renders its own fully custom panel (WarehouseModePanel) instead of the
+      // generic field/step abstraction, so it has no steps of its own here.
+      warehouse: [],
       DEFAULT: [skillsInstallStep],
     },
   },

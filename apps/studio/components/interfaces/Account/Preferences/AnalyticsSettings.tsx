@@ -14,8 +14,6 @@ import {
 } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
-import { useSendResetMutation } from '@/data/telemetry/send-reset-mutation'
-
 const AnalyticsSchema = z.object({
   telemetryEnabled: z.boolean(),
 })
@@ -23,8 +21,6 @@ const AnalyticsSchema = z.object({
 export const AnalyticsSettings = () => {
   const { hasAccepted, acceptAll, denyAll, categories } = useConsentState()
   const hasLoaded = categories !== null
-
-  const { mutate: sendReset } = useSendResetMutation()
 
   const form = useForm<z.infer<typeof AnalyticsSchema>>({
     resolver: zodResolver(AnalyticsSchema),
@@ -43,8 +39,9 @@ export const AnalyticsSettings = () => {
     if (value) {
       acceptAll()
     } else {
-      denyAll()
-      sendReset()
+      denyAll().then((isSaved) => {
+        if (isSaved) window.location.reload()
+      })
     }
 
     form.setValue('telemetryEnabled', value)
@@ -72,6 +69,7 @@ export const AnalyticsSettings = () => {
                     layout="flex-row-reverse"
                     label="Send telemetry data from Supabase services"
                     description="By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience and use it for marketing and advertising purposes"
+                    id="telemetry"
                   >
                     <FormControl>
                       <Switch
@@ -80,6 +78,7 @@ export const AnalyticsSettings = () => {
                           field.onChange(value)
                           handleToggle(value)
                         }}
+                        id="telemetry"
                       />
                     </FormControl>
                   </FormItemLayout>

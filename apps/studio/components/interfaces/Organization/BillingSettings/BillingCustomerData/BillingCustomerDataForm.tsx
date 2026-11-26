@@ -4,9 +4,9 @@ import type {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
-import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, InfoIcon, XIcon } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Button,
   cn,
@@ -78,7 +78,7 @@ export const BillingCustomerDataForm = ({
     form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
-  const { tax_id_name } = form.watch()
+  const tax_id_name = useWatch({ control: form.control, name: 'tax_id_name' })
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
   const availableTaxIds = useMemo(() => {
@@ -128,7 +128,7 @@ export const BillingCustomerDataForm = ({
               afterLabel={
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info size={14} className="text-foreground-lighter cursor-pointer" />
+                    <InfoIcon size={14} className="text-foreground-lighter cursor-pointer" />
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs text-left">
                     If you are an individual, no need to add a Tax ID. If you are a business below
@@ -143,7 +143,6 @@ export const BillingCustomerDataForm = ({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant="default"
                       role="combobox"
                       size="medium"
                       disabled={disabled}
@@ -154,7 +153,10 @@ export const BillingCustomerDataForm = ({
                         !selectedTaxId && 'text-muted'
                       )}
                       iconRight={
-                        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1.5} />
+                        <ChevronsUpDownIcon
+                          className="h-4 w-4 shrink-0 opacity-50"
+                          strokeWidth={1.5}
+                        />
                       }
                     >
                       {selectedTaxId
@@ -183,7 +185,7 @@ export const BillingCustomerDataForm = ({
                               setShowTaxIDsPopover(false)
                             }}
                           >
-                            <Check
+                            <CheckIcon
                               className={cn(
                                 'mr-2 h-4 w-4',
                                 selectedTaxId?.name === option.name ? 'opacity-100' : 'opacity-0'
@@ -223,7 +225,7 @@ export const BillingCustomerDataForm = ({
             <Button
               variant="text"
               className="px-1"
-              icon={<X />}
+              icon={<XIcon />}
               disabled={disabled}
               onClick={() => onRemoveTaxId()}
             />

@@ -1,12 +1,11 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { usePathname } from 'next/navigation'
+import { useLocation } from '@tanstack/react-router'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ObservabilityMenu } from './ObservabilityMenu'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { BannerMetricsAPI } from '@/components/ui/BannerStack/Banners/BannerMetricsAPI'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -22,37 +21,19 @@ const ObservabilityLayoutContent = ({
   children,
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
-
-  const [isMetricsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
 
   const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
 
-  useEffect(() => {
-    if (!isMetricsBannerDismissed && IS_PLATFORM) {
-      addBanner({
-        id: 'metrics-api-banner',
-        isDismissed: false,
-        content: <BannerMetricsAPI />,
-        priority: 1,
-      })
-    } else {
-      dismissBanner('metrics-api-banner')
-    }
-  }, [isMetricsBannerDismissed, addBanner, dismissBanner])
-
   const prevPathnameRef = useRef(pathname)
 
   useEffect(() => {
-    const isQueryPerformancePage = pathname?.includes('/query-performance')
+    const isQueryPerformancePage = pathname.includes('/query-performance')
 
     if (
       isQueryPerformancePage &&

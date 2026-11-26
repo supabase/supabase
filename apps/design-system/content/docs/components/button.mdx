@@ -1,11 +1,11 @@
 ---
 title: Button
-description: Displays a button or a component that looks like a button.
+description: Displays a button or a link that looks like a button.
 featured: true
 component: true
 ---
 
-<ComponentPreview name="button-demo" peekCode wide />
+<ComponentPreview name="button-default" peekCode wide />
 
 ## Usage
 
@@ -47,22 +47,17 @@ Use the `size` prop to determine the size of the button.
 
 ### Variants
 
-These are all the different `variant` variations.
+#### Default
+
+Used when no `variant` is specified. Prefer this unless another variant fits better, as below.
+
+<ComponentPreview name="button-default" />
 
 #### Primary
 
-Used for data insertion actions, confirming purchases, strong positive actions.
+Use sparingly for data insertion, confirming purchases, and other strong positive actions. Because it is so prominent, aim for at most one primary button in a viewport.
 
 <ComponentPreview name="button-demo" />
-
-#### Default
-
-Used for opening dialogs, navigating to pages, and other non CRUD actions.
-
-This `variant` will probably be the most used button variant.
-It will probably be changed to be the default variant in future.
-
-<ComponentPreview name="button-default" />
 
 #### Secondary
 
@@ -105,13 +100,17 @@ Used for actions that are not as important as the primary action, or for actions
 
 <ComponentPreview name="button-link" />
 
-### Only an icon
+### Icon-only
 
-Displaying only an Icon in a button.
+Render an [icon](./icons) in a button without accompanying text. Ensure the button is accessible by:
 
-<Admonition type="note" title="This feature requires more support" className="mt-3">
-  We should update the button component to support this use case better.
-</Admonition>
+- Wrapping it in a [Tooltip](./tooltip) for sighted users.
+- Adding an `aria-label` prop for screen readers.
+- Setting its `aria-describedby` prop to `undefined` when the tooltip content repeats the label. Otherwise screen readers read the label twice.
+
+Consider also squaring off the button container as shown in the example below. For the default `tiny` size (`h-[26px]`), use `w-6.5` so the button is square.
+
+Compact icon-only buttons may also benefit from the `hit-area` utility. This increases their tap target slightly each side without changing the visual layout. See the [Table](./table#actions) component for more information.
 
 <ComponentPreview name="button-icon" />
 
@@ -123,27 +122,97 @@ Supports slot behavior with `asChild` prop.
 
 ### Split with dropdown
 
-Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
-
-When secondary actions are related but distinct—not alternatives to the primary action—display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+Use a split button when the menu offers variations of the same action. The main button runs the most common variation directly, and the attached chevron opens the alternatives. For example, “Export CSV” runs immediately while the menu offers “Export JSON”.
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
-The shared middle border is the tricky part. Do **not** use `border-l-0` on the chevron button — that drops the divider on hover/focus. Instead:
+For the default variant, wrap the button and its chevron trigger in `SplitButtonGroup`. To name the group for screen readers, pass an `aria-label` to it.
 
-- Primary: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
-- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
-- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
+Give the chevron trigger `shrink-0` and `px-1 py-1.25`. The chevron icon is decorative, so also give the trigger an `aria-label` that names the menu.
 
-Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions, also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary when `layout="responsive"`.
+The `primary`, `danger`, and `warning` variants have an opaque fill, so they use per-button classes in place of `SplitButtonGroup`. Add `rounded-r-none hover:z-10` to the primary action and `rounded-l-none -ml-px` to the chevron trigger.
+
+In [Admonition](../fragments/admonition#split-button-with-dropdown) actions with `layout="responsive"`, add `w-full @lg:w-auto` to `SplitButtonGroup` and `flex-1 @lg:flex-none` to the primary action.
+
+`SplitButtonGroup` renders a `role="group"` wrapper with the `raised-control-group` utility, which changes the default-variant buttons in these ways:
+
+- It squares the inner corners and rounds them slightly while the focus ring shows.
+- It overlaps the buttons by one pixel, and only one button paints that shared column. Under the translucent dark fill, a plain `-ml-px` overlap stacks both edges and makes the divider look heavier.
+- It lets the hovered button paint the shared column, so the divider matches that button's edge color. At rest, the chevron trigger paints it.
+- It lifts the focused button above its neighbor.
+- It keeps the primary action from shrinking on press.
+
+### Dropdown button
+
+Use a single labeled button with a chevron when clicking anywhere on the button should open a menu. For example, a time-range button shows the current selection and opens the list of available ranges.
+
+<ComponentPreview name="button-dropdown" peekCode />
+
+### Button with more actions
+
+Keep the main action visible and put other actions for the same item or section in a separate ellipsis menu. For example, “Add pipeline” creates a pipeline, while the menu offers usage and settings for Pipelines. At the individual pipeline level, “Stop” stays visible while “Restart pipeline”, “Edit pipeline”, and “Delete pipeline” go in the menu.
+
+Use a primary or default button for the visible action based on its importance on the page. Keep a gap between the controls so they read as separate buttons. The order of the buttons depends on their context.
+
+Give the icon-only trigger an accessible name that identifies its context, such as “More actions for this pipeline”, and a short tooltip such as “More actions”. For table rows, see [Multiple actions](./table#multiple-actions).
+
+<ComponentPreview name="button-more-actions" peekCode />
+
+## Default fill and floating buttons
+
+The default variant is meant to read as raised chrome on whatever surface it sits on.
+
+- **Light:** opaque `bg-card` (a solid elevated plate). Opaque on purpose so the button can cover busy content underneath.
+- **Dark:** translucent `bg-muted` (a foreground wash). That adapts to the local surface, but content can show through the fill.
+
+Hover: light uses `hover:bg-muted`; dark uses `dark:hover:bg-accent`.
+
+### Floating over content
+
+If a default button is absolutely or sticky-positioned over code, tables, maps, or other busy UI, wrap it in [`FloatingPlate`](#floating-plate) so nothing bleeds through:
+
+<ComponentPreview name="button-floating-plate" peekCode />
+
+Keep positioning, z-index, and hover/focus reveal on the plate's `className`. Use `rounded="full"` when the child is a pill. For clusters (split toggles, parallel actions), wrap the group once.
+
+Do not override the button fill with `bg-popover` at the callsite. The plate owns occlusion; the button stays a normal default control.
+
+## Floating plate
+
+`FloatingPlate` is an opaque `bg-popover` shell for floating default buttons (and small clusters).
+
+```tsx
+import { Button, FloatingPlate } from 'ui'
+```
+
+| Prop        | Default | Notes                                                           |
+| ----------- | ------- | --------------------------------------------------------------- |
+| `rounded`   | `lg`    | `md`, `lg`, or `full`. Match or exceed the child button radius. |
+| `className` | —       | Positioning, opacity, gaps for clusters.                        |
+
+See [Floating over content](#floating-over-content) for when to use it.
 
 ## Accessibility
 
 [Keyboard focus](../accessibility#focus-management) is automatically handled:
 
 - Enabled buttons default to `tabIndex={0}` (keyboard accessible)
-- Disabled buttons default to `tabIndex={-1}` (removed from tab order)
+- Buttons with native `disabled` default to `tabIndex={-1}` (removed from tab order)
 - You can still override with an explicit `tabIndex` prop when needed
 - Keyboard focus uses the shared `focus-ring` utility; variants do not change ring colour
 
-You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.
+You therefore don't need to manually set `tabIndex` for buttons using native `disabled`.
+
+When a disabled action has a non-obvious reason and needs a tooltip, add `focusableWhenDisabled` so keyboard users can still focus the control. See [Disabled controls](../accessibility#disabled-controls).
+
+### Focusable when disabled
+
+Use `focusableWhenDisabled` with `disabled` when the action is blocked for a non-obvious reason and you need a tooltip or other explanation. The control stays in the tab order and uses `aria-disabled` instead of native `disabled`.
+
+```tsx
+<Button disabled focusableWhenDisabled>
+  Pause project
+</Button>
+```
+
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.

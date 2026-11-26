@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -16,7 +16,7 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
     <Input
       size="tiny"
       autoComplete="off"
-      icon={<Search />}
+      icon={<SearchIcon />}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={onSearchInputEscape(value, onChange)}
@@ -30,7 +30,7 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
             key="clear"
             size="tiny"
             variant="text"
-            icon={<X />}
+            icon={<XIcon />}
             onClick={() => onChange('')}
             className="p-0 h-5 w-5"
           />

@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Form } from 'ui'
 
 import {
   ORG_KIND_DEFAULT,
   ORG_SIZE_DEFAULT,
+} from '../../OnboardingSurvey/OnboardingSurvey.constants'
+import {
   OrganizationDetailsFields,
   organizationDetailsSchema,
   type OrganizationDetailsFormValues,
-} from '../NewOrg/OrganizationDetailsFields'
+} from './OrganizationDetailsFields'
 
 interface Props {
   onSubmit: (values: NewMarketplaceOrgForm) => void
@@ -28,7 +30,7 @@ export const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
     },
   })
 
-  const kind = form.watch('kind')
+  const kind = useWatch({ control: form.control, name: 'kind' })
 
   return (
     <Form {...form}>

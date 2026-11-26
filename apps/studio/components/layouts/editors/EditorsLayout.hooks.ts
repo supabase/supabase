@@ -1,13 +1,15 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { usePathname } from 'next/navigation'
 
-export function useEditorType(): 'table' | 'sql' | undefined {
-  const pathname = usePathname()
+export type EditorType = 'table' | 'sql' | 'explorer' | undefined
+
+export function useEditorType(): EditorType {
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
 
-  return pathname?.includes(`/project/${ref}/editor`)
-    ? 'table'
-    : pathname?.includes(`/project/${ref}/sql`)
-      ? 'sql'
-      : undefined
+  if (pathname.includes(`/project/${ref}/editor`)) return 'table'
+  if (pathname.includes(`/project/${ref}/sql`)) return 'sql'
+  if (pathname.includes(`/project/${ref}/explorer`)) return 'explorer'
+
+  return undefined
 }

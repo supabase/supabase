@@ -2,8 +2,10 @@ import { getPgStatActivitySql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type LockWaitEvent =
   | 'relation'
@@ -67,6 +69,7 @@ export type DatabaseActivity = {
   application_name: string
   blocked_by: number[]
   query: string | null
+  backend_start: string
   query_start: string | null
   transaction_start: string | null
   state_change: string | null
@@ -92,7 +95,15 @@ export async function getDatabaseActivity(
   const sql = getPgStatActivitySql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['activity'] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'activity',
+      queryKey: ['activity'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
@@ -102,7 +113,7 @@ export async function getDatabaseActivity(
 }
 
 export type DatabaseActivityData = Awaited<ReturnType<typeof getDatabaseActivity>>
-export type DatabaseActivityError = ResponseError
+export type DatabaseActivityError = StudioError
 
 export const useDatabaseActivityQuery = <TData = DatabaseActivityData>(
   { projectRef, connectionString }: DatabaseActivityVariables,

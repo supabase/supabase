@@ -1,72 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { isTracingAllowed } from './braintrust-logger'
+import { hideSpanErrorFromTrace, redactHiddenSpanError } from './braintrust-logger'
+import { NO_DATA_ERROR } from './tools/execute-sql-output'
 
-const baseAllowed = {
-  orgHasHipaaAddon: false,
-  projectIsSensitive: false,
-  projectRegion: 'us-east-1',
-}
+describe('redactHiddenSpanError', () => {
+  it('hides child errors until the hidden span ends', () => {
+    hideSpanErrorFromTrace('parent')
+    const childError = (span_id: string) => ({
+      span_id,
+      span_parents: ['parent'],
+      error: 'key (email)=(a@b.c)',
+    })
 
-describe('isTracingAllowed', () => {
-  it('allows tracing when all flags are explicitly off/non-EU', () => {
-    expect(isTracingAllowed(baseAllowed)).toBe(true)
-  })
-
-  it('disallows tracing when HIPAA addon is active and project is sensitive', () => {
-    expect(
-      isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: true, projectIsSensitive: true })
-    ).toBe(false)
-  })
-
-  it('allows tracing when HIPAA addon is active but project is not sensitive', () => {
-    expect(
-      isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: true, projectIsSensitive: false })
-    ).toBe(true)
-  })
-
-  it('allows tracing when project is sensitive but no HIPAA addon', () => {
-    expect(
-      isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: false, projectIsSensitive: true })
-    ).toBe(true)
-  })
-
-  it('disallows tracing for EU regions', () => {
-    expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'eu-west-1' })).toBe(false)
-    expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'eu-central-1' })).toBe(false)
-  })
-
-  it('allows tracing for non-EU regions', () => {
-    expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'ap-southeast-1' })).toBe(true)
-  })
-
-  it('allows tracing when HIPAA addon is false and is_sensitive is null (DB default)', () => {
-    expect(isTracingAllowed({ ...baseAllowed, projectIsSensitive: null })).toBe(true)
-  })
-
-  it('disallows tracing when HIPAA addon is unknown and is_sensitive is null', () => {
-    expect(
-      isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: undefined, projectIsSensitive: null })
-    ).toBe(false)
-  })
-
-  it('disallows tracing when flags are undefined (unknown = restricted)', () => {
-    expect(
-      isTracingAllowed({
-        orgHasHipaaAddon: undefined,
-        projectIsSensitive: undefined,
-        projectRegion: undefined,
+    for (const span_id of ['tool-1', 'tool-2']) {
+      expect(redactHiddenSpanError(childError(span_id))).toEqual({
+        ...childError(span_id),
+        error: NO_DATA_ERROR,
       })
-    ).toBe(false)
-    expect(isTracingAllowed({ ...baseAllowed, projectRegion: undefined })).toBe(false)
-    expect(isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: undefined })).toBe(false)
-    // projectIsSensitive unknown only matters when orgHasHipaaAddon is also unknown
-    expect(
-      isTracingAllowed({
-        ...baseAllowed,
-        orgHasHipaaAddon: undefined,
-        projectIsSensitive: undefined,
-      })
-    ).toBe(false)
+    }
+    redactHiddenSpanError({ span_id: 'parent', metrics: { end: 1 } })
+    expect(redactHiddenSpanError(childError('tool-3'))).toEqual(childError('tool-3'))
+  })
+
+  it('leaves errors on other spans alone', () => {
+    hideSpanErrorFromTrace('hidden')
+    const otherError = { span_id: 'other', span_parents: ['root'], error: 'boom' }
+
+    expect(redactHiddenSpanError(otherError)).toEqual(otherError)
   })
 })

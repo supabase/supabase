@@ -1,18 +1,12 @@
-import { useBreakpoint, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useBreakpoint, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import {
-  buttonVariants,
-  cn,
-  ResizablePanel,
-  ResizablePanelGroup,
-  SidebarProvider,
-  usePanelRef,
-} from 'ui'
+import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
-import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileNavigationBar } from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
@@ -22,11 +16,14 @@ import {
 } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
-import { Sidebar } from '@/components/interfaces/Sidebar'
-import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
+import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
+import { OnboardingSurveyFollowUpCard } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUpCard'
+import { DEFAULT_SIDEBAR_BEHAVIOR, Sidebar } from '@/components/interfaces/Sidebar'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
+import { getPathSegment } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -50,18 +47,23 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
   const router = useRouter()
   const panelRef = usePanelRef()
   const isMobile = useBreakpoint('md')
+  const isSidebarOverlay = useBreakpoint('xl')
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const [isMounted, setIsMounted] = useState(false)
+  const [sidebarBehavior] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
 
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
@@ -81,13 +83,13 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile || isSidebarOverlay) return
     if (isMaximised) {
       panelRef.current.collapse()
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile, isSidebarOverlay])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
@@ -96,24 +98,12 @@ export const DefaultLayout = ({
   }
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={sidebarBehavior === 'open'}>
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a
-                className={cn(
-                  buttonVariants({
-                    size: 'xlarge',
-                    variant: 'primary',
-                  }),
-                  'absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full focus:translate-y-4'
-                )}
-                href="#main"
-                tabIndex={0}
-              >
-                Skip to content
-              </a>
+              <SkipToContent href="#main" />
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -124,6 +114,7 @@ export const DefaultLayout = ({
                   />
                 )}
                 <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
+                {showConfigDrift && ref && <GitHubConfigDriftBanner />}
               </div>
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">
@@ -144,7 +135,7 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" className="h-full overflow-y-auto">
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
                       {children}
                     </main>
                   </ResizablePanel>
@@ -158,7 +149,10 @@ export const DefaultLayout = ({
             </div>
 
             <BannerStack />
-            <StudioMobileSheetNav />
+            {IS_PLATFORM && <OnboardingSurveyFollowUpCard />}
+            <StudioMobileSheetNav
+              shouldCloseOnQueryChange={getPathSegment(router.pathname, 3) !== 'issues'}
+            />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>

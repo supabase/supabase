@@ -1,8 +1,7 @@
 'use client'
 
 import { useFeatureFlags } from 'common'
-import { Copy, EyeOff, Search, X } from 'lucide-react'
-import Image from 'next/image'
+import { Copy, Search, X } from 'lucide-react'
 import {
   useCallback,
   useEffect,
@@ -35,6 +34,7 @@ import {
 } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
+import { DevToolbarLogo } from './DevToolbarLogo'
 import type { DevTelemetryEvent, ExtraTab } from './types'
 import {
   CC_ORIGINALS_KEY,
@@ -85,13 +85,13 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
             <span
               className={cn(
                 'w-1.5 h-1.5 rounded-[2px] shrink-0',
-                event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
+                event.source === 'client' ? 'bg-brand-default' : 'bg-foreground-lighter'
               )}
             />
             <span
               className={cn(
                 'font-mono text-xs uppercase',
-                event.source === 'client' ? 'text-brand' : 'text-foreground-light'
+                event.source === 'client' ? 'text-primary' : 'text-foreground-light'
               )}
             >
               {event.source}
@@ -208,7 +208,7 @@ function FlagRow({
 }
 
 export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
-  const { isEnabled, isOpen, setIsOpen, events, setEvents, dismissToolbar } = useDevToolbar()
+  const { isEnabled, isOpen, setIsOpen, events, setEvents } = useDevToolbar()
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
   const [eventFilter, setEventFilter] = useState<string>('')
@@ -391,18 +391,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
               View telemetry events and feature flags for local development
             </SheetDescription>
             <div className="flex items-center px-6">
-              <Image
-                src="/img/logo-pixel-small-light.png"
-                alt="Dev Toolbar"
-                width={16}
-                height={16}
-                style={{
-                  filter:
-                    'brightness(0) saturate(100%) invert(72%) sepia(57%) saturate(431%) hue-rotate(108deg) brightness(95%) contrast(91%)',
-                }}
-                aria-hidden="true"
-                className="shrink-0 mr-4"
-              />
+              <DevToolbarLogo className="shrink-0 mr-4" />
               <TabsList className="flex gap-x-4 rounded-none border-none! h-auto">
                 <TabsTrigger value="events" className="text-xs py-3 border-b font-mono uppercase">
                   Events ({filteredEvents.length})
@@ -421,17 +410,6 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 ))}
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="text"
-                      icon={<EyeOff className="w-4 h-4" />}
-                      onClick={dismissToolbar}
-                      className="text-foreground-light hover:text-foreground p-1"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Hide Dev Toolbar</TooltipContent>
-                </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <SheetClose asChild>
@@ -464,7 +442,6 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                     </InputGroupAddon>
                   </InputGroup>
                   <Button
-                    variant="default"
                     onClick={() => setEvents([])}
                     className="text-foreground-lighter hover:text-foreground"
                   >

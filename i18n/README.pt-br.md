@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) é uma alternativa de código aberto ao Firebase. Estamos desenvolvendo os recursos do Firebase usando ferramentas de código aberto de nível empresarial.
 
-- [x] Banco de dados Postgres hospedado. [Docs](https://supabase.com/docs/guides/database)
+- [x] Banco de dados Postgres hospedado. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Autenticação e autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs geradas automaticamente.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -48,7 +48,7 @@ Supabase é uma combinação de ferramentas de código aberto. Estamos desenvolv
 **Arquitetura**
 
 Supabase é uma [plataforma hospedada](https://supabase.com/dashboard). Você pode se registrar e começar a usar o Supabase sem instalar nada.
-Você também pode [auto-hospedar](https://supabase.com/docs/guides/hosting/overview) e [desenvolver localmente](https://supabase.com/docs/guides/local-development).
+Você também pode [auto-hospedar](https://supabase.com/docs/guides/self-hosting) e [desenvolver localmente](https://supabase.com/docs/guides/local-development).
 
 ![Arquitetura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -57,7 +57,7 @@ Você também pode [auto-hospedar](https://supabase.com/docs/guides/hosting/over
 - [PostgREST](http://postgrest.org/) é um servidor da Web que transforma seu banco de dados PostgreSQL diretamente em uma API RESTful
 - [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerenciar usuários e emitir tokens SWT.
 - [pg_graphql](http://github.com/supabase/pg_graphql/) é uma extensão do PostgreSQL que expõe uma API GraphQL
-- [Storage](https://github.com/supabase/storage-api) fornece uma interface RESTful para gerenciar arquivos armazenados no S3, usando o Postgres para gerenciar permissões.
+- [Storage](https://github.com/supabase/storage) fornece uma interface RESTful para gerenciar arquivos armazenados no S3, usando o Postgres para gerenciar permissões.
 - [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerenciar seu Postgres, permitindo que você busque tabelas, adicione funções e execute consultas, etc.
 - [Kong](https://github.com/Kong/kong) é um gateway de API nativo da nuvem.
 
@@ -71,14 +71,14 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <th>Cliente</th>
     <th colspan="5">Feature-Clients (incluídos no cliente Supabase)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -92,9 +92,9 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ Oficial ⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -113,12 +113,12 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚 comunidade 💚</th>
-  
+
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -154,7 +154,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -197,7 +197,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

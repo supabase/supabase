@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ApiAuthorizationDeclineVariables = {
   id: string
@@ -28,26 +28,18 @@ export async function declineApiAuthorization({ id, slug }: ApiAuthorizationDecl
 
 type ApiAuthorizationDeclineData = Awaited<ReturnType<typeof declineApiAuthorization>>
 
-export const useApiAuthorizationDeclineMutation = ({
-  onError,
-  ...options
-}: Omit<
-  UseCustomMutationOptions<
-    ApiAuthorizationDeclineData,
-    ResponseError,
-    ApiAuthorizationDeclineVariables
-  >,
-  'mutationFn'
-> = {}) => {
-  return useMutation<ApiAuthorizationDeclineData, ResponseError, ApiAuthorizationDeclineVariables>({
+export const useApiAuthorizationDeclineMutation = (
+  options: Omit<
+    UseCustomMutationOptions<
+      ApiAuthorizationDeclineData,
+      StudioError,
+      ApiAuthorizationDeclineVariables
+    >,
+    'mutationFn'
+  > = {}
+) => {
+  return useMutation<ApiAuthorizationDeclineData, StudioError, ApiAuthorizationDeclineVariables>({
     mutationFn: (vars) => declineApiAuthorization(vars),
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to decline authorization request: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
-    },
     ...options,
   })
 }

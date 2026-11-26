@@ -11,7 +11,7 @@ interface ProgressBarProps {
 export function ProgressBar({
   className = 'h-4',
   backgroundClassName = 'bg-foreground-muted/80',
-  foregroundClassName = 'bg-brand',
+  foregroundClassName = 'bg-brand-default',
   animationDelay,
   reverse = false,
 }: ProgressBarProps) {
@@ -62,7 +62,7 @@ const PROGRESS_BARS = [
   {
     height: 'h-8',
     bgColor: 'bg-foreground-muted/50',
-    fgColor: 'bg-brand',
+    fgColor: 'bg-brand-default',
     animationDelay: '0.3s',
   },
   {

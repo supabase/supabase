@@ -13,10 +13,6 @@ import {
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
-import MetaFaviconsPagesRouter, {
-  DEFAULT_FAVICON_ROUTE,
-  DEFAULT_FAVICON_THEME_COLOR,
-} from 'common/MetaFavicons/pages-router'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
@@ -31,6 +27,12 @@ import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
 import { MD_PAGES } from '@/app/api-v2/md/content.generated'
 import { Toaster } from '@/app/toaster'
 import { WwwCommandMenu } from '@/components/CommandMenu'
+import {
+  DEFAULT_FAVICON_THEME_COLOR,
+  MetaFaviconsPagesRouter,
+} from '@/components/MetaFaviconsPagesRouter'
+import { WwwPagesFrameworkProvider } from '@/components/WwwPagesFrameworkProvider'
+import { getPagesCanonicalHref, normalizePagesPath } from '@/lib/canonical'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -46,24 +48,23 @@ export default function App({ Component, pageProps }: AppProps) {
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const forceDarkMode = isDarkLaunchWeek
 
-  let applicationName = 'Supabase'
-  let faviconRoute = DEFAULT_FAVICON_ROUTE
-  let themeColor = DEFAULT_FAVICON_THEME_COLOR
-
-  if (router.asPath?.includes('/launch-week/x')) {
-    applicationName = 'Supabase LWX'
-    faviconRoute = 'images/launchweek/lwx/favicon'
-    themeColor = 'FFFFFF'
-  }
+  const applicationName = 'Supabase'
+  const faviconRoute = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+  const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.
-  const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
-  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const cleanPath = normalizePagesPath(router.asPath ?? '/') || '/'
+  const mdSlug = cleanPath === '/' ? 'index' : cleanPath.slice(1)
   const mdAlternateHref = MD_PAGES.has(mdSlug)
     ? cleanPath === '/'
-      ? '/homepage.md'
+      ? '/index.md'
       : `${cleanPath}.md`
     : null
+
+  // Canonical for every pages-router route. Pages that set their own canonical
+  // via NextSeo override this default. Unresolved dynamic routes (e.g. `/[ref]`
+  // on a page without getStaticProps) are skipped rather than emitted literally.
+  const canonicalHref = getPagesCanonicalHref(router.asPath ?? '/')
 
   return (
     <>
@@ -76,12 +77,12 @@ export default function App({ Component, pageProps }: AppProps) {
         route={faviconRoute}
         themeColor={themeColor}
         includeManifest
-        includeMsApplicationConfig
         includeRssXmlFeed
       />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
+        canonical={canonicalHref}
         openGraph={{
           type: 'website',
           url: 'https://supabase.com/',
@@ -103,28 +104,31 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <div className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}>
-        <AuthProvider>
-          {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
-          <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
-            <DevToolbarProvider apiUrl={API_URL}>
-              <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
-                <TooltipProvider delayDuration={0}>
-                  <CommandProvider app="www" onTelemetry={onTelemetry}>
-                    <Toaster />
-                    <Component {...pageProps} />
-                    <WwwCommandMenu />
-                    <PageTelemetry
-                      API_URL={API_URL}
-                      hasAcceptedConsent={hasAcceptedConsent}
-                      enabled={IS_PLATFORM}
-                    />
-                    <DevToolbar />
-                  </CommandProvider>
-                </TooltipProvider>
-              </ThemeProvider>
-            </DevToolbarProvider>
-          </FeatureFlagProvider>
-        </AuthProvider>
+        <WwwPagesFrameworkProvider>
+          <AuthProvider>
+            {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
+            <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
+              <DevToolbarProvider apiUrl={API_URL}>
+                <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
+                  <TooltipProvider delayDuration={0}>
+                    <CommandProvider app="www" onTelemetry={onTelemetry}>
+                      <Toaster />
+                      <Component {...pageProps} />
+                      <WwwCommandMenu />
+                      <PageTelemetry
+                        API_URL={API_URL}
+                        platform="www"
+                        hasAcceptedConsent={hasAcceptedConsent}
+                        enabled={IS_PLATFORM}
+                      />
+                      <DevToolbar />
+                    </CommandProvider>
+                  </TooltipProvider>
+                </ThemeProvider>
+              </DevToolbarProvider>
+            </FeatureFlagProvider>
+          </AuthProvider>
+        </WwwPagesFrameworkProvider>
         <TelemetryTagManager />
       </div>
     </>

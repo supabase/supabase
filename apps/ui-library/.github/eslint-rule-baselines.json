@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 36,
+    "shadcn/no-unknown-classes": 11,
+    "shadcn/no-raw-colors": 2
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {
+      "app/example/headless-app/layout.tsx": 3,
+      "app/example/oauth-consent/layout.tsx": 3,
+      "app/example/password-based-auth/layout.tsx": 3,
+      "app/example/social-auth/layout.tsx": 3,
+      "components/catalog-preview.tsx": 5,
+      "components/command-menu.tsx": 2,
+      "components/command.tsx": 2,
+      "components/component-preview.tsx": 7,
+      "components/library-overview.tsx": 3,
+      "components/mdx-components.tsx": 2,
+      "components/tanstack-db-generator/index.tsx": 1,
+      "registry/default/blocks/realtime-flow/components/realtime-flow-overlay.tsx": 1,
+      "registry/default/platform/platform-kit-nextjs/components/supabase-manager/index.tsx": 1
+    },
+    "shadcn/no-unknown-classes": {
+      "app/(app)/docs/[[...slug]]/page.tsx": 2,
+      "components/block-overview-tabs.tsx": 2,
+      "components/block-preview.tsx": 1,
+      "components/component-preview.tsx": 2,
+      "components/mdx-components.tsx": 1,
+      "registry/default/components/ui/popover.tsx": 1,
+      "registry/default/components/ui/select.tsx": 1,
+      "registry/default/components/ui/tooltip.tsx": 1
+    },
+    "shadcn/no-raw-colors": {
+      "components/mdx-components.tsx": 2
+    }
+  }
+}

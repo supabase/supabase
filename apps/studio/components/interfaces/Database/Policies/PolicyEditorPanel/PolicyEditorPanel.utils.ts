@@ -1,5 +1,12 @@
 import type { PGPolicy } from '@supabase/pg-meta'
-import { ident, keyword, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+import {
+  ident,
+  keyword,
+  safeSql,
+  untrustedSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { isEqual } from 'lodash'
 
 // [Joshen] Not used but keeping this for now in case we do an inline editor
@@ -75,6 +82,55 @@ export const generateCreatePolicyQuery = ({
     return safeSql`${withUsing} with check (${check ?? safeSql``});`
   }
   return safeSql`${withUsing};`
+}
+
+/**
+ * Diffs the editor form against the stored policy and returns only the fields
+ * that changed — an empty result means there is nothing to save. A stored
+ * `null` definition/check (policy created without that clause) counts as
+ * empty, so typing an expression into a previously empty editor is a change.
+ * Empty form values never produce a payload field, because ALTER POLICY can
+ * only replace an expression, not remove it.
+ *
+ * Expressions are returned as UntrustedSqlFragment — the caller promotes them
+ * with acceptUntrustedSql in the submit handler.
+ */
+export const generateUpdatePolicyPayload = (
+  selectedPolicy: Pick<PGPolicy, 'name' | 'roles' | 'command' | 'definition' | 'check'>,
+  policyForm: {
+    name: string
+    roles: string[]
+    using?: string
+    check?: string
+  }
+): {
+  name?: string
+  roles?: string[]
+  definition?: UntrustedSqlFragment
+  check?: UntrustedSqlFragment
+} => {
+  const payload: {
+    name?: string
+    roles?: string[]
+    definition?: UntrustedSqlFragment
+    check?: UntrustedSqlFragment
+  } = {}
+  const usingVal = policyForm.using?.trim()
+  const checkVal = policyForm.check?.trim()
+
+  if (policyForm.name !== selectedPolicy.name) payload.name = policyForm.name
+  if (!isEqual(selectedPolicy.roles, policyForm.roles)) payload.roles = policyForm.roles
+
+  if (selectedPolicy.command === 'INSERT') {
+    // For INSERT policies editor one holds the with check expression
+    if (!!usingVal && usingVal !== selectedPolicy.check) payload.check = untrustedSql(usingVal)
+  } else {
+    if (!!usingVal && usingVal !== selectedPolicy.definition)
+      payload.definition = untrustedSql(usingVal)
+    if (!!checkVal && checkVal !== selectedPolicy.check) payload.check = untrustedSql(checkVal)
+  }
+
+  return payload
 }
 
 export const checkIfPolicyHasChanged = (

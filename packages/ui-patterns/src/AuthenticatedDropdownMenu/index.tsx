@@ -1,11 +1,10 @@
 'use client'
 
 import type { User } from '@supabase/supabase-js'
+import { FrameworkImage, FrameworkLink } from 'common'
 import type { LucideIcon } from 'icons/src/createSupabaseIcon'
 import { UserIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import Link from 'next/link'
 import { Fragment } from 'react'
 import {
   buttonVariants,
@@ -53,12 +52,12 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ variant: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] px-0 data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
             'rounded-full overflow-hidden opacity-0 transition-opacity animate-fade-in'
           )}
         >
           {userAvatar ? (
-            <Image
+            <FrameworkImage
               src={userAvatar}
               alt={user?.email ?? ''}
               placeholder="blur"
@@ -134,7 +133,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                 case 'link':
                 default:
                   return (
-                    <Link
+                    <FrameworkLink
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
                       href={sectionItem.href!}
                       {...sectionItem.otherProps}
@@ -145,7 +144,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                       >
                         <DropdownItemContent {...sectionItem} />
                       </DropdownMenuItem>
-                    </Link>
+                    </FrameworkLink>
                   )
               }
             })}

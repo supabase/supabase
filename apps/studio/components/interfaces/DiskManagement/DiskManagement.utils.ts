@@ -248,8 +248,6 @@ export function getAvailableComputeOptions(
       price_interval: 'hourly',
       price_type: 'usage',
       meta: {
-        cpu_cores: INSTANCE_MICRO_SPECS.cpu_cores,
-        cpu_dedicated: INSTANCE_MICRO_SPECS.cpu_dedicated,
         memory_gb: INSTANCE_MICRO_SPECS.memory_gb,
         baseline_disk_io_mbs: INSTANCE_MICRO_SPECS.baseline_disk_io_mbs,
         max_disk_io_mbs: INSTANCE_MICRO_SPECS.max_disk_io_mbs,
@@ -268,8 +266,6 @@ export function getAvailableComputeOptions(
     price_type: 'usage',
     // @ts-ignore API types it as Record<string, never>
     meta: {
-      cpu_cores: INSTANCE_NANO_SPECS.cpu_cores,
-      cpu_dedicated: INSTANCE_NANO_SPECS.cpu_dedicated,
       memory_gb: INSTANCE_NANO_SPECS.memory_gb,
       baseline_disk_io_mbs: INSTANCE_NANO_SPECS.baseline_disk_io_mbs,
       max_disk_io_mbs: INSTANCE_NANO_SPECS.max_disk_io_mbs,
@@ -281,8 +277,9 @@ export function getAvailableComputeOptions(
   return computeOptions
 }
 
+const MAX_GP3_IOPS = DISK_LIMITS[DiskType.GP3]['maxIops']
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  return Math.max(3000, Math.min(500 * totalSize, 16000))
+  return Math.max(3000, Math.min(500 * totalSize, MAX_GP3_IOPS))
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
@@ -297,8 +294,9 @@ export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {
   return Math.max(4, Math.ceil(iops / 1000))
 }
 
+const MAX_GP3_THROUGHPUT = DISK_LIMITS[DiskType.GP3]['maxThroughput']
 export const calculateMaxThroughput = (iops: number) => {
-  return Math.min(0.256 * iops, 1000)
+  return Math.min(0.256 * iops, MAX_GP3_THROUGHPUT)
 }
 
 export const calculateIopsRequiredForThroughput = (throughput: number) => {
@@ -401,28 +399,6 @@ export const mapComputeSizeNameToAddonVariantId = (
   return infraToAddonVariant[sizeKey]
 }
 
-// Compute variants below 4XL run on EBS instances that draw on a burst credit
-// pool for disk IO, so burst balance metrics only make sense for these. 4XL
-// and larger instances have sustained disk IO at their baseline (baseline
-// equals max) and don't expose a burst budget.
-const BURSTABLE_IO_VARIANTS: ReadonlySet<ComputeInstanceAddonVariantId> = new Set([
-  'ci_nano',
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-  'ci_large',
-  'ci_xlarge',
-  'ci_2xlarge',
-])
-
-export const hasBurstableIO = (computeSize: ProjectDetail['infra_compute_size']): boolean => {
-  // Don't fall back to the nano default that mapComputeSizeNameToAddonVariantId
-  // uses: if compute metadata is missing or unrecognized, treat the project as
-  // non-burstable so we don't accidentally surface burst-only charts.
-  if (!computeSize || !isInfraInstanceSize(computeSize)) return false
-  return BURSTABLE_IO_VARIANTS.has(infraToAddonVariant[computeSize])
-}
-
 const addonVariantToComputeSize: Record<ComputeInstanceAddonVariantId, ComputeInstanceSize> = {
   ci_nano: 'Nano',
   ci_micro: 'Micro',
@@ -453,10 +429,13 @@ export const mapAddOnVariantIdToComputeSize = (
   return addonVariantToComputeSize[parsed.data]
 }
 
-export const formatNumber = (num: number): string => {
-  return num.toLocaleString('en-US')
+// A Postgres upgrade right-sizes disks down to 1.2x the database size, with a minimum of 8 GB
+const MIN_RIGHT_SIZED_DISK_GB = 8
+
+export const canRightSizeDisk = (diskSizeGb: number | undefined): boolean => {
+  return (diskSizeGb ?? 0) > MIN_RIGHT_SIZED_DISK_GB
 }
 
-export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
-  return plan !== 'free' && infraComputeSize === 'nano'
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString('en-US')
 }

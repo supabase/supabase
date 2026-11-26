@@ -89,3 +89,37 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 ### Disabled
 
 <ComponentPreview name="toggle-group-disabled" />
+
+## Segmented
+
+A Supabase addition, not part of shadcn or Radix. A segmented control is a compact row of two to
+four mutually exclusive options sharing one continuous track, for switching view state (Data or
+Definition) or filtering a list (All, Active, Revoked). The choice takes effect immediately and is
+never saved, so reach for a [Switch](../components/switch) or
+[Radio Group](../components/radio-group) when the setting is persisted, and
+[Tabs](../components/tabs) when the options swap whole panels of content. Items paint nothing
+themselves; a single indicator slides between them, so the group always has exactly one thing
+selected. Give a filter an explicit **All** segment rather than letting deselection stand for
+"no filter".
+
+<ComponentPreview name="toggle-group-segmented" />
+
+<ComponentPreview name="toggle-group-segmented-filter" peekCode />
+
+## Props
+
+`ToggleGroup` forwards every prop to the underlying
+[Radix Toggle Group](https://www.radix-ui.com/docs/primitives/components/toggle-group#api-reference).
+These are the ones worth knowing about.
+
+| Prop            | Type                                    | Default     | Description                                                                                                                                                                                                              |
+| --------------- | --------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `type`          | `'single' \| 'multiple'`                |             | Required by Radix. Only a `'single'` group gets the segmented indicator; a `'multiple'` group falls back to items painting their own background.                                                                         |
+| `variant`       | `'default' \| 'outline' \| 'segmented'` | `'default'` | Styles the root and every item, which inherit it through context. `segmented` drops the gaps and per-item borders in favor of an indicator that slides between segments, respecting `prefers-reduced-motion`.            |
+| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`   | `'default'` | Item height and padding, inherited through context. `tiny` suits a dense toolbar or table footer. Segments hug their labels, so add `className="flex-1"` to each item, plus a width on the root, if you need them equal. |
+| `tone`          | `'text' \| 'outline' \| 'primary'`      | `'text'`    | Segmented only. `text` is a flat `bg-accent` fill, `outline` adds a container border and a raised bordered indicator, `primary` fills the indicator with brand.                                                          |
+| `allowDeselect` | `boolean`                               | `true`      | Whether clicking the active item in a `type="single"` group clears it, emitting `''`. Set `false` for a segmented control, which has no empty state.                                                                     |
+| `aria-label`    | `string`                                |             | Names what is being switched or filtered. The segments name the options, not the axis.                                                                                                                                   |
+
+`variant` and `size` are the shadcn variant axes; `segmented`, `tone` and `allowDeselect` are the
+Supabase additions. `default` and `outline` are unchanged from shadcn.

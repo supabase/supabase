@@ -115,49 +115,33 @@ function list<T extends boolean | undefined = true>(
   }
 }
 
-function retrieve(identifier: TableIdentifier & { scoped?: boolean }): {
+function retrieve(identifier: TableIdentifier): {
   sql: SafeSqlFragment
   zod: z.ZodType<TableWithColumns>
 } {
-  let whereClause = getIdentifierWhereClause(identifier)
+  const whereClause = getIdentifierWhereClause(identifier)
 
-  // Scoped path: resolve the target relation's OID once (via pg_class's
-  // (relname, relnamespace) index for the name+schema branch, or the literal
-  // for the id branch) and push it into BOTH enrichment CTEs, so the query
-  // computes sizes / PKs / relationships / columns only for the requested
-  // relation instead of the entire catalog (which timed out at ~58s on a
-  // hundreds-of-schemas database). Output rows are identical -- the legacy outer
-  // identifier filter already restricted the result to this relation.
-  if (identifier.scoped) {
-    // Resolve the target OID as a scalar the planner evaluates once (initplan):
-    // a literal for the id branch, or an uncorrelated scalar subquery resolving
-    // via pg_class's (relname, relnamespace) index for the name+schema branch.
-    let targetOid: SafeSqlFragment
-    if ('id' in identifier && identifier.id) {
-      targetOid = safeSql`${literal(identifier.id)}`
-    } else if ('name' in identifier && identifier.name && identifier.schema) {
-      targetOid = safeSql`(select tc.oid from pg_class tc join pg_namespace tn on tn.oid = tc.relnamespace where tc.relname = ${literal(identifier.name)} and tn.nspname = ${literal(identifier.schema)})`
-    } else {
-      throw new Error('Must provide either id or name and schema')
-    }
-    const scopedTables = getTablesSql(targetOid)
-    const scopedColumns = getColumnsSql({
-      filter: { column: 'oid', predicate: safeSql`= ${targetOid}` },
-    })
-    const sql = safeSql`
+  // Resolve the target OID once (initplan) and push it into both enrichment
+  // CTEs so sizes / PKs / relationships / columns are for this relation only.
+  let targetOid: SafeSqlFragment
+  if ('id' in identifier && identifier.id) {
+    targetOid = safeSql`${literal(identifier.id)}`
+  } else if ('name' in identifier && identifier.name && identifier.schema) {
+    targetOid = safeSql`(select tc.oid from pg_class tc join pg_namespace tn on tn.oid = tc.relnamespace where tc.relname = ${literal(identifier.name)} and tn.nspname = ${literal(identifier.schema)})`
+  } else {
+    throw new Error('Must provide either id or name and schema')
+  }
+  const scopedTables = getTablesSql(targetOid)
+  const scopedColumns = getColumnsSql({
+    filter: { column: 'oid', predicate: safeSql`= ${targetOid}` },
+  })
+  const sql = safeSql`
   with tables as (${scopedTables})
   , columns as (${scopedColumns})
   select
     *
     , ${coalesceRowsToArray('columns', safeSql`columns.table_id = tables.id`, safeSql`columns.ordinal_position`)}
   from tables where ${whereClause};`
-    return {
-      sql,
-      zod: pgTableZod,
-    }
-  }
-
-  const sql = safeSql`${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
     zod: pgTableZod,

@@ -1,7 +1,14 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, FormField, Switch } from 'ui'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DASHBOARD_LOG_CATEGORIES } from './dashboard-logs'
@@ -33,7 +40,6 @@ export function DashboardLogsToggle({
       render={({ field }) => (
         <FormItemLayout
           hideMessage
-          name="attachDashboardLogs"
           className={className}
           layout="flex"
           align={align}
@@ -53,7 +59,7 @@ export function DashboardLogsToggle({
                     'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                   }
                 >
-                  <ChevronRight
+                  <ChevronRightIcon
                     size={14}
                     className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                   />
@@ -68,12 +74,9 @@ export function DashboardLogsToggle({
             </div>
           }
         >
-          <Switch
-            size="large"
-            id="attachDashboardLogs"
-            checked={field.value}
-            onCheckedChange={field.onChange}
-          />
+          <FormControl>
+            <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+          </FormControl>
         </FormItemLayout>
       )}
     />

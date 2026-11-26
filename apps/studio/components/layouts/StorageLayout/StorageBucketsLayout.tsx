@@ -1,6 +1,5 @@
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -15,7 +14,14 @@ import {
 
 import { BUCKET_TYPES } from '@/components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from '@/components/interfaces/Storage/Storage.utils'
+import { URL_SIGNING_KEYS_PAGE } from '@/components/interfaces/Storage/UrlSigningKeys/UrlSigningKeys.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
+
+const getPageHeaderConfig = (page: ReturnType<typeof useStorageV2Page>) => {
+  if (page === 'signing-keys') return URL_SIGNING_KEYS_PAGE
+  if (page === undefined || page === 's3') return undefined
+  return BUCKET_TYPES[page]
+}
 
 export const StorageBucketsLayout = ({
   title,
@@ -23,28 +29,28 @@ export const StorageBucketsLayout = ({
   children,
 }: PropsWithChildren<{ title?: string; hideSubtitle?: boolean }>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const matchRoute = useMatchRoute()
   const page = useStorageV2Page()
-  const config = !!page && page !== 's3' ? BUCKET_TYPES[page] : undefined
+  const config = getPageHeaderConfig(page)
 
   const navigationItems =
     page === 'files'
       ? [
           {
             label: 'Buckets',
-            href: `/project/${ref}/storage/files`,
+            to: '/project/$ref/storage/files' as const,
           },
           ...(IS_PLATFORM
             ? [
                 {
                   label: 'Settings',
-                  href: `/project/${ref}/storage/files/settings`,
+                  to: '/project/$ref/storage/files/settings' as const,
                 },
               ]
             : []),
           {
             label: 'Policies',
-            href: `/project/${ref}/storage/files/policies`,
+            to: '/project/$ref/storage/files/policies' as const,
           },
         ]
       : []
@@ -71,8 +77,17 @@ export const StorageBucketsLayout = ({
           <PageHeaderNavigationTabs>
             <NavMenu>
               {navigationItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
+                  <Link
+                    to={item.to}
+                    params={{ ref: ref ?? '_' }}
+                    activeOptions={{ exact: true, includeSearch: false }}
+                  >
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>

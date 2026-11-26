@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { ChangeEvent, ComponentProps, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -14,14 +13,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from '@/data/database/database-password-reset-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
@@ -45,16 +45,9 @@ export const ResetDbPasswordDialog = ({
 }: ResetDbPasswordDialogProps) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { data: project } = useSelectedProjectQuery()
 
-  const { can: canResetDbPassword } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canResetDbPassword } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE
   )
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
@@ -155,6 +148,10 @@ export const ResetDbPasswordDialog = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="w-full space-y-8">
+          <Admonition type="warning" title="This password is shared across every connection method">
+            Resetting it will disconnect the pooler, read replicas, and any app, ORM, or tool still
+            using the old password. Update it everywhere before switching over.
+          </Admonition>
           <FormItemLayout
             layout="vertical"
             isReactForm={false}
@@ -180,11 +177,7 @@ export const ResetDbPasswordDialog = ({
           </FormItemLayout>
         </DialogSection>
         <DialogFooter>
-          <Button
-            variant="default"
-            disabled={isUpdatingPassword}
-            onClick={() => setShowResetDbPass(false)}
-          >
+          <Button disabled={isUpdatingPassword} onClick={() => setShowResetDbPass(false)}>
             Cancel
           </Button>
           <Button

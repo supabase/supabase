@@ -1,19 +1,21 @@
 import { cn } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import { InvoicesSection } from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
-import CostControl from './CostControl/CostControl'
+import { CostControl } from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
 import Subscription from './Subscription/Subscription'
-import {
-  ScaffoldContainer,
-  ScaffoldContainerLegacy,
-  ScaffoldDivider,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
+import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -44,34 +46,38 @@ export const BillingSettings = () => {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Billing</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Billing</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-      <ScaffoldContainer id="subscription" className={cn('[&>div]:pt-0!')}>
+      <PageContainer id="subscription" className={cn('[&>div]:pt-0!')}>
         <Subscription />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="cost-control">
+      <PageContainer id="cost-control">
         <CostControl />
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ScaffoldDivider />
 
       {org && org.plan.id !== 'free' && (
-        <ScaffoldContainer id="breakdown">
+        <PageContainer id="breakdown">
           <BillingBreakdown />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
 
       {isBillingInvoicesEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
-          <ScaffoldContainer id="invoices">
+          <PageContainer id="invoices">
             <InvoicesSection />
-          </ScaffoldContainer>
+          </PageContainer>
         </>
       )}
 
@@ -79,9 +85,9 @@ export const BillingSettings = () => {
         <>
           <ScaffoldDivider />
 
-          <ScaffoldContainer id="payment-methods">
+          <PageContainer id="payment-methods">
             <PaymentMethods />
-          </ScaffoldContainer>
+          </PageContainer>
         </>
       )}
 
@@ -89,9 +95,9 @@ export const BillingSettings = () => {
         <>
           <ScaffoldDivider />
 
-          <ScaffoldContainer id="credits-balance">
+          <PageContainer id="credits-balance">
             <CreditBalance />
-          </ScaffoldContainer>
+          </PageContainer>
         </>
       )}
 
@@ -99,15 +105,15 @@ export const BillingSettings = () => {
         <>
           <ScaffoldDivider />
 
-          <ScaffoldContainer id="email">
+          <PageContainer id="email">
             <BillingEmail />
-          </ScaffoldContainer>
+          </PageContainer>
 
           <ScaffoldDivider />
 
-          <ScaffoldContainer id="address">
+          <PageContainer id="address">
             <BillingCustomerData />
-          </ScaffoldContainer>
+          </PageContainer>
         </>
       )}
     </>

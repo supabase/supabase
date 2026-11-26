@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { customDomainKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainCreateVariables = {
   projectRef: string
@@ -17,6 +18,7 @@ export async function createCustomDomain({
   const { data, error } = await post(`/v1/projects/{ref}/custom-hostname/initialize`, {
     params: { path: { ref: projectRef } },
     body: { custom_hostname: customDomain },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -30,12 +32,12 @@ export const useCustomDomainCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>,
+  UseCustomMutationOptions<CustomDomainCreateData, StudioError, CustomDomainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>({
+  return useMutation<CustomDomainCreateData, StudioError, CustomDomainCreateVariables>({
     mutationFn: (vars) => createCustomDomain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

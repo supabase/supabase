@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 
 import { createSupportStorageClient } from './support-storage-client'

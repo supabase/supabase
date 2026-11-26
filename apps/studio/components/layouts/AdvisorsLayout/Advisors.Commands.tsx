@@ -1,16 +1,28 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+import type { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 
 export function useAdvisorsGoToCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
     [
+      ...(isHealthAdvisorEnabled
+        ? [
+            {
+              id: 'nav-advisors-health',
+              name: 'Health Advisor',
+              route: `/project/${ref}/advisors/health`,
+              defaultHidden: true,
+            } satisfies IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-advisors-security',
         name: 'Security Advisor',
@@ -24,6 +36,6 @@ export function useAdvisorsGoToCommands(options?: CommandOptions) {
         defaultHidden: true,
       },
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [ref, isHealthAdvisorEnabled] }
   )
 }

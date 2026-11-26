@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { PageTelemetry, posthogClient, useParams, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
@@ -6,6 +6,7 @@ import { useConsentToast } from 'ui-patterns/consent'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
+import { IS_SESSION_REPLAY_ENABLED, SESSION_REPLAY_CONFIG } from '@/lib/session-replay'
 
 export function Telemetry() {
   // Although this is "technically" breaking the rules of hooks
@@ -67,9 +68,11 @@ export function Telemetry() {
   return (
     <PageTelemetry
       API_URL={API_URL}
+      platform="studio"
       hasAcceptedConsent={hasAcceptedConsent}
       enabled={IS_PLATFORM}
       organizationSlug={organization?.slug}
+      sessionReplay={IS_SESSION_REPLAY_ENABLED ? SESSION_REPLAY_CONFIG : undefined}
     />
   )
 }

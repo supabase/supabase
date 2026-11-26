@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tracing',
+          href: '/docs/ui-patterns/tracing',
+          items: [],
+        },
+        {
           title: 'Connect Interstitials',
           href: '/docs/ui-patterns/connect-interstitials',
           items: [],
@@ -128,8 +133,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Collapsible Alert',
-          href: '/docs/fragments/collapsible-alert',
+          title: 'Code Block',
+          href: '/docs/fragments/code-block',
           items: [],
         },
         {
@@ -223,6 +228,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'AI Tools',
+          href: '/docs/fragments/ai-tools',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],
@@ -245,6 +255,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Single Value Field Array',
           href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Skip to Content',
+          href: '/docs/fragments/skip-to-content',
           items: [],
         },
       ],

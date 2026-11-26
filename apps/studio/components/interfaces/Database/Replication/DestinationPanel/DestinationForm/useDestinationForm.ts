@@ -4,38 +4,31 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
-import { CREATE_NEW_NAMESPACE, DEFAULT_MAX_FILL_MS } from './DestinationForm.constants'
+import { DEFAULT_MAX_FILL_MS } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   buildBatchConfig,
   buildDestinationConfig,
-  buildDestinationConfigForValidation,
   buildTableSyncCopyConfig,
 } from './DestinationForm.utils'
-import {
-  useCreateDestinationPipelineMutation,
-  type BatchConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
+import { useDestinationValidation } from './useDestinationValidation'
+import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
-import {
-  useValidateDestinationMutation,
-  type ValidationFailure,
-} from '@/data/replication/validate-destination-mutation'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
-import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
-import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
-  const { setRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
   const [destinationValidationFailures, setDestinationValidationFailures] = useState<
@@ -48,17 +41,13 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
-  const { mutateAsync: validateDestination, isPending: isValidatingDestination } =
-    useValidateDestinationMutation()
+  const { validateDestination, isValidatingDestination } = useDestinationValidation({
+    projectRef,
+    selectedType,
+  })
 
   const { mutateAsync: validatePipeline, isPending: isValidatingPipeline } =
     useValidatePipelineMutation()
-
-  const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
-    useS3AccessKeyCreateMutation()
-
-  const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation()
 
   const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
@@ -70,33 +59,14 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       onError: () => {},
     })
 
-  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
 
   const isValidating = isValidatingDestination || isValidatingPipeline
 
   const isSaving =
-    creatingDestinationPipeline ||
-    updatingDestinationPipeline ||
-    startingPipeline ||
-    isCreatingS3AccessKey ||
-    isCreatingNamespace ||
-    isValidating
-
-  // Helper function to handle namespace creation if needed
-  const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
-    if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) throw new Error('New namespace name is required')
-
-      await createNamespace({
-        projectRef,
-        warehouse: data.warehouseName!,
-        namespace: data.newNamespaceName,
-      })
-
-      return data.newNamespaceName
-    }
-    return data.namespace
-  }
+    creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline || isValidating
 
   const resetValidation = useCallback(() => {
     setHasRunValidation(false)
@@ -131,12 +101,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     // even if one fails - this makes the validation feel like a single operation
     const results = await Promise.allSettled([
       validateDestination({
-        projectRef,
-        destinationConfig: buildDestinationConfigForValidation({
-          projectRef,
-          selectedType,
-          data,
-        }),
+        data,
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
@@ -216,15 +181,13 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     const editMode = !!existingDestination
 
     try {
-      const destinationConfig = await buildDestinationConfig({
+      const destinationConfig = buildDestinationConfig({
         projectRef,
         selectedType,
         data,
-        createS3AccessKey,
-        resolveNamespace,
       })
 
-      if (!destinationConfig) throw new Error('Destination configuration is missing')
+      if (!destinationConfig) throw new Error('Destination configuration is missing.')
 
       const shouldSendBatch =
         !editMode || data.maxFillMs !== (existingBatch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS)
@@ -250,41 +213,35 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       }
 
       if (editMode && existingDestination) {
-        if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
+        const pipelineId = existingDestination.pipelineId
+        if (!pipelineId) return console.error('Pipeline id is required')
 
-        await updateDestinationPipeline(
-          {
-            destinationId: existingDestination.destinationId,
-            pipelineId: existingDestination.pipelineId,
-            projectRef,
-            destinationName: data.name,
-            destinationConfig,
-            pipelineConfig,
-            sourceId,
-          },
-          { onSuccess }
+        const update = () =>
+          updateDestinationPipeline(
+            {
+              destinationId: existingDestination.destinationId,
+              pipelineId,
+              projectRef,
+              destinationName: data.name,
+              destinationConfig,
+              pipelineConfig,
+              sourceId,
+            },
+            { onSuccess }
+          )
+
+        await runWithRequestStatus(
+          pipelineId,
+          existingDestination.enabled
+            ? PipelineStatusRequestStatus.StopRequested
+            : PipelineStatusRequestStatus.None,
+          update
         )
-
-        // Set request status only right before starting, then fire and close
-        const snapshot =
-          existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
-        if (existingDestination.enabled) {
-          // The pipeline restarts automatically on the backend when its config is updated
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.RestartRequested,
-            snapshot
-          )
-          toast.success('Settings applied. Restarting the pipeline...')
-        } else {
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.StartRequested,
-            snapshot
-          )
-          toast.success('Settings applied. Starting the pipeline...')
-          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
-        }
+        toast.success(
+          existingDestination.enabled
+            ? 'Settings applied.'
+            : 'Settings applied. The pipeline remains stopped.'
+        )
         onClose()
       } else {
         const { pipeline_id: pipelineId } = await createDestinationPipeline(
@@ -297,19 +254,22 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           },
           { onSuccess }
         )
-        // Set request status only right before starting, then fire and close
-        setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
-        toast.success('Pipeline created. Starting the pipeline...')
-        startPipeline({ projectRef, pipelineId })
+        // Creation has committed. Close the form even if starting fails, so retrying cannot
+        // create a duplicate pipeline; the new row offers its own start action.
         onClose()
+        await runWithRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, () =>
+          startPipeline({ projectRef, pipelineId })
+        )
+        toast.success('Pipeline created. Starting…')
       }
     } catch (error) {
-      const action = editMode
-        ? existingDestination?.enabled
+      let action = 'create and start pipeline'
+      if (editMode) {
+        action = existingDestination?.enabled
           ? 'apply changes and restart pipeline'
-          : 'apply changes and start pipeline'
-        : 'create and start pipeline'
-      toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
+          : 'apply changes'
+      }
+      toast.error(`Failed to ${action}: ${(error as StudioError).message}`)
     }
   }
 

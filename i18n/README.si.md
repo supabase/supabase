@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) යනු විවෘත පරිශීලක Firebase වෙනුවට ආදේශකයකි.අපි Firebase වල ඇති පහසුකම් enterprise-grade විවෘත පරිශීලක මෘදුකාංග භාවිතා කරමින් නිපදවනු ලබයි.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api)
@@ -48,15 +48,15 @@ Supabase යනු විවෘත පරිශීලක උපාංග කි�
 **Architecture**
 
 Supabase යනු [hosted platform](https://supabase.com/dashboard). ඔබට කිසිවක් ස්ථාපනය නොකර ලියාපදිංචි වී Supabase භාවිතා කිරීම ආරම්භ කළ හැකිය.
-ඔබට [self-host](https://supabase.com/docs/guides/hosting/overview) සහ [develop locally](https://supabase.com/docs/guides/local-development) කළ හැකිය.
+ඔබට [self-host](https://supabase.com/docs/guides/self-hosting) සහ [develop locally](https://supabase.com/docs/guides/local-development) කළ හැකිය.
 
-![Architecture](apps/docs/public/img/supabase-architecture.svg)
+![Architecture](https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) යනු අවුරුදු 30 වඩා කාලයක් ක්‍රියාත්මක වෙමින් පවතින object-relational database system එකක් වන අතර එය විශ්වාසනීයත්වයට,ක්‍රියාකාරීත්වයට හා feature robustness බවට කීර්තියක් අත්පත්කරගෙන සිටියි
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) යනු PostgreSQL database කෙලින්ම RESTful API එකක් බවට පරිවර්තනය කරන web server එකකි.
 - [GoTrue](https://github.com/netlify/gotrue) JWT tokens භාවිත කරන්නන්ව හැසිරවීමට JWT ආශ්‍රිත APi එකකි.
-- [Storage](https://github.com/supabase/storage-api) S3 වල ගබඩා කර ඇති files හසුරවන්න RESTful interface එකක් ලබාදීම, Postgres භාවිත කරමින් අවසරයන් හැසිරවීමට
+- [Storage](https://github.com/supabase/storage) S3 වල ගබඩා කර ඇති files හසුරවන්න RESTful interface එකක් ලබාදීම, Postgres භාවිත කරමින් අවසරයන් හැසිරවීමට
 - [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
 - [postgres-meta](https://github.com/supabase/postgres-meta) Postgres හැසිරවීමට RESTful API එකක් ලබාදෙන අතර table වල දත්ත ලබාගැනීමට,roles add කිරීමට හා queries run කිරීම කර දෙයි
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
@@ -76,9 +76,9 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -136,7 +136,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
   <!-- notranslate -->
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -205,7 +205,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 
 ## Badges
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -222,7 +222,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](https://supabase.com/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)

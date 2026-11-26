@@ -1,7 +1,9 @@
 import type { inferParserType } from 'nuqs'
 import type { ReactNode } from 'react'
+import type { z } from 'zod'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { querySearchParamsSchema, unifiedLogsScopeSchema } from './UnifiedLogs.schema'
 
 type Percentile = 50 | 75 | 90 | 95 | 99
 
@@ -12,7 +14,8 @@ export type LogsMeta = {
 export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefined
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
-export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'>
+export type UnifiedLogsScope = z.infer<typeof unifiedLogsScopeSchema>
+export type QuerySearchParamsType = z.infer<typeof querySearchParamsSchema>
 
 /** ----------------------------------------- */
 

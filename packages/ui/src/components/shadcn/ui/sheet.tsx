@@ -174,6 +174,7 @@ const SheetContent = React.forwardRef<
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side, size }), className)}
+      tabIndex={undefined}
       {...props}
     >
       {children}

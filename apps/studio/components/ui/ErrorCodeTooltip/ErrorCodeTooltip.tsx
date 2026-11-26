@@ -1,6 +1,5 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { useState } from 'react'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -9,7 +8,7 @@ import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
-import { Service } from '@/data/graphql/graphql'
+import type { Service } from '@/data/graphql/graphql'
 import { BASE_PATH } from '@/lib/constants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -92,7 +91,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
           >
             {docsUrl && (
               <div className="flex items-center gap-1.5">
-                <Image
+                <img
                   src={
                     resolvedTheme?.includes('dark')
                       ? `${BASE_PATH}/img/supabase-dark.svg`
@@ -102,7 +101,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
                   height={14}
                   width={72}
                 />
-                <span className="font-mono text-[11px] font-semibold text-brand tracking-wide">
+                <span className="font-mono text-[11px] font-semibold text-primary tracking-wide">
                   DOCS
                 </span>
               </div>
@@ -117,7 +116,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               additionalDropdownItems={[
                 {
                   label: 'Go to Docs',
-                  icon: <ExternalLink size={14} />,
+                  icon: <ExternalLinkIcon size={14} />,
                   href: docsUrl,
                 },
               ]}

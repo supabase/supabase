@@ -1,3 +1,7 @@
+import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
 import { Realtime } from 'icons'
 import {
   ArrowLeft,
@@ -14,13 +18,12 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, Button, Separator, cn } from 'ui'
-import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
+import { Badge, Button, cn, Separator } from 'ui'
+
+import { canonicalAlternates } from '@/lib/canonical'
 
 const githubUsers = [
   'aantti',
@@ -139,6 +142,10 @@ const especially = [
       'Help the team by writing docs, creating examples, and making sure our guides are up to date.',
   },
 ]
+
+export const metadata: Metadata = {
+  alternates: canonicalAlternates('/contribute/about'),
+}
 
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {

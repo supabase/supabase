@@ -4,9 +4,11 @@ import { toast } from 'sonner'
 import type { ProjectAuthConfigData } from './auth-config-query'
 import { authKeys } from './keys'
 import { type AuthTemplateResetType } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.types'
+import { configKeys } from '@/data/config/keys'
 import { handleError, post } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type AuthTemplateResetVariables = {
   projectRef: string
@@ -29,20 +31,23 @@ export const useAuthTemplateResetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuthTemplateResetData, ResponseError, AuthTemplateResetVariables>,
+  UseCustomMutationOptions<AuthTemplateResetData, StudioError, AuthTemplateResetVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthTemplateResetData, ResponseError, AuthTemplateResetVariables>({
+  return useMutation<AuthTemplateResetData, StudioError, AuthTemplateResetVariables>({
     mutationFn: (vars) => resetAuthTemplate(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       queryClient.setQueryData<ProjectAuthConfigData>(authKeys.authConfig(projectRef), data)
-      await queryClient.invalidateQueries({
-        queryKey: authKeys.authConfig(projectRef),
-        refetchType: 'none',
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: authKeys.authConfig(projectRef),
+          refetchType: 'none',
+        }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
 
       void queryClient

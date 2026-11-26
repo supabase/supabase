@@ -1,10 +1,10 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLink, XIcon } from 'lucide-react'
-import Head from 'next/head'
+import { ExternalLinkIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
+import { ORG_SETTINGS_ROUTES } from './OrganizationLayout/OrganizationLayout.utils'
 import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -20,9 +20,6 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 interface OrganizationLayoutProps {
   title: string
 }
-
-// [Joshen] Just for page title generation for org settings pages
-const settingsPages = ['general', 'security', 'sso', 'apps', 'audit', 'documents']
 
 type MarketplaceBannerRedirectSource = 'vercel' | 'aws'
 
@@ -98,7 +95,7 @@ const OrganizationLayoutContent = ({
   )
 
   // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
-  const isSettingsSurface = settingsPages.some((x) => router.pathname.endsWith(x))
+  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => router.pathname.endsWith(x))
   const pageTitle = buildStudioPageTitle({
     section: title,
     surface: isSettingsSurface ? 'Organization Settings' : undefined,
@@ -134,10 +131,10 @@ const OrganizationLayoutContent = ({
   return (
     <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
       {pageTitle && (
-        <Head>
+        <>
           <title>{pageTitle}</title>
           <meta name="description" content="Supabase Studio" />
-        </Head>
+        </>
       )}
       {selectedOrganization && bannerConfig && !isBannerDismissed && (
         <Alert
@@ -151,7 +148,7 @@ const OrganizationLayoutContent = ({
           </div>
           <div className="flex items-center gap-2">
             {selectedRedirectQuery?.data?.url && (
-              <Button asChild variant="default" iconRight={<ExternalLink />}>
+              <Button asChild iconRight={<ExternalLinkIcon />}>
                 <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
                   Manage
                 </a>
@@ -168,7 +165,7 @@ const OrganizationLayoutContent = ({
           </div>
         </Alert>
       )}
-      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
+      <main className="relative h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
   )
 }

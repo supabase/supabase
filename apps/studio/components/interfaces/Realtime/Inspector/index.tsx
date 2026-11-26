@@ -19,7 +19,7 @@ export const RealtimeInspector = () => {
   const { data: project } = useSelectedProjectQuery()
 
   // Check if realtime publications are available
-  const { data: publications } = useDatabasePublicationsQuery({
+  const { data: publications, isSuccess: isPublicationsSuccess } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -54,6 +54,11 @@ export const RealtimeInspector = () => {
 
   const hasChannel = realtimeConfig.channelName.length > 0
   const isListening = realtimeConfig.enabled
+
+  // Only show setup guidance once publications confirm that Postgres Changes
+  // is not configured. An empty Inspector session does not imply Realtime is unused.
+  const showMessagesTable =
+    !isPublicationsSuccess || isRealtimeAvailable || hasChannel || (logData ?? []).length > 0
 
   const handleJoinChannel = useCallback(() => {
     if (!hasChannel) {
@@ -98,7 +103,7 @@ export const RealtimeInspector = () => {
       />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          {(logData ?? []).length > 0 ? (
+          {showMessagesTable ? (
             <MessagesTable
               hasChannelSet={hasChannel}
               enabled={isListening}

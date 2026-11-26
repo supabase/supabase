@@ -1,4 +1,4 @@
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
@@ -17,7 +17,8 @@ interface NoDataPlaceholderProps {
   hideTotalPlaceholder?: boolean
   docsUrl?: string
 }
-const NoDataPlaceholder = ({
+
+export const NoDataPlaceholder = ({
   attribute,
   message = 'No data to show',
   description,
@@ -51,7 +52,7 @@ const NoDataPlaceholder = ({
         // extra 20 px for the x ticks
         style={{ minHeight: minHeight + 20 }}
       >
-        <BarChart2 size={20} className="text-border-stronger" />
+        <BarChart2Icon size={20} className="text-border-stronger" />
         <div className="px-1">
           <p className="text-foreground-light text-xs">{message}</p>
           {description && <p className="text-foreground-lighter text-xs">{description}</p>}
@@ -60,4 +61,3 @@ const NoDataPlaceholder = ({
     </div>
   )
 }
-export default NoDataPlaceholder

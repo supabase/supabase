@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { authKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserDeleteVariables = {
   projectRef: string
@@ -26,12 +27,12 @@ export const useUserDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserDeleteData, ResponseError, UserDeleteVariables>,
+  UseCustomMutationOptions<UserDeleteData, StudioError, UserDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UserDeleteData, ResponseError, UserDeleteVariables>({
+  return useMutation<UserDeleteData, StudioError, UserDeleteVariables>({
     mutationFn: (vars) => deleteUser(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, skipInvalidation = false } = variables

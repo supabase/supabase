@@ -4,8 +4,9 @@ import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pric
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsomorphicLayoutEffect } from 'common'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import {
@@ -20,6 +21,7 @@ import {
 } from 'ui'
 
 import UpgradePlan from './UpgradePlan'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const MobileHeader = ({
   description,
@@ -45,10 +47,21 @@ const MobileHeader = ({
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
+  const trackPlanCtaClick = () =>
+    sendTelemetryEvent({
+      action: 'www_pricing_plan_cta_clicked',
+      properties: {
+        plan,
+        showUpgradeText: false,
+        section: 'comparison_table',
+        tableMode: 'mobile',
+      },
+      ...(orgSlug && { groups: { organization: orgSlug } }),
+    })
 
   return (
     <div className="mt-8 px-4 mobile-header">
-      <h2 className="text-foreground text-3xl font-medium uppercase font-mono">{plan}</h2>
+      <h2 className="text-foreground text-3xl font-medium font-mono">{plan}</h2>
       <div className="flex items-baseline gap-2">
         {from && <span className="text-foreground text-base">From</span>}
         {showDollarSign ? (
@@ -82,24 +95,16 @@ const MobileHeader = ({
           planId={selectedPlan.planId}
         />
       ) : (
-        <Button asChild size="medium" variant={plan === 'Enterprise' ? 'default' : 'primary'} block>
-          <Link
-            href={selectedPlan.href}
-            onClick={() =>
-              sendTelemetryEvent({
-                action: 'www_pricing_plan_cta_clicked',
-                properties: {
-                  plan,
-                  showUpgradeText: false,
-                  section: 'comparison_table',
-                  tableMode: 'mobile',
-                },
-                ...(orgSlug && { groups: { organization: orgSlug } }),
-              })
-            }
-          >
-            {selectedPlan.cta}
-          </Link>
+        <Button asChild size="medium" variant={plan === 'Pro' ? 'primary' : 'default'} block>
+          {isCrossZoneHref(selectedPlan.href) ? (
+            <a href={selectedPlan.href} onClick={trackPlanCtaClick}>
+              {selectedPlan.cta}
+            </a>
+          ) : (
+            <Link href={selectedPlan.href} onClick={trackPlanCtaClick}>
+              {selectedPlan.cta}
+            </Link>
+          )}
         </Button>
       )}
     </div>
@@ -119,6 +124,23 @@ const PricingComparisonTable = ({
 
   const sendTelemetryEvent = useSendTelemetryEvent()
   const orgSlug = organizations?.[0]?.slug
+
+  const tableRef = useRef<HTMLTableElement>(null)
+  const theadRef = useRef<HTMLTableSectionElement>(null)
+
+  useIsomorphicLayoutEffect(() => {
+    const table = tableRef.current
+    const thead = theadRef.current
+    if (!table || !thead) return
+
+    const observer = new ResizeObserver(() => {
+      const theadTop = parseFloat(getComputedStyle(thead).top) || 0
+      const categoryTop = Math.floor(theadTop + thead.getBoundingClientRect().height)
+      table.style.setProperty('--pricing-category-top', `${categoryTop}px`)
+    })
+    observer.observe(thead)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <div
@@ -372,9 +394,9 @@ const PricingComparisonTable = ({
 
       {/* <!-- lg+ --> */}
       <div className="hidden lg:block">
-        <table className="h-px w-full table-fixed">
+        <table ref={tableRef} className="h-px w-full table-fixed">
           <caption className="sr-only">Pricing plan comparison</caption>
-          <thead className="bg-background sticky top-[62px] z-10">
+          <thead ref={theadRef} className="bg-background sticky top-[62px] z-10">
             <tr>
               <th
                 className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
@@ -389,6 +411,17 @@ const PricingComparisonTable = ({
 
               {plans.map((plan) => {
                 const isUpgradablePlan = plan.name === 'Pro' || plan.name === 'Team'
+                const trackPlanCtaClick = () =>
+                  sendTelemetryEvent({
+                    action: 'www_pricing_plan_cta_clicked',
+                    properties: {
+                      plan: plan.name,
+                      showUpgradeText: false,
+                      section: 'comparison_table',
+                      tableMode: 'desktop',
+                    },
+                    ...(orgSlug && { groups: { organization: orgSlug } }),
+                  })
 
                 return (
                   <th
@@ -397,8 +430,8 @@ const PricingComparisonTable = ({
                     key={plan.name}
                   >
                     <span className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
-                      <span className="flex flex-col xl:flex-row xl:items-end gap-1">
-                        <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 uppercase font-mono font-normal flex items-center">
+                      <span className="flex flex-col xl:flex-row xl:items-baseline gap-1">
+                        <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 font-mono font-medium flex items-center">
                           {plan.name}
                         </h3>
                         <p
@@ -442,26 +475,18 @@ const PricingComparisonTable = ({
                           <Button
                             asChild
                             size="tiny"
-                            variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                            variant={plan.name === 'Pro' ? 'primary' : 'default'}
                             block
                           >
-                            <Link
-                              href={plan.href}
-                              onClick={() =>
-                                sendTelemetryEvent({
-                                  action: 'www_pricing_plan_cta_clicked',
-                                  properties: {
-                                    plan: plan.name,
-                                    showUpgradeText: false,
-                                    section: 'comparison_table',
-                                    tableMode: 'desktop',
-                                  },
-                                  ...(orgSlug && { groups: { organization: orgSlug } }),
-                                })
-                              }
-                            >
-                              {plan.cta}
-                            </Link>
+                            {isCrossZoneHref(plan.href) ? (
+                              <a href={plan.href} onClick={trackPlanCtaClick}>
+                                {plan.cta}
+                              </a>
+                            ) : (
+                              <Link href={plan.href} onClick={trackPlanCtaClick}>
+                                {plan.cta}
+                              </Link>
+                            )}
                           </Button>
                         )}
                       </span>
@@ -471,7 +496,7 @@ const PricingComparisonTable = ({
               })}
             </tr>
           </thead>
-          <tbody className="border-default divide-border divide-y first:divide-y-0">
+          <tbody className="*:not-first:*:groove-page">
             <PricingTableRowDesktop
               category={pricing.database}
               icon={Solutions['database'].icon}

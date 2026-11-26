@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SendDowngradeFeedbackVariables = {
   projectRef?: string
@@ -38,14 +39,10 @@ export const useSendDowngradeFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    SendDowngradeFeedbackData,
-    ResponseError,
-    SendDowngradeFeedbackVariables
-  >,
+  UseCustomMutationOptions<SendDowngradeFeedbackData, StudioError, SendDowngradeFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>({
+  return useMutation<SendDowngradeFeedbackData, StudioError, SendDowngradeFeedbackVariables>({
     mutationFn: (vars) => sendDowngradeFeedback(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

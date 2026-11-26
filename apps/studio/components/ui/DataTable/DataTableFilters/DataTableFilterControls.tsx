@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 import { DateRangeDisabled } from '../DataTable.types'
@@ -27,13 +27,13 @@ export function DataTableFilterControls({
   itemsAfter,
 }: DataTableFilterControls) {
   const { filterFields, isLoadingCounts } = useDataTable()
+  const [openFilters, setOpenFilters] = useState<string[]>(
+    () =>
+      filterFields?.filter(({ defaultOpen }) => defaultOpen)?.map(({ value }) => value as string) ??
+      []
+  )
   return (
-    <Accordion
-      type="multiple"
-      defaultValue={filterFields
-        ?.filter(({ defaultOpen }) => defaultOpen)
-        ?.map(({ value }) => value as string)}
-    >
+    <Accordion type="multiple" value={openFilters} onValueChange={setOpenFilters}>
       {filterFields
         ?.filter((field) => !field.hidden)
         .map((field) => {
@@ -41,8 +41,8 @@ export function DataTableFilterControls({
           return (
             <Fragment key={value}>
               <AccordionItem value={value} className="border-none">
-                <div className="flex items-center gap-2 pr-2">
-                  <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+                <div className="flex items-center gap-2 px-2">
+                  <AccordionTrigger className="flex-1 px-0 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
                     <div className="flex items-center gap-2 truncate py-2">
                       <p className="text-sm">{field.label}</p>
                     </div>
@@ -50,18 +50,16 @@ export function DataTableFilterControls({
                   <DataTableFilterResetButton {...field} />
                 </div>
                 <AccordionContent>
-                  {/* REMINDER: avoid the focus state to be cut due to overflow-hidden */}
-                  {/* REMINDER: need to move within here because of accordion height animation */}
-                  <div className="p-1">
+                  <div className="py-1 px-2">
                     {(() => {
                       switch (field.type) {
                         case 'checkbox': {
-                          // [Joshen] Loader here so that CheckboxAsync can retrieve the data
-                          // immediately to be set in its react query state
-                          if (field.hasDynamicOptions && isLoadingCounts) {
+                          if (field.hasDynamicOptions && !field.hasAsyncSearch && isLoadingCounts) {
                             return <DataTableFilterCheckboxLoader />
                           } else if (field.hasAsyncSearch) {
-                            return <DataTableFilterCheckboxAsync {...field} />
+                            return openFilters.includes(value) ? (
+                              <DataTableFilterCheckboxAsync {...field} />
+                            ) : null
                           } else {
                             return <DataTableFilterCheckbox {...field} />
                           }

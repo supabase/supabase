@@ -2,7 +2,7 @@
 
 import staticContent from '.generated/staticContent/_index.json'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useInView } from 'framer-motion'
+import { useInView } from 'motion/react'
 import Link from 'next/link'
 import { useRef } from 'react'
 import { Button } from 'ui'
@@ -55,7 +55,7 @@ const COLS = 72
 const ROWS = 40
 
 const githubStars = staticContent.githubStars
-const TEXT = kFormatter(githubStars)
+const TEXT = typeof githubStars === 'number' && githubStars > 0 ? kFormatter(githubStars) : ''
 const TEXT_MASK = textToPixelMask(TEXT)
 const TEXT_W = TEXT.length * 6 - 1
 const TEXT_H = 7
@@ -170,7 +170,6 @@ export function OpenSourceSection() {
               <Button
                 asChild
                 size="small"
-                variant="default"
                 icon={
                   <svg viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path

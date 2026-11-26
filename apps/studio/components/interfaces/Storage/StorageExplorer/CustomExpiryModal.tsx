@@ -147,9 +147,7 @@ export const CustomExpiryModal = () => {
             )}
           </DialogSection>
           <DialogFooter>
-            <Button variant="default" onClick={handleClose}>
-              Cancel
-            </Button>
+            <Button onClick={handleClose}>Cancel</Button>
             <Button
               form={formId}
               disabled={!isDirty || isSubmitting}

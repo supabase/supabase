@@ -284,17 +284,19 @@ When using WebSockets, keep in mind that the HTTP request is considered complete
 while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise
 that resolves in `socket.onclose`.
 
+If WebSocket connections drop unexpectedly, see [Edge Functions worker timeouts and WebSocket drops](/kb/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops).
+
 ---
 
 ## Testing WebSockets locally
 
-When testing Edge Functions locally with Supabase CLI, the instances are terminated
+When testing Edge Functions locally with [Supabase CLI](/docs/guides/local-development/cli/getting-started), the instances are terminated
 automatically after a request is completed. This will prevent keeping WebSocket
 connections open.
 
-To prevent that, you can update the `supabase/config.toml` with the following settings:
+To prevent that, you can update your config file (`supabase/config.toml` or `supabase/config.jsonc`) with the following settings:
 
-```toml
+```toml supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```

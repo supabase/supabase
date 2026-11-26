@@ -20,33 +20,52 @@ export const selfHostingGetStarted: ContentListingGroup = {
 
 export const selfHostingCommunity: ContentListingGroup = {
   id: 'self-hosting-community',
-  heading: 'Community-driven projects',
+  heading: 'Community projects',
   headingLevel: 'h2',
   type: 'grid',
   columns: 2,
   description:
-    "There are several other options to deploy Supabase. If you're interested in helping these projects, visit our Community page.",
+    'These projects are maintained by the Supabase community, not by Supabase. To get involved, see the [Community page](https://supabase.com/contribute).',
   items: [
     {
       title: 'Kubernetes',
       href: 'https://github.com/supabase-community/supabase-kubernetes',
       icon: '/docs/img/icons/kubernetes-icon',
       hasLightIcon: false,
-      description: 'Helm charts to deploy a Supabase on Kubernetes.',
+      description: 'Run Supabase on Kubernetes with the Supabase Operator or a Helm chart.',
     },
     {
-      title: 'Traefik',
-      href: 'https://github.com/supabase-community/supabase-traefik',
-      icon: '/docs/img/icons/traefik-icon',
-      hasLightIcon: false,
-      description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
+      title: 'Observability',
+      href: 'https://github.com/supabase-community/supabase-observability',
+      icon: { kind: 'grafana', color: '#F05A28', bg: 'rgba(240,90,40,0.1)' },
+      description:
+        'Collect logs, metrics, and traces from self-hosted Supabase with open-source tools.',
     },
   ],
 }
 
-export const selfHostingResolveIssues: ContentListingGroup = {
-  id: 'self-hosting-resolve-issues',
-  description: 'For resolving common issues:',
+export const selfHostingThirdPartyGuides: ContentListingGroup = {
+  id: 'self-hosting-third-party-guides',
+  heading: 'Third-party guides',
+  headingLevel: 'h2',
+  type: 'grid',
+  columns: 2,
+  description:
+    "Guides written by other projects and companies. Supabase doesn't maintain them, so check that they match your version of self-hosted Supabase.",
+  items: [
+    {
+      title: 'Secure self-hosted Supabase with NetBird',
+      href: 'https://netbird.io/knowledge-hub/supabase-self-hosted-netbird',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      subtitle: 'By NetBird',
+      description:
+        'Keep Studio and Postgres off the public internet with NetBird network access controls.',
+    },
+  ],
+}
+
+export const selfHostingSupport: ContentListingGroup = {
+  id: 'self-hosting-support',
   type: 'grid',
   columns: 2,
   items: [
@@ -54,51 +73,33 @@ export const selfHostingResolveIssues: ContentListingGroup = {
       title: 'GitHub Discussions',
       href: 'https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted',
       icon: '/docs/img/icons/github-icon',
-      description: 'Questions, feature requests, and workarounds',
+      description: 'Ask questions, resolve common issues, and make feature requests',
     },
     {
       title: 'GitHub Issues',
       href: 'https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted',
       icon: '/docs/img/icons/github-icon',
-      description: 'Known issues',
+      description: 'Find out about known issues and workarounds',
     },
-  ],
-}
-
-export const selfHostingGetHelp: ContentListingGroup = {
-  id: 'self-hosting-get-help',
-  description: 'Get help and connect with other users:',
-  type: 'grid',
-  columns: 2,
-  items: [
     {
       title: 'Discord',
       href: 'https://discord.supabase.com',
       icon: '/docs/img/icons/discord-icon',
       hasLightIcon: false,
-      description: 'Real-time chat and community support',
+      description: 'Connect with other users and get help',
     },
     {
       title: 'Reddit',
       href: 'https://www.reddit.com/r/Supabase/',
       icon: '/docs/img/icons/reddit-icon',
       hasLightIcon: false,
-      description: 'Official Supabase subreddit',
+      description: 'Join the official Supabase subreddit',
     },
-  ],
-}
-
-export const selfHostingShareExperience: ContentListingGroup = {
-  id: 'self-hosting-share-experience',
-  description: 'Share your self-hosting experience:',
-  type: 'grid',
-  columns: 2,
-  items: [
     {
-      title: 'GitHub Discussions',
+      title: 'Share your experience',
       href: 'https://github.com/orgs/supabase/discussions/39820',
       icon: '/docs/img/icons/github-icon',
-      description: "Self-hosting: What's working (and what's not)?",
+      description: 'Share your self-hosting experience',
     },
   ],
 }

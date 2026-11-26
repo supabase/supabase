@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import UserReportPage from '@/pages/project/[ref]/observability/index'
+import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'
 
 export const Route = createFileRoute('/project/$ref/observability/')({
-  component: ObservabilityIndexRoute,
+  component: UserReportPage,
   staticData: {
     observabilityLayoutTitle: 'Overview',
   },
 })
 
-function ObservabilityIndexRoute() {
-  return <UserReportPage dehydratedState={undefined} />
+function UserReportPage() {
+  return <ObservabilityOverview />
 }

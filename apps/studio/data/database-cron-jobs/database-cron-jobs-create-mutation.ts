@@ -3,8 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
+import { isUserFaultForValues } from '@/data/error-classification'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobCreateVariables = {
   projectRef: string
@@ -23,7 +26,12 @@ export async function createDatabaseCronJob({
     projectRef,
     connectionString,
     sql: query,
+    // Studio composes the statement; the user's name, schedule and command are string literals
+    sqlOrigin: 'studio',
+    queryName: 'database-cron-job-create',
+    isUserFaultSqlState: isUserFaultForValues,
     queryKey: databaseCronJobsKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -36,16 +44,12 @@ export const useDatabaseCronJobCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseCronJobCreateData,
-    ResponseError,
-    DatabaseCronJobCreateVariables
-  >,
+  UseCustomMutationOptions<DatabaseCronJobCreateData, StudioError, DatabaseCronJobCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>({
+  return useMutation<DatabaseCronJobCreateData, StudioError, DatabaseCronJobCreateVariables>({
     mutationFn: (vars) => createDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables

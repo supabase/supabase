@@ -1,7 +1,7 @@
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Input } from 'ui'
@@ -64,7 +64,7 @@ function GitHubDiscussionSuggestion({ subject }: GitHubDiscussionSuggestionProps
         className="flex items-center gap-x-1 underline hover:text-foreground transition"
       >
         GitHub discussions
-        <ExternalLink size={14} strokeWidth={2} />
+        <ExternalLinkIcon size={14} strokeWidth={2} />
       </Link>
       for a quick answer
     </p>

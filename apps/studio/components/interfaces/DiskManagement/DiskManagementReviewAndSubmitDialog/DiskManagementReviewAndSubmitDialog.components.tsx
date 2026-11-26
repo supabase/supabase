@@ -27,8 +27,12 @@ export const ValueChange = ({ from, to }: { from: string; to: string }) => (
 )
 
 export const PriceDelta = ({ delta }: { delta: number }) => (
-  <span className={cn('text-xs', delta >= 0 ? 'text-brand' : 'text-destructive')}>
-    {delta >= 0 ? `+${formatCurrency(delta)}` : `-${formatCurrency(Math.abs(delta))}`}{' '}
+  <span className={cn('text-xs', delta >= 0 ? 'text-primary' : 'text-destructive')}>
+    {delta >= 0 ? (
+      <span>{`+${formatCurrency(delta)}`}</span>
+    ) : (
+      <span>{`-${formatCurrency(Math.abs(delta))}`}</span>
+    )}{' '}
     <span className="text-foreground-lighter">per month</span>
   </span>
 )

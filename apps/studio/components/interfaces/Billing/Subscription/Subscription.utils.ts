@@ -22,8 +22,6 @@ export const billingPartnerLabel = (billingPartner?: string) => {
   if (!billingPartner) return billingPartner
 
   switch (billingPartner) {
-    case 'fly':
-      return 'Fly.io'
     case 'aws':
       return 'AWS'
     case 'vercel_marketplace':
@@ -33,7 +31,7 @@ export const billingPartnerLabel = (billingPartner?: string) => {
   }
 }
 
-type PlanChangeType = 'upgrade' | 'downgrade' | 'none'
+export type PlanChangeType = 'upgrade' | 'downgrade' | 'none'
 
 export const getPlanChangeType = (
   fromPlan: PlanId | undefined,

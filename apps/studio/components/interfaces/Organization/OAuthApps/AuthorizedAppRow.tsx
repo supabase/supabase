@@ -1,4 +1,4 @@
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { Button, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -43,12 +43,7 @@ export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps)
         />
       </TableCell>
       <TableCell className="text-right">
-        <Button
-          variant="default"
-          icon={<Trash />}
-          className="px-1"
-          onClick={() => onSelectRevoke()}
-        />
+        <Button icon={<TrashIcon />} className="px-1" onClick={() => onSelectRevoke()} />
       </TableCell>
     </TableRow>
   )

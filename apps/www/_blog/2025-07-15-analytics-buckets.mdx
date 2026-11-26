@@ -44,7 +44,7 @@ Once your project has been accepted into the alpha release program, Analytics bu
   src="/images/blog/launch-week-15/day-2-analytics-buckets/img1.png"
 />
 
-Analytics buckets are a separate bucket type from standard Supabase Storage buckets. You can't mix file types between the two.
+Analytics buckets are a separate bucket type from standard [Supabase Storage](/storage) buckets. You can't mix file types between the two.
 
 They're stored in a new system table: `storage.buckets_iceberg`. These buckets are not included in the `storage.buckets` table and objects inside them are not shown in `storage.objects`. However, the `listBuckets()` endpoint returns a merged list of standard and analytics buckets for consistency with Studio and API consumers.
 
@@ -53,7 +53,7 @@ They're stored in a new system table: `storage.buckets_iceberg`. These buckets a
   src="/images/blog/launch-week-15/day-2-analytics-buckets/img4.png"
 />
 
-After creating the bucket, we're met with connection details. Copy the `WAREHOUSE`, `VAULT_TOKEN`, and `CATALOG_URI` values and and create an Iceberg namespace and table using your preferred method. The example below uses pyiceberg to create a namespace `market` with table `prices`:
+After creating the bucket, we're met with connection details. Copy the `WAREHOUSE`, `VAULT_TOKEN`, and `CATALOG_URI` values and create an Iceberg namespace and table using your preferred method. The example below uses pyiceberg to create a namespace `market` with table `prices`:
 
 ```python
 import datetime

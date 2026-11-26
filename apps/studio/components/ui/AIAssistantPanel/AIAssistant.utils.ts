@@ -2,6 +2,10 @@ import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import {
+  isLogsSource,
+  sqlSourceToFenceLanguage,
+} from '@/components/interfaces/SQLEditor/querySource'
 import { authKeys } from '@/data/auth/keys'
 import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
 import { databaseIndexesKeys } from '@/data/database-indexes/keys'
@@ -11,8 +15,10 @@ import { databaseKeys } from '@/data/database/keys'
 import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
 import { handleError } from '@/data/fetchers'
 import { tableKeys } from '@/data/tables/keys'
+import { isManualApprovalRequested } from '@/lib/ai/message-utils'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { tryParseJson } from '@/lib/helpers'
-import { ResponseError } from '@/types'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 
 export type MutationCategory = 'functions' | 'rls-policies'
 
@@ -80,7 +86,7 @@ export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts
   return messages.some((message) => {
     if (message.role !== 'assistant') return false
 
-    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
+    return message.parts?.some((part) => isManualApprovalRequested(part))
   })
 }
 
@@ -146,9 +152,9 @@ export const onErrorChat = (error: Error) => {
   const parsedError = error ? tryParseJson(error.message) : undefined
 
   try {
-    handleError(parsedError?.error || parsedError || error)
+    handleError(parsedError?.error || parsedError || error, { reportImmediately: true })
   } catch (e: any) {
-    if (e instanceof ResponseError) {
+    if (isStudioError(e)) {
       toast.error(e.message)
     } else if (e instanceof Error) {
       toast.error(e.message)
@@ -158,4 +164,42 @@ export const onErrorChat = (error: Error) => {
       toast.error('An unknown error occurred')
     }
   }
+}
+
+export function containsLogsSnippets(snippets: readonly SqlSnippet[] | undefined): boolean {
+  return (snippets ?? []).some(
+    (snippet) => typeof snippet !== 'string' && isLogsSource(snippet.source)
+  )
+}
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string =>
+  typeof snippet === 'string' ? `Snippet ${index + 1}` : snippet.label
+
+export const getSnippetContent = (snippet: SqlSnippet): string =>
+  typeof snippet === 'string' ? snippet : snippet.content
+
+/**
+ * The fence language an attached query is written into the message with. A logs query
+ * is fenced as `clickhouse` so the model can tell which attachment is ClickHouse
+ * against the `logs` table — a single message can carry both dialects.
+ *
+ * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
+ * fence as runnable Postgres (`AssistantQueryCell`, branded with `untrustedSql`),
+ * which a ClickHouse query must never be offered as.
+ */
+function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
+  return sqlSourceToFenceLanguage(typeof snippet === 'string' ? undefined : snippet.source)
+}
+
+/**
+ * Renders attached queries as the fenced code blocks appended to the message text,
+ * each labelled with its own dialect.
+ */
+export function formatAttachedSnippets(snippets: readonly SqlSnippet[]): string {
+  return snippets
+    .map(
+      (snippet) =>
+        '```' + getSnippetFenceLanguage(snippet) + '\n' + getSnippetContent(snippet) + '\n```'
+    )
+    .join('\n')
 }

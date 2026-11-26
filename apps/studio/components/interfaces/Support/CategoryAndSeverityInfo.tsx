@@ -12,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { FreeMicroUpgradeSuggestion } from './FreeMicroUpgradeSuggestion'
 import {
   CATEGORY_OPTIONS,
   SEVERITY_OPTIONS,
@@ -23,12 +24,14 @@ import {
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
+import type { OrganizationPlanID } from '@/data/organizations/organization-query'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
   category: ExtendedSupportCategories
   severity?: string
   projectRef: string
+  subscriptionPlanId?: OrganizationPlanID
   showSeverity?: boolean
   showIssueSuggestion?: boolean
 }
@@ -38,6 +41,7 @@ export function CategoryAndSeverityInfo({
   category,
   severity,
   projectRef,
+  subscriptionPlanId,
   showSeverity = true,
   showIssueSuggestion = true,
 }: CategoryAndSeverityInfoProps) {
@@ -50,7 +54,13 @@ export function CategoryAndSeverityInfo({
     >
       <CategorySelector form={form} />
       {showSeverity && <SeveritySelector form={form} />}
-      {showIssueSuggestion && <IssueSuggestion category={category} projectRef={projectRef} />}
+      {showIssueSuggestion && (
+        <IssueSuggestion
+          category={category}
+          projectRef={projectRef}
+          subscriptionPlanId={subscriptionPlanId}
+        />
+      )}
       {(severity === 'Urgent' || severity === 'High') && (
         <Admonition
           type="default"
@@ -91,7 +101,11 @@ function CategorySelector({ form }: CategorySelectorProps) {
           <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
             <FormControl>
               <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
-                <SelectTrigger aria-label="Select an issue" className="w-full">
+                <SelectTrigger
+                  data-support-field="category"
+                  aria-label="Select an issue"
+                  className="w-full"
+                >
                   <SelectValue placeholder="Select an issue">
                     {field.value
                       ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
@@ -162,7 +176,15 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
   )
 }
 
-const IssueSuggestion = ({ category, projectRef }: { category: string; projectRef?: string }) => {
+const IssueSuggestion = ({
+  category,
+  projectRef,
+  subscriptionPlanId,
+}: {
+  category: string
+  projectRef?: string
+  subscriptionPlanId?: OrganizationPlanID
+}) => {
   const baseUrl = `/project/${projectRef === NO_PROJECT_MARKER ? '_' : projectRef}`
 
   const className = 'col-span-2 mb-0'
@@ -186,32 +208,33 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
       <Admonition
         type="default"
         className={className}
-        title="Have you checked your project's infrastructure activity?"
+        title="Have you checked your project's database observability reports?"
       >
         High memory or low disk IO bandwidth may be slowing down your database. Verify by checking
-        the infrastructure activity of your project{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
+        your project's database observability reports{' '}
+        <InlineLink href={`${baseUrl}/observability/database`}>here</InlineLink>.
       </Admonition>
     )
   }
 
   if (category === SupportCategories.PERFORMANCE_ISSUES) {
     return (
-      <Admonition
-        type="default"
-        className={className}
-        title="Have you checked the Query Performance Advisor?"
-      >
-        Identify slow running queries and get actionable insights on how to optimize them with the
-        Query Performance Advisor{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
-      </Admonition>
+      <>
+        <FreeMicroUpgradeSuggestion
+          className={className}
+          projectRef={projectRef}
+          planId={subscriptionPlanId}
+        />
+        <Admonition
+          type="default"
+          className={className}
+          title="Have you checked the Query Performance Advisor?"
+        >
+          Identify slow running queries and get actionable insights on how to optimize them with
+          Query Performance{' '}
+          <InlineLink href={`${baseUrl}/observability/query-performance`}>here</InlineLink>.
+        </Admonition>
+      </>
     )
   }
 

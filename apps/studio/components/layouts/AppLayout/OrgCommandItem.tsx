@@ -1,7 +1,6 @@
-import { Check } from 'lucide-react'
-import Link from 'next/link'
-import { cn, CommandItem } from 'ui'
+import { CheckIcon } from 'lucide-react'
 
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { Organization } from '@/types'
 
@@ -11,7 +10,6 @@ export interface OrgCommandItemProps {
   routePathname: string
   hasRouteSlug: boolean
   onClose: () => void
-  compactPadding?: boolean
 }
 
 export function OrgCommandItem({
@@ -20,30 +18,24 @@ export function OrgCommandItem({
   routePathname,
   hasRouteSlug,
   onClose,
-  compactPadding = false,
 }: OrgCommandItemProps) {
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
   return (
-    <CommandItem
+    <CommandItemLink
       key={org.slug}
+      href={href}
       value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
       className="cursor-pointer w-full"
-      onSelect={() => onClose()}
+      onSelect={onClose}
     >
-      <Link
-        href={href}
-        className={cn(
-          'w-full flex items-center justify-between text-sm md:text-xs',
-          !compactPadding && 'p-0.5'
-        )}
-      >
+      <div className="w-full flex items-center justify-between p-0.5 md:p-0 text-sm md:text-xs">
         <div className="flex items-center gap-2">
           <span>{org.name}</span>
           <PartnerIcon organization={org} />
         </div>
-        {org.slug === selectedSlug && <Check size={16} />}
-      </Link>
-    </CommandItem>
+        {org.slug === selectedSlug && <CheckIcon size={16} />}
+      </div>
+    </CommandItemLink>
   )
 }

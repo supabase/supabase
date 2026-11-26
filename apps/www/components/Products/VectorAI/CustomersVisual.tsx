@@ -1,5 +1,5 @@
 import { DEFAULT_EASE } from '~/lib/animations'
-import { m } from 'framer-motion'
+import { m } from 'motion/react'
 import React from 'react'
 
 const CustomersVisual = () => {

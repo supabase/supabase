@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangleIcon } from 'lucide-react'
 import {
   Alert,
   AlertDescription,
@@ -14,7 +14,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
-import { Service, type ErrorCodeQueryQuery } from '@/data/graphql/graphql'
+import type { ErrorCodeQueryQuery, Service } from '@/data/graphql/graphql'
 
 interface ErrorCodeDialogProps {
   open: boolean
@@ -99,7 +99,7 @@ const ErrorExplanation = ({
 
 const ErrorState = ({ refetch }: { refetch?: () => void }) => (
   <Alert variant="warning">
-    <AlertTriangle />
+    <AlertTriangleIcon />
     <AlertTitle>Lookup failed</AlertTitle>
     <AlertDescription>
       <p>Failed to look up error code help info</p>

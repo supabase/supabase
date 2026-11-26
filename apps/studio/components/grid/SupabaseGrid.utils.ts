@@ -1,9 +1,9 @@
+import { useLocation } from '@tanstack/react-router'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { safeLocalStorage, safeSessionStorage } from 'common'
 import { compact } from 'lodash'
-import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import {
   CalculatedColumn,
   CellKeyboardEvent,
@@ -234,11 +234,16 @@ export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromis
   500
 )
 
+export function getTableIdFromPath(path: string) {
+  return path.split(/[?#]/)[0].match(/\/editor\/(\d+)\/?$/)?.[1]
+}
+
 function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  return { sort, filter }
+  const tableId = getTableIdFromPath(window.location.pathname)
+  return { tableId, sort, filter }
 }
 
 export function useSyncTableEditorStateFromLocalStorageWithUrl({
@@ -258,21 +263,19 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
       history: 'replace',
     }
   )
-  // Use nextjs useSearchParams to get the latest URL params
-  const searchParams = useSearchParams()
-  const urlParams = useMemo(() => {
-    const sort = searchParams?.getAll('sort') ?? []
-    const filter = searchParams?.getAll('filter') ?? []
-    return { sort, filter }
-  }, [searchParams])
+  // Subscribe to search-string changes so we re-sync whenever URL filters/sorts change.
+  const searchStr = useLocation({ select: (location) => location.searchStr })
 
   useEffect(() => {
     if (!projectRef || !table) {
       return
     }
 
-    // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
+    // `useQueryStates` can be stale so always get the latest from the URL
     const latestUrlParams = getLatestParams()
+    // Under TanStack the URL moves to the next table before `table` does; saving then would
+    // store one table's filters and sorts under another's id.
+    if (latestUrlParams.tableId !== String(table.id)) return
 
     saveTableEditorStateToLocalStorage({
       projectRef,
@@ -280,10 +283,10 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
       sorts: latestUrlParams.sort,
       filters: latestUrlParams.filter,
     })
-  }, [urlParams, table, projectRef])
+  }, [searchStr, table, projectRef])
 }
 
-export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
+export const handleCellKeyDown = <TRow extends Record<string, unknown> = SupaRow>(
   args: CellKeyDownArgs<TRow, unknown>,
   event: CellKeyboardEvent,
   context?: {

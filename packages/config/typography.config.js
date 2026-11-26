@@ -114,15 +114,8 @@ module.exports = {
               border: '1px solid var(--border-default)',
               borderRadius: 'var(--radius-lg)',
             },
-            td: {
+            'tbody tr:not(:last-child) td': {
               borderBottom: '1px solid var(--background-surface-200)',
-            },
-            code: {
-              fontWeight: '400',
-              padding: '0.2rem 0.4rem',
-              backgroundColor: 'var(--background-surface-200)',
-              border: '1px solid var(--background-surface-300)',
-              borderRadius: 'var(--radius-lg)',
             },
             a: {
               position: 'relative',
@@ -130,13 +123,15 @@ module.exports = {
               paddingBottom: '2px',
               fontWeight: '400',
               opacity: 1,
-              color: 'var(--foreground-default)',
+              // Match Studio InlineLink: inherit body color, foreground on hover
+              color: 'inherit',
               textDecorationLine: 'underline',
-              textDecorationColor: 'var(--foreground-muted)',
+              textDecorationColor: 'inherit',
               textDecorationThickness: '1px',
               textUnderlineOffset: '2px',
             },
             'a:hover': {
+              color: 'var(--foreground-default)',
               textDecorationColor: 'var(--foreground-default)',
             },
             figcaption: {
@@ -199,7 +194,7 @@ module.exports = {
             '--tw-prose-body': 'var(--foreground-light)',
             '--tw-prose-headings': 'var(--foreground-default)',
             '--tw-prose-lead': 'var(--foreground-light)',
-            '--tw-prose-links': 'hsl(var(--brand-500))',
+            '--tw-prose-links': 'inherit',
             '--tw-prose-bold': 'var(--foreground-light)',
             '--tw-prose-counters': 'var(--foreground-light)',
             '--tw-prose-bullets': 'var(--foreground-muted)',

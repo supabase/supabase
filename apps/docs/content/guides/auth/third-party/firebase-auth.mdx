@@ -12,7 +12,7 @@ Firebase Auth can be used as a third-party authentication provider alongside Sup
 2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party).
 3. If you are using Third Party Auth when self hosting, create and attach restrictive RLS policies to all tables in your public schema, Storage and Realtime to **prevent unauthorized access from unrelated Firebase projects**.
 4. Assign the `role: 'authenticated'` [custom user claim](https://firebase.google.com/docs/auth/admin/custom-claims) to all your users.
-5. Finally set up the Supabase client in your application.
+5. Finally set up the [Supabase client](/docs/reference/javascript/introduction) in your application.
 
 ## Setup the Supabase client library
 
@@ -113,6 +113,8 @@ val supabase = createSupabaseClient(
 }
 ```
 
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). If you install it, supabase-kt throws an error when it creates the client.
+
 </TabPanel>
 </$Show>
 
@@ -136,22 +138,42 @@ val supabase = createSupabaseClient(
 }
 ```
 
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). If you install it, supabase-kt throws an error when it creates the client.
+
 </TabPanel>
 </$Show>
 
 </Tabs>
 
+A client that sets `accessToken` can't use Supabase Auth methods, such as password sign-in. On that client, sign users in and out with Firebase Auth. To use Supabase Auth as well, create a second client without `accessToken`. Send each user's requests with the client that matches how they signed in.
+
 ## Add a new Third-Party Auth integration to your project
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
+In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.firebase]
 enabled = true
 project_id = "<id>"
 ```
+
+## Write RLS policies for Firebase users
+
+The `sub` claim of a Firebase ID token is the Firebase user's `uid`. To limit rows to the signed-in user, compare a column with `auth.jwt()->>'sub'` in your [RLS policies](/docs/guides/database/postgres/row-level-security):
+
+```sql
+create policy "Users can read their own rows"
+  on table_name
+  for select
+  to authenticated
+  using (user_id = (select auth.jwt()->>'sub'));
+```
+
+Firebase UIDs aren't UUIDs, so `user_id` must be a `text` column. Use `auth.jwt()->>'sub'` in place of `auth.uid()`, which casts `sub` to `uuid` and fails with `invalid input syntax for type uuid`.
+
+The `to authenticated` clause needs the [`role` claim](#assign-the-role-custom-claim) on your Firebase users. When self-hosting, also add the [restrictive issuer policy](#adding-an-extra-layer-of-security-to-your-projects-rls-policies-self-hosting-only) to accept only tokens from your Firebase project.
 
 ## Adding an extra layer of security to your project's RLS policies (self-hosting only)
 
@@ -163,7 +185,7 @@ When using the Supabase hosted platform, following this step is optional.
 
 </Admonition>
 
-Firebase Auth uses a single set of JWT signing keys for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project.
+Firebase Auth uses a single set of [JWT signing keys](/docs/guides/auth/signing-keys) for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project.
 
 When using the Supabase hosted platform, JWTs coming from Firebase project IDs you have not registered will be rejected before they reach your database. When self-hosting implementing this mechanism is your responsibility. An easy way to guard against this is to create and maintain the following RLS policies for **all of your tables in the `public` schema**. You should also attach this policy to [Storage](/docs/guides/storage/security/access-control) buckets or [Realtime](/docs/guides/realtime/authorization) channels.
 
@@ -226,7 +248,7 @@ create policy "Restrict access to correct Supabase and Firebase projects"
 
 ## Assign the "role" custom claim
 
-Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct [Postgres role](/docs/guides/database/postgres/roles) when using the Data API, Storage or Realtime authorization.
 
 By default, Firebase JWTs do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
@@ -333,10 +355,10 @@ Note that these functions are only called on new sign-ups and sign-ins. Existing
 You need to run a script that will assign the `role: 'authenticated'` custom claim to all of your existing Firebase Authentication users. You can do this by combining the [list users](https://firebase.google.com/docs/auth/admin/manage-users#list_all_users) and [set custom user claims](https://firebase.google.com/docs/auth/admin/create-custom-tokens) admin APIs. An example script is provided below:
 
 ```javascript
-'use strict';
-const { initializeApp } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
-initializeApp();
+'use strict'
+const { initializeApp } = require('firebase-admin/app')
+const { getAuth } = require('firebase-admin/auth')
+initializeApp()
 
 async function setRoleCustomClaim() {
   let nextPageToken = undefined
@@ -346,17 +368,19 @@ async function setRoleCustomClaim() {
 
     nextPageToken = listUsersResult.pageToken
 
-    await Promise.all(listUsersResult.users.map(async (userRecord) => {
-      try {
-        await getAuth().setCustomUserClaims(userRecord.id, {
-          role: 'authenticated'
-        })
-      } catch (error) {
-        console.error('Failed to set custom role for user', userRecord.id)
-      }
-    })
-  } while (nextPageToken);
-};
+    await Promise.all(
+      listUsersResult.users.map(async (userRecord) => {
+        try {
+          await getAuth().setCustomUserClaims(userRecord.uid, {
+            role: 'authenticated',
+          })
+        } catch (error) {
+          console.error('Failed to set custom role for user', userRecord.uid)
+        }
+      })
+    )
+  } while (nextPageToken)
+}
 
 setRoleCustomClaim().then(() => process.exit(0))
 ```

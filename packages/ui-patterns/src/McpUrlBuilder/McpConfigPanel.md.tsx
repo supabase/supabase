@@ -9,6 +9,7 @@ import {
   DEFAULT_MCP_URL_NON_PLATFORM as LOCAL_URL,
   MCP_CLIENT_DATA,
   MCP_CLIENT_GROUPS,
+  MCP_HOSTED_AUTH_NOTE,
 } from './clients.data'
 import type { McpClientData } from './clients.data'
 import {
@@ -130,7 +131,10 @@ export function McpConfigPanel() {
         Find your client below and add the configuration shown. You can scope the server by
         appending URL query parameters: <inlineCode value="?project_ref=<id>" /> to limit it to a
         single project, <inlineCode value="?read_only=true" /> to allow only read queries, and{' '}
-        <inlineCode value="?features=database,docs" /> to enable specific tool groups.
+        <inlineCode value="?features=database,docs" /> to enable specific tool groups. For hosted
+        connections, the optional <inlineCode value="skip_elicitations" /> parameter selects which{' '}
+        <link url="/docs/guides/ai-tools/mcp#skip-form-confirmations">form confirmations</link> to
+        skip when elicitation is available.
       </paragraph>
 
       {MCP_CLIENT_GROUPS.map((group) => (
@@ -144,16 +148,9 @@ export function McpConfigPanel() {
       ))}
 
       <paragraph>
-        <strong>Authentication</strong>
+        <strong>{MCP_HOSTED_AUTH_NOTE.title}</strong>
       </paragraph>
-      <paragraph>
-        Some MCP clients automatically prompt you to log in during setup, while others require
-        manual authentication steps. Either way, a browser window opens where you log in to your
-        Supabase account and grant the MCP client access to your organization.
-      </paragraph>
-      <paragraph>
-        A personal access token (PAT) was previously required, but is no longer needed.
-      </paragraph>
+      <paragraph>{MCP_HOSTED_AUTH_NOTE.body}</paragraph>
     </>
   )
 }

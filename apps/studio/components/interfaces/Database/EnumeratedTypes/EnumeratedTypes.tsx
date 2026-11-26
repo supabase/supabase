@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, SearchIcon, TrashIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -30,6 +30,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumerated-type-delete-mutation'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -158,7 +159,7 @@ export const EnumeratedTypes = () => {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={onSearchInputEscape(search, setSearch)}
             placeholder="Search for a type"
-            icon={<Search />}
+            icon={<SearchIcon />}
           />
         </div>
 
@@ -217,14 +218,7 @@ export const EnumeratedTypes = () => {
                   </TableRow>
                 )}
                 {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4}>
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-foreground-light">
-                        Your search for "{search}" did not return any results
-                      </p>
-                    </TableCell>
-                  </TableRow>
+                  <TableRowNoResults colSpan={4} search={search} />
                 )}
                 {filteredEnumeratedTypes.length > 0 &&
                   filteredEnumeratedTypes.map((type) => (
@@ -242,9 +236,8 @@ export const EnumeratedTypes = () => {
                                 <TooltipTrigger asChild>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      variant="default"
                                       className="px-1"
-                                      icon={<MoreVertical />}
+                                      icon={<MoreVerticalIcon />}
                                       aria-label={`${type.name} actions`}
                                     />
                                   </DropdownMenuTrigger>
@@ -256,14 +249,14 @@ export const EnumeratedTypes = () => {
                                   className="space-x-2"
                                   onClick={() => setSelectedTypeIdToEdit(type.id.toString())}
                                 >
-                                  <Edit size={14} />
+                                  <EditIcon size={14} />
                                   <p>Update type</p>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setSelectedTypeIdToDelete(type.id.toString())}
                                 >
-                                  <Trash size={14} />
+                                  <TrashIcon size={14} />
                                   <p>Delete type</p>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

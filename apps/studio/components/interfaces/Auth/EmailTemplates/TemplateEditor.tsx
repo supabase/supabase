@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
@@ -19,7 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -40,7 +39,7 @@ import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -89,9 +88,8 @@ const getPreviewSrcDoc = (html: string) => {
 
 export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
   const canEdit = canUpdateConfig && !isReadOnly
 
@@ -199,7 +197,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   }
 
   // Check if form values have changed
-  const formValues = form.watch()
+  const formValues = useWatch({ control: form.control })
   const baselineValues = INITIAL_VALUES
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
   const hasCustomTemplate =
@@ -396,8 +394,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                             {variable.name === 'Token' &&
                               template.variables.some((x) => x.name === 'ConfirmationURL') && (
                                 <>
-                                  , which can be used instead of{' '}
-                                  <code className="text-code-inline">ConfirmationURL</code>
+                                  , which can be used instead of <code>ConfirmationURL</code>
                                 </>
                               )}
 
@@ -451,7 +448,6 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
               <div className="ml-auto flex flex-row gap-2">
                 {hasChanges && (
                   <Button
-                    variant="default"
                     type="button"
                     onClick={() => {
                       form.reset(INITIAL_VALUES)

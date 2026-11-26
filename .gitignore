@@ -7,6 +7,8 @@ tmp
 *.swp
 
 coverage
+# vitest reporter output (json/junit/html/attachments)
+.vitest
 allure-results
 allure-report
 .nyc_output
@@ -121,9 +123,8 @@ next-env.d.ts
 .claude/*
 !.claude/settings.json
 !.claude/scripts/
-!.claude/skills/
-.claude/skills/me-*
-!.claude/CLAUDE.md
+!.claude/skills
+.agents/skills/me-*
 CLAUDE.local.md
 
 #include template .env file for docker-compose
@@ -167,3 +168,6 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+
+# local-only lockfile for the mcp-server registry block
+apps/ui-library/registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock

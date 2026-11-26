@@ -88,12 +88,7 @@ export function RepliesList({ replies, questionAuthor, totalReplyCount }: Replie
         </CardContent>
         {hasMoreThanThree && (
           <CardFooter className="flex justify-center">
-            <Button
-              variant="default"
-              size="tiny"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="w-min"
-            >
+            <Button size="tiny" onClick={() => setIsExpanded(!isExpanded)} className="w-min">
               {isExpanded
                 ? 'Show fewer replies'
                 : `Show ${replies.length - 3} more ${replies.length - 3 === 1 ? 'reply' : 'replies'}`}

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Accordion,
@@ -208,11 +208,10 @@ export const CreateTableInstructions = ({
                   }}
                 />
                 <ButtonTooltip
-                  variant="default"
                   className="w-7"
                   loading={isFetchingSecretValues}
                   onClick={() => setShowKeys(!showKeys)}
-                  icon={showKeys ? <EyeOff /> : <Eye />}
+                  icon={showKeys ? <EyeOffIcon /> : <EyeIcon />}
                   tooltip={{
                     content: {
                       side: 'bottom',

@@ -1,9 +1,10 @@
 import { BaseEdge, Edge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { EdgeData, REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { EdgeData } from './InstanceConfiguration.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
@@ -62,7 +63,7 @@ export const SmoothstepEdge = ({
                 }}
               >
                 {isLoading ? (
-                  <Loader2 size={12} className="animate-spin" />
+                  <Loader2Icon size={12} className="animate-spin" />
                 ) : (
                   <p className="font-mono text-xs">{lagValue}s</p>
                 )}

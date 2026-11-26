@@ -10,8 +10,8 @@ author: paul_copplestone
 author_title: Supabase
 author_url: https://github.com/kiwicopple
 author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
-logo: /images/customers/logos/berriai.png
-logo_inverse: /images/customers/logos/light/berriai.png
+logo: /images/customers/logos/on-light/berriai.png
+logo_inverse: /images/customers/logos/on-dark/berriai.png
 tags:
   - supabase
 date: '2023-06-06'
@@ -48,7 +48,7 @@ Initially, Berri AI attempted to develop with AWS RDS to reduce latency and gain
 
 ## Why they chose Supabase:
 
-Berri AI migrated their vector database from AWS RDS to Supabase for several compelling reasons:
+Berri AI migrated their [vector database](https://supabase.com/features/vector-database) from AWS RDS to Supabase for several compelling reasons:
 
 1. **Community:** After considering alternatives like Pinecone and Chroma, they prioritized a solution with a strong and accessible community, along with [managed infrastructure](https://supabase.com/docs/guides/platform).
 2. **Fewer services to manage:** Since they were already utilizing Supabase for other purposes, it made sense for Berri AI to consolidate their systems and avoid the complexities of self-hosting. One of the major pain points they faced with their previous setup was managing connection pools and handling errors with the Postgres database hosted on AWS. This involved writing extensive code and dealing with rollbacks, with each database update function requiring 40-50 lines of code. Supabase simplified this process significantly by condensing it to just one line of code, eliminating the burdens of managing dependencies and handling new errors. This significantly improved their update velocity, which had a huge impact on their productivity.

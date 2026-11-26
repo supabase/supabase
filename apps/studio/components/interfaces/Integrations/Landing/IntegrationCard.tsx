@@ -1,5 +1,4 @@
-import { BadgeCheck } from 'lucide-react'
-import Image from 'next/image'
+import { BadgeCheckIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Card, CardContent, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -55,11 +54,11 @@ export const IntegrationCard = ({
           {/* Full-width image/icon at the top */}
           <div className="w-full h-24 bg-surface-400 rounded-t-md flex items-center justify-center overflow-hidden relative">
             {image ? (
-              <Image
-                fill
+              <img
                 src={image}
-                alt={`${name} integration`}
-                className="w-full h-full object-cover"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
               <div className="w-12 h-12 text-foreground relative">
@@ -92,8 +91,8 @@ export const IntegrationCard = ({
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-brand-link" />
-                <span className="text-brand-link text-xs">Installed</span>
+                <BadgeCheckIcon size={14} className="text-primary" />
+                <span className="text-primary text-xs">Installed</span>
               </div>
             )}
           </div>

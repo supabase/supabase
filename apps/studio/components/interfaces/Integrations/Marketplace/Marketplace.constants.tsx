@@ -1,4 +1,12 @@
-import { BadgeCheck, Cable, Database, Package2, Plug, Users, type LucideIcon } from 'lucide-react'
+import {
+  BadgeCheckIcon,
+  CableIcon,
+  DatabaseIcon,
+  Package2Icon,
+  PlugIcon,
+  UsersIcon,
+  type LucideIcon,
+} from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Badge, cn, IconPartners } from 'ui'
 
@@ -28,10 +36,10 @@ export const INTEGRATION_TYPES: Array<{
   label: string
   icon: LucideIcon
 }> = [
-  { key: 'oauth', label: 'OAuth App', icon: Plug },
-  { key: 'postgres_extension', label: 'Postgres Module', icon: Database },
-  { key: 'template', label: 'Template', icon: Package2 },
-  { key: 'wrapper', label: 'Wrapper', icon: Cable },
+  { key: 'oauth', label: 'OAuth App', icon: PlugIcon },
+  { key: 'postgres_extension', label: 'Postgres Module', icon: DatabaseIcon },
+  { key: 'template', label: 'Template', icon: Package2Icon },
+  { key: 'wrapper', label: 'Wrapper', icon: CableIcon },
 ]
 
 export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
@@ -84,9 +92,9 @@ export const MARKETPLACE_SOURCES: Array<{
   label: string
   icon: LucideIcon | ((props: { className?: string }) => ReactNode)
 }> = [
-  { key: 'Official', label: 'Official', icon: BadgeCheck },
+  { key: 'Official', label: 'Official', icon: BadgeCheckIcon },
   { key: 'Partner', label: 'Partner', icon: IconPartners },
-  { key: 'Community', label: 'Community', icon: Users },
+  { key: 'Community', label: 'Community', icon: UsersIcon },
 ]
 
 export const getMarketplaceSource = (integration: IntegrationDefinition): MarketplaceSource => {

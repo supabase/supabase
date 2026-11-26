@@ -11,10 +11,9 @@ import {
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { Form } from '@ui/components/shadcn/ui/form'
-import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, HelpCircleIcon } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -26,6 +25,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -140,7 +140,10 @@ export const NewPaymentMethodElement = forwardRef(
       form.setValue('tax_id_name', name)
     }
 
-    const { tax_id_name, tax_id_value: rawTaxIdValue } = form.watch()
+    const [tax_id_name, rawTaxIdValue] = useWatch({
+      control: form.control,
+      name: ['tax_id_name', 'tax_id_value'],
+    })
     const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
@@ -328,30 +331,31 @@ export const NewPaymentMethodElement = forwardRef(
     return (
       <div className="space-y-2">
         <p className="text-sm text-foreground-lighter">
-          Please ensure CVC and postal codes match what’s on file for your card.
+          Ensure CVC and postal code match your card’s records.
         </p>
 
         <PaymentElement
           options={{
             layout: 'tabs',
+            wallets: { link: 'never' }, // prevent Stripe Link from auto-registering
             defaultValues: { billingDetails: { email: email ?? undefined } },
             readOnly,
           }}
         />
 
         {fullyLoaded && (
-          <div className="flex items-center space-x-2 py-4">
+          <div className="flex items-center space-x-2 py-2 mt-4">
             <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label htmlFor="business" className="text-foreground text-sm leading-none">
+            <label htmlFor="business" className="text-foreground text-xs leading-none">
               I’m purchasing as a business
             </label>
             <Tooltip>
               <TooltipTrigger asChild>
-                <HelpCircle
+                <HelpCircleIcon
                   size={14}
                   className="text-foreground-lighter hover:text-foreground transition"
                 />
@@ -364,6 +368,17 @@ export const NewPaymentMethodElement = forwardRef(
               </TooltipContent>
             </Tooltip>
           </div>
+        )}
+
+        {/*
+          Stripe renders the AddressElement's "Full name" label inside its iframe and exposes
+          no option to reword it (display.name only toggles full/split/organization), so the
+          business-name case is spelled out here instead.
+        */}
+        {!purchasingAsBusiness && (
+          <p className="text-sm text-foreground-lighter">
+            Enter your full name or your business name
+          </p>
         )}
 
         <AddressElement
@@ -396,7 +411,6 @@ export const NewPaymentMethodElement = forwardRef(
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}
@@ -406,7 +420,7 @@ export const NewPaymentMethodElement = forwardRef(
                               !selectedTaxId && 'text-muted'
                             )}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="ml-2 h-4 w-4 shrink-0 opacity-50"
                                 strokeWidth={1.5}
                               />
@@ -438,7 +452,7 @@ export const NewPaymentMethodElement = forwardRef(
                                     setShowTaxIDsPopover(false)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'mr-2 h-4 w-4',
                                       selectedTaxId?.name === option.name

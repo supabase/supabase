@@ -1,35 +1,68 @@
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
-
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { NavMenu, NavMenuItem } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
+  const matchRoute = useMatchRoute()
 
   const navigationItems = [
     {
       label: 'JWT Signing Keys',
-      href: `/project/${projectRef}/settings/jwt`,
+      to: '/project/$ref/settings/jwt' as const,
       id: 'signing-keys',
     },
     {
       label: 'Legacy JWT Secret',
-      href: `/project/${projectRef}/settings/jwt/legacy`,
+      to: '/project/$ref/settings/jwt/legacy' as const,
       id: 'legacy-jwt-keys',
     },
   ]
 
   return (
-    <PageLayout
-      title="JWT Keys"
-      subtitle="Control the keys used to sign JSON Web Tokens for your project"
-      navigationItems={navigationItems}
-    >
-      <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
-        {children}
-      </ScaffoldContainer>
-    </PageLayout>
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>JWT Keys</PageHeaderTitle>
+            <PageHeaderDescription>
+              Control the keys used to sign JSON Web Tokens for your project
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageNav size="default">
+        <NavMenu>
+          {navigationItems.map((item) => (
+            <NavMenuItem
+              key={item.id}
+              active={
+                !!matchRoute({ to: item.to, params: { ref: projectRef ?? '_' }, fuzzy: false })
+              }
+            >
+              <Link
+                to={item.to}
+                params={{ ref: projectRef ?? '_' }}
+                activeOptions={{ exact: true, includeSearch: false }}
+              >
+                {item.label}
+              </Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
+      </PageNav>
+      <PageContainer className="flex flex-col py-8 pb-16 gap-8">{children}</PageContainer>
+    </>
   )
 }
 

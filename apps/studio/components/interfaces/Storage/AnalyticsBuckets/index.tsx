@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
-import { ChevronRight, Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -27,13 +27,14 @@ import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const [filterString, setFilterString] = useState('')
 
@@ -110,7 +111,7 @@ export const AnalyticsBuckets = () => {
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}
-                        icon={<Search />}
+                        icon={<SearchIcon />}
                       />
                       <CreateBucketButton onClick={() => setVisible(true)} />
                     </div>
@@ -136,19 +137,16 @@ export const AnalyticsBuckets = () => {
                           </TableHeader>
                           <TableBody>
                             {analyticsBuckets.length === 0 && filterString.length > 0 && (
-                              <TableRow className="[&>td]:hover:bg-inherit">
-                                <TableCell colSpan={3}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-light">
-                                    Your search for "{filterString}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                className="[&>td]:hover:bg-inherit"
+                                colSpan={3}
+                                search={filterString}
+                              />
                             )}
                             {analyticsBuckets.map((bucket) => {
                               const handleBucketNavigation = createNavigationHandler(
                                 `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.name)}`,
-                                router
+                                navigate
                               )
 
                               return (
@@ -183,7 +181,7 @@ export const AnalyticsBuckets = () => {
 
                                   <TableCell>
                                     <div className="flex justify-end items-center h-full">
-                                      <ChevronRight
+                                      <ChevronRightIcon
                                         size={14}
                                         className="text-foreground-muted/60"
                                       />

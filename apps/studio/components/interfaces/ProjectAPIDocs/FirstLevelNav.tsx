@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Book, BookOpen } from 'lucide-react'
+import { BookIcon, BookOpenIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
@@ -124,7 +124,7 @@ export const FirstLevelNav = (): ReactNode => {
             GraphiQL
           </Link>
         </Button>
-        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpenIcon />}>
           <Link
             href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
@@ -137,12 +137,12 @@ export const FirstLevelNav = (): ReactNode => {
       </div>
 
       <div className="px-2 py-4">
-        <Button block asChild variant="text" size="small" icon={<Book />}>
+        <Button block asChild variant="text" size="small" icon={<BookIcon />}>
           <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="justify-start!">
             Documentation
           </Link>
         </Button>
-        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpenIcon />}>
           <Link
             href={`${DOCS_URL}/guides/api`}
             target="_blank"

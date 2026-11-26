@@ -1,21 +1,24 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   func: SavedDatabaseFunction
 }
 
 export async function deleteDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   func,
 }: DatabaseFunctionDeleteVariables) {
@@ -24,8 +27,11 @@ export async function deleteDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'functions-delete',
+    sql: asWriteSql(sql),
     queryKey: ['functions', 'delete', func.id.toString()],
+    grant,
   })
 
   return result as z.infer<typeof zod>
@@ -40,14 +46,14 @@ export const useDatabaseFunctionDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionDeleteVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionDeleteData, ResponseError, DatabaseFunctionDeleteVariables>({
+  return useMutation<DatabaseFunctionDeleteData, StudioError, DatabaseFunctionDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

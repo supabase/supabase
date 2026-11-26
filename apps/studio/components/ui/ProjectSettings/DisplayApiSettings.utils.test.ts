@@ -3,7 +3,7 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { describe, expect, it } from 'vitest'
 
-import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import { getLastUsedAPIKeys, getLegacyApiKeyType } from './DisplayApiSettings.utils'
 
 // getLastUsedAPIKeys humanizes a duration, which needs both plugins.
 dayjs.extend(duration)
@@ -17,7 +17,7 @@ const serviceRoleKey = { tags: 'service_role', api_key: 'header.payload.services
 describe('getLastUsedAPIKeys', () => {
   it('returns an empty object when there are no api keys', () => {
     expect(
-      getLastUsedAPIKeys([], [{ timestamp: 1, role: 'anon', signature_prefix: 'anon' }])
+      getLastUsedAPIKeys([], [{ timestamp: 1, role: 'anon', signaturePrefix: 'anon' }])
     ).toEqual({})
   })
 
@@ -34,7 +34,7 @@ describe('getLastUsedAPIKeys', () => {
         {
           timestamp: dayjs().subtract(2, 'hour').valueOf(),
           role: 'anon',
-          signature_prefix: 'anonsig',
+          signaturePrefix: 'anonsig',
         },
       ]
     )
@@ -50,7 +50,7 @@ describe('getLastUsedAPIKeys', () => {
         {
           timestamp: dayjs().subtract(1, 'day').valueOf(),
           role: 'service_role',
-          signature_prefix: 'servicesig',
+          signaturePrefix: 'servicesig',
         },
       ]
     )
@@ -64,10 +64,22 @@ describe('getLastUsedAPIKeys', () => {
       [anonKey],
       [
         { timestamp: 1, role: 'anon' },
-        { timestamp: 2, signature_prefix: 'anonsig' },
+        { timestamp: 2, signaturePrefix: 'anonsig' },
       ]
     )
 
     expect(result).toEqual({})
+  })
+})
+
+describe('getLegacyApiKeyType', () => {
+  it('maps the anon and service_role tags to telemetry key types', () => {
+    expect(getLegacyApiKeyType('anon')).toBe('legacy_anon')
+    expect(getLegacyApiKeyType('service_role')).toBe('legacy_service_role')
+  })
+
+  it('returns undefined for unknown or missing tags', () => {
+    expect(getLegacyApiKeyType('other')).toBeUndefined()
+    expect(getLegacyApiKeyType(undefined)).toBeUndefined()
   })
 })

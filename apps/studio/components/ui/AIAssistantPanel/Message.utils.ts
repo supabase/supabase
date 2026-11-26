@@ -122,10 +122,6 @@ export const deployEdgeFunctionInputSchema = z
     }
   })
 
-export const deployEdgeFunctionOutputSchema = z
-  .object({ success: z.boolean().optional() })
-  .passthrough()
-
 export const rateMessageResponseSchema = z.object({
   category: z.enum([
     'sql_generation',

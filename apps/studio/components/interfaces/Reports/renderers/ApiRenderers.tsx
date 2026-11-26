@@ -1,8 +1,10 @@
+import { useFlag } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState, type ReactNode } from 'react'
+import Link from 'next/link'
+import { useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
   Alert,
@@ -12,6 +14,12 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   WarningIcon,
 } from 'ui'
 import * as z from 'zod'
@@ -34,32 +42,32 @@ import {
   jsonSyntaxHighlight,
   TextFormatter,
 } from '@/components/interfaces/Settings/Logs/LogsFormatters'
-import Table from '@/components/to-be-cleaned/Table'
 import { AlertError } from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     ingress: number
-    egress: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
+  const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
     timestampKey: 'timestamp',
-    valueKey: ['ingress_mb', 'egress_mb'],
+    valueKey: 'ingress_mb',
     defaultValue: 0,
     startDate: props.params?.iso_timestamp_start,
     endDate: props.params?.iso_timestamp_end,
   })
 
   const totalIngress = sumBy(props.data, 'ingress_mb')
-  const totalEgress = sumBy(props.data, 'egress_mb')
 
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
@@ -68,7 +76,7 @@ export const NetworkTrafficRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
   } else if (isError) {
     return (
@@ -83,6 +91,7 @@ export const NetworkTrafficRenderer = (
   return (
     <div className="flex flex-col gap-12 w-full">
       <BarChart
+        chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
         size="small"
         title="Ingress"
         highlightedValue={sumBy(props.data, 'ingress_mb')}
@@ -95,18 +104,19 @@ export const NetworkTrafficRenderer = (
         displayDateInUtc
       />
 
-      <BarChart
-        size="small"
-        title="Egress"
-        highlightedValue={totalEgress}
-        format="MB"
-        valuePrecision={determinePrecision(totalEgress)}
-        className="w-full"
-        data={data}
-        yAxisKey="egress_mb"
-        xAxisKey="timestamp"
-        displayDateInUtc
-      />
+      {organization && (
+        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
+          <div>
+            <p className="text-sm text-foreground">Billable egress</p>
+            <p className="text-sm text-foreground-light">
+              View your organization&apos;s Usage page for billable egress.
+            </p>
+          </div>
+          <Button asChild variant="default" size="tiny">
+            <Link href={`/org/${organization.slug}/usage#egress`}>View Usage</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -117,6 +127,7 @@ export const TotalRequestsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -132,7 +143,7 @@ export const TotalRequestsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve total requests" error={error} />
   } else if (isError) {
     return (
@@ -146,6 +157,7 @@ export const TotalRequestsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -172,70 +184,61 @@ export const TopApiRoutesRenderer = (
 ) => {
   const [showMore, setShowMore] = useState(false)
 
-  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200! border-x-0! rounded-none!'
-  const cellClasses = 'text-xs! py-2! border-x-0! rounded-none! align-middle'
+  const cellClasses = 'text-xs py-2 align-middle'
 
   if (props.data.length === 0) return null
 
   return (
     <>
-      <Table
-        className="rounded-t-none"
-        containerClassName="overflow-x-auto"
-        head={
-          <>
-            <Table.th className={headerClasses}>Request</Table.th>
-            <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
-            {props.data[0].avg !== undefined && (
-              <Table.th className={headerClasses + ' text-right'}>Avg</Table.th>
-            )}
-          </>
-        }
-        body={
-          <>
-            {props.data.map((datum, index) => (
-              <Fragment key={index + datum.method + datum.path + (datum.search || '')}>
-                <Table.tr
-                  className={[
-                    'p-0 transition transform cursor-pointer hover:bg-surface-200',
-                    showMore && index >= 3 ? 'w-full h-full opacity-100' : '',
-                    !showMore && index >= 3 ? ' w-0 h-0 translate-y-10 opacity-0' : '',
-                  ].join(' ')}
-                >
-                  {(!showMore && index < 3) || showMore ? (
-                    <>
-                      <Table.td className={[cellClasses].join(' ')}>
-                        <RouteTdContent {...datum} />
-                      </Table.td>
-                      <Table.td className={[cellClasses, 'text-right'].join(' ')}>
-                        {datum.count}
-                      </Table.td>
-                      {props.data[0].avg !== undefined && (
-                        <Table.td className={[cellClasses, 'text-right'].join(' ')}>
-                          {Number(datum.avg).toFixed(2)}ms
-                        </Table.td>
-                      )}
-                    </>
-                  ) : null}
-                </Table.tr>
-              </Fragment>
-            ))}
-          </>
-        }
-      />
-      <div className="flex flex-row justify-end w-full gap-2 p-1">
-        <Button
-          variant="text"
-          onClick={() => setShowMore(!showMore)}
-          className={[
-            'transition',
-            showMore ? 'text-foreground' : 'text-foreground-lighter',
-            props.data.length <= 3 ? 'hidden' : '',
-          ].join(' ')}
-        >
-          {!showMore ? 'Show more' : 'Show less'}
-        </Button>
-      </div>
+      <Table className="rounded-t-none">
+        <TableHeader>
+          <TableRow className="border-t">
+            <TableHead>Request</TableHead>
+            <TableHead className="text-right">Count</TableHead>
+            {props.data[0].avg !== undefined && <TableHead className="text-right">Avg</TableHead>}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {props.data.map((datum, index) => (
+            <TableRow
+              key={index + datum.method + datum.path + (datum.search || '')}
+              className={[
+                'p-0 transition transform cursor-pointer hover:bg-surface-200',
+                showMore && index >= 3 ? 'w-full h-full opacity-100' : '',
+                !showMore && index >= 3 ? ' w-0 h-0 translate-y-10 opacity-0' : '',
+              ].join(' ')}
+            >
+              {(!showMore && index < 3) || showMore ? (
+                <>
+                  <TableCell className={cellClasses}>
+                    <RouteTdContent {...datum} />
+                  </TableCell>
+                  <TableCell className={`${cellClasses} text-right`}>{datum.count}</TableCell>
+                  {props.data[0].avg !== undefined && (
+                    <TableCell className={`${cellClasses} text-right`}>
+                      {Number(datum.avg).toFixed(2)}ms
+                    </TableCell>
+                  )}
+                </>
+              ) : null}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {props.data.length > 3 && (
+        <div className="flex flex-row justify-end w-full gap-2 p-1">
+          <Button
+            variant="text"
+            onClick={() => setShowMore(!showMore)}
+            className={[
+              'transition',
+              showMore ? 'text-foreground' : 'text-foreground-lighter',
+            ].join(' ')}
+          >
+            {!showMore ? 'Show more' : 'Show less'}
+          </Button>
+        </div>
+      )}
     </>
   )
 }
@@ -246,6 +249,7 @@ export const ErrorCountsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -262,7 +266,7 @@ export const ErrorCountsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve request errors" error={error} />
   } else if (isError) {
     return (
@@ -276,6 +280,7 @@ export const ErrorCountsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       className="w-full"
@@ -294,6 +299,7 @@ export const ResponseSpeedChartRenderer = (
     avg: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
@@ -313,7 +319,7 @@ export const ResponseSpeedChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
   } else if (isError) {
     return (
@@ -327,6 +333,7 @@ export const ResponseSpeedChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       highlightedValue={lastAvg}
       format="ms"
@@ -352,7 +359,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       <div className="flex gap-2 items-center">
         <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
-            <ChevronRight
+            <ChevronRightIcon
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />

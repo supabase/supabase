@@ -1,5 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
+import {
+  CheckIcon,
+  CopyIcon,
+  PencilIcon,
+  SplitIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -23,7 +31,7 @@ export function MessageActions({
   alwaysShow = false,
 }: PropsWithChildren<{ alwaysShow?: boolean }>) {
   return (
-    <div className="flex items-center gap-4 mt-2 mb-1">
+    <div className="w-full max-w-3xl mx-auto flex items-center gap-4 mt-2 mb-1">
       <span className="h-0.5 w-5 bg-muted" />
       <div className={cn('group-hover:opacity-100 transition-opacity', !alwaysShow && 'opacity-0')}>
         {children}
@@ -35,7 +43,7 @@ function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip
   return (
     <ButtonTooltip
       variant="text"
-      icon={<Pencil size={14} strokeWidth={1.5} />}
+      icon={<PencilIcon size={14} strokeWidth={1.5} />}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       aria-label={tooltip}
@@ -54,7 +62,7 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   return (
     <ButtonTooltip
       variant="text"
-      icon={<Trash2 size={14} strokeWidth={1.5} />}
+      icon={<Trash2Icon size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
@@ -64,6 +72,44 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   )
 }
 MessageActions.Delete = MessageActionsDelete
+
+function MessageActionsBranch({ onClick }: { onClick: () => void }) {
+  return (
+    <ButtonTooltip
+      variant="text"
+      icon={<SplitIcon size={14} strokeWidth={1.5} />}
+      onClick={onClick}
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      title="Branch in new chat"
+      aria-label="Branch in new chat"
+      tooltip={{ content: { side: 'bottom', text: 'Branch in new chat' } }}
+    />
+  )
+}
+MessageActions.Branch = MessageActionsBranch
+
+function MessageActionsCopy({ onClick }: { onClick: (onSuccess: () => void) => void }) {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (copied) setTimeout(() => setCopied(false), 1000)
+  }, [copied])
+
+  return (
+    <ButtonTooltip
+      variant="text"
+      icon={
+        copied ? <CheckIcon size={14} strokeWidth={2} /> : <CopyIcon size={14} strokeWidth={1.5} />
+      }
+      onClick={() => onClick(() => setCopied(true))}
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      title="Copy response"
+      aria-label="Copy response"
+      tooltip={{ content: { side: 'bottom', text: 'Copy response' } }}
+    />
+  )
+}
+MessageActions.Copy = MessageActionsCopy
 
 function MessageActionsThumbsUp({
   onClick,
@@ -79,12 +125,12 @@ function MessageActionsThumbsUp({
       variant="text"
       disabled={disabled}
       icon={
-        <ThumbsUp
+        <ThumbsUpIcon
           size={14}
           strokeWidth={1.5}
           className={cn(
             isActive
-              ? 'text-brand hover:text-brand-700'
+              ? 'text-primary hover:text-brand-700'
               : 'text-foreground-light hover:text-foreground'
           )}
         />
@@ -164,7 +210,7 @@ function MessageActionsThumbsDown({
           title="Bad response"
           aria-label="Bad response"
         >
-          <ThumbsDown
+          <ThumbsDownIcon
             size={14}
             strokeWidth={1.5}
             className={cn(

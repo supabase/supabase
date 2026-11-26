@@ -38,7 +38,7 @@ Primary keys are **guaranteed not to change**. Columns, indices, constraints or 
 
 </Admonition>
 
-To update your `public.profiles` table every time a user signs up, set up a trigger. If the trigger fails, it could block signups, so test your code thoroughly.
+To create a row in your `public.profiles` table every time a user signs up, set up a trigger. If the trigger fails, it could block signups, so test your code thoroughly.
 
 ```sql
 -- inserts a row into public.profiles
@@ -59,6 +59,35 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+
+<Admonition type="caution">
+
+Put the schema in front of every table, function, and type in this function that isn't built in, such as `public.profiles`. The function sets `search_path = ''`, so Postgres can't find a name like `profiles` without its schema. The trigger then fails, and every sign-up fails with `Database error saving new user`. To learn why the search path stays empty, see [Security `definer` vs `invoker`](/docs/guides/database/functions#security-definer-vs-invoker).
+
+</Admonition>
+
+Don't insert the profile from the client after sign-up. The trigger already creates it, and the table has no insert policy, so a client insert fails with `new row violates row-level security policy for table "profiles"`. The trigger can insert the row because the function is `security definer`: it runs as its owner. A function created in the Dashboard or by a migration is owned by `postgres`, which bypasses Row Level Security.
+
+With RLS enabled and no policies, the `anon` and `authenticated` roles can't read or change any row of `public.profiles`. The following policies let each signed-in user read and update only their own profile:
+
+```sql
+-- Each user can read their own profile
+create policy "Users can view their own profile"
+on public.profiles for select
+to authenticated
+using ( (select auth.uid()) = id );
+
+-- Each user can update their own profile
+create policy "Users can update their own profile"
+on public.profiles for update
+to authenticated
+using ( (select auth.uid()) = id )
+with check ( (select auth.uid()) = id );
+```
+
+`auth.uid()` returns the ID of the user making the request. In the update policy, `using` limits which rows a user can update, and `with check` stops them from changing the row's `id` to another user's.
+
+For other patterns, such as [profiles that everyone can read](/docs/guides/database/postgres/row-level-security#authenticated-and-unauthenticated-roles), see the [Row Level Security](/docs/guides/database/postgres/row-level-security) guide.
 
 ## Adding and retrieving user metadata
 
@@ -139,6 +168,22 @@ val data = supabase.auth.signUpWith(Email) {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var session = await supabase.Auth.SignUp("valid.email@supabase.io", "example-password", new SignUpOptions
+{
+    Data = new Dictionary<string, object>
+    {
+        { "first_name", "John" },
+        { "age", 27 }
+    }
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
@@ -196,7 +241,25 @@ val metadata = user?.userMetadata
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var user = supabase.Auth.CurrentUser;
+var metadata = user?.UserMetadata;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
+
+<Admonition type="danger">
+
+Users can edit their own user metadata, so a role or tenant ID stored there lets a user grant themselves access. Any signed-in user can add, overwrite, or remove fields in their `user_metadata`, and Supabase Auth doesn't check the values. In JavaScript, that's `updateUser()` with `data`. Don't use user metadata, including the `user_metadata` claim in the JWT, in RLS policies or authorization logic.
+
+Store values that users must not change in `app_metadata`, which is saved in the `raw_app_meta_data` column. Users can't change it themselves. Set it from a trusted server with your project's [secret key](/docs/guides/getting-started/api-keys), for example with [`auth.admin.updateUserById()`](/docs/reference/javascript/auth-admin-updateuserbyid). For more information about both fields, see [the user object](/docs/guides/auth/users#the-user-object) and [`auth.jwt()`](/docs/guides/database/postgres/row-level-security#authjwt) in the Row Level Security guide.
+
+</Admonition>
 
 ## Deleting users
 
@@ -209,6 +272,22 @@ You cannot delete a user if they are the owner of any objects in Supabase Storag
 You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
 
 </Admonition>
+
+### Removing account access
+
+When the goal is to remove an account so it can no longer access your app, delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser). With the default `shouldSoftDelete: false`, this removes the row from `auth.users`, which cascades to `auth.sessions` and invalidates the user's refresh tokens — so the account can no longer mint new access tokens.
+
+A few things are _not_ a substitute for deleting the user:
+
+- A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions.
+- Marking the account as deleted only in your own application tables leaves the `auth.users` row intact, so it can still authenticate and refresh.
+
+Deleting the user still cannot retroactively invalidate an access token that was already issued. Supabase access tokens are stateless JWTs, so a token already in the user's hands stays valid until its `exp` claim passes, and during that window the account can still call the API. You have two ways to handle this window:
+
+- **Bound it:** keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, so any outstanding token expires soon after you delete the user.
+- **Close it for sensitive operations:** validate the `session_id` claim against the `auth.sessions` table on those operations. Because deleting the user removes the session row, an outstanding token fails this check — but only on the requests where you perform it; other API calls still accept the token until `exp`.
+
+See [User sessions](/docs/guides/auth/sessions) for details.
 
 ## Exporting users
 

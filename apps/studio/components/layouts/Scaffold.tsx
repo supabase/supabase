@@ -14,6 +14,9 @@ export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
  *    {children}
  *  </ScaffoldContainer>
  * </Layout>```
+ *
+ * @deprecated Prefer PageContainer from ui-patterns.
+ * See /design-system/docs/fragments/page-container
  */
 export const ScaffoldContainer = forwardRef<
   HTMLDivElement,
@@ -47,8 +50,10 @@ export const ScaffoldContainer = forwardRef<
 /**
  * Top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldHeader component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
+ *
+ * @deprecated Prefer PageHeader from ui-patterns.
+ * See /design-system/docs/fragments/page-header
  */
 export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
@@ -61,8 +66,10 @@ export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 /**
  * Title for the top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldTitle component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
+ *
+ * @deprecated Prefer PageHeaderTitle from ui-patterns.
+ * See /design-system/docs/fragments/page-header
  */
 export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => {
@@ -73,8 +80,10 @@ export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLH
 /**
  * Description for the top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldDescription component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
+ *
+ * @deprecated Prefer PageHeaderDescription from ui-patterns.
+ * See /design-system/docs/fragments/page-header
  */
 export const ScaffoldDescription = forwardRef<
   HTMLHeadingElement,
@@ -83,6 +92,10 @@ export const ScaffoldDescription = forwardRef<
   return <p ref={ref} {...props} className={cn('text-sm text-foreground-light', className)} />
 })
 
+/**
+ * @deprecated Prefer PageSection from ui-patterns.
+ * See /design-system/docs/fragments/page-section
+ */
 export const ScaffoldSection = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement> & { isFullWidth?: boolean; topPadding?: boolean }
@@ -111,6 +124,9 @@ export const ScaffoldDivider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDiv
 
 /**
  * Title for a page section
+ *
+ * @deprecated Prefer PageSectionTitle from ui-patterns.
+ * See /design-system/docs/fragments/page-section
  */
 export const ScaffoldSectionTitle = forwardRef<
   HTMLHeadingElement,
@@ -121,6 +137,9 @@ export const ScaffoldSectionTitle = forwardRef<
 
 /**
  * Description for a page section
+ *
+ * @deprecated Prefer PageSectionDescription from ui-patterns.
+ * See /design-system/docs/fragments/page-section
  */
 export const ScaffoldSectionDescription = forwardRef<
   HTMLParagraphElement,
@@ -131,6 +150,9 @@ export const ScaffoldSectionDescription = forwardRef<
 
 /**
  * Child of ScaffoldSection - Left hand column for a section
+ *
+ * @deprecated Prefer PageSectionMeta and PageSectionSummary from ui-patterns.
+ * See /design-system/docs/fragments/page-section
  */
 export const ScaffoldSectionDetail = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, children, title, ...props }, ref) => {
@@ -145,6 +167,9 @@ export const ScaffoldSectionDetail = forwardRef<HTMLDivElement, HTMLAttributes<H
 
 /**
  * Child of ScaffoldSection - Right hand column for a section
+ *
+ * @deprecated Prefer PageSectionContent from ui-patterns.
+ * See /design-system/docs/fragments/page-section
  */
 export const ScaffoldSectionContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
@@ -210,7 +235,9 @@ export const ScaffoldColumn = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 
 /**
  * For older layouts - eventually to be replaced with ScaffoldContainer component
- * @deprecated
+ *
+ * @deprecated Prefer PageContainer from ui-patterns.
+ * See /design-system/docs/fragments/page-container
  */
 export const ScaffoldContainerLegacy = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {

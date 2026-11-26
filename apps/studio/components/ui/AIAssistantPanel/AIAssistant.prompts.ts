@@ -1,42 +1,51 @@
-export const defaultPrompts = [
+import {
+  BookOpenIcon,
+  BugIcon,
+  DatabaseIcon,
+  GaugeIcon,
+  NotebookTextIcon,
+  ShieldCheckIcon,
+  type LucideIcon,
+} from 'lucide-react'
+
+export type ChatTemplate = {
+  title: string
+  icon: LucideIcon
+  initialMessage: string
+}
+
+export const CHAT_TEMPLATES: ChatTemplate[] = [
   {
-    title: 'Create a back-end',
-    prompt:
-      'Create a messaging app with users, messages, and an edge function that uses OpenAI to summarize message threads.',
-  },
-  {
-    title: 'Health check',
-    prompt: 'Can you check if my database and edge functions are healthy?',
-  },
-  {
-    title: 'Query your data',
-    prompt: 'Give me a list of new users from the auth.users table who signed up in the past week',
+    title: 'Generate sample data',
+    icon: DatabaseIcon,
+    initialMessage: 'Generate sample data for a blog with users, posts, and comments tables.',
   },
   {
     title: 'Set up RLS policies',
-    prompt: 'Create RLS policies to ensure users can only access their own data',
+    icon: ShieldCheckIcon,
+    initialMessage: 'Create RLS policies to ensure users can only access their own data.',
   },
   {
-    title: 'Create a function',
-    prompt: 'Create an edge function that summarises the contents of a table row using OpenAI',
-  },
-  {
-    title: 'Generate sample data',
-    prompt: 'Generate sample data for a blog with users, posts, and comments tables',
+    title: 'Build a notebook',
+    icon: NotebookTextIcon,
+    initialMessage: 'Build me a notebook that tracks weekly signups and active users.',
   },
 ]
 
 export const codeSnippetPrompts = [
   {
     title: 'Explain code',
+    icon: BookOpenIcon,
     prompt: 'Explain what this code does and how it works',
   },
   {
     title: 'Improve code',
+    icon: GaugeIcon,
     prompt: 'How can I improve this code for better performance and readability?',
   },
   {
     title: 'Debug issues',
+    icon: BugIcon,
     prompt: 'Help me debug any potential issues with this code',
   },
 ]

@@ -236,12 +236,12 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             Use the{' '}
-            <Link
-              href="https://supabase.com/docs/guides/functions/cicd-workflow"
+            <a
+              href="https://supabase.com/docs/guides/functions/deploy#cicd-deployment"
               className="underline hover:text-foreground-light transition-colors"
             >
               Supabase CLI with GitHub actions
-            </Link>{' '}
+            </a>{' '}
             to preview and deploy your functions along with the rest of your application
           </>
         ),
@@ -264,12 +264,12 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             Edge functions run globally or can be{' '}
-            <Link
+            <a
               href="https://supabase.com/docs/guides/functions/regional-invocation"
               className="underline hover:text-foreground-light transition-colors"
             >
               pinned to your database's proximity
-            </Link>
+            </a>
           </>
         ),
       },
@@ -336,12 +336,12 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             Edge Functions are designed to work seamlessly with{' '}
-            <Link
+            <a
               href="https://supabase.com/docs/guides/functions/auth"
               className="underline hover:text-foreground-light transition-colors"
             >
               Supabase Auth
-            </Link>
+            </a>
           </>
         ),
         panel: <WorksWithAuthPanel />,
@@ -351,12 +351,12 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             Edge Functions are designed to work seamlessly with{' '}
-            <Link
+            <a
               href="https://supabase.com/docs/guides/functions/storage-caching"
               className="underline hover:text-foreground-light transition-colors"
             >
               Supabase Storage
-            </Link>
+            </a>
           </>
         ),
         panel: <WorksWithStoragePanel />,

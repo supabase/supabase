@@ -180,6 +180,18 @@ data = supabase.from_('orchestral_sections').select('id, name, instruments(id, n
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<OrchestralSection>()
+  .Select("id, name, instruments(id, name)")
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -219,6 +231,8 @@ By default, embedded relations use **left join** semantics from the parent table
 - The embedded relation is `[]` for one-to-many joins and `null` for many-to-one joins when nothing matches.
 
 To filter out parent rows that do not match the related table, use `!inner` on the embedded relation.
+
+If you know the join you want in SQL, use the [SQL to REST API Translator](/docs/guides/api/sql-to-rest). It converts a SQL `select` query into the matching Data API request and Supabase JavaScript client code, with joins as embedded relations. The Data API supports only a subset of SQL, so some queries won't translate. For example, the translator handles only left and inner joins that compare columns with `=`. The request it returns works only when a foreign key links the two tables.
 
 ### What `:` and `!` mean in join syntax
 
@@ -524,7 +538,7 @@ GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instrum
 </TabPanel>
 </Tabs>
 
-#### Result
+#### Result [#inner-join-inner-result]
 
 ```json
 [
@@ -642,7 +656,7 @@ GET https://[REF].supabase.co/rest/v1/instruments?select=id,name,orchestral_sect
 </TabPanel>
 </Tabs>
 
-#### Result
+#### Result [#filtering-using-joined-fields-result]
 
 ```json
 [
@@ -768,13 +782,18 @@ data = supabase.from_('teams').select('id, team_name, users(id, name)').execute(
 
 </TabPanel>
 </$Show>
-<TabPanel id="graphql" label="GraphQL">
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
 
-````javascript
-const Query = `
-  query {
+```c#
+var result = await supabase
+  .From<Team>()
+  .Select("id, team_name, users(id, name)")
+  .Get();
+```
 
 </TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -794,7 +813,7 @@ const Query = `
     }
   }
 `
-````
+```
 
 </TabPanel>
 <TabPanel id="url" label="URL">
@@ -896,7 +915,8 @@ struct Shift: Codable {
   let userId: Int
   let attendanceStatus: String?
 
-  let scans: [Scan]
+  let startScan: Scan
+  let endScan: Scan
 
   struct Scan: Codable {
     let id: Int
@@ -914,6 +934,8 @@ struct Shift: Codable {
     case id
     case userId = "user_id"
     case attendanceStatus = "attendance_status"
+    case startScan = "start_scan"
+    case endScan = "end_scan"
   }
 }
 
@@ -927,11 +949,11 @@ let shifts: [Shift] = try await supabase
         user_id,
         badge_scan_time
       ),
-     scans: scan_id_end (
+      end_scan:scans!scan_id_end (
         id,
         user_id,
         badge_scan_time
-     )
+      )
     """
   )
   .execute()
@@ -980,6 +1002,30 @@ data = supabase.from_('shifts').select("""
     badge_scan_time
   )
 """).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Shift>()
+  .Select(@"
+    *,
+    start_scan:scans!scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    ),
+    end_scan:scans!scan_id_end (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  ")
+  .Get();
 ```
 
 </TabPanel>

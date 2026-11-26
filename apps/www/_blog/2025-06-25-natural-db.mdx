@@ -41,12 +41,12 @@ The assistant uses a dedicated Postgres schema called `memories` to store all of
 Three complementary memory types maintain conversation continuity:
 
 - **Message History (Short-term Memory)**: Maintains a chronological list of recent messages for immediate context
-- **Semantic Memory (Vector Search using pgvector)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
+- **Semantic Memory (Vector Search using [pgvector](/docs/guides/database/extensions/pgvector))**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
 - **Structured Memory (SQL Data)**: Stores concrete facts in LLM-created tables for precise queries ("How much did I spend on coffee last quarter?")
 
 ### Scheduled Prompts
 
-The system achieves autonomy through scheduled prompts which are powered by pg_cron through a dedicated tool. Scheduled prompts call the same edge functions as a normal prompt via pg_net and can therefore use all the same tools.
+The system achieves autonomy through scheduled prompts which are powered by [pg_cron](/docs/guides/database/extensions/pg_cron) through a dedicated tool. Scheduled prompts call the same edge functions as a normal prompt via pg_net and can therefore use all the same tools.
 
 **Example**: "Every Sunday at 6 PM, analyze my portfolio performance and research market trends"
 
@@ -85,7 +85,7 @@ Through Zapier's MCP integration, your assistant can:
 
 ### Input/Output Integration
 
-The system uses a Telegram Bot as the default interface which calls an edge function via webhook. You can change this to whatever interface you want, for example a web page, voice or other.
+The system uses a Telegram Bot as the default interface which calls an [edge function](/docs/guides/functions) via webhook. You can change this to whatever interface you want, for example a web page, voice or other.
 
 ### Self-Evolving System Prompt
 
@@ -151,7 +151,7 @@ When you say "be more formal" or "address me by name," these preferences are sto
 
 ### Optional: Using the CLI
 
-If you prefer the command line, you can use the Supabase CLI to set up your database and Edge Functions. This replaces **Step 1** and **Step 2**.
+If you prefer the command line, you can use the [Supabase CLI](/features/cli) to set up your database and [Edge Functions](/edge-functions). This replaces **Step 1** and **Step 2**.
 
 1.  **Clone the repository**.
     ```bash

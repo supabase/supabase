@@ -73,7 +73,7 @@ export default function ChartComposedTable() {
                 showYAxis={true}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}k`,
-                  width: 80,
+                  width: 36,
                 }}
                 isFullHeight={true}
               />

@@ -1,8 +1,7 @@
+import { Link, useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
-import { Download, Settings } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { DownloadIcon, SettingsIcon } from 'lucide-react'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -41,8 +40,8 @@ interface DownloadLogsButtonProps {
 
 export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
-  const pathname = usePathname()
-  const isLogs = pathname?.includes?.('/logs') ?? false
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const isLogs = pathname.includes('/logs')
   const [numRows, setNumRows] = useState(DEFAULT_NUM_ROWS)
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
@@ -104,9 +103,8 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
           <DropdownMenuTrigger asChild>
             <Button
-              variant="default"
               className="w-[26px]"
-              icon={<Download className="text-foreground" />}
+              icon={<DownloadIcon className="text-foreground" />}
               aria-label="Download logs"
             />
           </DropdownMenuTrigger>
@@ -114,18 +112,18 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
-              <Link href={`/project/${ref}/settings/log-drains`}>
-                <Settings size={14} />
+              <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '_' }}>
+                <SettingsIcon size={14} />
                 <p>Add a Log Drain</p>
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={() => setSelectedFormat('csv')} className="gap-x-2">
-            <Download size={14} />
+            <DownloadIcon size={14} />
             <p>Download as CSV</p>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('json')} className="gap-x-2">
-            <Download size={14} />
+            <DownloadIcon size={14} />
             <p>Download as JSON</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -174,11 +172,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
             )}
           </DialogSection>
           <DialogFooter>
-            <Button
-              variant="default"
-              disabled={isPending}
-              onClick={() => setSelectedFormat(undefined)}
-            >
+            <Button disabled={isPending} onClick={() => setSelectedFormat(undefined)}>
               Cancel
             </Button>
             <Button variant="primary" loading={isPending} onClick={onExportData}>

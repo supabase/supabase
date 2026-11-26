@@ -4,12 +4,16 @@ import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
 import { inter, manrope, sourceCodePro } from '~/lib/fonts'
+import { SIGNED_IN_HINT_SCRIPT } from 'common/gotrue'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 
 import Providers from './providers'
 import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 const site_title = `${APP_NAME} | The Postgres Development Platform`
+
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
 
 export const metadata: Metadata = {
   title: site_title,
@@ -32,11 +36,9 @@ export const metadata: Metadata = {
     site: '@supabase',
     card: 'summary_large_image',
   },
-  icons: {
-    icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon.ico',
-    apple: '/favicon/favicon.ico',
-  },
+  // www serves from the site root (`basePath: ''` in next.config.mjs)
+  icons: genFaviconData('', FAVICON_ROUTE),
+  manifest: `${FAVICON_ROUTE}/manifest.json`,
 }
 
 export const viewport: Viewport = {
@@ -51,6 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SIGNED_IN_HINT_SCRIPT }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

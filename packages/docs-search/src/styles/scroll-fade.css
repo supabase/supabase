@@ -1,0 +1,32 @@
+@property --scroll-fade-size {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+@keyframes scroll-fade-bottom {
+  0%,
+  85% {
+    --scroll-fade-size: 24px;
+  }
+  100% {
+    --scroll-fade-size: 0px;
+  }
+}
+
+@layer components {
+  @supports (animation-timeline: scroll()) {
+    .scroll-fade-bottom {
+      mask-image: linear-gradient(
+        to bottom,
+        #000 calc(100% - var(--scroll-fade-size)),
+        rgb(0 0 0 / 0.8) calc(100% - var(--scroll-fade-size) * 0.75),
+        rgb(0 0 0 / 0.5) calc(100% - var(--scroll-fade-size) * 0.5),
+        rgb(0 0 0 / 0.2) calc(100% - var(--scroll-fade-size) * 0.25),
+        transparent 100%
+      );
+      animation: scroll-fade-bottom linear both;
+      animation-timeline: scroll(self);
+    }
+  }
+}

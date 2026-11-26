@@ -17,21 +17,25 @@ import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
-import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
+import { IssuesSection } from './IssuesSection'
+import { NotebooksSection } from './NotebooksSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
 import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
-import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { SortableSection } from '@/components/ui/SortableSection'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
+
+const SORT_GRIP_CLASS = 'absolute -left-10'
 
 export const ProjectHome = () => {
   const { enableBranching } = useParams()
@@ -40,6 +44,8 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -95,6 +101,7 @@ export const ProjectHome = () => {
   const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
+    if (id === 'issues') return isIssuesInboxEnabled
     if (id === 'connect') return showConnectSection
     if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
@@ -123,7 +130,7 @@ export const ProjectHome = () => {
                           key={id}
                           className={cn(isComingUp && 'opacity-60 pointer-events-none')}
                         >
-                          <SortableSection id={id}>
+                          <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
                             <UsageSection />
                           </SortableSection>
                         </div>
@@ -131,31 +138,32 @@ export const ProjectHome = () => {
                     }
                     if (id === 'connect' && showConnectSection) {
                       return (
-                        <SortableSection key={id} id={id}>
+                        <SortableSection gripClassName={SORT_GRIP_CLASS} key={id} id={id}>
                           <ConnectSection />
                         </SortableSection>
                       )
                     }
-                    if (id === 'advisor') {
+                    if (id === 'issues') {
                       return (
                         <div
                           key={id}
                           className={cn(isComingUp && 'opacity-60 pointer-events-none')}
                         >
-                          <SortableSection id={id}>
-                            <AdvisorSection showEmptyState={isComingUp} />
+                          <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
+                            <IssuesSection showEmptyState={isComingUp} />
                           </SortableSection>
                         </div>
                       )
                     }
                     if (IS_PLATFORM && id === 'custom-report') {
+                      // Notebooks take over the reports slot (and its saved position) under the Explorer preview
                       return (
                         <div
                           key={id}
                           className={cn(isComingUp && 'opacity-60 pointer-events-none')}
                         >
-                          <SortableSection id={id}>
-                            <CustomReportSection />
+                          <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
+                            {isExplorerEnabled ? <NotebooksSection /> : <CustomReportSection />}
                           </SortableSection>
                         </div>
                       )

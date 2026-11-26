@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import Head from 'next/head'
 import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -108,7 +107,6 @@ function usePrefillFormOnOrganizationsSuccess(
     if (organizationsState._tag === 'success') {
       prefillForm()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [organizationsState._tag])
 }
 
@@ -143,38 +141,57 @@ export function ApiAuthorizationValidScreen({
   } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
 
-  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
+  const {
+    mutate: approveRequest,
+    error: approveError,
+    reset: resetApproveError,
+  } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
-  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
+  const {
+    mutate: declineRequest,
+    error: declineError,
+    reset: resetDeclineError,
+  } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       navigate('/organizations')
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
+  const actionError = approveError
+    ? `Failed to authorize request: ${approveError.message}`
+    : declineError
+      ? `Failed to cancel authorization request: ${declineError.message}`
+      : undefined
+  const resetActionError = () => {
+    resetApproveError()
+    resetDeclineError()
+  }
 
   const onApproveRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('approving')
-    approveRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   const onDeclineRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('declining')
-    declineRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    declineRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   if (isLoading) {
@@ -207,7 +224,7 @@ export function ApiAuthorizationValidScreen({
 
     return (
       <>
-        <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+        {pageTitle && <title>{pageTitle}</title>}
         <ApiAuthorizationApprovedScreen
           requester={effectiveRequester}
           organization={approvedOrganization}
@@ -218,13 +235,16 @@ export function ApiAuthorizationValidScreen({
 
   return (
     <>
-      <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+      {pageTitle && <title>{pageTitle}</title>}
       <ApiAuthorizationMainView
+        auth_id={auth_id}
         approvalState={effectiveApprovalState}
         form={form}
         requester={effectiveRequester}
         requestedOrganizationSlug={effectiveOrganizationSlug}
         organizations={effectiveOrganizationsState}
+        actionError={actionError}
+        onOrganizationChange={resetActionError}
         onApprove={onApproveRequest}
         onDecline={onDeclineRequest}
       />

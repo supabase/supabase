@@ -6,7 +6,8 @@ import type { PropsWithChildren } from 'react'
 import { TooltipProvider } from 'ui'
 
 import { AuthContainer } from './auth/auth.client'
-import { DocsCommandMenu, DocsCommandProvider } from './command'
+import { DocsFrameworkProvider } from './framework.client'
+import { SearchV2Provider } from './SearchV2/SearchV2Provider'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { Toaster } from './toaster'
@@ -18,31 +19,30 @@ import { ThemeSandbox } from './ui/theme.client'
  */
 function GlobalProviders({ children }: PropsWithChildren) {
   return (
-    <QueryClientProvider>
-      <AuthContainer>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
-          <DevToolbarProvider apiUrl={API_URL}>
-            <PageTelemetry />
-            <ScrollRestoration />
-            <ThemeProvider>
-              <TooltipProvider delayDuration={0}>
-                <DocsCommandProvider>
-                  <div className="flex flex-col">
-                    <SiteLayout>
-                      {children}
-                      <DocsCommandMenu />
-                    </SiteLayout>
-                    <ThemeSandbox />
-                  </div>
-                </DocsCommandProvider>
-                <Toaster />
-                <DevToolbar />
-              </TooltipProvider>
-            </ThemeProvider>
-          </DevToolbarProvider>
-        </FeatureFlagProvider>
-      </AuthContainer>
-    </QueryClientProvider>
+    <DocsFrameworkProvider>
+      <QueryClientProvider>
+        <AuthContainer>
+          <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+            <DevToolbarProvider apiUrl={API_URL}>
+              <PageTelemetry />
+              <ScrollRestoration />
+              <ThemeProvider>
+                <TooltipProvider delayDuration={0}>
+                  <SearchV2Provider>
+                    <div className="flex flex-col">
+                      <SiteLayout>{children}</SiteLayout>
+                      <ThemeSandbox />
+                    </div>
+                  </SearchV2Provider>
+                  <Toaster />
+                  <DevToolbar />
+                </TooltipProvider>
+              </ThemeProvider>
+            </DevToolbarProvider>
+          </FeatureFlagProvider>
+        </AuthContainer>
+      </QueryClientProvider>
+    </DocsFrameworkProvider>
   )
 }
 

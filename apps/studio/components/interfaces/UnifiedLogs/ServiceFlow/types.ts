@@ -1,10 +1,13 @@
 import { Table } from '@tanstack/react-table'
 
+import type { LogsFilterOperator } from '../UnifiedLogs.filters'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 /**
  * Service Flow Type Definitions
  */
+
+export type AddAttributeFilter = (key: string, value: string, operator: LogsFilterOperator) => void
 
 /**
  * Props for individual service flow blocks (Network, PostgREST, Auth, etc.)
@@ -15,6 +18,7 @@ export interface ServiceFlowBlockProps {
   isLoading?: boolean // Whether enriched data is still loading
   error?: string // Error message if enriched data failed to load
   isLast?: boolean // Whether this is the last block in the flow
+  defaultOpen?: boolean
   filterFields: DataTableFilterField<any>[] // Available filter fields for clickable values
   table: Table<any> // Table instance for filtering actions
 }

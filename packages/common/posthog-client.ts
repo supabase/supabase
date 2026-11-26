@@ -1,6 +1,17 @@
-import posthog, { PostHogConfig } from 'posthog-js'
+import posthog, {
+  type CapturedNetworkRequest,
+  type PostHogConfig,
+  type SessionRecordingOptions,
+} from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
+import {
+  getTelemetryCookieOptions,
+  getTelemetryPlatform,
+  redactEventUrlKeywords,
+} from './telemetry-utils'
+
+export type { CapturedNetworkRequest, SessionRecordingOptions }
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
@@ -23,6 +34,30 @@ interface PostHogClientConfig {
   uiHost?: string
 }
 
+interface PostHogInitOptions {
+  hasConsent?: boolean
+  /**
+   * Masking policy for session replay. Omit to disable recording, which every app
+   * sharing this PostHog project does unless it passes a policy of its own.
+   */
+  sessionReplay?: SessionRecordingOptions
+}
+
+/**
+ * Enables session recording when given a masking config, and disables it when
+ * given nothing.
+ */
+export function buildSessionRecordingConfig(
+  sessionReplay?: SessionRecordingOptions
+): Partial<PostHogConfig> {
+  return {
+    disable_session_recording: !sessionReplay,
+    // Console output is not in the DOM, so text masking cannot reach it.
+    enable_recording_console_log: false,
+    ...(sessionReplay && { session_recording: sessionReplay }),
+  }
+}
+
 class PostHogClient {
   /** True after posthog.init() is called (prevents double-init) */
   private initStarted = false
@@ -36,6 +71,7 @@ class PostHogClient {
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
   private devListeners: Set<ClientTelemetryListener> = new Set()
   private pendingFeatureFlagCallbacks: Set<() => void> = new Set()
+  private optedOut = false
 
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
@@ -50,7 +86,7 @@ class PostHogClient {
     }
   }
 
-  init(hasConsent: boolean = true) {
+  init({ hasConsent = true, sessionReplay }: PostHogInitOptions = {}) {
     if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
@@ -64,7 +100,34 @@ class PostHogClient {
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
+      opt_out_persistence_by_default: true,
+      // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
+      // load on init, identify and group changes.
+      remote_config_refresh_interval_ms: 0,
+      ...buildSessionRecordingConfig(sessionReplay),
+      // Not posthog.register(): super properties persist in localStorage shared by every
+      // supabase.com app, so events sent before register() runs carry the last app's value.
+      before_send: (event) => {
+        const platform = getTelemetryPlatform()
+        if (event && platform) event.properties.platform = platform
+        if (event) redactEventUrlKeywords(event)
+        return event
+      },
       loaded: (posthog) => {
+        // init() only runs with consent. Clear an earlier opt-out before the flushes below,
+        // which capture() would otherwise drop.
+        this.optIn()
+
+        // Read first so onSessionId replays the id: a reload that finds the session unchanged
+        // reports no change. Subscribed before the flushes below, which can rotate it.
+        posthog.get_session_id()
+        posthog.onSessionId((sessionId) => {
+          // Skip while opted out, here or in another tab: an opt-out resets the session, and
+          // writing the new id would restore the cookie that withdrawing consent cleared.
+          if (this.optedOut || posthog.has_opted_out_capturing()) return
+          document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
+        })
+
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting
         // consent right away
@@ -202,9 +265,31 @@ class PostHogClient {
     if (!this.initStarted) return
 
     try {
+      // posthog.reset() clears the stored opt-out, so a sign-out would otherwise resume capture.
+      // The stored value covers an opt-out made in another tab.
+      const wasOptedOut = this.optedOut || posthog.has_opted_out_capturing()
       posthog.reset()
+      if (wasOptedOut) posthog.opt_out_capturing()
     } catch (error) {
       console.error('PostHog reset failed:', error)
+    }
+  }
+
+  optOut() {
+    this.optedOut = true
+    this.reset()
+  }
+
+  optIn() {
+    this.optedOut = false
+    if (!this.initStarted) return
+
+    try {
+      if (posthog.has_opted_out_capturing()) {
+        posthog.opt_in_capturing({ captureEventName: false })
+      }
+    } catch (error) {
+      console.error('PostHog opt in failed:', error)
     }
   }
 
@@ -339,6 +424,21 @@ class PostHogClient {
       return posthog.get_session_id()
     } catch (error) {
       console.error('PostHog getSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
+   * Returns PostHog's session_id after counting this call as user activity: an expired
+   * session rotates first. Returns undefined until PostHog's `loaded` callback fires.
+   */
+  refreshSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.sessionManager?.checkAndGetSessionAndWindowId().sessionId
+    } catch (error) {
+      console.error('PostHog refreshSessionId failed:', error)
       return undefined
     }
   }

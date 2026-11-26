@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
 import { cn } from 'ui'
@@ -68,7 +68,7 @@ export const SidebarContent = ({
                   href={backToDashboardURL}
                   className="flex text-sm flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
                 >
-                  <ArrowLeft strokeWidth={1.5} size={16} />
+                  <ArrowLeftIcon strokeWidth={1.5} size={16} />
                   Back to dashboard
                 </Link>
               </div>

@@ -1,4 +1,4 @@
-import { PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
+import { AGENT_CLIENT_PARAM, PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 import { MCP_CLIENT_DATA } from 'ui-patterns/McpUrlBuilder/clients.data'
 
@@ -15,12 +15,15 @@ const ICON_ASSETS: Record<string, { icon: string; hasLightIcon?: boolean }> = {
   'claude-code': { icon: '/docs/img/icons/agent-claude-icon', hasLightIcon: false },
   codex: { icon: '/docs/img/icons/agent-openai-icon', hasLightIcon: true },
   cursor: { icon: '/docs/img/icons/agent-cursor-icon', hasLightIcon: true },
+  grok: { icon: '/docs/img/icons/agent-grok-icon', hasLightIcon: true },
   'gemini-cli': { icon: '/docs/img/icons/agent-gemini-cli-icon', hasLightIcon: false },
   'github-copilot': { icon: '/docs/img/icons/agent-copilot-icon', hasLightIcon: true },
   kimi: { icon: '/docs/img/icons/agent-kimi-icon', hasLightIcon: true },
+  omp: { icon: '/docs/img/icons/agent-omp-icon', hasLightIcon: false },
   vscode: { icon: '/docs/img/icons/agent-vscode-icon', hasLightIcon: false },
   antigravity: { icon: '/docs/img/icons/agent-antigravity-icon', hasLightIcon: false },
-  windsurf: { icon: '/docs/img/icons/agent-windsurf-icon', hasLightIcon: true },
+  windsurf: { icon: '/docs/img/icons/agent-devin-icon', hasLightIcon: true },
+  warp: { icon: '/docs/img/icons/agent-warp-icon', hasLightIcon: true },
   goose: { icon: '/docs/img/icons/agent-goose-icon', hasLightIcon: true },
   factory: { icon: '/docs/img/icons/agent-factory-icon', hasLightIcon: true },
   opencode: { icon: '/docs/img/icons/agent-opencode-icon', hasLightIcon: true },
@@ -44,6 +47,7 @@ const TAGLINES: Record<string, string> = {
   goose: 'Your native open source AI agent — desktop app, CLI, and API.',
   kimi: 'Engineered to drop into any dev workflow and get programming tasks done fast.',
   kiro: 'Move beyond AI coding to agentic engineering.',
+  omp: 'A coding agent with the IDE wired in.',
   opencode: 'The open source AI coding agent.',
   vscode: 'The open source AI code editor — your home for multi-agent development.',
   // Pre-acquisition tagline (Cognition/Devin acquired Windsurf in 2025) — see "Open questions".
@@ -94,9 +98,9 @@ function badgeFor(plugin: boolean, mcp: boolean): string {
   return 'MCP'
 }
 
-// Route to our own setup instructions rather than each vendor's external docs.
+// route to our own setup pages with the agent preselected, not vendor docs
 function hrefFor(agent: AgentEntry): string {
-  return agent.plugin ? '/guides/ai-tools/plugins' : '/guides/ai-tools/mcp'
+  return `/guides/ai-tools/${agent.plugin ? 'plugins' : 'mcp'}?${AGENT_CLIENT_PARAM}=${agent.key}`
 }
 
 export const aiToolsSupportedAgents: ContentListingGroup = {

@@ -12,7 +12,7 @@ You can see how this works with the Supabase docs. Enter `cmd+k` and ask, for ex
 
 ## Tech stack
 
-- Supabase: Database & Edge Functions.
+- Supabase: [Database](/docs/guides/database/overview) & [Edge Functions](/docs/guides/functions).
 - OpenAI: Embeddings and completions.
 - GitHub Actions: for ingesting your markdown docs.
 
@@ -39,14 +39,14 @@ Now we can use the [Headless Vector Search](https://github.com/supabase/headless
 
 1. Clone the repo to your local machine: `git clone git@github.com:supabase/headless-vector-search.git`
 2. Link the repo to your remote project: `supabase link --project-ref XXX`
-3. Apply the database migrations: `supabase db push`
+3. Apply the database migrations: `supabase db push --remote`
 4. Set your OpenAI key as a secret: `supabase secrets set OPENAI_API_KEY=sk-xxx`
 5. Deploy the Edge Functions: `supabase functions deploy --no-verify-jwt`
 6. Expose `docs` schema via API in Supabase Dashboard [settings](/dashboard/project/_/settings/api) > `API Settings` > `Exposed schemas`
 
 ### Ingest your documentation
 
-Now we need to push your documentation into the database as embeddings. You can do this manually, but to make it easier we've created a [GitHub Action](https://github.com/marketplace/actions/supabase-embeddings-generator) which can update your database every time there is a Pull Request.
+Now we need to push your documentation into the database as embeddings. You can do this manually, but to make it easier we've created a [GitHub Action](https://github.com/supabase/embeddings-generator) which can update your database every time there is a Pull Request.
 
 In your knowledge base repository, create a new action called `.github/workflows/generate_embeddings.yml` with the following content:
 

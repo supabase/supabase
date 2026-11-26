@@ -1,9 +1,9 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { safeLocalStorage, safeSessionStorage } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import CopyButton from '../CopyButton'
 import { InlineLinkClassName } from '../InlineLink'
@@ -80,13 +80,13 @@ export const ClientSideExceptionHandler = ({
       </Admonition>
 
       <div className={cn('w-full mx-auto grid gap-2', 'grid-cols-2 sm:w-1/2')}>
-        <Button asChild variant="default" icon={<ExternalLink />}>
+        <Button asChild icon={<ExternalLinkIcon />}>
           <SupportLink
             queryParams={{
               category: SupportCategories.DASHBOARD_BUG,
               subject: 'Client side exception occurred on dashboard',
               sid: sentryIssueId,
-              error: urlMessage,
+              errorMessage: urlMessage,
             }}
           >
             Contact support

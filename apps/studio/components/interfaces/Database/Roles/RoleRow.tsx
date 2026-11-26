@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronUp, MoreVertical, Trash } from 'lucide-react'
+import { ChevronUpIcon, KeyRoundIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -11,7 +11,6 @@ import {
   CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
   FormControl,
@@ -24,7 +23,10 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { ROLE_PERMISSIONS } from './Roles.constants'
+import { ResetRolePasswordDialog } from './ResetRolePasswordDialog'
+import { RolePasswordField } from './RolePasswordField'
+import { ROLE_PERMISSIONS, SYSTEM_ROLES } from './Roles.constants'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
 import type { PgRole } from '@/data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -36,33 +38,46 @@ interface RoleRowProps {
 }
 
 const permissionSchema = z.boolean().optional()
-const formSchema = z.object(
-  Object.keys(ROLE_PERMISSIONS).reduce(
+const formSchema = z.object({
+  ...Object.keys(ROLE_PERMISSIONS).reduce(
     (acc, key) => ({
       ...acc,
       [key]: permissionSchema,
     }),
     {} as Record<keyof typeof ROLE_PERMISSIONS, z.ZodBoolean>
-  )
-)
+  ),
+  password: z.string(),
+})
+
+// The password is never loaded from the role, so the field always starts empty
+const getFormValues = (role: PgRole) => ({ ...role, password: '' })
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const isSystemRole = SYSTEM_ROLES.some((name) => name === role.name)
+  const canResetPassword = !isSystemRole && role.canLogin
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: role,
+    defaultValues: getFormValues(role),
   })
 
   const { reset, formState } = form
   const { isDirty } = formState
+  const canLogin = useWatch({ control: form.control, name: 'canLogin' })
+  // Only a role that is gaining login here can be given a password
+  const canSetPassword = !disabled && !role.canLogin && canLogin
 
   useEffect(() => {
-    reset(role)
+    reset(getFormValues(role))
   }, [role, reset])
 
-  const onSaveChanges: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
+  const onSaveChanges: SubmitHandler<z.infer<typeof formSchema>> = async ({
+    password,
+    ...values
+  }) => {
     if (!project) return console.error('Project is required')
 
     const changed = Object.fromEntries(
@@ -71,10 +86,13 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         return v !== role[key]
       })
     )
+    // An empty password is omitted so the role gains login without one
+    const payload =
+      !role.canLogin && values.canLogin && password.length > 0 ? { ...changed, password } : changed
 
-    if (Object.keys(changed).length === 0) {
+    if (Object.keys(payload).length === 0) {
       // No actual changes to persist; avoid sending an empty update payload
-      reset(role)
+      reset(getFormValues(role))
       return
     }
 
@@ -83,12 +101,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         projectRef: project.ref,
         connectionString: project.connectionString,
         id: role.id,
-        payload: changed,
+        payload,
       },
       {
         onSuccess: () => {
           toast.success(`Successfully updated role "${role.name}"`)
-          reset(values)
+          reset({ ...values, password: '' })
         },
       }
     )
@@ -126,7 +144,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             }}
           >
             <div className="flex items-start space-x-3">
-              <ChevronUp
+              <ChevronUpIcon
                 className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
@@ -140,8 +158,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-default opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-default opacity-75"></span>
                   </span>
                 </div>
               )}
@@ -162,26 +180,51 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
                     className="px-1"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     aria-label={`${role.name} actions`}
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
               <TooltipContent side="bottom">More options</TooltipContent>
             </Tooltip>
-            <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
-              <DropdownMenuItem
+            <DropdownMenuContent side="bottom" align="end" className="w-[160px]">
+              <DropdownMenuItemTooltip
                 className="space-x-2"
+                disabled={!canResetPassword}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: isSystemRole
+                      ? `The ${role.name} role is a system role and its password cannot be reset here`
+                      : `The ${role.name} role cannot log in. Turn on "User can login" to set a password`,
+                  },
+                }}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setIsResetPasswordOpen(true)
+                }}
+              >
+                <KeyRoundIcon size="14" strokeWidth={2} />
+                <p>Reset password</p>
+              </DropdownMenuItemTooltip>
+              <DropdownMenuItemTooltip
+                className="space-x-2"
+                disabled={isSystemRole}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: `The ${role.name} role is a system role and cannot be deleted`,
+                  },
+                }}
                 onClick={(event) => {
                   event.stopPropagation()
                   onSelectDelete(role.id.toString())
                 }}
               >
-                <Trash className="text-red-800" size="14" strokeWidth={2} />
+                <TrashIcon className="text-red-800" size="14" strokeWidth={2} />
                 <p>Delete</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -221,9 +264,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 )
               )}
             </div>
+            {canSetPassword && (
+              <div className="py-4">
+                <RolePasswordField isExistingRole />
+              </div>
+            )}
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button
@@ -239,6 +287,11 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </form>
         </Form>
       </CollapsibleContent>
+      <ResetRolePasswordDialog
+        role={role}
+        open={isResetPasswordOpen}
+        onOpenChange={setIsResetPasswordOpen}
+      />
     </Collapsible>
   )
 }

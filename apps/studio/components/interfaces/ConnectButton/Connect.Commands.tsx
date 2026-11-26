@@ -1,4 +1,4 @@
-import { Plug } from 'lucide-react'
+import { PlugIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -29,7 +29,7 @@ export function useConnectCommands() {
           setShowConnect(true)
           setIsOpen(false)
         },
-        icon: () => <Plug className="rotate-90" />,
+        icon: () => <PlugIcon className="rotate-90" />,
         badge: () => <ShortcutBadge shortcutId={SHORTCUT_IDS.CONNECT_OPEN_SHEET} />,
       },
       {
@@ -40,7 +40,7 @@ export function useConnectCommands() {
           setConnectTab('mcp')
           setIsOpen(false)
         },
-        icon: () => <Plug className="rotate-90" />,
+        icon: () => <PlugIcon className="rotate-90" />,
       },
     ] as ICommand[],
     {

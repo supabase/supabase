@@ -2,6 +2,13 @@ import dayjs from 'dayjs'
 
 import type { ApiKeyLastUsed } from '@/data/analytics/api-keys-last-used-query'
 
+/** Maps a legacy project API key's tag to its telemetry key type */
+export function getLegacyApiKeyType(tags: string | undefined) {
+  if (tags === 'anon') return 'legacy_anon' as const
+  if (tags === 'service_role') return 'legacy_service_role' as const
+  return undefined
+}
+
 export function getLastUsedAPIKeys(
   apiKeys: {
     tags: string
@@ -18,11 +25,11 @@ export function getLastUsedAPIKeys(
   return apiKeys.reduce(
     (a, i) => {
       const entry = logData?.find(
-        ({ role, signature_prefix }) =>
+        ({ role, signaturePrefix }) =>
           role &&
-          signature_prefix &&
+          signaturePrefix &&
           i.tags.indexOf(role) >= 0 &&
-          i.api_key.split('.')[2]?.startsWith(signature_prefix)
+          i.api_key.split('.')[2]?.startsWith(signaturePrefix)
       )?.timestamp
 
       if (entry) {

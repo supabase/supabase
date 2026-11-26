@@ -10,6 +10,7 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Image } from 'ui-patterns/Image'
 
 import { getSharedSections } from './shared-sections'
@@ -89,7 +90,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -119,14 +120,14 @@ const data: () => {
         logo: (
           <>
             <Image
-              src="/images/customers/logos/juniver.png"
+              src="/images/customers/logos/on-light/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/juniver.png"
+              src="/images/customers/logos/on-dark/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
@@ -224,7 +225,7 @@ const data: () => {
           Or, start with <span className="text-foreground">Supabase AI Prompts</span>
         </>
       ),
-      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts',
       leftFooter: (
         <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
           {frameworks.map((framework) => (
@@ -238,16 +239,14 @@ const data: () => {
           title: 'Bootstrap Next.js app with Supabase Auth',
           code: 'Set up Supabase Auth with Next.js: install @supabase/supabase-js and @supabase/ssr, configure environment variables, create browser and server clients, and add middleware for token refresh.',
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
           code: 'Generate Row Level Security policies for healthcare data. Retrieve your schema, then write policies that restrict access to PHI based on user roles, auth.uid(), and organizational boundaries.',
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/database-rls-policies',
         },
       ],
     },
@@ -261,7 +260,7 @@ const data: () => {
       customers: [
         {
           name: 'Juniver',
-          logo: '/images/customers/logos/juniver.png',
+          logo: '/images/customers/logos/on-light/juniver.png',
           highlights: [
             'Automated B2B workflows with Edge Functions and RLS',
             'Improved developer experience and performance',

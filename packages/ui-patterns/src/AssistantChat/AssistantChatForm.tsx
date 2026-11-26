@@ -3,8 +3,7 @@
 import { useBreakpoint } from 'common'
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
-import { ExpandingTextArea } from 'ui'
-import { cn } from 'ui/src/lib/utils'
+import { cn, ExpandingTextArea } from 'ui'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -79,7 +78,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           ref={textAreaRef}
           autoFocus={isMobile}
           disabled={disabled}
-          className="text-base md:text-sm pr-10 rounded-sm max-h-64"
+          className="text-sm pr-10 rounded-sm max-h-64"
           placeholder={placeholder}
           spellCheck={false}
           rows={3}

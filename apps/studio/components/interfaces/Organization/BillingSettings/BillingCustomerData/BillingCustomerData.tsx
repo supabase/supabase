@@ -1,12 +1,20 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe/stripe-js'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
@@ -15,11 +23,6 @@ import {
   getAddressElementAppearanceOptions,
   STRIPE_ELEMENT_FONTS,
 } from '@/components/interfaces/Billing/Payment/Payment.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -28,7 +31,7 @@ import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-ut
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
@@ -41,25 +44,32 @@ export const BillingCustomerData = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
+
+  const { ref, inView } = useInView({ triggerOnce: true })
 
   const {
     data: customerProfile,
     error,
     isPending: isLoading,
     isSuccess,
-  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
+  } = useOrganizationCustomerProfileQuery(
+    { slug },
+    {
+      enabled: canReadBillingCustomerData && inView,
+      select: (data) => (data ? { address: data.address, billing_name: data.billing_name } : data),
+    }
+  )
 
   const {
     data: taxId,
     error: errorLoadingTaxId,
     isPending: isLoadingTaxId,
     isSuccess: loadedTaxId,
-  } = useOrganizationTaxIdQuery({ slug })
+  } = useOrganizationTaxIdQuery({ slug }, { enabled: inView })
 
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onError: () => {},
@@ -165,19 +175,19 @@ export const BillingCustomerData = () => {
   )
 
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
-          <p className="text-sm text-foreground-light m-0">
-            Changes will be reflected in every upcoming invoice, past invoices are not affected
-          </p>
-          <p className="text-sm text-foreground-light m-0">
-            A Tax ID is only required for registered businesses.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+    <PageSection ref={ref} orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Billing Address &amp; Tax ID</PageSectionTitle>
+          <PageSectionDescription className="space-y-2">
+            <p>
+              Changes will be reflected in every upcoming invoice, past invoices are not affected
+            </p>
+            <p>A Tax ID is only required for registered businesses.</p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent className="flex flex-col gap-6">
         {selectedOrganization && isPartnerBilledOrganization ? (
           <PartnerManagedResource
             managedBy={selectedOrganization?.managed_by}
@@ -230,11 +240,7 @@ export const BillingCustomerData = () => {
                           </span>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="default"
-                            onClick={handleReset}
-                            disabled={isSubmitDisabled}
-                          >
+                          <Button onClick={handleReset} disabled={isSubmitDisabled}>
                             Cancel
                           </Button>
                           <Button
@@ -254,7 +260,7 @@ export const BillingCustomerData = () => {
             )}
           </>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }
