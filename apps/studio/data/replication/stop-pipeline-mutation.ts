@@ -11,16 +11,20 @@ export type StopPipelineParams = {
   projectRef: string
   pipelineId: string
   waitUntilStopped?: boolean
+  clusterId?: string
 }
 
 export async function stopPipeline(
-  { projectRef, pipelineId }: StopPipelineParams,
+  { projectRef, pipelineId, clusterId }: StopPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/stop', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    params: {
+      path: { ref: projectRef, pipeline_id: pipelineId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
   if (error) {
@@ -52,7 +56,7 @@ export const useStopPipelineMutation = ({
       const { projectRef, pipelineId } = variables
       await queryClient.invalidateQueries(
         {
-          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId, variables.clusterId),
         },
         { cancelRefetch: false }
       )
@@ -61,7 +65,11 @@ export const useStopPipelineMutation = ({
     async onError(data, variables, context) {
       await queryClient.invalidateQueries(
         {
-          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+          queryKey: replicationKeys.pipelinesStatus(
+            variables.projectRef,
+            variables.pipelineId,
+            variables.clusterId
+          ),
         },
         { cancelRefetch: false }
       )

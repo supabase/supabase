@@ -19,6 +19,7 @@ import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -50,6 +51,7 @@ export const BatchRestartDialog = ({
   onResetComplete,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
   const { runWithRequestStatus } = usePipelineRequestStatus()
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const affectedTables = useMemo(() => {
@@ -83,6 +85,7 @@ export const BatchRestartDialog = ({
       await runWithRequestStatus(pipelineId, restartRequestStatus, () =>
         rollbackTables({
           projectRef,
+          clusterId,
           pipelineId,
           target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
         })

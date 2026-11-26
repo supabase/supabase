@@ -14,10 +14,11 @@ type RollbackTablesParams = {
   projectRef: string
   pipelineId: string
   target: RollbackTablesTarget
+  clusterId?: string
 }
 
 async function rollbackTables(
-  { projectRef, pipelineId, target }: RollbackTablesParams,
+  { projectRef, pipelineId, target, clusterId }: RollbackTablesParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project reference is required')
@@ -26,7 +27,10 @@ async function rollbackTables(
   const { data, error } = await post(
     '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables',
     {
-      params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+      params: {
+        path: { ref: projectRef, pipeline_id: pipelineId },
+        query: { cluster_id: clusterId },
+      },
       // Production OpenAPI still includes the retired rollback_type field.
       body: { target } as components['schemas']['RollbackTablesBody'],
       signal,
@@ -56,13 +60,17 @@ export const useRollbackTablesMutation = ({
       await Promise.all([
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId, variables.clusterId),
           },
           { cancelRefetch: false }
         ),
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+            queryKey: replicationKeys.pipelinesReplicationStatus(
+              projectRef,
+              pipelineId,
+              variables.clusterId
+            ),
           },
           { cancelRefetch: false }
         ),
@@ -74,7 +82,11 @@ export const useRollbackTablesMutation = ({
       await Promise.all([
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+            queryKey: replicationKeys.pipelinesStatus(
+              variables.projectRef,
+              variables.pipelineId,
+              variables.clusterId
+            ),
           },
           { cancelRefetch: false }
         ),
@@ -82,7 +94,8 @@ export const useRollbackTablesMutation = ({
           {
             queryKey: replicationKeys.pipelinesReplicationStatus(
               variables.projectRef,
-              variables.pipelineId
+              variables.pipelineId,
+              variables.clusterId
             ),
           },
           { cancelRefetch: false }

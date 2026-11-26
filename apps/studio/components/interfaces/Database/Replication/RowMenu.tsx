@@ -129,7 +129,7 @@ export const RowMenu = ({
 
     try {
       await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
-        stopPipeline({ projectRef, pipelineId: pipeline.id })
+        stopPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
       )
     } catch (error) {
       toast.error(`Failed to stop pipeline: ${(error as StudioError).message}`)
@@ -142,7 +142,7 @@ export const RowMenu = ({
 
     try {
       await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
-        restartPipeline({ projectRef, pipelineId: pipeline.id })
+        restartPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
       )
     } catch (error) {
       toast.error(`Failed to restart pipeline: ${(error as StudioError).message}`)

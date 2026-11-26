@@ -123,7 +123,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
+      await stopPipeline({ projectRef, pipelineId: pipeline.id, clusterId, waitUntilStopped: true })
       await deleteDestinationPipeline({
         projectRef,
         destinationId: destinationId,

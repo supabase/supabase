@@ -197,11 +197,11 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         )
       } else if (resolvedAction === 'stop') {
         await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
-          stopPipeline({ projectRef, pipelineId: pipeline.id })
+          stopPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
         )
       } else {
         await runWithRequestStatus(pipeline.id, getRestartRequestStatus(statusName), () =>
-          restartPipeline({ projectRef, pipelineId: pipeline.id })
+          restartPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
         )
       }
     } catch (error) {
@@ -215,7 +215,12 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     try {
       setIsDeleting(true)
       if (statusName !== PipelineStatusName.STOPPED) {
-        await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
+        await stopPipeline({
+          projectRef,
+          pipelineId: pipeline.id,
+          clusterId,
+          waitUntilStopped: true,
+        })
       }
       await deleteDestinationPipeline({
         projectRef,
