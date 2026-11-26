@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -17,7 +17,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const matchRoute = useMatchRoute()
   const { authenticationSignInProviders, authenticationThirdPartyAuth } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -27,14 +27,12 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
     {
       label: 'Supabase Auth',
       to: '/project/$ref/auth/providers' as const,
-      href: `/project/${ref}/auth/providers`,
     },
     ...(authenticationThirdPartyAuth
       ? [
           {
             label: 'Third-Party Auth',
             to: '/project/$ref/auth/third-party' as const,
-            href: `/project/${ref}/auth/third-party`,
           },
         ]
       : []),
@@ -57,10 +55,13 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
           <PageNav size="default">
             <NavMenu>
               {navItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
                   <Link
                     to={item.to}
-                    params={{ ref: ref ?? '' }}
+                    params={{ ref: ref ?? '_' }}
                     activeOptions={{ exact: true, includeSearch: false }}
                   >
                     {item.label}

@@ -13,13 +13,13 @@ describe('JWTKeysLayout', () => {
       { initialUrl: '/project/default/settings/jwt/legacy' }
     )
 
-    expect(screen.getByRole('link', { name: 'Legacy JWT Secret' })).toHaveAttribute(
-      'aria-current',
-      'page'
-    )
-    expect(screen.getByRole('link', { name: 'JWT Signing Keys' })).not.toHaveAttribute(
-      'aria-current'
-    )
+    const legacyLink = screen.getByRole('link', { name: 'Legacy JWT Secret' })
+    const signingKeysLink = screen.getByRole('link', { name: 'JWT Signing Keys' })
+
+    expect(legacyLink).toHaveAttribute('aria-current', 'page')
+    expect(legacyLink.closest('li')).toHaveAttribute('aria-selected', 'true')
+    expect(signingKeysLink).not.toHaveAttribute('aria-current')
+    expect(signingKeysLink.closest('li')).toHaveAttribute('aria-selected', 'false')
   })
 
   it('keeps the signing keys tab marked as current when query params are present', () => {
@@ -30,12 +30,12 @@ describe('JWTKeysLayout', () => {
       { initialUrl: '/project/default/settings/jwt?view=standby' }
     )
 
-    expect(screen.getByRole('link', { name: 'JWT Signing Keys' })).toHaveAttribute(
-      'aria-current',
-      'page'
-    )
-    expect(screen.getByRole('link', { name: 'Legacy JWT Secret' })).not.toHaveAttribute(
-      'aria-current'
-    )
+    const signingKeysLink = screen.getByRole('link', { name: 'JWT Signing Keys' })
+    const legacyLink = screen.getByRole('link', { name: 'Legacy JWT Secret' })
+
+    expect(signingKeysLink).toHaveAttribute('aria-current', 'page')
+    expect(signingKeysLink.closest('li')).toHaveAttribute('aria-selected', 'true')
+    expect(legacyLink).not.toHaveAttribute('aria-current')
+    expect(legacyLink.closest('li')).toHaveAttribute('aria-selected', 'false')
   })
 })

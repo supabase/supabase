@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -29,7 +29,7 @@ export const StorageBucketsLayout = ({
   children,
 }: PropsWithChildren<{ title?: string; hideSubtitle?: boolean }>) => {
   const { ref } = useParams()
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const matchRoute = useMatchRoute()
   const page = useStorageV2Page()
   const config = getPageHeaderConfig(page)
 
@@ -39,21 +39,18 @@ export const StorageBucketsLayout = ({
           {
             label: 'Buckets',
             to: '/project/$ref/storage/files' as const,
-            href: `/project/${ref}/storage/files`,
           },
           ...(IS_PLATFORM
             ? [
                 {
                   label: 'Settings',
                   to: '/project/$ref/storage/files/settings' as const,
-                  href: `/project/${ref}/storage/files/settings`,
                 },
               ]
             : []),
           {
             label: 'Policies',
             to: '/project/$ref/storage/files/policies' as const,
-            href: `/project/${ref}/storage/files/policies`,
           },
         ]
       : []
@@ -80,10 +77,13 @@ export const StorageBucketsLayout = ({
           <PageHeaderNavigationTabs>
             <NavMenu>
               {navigationItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
                   <Link
                     to={item.to}
-                    params={{ ref: ref ?? '' }}
+                    params={{ ref: ref ?? '_' }}
                     activeOptions={{ exact: true, includeSearch: false }}
                   >
                     {item.label}

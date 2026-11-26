@@ -112,7 +112,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
-              <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '' }}>
+              <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '_' }}>
                 <SettingsIcon size={14} />
                 <p>Add a Log Drain</p>
               </Link>

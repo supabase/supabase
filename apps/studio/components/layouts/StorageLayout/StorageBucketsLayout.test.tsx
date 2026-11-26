@@ -18,8 +18,13 @@ describe('StorageBucketsLayout', () => {
       { initialUrl: '/project/default/storage/files/policies' }
     )
 
-    expect(screen.getByRole('link', { name: 'Policies' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: 'Buckets' })).not.toHaveAttribute('aria-current')
+    const policiesLink = screen.getByRole('link', { name: 'Policies' })
+    const bucketsLink = screen.getByRole('link', { name: 'Buckets' })
+
+    expect(policiesLink).toHaveAttribute('aria-current', 'page')
+    expect(policiesLink.closest('li')).toHaveAttribute('aria-selected', 'true')
+    expect(bucketsLink).not.toHaveAttribute('aria-current')
+    expect(bucketsLink.closest('li')).toHaveAttribute('aria-selected', 'false')
   })
 
   it('keeps the buckets tab marked as current when query params are present', () => {
@@ -32,7 +37,12 @@ describe('StorageBucketsLayout', () => {
       { initialUrl: '/project/default/storage/files?new=true' }
     )
 
-    expect(screen.getByRole('link', { name: 'Buckets' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: 'Policies' })).not.toHaveAttribute('aria-current')
+    const bucketsLink = screen.getByRole('link', { name: 'Buckets' })
+    const policiesLink = screen.getByRole('link', { name: 'Policies' })
+
+    expect(bucketsLink).toHaveAttribute('aria-current', 'page')
+    expect(bucketsLink.closest('li')).toHaveAttribute('aria-selected', 'true')
+    expect(policiesLink).not.toHaveAttribute('aria-current')
+    expect(policiesLink.closest('li')).toHaveAttribute('aria-selected', 'false')
   })
 })

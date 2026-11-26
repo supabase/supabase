@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -14,19 +14,17 @@ import { PageNav } from 'ui-patterns/PageNav'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const matchRoute = useMatchRoute()
 
   const navigationItems = [
     {
       label: 'JWT Signing Keys',
       to: '/project/$ref/settings/jwt' as const,
-      href: `/project/${projectRef}/settings/jwt`,
       id: 'signing-keys',
     },
     {
       label: 'Legacy JWT Secret',
       to: '/project/$ref/settings/jwt/legacy' as const,
-      href: `/project/${projectRef}/settings/jwt/legacy`,
       id: 'legacy-jwt-keys',
     },
   ]
@@ -46,10 +44,15 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
       <PageNav size="default">
         <NavMenu>
           {navigationItems.map((item) => (
-            <NavMenuItem key={item.id} active={pathname === item.href}>
+            <NavMenuItem
+              key={item.id}
+              active={
+                !!matchRoute({ to: item.to, params: { ref: projectRef ?? '_' }, fuzzy: false })
+              }
+            >
               <Link
                 to={item.to}
-                params={{ ref: projectRef ?? '' }}
+                params={{ ref: projectRef ?? '_' }}
                 activeOptions={{ exact: true, includeSearch: false }}
               >
                 {item.label}

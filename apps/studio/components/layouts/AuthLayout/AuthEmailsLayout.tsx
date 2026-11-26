@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -17,7 +17,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const matchRoute = useMatchRoute()
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
@@ -25,12 +25,10 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
     {
       label: 'Templates',
       to: '/project/$ref/auth/templates' as const,
-      href: `/project/${ref}/auth/templates`,
     },
     {
       label: 'SMTP Settings',
       to: '/project/$ref/auth/smtp' as const,
-      href: `/project/${ref}/auth/smtp`,
     },
   ]
 
@@ -51,10 +49,13 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
           <PageNav size="default">
             <NavMenu>
               {navItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
                   <Link
                     to={item.to}
-                    params={{ ref: ref ?? '' }}
+                    params={{ ref: ref ?? '_' }}
                     activeOptions={{ exact: true, includeSearch: false }}
                   >
                     {item.label}
