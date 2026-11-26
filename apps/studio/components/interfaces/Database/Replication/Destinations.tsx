@@ -212,21 +212,21 @@ export const Destinations = () => {
   const hasGeneralErrors = isRegionsError || isSourcesError
   const getWarningTitle = () => {
     if (hasGeneralErrors) return 'Could not load pipeline information'
-    if (failedRegions.length === 1) return `Could not load pipelines from ${failedRegionName}`
-    return 'Could not load pipelines from some regions'
+    if (failedRegions.length === 1) return `Could not load results from ${failedRegionName}`
+    return 'Could not load results from some regions'
   }
   const warningTitle = getWarningTitle()
   const unavailableInformation = [
     isRegionsError && 'Available regions',
     isSourcesError && 'Pipelines enablement status',
     hasClusterErrors &&
-      `pipelines from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
+      `pipeline results from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
   ].filter((item): item is string => Boolean(item))
   const getWarningDescription = () => {
     if (!hasGeneralErrors) {
       return failedRegions.length === 1
-        ? `Pipelines from ${failedRegionName} are missing from this view.`
-        : 'Pipelines from these regions are missing from this view.'
+        ? 'Any pipelines in this region are missing from this view.'
+        : 'Any pipelines in the following regions are missing from this view:'
     }
     const information =
       unavailableInformation.length > 1
