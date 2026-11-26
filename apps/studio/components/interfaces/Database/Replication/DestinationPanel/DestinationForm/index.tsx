@@ -56,6 +56,7 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -75,7 +76,9 @@ interface DestinationFormProps {
   checkIsDirtyRef?: RefObject<() => boolean>
   onClose: () => void
   onCancel?: () => void
+  onRegionChange?: (clusterId: string | undefined) => void
   isPreparingRegion?: boolean
+  preferredClusterId?: string
 }
 
 export const DestinationForm = ({
@@ -86,7 +89,9 @@ export const DestinationForm = ({
   checkIsDirtyRef,
   onClose,
   onCancel = onClose,
+  onRegionChange,
   isPreparingRegion = false,
+  preferredClusterId,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
   const clusterId = useReplicationClusterId()
@@ -116,6 +121,9 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { hasMultipleRegions } = useReplicationClusters()
+  // Publications are listed through the region's source, so the region is chosen first.
+  const canSelectRegion = !editMode && hasMultipleRegions && onRegionChange !== undefined
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
@@ -253,8 +261,8 @@ export const DestinationForm = ({
 
   const isSubmitDisabled =
     isSaving ||
-    isPreparingRegion ||
     (isManagedDuckLake && isDuckLakeProjectBlocked) ||
+    isPreparingRegion ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -479,6 +487,22 @@ export const DestinationForm = ({
     </>
   )
 
+  const regionField = (
+    <PipelineRegionField
+      destinationType={selectedType}
+      preferredClusterId={preferredClusterId}
+      onRegionChange={
+        canSelectRegion
+          ? (clusterId) => {
+              resetValidation()
+              onRegionChange(clusterId)
+            }
+          : undefined
+      }
+      disabled={isPreparingRegion || isSaving}
+    />
+  )
+
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -488,7 +512,11 @@ export const DestinationForm = ({
             <fieldset disabled={!isExistingConfigReady || isPreparingRegion} className="contents">
               {shouldShowConnectionSection && (
                 <>
-                  <PipelineConnectionSection type={selectedType} form={form}>
+                  <PipelineConnectionSection
+                    type={selectedType}
+                    form={form}
+                    regionField={regionField}
+                  >
                     {destinationFields}
                   </PipelineConnectionSection>
                   <DialogSectionSeparator />
@@ -515,12 +543,13 @@ export const DestinationForm = ({
 
                     <div className="flex flex-col gap-y-4">
                       <DestinationNameInput form={form} destinationType={selectedType} />
+                      {canSelectRegion && regionField}
                       <PublicationSelection
                         form={form}
                         onSelectNewPublication={() => setPublicationPanelVisible(true)}
                       />
                       <TableCopySelection form={form} editMode={editMode} />
-                      <PipelineRegionField destinationType={selectedType} />
+                      {!canSelectRegion && regionField}
                     </div>
                   </div>
 

@@ -133,6 +133,11 @@ export const DestinationPanel = () => {
     error: regionSourceError,
     reset: resetRegionSource,
   } = useEnsurePipelineRegionSource(projectRef)
+  const handleRegionChange = (clusterId: string | undefined) => {
+    setChosenClusterId(clusterId)
+    resetRegionSource()
+    void ensureRegionSource(clusterId)
+  }
 
   // A preselected region may need the project's source, just like an explicit pick.
   const attemptedPreferredClusterRef = useRef<string | undefined | null>(null)
@@ -297,6 +302,8 @@ export const DestinationPanel = () => {
                   checkIsDirtyRef={checkIsDirtyRef}
                   onClose={onClose}
                   onCancel={confirmOnClose}
+                  preferredClusterId={preferredCluster.clusterId}
+                  onRegionChange={handleRegionChange}
                   isPreparingRegion={isCreatingSource || regionSourceError !== null}
                 />
               </ReplicationClusterProvider>
