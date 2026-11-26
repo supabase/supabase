@@ -14,7 +14,7 @@ PR opened / updated
     │
     ├── Docs Tests                 (pnpm test:docs on relevant docs code/spec changes)
     ├── TypeScript & Lint          (tsc + eslint)
-    ├── Prettier                   (format check)
+    ├── Check Code Formatting      (oxfmt format check)
     ├── reviewdog                  (inline annotations)
     ├── Validate pull request      (PR metadata)
     └── Authorize Vercel Deploys → Vercel builds preview deploy → Preview on CDN
@@ -46,9 +46,9 @@ Ubuntu runner with concurrency controls to cancel stale builds.
 
 TypeScript type checking and ESLint across the monorepo.
 
-### 3. Prettier (`prettier.yml`)
+### 3. Check Code Formatting (`prettier.yml`)
 
-Format checking across the whole repo including `apps/docs`.
+Format checking with oxfmt across the whole repo including `apps/docs`.
 
 ### 4. Authorize Vercel Deploys
 

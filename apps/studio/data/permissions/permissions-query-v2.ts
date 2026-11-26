@@ -1,5 +1,6 @@
-import { queryOptions, useQuery, type QueryClient } from '@tanstack/react-query'
+import { queryOptions, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
+import { useCallback } from 'react'
 
 import { permissionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -59,6 +60,14 @@ export const usePermissionsQueryV2 = <TData = PermissionsV2Data>({
     enabled: IS_PLATFORM && enabled && isLoggedIn,
     staleTime: 5 * 60 * 1000,
   })
+}
+
+export const useInvalidatePermissionsV2Query = () => {
+  const queryClient = useQueryClient()
+  const invalidatePermissionsQuery = useCallback(() => {
+    return queryClient.invalidateQueries({ queryKey: permissionKeys.listV2() })
+  }, [queryClient])
+  return { invalidatePermissionsQuery }
 }
 
 export function invalidatePermissionsQueryV2(client: QueryClient) {

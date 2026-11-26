@@ -134,7 +134,9 @@ If replication has already failed on a partial update, use [**Reset table**](/do
 
 <Admonition type="danger">
 
-Resetting a table deletes its existing BigQuery data when replication resumes. Include the table in **Initial sync** before resetting if you want to copy its current source rows again.
+A table reset **replaces the replicated data** in BigQuery when replication resumes. Include the table in **Initial sync** before resetting if you need to copy its current source rows again.
+
+Obsolete backing tables can remain in the dataset after a reset. If you need physical deletion, verify that BigQuery removed them.
 
 </Admonition>
 
@@ -155,7 +157,9 @@ Pipelines supports:
 
 New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
 
-Adding `NOT NULL` keeps an existing destination column nullable. Changes to published columns can require a table reset. For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+Adding `NOT NULL` keeps an existing destination column nullable. Changes to published columns can require a table reset.
+
+Replication can continue after a source type change that keeps the same BigQuery column type. If the change requires a different BigQuery type, Pipelines stops replication for the whole pipeline before updating the destination table. Use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the affected table.
 
 ### Column defaults
 

@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
@@ -256,8 +255,9 @@ export const SpendCapSidePanel = () => {
                       )}
                       onClick={() => !isFreePlan && setSelectedOption(option.value)}
                     >
-                      <Image
-                        alt="Spend Cap"
+                      <img
+                        alt=""
+                        aria-hidden="true"
                         className={cn(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                           isSelected

@@ -1,6 +1,5 @@
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -30,7 +29,7 @@ export const StorageBucketsLayout = ({
   children,
 }: PropsWithChildren<{ title?: string; hideSubtitle?: boolean }>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const matchRoute = useMatchRoute()
   const page = useStorageV2Page()
   const config = getPageHeaderConfig(page)
 
@@ -39,19 +38,19 @@ export const StorageBucketsLayout = ({
       ? [
           {
             label: 'Buckets',
-            href: `/project/${ref}/storage/files`,
+            to: '/project/$ref/storage/files' as const,
           },
           ...(IS_PLATFORM
             ? [
                 {
                   label: 'Settings',
-                  href: `/project/${ref}/storage/files/settings`,
+                  to: '/project/$ref/storage/files/settings' as const,
                 },
               ]
             : []),
           {
             label: 'Policies',
-            href: `/project/${ref}/storage/files/policies`,
+            to: '/project/$ref/storage/files/policies' as const,
           },
         ]
       : []
@@ -78,8 +77,17 @@ export const StorageBucketsLayout = ({
           <PageHeaderNavigationTabs>
             <NavMenu>
               {navigationItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
+                  <Link
+                    to={item.to}
+                    params={{ ref: ref ?? '_' }}
+                    activeOptions={{ exact: true, includeSearch: false }}
+                  >
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>

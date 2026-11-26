@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { CheckIcon, DatabaseZapIcon, DollarSignIcon, GitMergeIcon, Loader2Icon } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
@@ -380,7 +379,7 @@ export const CreateBranchModal = () => {
                           <div className="flex items-center justify-between w-full gap-4">
                             <span className="flex-1">Sync with Git branch</span>
                             <div className="flex items-center gap-2 text-sm">
-                              <Image
+                              <img
                                 className={cn('dark:invert')}
                                 src={`${BASE_PATH}/img/icons/github-icon.svg`}
                                 width={16}

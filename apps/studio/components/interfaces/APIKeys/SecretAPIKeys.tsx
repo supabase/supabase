@@ -14,9 +14,11 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
 import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   // Lists keys without their secret values (revealing happens per key), so a plain grant is enough
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
   const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
@@ -48,7 +50,9 @@ export const SecretAPIKeys = () => {
     isPending: isDeletingAPIKey,
     isSuccess: isDeleteSuccess,
   } = useAPIKeyDeleteMutation({
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      // Attribute to the project the key was deleted from, not whichever project the route is on now
+      track('api_key_removed', { keyType: 'secret' }, { project: variables.projectRef })
       toast.success('Successfully deleted secret key')
       setDeleteId(null)
     },

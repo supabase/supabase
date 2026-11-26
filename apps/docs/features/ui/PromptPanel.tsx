@@ -347,7 +347,7 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
     >
       {header}
       {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
-      <div className="grid">
+      <div className="grid grid-cols-1">
         {prompts.map((prompt) => {
           const isActive = prompt.value === activeTab
 

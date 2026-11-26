@@ -30,6 +30,7 @@ export const LegacyAPIKeysRetirementNotice = () => {
             href={`${DOCS_URL}/guides/getting-started/migrating-to-new-api-keys`}
             label="Migration guide"
             topic="Migrating to new API keys"
+            data-attr="api-keys-docs"
           />
         </>
       }

@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { ChevronRightIcon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import {
   Badge,
   TableCell,
@@ -117,7 +117,7 @@ export const BucketTableRow = ({
   projectRef,
   formattedGlobalUploadLimit,
 }: BucketTableRowProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { getPolicyCount } = useBucketPolicyCount()
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
@@ -126,7 +126,7 @@ export const BucketTableRow = ({
 
   const handleBucketNavigation = createNavigationHandler(
     `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`,
-    router
+    navigate
   )
 
   return (

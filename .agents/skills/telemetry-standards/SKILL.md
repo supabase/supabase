@@ -54,6 +54,7 @@ enabled, disabled, copied, exposed, failed, converted, closed, completed, applie
 - PascalCase properties
 - Inconsistent names across similar events (e.g., `assistantType` in one event, `aiType` in a related event)
 - Mixing camelCase and snake_case within the same event
+- A name another event already sends with a different type. PostHog keeps one type per property name across the whole project, so values of another type can read as empty in insights. Generic names (`step`, `type`, `status`, `count`) collide most: search `packages/common/telemetry-constants.ts` for the name first
 
 ## What NOT to Track
 
@@ -94,8 +95,6 @@ track('policy_created', { operation: 'select', hasCheckExpression: true })
 If you need to tell values apart, derive a category (`public` / `protected` / `custom`), a count (`tableCount`), or a boolean (`isDefaultSchema`). If a raw name seems essential, stop and ask before adding it.
 
 This section takes precedence over "match similar events" guidance elsewhere in this skill: if a similar event carries a user-defined name, don't copy that property.
-
-`data-attr` attributes are not tracked while PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`). Keep their values static strings, and never build them from user-defined names, in case autocapture is enabled later.
 
 ## Privacy: Secrets, Project Content and URL State
 
@@ -146,6 +145,12 @@ const MyComponent = () => {
   return <button onClick={handleClick}>Click me</button>
 }
 ```
+
+Where the `track()` call goes:
+
+- **`data-attr` is not tracking.** PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`), so the attribute sends nothing. A click you want measured gets a `track()` call. Keep any `data-attr` value a static string, never built from user-defined names, in case autocapture is enabled later.
+- **Mutation outcomes.** Don't track in the callbacks passed as the second argument to `mutate()` (`onSuccess`, `onError`): they are skipped if the component unmounts first. Track around `await mutateAsync()` (after it for success, in a `catch` for failure), or in the callbacks passed to the mutation hook itself (`useXMutation({ onSuccess, onError })`) when the hook always calls them: some return early, on a 202 for example. The selected project can change before the response arrives, so attribute the event to the mutation's own project or org (from its variables, or from the response for a create) with the third `track()` argument, for example `{ project: variables.projectRef }`.
+- **One meaning per event.** When one event name fires from several places, every call site fires on the same kind of user action, so the counts are comparable. Don't mix a `copy` event handler on a DOM element, which also fires on keyboard and partial-selection copies, with a Copy button's click callback under one event name: track the same action in both, or add a property that tells them apart.
 
 ## Feature Flag Measurement
 
@@ -206,6 +211,7 @@ When reviewing a PR, flag these as **required changes:**
 5. **Unmeasured feature flags** — a PostHog flag gates new behavior but its value is not captured in any `track()` call, or there is no outcome tracking for the gated behavior
 6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, raw error messages, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one (feature flag values excepted). Required even when the value looks harmless; ask for a count, enum, boolean or category instead
 7. **Secrets, project content, URL state or consent** — a property that can carry a secret or content read from a project; new query-string or hash state holding tokens, user input or row values with no redaction; a send path that bypasses the consent check; analytics storage written before consent
+8. **Tracking placement** — a `track()` call or a `data-attr` that breaks one of the placement rules under [Required Pattern](#required-pattern)
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
