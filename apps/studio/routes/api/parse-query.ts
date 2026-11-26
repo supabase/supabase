@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { parse } from 'libpg-query'
 
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const getOperation = (stmt: Record<string, unknown>) => {
   if ('SelectStmt' in stmt) return 'SELECT'
@@ -98,7 +98,7 @@ const getWhereClauseText = (sql: string, stmtType: string, stmt: Record<string, 
   return sql.slice(start, end).trim()
 }
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const body = await parseJsonBody<{ sql?: unknown } | null>(request)
   const sql = body?.sql
 
@@ -119,7 +119,7 @@ async function handlePost(request: Request): Promise<Response> {
         ? getWhereClauseText(sql, stmtType, stmtNode as Record<string, unknown>)
         : null
 
-    return Response.json({ tables, operation, whereClause, statementCount }, { status: 200 })
+    return Response.json({ tables, operation, whereClause, statementCount })
   } catch (error) {
     const message =
       (error as { sqlDetails?: { message?: string } })?.sqlDetails?.message ??
@@ -131,7 +131,7 @@ async function handlePost(request: Request): Promise<Response> {
 export const Route = createFileRoute('/api/parse-query')({
   server: {
     handlers: createApiHandlers({
-      POST: ({ request }) => handlePost(request),
+      POST: handlePost,
     }),
   },
 })

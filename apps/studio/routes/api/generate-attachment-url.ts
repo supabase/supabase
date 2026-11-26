@@ -4,8 +4,7 @@ import z from 'zod'
 
 import { DASHBOARD_LOG_BUCKET } from '@/components/interfaces/Support/dashboard-logs'
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
-import { getUserClaims } from '@/lib/gotrue'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
@@ -14,11 +13,8 @@ const GenerateAttachmentUrlSchema = z.object({
     .default('support-attachments'),
 })
 
-async function handlePost(request: Request): Promise<Response> {
-  const { claims, error: userClaimsError } = await getUserClaims(
-    request.headers.get('authorization') ?? ''
-  )
-  if (userClaimsError || !claims) {
+async function handlePost({ request, claims }: ApiHandlerContext) {
+  if (!claims) {
     return Response.json({ error: { message: 'Unauthorized' } }, { status: 401 })
   }
   const userId = claims.sub
@@ -69,16 +65,11 @@ async function handlePost(request: Request): Promise<Response> {
       { status: 500 }
     )
   }
-  return Response.json(data ? data.map((file) => file.signedUrl) : [], { status: 200 })
+  return Response.json(data ? data.map((file) => file.signedUrl) : [])
 }
 
 export const Route = createFileRoute('/api/generate-attachment-url')({
   server: {
-    handlers: createApiHandlers(
-      {
-        POST: ({ request }) => handlePost(request),
-      },
-      { withAuth: true }
-    ),
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
   },
 })

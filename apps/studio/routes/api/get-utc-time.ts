@@ -7,11 +7,7 @@ import { createApiHandlers } from '@/lib/api/apiWrapper'
 export const Route = createFileRoute('/api/get-utc-time')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        const utcTime = new Date().toISOString()
-
-        return Response.json({ utcTime }, { status: 200 })
-      },
+      GET: () => Response.json({ utcTime: new Date().toISOString() }),
     }),
   },
 })

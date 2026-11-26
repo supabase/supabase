@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/check-cname')({
               headers: { Accept: 'application/dns-json' },
             }
           ).then((res) => res.json())
-          return Response.json(result, { status: 200 })
+          return Response.json(result)
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error)
           return Response.json({ message }, { status: 400 })

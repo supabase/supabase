@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { IS_PLATFORM } from 'common'
 
 import { parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { getEdgeFunctionTestUrl } from '@/lib/api/edgeFunctions'
 import { DEFAULT_SUPABASE_PUBLIC_URL } from '@/lib/constants/api'
 
@@ -13,7 +13,7 @@ interface EdgeFunctionTestBody {
   headers?: Record<string, string | null | undefined>
 }
 
-async function handlePost(request: Request): Promise<Response> {
+async function handlePost({ request }: ApiHandlerContext) {
   const parsedBody = await parseJsonBody<EdgeFunctionTestBody>(request)
 
   try {
@@ -83,14 +83,11 @@ async function handlePost(request: Request): Promise<Response> {
       }
     })
 
-    return Response.json(
-      {
-        status: response.status,
-        headers: responseHeaders,
-        body: responseBody,
-      },
-      { status: 200 }
-    )
+    return Response.json({
+      status: response.status,
+      headers: responseHeaders,
+      body: responseBody,
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : ''
     return Response.json(
@@ -108,7 +105,7 @@ async function handlePost(request: Request): Promise<Response> {
 export const Route = createFileRoute('/api/edge-functions/test')({
   server: {
     handlers: createApiHandlers({
-      POST: ({ request }) => handlePost(request),
+      POST: handlePost,
     }),
   },
 })

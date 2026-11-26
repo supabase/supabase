@@ -9,15 +9,12 @@ export const Route = createFileRoute('/api/enabled-features-overrides')({
     handlers: createApiHandlers({
       GET: () => {
         if (IS_PLATFORM) {
-          return Response.json({ disabled_features: [] }, { status: 200 })
+          return Response.json({ disabled_features: [] })
         }
 
-        return Response.json(
-          {
-            disabled_features: getEnabledFeaturesOverrideDisabledList(process.env),
-          },
-          { status: 200 }
-        )
+        return Response.json({
+          disabled_features: getEnabledFeaturesOverrideDisabledList(process.env),
+        })
       },
     }),
   },

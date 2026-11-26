@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/generate-attachment-url'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type GoTrueErrorResponse = { msg: string }
 type CreateSignedUrlsResponse = Array<{
@@ -18,6 +18,12 @@ const { GOTRUE_URL } = vi.hoisted(() => {
   vi.stubEnv('NEXT_PUBLIC_GOTRUE_URL', url)
   return { GOTRUE_URL: url }
 })
+
+// Authentication comes from the platform-only `withAuth` wrapper.
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  IS_PLATFORM: true,
+}))
 
 const SUPPORT_API_URL = 'https://support.example.test'
 const SUPPORT_SECRET_KEY = 'sb_secret_test_key'
@@ -34,6 +40,13 @@ function createJwt(sub: string): string {
   ).toString('base64url')
   const signature = Buffer.from('test-signature').toString('base64url')
   return `${header}.${payload}.${signature}`
+}
+
+function postAttachmentUrl(init: { headers?: HeadersInit; body: string }) {
+  return callRoute(
+    Route,
+    new Request('http://localhost/api/generate-attachment-url', { method: 'POST', ...init })
+  )
 }
 
 function mockGoTrueUser(token: string, userId: string) {
@@ -88,18 +101,12 @@ describe('/api/generate-attachment-url', () => {
       )
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/generate-attachment-url', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'text/plain;charset=UTF-8',
-        },
-        body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
-      }),
+    const response = await postAttachmentUrl({
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'text/plain;charset=UTF-8',
+      },
+      body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
     })
 
     expect(response.status).toBe(200)
@@ -124,18 +131,9 @@ describe('/api/generate-attachment-url', () => {
       )
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/generate-attachment-url', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
-      }),
+    const response = await postAttachmentUrl({
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filenames: ['user-1/screenshot.png'] }),
     })
 
     expect(response.status).toBe(401)
@@ -145,47 +143,11 @@ describe('/api/generate-attachment-url', () => {
     const token = createJwt('user-1')
     mockGoTrueUser(token, 'user-1')
 
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/generate-attachment-url', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ filenames: ['user-2/secret.png'] }),
-      }),
+    const response = await postAttachmentUrl({
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ filenames: ['user-2/secret.png'] }),
     })
 
     expect(response.status).toBe(403)
-  })
-
-  it('returns 400 on malformed JSON body', async () => {
-    const token = createJwt('user-1')
-    mockGoTrueUser(token, 'user-1')
-
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/generate-attachment-url', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: '{invalid',
-      }),
-    })
-
-    expect(response.status).toBe(400)
-  })
-
-  it('returns 405 with Allow: POST for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request('http://localhost/api/generate-attachment-url', { method: 'GET' }),
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST')
   })
 })

@@ -5,7 +5,7 @@ import { waitUntil } from '@vercel/functions'
 import { z } from 'zod'
 
 import { getBearerToken, parseJsonBody } from '@/lib/api/apiHelpers'
-import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
@@ -24,7 +24,7 @@ async function isStripeSyncEnabled() {
   return true
 }
 
-async function handleDeleteStripeSyncInstall(request: Request): Promise<Response> {
+async function handleDeleteStripeSyncInstall({ request }: ApiHandlerContext) {
   if (!(await isStripeSyncEnabled())) {
     return Response.json({ data: null, error: { message: 'Not Found' } }, { status: 404 })
   }
@@ -60,13 +60,10 @@ async function handleDeleteStripeSyncInstall(request: Request): Promise<Response
     })
   )
 
-  return Response.json(
-    { data: { message: 'Stripe Sync uninstallation initiated' }, error: null },
-    { status: 200 }
-  )
+  return Response.json({ data: { message: 'Stripe Sync uninstallation initiated' }, error: null })
 }
 
-async function handleSetupStripeSyncInstall(request: Request): Promise<Response> {
+async function handleSetupStripeSyncInstall({ request }: ApiHandlerContext) {
   if (!(await isStripeSyncEnabled())) {
     return Response.json({ data: null, error: { message: 'Not Found' } }, { status: 404 })
   }
@@ -137,17 +134,17 @@ async function handleSetupStripeSyncInstall(request: Request): Promise<Response>
     })
   )
 
-  return Response.json(
-    { data: { message: 'Stripe Sync setup initiated', version: VERSION }, error: null },
-    { status: 200 }
-  )
+  return Response.json({
+    data: { message: 'Stripe Sync setup initiated', version: VERSION },
+    error: null,
+  })
 }
 
 export const Route = createFileRoute('/api/integrations/stripe-sync')({
   server: {
     handlers: createApiHandlers({
-      POST: ({ request }) => handleSetupStripeSyncInstall(request),
-      DELETE: ({ request }) => handleDeleteStripeSyncInstall(request),
+      POST: handleSetupStripeSyncInstall,
+      DELETE: handleDeleteStripeSyncInstall,
     }),
   },
 })

@@ -29,9 +29,9 @@ export const Route = createFileRoute('/api/cli-release-version')({
             .catch(() => [])
           const beta = data[0]?.tag_name
 
-          return Response.json({ current, latest, beta, published_at }, { status: 200 })
+          return Response.json({ current, latest, beta, published_at })
         } catch {
-          return Response.json({ current }, { status: 200 })
+          return Response.json({ current })
         }
       },
     }),

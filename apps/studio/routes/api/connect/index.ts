@@ -35,7 +35,7 @@ export const Route = createFileRoute('/api/connect/')({
       GET: async () => {
         const folderPath = path.join(process.cwd(), 'components/interfaces/ConnectSheet/content')
         const filepaths = getFilePaths(folderPath)
-        return Response.json(filepaths, { status: 200 })
+        return Response.json(filepaths)
       },
     }),
   },

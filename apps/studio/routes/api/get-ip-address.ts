@@ -18,7 +18,7 @@ export const Route = createFileRoute('/api/get-ip-address')({
           ipAddress = forwardedFor.split(',').at(0) ?? 'Unknown'
         }
 
-        return Response.json({ ipAddress }, { status: 200 })
+        return Response.json({ ipAddress })
       },
     }),
   },
