@@ -124,7 +124,6 @@ export function ApiKeyPill({
             <Button
               variant="outline"
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
-              data-attr={show ? undefined : 'api-key-reveal'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
               icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
@@ -149,7 +148,6 @@ export function ApiKeyPill({
           <CopyButton
             variant="default"
             aria-label="Copy API key"
-            data-attr="api-key-copy"
             asyncText={onCopy}
             onCopied={onCopied}
             iconOnly

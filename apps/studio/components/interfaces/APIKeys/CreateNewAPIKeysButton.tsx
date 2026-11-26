@@ -120,9 +120,7 @@ export const CreateNewAPIKeysButton = () => {
         )}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction data-attr="api-key-create-initial" onClick={handleCreateNewApiKeys}>
-            Create keys
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleCreateNewApiKeys}>Create keys</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

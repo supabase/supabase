@@ -18,7 +18,6 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
   return (
     <DropdownMenuItemTooltip
       className="flex gap-2"
-      data-attr="api-key-delete"
       onClick={() => {
         if (canDeleteAPIKeys) {
           setKeyToDelete(apiKey.id)
