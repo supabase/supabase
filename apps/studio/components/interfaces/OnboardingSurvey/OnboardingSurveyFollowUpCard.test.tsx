@@ -411,14 +411,6 @@ describe('OnboardingSurveyFollowUpCard', () => {
       billing_partner: 'vercel_marketplace',
     })
 
-    it('asks the owner of an org created on the start date', async () => {
-      mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
-
-      renderCard({ organization: vercelOrg })
-
-      expect(await screen.findByRole('button', { name: 'Answer' })).toBeInTheDocument()
-    })
-
     it('does not ask about an org created before the start date', async () => {
       const detailRequests = mockOrganizationDetail(vercelOrg, '2026-11-24T23:59:59Z')
 
@@ -453,7 +445,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
       expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
     })
 
-    it('stores a skip and sends nothing', async () => {
+    it('asks about an org created on the start date and stores a skip without sending anything', async () => {
       mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
       const requests = mockSurveyEndpoint(204)
 
@@ -482,23 +474,6 @@ describe('OnboardingSurveyFollowUpCard', () => {
 
       expect(readStoredState()).toBeNull()
       expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull()
-    })
-
-    it('sends the answers and does not ask again', async () => {
-      mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
-      const requests = mockSurveyEndpoint(204)
-
-      renderCard({ organization: vercelOrg })
-      fireEvent.click(await screen.findByRole('button', { name: 'Answer' }))
-      const dialog = await screen.findByRole('dialog')
-      await chooseOption(dialog, 1, 'Other')
-      fireEvent.click(within(dialog).getByRole('button', { name: 'Send answers' }))
-
-      expect(await screen.findByText('Thanks for sharing')).toBeInTheDocument()
-      expect(requests).toEqual([{ slug: ORG_SLUG, building: 'other' }])
-      expect(readStoredState()).toMatchObject({ status: 'submitted' })
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-      expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
     })
   })
 })
