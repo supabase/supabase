@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
@@ -198,6 +199,7 @@ describe('PipelineCreationFlow', () => {
   it.each([
     ['preferred region', undefined, 'Frankfurt (eu-central-1)', false],
     ['deep-linked region', '?cluster_id=1', 'Singapore (ap-southeast-1)', false],
+    ['unknown deep link', '?cluster_id=unknown', 'Frankfurt (eu-central-1)', false],
     ['default after lookup failure', undefined, 'Singapore (ap-southeast-1)', true],
   ] as const)(
     'locks the chosen region while source lookup is pending (%s)',
@@ -291,12 +293,62 @@ describe('PipelineCreationFlow', () => {
       expect(screen.getByLabelText('Pipeline name')).toBeInTheDocument()
       expect(screen.queryByText('Select publication')).not.toBeInTheDocument()
       finishLookup()
+      expect(sourceClusters).not.toContain('unknown')
       expect(await screen.findByText('Select publication')).toBeInTheDocument()
       if (shouldFailLookup) {
         expect(sourceClusters).toEqual([null])
       }
     }
   )
+
+  it('keeps the chosen region through review and uses it for connection validation', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+      default_cluster_id: '1',
+      regions: [
+        { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+        { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+      ],
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    const requestedClusters: (string | null)[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: ({ request }) => {
+        requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      queryClient,
+      rateLimitFactor: 1,
+    })
+    clickContinue()
+    const selector = await screen.findByRole('combobox', { name: 'Pipeline region' })
+    await waitFor(() => expect(selector).toBeEnabled())
+    await userEvent.click(selector)
+    await userEvent.click(
+      within(await screen.findByRole('listbox')).getByRole('option', {
+        name: /Frankfurt/,
+      })
+    )
+    await waitFor(() => expect(selector).toHaveTextContent('Frankfurt (eu-central-1)'))
+    fillConnection()
+    clickContinue()
+    await screen.findByText('Select publication')
+    await selectPublication()
+    clickContinue()
+    await screen.findByText('Start pipeline')
+    expect(screen.getByText('Frankfurt', { exact: true })).toBeVisible()
+    expect(requestedClusters).toEqual(['2'])
+  })
 
   it('keeps header navigation pending until dirty changes are discarded', async () => {
     const push = vi.spyOn(router, 'push')
