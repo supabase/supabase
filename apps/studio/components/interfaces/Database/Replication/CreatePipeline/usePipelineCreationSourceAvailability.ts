@@ -12,10 +12,10 @@ export const usePipelineCreationSourceAvailability = ({
   enabled: boolean
 }) => {
   const canQuerySources = !!projectRef && enabled
-  const { groups, isDiscovering } = useReplicationClusters({ enabled: canQuerySources })
+  const { clusters, isDiscovering } = useReplicationClusters({ enabled: canQuerySources })
   const sources = useQueries({
-    queries: groups.map(({ clusterId }) => ({
-      ...replicationSourcesQueryOptions({ projectRef, clusterId }),
+    queries: clusters.map(({ clusterId, isDefault }) => ({
+      ...replicationSourcesQueryOptions({ projectRef, clusterId: isDefault ? undefined : clusterId }),
       enabled: canQuerySources && !isDiscovering,
       refetchOnMount: 'always' as const,
       staleTime: 0,

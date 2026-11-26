@@ -38,7 +38,7 @@ const ReplicationDiagramContent = () => {
   const { ref: projectRef = 'default' } = useParams()
 
   const { clusters } = useReplicationClusters()
-  const groups = clusters.map((cluster) => ({
+  const requestClusters = clusters.map((cluster) => ({
     clusterId: cluster.isDefault ? undefined : cluster.clusterId,
     region:
       cluster.regionName === undefined
@@ -52,7 +52,7 @@ const ReplicationDiagramContent = () => {
   const combineDestinations = useCallback(
     (results: UseQueryResult<ReplicationDestinationsData, StudioError>[]) => ({
       destinations: results.flatMap((result, index) => {
-        const { clusterId, region } = groups[index]
+        const { clusterId, region } = requestClusters[index]
         return (result.data?.destinations ?? []).map((destination) => ({
           nodeId: JSON.stringify([clusterId ?? null, destination.id]),
           destination,
@@ -64,10 +64,10 @@ const ReplicationDiagramContent = () => {
         (result) => result.data !== undefined || checkLocalPipelinesNotSetUp(result.error)
       ),
     }),
-    [groups]
+    [requestClusters]
   )
   const { destinations, canRenderGraph } = useQueries({
-    queries: groups.map(({ clusterId }) =>
+    queries: requestClusters.map(({ clusterId }) =>
       replicationDestinationsQueryOptions({ projectRef, clusterId })
     ),
     combine: combineDestinations,
