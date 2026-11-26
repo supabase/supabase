@@ -57,7 +57,7 @@ import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
-import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
@@ -121,7 +121,7 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
-  const { hasMultipleRegions } = useReplicationClusterGroups()
+  const { hasMultipleRegions } = useReplicationClusters()
   // Publications are listed through the region's source, so the region is chosen first.
   const canSelectRegion = !editMode && hasMultipleRegions && onRegionChange !== undefined
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
