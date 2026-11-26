@@ -44,7 +44,7 @@ export function usePipelineList({
   projectRef?: string
   clusters: ReplicationCluster[]
   filterString: string
-  sortColumn: 'name' | 'status'
+  sortColumn: 'name' | 'status' | 'region'
   sortDirection: 'asc' | 'desc'
 }) {
   const queryClient = useQueryClient()
@@ -139,6 +139,12 @@ export function usePipelineList({
       const comparison = a.destination.name.localeCompare(b.destination.name)
       const nameComparison = sortDirection === 'asc' ? comparison : -comparison
       if (sortColumn === 'name') return nameComparison
+      if (sortColumn === 'region') {
+        const regionComparison = (a.cluster.regionName ?? '').localeCompare(
+          b.cluster.regionName ?? ''
+        )
+        return (sortDirection === 'asc' ? regionComparison : -regionComparison) || comparison
+      }
       return compareStatusNames(a.status, b.status, sortDirection) || nameComparison
     })
 

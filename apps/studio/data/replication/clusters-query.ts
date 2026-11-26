@@ -23,7 +23,9 @@ export const replicationClustersQueryOptions = () =>
   queryOptions<ReplicationClustersData, ReplicationClustersError>({
     queryKey: replicationKeys.clusters(),
     queryFn: ({ signal }) => getReplicationClusters(signal),
-    enabled: IS_PLATFORM,
+    // Vite compile-time constants; the temporary local mock config defines this flag.
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    enabled: IS_PLATFORM || (import.meta.env.DEV && import.meta.env.STUDIO_PIPELINES_MOCK === true),
     staleTime: 5 * 60 * 1000,
     // A failed discovery falls back to the default cluster. Retrying whenever another region
     // consumer mounts would put the pipeline pages back into their loading state in a loop.

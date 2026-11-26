@@ -50,7 +50,12 @@ const addSourcesMock = () =>
             tenant_id: 't',
             id: 1,
             name: 'default',
-            config: { host: 'db.internal', port: 5432, name: 'main-db', username: 'etl_user' },
+            config: {
+              host: 'db.internal',
+              port: 5432,
+              name: 'main-db',
+              username: 'etl_user',
+            },
           },
         ],
       }),
@@ -170,6 +175,7 @@ describe('DestinationRow', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Pipeline options' }))
       expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
         'View details',
+        'View logs',
         ...(status === 'stopped' ? [] : ['Stop pipeline']),
         'Delete pipeline',
       ])
@@ -248,7 +254,9 @@ describe('DestinationRow', () => {
         const clusterId = getClusterId(request)
         return HttpResponse.json<ReplicationPipelineStatusResponse>({
           pipeline_id: PIPELINE_ID,
-          status: { name: startedClusters.has(clusterId) ? 'started' : 'stopped' },
+          status: {
+            name: startedClusters.has(clusterId) ? 'started' : 'stopped',
+          },
         })
       },
     })
@@ -347,7 +355,11 @@ describe('DestinationRow', () => {
           params.pipeline_id
         )
         return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
-          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+          {
+            destination_deleted: true,
+            destination_id: DESTINATION_ID,
+            pipeline_id: PIPELINE_ID,
+          }
         )
       },
     })
@@ -426,12 +438,18 @@ describe('DestinationRow', () => {
       response: () => {
         deleted()
         return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
-          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+          {
+            destination_deleted: true,
+            destination_id: DESTINATION_ID,
+            pipeline_id: PIPELINE_ID,
+          }
         )
       },
     })
     const queryClient = new QueryClient()
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />, { queryClient })
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      queryClient,
+    })
     await screen.findByRole('button', { name: 'Pipeline options' })
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
@@ -487,6 +505,20 @@ describe('DestinationRow', () => {
 
     const lag = await screen.findByText('Caught up')
     expect(lag.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
+  })
+
+  test('labels a stopped pipeline lag as last reported instead of caught up', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('stopped')
+    addReplicationStatusMock(0)
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Last reported')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
   test('shows formatted lag value when confirmed_flush_lsn_bytes is non-zero', async () => {
@@ -681,7 +713,11 @@ describe('DestinationRow', () => {
         name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
-        state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
+        state: {
+          name: 'error',
+          reason: 'table not found',
+          retry_policy: { policy: 'no_retry' },
+        },
       },
     ])
     addVersionMock()
@@ -705,7 +741,11 @@ describe('DestinationRow', () => {
         name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
-        state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
+        state: {
+          name: 'error',
+          reason: 'table not found',
+          retry_policy: { policy: 'no_retry' },
+        },
       },
     ])
     addVersionMock()
@@ -728,7 +768,9 @@ describe('DestinationRow', () => {
     })
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
-      queryClient: new QueryClient({ defaultOptions: { queries: { retryDelay: 0 } } }),
+      queryClient: new QueryClient({
+        defaultOptions: { queries: { retryDelay: 0 } },
+      }),
     })
 
     expect(await screen.findByText('Failed to retrieve pipeline information')).toBeInTheDocument()

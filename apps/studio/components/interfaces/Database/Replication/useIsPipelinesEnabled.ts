@@ -17,6 +17,9 @@ const useIsCurrentOrgInFlagList = (flag: string) => {
       : []
 
   // [Joshen] Override to enable for all organizations by setting the flag value as `all`
+  // Vite compile-time constants; the temporary local mock config defines this flag.
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  if (import.meta.env.DEV && import.meta.env.STUDIO_PIPELINES_MOCK === true) return true
   if (allowedOrgSlugs.includes('all')) return true
 
   // [Joshen] Otherwise fallback to checking against org slug

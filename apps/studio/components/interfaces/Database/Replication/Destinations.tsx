@@ -55,7 +55,7 @@ import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-type DestinationSortColumn = 'name' | 'status'
+type DestinationSortColumn = 'name' | 'status' | 'region'
 type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
 
 export const Destinations = () => {
@@ -206,6 +206,7 @@ export const Destinations = () => {
       ({ cluster }) =>
         !failedRegions.some((failed) => failed.cluster.clusterId === cluster.clusterId)
     )
+
   const hasGeneralErrors = isRegionsError || isSourcesError
   const getWarningTitle = () => {
     if (hasGeneralErrors) return 'Could not load pipeline information'
@@ -428,7 +429,7 @@ export const Destinations = () => {
         )}
 
         {isDestinationsLoading && !shouldShowTable && (
-          <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
+          <GenericTableLoader headers={[null, 'Pipeline', 'Status', 'Region', 'Lag', null]} />
         )}
 
         {shouldShowTable && (
@@ -444,7 +445,7 @@ export const Destinations = () => {
                         currentSort={sort}
                         onSortChange={handleSortChange}
                       >
-                        Name
+                        Pipeline
                       </TableHeadSort>
                     </TableHead>
                     <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
@@ -456,7 +457,15 @@ export const Destinations = () => {
                         Status
                       </TableHeadSort>
                     </TableHead>
-                    <TableHead key="region">Region</TableHead>
+                    <TableHead key="region" aria-sort={getAriaSort('region')}>
+                      <TableHeadSort
+                        column="region"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Region
+                      </TableHeadSort>
+                    </TableHead>
                     <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
@@ -472,6 +481,7 @@ export const Destinations = () => {
                       <DestinationRow
                         destinationId={destination.id}
                         pipelineRegion={cluster.regionName}
+                        pipelineRegionCode={cluster.regionCode ?? undefined}
                       />
                     </ReplicationClusterProvider>
                   ))}

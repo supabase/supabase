@@ -55,7 +55,9 @@ const renderWithRouter = (
 ) => {
   const router = createRouter({
     routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines/42'] }),
+    history: createMemoryHistory({
+      initialEntries: ['/project/default/database/pipelines/42'],
+    }),
     parseSearch,
     stringifySearch,
   })
@@ -73,7 +75,10 @@ const renderLayout = (children?: ReactNode, queryClient?: QueryClient, clusterId
     <PipelineClusterScope>
       <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
     </PipelineClusterScope>,
-    { queryClient, nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined } }
+    {
+      queryClient,
+      nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined },
+    }
   )
 
 const TableResetFixture = () => {
@@ -182,7 +187,10 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () => HttpResponse.json<PipelinesResponse>({ pipelines: [{ ...PIPELINE, id }] }),
+    response: () =>
+      HttpResponse.json<PipelinesResponse>({
+        pipelines: [{ ...PIPELINE, id }],
+      }),
   })
   addAPIMock({
     method: 'get',
@@ -194,7 +202,12 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
             tenant_id: 'default',
             id: 2,
             name: 'default',
-            config: { host: 'db.internal', port: 5432, name: 'main-db', username: 'etl_user' },
+            config: {
+              host: 'db.internal',
+              port: 5432,
+              name: 'main-db',
+              username: 'etl_user',
+            },
           },
         ],
       }),
@@ -207,7 +220,10 @@ const mockStatus = (name: PipelineStatusResponse['status']['name'], id: string |
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
     response: () =>
-      HttpResponse.json<PipelineStatusResponse>({ pipeline_id: id, status: { name } }),
+      HttpResponse.json<PipelineStatusResponse>({
+        pipeline_id: id,
+        status: { name },
+      }),
   })
 
 const mockVersion = (hasUpdate: boolean, id: string | number = 42) =>
@@ -245,6 +261,71 @@ describe('ReplicationPipelineLayout', () => {
     mockVersion(false)
   })
 
+  test.each<{
+    status: Parameters<typeof mockStatus>[0]
+    bytes: number
+    label: string
+  }>([
+    { status: 'started', bytes: 4096, label: 'Lag: 4 KB' },
+    { status: 'started', bytes: 0, label: 'Caught up' },
+    { status: 'failed', bytes: 4096, label: 'Last reported lag: 4 KB' },
+    { status: 'stopped', bytes: 4096, label: 'Last reported lag: 4 KB' },
+  ])('names the header lag for $status with $bytes bytes', async ({ status, bytes, label }) => {
+    mockStatus(status)
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: () =>
+        HttpResponse.json<PipelineReplicationStatusResponse>({
+          pipeline_id: '42',
+          table_statuses: [],
+          apply_lag: { active: true, confirmed_flush_lsn_bytes: bytes },
+        }),
+    })
+    renderLayout()
+    await waitFor(() => expect(screen.getByLabelText('Replication lag')).toHaveTextContent(label))
+  })
+
+  test('shows the ClickHouse host and database in Overview', async () => {
+    mockPipeline('42', {
+      ...DESTINATION,
+      config: {
+        clickhouse: {
+          url: 'https://preview.clickhouse.example',
+          user: 'default',
+          database: 'operations',
+          engine: 'merge_tree',
+        },
+      },
+    })
+    renderLayout()
+    const host = await screen.findByText('Host')
+    expect(within(host.parentElement!).getByText('preview.clickhouse.example')).toBeVisible()
+    const database = screen.getByText('Database', { exact: true })
+    expect(within(database.parentElement!).getByText('operations')).toBeVisible()
+  })
+
+  test.each(['00150', '03h6pes1npx2ptvf052my5nx2'.repeat(4)])(
+    'shows the full pipeline ID %s in the overview without a copy action',
+    async (pipelineId) => {
+      routeParams.pipelineId = pipelineId
+      mockPipeline(pipelineId)
+      mockVersion(false, pipelineId)
+      mockStatus('stopped', pipelineId)
+
+      renderLayout()
+
+      expect(await screen.findByText(pipelineId)).toBeVisible()
+      expect(screen.queryByLabelText('Replication lag')).not.toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Overview' })).toBeVisible()
+      expect(
+        screen.queryByRole('button', {
+          name: `Copy pipeline ID ${pipelineId}`,
+        })
+      ).not.toBeInTheDocument()
+    }
+  )
+
   test.each(['started', 'stopped', 'failed'] as const)(
     'only allows stopping and deletion for an unknown destination when %s',
     async (status) => {
@@ -254,9 +335,9 @@ describe('ReplicationPipelineLayout', () => {
 
       renderLayout(<ReplicationPipelineStatus />)
 
-      expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
+      expect((await screen.findAllByRole('img', { name: 'Unknown destination' }))[0]).toBeVisible()
       expect(
-        screen.queryByRole('button', { name: /^(Start|Restart|Update available)$/ })
+        screen.queryByRole('button', { name: /^(Start|Restart|Update)$/ })
       ).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /Reset/ })).not.toBeInTheDocument()
       if (status === 'stopped') {
@@ -270,10 +351,10 @@ describe('ReplicationPipelineLayout', () => {
             return HttpResponse.json<Record<string, never>>({}, { status: 202 })
           },
         })
-        await screen.findByText(status === 'started' ? 'Running' : 'Failed')
+        await screen.findAllByText(status === 'started' ? 'Running' : 'Failed')
         expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
         await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
-        expect(await screen.findByText('Stopped')).toBeVisible()
+        expect((await screen.findAllByText('Stopped'))[0]).toBeVisible()
         expect(screen.queryByRole('button', { name: 'Start' })).not.toBeInTheDocument()
       }
       await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
@@ -339,11 +420,14 @@ describe('ReplicationPipelineLayout', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
     await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
-    expect(await screen.findByText('Stopped')).toBeVisible()
+    expect((await screen.findAllByText('Stopped'))[0]).toBeVisible()
   })
 
   test('deletes an unknown pipeline and returns to its cluster', async () => {
-    const requestedClusters = mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+    const requestedClusters = mockPipeline('42', {
+      ...DESTINATION,
+      config: { unknown: {} },
+    })
     mockStatus('started', '42')
     mockVersion(false, '42')
     addAPIMock({
@@ -370,7 +454,7 @@ describe('ReplicationPipelineLayout', () => {
     const clusterId = 'eu-west-1'
     const { router } = renderLayout(undefined, queryClient, clusterId)
     const listHref = '/project/default/database/pipelines'
-    await screen.findByRole('img', { name: 'Unknown destination' })
+    await screen.findAllByRole('img', { name: 'Unknown destination' })
     expect(requestedClusters).toEqual([clusterId])
     expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
@@ -382,7 +466,7 @@ describe('ReplicationPipelineLayout', () => {
       expect(within(dialog).getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
     fireEvent.submit(dialog.querySelector('form')!)
-    await screen.findByText('Stopping')
+    await screen.findAllByText('Stopping')
     await act(() =>
       queryClient.invalidateQueries({
         queryKey: replicationKeys.pipelinesStatus('default', '42', clusterId),
@@ -420,7 +504,10 @@ describe('ReplicationPipelineLayout', () => {
       })
 
       const queryClient = new QueryClient()
-      queryClient.setQueryData(replicationKeys.clusters(), { default_cluster_id: '1', regions: [] })
+      queryClient.setQueryData(replicationKeys.clusters(), {
+        default_cluster_id: '1',
+        regions: [],
+      })
       renderLayout(undefined, queryClient, '1')
 
       expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
@@ -447,8 +534,7 @@ describe('ReplicationPipelineLayout', () => {
 
     renderLayout()
 
-    expect(screen.getByText('Primary database')).toBeVisible()
-    expect(screen.getByText('Loading destination')).toBeInTheDocument()
+    expect(screen.getByText('Loading pipeline details')).toBeInTheDocument()
     expect(screen.queryByText('Running')).not.toBeInTheDocument()
 
     resolvePipeline(PIPELINE)
@@ -464,7 +550,7 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout(<ReplicationPipelineStatus />)
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
+    expect(screen.getAllByRole('link', { name: 'Logs' })).toHaveLength(1)
     expect(await screen.findByRole('heading', { name: 'Pipeline stopped' })).toBeVisible()
   })
 
@@ -486,11 +572,11 @@ describe('ReplicationPipelineLayout', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     // Primary button is Stop while running, so the menu carries Restart instead
-    const restartAction = await screen.findByRole('menuitem', { name: 'Restart pipeline' })
+    const restartAction = await screen.findByRole('menuitem', {
+      name: 'Restart pipeline',
+    })
     expect(restartAction).toBeVisible()
-    expect(restartAction).toHaveAccessibleDescription(
-      'Resume saved progress. Unfinished initial syncs start over.'
-    )
+    expect(restartAction).toHaveAccessibleDescription('Unfinished initial syncs restart.')
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
   })
 
@@ -501,7 +587,7 @@ describe('ReplicationPipelineLayout', () => {
 
     const lifecycleAction = await screen.findByRole('button', { name: 'Stop' })
     const options = screen.getByRole('button', { name: 'Pipeline options' })
-    const update = await screen.findByRole('button', { name: 'Update available' })
+    const update = await screen.findByRole('button', { name: 'Update' })
     expect(lifecycleAction).toBeEnabled()
     expect(options).toBeEnabled()
     expect(update).toBeEnabled()
@@ -522,7 +608,13 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     await screen.findByRole('heading', { name: 'Analytics warehouse' })
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Restart' })).toBeEnabled())
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'Restart' })).toHaveLength(2))
+    await userEvent.click(screen.getByRole('button', { name: 'More pipeline recovery actions' }))
+    expect(await screen.findByRole('menuitem', { name: 'View logs' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('logs')
+    )
+    await userEvent.keyboard('{Escape}')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     expect(await screen.findByRole('menuitem', { name: 'Stop pipeline' })).toBeVisible()
@@ -535,7 +627,7 @@ describe('ReplicationPipelineLayout', () => {
 
     renderLayout()
 
-    const updateButton = await screen.findByRole('button', { name: 'Update available' })
+    const updateButton = await screen.findByRole('button', { name: 'Update' })
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()

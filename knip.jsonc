@@ -28,6 +28,8 @@
         // it is traced already.
         "router.tsx",
         "start.ts",
+        // Temporary local Pipelines review server; trace its mock fixtures too.
+        "vite.pipelines-mock.config.ts",
         // Route modules are real entry points.
         "routes/**/*.{ts,tsx}",
         // Next.js compat shims. Reached only through the `nextShims` aliases in

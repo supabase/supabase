@@ -3,7 +3,7 @@ import { ChevronRightIcon, MinusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn, TableCell, TableRow } from 'ui'
+import { cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -12,6 +12,7 @@ import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { canModifyDestination } from './ReplicationDiagram/Nodes.utils'
+import { getOverviewDestination } from './ReplicationDiagram/Overview.utils'
 import {
   getFormattedLagValue,
   getInitialSyncProgress,
@@ -20,6 +21,7 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -36,9 +38,14 @@ import {
 interface DestinationRowProps {
   destinationId: number
   pipelineRegion?: string
+  pipelineRegionCode?: string
 }
 
-export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRowProps) => {
+export const DestinationRow = ({
+  destinationId,
+  pipelineRegion,
+  pipelineRegionCode,
+}: DestinationRowProps) => {
   const clusterId = useReplicationClusterId()
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -56,6 +63,11 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
     isError: isPipelineError,
   } = pipelineFetcher
   const destinationName = destination?.name ?? pipeline?.destination_name ?? ''
+  const destinationIdentity = getOverviewDestination({
+    destination,
+    destinationId,
+    clusterId,
+  })
 
   const {
     error: pipelineStatusError,
@@ -72,7 +84,9 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
     onError: () => {},
   })
@@ -147,6 +161,16 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
   // Five distinct states, so early returns rather than a ternary chain.
   const renderLag = () => {
     if (isReplicationStatusLoading) return <ShimmeringLoader />
+    if (
+      (statusName !== PipelineStatusName.STARTED || isReplicationStatusError) &&
+      lagBytes !== undefined
+    )
+      return (
+        <span className="flex flex-col gap-0.5">
+          <span className="text-foreground-light">{lag.display}</span>
+          <span className="text-xs text-foreground-lighter">Last reported</span>
+        </span>
+      )
     if (isInitialSyncRunning)
       return <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
     if (isReplicationStatusError || !applyLag)
@@ -179,10 +203,14 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
           tabIndex={pipeline ? 0 : undefined}
         >
           <TableCell className="!pr-1">
-            {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
+            {type && (
+              <span role="img" aria-label={type} className="inline-flex">
+                <DestinationLogo type={type} hasErrors={hasTableErrors} />
+              </span>
+            )}
           </TableCell>
 
-          <TableCell className="max-w-[180px]">
+          <TableCell className="max-w-xs">
             {isPipelineLoading && !destinationName ? (
               <ShimmeringLoader />
             ) : (
@@ -191,13 +219,25 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
                   {destinationName || type}
                 </p>
                 {pipeline && (
-                  <DetailSubtext className="flex items-center gap-x-1.5">
-                    <span>{type}</span>
+                  <DetailSubtext className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                    <span
+                      className="block max-w-full truncate"
+                      title={
+                        type === 'BigQuery' || type === 'ClickHouse'
+                          ? destinationIdentity.label
+                          : undefined
+                      }
+                    >
+                      {type === 'BigQuery' || type === 'ClickHouse'
+                        ? destinationIdentity.label
+                        : type}
+                    </span>
                     {hasTableErrors && (
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : <span>s</span>}
+                          {errorCount} table error
+                          {errorCount === 1 ? '' : <span>s</span>}
                         </span>
                       </>
                     )}
@@ -212,6 +252,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
               <ShimmeringLoader />
             ) : (
               <PipelineStatePill
+                shouldPulseRunning
                 pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
@@ -225,7 +266,21 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
           </TableCell>
 
           <TableCell className="text-foreground-light whitespace-nowrap">
-            {pipelineRegion ?? 'Unavailable'}
+            <div className="flex items-center gap-x-2">
+              {pipelineRegionCode && (
+                <RegionFlag className="w-4 shrink-0" region={pipelineRegionCode} />
+              )}
+              <div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={pipelineRegionCode ? 0 : undefined} className="block">
+                      {pipelineRegion ?? 'Region unavailable'}
+                    </span>
+                  </TooltipTrigger>
+                  {pipelineRegionCode && <TooltipContent>{pipelineRegionCode}</TooltipContent>}
+                </Tooltip>
+              </div>
+            </div>
           </TableCell>
 
           <TableCell>

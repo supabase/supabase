@@ -4,6 +4,7 @@ import {
   CircleStopIcon,
   EditIcon,
   EyeIcon,
+  ListIcon,
   MoreVerticalIcon,
   PlayIcon,
   RotateCcwIcon,
@@ -26,12 +27,17 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getStatusName } from './Pipeline.utils'
+import {
+  getPipelineLegacyLogsUrl,
+  getPipelineUnifiedLogsUrl,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import {
   canModifyDestination,
   type ReplicationDestinationType,
 } from './ReplicationDiagram/Nodes.utils'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
@@ -70,6 +76,7 @@ export const RowMenu = ({
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const clusterId = useReplicationClusterId()
   const statusName = getStatusName(pipelineStatus)
 
@@ -80,8 +87,12 @@ export const RowMenu = ({
   // Destination IDs are only unique within a cluster, so the edit panel needs the row's cluster.
   const [, setEditClusterId] = useQueryState('cluster_id', parseAsString)
 
-  const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: startPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({
+    onError: () => {},
+  })
   const { mutateAsync: restartPipeline } = useRestartPipelineMutation()
   const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
@@ -198,6 +209,21 @@ export const RowMenu = ({
               <p>View details</p>
             </Link>
           </DropdownMenuItem>
+          {pipeline && (
+            <DropdownMenuItem asChild className="gap-x-2">
+              <Link
+                href={(isUnifiedLogsEnabled ? getPipelineUnifiedLogsUrl : getPipelineLegacyLogsUrl)(
+                  {
+                    projectRef,
+                    pipelineId: pipeline.id,
+                  }
+                )}
+              >
+                <ListIcon size={14} />
+                <span>View logs</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           {shouldShowUpdate && (
             <>
@@ -232,13 +258,13 @@ export const RowMenu = ({
                   className="gap-x-2 items-start"
                   onClick={onRestartPipeline}
                   aria-label="Restart pipeline"
-                  aria-description="Resume saved progress. Unfinished initial syncs start over."
+                  aria-description="Unfinished initial syncs restart."
                 >
                   <RotateCcwIcon size={14} className="mt-0.5 shrink-0" />
                   <div>
                     <p>Restart pipeline</p>
                     <p className="text-xs text-foreground-lighter">
-                      Resume saved progress. Unfinished initial syncs start over.
+                      Unfinished initial syncs restart.
                     </p>
                   </div>
                 </DropdownMenuItem>

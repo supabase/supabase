@@ -89,8 +89,7 @@ export const getPipelineStateNotice = ({
     return {
       type: 'destructive',
       title: displayState.title,
-      description:
-        'Replication has stopped. Restart the pipeline to resume from its last checkpoint. Table states below are from before it failed.',
+      description: `Replication has stopped. Restart the pipeline to resume from its last checkpoint.${tableStatuses.length > 0 ? ' Table states below show the last reported status.' : ''}`,
       showLogsLink: true,
     }
   }
@@ -100,7 +99,9 @@ export const getPipelineStateNotice = ({
       type: 'note',
       title: displayState.title,
       description:
-        'Changes to your source tables wait in Postgres until you start the pipeline again. Table states below are from before it stopped.',
+        tableStatuses.length > 0
+          ? 'Start the pipeline to resume replication. Table states below show the last reported status.'
+          : 'Start the pipeline to replicate changes and view table status.',
       showLogsLink: false,
     }
   }
@@ -123,4 +124,40 @@ export const getPipelineStateNotice = ({
     description: `${getInitialSyncSummary(progress)} Each table starts streaming as its copy finishes.`,
     showLogsLink: false,
   }
+}
+
+export const getPipelineHealthNotice = ({
+  statusName,
+  metrics,
+  isError,
+}: {
+  statusName?: string
+  metrics?: { active?: boolean | null; wal_status?: string | null } | null
+  isError: boolean
+}): PipelineStateNotice | undefined => {
+  if (isError || statusName !== PipelineStatusName.STARTED) return undefined
+  if (metrics?.wal_status === 'lost')
+    return {
+      type: 'warning',
+      title: 'Replication cannot continue',
+      description:
+        'Postgres has removed changes this pipeline still needs. Review pipeline health before choosing recovery.',
+      showLogsLink: true,
+    }
+  if (metrics?.wal_status === 'unreserved')
+    return {
+      type: 'warning',
+      title: 'Replication changes at risk',
+      description:
+        'Postgres may remove changes this pipeline still needs. Check pipeline health and logs.',
+      showLogsLink: true,
+    }
+  if (metrics?.active === false)
+    return {
+      type: 'warning',
+      title: 'Pipeline disconnected',
+      description:
+        'The pipeline is running but isn’t connected to your database right now. It reconnects on its own; if this persists, check the logs.',
+      showLogsLink: true,
+    }
 }
