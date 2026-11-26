@@ -19,7 +19,7 @@ export const StorageVersioningPreview = () => {
       </p>
       <Admonition
         type="warning"
-        title="Storage Object Versioning is in Public Alpha"
+        title="Storage object versioning is in Public Alpha"
         description="This feature may change during development and is not recommended for production workloads."
       />
       <Image
