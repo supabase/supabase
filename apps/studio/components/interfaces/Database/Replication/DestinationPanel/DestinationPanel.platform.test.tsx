@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -10,6 +10,7 @@ import { expect, test } from 'vitest'
 import { DestinationPanel } from './DestinationPanel'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -33,10 +34,46 @@ const mockRegions = (isUnavailable = () => false) =>
           }),
   })
 
+const mockProject = (region?: string) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      region === undefined
+        ? HttpResponse.json<APIErrorBody>(
+            { message: 'Project details unavailable' },
+            { status: 500 }
+          )
+        : HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+            cloud_provider: 'AWS',
+            id: 1,
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            is_branch_enabled: false,
+            is_physical_backups_enabled: false,
+            name: 'Project',
+            organization_id: 1,
+            ref: 'default',
+            region,
+            status: 'ACTIVE_HEALTHY',
+            subscription_id: 'subscription-1',
+            connectionString: null,
+            db_host: 'db.default.supabase.co',
+            high_availability: false,
+            integration_source: null,
+            restUrl: 'https://default.supabase.co',
+            updated_at: '2026-01-01T00:00:00.000Z',
+          }),
+  })
+
 const mockPanelResources = (
   enabledClusters: Set<string | null>,
   unavailableClusters = new Set<string | null>()
 ) => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/destinations',
+    response: { destinations: [] },
+  })
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
@@ -77,7 +114,7 @@ const mockPanelResources = (
   })
 }
 
-const renderPanel = () => {
+const renderPanel = (clusterId?: string) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), [])
   customRender(
@@ -86,14 +123,19 @@ const renderPanel = () => {
         hasLoaded: true,
         configcat: {
           etlEnableBigQueryPrivateAlpha: 'all',
+          etlEnableDucklakePrivateAlpha: '',
+          etlEnableSnowflakePrivateAlpha: '',
+          etlEnableClickHousePrivateAlpha: '',
           pipelineCreationWizard: false,
         },
         posthog: {},
       }}
     >
-      <PipelineRequestStatusProvider>
-        <DestinationPanel />
-      </PipelineRequestStatusProvider>
+      <ReplicationClusterProvider clusterId={clusterId}>
+        <PipelineRequestStatusProvider>
+          <DestinationPanel />
+        </PipelineRequestStatusProvider>
+      </ReplicationClusterProvider>
     </FeatureFlagContext.Provider>,
     { queryClient, nuqs: { hasMemory: true, searchParams: '?destinationType=BigQuery' } }
   )
@@ -104,6 +146,7 @@ test.each(['regions', 'sources'])(
   async (failure) => {
     let isRegionsUnavailable = failure === 'regions'
     mockRegions(() => isRegionsUnavailable)
+    mockProject(FRANKFURT.region_code)
     const unavailableClusters = new Set(failure === 'sources' ? [FRANKFURT.cluster_id] : [])
     mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
     renderPanel()
@@ -119,5 +162,77 @@ test.each(['regions', 'sources'])(
     await userEvent.click(await screen.findByText('Select publication'))
     expect(await screen.findByText('frankfurt')).toBeVisible()
     expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+  }
+)
+
+test('opens the panel with a source only in a non-default region', async () => {
+  mockRegions()
+  mockProject(FRANKFURT.region_code)
+  mockPanelResources(new Set([FRANKFURT.cluster_id]))
+  renderPanel()
+
+  expect(await screen.findByText('Frankfurt')).toBeVisible()
+})
+
+test('uses the default region when the project region lookup fails', async () => {
+  mockRegions()
+  mockProject()
+  mockPanelResources(new Set([null]))
+  renderPanel()
+
+  expect(await screen.findByText('Singapore')).toBeVisible()
+})
+
+test.each(['success', 'creation failure', 'refresh failure'])(
+  'prepares the preferred region and loads publications after %s',
+  async (scenario) => {
+    mockRegions()
+    mockProject(FRANKFURT.region_code)
+    const enabledClusters = new Set<string | null>([null])
+    const unavailableClusters = new Set<string | null>()
+    mockPanelResources(enabledClusters, unavailableClusters)
+    const writes: (string | null)[] = []
+    let shouldFail = scenario !== 'success'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        const cluster = clusterFrom(request)
+        writes.push(cluster)
+        if (shouldFail && scenario === 'creation failure') {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Source creation unavailable' },
+            { status: 503 }
+          )
+        }
+        enabledClusters.add(cluster)
+        if (shouldFail) unavailableClusters.add(cluster)
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          tenant_id: 'default',
+          source_id: 1,
+        })
+      },
+    })
+    renderPanel()
+
+    expect(await screen.findByText('Frankfurt')).toBeVisible()
+    if (shouldFail) {
+      expect(await screen.findByText('Failed to prepare pipeline region')).toBeVisible()
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+      shouldFail = false
+      unavailableClusters.clear()
+      await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      await waitFor(() =>
+        expect(screen.queryByText('Failed to prepare pipeline region')).not.toBeInTheDocument()
+      )
+    }
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('frankfurt')).toBeVisible()
+    expect(writes).toEqual(
+      scenario === 'creation failure'
+        ? [FRANKFURT.cluster_id, FRANKFURT.cluster_id]
+        : [FRANKFURT.cluster_id]
+    )
+    expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
   }
 )
