@@ -888,9 +888,7 @@ describe('regions', () => {
     })
     renderRegions()
 
-    expect(
-      await screen.findByText('Could not load results from Frankfurt')
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Could not load results from Frankfurt')).toBeInTheDocument()
 
     canReadSource = true
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
