@@ -41,10 +41,12 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
 
   it('forwards query params to pg-meta and returns the response', async () => {
     let includedSchemas: string | null = null
+    let forwardedHeaders: Headers | undefined
 
     mswServer.use(
       http.get(`${PG_META_URL}/tables`, ({ request }) => {
         includedSchemas = new URL(request.url).searchParams.get('included_schemas')
+        forwardedHeaders = request.headers
         return HttpResponse.json<PGTable[]>([mockTable])
       })
     )
@@ -54,12 +56,23 @@ describe('/api/platform/pg-meta/$ref/tables', () => {
       'GET'
     )({
       request: new Request(
-        'http://localhost/api/platform/pg-meta/default/tables?included_schemas=public'
+        'http://localhost/api/platform/pg-meta/default/tables?included_schemas=public',
+        {
+          headers: {
+            authorization: 'Basic browser-credentials',
+            cookie: 'session=abc',
+            'x-connection-encrypted': 'encrypted-connection',
+          },
+        }
       ),
       params: { ref: 'default' },
     })
 
     expect(includedSchemas).toBe('public')
+    // Only the cookie and connection headers are relayed, as with the Next API adapter
+    expect(forwardedHeaders?.get('cookie')).toBe('session=abc')
+    expect(forwardedHeaders?.get('x-connection-encrypted')).toBe('encrypted-connection')
+    expect(forwardedHeaders?.get('authorization')).not.toBe('Basic browser-credentials')
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual([mockTable])
   })

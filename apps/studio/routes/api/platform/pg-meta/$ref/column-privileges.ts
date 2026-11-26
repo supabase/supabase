@@ -9,7 +9,7 @@ export const Route = createFileRoute('/api/platform/pg-meta/$ref/column-privileg
     handlers: createApiHandlers(
       {
         GET: async ({ request }) => {
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
           const response = await fetchGet(getPgMetaRedirectUrl(request, 'column-privileges'), {
             headers,
           })

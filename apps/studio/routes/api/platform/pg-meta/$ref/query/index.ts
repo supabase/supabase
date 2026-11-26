@@ -11,7 +11,7 @@ export const Route = createFileRoute('/api/platform/pg-meta/$ref/query/')({
       {
         POST: async ({ request }) => {
           const { query } = await parseJsonBody<{ query: string }>(request)
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
           const { data, error } = await executeQuery({ query, headers })
 
           if (error) {

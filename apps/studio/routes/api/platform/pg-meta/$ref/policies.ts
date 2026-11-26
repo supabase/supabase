@@ -10,7 +10,7 @@ export const Route = createFileRoute('/api/platform/pg-meta/$ref/policies')({
     handlers: createApiHandlers(
       {
         GET: async ({ request }) => {
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
           const response = await fetchGet(`${PG_META_URL}/policies`, { headers })
 
           if (response.error) {

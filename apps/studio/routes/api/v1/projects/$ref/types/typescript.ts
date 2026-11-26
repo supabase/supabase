@@ -10,7 +10,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/types/typescript')({
     handlers: createApiHandlers(
       {
         GET: async ({ request }) => {
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
 
           const response = await generateTypescriptTypes({ headers })
 

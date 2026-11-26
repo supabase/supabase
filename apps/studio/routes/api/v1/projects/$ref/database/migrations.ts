@@ -10,7 +10,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/database/migrations'
     handlers: createApiHandlers(
       {
         GET: async ({ request }) => {
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
           const { data, error } = await listMigrationVersions({ headers })
 
           if (error) {
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/api/v1/projects/$ref/database/migrations'
           return Response.json(data, { status: 200 })
         },
         POST: async ({ request }) => {
-          const headers = constructHeaders(request.headers)
+          const headers = constructHeaders(Object.fromEntries(request.headers))
           const { query, name } = await parseJsonBody<{ query: string; name?: string }>(request)
 
           const { data, error } = await applyAndTrackMigrations({ query, name, headers })
