@@ -150,12 +150,6 @@ export const Destinations = () => {
 
   const failedRegions = clusterResults.filter(({ error }) => error !== null)
   const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
-  const failedRegionTitle =
-    failedRegions.length === 1
-      ? `Could not load results from ${failedRegions[0].cluster.regionName ?? 'one region'}`
-      : 'Could not load results from some regions'
-
-  const pipelineListStatus = hasClusterErrors ? `Warning: ${failedRegionTitle}` : ''
   const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
 
   const {
@@ -204,6 +198,40 @@ export const Destinations = () => {
   const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
+
+  const failedRegionName = failedRegions[0]?.cluster.regionName ?? 'the default region'
+  const hasVisibleOtherRegions =
+    hasClusterErrors &&
+    sortedDestinations.some(
+      ({ cluster }) =>
+        !failedRegions.some((failed) => failed.cluster.clusterId === cluster.clusterId)
+    )
+  const hasGeneralErrors = isRegionsError || isSourcesError
+  const getWarningTitle = () => {
+    if (hasGeneralErrors) return 'Could not load pipeline information'
+    if (failedRegions.length === 1) return `Could not load pipelines from ${failedRegionName}`
+    return 'Could not load pipelines from some regions'
+  }
+  const warningTitle = getWarningTitle()
+  const unavailableInformation = [
+    isRegionsError && 'Available regions',
+    isSourcesError && 'Pipelines enablement status',
+    hasClusterErrors &&
+      `pipelines from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
+  ].filter((item): item is string => Boolean(item))
+  const getWarningDescription = () => {
+    if (!hasGeneralErrors) {
+      return failedRegions.length === 1
+        ? `Pipelines from ${failedRegionName} are missing from this view.`
+        : 'Pipelines from these regions are missing from this view.'
+    }
+    const information =
+      unavailableInformation.length > 1
+        ? `${unavailableInformation.slice(0, -1).join(', ')}${unavailableInformation.length > 2 ? ',' : ''} and ${unavailableInformation.at(-1)}`
+        : (unavailableInformation[0] ?? 'Pipeline information')
+    return `${information.charAt(0).toUpperCase()}${information.slice(1)} ${unavailableInformation.length > 1 || isRegionsError || hasClusterErrors ? 'are' : 'is'} unavailable.`
+  }
+  const pipelineListStatus = hasListErrors ? `Warning: ${warningTitle}` : ''
 
   const canLinkToWizard =
     isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
@@ -374,41 +402,27 @@ export const Destinations = () => {
           <Admonition
             type="warning"
             layout="responsive"
-            title={hasClusterErrors ? failedRegionTitle : 'Could not load pipeline information'}
-            description="Some pipeline information is unavailable. Retry to load the missing information."
+            title={warningTitle}
+            description={getWarningDescription()}
             actions={
               <Button loading={isRetryingList} onClick={retryList}>
                 Retry
               </Button>
             }
           >
-            <ul className="list-disc pl-5 space-y-1">
-              {isRegionsError && <li>Failed to retrieve pipeline regions</li>}
-              {isSourcesError && (
-                <li>
-                  {sourceErrorTitle}
-                  {checkLocalPipelinesNotSetUp(sourcesError) && (
-                    <p>Configure the replication API to manage pipelines in local development.</p>
-                  )}
-                </li>
-              )}
-              {hasClusterErrors && (
-                <li>
-                  <span>
-                    {failedRegions.length === 1
-                      ? 'Any pipelines in this region are missing from this view. Please try again.'
-                      : 'Any pipelines in these regions are missing from this view:'}
-                  </span>
-                  <ul className="list-disc pl-5">
-                    {failedRegions.map(({ cluster }) => (
-                      <li key={cluster.clusterId ?? 'default'}>
-                        {cluster.regionName ?? 'Default region'}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-            </ul>
+            {failedRegions.length > 1 && (
+              <ul className="list-disc pl-5 space-y-1">
+                {failedRegions.map(({ cluster }) => (
+                  <li key={cluster.clusterId ?? 'default'}>
+                    {cluster.regionName ?? 'Default region'}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {sortedDestinations.length > 0 && <p>Pipelines from other regions are still shown.</p>}
+            {isSourcesError && checkLocalPipelinesNotSetUp(sourcesError) && (
+              <p>Configure the replication API to manage pipelines in local development.</p>
+            )}
           </Admonition>
         )}
 
