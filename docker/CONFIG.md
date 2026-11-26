@@ -689,7 +689,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key`. Each key is a 256-bit key, base64-RawURL-encoded (unpadded); any other value stops Auth from starting. With encryption enabled, it must include the key for `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key`. Each key is a 256-bit key, base64-RawURL-encoded (unpadded); any other value stops Auth from starting. With encryption enabled, it must map `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` to the same key as `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY`. Startup only checks that the entry exists: a different key lets Auth start, but values written with the active key (e.g. MFA secrets) can't be decrypted |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | boolean |  | Enable column-level encryption for new writes. |  |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true`; an invalid key stops Auth from starting |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true` |
