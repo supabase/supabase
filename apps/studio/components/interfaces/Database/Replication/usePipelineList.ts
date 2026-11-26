@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import type { ReplicationClustersData } from '@/data/replication/clusters-query'
+import type { ReplicationCluster } from './useReplicationClusters'
 import { replicationDestinationsQueryOptions } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
@@ -11,11 +11,6 @@ import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-ver
 import { replicationPipelinesQueryOptions } from '@/data/replication/pipelines-query'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
-
-type PipelineListGroup = {
-  clusterId?: string
-  region?: ReplicationClustersData['regions'][number]
-}
 
 // Worst first, so sorting ascending by status surfaces the pipelines that need attention.
 const STATUS_SORT_ORDER: PipelineStatusName[] = [
@@ -41,37 +36,41 @@ const compareStatusNames = (
 
 export function usePipelineList({
   projectRef,
-  groups,
+  clusters,
   filterString,
   sortColumn,
   sortDirection,
 }: {
   projectRef?: string
-  groups: PipelineListGroup[]
+  clusters: ReplicationCluster[]
   filterString: string
   sortColumn: 'name' | 'status'
   sortDirection: 'asc' | 'desc'
 }) {
   const queryClient = useQueryClient()
+  const requestClusters = clusters.map((cluster) => ({
+    ...cluster,
+    clusterId: cluster.isDefault ? undefined : cluster.clusterId,
+  }))
   const prefetchedClustersRef = useRef(new Set<string>())
 
   const destinationResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
+    queries: requestClusters.map(({ clusterId }) =>
       replicationDestinationsQueryOptions({ projectRef, clusterId })
     ),
   })
   const pipelineResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
+    queries: requestClusters.map(({ clusterId }) =>
       replicationPipelinesQueryOptions({ projectRef, clusterId })
     ),
   })
   const sourceResults = useQueries({
-    queries: groups.map(({ clusterId }) =>
+    queries: requestClusters.map(({ clusterId }) =>
       replicationSourcesQueryOptions({ projectRef, clusterId })
     ),
   })
 
-  const clusterResults = groups.map((group, index) => {
+  const clusterResults = requestClusters.map((cluster, index) => {
     const destinationsResult = destinationResults[index]
     const pipelinesResult = pipelineResults[index]
     const sourcesResult = sourceResults[index]
@@ -86,9 +85,9 @@ export function usePipelineList({
     const error =
       destinationsResult.error ??
       pipelinesResult.error ??
-      (group.clusterId === undefined ? null : sourcesResult.error)
+      (cluster.clusterId === undefined ? null : sourcesResult.error)
     return {
-      group,
+      cluster,
       destinationsResult,
       pipelinesResult,
       sourcesResult,
@@ -101,8 +100,8 @@ export function usePipelineList({
     }
   })
 
-  const pipelineEntries = clusterResults.flatMap(({ group, pipelines }) =>
-    pipelines.map((pipeline) => ({ clusterId: group.clusterId, pipeline }))
+  const pipelineEntries = clusterResults.flatMap(({ cluster, pipelines }) =>
+    pipelines.map((pipeline) => ({ clusterId: cluster.clusterId, pipeline }))
   )
 
   // These queries share the rows' query keys, so each status is fetched once per pipeline.
@@ -124,13 +123,13 @@ export function usePipelineList({
 
   const search = filterString.toLowerCase()
   const sortedDestinations = clusterResults
-    .flatMap(({ group, visibleDestinations, pipelinesByDestination }) =>
+    .flatMap(({ cluster, visibleDestinations, pipelinesByDestination }) =>
       visibleDestinations
         .filter(({ name }) => name.toLowerCase().includes(search))
         .map((destination) => {
           const pipeline = pipelinesByDestination.get(destination.id)
           return {
-            group,
+            cluster,
             destination,
             status: pipeline && statuses.get(pipeline),
           }
@@ -145,7 +144,7 @@ export function usePipelineList({
 
   useEffect(() => {
     if (!projectRef) return
-    clusterResults.forEach(({ group: { clusterId }, pipelinesResult, pipelines }) => {
+    clusterResults.forEach(({ cluster: { clusterId }, pipelinesResult, pipelines }) => {
       const prefetchKey = JSON.stringify([projectRef, clusterId])
       if (!pipelinesResult.isSuccess || pipelines.length === 0) return
       if (prefetchedClustersRef.current.has(prefetchKey)) return

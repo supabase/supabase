@@ -1,3 +1,4 @@
+import { useReplicationClusters } from './useReplicationClusters'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
@@ -45,7 +46,6 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import {
   replicationClustersQueryOptions,
-  useReplicationClusterGroups,
 } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
@@ -96,7 +96,7 @@ export const Destinations = () => {
     })
   )
 
-  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const { clusters, hasMultipleRegions } = useReplicationClusters()
   const {
     isLoading: isDiscoveringRegions,
     isSuccess: isRegionsSuccess,
@@ -118,7 +118,7 @@ export const Destinations = () => {
 
   const { clusterResults, sortedDestinations } = usePipelineList({
     projectRef,
-    groups,
+    clusters,
     filterString,
     sortColumn,
     sortDirection,
@@ -147,7 +147,7 @@ export const Destinations = () => {
     .filter(({ sourcesResult }) =>
       sourcesResult.data?.sources.some(({ name }) => name === projectRef)
     )
-    .map(({ group }) => group.clusterId)
+    .map(({ cluster }) => cluster.clusterId)
   const hasExternalReplicationSource = clustersWithProjectSource.length > 0
   const replicationNotEnabled = isSourcesSuccess && !hasExternalReplicationSource
 
@@ -404,14 +404,14 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedDestinations.map(({ group, destination }) => (
+                  {sortedDestinations.map(({ cluster, destination }) => (
                     <ReplicationClusterProvider
-                      key={`${group.clusterId ?? 'default'}:${destination.id}`}
-                      clusterId={group.clusterId}
+                      key={`${cluster.clusterId ?? 'default'}:${destination.id}`}
+                      clusterId={cluster.clusterId}
                     >
                       <DestinationRow
                         destinationId={destination.id}
-                        pipelineRegion={group.region?.region_name}
+                        pipelineRegion={cluster.regionName}
                       />
                     </ReplicationClusterProvider>
                   ))}

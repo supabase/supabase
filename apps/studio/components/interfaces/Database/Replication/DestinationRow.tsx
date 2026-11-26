@@ -152,7 +152,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
     if (isReplicationStatusError || !applyLag)
       return (
         <>
-          <MinusIcon size={18} className="text-foreground-lighter" aria-hidden />
+          <MinusIcon size={18} className="text-foreground-light" aria-hidden />
           <span className="sr-only">Lag unavailable</span>
         </>
       )
@@ -225,7 +225,7 @@ export const DestinationRow = ({ destinationId, pipelineRegion }: DestinationRow
           </TableCell>
 
           <TableCell className="text-foreground-light whitespace-nowrap">
-            {pipelineRegion ?? 'Region unavailable'}
+            {pipelineRegion ?? 'Unavailable'}
           </TableCell>
 
           <TableCell>
