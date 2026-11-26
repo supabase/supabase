@@ -39,6 +39,7 @@ import {
   getPipelineUnifiedLogsUrl,
   getStatusName,
 } from '../Pipeline.utils'
+import { useUrlReplicationClusterId } from '../PipelineClusterScope'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -55,7 +56,6 @@ import {
 } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -120,7 +120,7 @@ const PipelineOverviewSkeleton = () => (
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId } = useParams()
-  const clusterId = useReplicationClusterId()
+  const clusterId = useUrlReplicationClusterId()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
@@ -139,7 +139,7 @@ export const ReplicationPipelineStatus = () => {
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
   const [resettingTableIds, setResettingTableIds] = useState<Set<number>>(new Set())
-  const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending } = usePipelineRequestStatus({ clusterId })
   const requestStatus = getRequestStatus(pipelineId)
 
   const {
@@ -508,6 +508,7 @@ export const ReplicationPipelineStatus = () => {
       {/* Restart Table Confirmation Dialog */}
       {selectedTableForRestart && (
         <RestartTableDialog
+          clusterId={clusterId}
           open={showRestartDialog}
           onOpenChange={setShowRestartDialog}
           table={selectedTableForRestart}
@@ -542,6 +543,7 @@ export const ReplicationPipelineStatus = () => {
       {/* Batch Restart Dialog */}
       {batchRestartMode && (
         <BatchRestartDialog
+          clusterId={clusterId}
           open={showBatchRestartDialog}
           onOpenChange={setShowBatchRestartDialog}
           mode={batchRestartMode}

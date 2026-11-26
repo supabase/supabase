@@ -10,11 +10,13 @@ import type { DestinationType } from '../DestinationPanel/DestinationPanel.types
 
 export const usePipelineCreationSubmission = ({
   type,
+  clusterId,
   form,
   validateData,
   onCreated,
 }: {
   type: DestinationType
+  clusterId?: string
   form: UseFormReturn<DestinationPanelSchemaType>
   validateData: () => Promise<boolean>
   onCreated: () => void
@@ -25,7 +27,7 @@ export const usePipelineCreationSubmission = ({
     destinationValidationFailures,
     pipelineValidationFailures,
     resetValidation,
-  } = useDestinationForm({ selectedType: type })
+  } = useDestinationForm({ selectedType: type, clusterId })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isSubmittingRef = useRef(false)
   const hasCreated = useRef(false)

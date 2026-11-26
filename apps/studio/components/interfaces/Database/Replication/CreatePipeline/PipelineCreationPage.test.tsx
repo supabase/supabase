@@ -7,7 +7,6 @@ import { beforeEach, expect, it, vi } from 'vitest'
 
 import { replicationKeys } from '@/data/replication/keys'
 import { Route } from '@/routes/project/$ref/database/pipelines/new'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { renderRoute } from '@/tests/lib/route-render'
@@ -112,12 +111,10 @@ const renderPage = ({
 }: { queryClient?: QueryClient; clusterId?: string } = {}) =>
   renderRoute(Route, {
     routeId: '/project/$ref/database/pipelines/new',
-    url: '/project/default/database/pipelines/new',
+    url: `/project/default/database/pipelines/new${clusterId ? `?cluster_id=${clusterId}` : ''}`,
     renderOptions: {
       wrapper: ({ children }) => (
-        <CustomWrapper queryClient={queryClient}>
-          <ReplicationClusterProvider clusterId={clusterId}>{children}</ReplicationClusterProvider>
-        </CustomWrapper>
+        <CustomWrapper queryClient={queryClient}>{children}</CustomWrapper>
       ),
     },
   })
@@ -130,6 +127,15 @@ const mockSources = (sources: components['schemas']['SourcesResponse_Output']['s
   })
 beforeEach(() => {
   state.navigate.mockClear()
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/regions',
+    response: () =>
+      HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+        default_cluster_id: '1',
+        regions: [],
+      }),
+  })
   mockSources([
     {
       id: 42,

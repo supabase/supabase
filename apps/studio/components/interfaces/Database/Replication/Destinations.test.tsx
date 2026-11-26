@@ -15,7 +15,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -168,7 +167,7 @@ const createListRouter = () =>
     parseSearch,
     stringifySearch,
   })
-const mountList = (router: ReturnType<typeof createListRouter>, clusterId?: string) => {
+const mountList = (router: ReturnType<typeof createListRouter>) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, retryDelay: 0 } },
   })
@@ -176,19 +175,17 @@ const mountList = (router: ReturnType<typeof createListRouter>, clusterId?: stri
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient} nuqs={{ hasMemory: true }}>
         <RouterContextProvider router={router}>
-          <ReplicationClusterProvider clusterId={clusterId}>
-            <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
-          </ReplicationClusterProvider>
+          <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
         </RouterContextProvider>
       </CustomWrapper>
     ),
   })
   return { ...view, router, queryClient }
 }
-const renderList = async (waitForSources = true, clusterId?: string) => {
+const renderList = async (waitForSources = true) => {
   const router = createListRouter()
   await router.load()
-  const view = mountList(router, clusterId)
+  const view = mountList(router)
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
@@ -317,7 +314,7 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
 test('renders both wizard entry controls as links', async () => {
   options.wizard = true
   isEnabled = true
-  const { router } = await renderList(true, 'eu-west-1')
+  const { router } = await renderList(true)
   const links = screen.getAllByRole('link', { name: 'Add pipeline' })
   expect(links).toHaveLength(2)
   links.forEach((link) => expect(link).toHaveAttribute('href', `${listPath}/new`))
@@ -327,7 +324,7 @@ test('renders both wizard entry controls as links', async () => {
 test('opens the wizard from the combined list with the shortcut', async () => {
   options.wizard = true
   isEnabled = true
-  const { router } = await renderList(true, 'eu-west-1')
+  const { router } = await renderList(true)
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
   await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
 })

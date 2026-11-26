@@ -3,7 +3,6 @@ import { useParams } from 'common'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
@@ -96,9 +95,11 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   )
 }
 
-/** Request statuses are shared across clusters; refreshes target the caller's cluster. */
-export const usePipelineRequestStatus = () => {
-  const clusterId = useReplicationClusterId()
+/**
+ * Request statuses are shared across clusters; refreshes target the caller's cluster.
+ * If clusterId is undefined, it just means the default cluster
+ * */
+export const usePipelineRequestStatus = ({ clusterId }: { clusterId?: string } = {}) => {
   const context = useContext(PipelineRequestStatusContext)
   if (context === undefined)
     throw new Error('usePipelineRequestStatus must be used within a PipelineRequestStatusProvider')

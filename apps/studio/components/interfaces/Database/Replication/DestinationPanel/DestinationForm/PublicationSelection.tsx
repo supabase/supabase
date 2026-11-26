@@ -10,21 +10,21 @@ import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
   onSelectNewPublication: () => void
   showLoadError?: boolean
+  clusterId?: string
 }
 
 export const PublicationSelection = ({
   form,
   onSelectNewPublication,
+  clusterId,
   showLoadError = true,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const {
@@ -86,6 +86,7 @@ export const PublicationSelection = ({
           </span>
           <FormControl>
             <PublicationsComboBox
+              clusterId={clusterId}
               field={{
                 ...field,
                 onChange: (value) => {

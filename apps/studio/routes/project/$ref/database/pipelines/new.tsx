@@ -6,6 +6,7 @@ import { usePipelineCreationPreview } from '@/components/interfaces/App/FeatureP
 import { PipelineCreationFlow } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationFlow'
 import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
 import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
+import { useUrlReplicationClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
@@ -18,7 +19,6 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/new')({
   staticData: { skipProjectLayout: true, skipDatabaseLayout: true },
@@ -33,7 +33,7 @@ function PipelineCreationRoute() {
 
 function PipelineCreationPage() {
   const { ref } = useParams()
-  const clusterId = useReplicationClusterId()
+  const clusterId = useUrlReplicationClusterId()
   const navigate = useNavigate()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
@@ -113,6 +113,7 @@ function PipelineCreationPage() {
       {status}
       <title>New Pipeline | Supabase</title>
       <PipelineCreationFlow
+        clusterId={clusterId}
         availableDestinations={[
           ...(bigQuery ? ['BigQuery' as const] : []),
           ...(duckLake ? ['DuckLake' as const] : []),

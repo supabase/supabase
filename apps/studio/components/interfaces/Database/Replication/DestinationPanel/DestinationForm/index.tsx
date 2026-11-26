@@ -63,12 +63,13 @@ import { useReplicationPublicationNamesQuery } from '@/data/replication/publicat
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const formId = 'destination-editor'
 
 interface DestinationFormProps {
   selectedType: DestinationType
+  /** The cluster this destination belongs to. `undefined` means the default cluster. */
+  clusterId: string | undefined
   visible: boolean
   existingDestination?: ExistingDestination
   typeSelection?: ReactNode
@@ -79,6 +80,7 @@ interface DestinationFormProps {
 
 export const DestinationForm = ({
   selectedType,
+  clusterId,
   visible,
   existingDestination,
   typeSelection,
@@ -87,7 +89,6 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
   const {
     isPending: isProjectPending,
@@ -153,7 +154,7 @@ export const DestinationForm = ({
     destinationValidationFailures,
     pipelineValidationFailures,
     resetValidation,
-  } = useDestinationForm({ selectedType })
+  } = useDestinationForm({ selectedType, clusterId })
 
   const defaultValues = useMemo(
     () =>
@@ -514,10 +515,11 @@ export const DestinationForm = ({
                       <DestinationNameInput form={form} destinationType={selectedType} />
                       <PublicationSelection
                         form={form}
+                        clusterId={clusterId}
                         onSelectNewPublication={() => setPublicationPanelVisible(true)}
                       />
-                      <TableCopySelection form={form} editMode={editMode} />
-                      <PipelineRegionField destinationType={selectedType} />
+                      <TableCopySelection form={form} editMode={editMode} clusterId={clusterId} />
+                      <PipelineRegionField destinationType={selectedType} clusterId={clusterId} />
                     </div>
                   </div>
 
@@ -526,7 +528,12 @@ export const DestinationForm = ({
 
                   <DialogSectionSeparator />
 
-                  <AdvancedSettings type={selectedType} form={form} group="all" />
+                  <AdvancedSettings
+                    type={selectedType}
+                    form={form}
+                    group="all"
+                    clusterId={clusterId}
+                  />
                 </>
               )}
 
@@ -604,6 +611,7 @@ export const DestinationForm = ({
 
       <NewPublicationPanel
         visible={publicationPanelVisible}
+        clusterId={clusterId}
         onClose={(newPublication?: string) => {
           if (newPublication) {
             form.setValue('tableSyncCopyMode', 'include_all_tables', {
@@ -637,6 +645,7 @@ export const DestinationForm = ({
 
       <PipelineCostDialog
         open={showCostDialog}
+        clusterId={clusterId}
         isConfirming={isSaving}
         publicationName={pendingFormValues?.publicationName}
         publicationTables={pendingPublicationTables}
