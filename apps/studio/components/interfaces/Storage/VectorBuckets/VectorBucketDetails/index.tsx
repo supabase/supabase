@@ -22,6 +22,14 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
@@ -37,13 +45,6 @@ import {
   WrapperMissing,
 } from './VectorBucketCallouts'
 import { VectorBucketTableExamplesSheet } from './VectorBucketTableExamplesSheet'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketQuery } from '@/data/storage/vector-bucket-query'
@@ -111,20 +112,22 @@ export const VectorBucketDetails = () => {
   return (
     <>
       {isErrorBucket ? (
-        <ScaffoldContainer bottomPadding>
-          <ScaffoldSection isFullWidth>
+        <PageContainer size="default">
+          <PageSection>
             <AlertError subject="Failed to fetch vector buckets" error={bucketError} />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
       ) : (
-        <ScaffoldContainer bottomPadding>
-          <ScaffoldSection isFullWidth className="gap-y-4">
-            <ScaffoldHeader className="pt-0 pb-3">
-              <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
-              <ScaffoldSectionDescription>
-                Vector tables stored in this bucket.
-              </ScaffoldSectionDescription>
-            </ScaffoldHeader>
+        <PageContainer size="default">
+          <PageSection className="gap-y-4">
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Tables</PageSectionTitle>
+                <PageSectionDescription>
+                  Vector tables stored in this bucket.
+                </PageSectionDescription>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <div className="flex flex-row justify-between">
               <Input
                 size="tiny"
@@ -285,12 +288,14 @@ export const VectorBucketDetails = () => {
                 </Table>
               </Card>
             )}
-          </ScaffoldSection>
+          </PageSection>
 
-          <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
-            <header>
-              <ScaffoldSectionTitle>Manage</ScaffoldSectionTitle>
-            </header>
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Manage</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <Card>
               <CardContent className="flex flex-col md:flex-row md:justify-between gap-y-4 gap-x-8 md:items-center">
                 <div className="flex flex-col">
@@ -309,8 +314,8 @@ export const VectorBucketDetails = () => {
                 </Button>
               </CardContent>
             </Card>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
       )}
 
       <DeleteVectorTableModal />

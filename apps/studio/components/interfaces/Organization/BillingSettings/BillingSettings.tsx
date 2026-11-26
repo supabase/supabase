@@ -1,4 +1,4 @@
-import { cn } from 'ui'
+import { cn, Separator } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,7 +15,6 @@ import BillingEmail from './BillingEmail'
 import { CostControl } from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
 import Subscription from './Subscription/Subscription'
-import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -58,13 +57,13 @@ export const BillingSettings = () => {
         <Subscription />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="cost-control">
         <CostControl />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       {org && org.plan.id !== 'free' && (
         <PageContainer id="breakdown">
@@ -74,7 +73,7 @@ export const BillingSettings = () => {
 
       {isBillingInvoicesEnabledOnProfileLevel && (
         <>
-          <ScaffoldDivider />
+          <Separator />
           <PageContainer id="invoices">
             <InvoicesSection />
           </PageContainer>
@@ -83,7 +82,7 @@ export const BillingSettings = () => {
 
       {billingPaymentMethodsEnabled && (
         <>
-          <ScaffoldDivider />
+          <Separator />
 
           <PageContainer id="payment-methods">
             <PaymentMethods />
@@ -93,7 +92,7 @@ export const BillingSettings = () => {
 
       {isBillingCreditsEnabledOnProfileLevel && (
         <>
-          <ScaffoldDivider />
+          <Separator />
 
           <PageContainer id="credits-balance">
             <CreditBalance />
@@ -103,13 +102,13 @@ export const BillingSettings = () => {
 
       {billingAccountDataEnabled && (
         <>
-          <ScaffoldDivider />
+          <Separator />
 
           <PageContainer id="email">
             <BillingEmail />
           </PageContainer>
 
-          <ScaffoldDivider />
+          <Separator />
 
           <PageContainer id="address">
             <BillingCustomerData />

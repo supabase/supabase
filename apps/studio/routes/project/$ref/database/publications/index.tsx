@@ -30,14 +30,14 @@ function DatabasePublications() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Publications</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection className="gap-y-4">
           <PublicationsList />
         </PageSection>

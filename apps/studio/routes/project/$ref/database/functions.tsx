@@ -47,7 +47,7 @@ function DatabaseFunctionsPage() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Functions</PageHeaderTitle>
@@ -57,7 +57,7 @@ function DatabaseFunctionsPage() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <FunctionsList />
