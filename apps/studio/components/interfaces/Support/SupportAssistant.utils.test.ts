@@ -33,7 +33,8 @@ describe('SupportAssistant utils', () => {
 
     expect(prompt).toContain('<support>')
     expect(prompt).toContain('<assistant_context>')
-    expect(prompt).toContain('a human member of the Supabase Support team is already looking at it')
+    expect(prompt).toContain('A support request has already been submitted.')
+    expect(prompt).not.toContain('human')
     expect(prompt).toContain('<subject>API requests fail</subject>')
     expect(prompt).not.toContain('<organization_slug>')
     expect(prompt).not.toContain('<project_ref>')
