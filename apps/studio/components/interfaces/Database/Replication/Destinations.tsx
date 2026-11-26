@@ -95,7 +95,7 @@ export const Destinations = () => {
     })
   )
 
-  const { clusters, hasMultipleRegions } = useReplicationClusters()
+  const { clusters } = useReplicationClusters()
   const {
     isLoading: isDiscoveringRegions,
     isSuccess: isRegionsSuccess,

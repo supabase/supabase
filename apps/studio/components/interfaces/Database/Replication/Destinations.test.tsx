@@ -756,7 +756,7 @@ describe('regions', () => {
             { status: 503 }
           )
         enabledClusters.delete(cluster)
-        return new HttpResponse(null, { status: 200 })
+        return HttpResponse.json<Record<string, never>>({}, { status: 200 })
       },
     })
 
@@ -858,7 +858,7 @@ describe('regions', () => {
     const { requests } = mockRegionalDisable()
     renderRegions()
 
-    expect(await screen.findByText('Failed to retrieve pipeline regions')).toBeInTheDocument()
+    expect(await screen.findByText('Could not load pipeline information')).toBeInTheDocument()
     await screen.findByRole('heading', { name: 'Add a pipeline' })
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
       button: 0,
