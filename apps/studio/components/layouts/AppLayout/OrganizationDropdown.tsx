@@ -1,6 +1,6 @@
+import { Link } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { BoxesIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, cn } from 'ui'
@@ -54,7 +54,7 @@ export const OrganizationDropdown = ({
     selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
     !isPartnerBillingOrganization(selectedOrganization.billing_partner)
   const showPlanBadgeUpgrade =
-    isFreePlan && isBilledBySupabase && isBillingEnabled && !isPlanChangeDisabled
+    !!slug && isFreePlan && isBilledBySupabase && isBillingEnabled && !isPlanChangeDisabled
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -109,7 +109,9 @@ export const OrganizationDropdown = ({
       trailingContent={
         showPlanBadgeUpgrade ? (
           <Link
-            href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
+            to="/org/$slug/billing"
+            params={{ slug }}
+            search={{ panel: 'subscriptionPlan', source: 'org_plan_badge' }}
             className="ml-2 shrink-0"
             aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
             onClick={() => track('upgrade_cta_clicked', { placement: 'org_plan_badge' })}

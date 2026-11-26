@@ -1,8 +1,15 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OrganizationDropdown } from './OrganizationDropdown'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganization, render } from '@/tests/helpers'
 import type { Organization } from '@/types'
 
@@ -39,6 +46,22 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
   default: ({ organization }: { organization: { managed_by: string } }) =>
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
+
+// The upgrade badge is a native TanStack `Link`, which needs a router in context.
+const renderDropdown = (props: Parameters<typeof OrganizationDropdown>[0] = {}) => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/org/org-one'] }),
+    parseSearch,
+    stringifySearch,
+  })
+
+  return render(
+    <RouterContextProvider router={router}>
+      <OrganizationDropdown {...props} />
+    </RouterContextProvider>
+  )
+}
 
 const queryUpgradeLink = () => screen.queryByRole('link', { name: /upgrade from the/i })
 
@@ -94,7 +117,7 @@ describe('OrganizationDropdown', () => {
       }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     const selectedLink = screen.getByRole('link', { name: /org one/i })
     expect(within(selectedLink).getByTestId('partner-icon')).toBeInTheDocument()
@@ -109,7 +132,7 @@ describe('OrganizationDropdown', () => {
       }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     const selectedLink = screen.getByRole('link', { name: /org one/i })
     expect(within(selectedLink).queryByTestId('partner-icon')).toBeNull()
@@ -120,7 +143,7 @@ describe('OrganizationDropdown', () => {
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     expect(screen.getByRole('link', { name: /upgrade from the free plan/i })).toHaveAttribute(
       'href',
@@ -136,7 +159,7 @@ describe('OrganizationDropdown', () => {
         data: createMockOrganization({ slug: 'org-one', name: 'Org One', ...organization }),
       })
 
-      render(<OrganizationDropdown />)
+      renderDropdown()
 
       expectInlinePlanBadge(planName)
     }
@@ -148,7 +171,7 @@ describe('OrganizationDropdown', () => {
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     expectInlinePlanBadge('Free')
   })
@@ -159,7 +182,7 @@ describe('OrganizationDropdown', () => {
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     expectInlinePlanBadge('Free')
   })
@@ -169,7 +192,7 @@ describe('OrganizationDropdown', () => {
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
-    render(<OrganizationDropdown embedded />)
+    renderDropdown({ embedded: true })
 
     const organizationLink = screen.getByRole('link', { name: /org two/i })
     expect(within(organizationLink).getByRole('option')).toBeInTheDocument()
