@@ -22,3 +22,12 @@ export function getRouteHandler(route: ServerRoute, method: string): ServerRoute
   if (!handler) throw new Error(`Route has no ${method} handler`)
   return handler
 }
+
+/** Dispatches `request` to the handler `route` registers for `request.method`. */
+export function callRoute(
+  route: ServerRoute,
+  request: Request,
+  params: Record<string, string> = {}
+): Promise<Response> {
+  return getRouteHandler(route, request.method)({ request, params })
+}

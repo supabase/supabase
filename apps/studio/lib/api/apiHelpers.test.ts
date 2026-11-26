@@ -7,7 +7,6 @@ import {
   fromNodeHeaders,
   getBearerToken,
   InvalidJsonError,
-  methodNotAllowed,
   parseJsonBody,
   toSnakeCase,
   zBooleanString,
@@ -65,28 +64,6 @@ describe('apiHelpers', () => {
       expect(result).toEqual({
         Authorization: 'Bearer token',
         'Content-Type': 'application/json',
-        apiKey: 'test-service-key',
-      })
-    })
-
-    it('should clean and include only allowed headers from a Web Headers instance', () => {
-      const inputHeaders = new Headers({
-        accept: 'application/json',
-        authorization: 'Bearer token',
-        'content-type': 'application/json',
-        'x-connection-encrypted': 'true',
-        cookie: 'test-cookie',
-        'user-agent': 'test-agent',
-        referer: 'test-referer',
-      })
-
-      const result = constructHeaders(inputHeaders)
-      expect(result).toEqual({
-        Accept: 'application/json',
-        Authorization: 'Bearer token',
-        'Content-Type': 'application/json',
-        'x-connection-encrypted': 'true',
-        cookie: 'test-cookie',
         apiKey: 'test-service-key',
       })
     })
@@ -360,20 +337,6 @@ describe('apiHelpers', () => {
       vi.spyOn(request, 'text').mockRejectedValue(readError)
 
       await expect(parseJsonBody(request)).rejects.toBe(readError)
-    })
-  })
-
-  describe('methodNotAllowed', () => {
-    it('returns 405 JSON with an Allow header listing the allowed methods', async () => {
-      const request = new Request('http://localhost/api/test', { method: 'PUT' })
-      const response = methodNotAllowed(request, ['GET', 'POST'])
-
-      expect(response.status).toBe(405)
-      expect(response.headers.get('Allow')).toBe('GET, POST')
-      expect(await response.json()).toEqual({
-        data: null,
-        error: { message: 'Method PUT Not Allowed' },
-      })
     })
   })
 })

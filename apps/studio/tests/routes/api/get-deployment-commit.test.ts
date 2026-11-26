@@ -1,24 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/get-deployment-commit'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 const SHA = '0123456789abcdef0123456789abcdef01234567'
 const COMMIT_URL = `https://api.github.com/repos/supabase/supabase/git/commits/${SHA}`
 const fetchMock = vi.fn<typeof fetch>()
 
 async function invoke() {
-  const response = await getRouteHandler(
+  const response = await callRoute(
     Route,
-    'GET'
-  )({
-    request: new Request(
-      'https://studio.example/api/get-deployment-commit?sha=untrusted-request-sha',
-      {
-        headers: { authorization: 'Bearer test-session', cookie: 'session=test-session' },
-      }
-    ),
-  })
+    new Request('https://studio.example/api/get-deployment-commit?sha=untrusted-request-sha', {
+      headers: { authorization: 'Bearer test-session', cookie: 'session=test-session' },
+    })
+  )
   return {
     status: response.status,
     body: await response.json(),

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { methodNotAllowed } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const commitSchema = z.object({
   committer: z.object({ date: z.string().datetime({ offset: true }) }),
@@ -32,7 +32,7 @@ async function getCommitTime(commitSha: string) {
   }
 }
 
-async function handleGet(): Promise<Response> {
+async function handleGet() {
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || 'development'
   const commitTime = commitSha !== 'development' ? await getCommitTime(commitSha) : 'unknown'
 
@@ -45,18 +45,12 @@ async function handleGet(): Promise<Response> {
       commitSha,
       commitTime,
     },
-    {
-      status: 200,
-      headers: { 'Cache-Control': cacheControl },
-    }
+    { headers: { 'Cache-Control': cacheControl } }
   )
 }
 
 export const Route = createFileRoute('/api/get-deployment-commit')({
   server: {
-    handlers: {
-      GET: () => handleGet(),
-      ANY: ({ request }) => methodNotAllowed(request, ['GET']),
-    },
+    handlers: createApiHandlers({ GET: handleGet }),
   },
 })

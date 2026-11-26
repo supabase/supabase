@@ -12,28 +12,21 @@ import { IS_PLATFORM, PG_META_URL } from '@/lib/constants'
  * To prevent relay frontend request headers like useragent, referrer... into the middleware requests.
  * We will only keep the header keys that are in this list: Accept, Authorization, Content-Type, x-connection-encrypted
  */
-export function constructHeaders(
-  headers: Headers | { [prop: string]: any } | null | undefined
-): Record<string, string> {
+export function constructHeaders(headers: { [prop: string]: any }) {
   if (headers) {
-    const getHeader = (name: string): string | undefined =>
-      headers instanceof Headers ? (headers.get(name) ?? undefined) : headers[name]
-
-    const cleansedHeaders: Record<string, string | undefined> = {
-      Accept: getHeader('Accept'),
-      Authorization: getHeader('Authorization'),
-      cookie: getHeader('cookie'),
-      'Content-Type': getHeader('Content-Type'),
-      'x-connection-encrypted': getHeader('x-connection-encrypted'),
-    }
-    const result: Record<string, string> = {}
-    for (const [key, value] of Object.entries(cleansedHeaders)) {
-      if (value !== undefined) {
-        result[key] = value
-      }
-    }
+    const cleansedHeaders = {
+      Accept: headers.Accept,
+      Authorization: headers.Authorization,
+      cookie: headers.cookie,
+      'Content-Type': headers['Content-Type'],
+      'x-connection-encrypted': headers['x-connection-encrypted'],
+    } as any
+    // clean up key with underfined value
+    Object.keys(cleansedHeaders).forEach((key) =>
+      cleansedHeaders[key] === undefined ? delete cleansedHeaders[key] : {}
+    )
     return {
-      ...result,
+      ...cleansedHeaders,
       // [Joshen] JFYI both Alaister and I checked on this and realised this might not be used actually
       // Could be safe to remove but leaving it here for now
       ...(!IS_PLATFORM && { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
@@ -176,19 +169,6 @@ export async function parseJsonBody<T = unknown>(request: Request): Promise<T> {
   } catch {
     throw new InvalidJsonError()
   }
-}
-
-/**
- * Build a standardized 405 Method Not Allowed response with an `Allow` header.
- */
-export function methodNotAllowed(request: Request, allowedMethods: readonly string[]): Response {
-  return Response.json(
-    { data: null, error: { message: `Method ${request.method} Not Allowed` } },
-    {
-      status: 405,
-      headers: { Allow: allowedMethods.join(', ') },
-    }
-  )
 }
 
 /**
