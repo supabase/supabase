@@ -962,8 +962,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `ADMIN_API_KEYS` | string |  | Comma-separated API keys accepted on the admin port. Legacy alias for `SERVER_ADMIN_API_KEYS`. | Default: empty |
-| `ADMIN_PORT` | integer |  | Port the admin HTTP server listens on. Legacy alias for `SERVER_ADMIN_PORT`. | Default: `5001` |
 | `EXPOSE_DOCS` | boolean |  | Expose `/docs` Swagger UI. | Default: `true` |
 | `HOST` | string |  | Host the public server binds to. Legacy alias for `SERVER_HOST`. | Default: `0.0.0.0` |
 | `NODE_ENV` | enum |  | Node.js runtime mode. When `production`, sets `isProduction` and forces HTTPS in TUS link generation. | Default: unset |
@@ -971,24 +969,24 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PROJECT_REF` | string |  | Single-tenant project reference; used as `tenantId` when set. | Optional (single-tenant) |
 | `REGION` | string | Self-hosted | Region label exposed in responses and used as fallback for `STORAGE_S3_REGION` / `SERVER_REGION`. | Default: `not-specified` |
 | `REQUEST_ADMIN_TRACE_HEADER` | string |  | Header carrying the admin request trace id. Legacy fallback for `REQUEST_TRACE_HEADER`. | Optional |
-| `REQUEST_ALLOW_X_FORWARDED_PATH` | boolean | Self-hosted | Honor the `X-Forwarded-Path` header when computing public URLs. | Default: `false` |
+| `REQUEST_ALLOW_X_FORWARDED_PATH` | boolean | Self-hosted | Honor the `X-Forwarded-Prefix` header as a path prefix when building TUS upload URLs and verifying S3 SigV4 signatures. | Default: `false` |
 | `REQUEST_ETAG_HEADERS` | string (CSV) |  | Comma-separated list of request headers that carry an ETag for conditional GETs. | Default: `if-none-match` |
+| `REQUEST_HARD_LIMITS_ENABLED` | boolean |  | Reject bulk delete requests (`DELETE /object/{bucket}` with `prefixes`, S3 `DeleteObjects`) that list more than 1000 objects. | Default: `false` (no cap) |
 | `REQUEST_ID_HEADER` | string |  | Legacy alias for `REQUEST_TRACE_HEADER`. | Optional |
 | `REQUEST_TRACE_HEADER` | string |  | Header name used to propagate the request trace id. | Default: unset |
-| `REQUEST_URL_LENGTH_LIMIT` | integer |  | Maximum object key URL length. | Default: `7500` |
 | `REQUEST_X_FORWARDED_HOST_REGEXP` | string (regex) |  | Regex applied to `X-Forwarded-Host` to derive the tenant id. | Optional |
-| `RESPONSE_S_MAXAGE` | integer (seconds) |  | `s-maxage` (CDN) cache lifetime added to public responses (seconds). | Default: `0` |
-| `SERVER_ADMIN_API_KEYS` | string |  | Comma-separated API keys accepted on the admin port. | Default: empty |
-| `SERVER_ADMIN_PORT` | integer |  | Port the admin HTTP server listens on. | Default: `5001` |
+| `RESPONSE_STALE_IF_ERROR` | integer (seconds) |  | `stale-if-error` lifetime added to the `Cache-Control` of object responses. `0` adds nothing. | Default: `0`; negative or non-numeric values fall back to `0` |
+| `RESPONSE_STALE_WHILE_REVALIDATE` | integer (seconds) |  | `stale-while-revalidate` lifetime added to the `Cache-Control` of object responses. | Default: `0`. With `0`, `stale-while-revalidate=30` is still added when the request's ETag differs from the object's; negative or non-numeric values fall back to `0` |
+| `RESPONSE_S_MAXAGE` | integer (seconds) |  | `s-maxage` (CDN) cache lifetime added to the `Cache-Control` of object responses when the request carries an ETag header (`REQUEST_ETAG_HEADERS`). | Default: `0` |
 | `SERVER_HEADERS_TIMEOUT` | integer (seconds) |  | Node `headersTimeout` (seconds) for the HTTP server. | Default: `65` |
 | `SERVER_HOST` | string |  | Host the public server binds to. | Default: `0.0.0.0` |
 | `SERVER_KEEP_ALIVE_TIMEOUT` | integer (seconds) |  | Node `keepAliveTimeout` (seconds) for the HTTP server. | Default: `61` |
 | `SERVER_PORT` | integer |  | Port the public HTTP server listens on. | Default: `5000` |
 | `SERVER_REGION` | string |  | Region label exposed in responses; falls back to `REGION`. | Default: `not-specified` |
 | `STORAGE_PUBLIC_URL` | URL | Self-hosted | Public base URL prepended to generated object URLs. | Optional |
-| `TENANT_ID` | string | Self-hosted | Single-tenant tenant id (fallback after `PROJECT_REF`). | Default: `storage-single-tenant` |
-| `URL_LENGTH_LIMIT` | integer |  | Legacy alias for `REQUEST_URL_LENGTH_LIMIT`. | Default: `7500` |
-| `VERSION` | string |  | Build version reported in logs and the default DB application name. | Default: `0.0.0` |
+| `STORAGE_VERSIONING_ENABLED` | boolean |  | Enable object versioning and bucket lifecycle configuration in single-tenant mode. | Default: `false`. When unset, setting a bucket's versioning to `ENABLED` or writing a lifecycle configuration returns 409 `FeatureNotEnabled` |
+| `TENANT_ID` | string | Both | Single-tenant tenant id (fallback after `PROJECT_REF`). | Default: `storage-single-tenant` |
+| `VERSION` | string |  | Build version reported in logs and the default DB application name. | Default: `0.0.0` in code; the image sets it to the release version |
 | `WORKERS_NUM` | integer |  | Number of cluster workers to spawn. | Default: `1` |
 | `X_FORWARDED_HOST_REGEXP` | string (regex) |  | Legacy alias for `REQUEST_X_FORWARDED_HOST_REGEXP`. | Optional |
 
@@ -996,13 +994,12 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `DATABASE_APPLICATION_NAME` | string |  | Postgres `application_name` for the API connection pool. | Default: `Supabase Storage API ${VERSION}` |
+| `DATABASE_APPLICATION_NAME` | string |  | Postgres `application_name` for Storage's connection pools. | Default: `Supabase Storage API ${VERSION}` (`Supabase Storage API Worker ${VERSION}` in worker processes) |
 | `DATABASE_CONNECTION_TIMEOUT` | integer (ms) |  | Postgres connection acquire timeout (ms). | Default: `3000` |
 | `DATABASE_ENABLE_QUERY_CANCELLATION` | boolean |  | Issue a Postgres cancel on request abort. | Default: `false` |
 | `DATABASE_FREE_POOL_AFTER_INACTIVITY` | integer (ms) |  | Time (ms) after which an idle tenant pool is released. | Default: `60000` |
-| `DATABASE_MAX_CONNECTIONS` | integer |  | Max connections per tenant pool. Ignored when `DATABASE_POOL_URL` is set. | Default: `20` |
-| `DATABASE_POOL_MODE` | enum |  | `single_use` or `recycle`. | Optional |
-| `DATABASE_POOL_URL` | URL |  | External pooler (Supavisor/PgBouncer) connection string. When set, `DATABASE_MAX_CONNECTIONS` is ignored. | Optional |
+| `DATABASE_MAX_CONNECTIONS` | integer |  | Max connections in the tenant's connection pool, also when `DATABASE_POOL_URL` is set; split across `WORKERS_NUM` worker processes. | Default: `20` |
+| `DATABASE_POOL_URL` | URL |  | External pooler (Supavisor/PgBouncer) connection string, used instead of `DATABASE_URL` for request queries. `DATABASE_SEARCH_PATH` isn't applied to it. | Optional |
 | `DATABASE_POSTGRES_VERSION` | string |  | Override the detected Postgres version string. | Optional |
 | `DATABASE_SEARCH_PATH` | string (CSV) |  | Comma-separated `search_path` prepended to every session. | Default: empty |
 | `DATABASE_SSL_ROOT_CERT` | path |  | PEM bundle used to verify the Postgres server certificate. | Optional |
@@ -1016,19 +1013,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DB_SEARCH_PATH` | string (CSV) |  | Legacy alias for `DATABASE_SEARCH_PATH`. | Default: empty |
 | `DB_SERVICE_ROLE` | string |  | Postgres role used by the service-role key. | Default: `service_role` |
 | `DB_SUPER_USER` | string |  | Postgres superuser used for migrations. | Default: `postgres` |
-| `TENANT_POOL_CACHE_HIT_LOG_SAMPLE_RATE` | number (ratio) |  | Sample rate (0-1) for logging tenant-pool cache hits. | Default: `0` |
-| `TENANT_POOL_CACHE_MISS_LOG_SAMPLE_RATE` | number (ratio) |  | Sample rate (0-1) for logging tenant-pool cache misses. | Default: `0` |
-| `TENANT_POOL_CACHE_TTL_MS` | integer (ms) |  | TTL (ms) for the per-tenant connection-pool cache. | Default: `10000` |
 
 ### JWT
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `AUTH_JWT_ALGORITHM` | enum |  | JWT algorithm used to verify tokens. | Default: `HS256` |
+| `AUTH_JWT_ALGORITHM` | enum |  | HMAC algorithm used with `AUTH_JWT_SECRET`: `HS256`, `HS384` or `HS512`. | Default: `HS256`; any other value fails at startup |
 | `AUTH_JWT_SECRET` | string | Both | HS256 secret used to verify the legacy `ANON_KEY` / `SERVICE_KEY`. | Required (single-tenant) |
 | `JWT_CACHING_ENABLED` | boolean |  | Cache decoded JWTs in memory to reduce verification cost. | Default: `false` |
 | `JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify asymmetric JWTs (e.g. ES256). | Required when using the new API keys and new auth. |
-| `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256` |
+| `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256`; same values as `AUTH_JWT_ALGORITHM` |
 | `PGRST_JWT_SECRET` | string |  | JWT secret used by Storage to verify Postgres-issued tokens; legacy alias for `AUTH_JWT_SECRET`. | Required (single-tenant) |
 
 ### Auth
@@ -1059,14 +1053,15 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_BACKEND` | enum | Both | Object backend driver: `s3` or `file`. | Default: `file` (compose) / unset (code) |
 | `STORAGE_EMPTY_BUCKET_MAX` | integer |  | Max objects deletable in a single empty-bucket call. | Default: `200000` |
 | `STORAGE_S3_BUCKET` | string |  | Bucket name used by the S3 backend. | Required when `STORAGE_BACKEND=s3` |
-| `STORAGE_S3_CLIENT_TIMEOUT` | integer (ms) |  | Per-request timeout (ms) for S3 SDK calls; `0` disables. | Default: `0` |
-| `STORAGE_S3_DISABLE_CHECKSUM` | boolean |  | Disable S3 SDK request checksums. | Default: `false` |
+| `STORAGE_S3_CLIENT_TIMEOUT` | integer (ms) |  | Socket timeout (ms) for the S3 backend's SDK calls and the TUS upload S3 clients; `0` disables. | Default: `0` (backend), `60000` (TUS S3 clients); range `0`-`2147483647`, out-of-range values fall back to the default |
 | `STORAGE_S3_ENABLED_METRICS` | boolean |  | Enable internal S3 client tracing/metrics. | Default: `false` |
 | `STORAGE_S3_ENDPOINT` | URL |  | Custom S3 endpoint (e.g. MinIO). | Optional |
 | `STORAGE_S3_FORCE_PATH_STYLE` | boolean |  | Use path-style S3 addressing. | Default: `false` |
 | `STORAGE_S3_MAX_SOCKETS` | integer |  | Max concurrent sockets for the S3 HTTP agent. | Default: `200` |
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
+| `STORAGE_S3_REQUEST_CHECKSUM_CALCULATION` | enum |  | AWS SDK `requestChecksumCalculation` for the S3 backend client: `WHEN_SUPPORTED` or `WHEN_REQUIRED`. | Default: unset (AWS SDK default). Case-insensitive; any other value fails at startup. Replaces `STORAGE_S3_DISABLE_CHECKSUM` (removed in v1.60.28) |
+| `STORAGE_S3_RESPONSE_CHECKSUM_VALIDATION` | enum |  | AWS SDK `responseChecksumValidation` for the S3 backend client: `WHEN_SUPPORTED` or `WHEN_REQUIRED`. | Default: unset (AWS SDK default). Case-insensitive; any other value fails at startup |
 | `STORAGE_S3_UPLOAD_PART_SIZE` | integer (bytes) |  | Multipart upload part size in bytes. Values below the 5 MiB S3 minimum are clamped up. | Default: `16777216` (16 MiB); minimum: `5242880` (5 MiB) |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
 
@@ -1083,7 +1078,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLE_IMAGE_TRANSFORMATION` | boolean | Both | Legacy alias for `IMAGE_TRANSFORMATION_ENABLED`. | Default: `false` |
-| `IMAGE_TRANSFORMATION_ENABLED` | boolean |  | Enable image rendering via imgproxy. | Default: `false` |
+| `IMAGE_TRANSFORMATION_ENABLED` | boolean | CLI | Enable image rendering via imgproxy. | Default: `false` |
 | `IMAGE_TRANSFORMATION_LIMIT_MAX_SIZE` | integer |  | Max requested dimension (px) for transformations. | Default: `2000` |
 | `IMAGE_TRANSFORMATION_LIMIT_MIN_SIZE` | integer |  | Min requested dimension (px) for transformations. | Default: `1` |
 | `IMGPROXY_HTTP_KEEP_ALIVE_TIMEOUT` | integer (seconds) |  | Keep-alive timeout (seconds) for the imgproxy HTTP agent. | Default: `61` |
@@ -1101,6 +1096,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `FILE_SIZE_LIMIT_STANDARD_UPLOAD` | integer (bytes) |  | Legacy alias for `UPLOAD_FILE_SIZE_LIMIT_STANDARD`. | Default: `0` (disabled) |
 | `SIGNED_UPLOAD_URL_EXPIRATION_TIME` | integer (seconds) | CLI | Legacy alias for `UPLOAD_SIGNED_URL_EXPIRATION_TIME`. | Default: `60` |
 | `TUS_ALLOW_S3_TAGS` | boolean |  | Propagate user metadata as S3 tags during TUS uploads. | Default: `true` |
+| `TUS_BODY_IDLE_TIMEOUT_MS` | integer (ms) |  | Abort a TUS upload request (408) when no body bytes arrive for this long. `0` disables. | Default: `60000`; range `0`-`2147483647`, out-of-range values fall back to the default |
 | `TUS_LOCK_TYPE` | enum |  | TUS upload lock backend: `postgres` or `s3`. | Default: `postgres` |
 | `TUS_MAX_CONCURRENT_UPLOADS` | integer |  | Max concurrent TUS upload sessions. | Default: `500` |
 | `TUS_PART_SIZE` | integer (MB) |  | TUS multipart part size (MB). | Default: `50` |
@@ -1124,18 +1120,28 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RATE_LIMITER_RENDER_PATH_MAX_REQ_SEC` | integer |  | Max requests per second on render paths. | Default: `5` |
 | `RATE_LIMITER_SKIP_ON_ERROR` | boolean |  | Allow requests through when the rate limiter errors. | Default: `false` |
 
+### Queue
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `ENABLE_QUEUE_EVENTS` | boolean |  | Legacy alias for `PG_QUEUE_ENABLE`. | Default: `false` |
+| `PG_QUEUE_CONNECTION_URL` | URL |  | Postgres connection string for the queue. | Default: `DATABASE_URL` |
+| `PG_QUEUE_ENABLE` | boolean |  | Run background event handlers (e.g. object and bucket deletes, webhooks) through a persistent pg-boss queue. When `false`, they run inline in the request. | Default: `false` |
+| `PG_QUEUE_MAX_CONNECTIONS` | integer |  | Max connections in the queue's Postgres pool. | Default: `4` |
+
 ### Webhook
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `WEBHOOK_API_KEY` | string |  | Bearer key sent with outbound webhooks. | Optional |
-| `WEBHOOK_QUEUE_PULL_INTERVAL` | integer (ms) |  | Polling interval (ms) for the webhook queue. | Default: `700` |
+| `WEBHOOK_QUEUE_PULL_INTERVAL` | integer (ms) |  | Polling interval (ms) for the webhook queue. | Default: `700`; only used when `PG_QUEUE_ENABLE=true` |
 | `WEBHOOK_URL` | URL |  | Endpoint that receives object events. | Optional |
 
 ### Logging
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `LOGFLARE_API_BASE_URL` | URL |  | Logflare API base URL that logs are sent to. | Default: `https://api.logflare.app` (`pino-logflare` default) |
 | `LOGFLARE_API_KEY` | string |  | Logflare ingest API key. | Required when `LOGFLARE_ENABLED=true` |
 | `LOGFLARE_BATCH_SIZE` | integer |  | Max records per Logflare batch. | Default: `200` |
 | `LOGFLARE_ENABLED` | boolean |  | Forward logs to Logflare. | Default: `false` |
@@ -1145,14 +1151,14 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `OTEL_EXPORTER_OTLP_COMPRESSION` | enum |  | OTLP exporter compression algorithm (`gzip`, `none`). | Optional |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | URL |  | OTLP endpoint used when a metrics-specific endpoint is not set. | Optional |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | URL |  | OTLP endpoint for metrics export. | Optional |
-| `OTEL_EXPORTER_OTLP_METRICS_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP metric requests. | Optional |
+| `OTEL_EXPORTER_OTLP_METRICS_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP metric requests. | Optional; read by the OTel exporter SDK |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | URL |  | OTLP endpoint for trace export. | Optional |
-| `OTEL_EXPORTER_OTLP_TRACES_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP trace requests. | Optional |
+| `OTEL_EXPORTER_OTLP_TRACES_HEADERS` | string (CSV) |  | Comma-separated `k=v` headers attached to OTLP trace requests. | Optional; read by the OTel exporter SDK |
 | `OTEL_METRICS_ENABLED` | boolean |  | Enable the OpenTelemetry metrics SDK. | Default: `false` |
 | `OTEL_METRICS_EXPORT_INTERVAL_MS` | integer (ms) |  | OTLP metrics export interval (ms). | Default: `60000` |
 | `OTEL_METRICS_TEMPORALITY` | enum |  | OTLP metrics temporality: `DELTA` or `CUMULATIVE`. | Default: `CUMULATIVE` |
-| `PROMETHEUS_METRICS_ENABLED` | boolean |  | Expose Prometheus metrics on the admin port. | Default: `false` |
-| `PROMETHEUS_METRICS_INCLUDE_TENANT` | boolean |  | Include the tenant id label on Prometheus metrics. | Default: `false` |
+| `PROMETHEUS_METRICS_ENABLED` | boolean |  | Expose Prometheus metrics at `/metrics` on the main port (on the admin port in multi-tenant mode). Requires `OTEL_METRICS_ENABLED=true`. | Default: `false` |
+| `SERVICE_NAME` | string |  | OpenTelemetry `service.name` for metrics and traces, and the Prometheus metric name prefix. | Default: `storage_api` |
 | `TRACING_ENABLED` | boolean |  | Enable OpenTelemetry tracing. | Default: `false` |
 | `TRACING_FEATURE_UPLOAD` | boolean |  | Emit detailed spans for the upload pipeline. | Default: `false` |
 | `TRACING_MODE` | enum |  | Tracing verbosity, e.g. `basic`, `debug`. | Default: `basic` |
@@ -1163,26 +1169,15 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `VECTOR_BUCKET_REGION` | string |  | AWS region for vector buckets. | Optional |
-| `VECTOR_ENABLED` | boolean |  | Enable vector bucket support. | Default: `false` |
+| `VECTOR_BUCKET_PROVIDER` | enum | CLI | Vector index backend: `s3` (Amazon S3 Vectors) or `pgvector` (Postgres). | Default: `s3`. Not validated: other values leave the vector API disabled (`FeatureNotEnabled`) |
+| `VECTOR_BUCKET_REGION` | string |  | AWS region for the S3 Vectors client (`VECTOR_BUCKET_PROVIDER=s3`). | Optional; falls back to `STORAGE_S3_REGION` |
+| `VECTOR_DATABASE_CREATE` | boolean |  | With `pgvector`, create a dedicated `storage_vectors` database on the `VECTOR_DATABASE_URL` server and use it. When `false`, use the database in `VECTOR_DATABASE_URL` directly. | Default: `true` |
+| `VECTOR_DATABASE_URL` | URL | CLI | Postgres connection string for the `pgvector` provider (the maintenance URL when `VECTOR_DATABASE_CREATE=true`). | Required when `VECTOR_BUCKET_PROVIDER=pgvector` and `VECTOR_ENABLED` or `VECTOR_STORE_MIGRATIONS_ENABLED` is `true`; startup fails otherwise |
+| `VECTOR_ENABLED` | boolean | CLI | Enable the vector bucket API in single-tenant mode. | Default: `false` |
 | `VECTOR_MAX_BUCKETS` | integer |  | Max vector buckets per tenant. | Default: `10` |
 | `VECTOR_MAX_INDEXES` | integer |  | Max indexes per vector bucket. | Default: `20` |
-| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 buckets backing vector indexes. | Optional |
-
-### Other (tooling)
-
-| Variable | Type | Set by | Description | Notes |
-|---|---|---|---|---|
-| `ADMIN_API_KEY` | string |  | API key used by the bundled `pprof-client` script. | Optional (tooling) |
-| `ADMIN_URL` | URL |  | Admin server URL used by the bundled `pprof-client` script. | Optional (tooling) |
-| `FLAME_SOURCEMAPS_DIRS` | string |  | Sourcemap directories used by the flamegraph tool. | Default: `dist` |
-| `PPROF_FLAME_MD_FORMAT` | boolean |  | Markdown format flag for the pprof flamegraph script. | Optional (tooling) |
-| `PPROF_GENERATE_FLAME` | boolean |  | Generate a flamegraph from a captured pprof profile. | Optional (tooling) |
-| `PPROF_NODE_MODULES_SOURCE_MAPS` | boolean |  | Include `node_modules` sourcemaps in flame output. | Optional (tooling) |
-| `PPROF_OUTPUT` | path |  | Output path for the pprof script. | Optional (tooling) |
-| `PPROF_SECONDS` | integer |  | Profile duration (seconds) for the pprof script. | Optional (tooling) |
-| `PPROF_SOURCE_MAPS` | boolean |  | Use sourcemaps when symbolicating pprof output. | Optional (tooling) |
-| `PPROF_WORKER_ID` | string |  | Worker id targeted by the pprof script. | Optional (tooling) |
+| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 Vectors buckets backing vector indexes. | Required when `VECTOR_BUCKET_PROVIDER=s3`; single-tenant mode uses the first entry |
+| `VECTOR_STORE_MIGRATIONS_ENABLED` | boolean | CLI | Run the `pgvector` vector-store migrations at startup. | Default: `false`; only with `VECTOR_BUCKET_PROVIDER=pgvector` |
 
 ---
 
