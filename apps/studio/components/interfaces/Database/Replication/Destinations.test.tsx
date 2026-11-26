@@ -739,7 +739,7 @@ describe('regions', () => {
     renderRegions()
     await screen.findByText('Could not load pipeline information')
     await screen.findByText(
-      'Some pipeline information could not be loaded. Region information, setup details, and results from the default region are unavailable.'
+      'The region list, setup details, and results from the default region are unavailable.'
     )
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
@@ -806,7 +806,7 @@ describe('regions', () => {
             { status: 503 }
           )
         enabledClusters.delete(cluster)
-        return new HttpResponse(null, { status: 200 })
+        return HttpResponse.json<Record<string, never>>({}, { status: 200 })
       },
     })
 
