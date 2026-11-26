@@ -104,7 +104,7 @@ using ( (select auth.jwt()->>'sub') = owner_id );
 
 <Admonition type="caution">
 
-The two examples above compare the JWT `sub` claim directly. If you trust more than one issuer, see the multi-issuer caveat in [Ownership](/docs/guides/storage/security/ownership#access-control).
+The two examples above compare the JWT `sub` claim directly. Storage stores the subject without the issuer, so subject values can collide across issuers, including issuers you no longer trust. See the multi-issuer caveat in [Ownership](/docs/guides/storage/security/ownership#access-control) before you rely on this comparison.
 
 </Admonition>
 
