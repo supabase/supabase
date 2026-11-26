@@ -204,8 +204,8 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `DB_NAMESPACE` | string |  | Database schema to use (bare alias). | Default: `auth` |
 | `GOTRUE_DB_DRIVER` | string | Both | Database driver name. | Required. Typically `postgres` |
 | `GOTRUE_DB_HEALTH_CHECK_PERIOD` | string (duration) |  | Interval between DB connection health checks. |  |
-| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | CLI | Maximum number of idle DB connections. |  |
-| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | CLI | Maximum total DB connections (0 = unlimited). |  |
+| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | Both | Maximum number of idle DB connections. | Default: `0` (keeps no idle connections, so every query opens a new one); `docker-compose.yml` sets `10` |
+| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | Both | Maximum total DB connections (0 = unlimited). | Default: `0`; `docker-compose.yml` sets `10` |
 | `GOTRUE_DB_MIGRATIONS_PATH` | path | | Filesystem path containing migration SQL files. | Default: `./migrations` |
 
 ### JWT
@@ -689,10 +689,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key` |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key`. Each key is a 256-bit key, base64-RawURL-encoded (unpadded); any other value stops Auth from starting. With encryption enabled, it must map `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` to the same key as `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY`. Startup only checks that the entry exists: a different key lets Auth start, but values written with the active key (e.g. MFA secrets) can't be decrypted |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | boolean |  | Enable column-level encryption for new writes. |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. |  |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true`; an invalid key stops Auth from starting |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. | Required when `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT=true` |
 | `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED` | boolean | CLI | Allow admins to link identities manually. | Default: `false` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALGORITHM_VERSION` | integer (count) |  | Refresh token algorithm version (0, 1 or 2). |  |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALLOW_REUSE` | boolean |  | Allow refresh-token reuse without rotation. |  |
@@ -820,7 +820,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of database schemas exposed by the REST API. `pg_catalog` and `information_schema` are not allowed. | Default: `public` |
 | `PGRST_DB_TX_END` | enum | | Controls how database transactions are terminated. Allowed values: `commit`, `commit-allow-override`, `rollback`, `rollback-allow-override`. | Default: `commit` |
 | `PGRST_DB_URI` | URL | Both | PostgreSQL connection string (URI or key/value). Prefix with `@` to load from a file. Defaults read libpq env vars. | Default: `postgresql://`; required |
-| `PGRST_DB_USE_LEGACY_GUCS` | boolean | Self-hosted | Toggles legacy text-based GUCs versus JSON GUCs for request context. | Deprecated; removed in PostgREST v12 (still set in self-hosted docker-compose) |
 | `PGRST_JWT_AUD` | string | | Expected value of the `aud` claim in JWTs. Must be a string or valid URI. | No default |
 | `PGRST_JWT_CACHE_MAX_ENTRIES` | integer (count) | | Maximum entries in the JWT validation cache. Set to `0` to disable caching. | Default: `1000` |
 | `PGRST_JWT_ROLE_CLAIM_KEY` | string | | JSPath expression locating the role claim inside the JWT. | Default: `.role`; alias `PGRST_ROLE_CLAIM_KEY` |

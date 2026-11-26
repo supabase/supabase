@@ -82,8 +82,6 @@ You can also enforce only one active session per user per device or browser. Whe
 
 Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. This can confuse developers because the actual duration of a session is the configured timeout plus the JWT expiration time. For single session per user, the effect will only be noticed at intervals of the JWT expiration time. Make sure you adjust this setting depending on your needs. We do not recommend going below 5 minutes for the JWT expiration time.
 
-Otherwise sessions are progressively deleted from the database 24 hours after they expire, which prevents you from causing a high load on your project by accident and allows you some freedom to undo changes without adversely affecting all users.
-
 ## Frequently asked questions
 
 ### What are recommended values for access token (JWT) expiration?
@@ -136,7 +134,7 @@ Most applications rarely need such strong guarantees. Consider adjusting the JWT
 
 When a user signs out, the sessions affected by the sign-out are removed from the database entirely. You can check that the `session_id` claim in the JWT corresponds to a row in the `auth.sessions` table. If such a row does not exist, it means that the user has signed out.
 
-Note that sessions are not proactively terminated when their maximum lifetime (time-box) or inactivity timeout are reached. These sessions are cleaned up progressively 24 hours after reaching that status. This allows you to tweak the values or roll back changes without causing unintended user friction.
+Note that sessions are not proactively terminated when their maximum lifetime (time-box) or inactivity timeout are reached. Their rows can remain in the `auth.sessions` table after that point, so the presence of a row does not by itself mean the session is still valid.
 
 ### Using HTTP-only cookies to store access and refresh tokens
 

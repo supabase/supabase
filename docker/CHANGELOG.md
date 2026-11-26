@@ -22,6 +22,13 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ---
 
+## Unreleased
+
+### Edge Runtime
+- Added structured request and runtime logs for Edge Functions - PR [#53134](https://github.com/supabase/supabase/pull/53134) (via [@luizfelmach](https://github.com/luizfelmach))
+
+---
+
 ## [0.8.5](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.5) - 2026-11-23
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below:
