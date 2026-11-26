@@ -820,7 +820,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of database schemas exposed by the REST API. `pg_catalog` and `information_schema` are not allowed. | Default: `public` |
 | `PGRST_DB_TX_END` | enum | | Controls how database transactions are terminated. Allowed values: `commit`, `commit-allow-override`, `rollback`, `rollback-allow-override`. | Default: `commit` |
 | `PGRST_DB_URI` | URL | Both | PostgreSQL connection string (URI or key/value). Prefix with `@` to load from a file. Defaults read libpq env vars. | Default: `postgresql://`; required |
-| `PGRST_DB_USE_LEGACY_GUCS` | boolean | Self-hosted | Toggles legacy text-based GUCs versus JSON GUCs for request context. | Deprecated; removed in PostgREST v12 (still set in self-hosted docker-compose) |
 | `PGRST_JWT_AUD` | string | | Expected value of the `aud` claim in JWTs. Must be a string or valid URI. | No default |
 | `PGRST_JWT_CACHE_MAX_ENTRIES` | integer (count) | | Maximum entries in the JWT validation cache. Set to `0` to disable caching. | Default: `1000` |
 | `PGRST_JWT_ROLE_CLAIM_KEY` | string | | JSPath expression locating the role claim inside the JWT. | Default: `.role`; alias `PGRST_ROLE_CLAIM_KEY` |
