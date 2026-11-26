@@ -200,9 +200,9 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `DB_NAMESPACE` | string |  | Database schema to use (bare alias). | Default: `auth` |
 | `GOTRUE_DB_DRIVER` | string | Both | Database driver name. | Required. Typically `postgres` |
 | `GOTRUE_DB_HEALTH_CHECK_PERIOD` | string (duration) |  | Interval between DB connection health checks. |  |
-| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) |  | Maximum number of idle DB connections. |  |
-| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) |  | Maximum total DB connections (0 = unlimited). |  |
-| `GOTRUE_DB_MIGRATIONS_PATH` | path | CLI | Filesystem path containing migration SQL files. | Default: `./migrations` |
+| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | CLI | Maximum number of idle DB connections. |  |
+| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | CLI | Maximum total DB connections (0 = unlimited). |  |
+| `GOTRUE_DB_MIGRATIONS_PATH` | path | | Filesystem path containing migration SQL files. | Default: `./migrations` |
 
 ### JWT
 
@@ -252,10 +252,10 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_SMTP_HOST` | string | Both | SMTP relay hostname. |  |
 | `GOTRUE_SMTP_LOGGING_ENABLED` | boolean |  | Verbose SMTP debug logging. | Default: `false` |
 | `GOTRUE_SMTP_MAX_FREQUENCY` | string (duration) | Both | Minimum interval between emails per address. | Default: `1m`, commented out in compose |
-| `GOTRUE_SMTP_PASS` | string | Self-hosted | SMTP password. |  |
+| `GOTRUE_SMTP_PASS` | string | Both | SMTP password. |  |
 | `GOTRUE_SMTP_PORT` | integer | Both | SMTP relay port. | Default: `587` |
 | `GOTRUE_SMTP_SENDER_NAME` | string | Both | From name displayed on emails. Falls back to `GOTRUE_SMTP_ADMIN_EMAIL` when unset. |  |
-| `GOTRUE_SMTP_USER` | string | Self-hosted | SMTP username. |  |
+| `GOTRUE_SMTP_USER` | string | Both | SMTP username. |  |
 
 ### Mailer notifications / subjects / templates / URL paths
 
@@ -537,11 +537,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_CUSTOM_OAUTH_ENABLED` | boolean |  | Enable user-defined custom OAuth/OIDC providers. | Default: `true` |
 | `GOTRUE_CUSTOM_OAUTH_EXTERNAL_URL` | URL |  | Base URL for the callback of custom OAuth/OIDC providers (`<url>/callback`). | Default: `API_EXTERNAL_URL`. An invalid URL stops Auth from starting |
 | `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | integer (count) |  | Maximum number of custom providers allowed. | Default: `0` (unlimited) |
-| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Self-hosted | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
-| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Self-hosted | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Both | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Both | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
 | `GOTRUE_OAUTH_SERVER_AUTHORIZATION_TTL` | string (duration) |  | How long an authorization request stays valid, from the redirect until the client exchanges the code. | Default: `10m` |
 | `GOTRUE_OAUTH_SERVER_DEFAULT_SCOPE` | string |  | Scope used when a client doesn't request one. | Default: `email` |
-| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean | Self-hosted | Enable the OAuth 2.1 server. See [Configure the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server). | Default: `false`. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean | Both | Enable the OAuth 2.1 server. See [Configure the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server). | Default: `false`. Commented out in compose |
 
 ### Phone / SMS
 
@@ -550,26 +550,26 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_PHONE_ENABLED` | boolean | Both | Enable phone-based authentication. | Default: `false` |
 | `GOTRUE_SMS_AUTOCONFIRM` | boolean | Both | Skip phone verification flow. |  |
 | `GOTRUE_SMS_MAX_FREQUENCY` | string (duration) | Both | Minimum interval between SMS messages per phone. | Default: `1m`, commented out in compose |
-| `GOTRUE_SMS_MESSAGEBIRD_ACCESS_KEY` | string |  | Messagebird API access key. |  |
-| `GOTRUE_SMS_MESSAGEBIRD_ORIGINATOR` | string |  | Messagebird originator (sender ID). |  |
+| `GOTRUE_SMS_MESSAGEBIRD_ACCESS_KEY` | string | CLI | Messagebird API access key. |  |
+| `GOTRUE_SMS_MESSAGEBIRD_ORIGINATOR` | string | CLI | Messagebird originator (sender ID). |  |
 | `GOTRUE_SMS_OTP_EXP` | integer (seconds) | Both | SMS OTP expiry in seconds. | Default: `60`, commented out in compose |
 | `GOTRUE_SMS_OTP_LENGTH` | integer (count) | Both | SMS OTP code length (6-10). | Default: `6`, commented out in compose |
-| `GOTRUE_SMS_PROVIDER` | string | Self-hosted | SMS provider name (`twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`). | Commented out in compose |
+| `GOTRUE_SMS_PROVIDER` | string | Both | SMS provider name (`twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`). | Commented out in compose |
 | `GOTRUE_SMS_TEMPLATE` | string | Both | Message template for SMS OTP. | Commented out in compose |
 | `GOTRUE_SMS_TEST_OTP` | JSON | Both | JSON map of phone-to-OTP overrides for testing. | Commented out in compose |
 | `GOTRUE_SMS_TEST_OTP_VALID_UNTIL` | string |  | Cutoff time after which test OTPs stop being accepted. |  |
-| `GOTRUE_SMS_TEXTLOCAL_API_KEY` | string |  | Textlocal API key. |  |
-| `GOTRUE_SMS_TEXTLOCAL_SENDER` | string |  | Textlocal sender ID. |  |
-| `GOTRUE_SMS_TWILIO_ACCOUNT_SID` | string | Self-hosted | Twilio account SID. | Commented out in compose |
-| `GOTRUE_SMS_TWILIO_AUTH_TOKEN` | string | Self-hosted | Twilio auth token. | Commented out in compose |
+| `GOTRUE_SMS_TEXTLOCAL_API_KEY` | string | CLI | Textlocal API key. |  |
+| `GOTRUE_SMS_TEXTLOCAL_SENDER` | string | CLI | Textlocal sender ID. |  |
+| `GOTRUE_SMS_TWILIO_ACCOUNT_SID` | string | Both | Twilio account SID. | Commented out in compose |
+| `GOTRUE_SMS_TWILIO_AUTH_TOKEN` | string | Both | Twilio auth token. | Commented out in compose |
 | `GOTRUE_SMS_TWILIO_CONTENT_SID` | string |  | Twilio content SID (template). |  |
-| `GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID` | string | Self-hosted | Twilio message service SID / phone number. | Commented out in compose |
-| `GOTRUE_SMS_TWILIO_VERIFY_ACCOUNT_SID` | string |  | Twilio Verify account SID. |  |
-| `GOTRUE_SMS_TWILIO_VERIFY_AUTH_TOKEN` | string |  | Twilio Verify auth token. |  |
-| `GOTRUE_SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID` | string |  | Twilio Verify message service SID. |  |
-| `GOTRUE_SMS_VONAGE_API_KEY` | string |  | Vonage API key. |  |
-| `GOTRUE_SMS_VONAGE_API_SECRET` | string |  | Vonage API secret. |  |
-| `GOTRUE_SMS_VONAGE_FROM` | string |  | Vonage `from` parameter (sender). |  |
+| `GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID` | string | Both | Twilio message service SID / phone number. | Commented out in compose |
+| `GOTRUE_SMS_TWILIO_VERIFY_ACCOUNT_SID` | string | CLI | Twilio Verify account SID. |  |
+| `GOTRUE_SMS_TWILIO_VERIFY_AUTH_TOKEN` | string | CLI | Twilio Verify auth token. |  |
+| `GOTRUE_SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID` | string | CLI | Twilio Verify message service SID. |  |
+| `GOTRUE_SMS_VONAGE_API_KEY` | string | CLI | Vonage API key. |  |
+| `GOTRUE_SMS_VONAGE_API_SECRET` | string | CLI | Vonage API secret. |  |
+| `GOTRUE_SMS_VONAGE_FROM` | string | CLI | Vonage `from` parameter (sender). |  |
 
 ### MFA
 
@@ -580,9 +580,9 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_MFA_MAX_ENROLLED_FACTORS` | integer (count) | Both | Maximum factors a user may enroll. | Default: `10`, commented out in compose |
 | `GOTRUE_MFA_MAX_VERIFIED_FACTORS` | integer (count) |  | Maximum verified factors per user. | Default: `10` |
 | `GOTRUE_MFA_PHONE_ENROLL_ENABLED` | boolean | Both | Allow enrolling a phone MFA factor. | Default: `false`, commented out in compose |
-| `GOTRUE_MFA_PHONE_MAX_FREQUENCY` | string (duration) |  | Minimum interval between MFA phone OTPs. | Default: `1m` |
-| `GOTRUE_MFA_PHONE_OTP_LENGTH` | integer (count) |  | Phone MFA OTP code length. | Default: `6` |
-| `GOTRUE_MFA_PHONE_TEMPLATE` | string |  | Template string for MFA phone OTP messages. |  |
+| `GOTRUE_MFA_PHONE_MAX_FREQUENCY` | string (duration) | CLI | Minimum interval between MFA phone OTPs. | Default: `1m` |
+| `GOTRUE_MFA_PHONE_OTP_LENGTH` | integer (count) | CLI | Phone MFA OTP code length. | Default: `6` |
+| `GOTRUE_MFA_PHONE_TEMPLATE` | string | CLI | Template string for MFA phone OTP messages. |  |
 | `GOTRUE_MFA_PHONE_VERIFY_ENABLED` | boolean | Both | Allow verifying a phone MFA factor. | Default: `false`, commented out in compose |
 | `GOTRUE_MFA_RATE_LIMIT_CHALLENGE_AND_VERIFY` | number |  | Rate limit for MFA challenge + verify. | Default: `15` |
 | `GOTRUE_MFA_RECOVERY_CODES_CODE_LENGTH` | integer |  | Length of each MFA recovery code (characters). | Default: `16`. Range 13-32, checked when recovery codes are enabled |
@@ -600,13 +600,13 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_PASSKEY_ENABLED` | boolean |  | Enable passkey (passwordless WebAuthn) authentication. | Default: `false` |
+| `GOTRUE_PASSKEY_ENABLED` | boolean | CLI | Enable passkey (passwordless WebAuthn) authentication. | Default: `false` |
 | `GOTRUE_PASSKEY_MAX_PASSKEYS_PER_USER` | integer (count) |  | Maximum passkeys a user may register. | Default: `10` |
 | `GOTRUE_WEBAUTHN_CHALLENGE_EXPIRY_DURATION` | string (duration) |  | Lifetime of a WebAuthn challenge. | Default: `5m` |
-| `GOTRUE_WEBAUTHN_RP_DISPLAY_NAME` | string |  | WebAuthn relying party display name. | Required when WebAuthn/Passkey is enabled |
-| `GOTRUE_WEBAUTHN_RP_ID` | string |  | WebAuthn relying party ID (host). | Required when WebAuthn/Passkey is enabled. Alias of `RP_ID` |
+| `GOTRUE_WEBAUTHN_RP_DISPLAY_NAME` | string | CLI | WebAuthn relying party display name. | Required when WebAuthn/Passkey is enabled |
+| `GOTRUE_WEBAUTHN_RP_ID` | string | CLI | WebAuthn relying party ID (host). | Required when WebAuthn/Passkey is enabled. Alias of `RP_ID` |
 | `RP_ID` | string |  | WebAuthn relying party ID (bare alias). |  |
-| `GOTRUE_WEBAUTHN_RP_ORIGINS` | string (CSV) |  | Allowed WebAuthn origins (https or http://localhost). | Required when WebAuthn/Passkey is enabled |
+| `GOTRUE_WEBAUTHN_RP_ORIGINS` | string (CSV) | CLI | Allowed WebAuthn origins (https or http://localhost). | Required when WebAuthn/Passkey is enabled |
 
 ### SAML
 
@@ -667,10 +667,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_SESSIONS_ALLOW_LOW_AAL` | string (duration) |  | Time during which a low-AAL session is still accepted. |  |
-| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout. |  |
+| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) | CLI | Session inactivity timeout. |  |
 | `GOTRUE_SESSIONS_SINGLE_PER_USER` | boolean |  | Allow only one active session per user. |  |
 | `GOTRUE_SESSIONS_TAGS` | string (CSV) |  | Tags attached to created sessions. |  |
-| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime. |  |
+| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) | CLI | Absolute session lifetime. |  |
 
 ### Web3
 
@@ -696,16 +696,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED` | boolean | CLI | Rotate refresh tokens on use; detects malicious reuse and revokes the offending token's descendants. | Default: `true` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_UPGRADE_PERCENTAGE` | integer (percent) |  | Percentage of users to upgrade to a newer refresh-token format (0-100). |  |
 | `GOTRUE_SECURITY_SB_FORWARDED_FOR_ENABLED` | boolean |  | Trust the `Sb-Forwarded-For` header. Auth parses the leftmost value as an IP address and uses it for IP tracking and rate limiting. | Default: `false` |
-| `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | boolean |  | Require the current password to change a password. |  |
+| `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | boolean | CLI | Require the current password to change a password. |  |
 | `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION` | boolean | CLI | Require reauthentication before changing a password. |  |
 
 ### CAPTCHA
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_CAPTCHA_ENABLED` | boolean |  | Enable CAPTCHA protection. | Default: `false` |
-| `GOTRUE_SECURITY_CAPTCHA_PROVIDER` | string |  | CAPTCHA provider (`hcaptcha` or `turnstile`). | Default: `hcaptcha` |
-| `GOTRUE_SECURITY_CAPTCHA_SECRET` | string |  | CAPTCHA provider secret. |  |
+| `GOTRUE_SECURITY_CAPTCHA_ENABLED` | boolean | CLI | Enable CAPTCHA protection. | Default: `false` |
+| `GOTRUE_SECURITY_CAPTCHA_PROVIDER` | string | CLI | CAPTCHA provider (`hcaptcha` or `turnstile`). | Default: `hcaptcha` |
+| `GOTRUE_SECURITY_CAPTCHA_SECRET` | string | CLI | CAPTCHA provider secret. |  |
 | `GOTRUE_SECURITY_CAPTCHA_TIMEOUT` | string (duration) |  | HTTP timeout for the CAPTCHA verify call. | Default: `10s` |
 
 ### Password
