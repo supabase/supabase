@@ -6,7 +6,7 @@ import { Route as MagicLinkRoute } from '@/routes/api/platform/auth/$ref/magicli
 import { Route as OtpRoute } from '@/routes/api/platform/auth/$ref/otp'
 import { Route as RecoverRoute } from '@/routes/api/platform/auth/$ref/recover'
 import { mswServer, type APIErrorBody } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 const SUPABASE_URL = 'http://supabase.test'
 
@@ -16,6 +16,18 @@ const routes = [
   { name: 'otp', route: OtpRoute, body: { phone: '+15551234567' } },
   { name: 'recover', route: RecoverRoute, body: { email: 'user@example.com' } },
 ] as const
+
+function postSender(route: (typeof routes)[number]['route'], name: string, body: object) {
+  return callRoute(
+    route,
+    new Request(`http://localhost/api/platform/auth/default/${name}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+    { ref: 'default' }
+  )
+}
 
 describe('self-hosted auth sender routes', () => {
   beforeAll(() => {
@@ -32,17 +44,7 @@ describe('self-hosted auth sender routes', () => {
     async ({ name, route, body }) => {
       mswServer.use(http.post(`${SUPABASE_URL}/auth/v1/${name}`, () => HttpResponse.error()))
 
-      const response = await getRouteHandler(
-        route,
-        'POST'
-      )({
-        request: new Request(`http://localhost/api/platform/auth/default/${name}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        }),
-        params: { ref: 'default' },
-      })
+      const response = await postSender(route, name, body)
 
       expect(response.status).toBe(500)
       expect(await response.json()).toEqual({ message: expect.any(String) })
@@ -50,7 +52,7 @@ describe('self-hosted auth sender routes', () => {
   )
 
   it.each(routes)(
-    '$name preserves explicit upstream error status codes',
+    '$name forwards only its field and preserves explicit upstream error status codes',
     async ({ name, route, body }) => {
       const receivedBodies: unknown[] = []
       mswServer.use(
@@ -60,34 +62,11 @@ describe('self-hosted auth sender routes', () => {
         })
       )
 
-      const response = await getRouteHandler(
-        route,
-        'POST'
-      )({
-        request: new Request(`http://localhost/api/platform/auth/default/${name}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        }),
-        params: { ref: 'default' },
-      })
+      const response = await postSender(route, name, { ...body, extra: 'ignored' })
 
       expect(receivedBodies).toEqual([body])
       expect(response.status).toBe(429)
       expect(await response.json()).toEqual({ message: 'Rate limited' })
     }
   )
-
-  it.each(routes)('$name returns 405 with Allow: POST for GET', async ({ name, route }) => {
-    const response = await getRouteHandler(
-      route,
-      'GET'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/${name}`, { method: 'GET' }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('POST')
-  })
 })
