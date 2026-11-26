@@ -560,8 +560,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SMS_OTP_LENGTH` | integer (count) | Both | SMS OTP code length (6-10). | Default: `6`, commented out in compose |
 | `GOTRUE_SMS_PROVIDER` | string | Both | SMS provider name (`twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`). | Commented out in compose |
 | `GOTRUE_SMS_TEMPLATE` | string | Both | Message template for SMS OTP. | Commented out in compose |
-| `GOTRUE_SMS_TEST_OTP` | JSON | Both | JSON map of phone-to-OTP overrides for testing. | Commented out in compose |
-| `GOTRUE_SMS_TEST_OTP_VALID_UNTIL` | string |  | Cutoff time after which test OTPs stop being accepted. |  |
+| `GOTRUE_SMS_TEST_OTP` | string (CSV) | Both | Comma-separated `phone:code` pairs of OTP overrides for testing. | Commented out in compose |
+| `GOTRUE_SMS_TEST_OTP_VALID_UNTIL` | string |  | Cutoff time after which test OTPs stop being accepted. | RFC 3339, e.g. `2026-12-31T23:59:59Z`. A date-only value stops Auth from starting |
 | `GOTRUE_SMS_TEXTLOCAL_API_KEY` | string | CLI | Textlocal API key. |  |
 | `GOTRUE_SMS_TEXTLOCAL_SENDER` | string | CLI | Textlocal sender ID. |  |
 | `GOTRUE_SMS_TWILIO_ACCOUNT_SID` | string | Both | Twilio account SID. | Commented out in compose |
