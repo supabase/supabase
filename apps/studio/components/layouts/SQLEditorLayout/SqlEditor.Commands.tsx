@@ -378,7 +378,7 @@ function TableSelector() {
           onValueChange={setFilterString}
         />
       </CommandHeader>
-      <CommandList className="pb-9">
+      <CommandList className="flex-1 min-h-0">
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
@@ -406,29 +406,27 @@ function TableSelector() {
                 No tables found based on your search
               </p>
             )}
-            {tables.length > 0 && (
-              <>
-                <div ref={sentinelRef} />
-                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
-                  <div className="flex items-center gap-x-2">
-                    {isFetchingNextTablesPage ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2Icon size={14} className="animate-spin" /> Loading...
-                      </span>
-                    ) : (
-                      <span>
-                        Total: {tables.length}{' '}
-                        {tables.length === 1 ? <span>table</span> : <span>tables</span>}
-                        {hasNextTablesPage ? <span>{' loaded'}</span> : ''}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+            {tables.length > 0 && <div ref={sentinelRef} />}
           </>
         )}
       </CommandList>
+      {isSuccess && tables.length > 0 && (
+        <div className="shrink-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light">
+          <div className="flex items-center gap-x-2">
+            {isFetchingNextTablesPage ? (
+              <span className="flex items-center gap-2">
+                <Loader2Icon size={14} className="animate-spin" /> Loading...
+              </span>
+            ) : (
+              <span>
+                Total: {tables.length}{' '}
+                {tables.length === 1 ? <span>table</span> : <span>tables</span>}
+                {hasNextTablesPage ? <span>{' loaded'}</span> : ''}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </CommandWrapper>
   )
 }
