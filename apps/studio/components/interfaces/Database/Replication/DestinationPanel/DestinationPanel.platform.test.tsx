@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -10,6 +10,7 @@ import { expect, test } from 'vitest'
 import { DestinationPanel } from './DestinationPanel'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
+import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { createMockProject } from '@/tests/helpers'
@@ -130,6 +131,13 @@ const renderPanel = (clusterId?: string) => {
   )
 }
 
+const findRegionSelector = () => screen.findByRole('combobox', { name: 'Pipeline region' })
+
+const choosePublication = async (name: string) => {
+  await userEvent.click(await screen.findByText('Select publication'))
+  await userEvent.click(await screen.findByText(name))
+}
+
 test('retries source discovery and opens creation when only another region is enabled', async () => {
   mockRegions()
   mockProject(FRANKFURT.region_code)
@@ -153,16 +161,135 @@ test('opens the panel with a source only in a non-default region', async () => {
   mockPanelResources(new Set([FRANKFURT.cluster_id]))
   renderPanel()
 
-  expect(await screen.findByText('Frankfurt')).toBeVisible()
+  expect(await findRegionSelector()).toHaveTextContent('Frankfurt (eu-central-1)')
 })
 
-test('uses the default region when the project region lookup fails', async () => {
+test('prepares the environment default from a non-default region context', async () => {
+  mockRegions()
+  mockProject(FRANKFURT.region_code)
+  const enabledClusters = new Set<string | null>([FRANKFURT.cluster_id])
+  mockPanelResources(enabledClusters)
+  const writes: (string | null)[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/tenants-sources',
+    response: ({ request }) => {
+      const cluster = clusterFrom(request)
+      writes.push(cluster)
+      enabledClusters.add(cluster)
+      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+        tenant_id: 'default',
+        source_id: 1,
+      })
+    },
+  })
+  renderPanel(FRANKFURT.cluster_id)
+
+  const selector = await findRegionSelector()
+  expect(selector).toHaveTextContent('Frankfurt (eu-central-1)')
+  await waitFor(() => expect(selector).toBeEnabled())
+  await userEvent.click(selector)
+  const options = within(await screen.findByRole('listbox')).getAllByRole('option')
+  expect(options.map((option) => option.textContent)).toEqual([
+    'Frankfurt (eu-central-1)',
+    'Singapore (ap-southeast-1)',
+  ])
+  await userEvent.click(options[1])
+  await waitFor(() => expect(selector).toBeEnabled())
+  await userEvent.click(await screen.findByText('Select publication'))
+  expect(await screen.findByText('singapore')).toBeVisible()
+  expect(selector).toHaveTextContent('Singapore (ap-southeast-1)')
+  expect(writes).toEqual([null])
+})
+
+test('keeps region selection available when the project region lookup fails', async () => {
   mockRegions()
   mockProject()
   mockPanelResources(new Set([null]))
   renderPanel()
 
-  expect(await screen.findByText('Singapore')).toBeVisible()
+  const selector = await findRegionSelector()
+  expect(selector).toHaveTextContent('Singapore (ap-southeast-1)')
+  await waitFor(() => expect(selector).toBeEnabled())
+})
+
+test('locks the region selector while saving the pipeline', async () => {
+  mockRegions()
+  mockProject(SINGAPORE.region_code)
+  mockPanelResources(new Set([null]))
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+    response: {
+      name: 'singapore',
+      config: {
+        type: 'tables',
+        tables: [],
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [],
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: () =>
+      HttpResponse.json<ReplicationCostEstimateData>({
+        currency: 'usd',
+        pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+        streaming: { rate_per_gb: 3 },
+        table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+      }),
+  })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/destinations/validate',
+    response: { validation_failures: [] },
+  })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/pipelines/validate',
+    response: { validation_failures: [] },
+  })
+  const pendingSave = Promise.withResolvers<void>()
+  const saveRequested = Promise.withResolvers<void>()
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/destinations-pipelines',
+    response: async () => {
+      saveRequested.resolve()
+      await pendingSave.promise
+      return HttpResponse.json<APIErrorBody>({ message: 'Create failed' }, { status: 500 })
+    },
+  })
+  renderPanel()
+
+  try {
+    const selector = await findRegionSelector()
+    await choosePublication('singapore')
+    const fields = {
+      'Pipeline name': 'Warehouse',
+      'Project ID': 'my-project',
+      'Dataset ID': 'dataset',
+      'Service account key': '{}',
+    }
+    for (const [name, value] of Object.entries(fields)) {
+      fireEvent.change(screen.getByLabelText(name), { target: { value } })
+    }
+    const submit = screen.getByRole('button', { name: 'Start pipeline' })
+    await waitFor(() => expect(submit).toBeEnabled())
+    fireEvent.click(submit)
+    const confirm = await screen.findByRole('button', { name: 'Create and start pipeline' })
+    await waitFor(() => expect(confirm).toBeEnabled())
+    await userEvent.click(confirm)
+    await saveRequested.promise
+    await waitFor(() => expect(selector).toBeDisabled())
+    pendingSave.resolve()
+    await waitFor(() => expect(selector).toBeEnabled())
+  } finally {
+    pendingSave.resolve()
+  }
 })
 
 test('prepares the source in the preferred region before loading its publications', async () => {
@@ -186,9 +313,8 @@ test('prepares the source in the preferred region before loading its publication
   })
   renderPanel()
 
-  expect(await screen.findByText('Frankfurt')).toBeVisible()
+  expect(await findRegionSelector()).toHaveTextContent('Frankfurt (eu-central-1)')
   await userEvent.click(await screen.findByText('Select publication'))
   expect(await screen.findByText('frankfurt')).toBeVisible()
   expect(writes).toEqual([FRANKFURT.cluster_id])
-  expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
 })
