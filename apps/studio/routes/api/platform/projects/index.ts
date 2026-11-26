@@ -7,7 +7,7 @@ export const Route = createFileRoute('/api/platform/projects/')({
   server: {
     handlers: createApiHandlers({
       // Platform specific endpoint
-      GET: () => Response.json([DEFAULT_PROJECT], { status: 200 }),
+      GET: () => Response.json([DEFAULT_PROJECT]),
     }),
   },
 })

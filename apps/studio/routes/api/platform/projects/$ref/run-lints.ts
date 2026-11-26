@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/platform/projects/$ref/run-lints')({
         if (error) {
           return Response.json(error, { status: 400 })
         }
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

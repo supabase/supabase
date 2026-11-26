@@ -15,12 +15,12 @@ export const Route = createFileRoute('/api/platform/projects/$ref/api/rest')({
         if (response.ok) {
           const data = await response.json()
 
-          return Response.json(data, { status: 200 })
+          return Response.json(data)
         }
 
         return Response.json({ error: { message: 'Internal Server Error' } }, { status: 500 })
       },
-      HEAD: () => new Response(null, { status: 200 }),
+      HEAD: () => new Response(null),
     }),
   },
 })

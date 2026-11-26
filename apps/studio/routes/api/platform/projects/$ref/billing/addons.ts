@@ -9,15 +9,12 @@ type ResponseData =
 export const Route = createFileRoute('/api/platform/projects/$ref/billing/addons')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        const response: ResponseData = {
+      GET: () =>
+        Response.json({
           ref: '',
           selected_addons: [],
           available_addons: [],
-        }
-
-        return Response.json(response, { status: 200 })
-      },
+        } satisfies ResponseData),
     }),
   },
 })

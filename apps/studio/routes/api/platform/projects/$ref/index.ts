@@ -6,16 +6,9 @@ import { DEFAULT_PROJECT, PROJECT_REST_URL } from '@/lib/constants/api'
 export const Route = createFileRoute('/api/platform/projects/$ref/')({
   server: {
     handlers: createApiHandlers({
+      // Platform specific endpoint
       GET: () =>
-        // Platform specific endpoint
-        Response.json(
-          {
-            ...DEFAULT_PROJECT,
-            connectionString: '',
-            restUrl: PROJECT_REST_URL,
-          },
-          { status: 200 }
-        ),
+        Response.json({ ...DEFAULT_PROJECT, connectionString: '', restUrl: PROJECT_REST_URL }),
     }),
   },
 })
