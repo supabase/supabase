@@ -22,8 +22,7 @@ describe('SupportRequestMessage', () => {
     render(
       <SupportRequestMessage
         request={{
-          assistant_context:
-            'A support request has already been submitted.',
+          assistant_context: 'A support request has already been submitted.',
           subject: 'Database unavailable',
           message: 'Connections are timing out',
           organization_slug: 'org-1',
