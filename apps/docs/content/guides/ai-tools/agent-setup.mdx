@@ -1,0 +1,75 @@
+---
+id: 'ai-tools-agent-setup'
+title: 'Set up your AI coding agent'
+description: 'Install the Supabase CLI and the Supabase Plugin, then initialize Supabase in your project, so your AI coding agent can start building on Supabase right away.'
+sidebar_label: 'Agent setup'
+---
+
+When you finish this page, your AI coding agent can run Supabase commands, use the Supabase MCP server, and load Supabase Agent Skills.
+
+To have your agent do the setup, paste this prompt into it:
+
+```text
+Set up Supabase in this project by following https://supabase.com/docs/guides/ai-tools/agent-setup
+```
+
+If you are an AI coding agent, run the commands on this page yourself. Ask the user only when a step needs their decision or their sign-in.
+
+## Prerequisites
+
+You need the following before you start:
+
+- A project directory to set up.
+- [Node.js](https://nodejs.org) 20 or later, for the `npm` and `npx` commands.
+
+## Set up Supabase for your agent
+
+Run these steps in order.
+
+1. Open a terminal in your project directory.
+2. Install the Supabase CLI. In a Node.js project, install it as a dev dependency so the version is pinned per project:
+
+   ```bash
+   npm install supabase --save-dev
+   # or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
+   ```
+
+   For Homebrew, Scoop, and Linux packages, see [Install the Supabase CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli).
+
+3. Install the Supabase Plugin. It bundles the MCP server and Agent Skills, and it detects the agents you have installed:
+
+   ```bash
+   npx plugins add supabase-community/supabase-plugin
+   ```
+
+   The command asks you to confirm. To skip the confirmation, add `--yes`. To install the plugin for one agent by hand, see [manual installation](/docs/guides/ai-tools/plugins#manual-installation).
+
+4. Check whether your project has a `supabase` directory with a `config.jsonc`, `config.json`, or `config.toml` file. If it doesn't, initialize Supabase:
+
+   ```bash
+   npx supabase init
+   ```
+
+   If you installed the CLI with Homebrew, Scoop, or a Linux package, run `supabase init`.
+
+## Verify
+
+Check that the CLI and the MCP server work.
+
+1. Print the CLI version:
+
+   ```bash
+   npx supabase --version
+   ```
+
+   The command prints a version number.
+
+2. Ask your agent: "What tables are there in the database? Use MCP tools." Your MCP client redirects you to sign in to Supabase in a browser window, where you grant access. Your agent then lists the tables in your project. Depending on the client, you might need to restart it before it detects the MCP server.
+
+## Next steps
+
+Continue with one of these pages:
+
+- [Supabase MCP server](/docs/guides/ai-tools/mcp): limit the server to one project or to read-only access before your agent works with real data.
+- [Agent Skills](/docs/guides/ai-tools/ai-skills): see which skills the plugin installed and how to update them.
+- [Getting started](/docs/guides/getting-started): pick a quickstart for your framework and build your first feature.
