@@ -1,5 +1,8 @@
 import { BookOpenIcon } from 'lucide-react'
+import type { MouseEvent } from 'react'
 import { Button } from 'ui'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 interface DocsButtonProps {
   href: string
@@ -20,13 +23,20 @@ export const DocsButton = ({
   label,
   'data-attr': dataAttr,
 }: DocsButtonProps) => {
+  const track = useTrack()
+
+  const handleClick = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation()
+    track('docs_button_clicked', { ...(topic && { topic }) })
+  }
+
   return (
     <Button
       asChild
       variant="default"
       className={className}
       icon={<BookOpenIcon />}
-      onClick={(e) => e.stopPropagation()}
+      onClick={handleClick}
     >
       <a
         data-attr={dataAttr}
