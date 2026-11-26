@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -8,9 +7,8 @@ import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerLayout } from './ExplorerLayout'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 
 vi.mock('../ProjectLayout', () => ({
   ProjectLayoutWithAuth: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -66,14 +64,7 @@ describe('Explorer Home tab navigation', () => {
         metadata: { queryId: 'query-1' },
         isPreview: false,
       })
-      const router = createRouter({
-        routeTree: createRootRoute(),
-        history: createMemoryHistory({
-          initialEntries: ['/project/default/explorer/query/query-1'],
-        }),
-        parseSearch,
-        stringifySearch,
-      })
+      const router = createTestRouter('/project/default/explorer/query/query-1')
       let historyAtNavigation: unknown
       const navigate = vi.spyOn(router, 'navigate')
       navigate.mockImplementationOnce(async () => {

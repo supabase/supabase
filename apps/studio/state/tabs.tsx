@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
 import {
@@ -25,10 +25,7 @@ export type TabRouter = {
 
 export const useTabRouter = (): TabRouter => {
   const navigate = useNavigate()
-  const { ref } = useParams()
-  const schema = useLocation({
-    select: (location) => (location.search as Record<string, string | string[] | undefined>).schema,
-  })
+  const { ref, schema } = useParams()
 
   return useMemo(
     () => ({

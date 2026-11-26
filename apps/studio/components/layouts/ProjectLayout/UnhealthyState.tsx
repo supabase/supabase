@@ -38,7 +38,7 @@ export const UnhealthyState = () => {
     onSuccess: () => {
       setProjectStatus({ ref: project?.ref ?? '', status: PROJECT_STATUS.RESTARTING })
       toast.success('Restarting project...')
-      void navigate({ to: '/project/$ref', params: { ref: ref ?? '' } })
+      if (ref) void navigate({ to: '/project/$ref', params: { ref } })
     },
     onError: (error) => {
       toast.error(`Failed to restart project: ${error.message}`)

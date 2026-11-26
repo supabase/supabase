@@ -14,14 +14,9 @@ export interface OrganizationSettingsMenuProps {
 }
 
 export function OrganizationSettingsMenu({ onCloseSheet }: OrganizationSettingsMenuProps) {
-  const { pathname, orgSlug } = useLocation({
-    select: (location) => ({
-      pathname: location.pathname,
-      orgSlug: (location.search as Record<string, string | string[] | undefined>).orgSlug,
-    }),
-  })
-  const { slug } = useParams()
-  const organizationSlug = slug ?? (typeof orgSlug === 'string' ? orgSlug : '')
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const { slug, orgSlug } = useParams()
+  const organizationSlug = slug ?? orgSlug ?? ''
 
   const currentPath = normalizeOrganizationSettingsPath(pathname)
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()

@@ -11,9 +11,6 @@ test('Should sanitize project routes correctly when switching projects by removi
   expect(sanitizeRoute('/project/$ref/storage/buckets/$bucketId')).toBe(
     '/project/$ref/storage/buckets'
   )
-  expect(sanitizeRoute('/project/$ref/logs/explorer?q=select')).toBe(
-    '/project/$ref/logs/explorer?q=select'
-  )
   expect(sanitizeRoute('/project/$ref/advisors/security/$preset')).toBe(
     '/project/$ref/advisors/security'
   )

@@ -1,6 +1,5 @@
 import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import { useMemo } from 'react'
 
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
@@ -25,23 +24,21 @@ export interface ObservabilityMenuSection {
 }
 
 const usePreservedQueryParams = () => {
-  const search = useLocation({ select: (location) => location.search }) as SearchRecord
-
   // Preserve date range query parameters when navigating
-  const preservedQueryParams = useMemo(() => {
-    const { its, ite, isHelper, helperText } = search
-    const params = new URLSearchParams()
+  return useLocation({
+    select: (location) => {
+      const { its, ite, isHelper, helperText } = location.search as SearchRecord
+      const params = new URLSearchParams()
 
-    if (its && typeof its === 'string') params.set('its', its)
-    if (ite && typeof ite === 'string') params.set('ite', ite)
-    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
-    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+      if (its && typeof its === 'string') params.set('its', its)
+      if (ite && typeof ite === 'string') params.set('ite', ite)
+      if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+      if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
 
-    const queryString = params.toString()
-    return queryString ? `?${queryString}` : ''
-  }, [search])
-
-  return preservedQueryParams
+      const queryString = params.toString()
+      return queryString ? `?${queryString}` : ''
+    },
+  })
 }
 
 export const useGenerateObservabilityMenu = () => {

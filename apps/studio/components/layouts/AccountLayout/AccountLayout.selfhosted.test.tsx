@@ -1,15 +1,9 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import AccountLayout from './AccountLayout'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
+import { customRender } from '@/tests/lib/custom-render'
 
 const { mockRegisterOpenMenu, mockSetMobileSheetContent } = vi.hoisted(() => ({
   mockRegisterOpenMenu: vi.fn(),
@@ -79,24 +73,8 @@ vi.mock('./WithSidebar', () => ({
   ),
 }))
 
-vi.mock('ui', () => ({
-  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-}))
-
-const renderAccountLayout = (initialUrl: string, children: ReactNode) => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
-  const view = render(
-    <RouterContextProvider router={router}>
-      <AccountLayout title="Preferences">{children}</AccountLayout>
-    </RouterContextProvider>
-  )
-  return { ...view, router }
-}
+const renderAccountLayout = (initialUrl: string, children: ReactNode) =>
+  customRender(<AccountLayout title="Preferences">{children}</AccountLayout>, { initialUrl })
 
 describe('AccountLayout (self-hosted)', () => {
   beforeEach(() => {

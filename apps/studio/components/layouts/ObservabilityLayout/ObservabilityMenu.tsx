@@ -33,7 +33,7 @@ export const ObservabilityMenu = () => {
   const navigate = useNavigate()
   const pathname = useLocation({ select: (location) => location.pathname })
   const { ref, id } = useParams()
-  const pageKey = (id || pathname.split('/')[4] || 'observability') as string
+  const pageKey = id || pathname.split('/')[4] || 'observability'
 
   const menuItems = useGenerateObservabilityMenu()
   const { data: customReportItems, isLoading } = useGenerateCustomReportsMenu()

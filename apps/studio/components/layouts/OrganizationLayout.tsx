@@ -1,4 +1,3 @@
-import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ExternalLinkIcon, XIcon } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
@@ -12,6 +11,7 @@ import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
 import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -83,7 +83,7 @@ const OrganizationLayoutContent = ({
   children,
   title,
 }: PropsWithChildren<OrganizationLayoutProps>) => {
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const routePattern = useRoutePattern()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { appTitle } = useCustomContent(['app:title'])
   const [isBannerDismissed, setIsBannerDismissed] = useLocalStorageQuery<boolean>(
@@ -95,7 +95,7 @@ const OrganizationLayoutContent = ({
   )
 
   // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
-  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => pathname.endsWith(x))
+  const isSettingsSurface = ORG_SETTINGS_ROUTES.some((x) => routePattern.endsWith(`/${x}`))
   const pageTitle = buildStudioPageTitle({
     section: title,
     surface: isSettingsSurface ? 'Organization Settings' : undefined,

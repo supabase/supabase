@@ -34,14 +34,9 @@ export interface OrgMenuContentProps {
 }
 
 export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
-  const { pathname, orgSlug } = useLocation({
-    select: (location) => ({
-      pathname: location.pathname,
-      orgSlug: (location.search as Record<string, string | string[] | undefined>).orgSlug,
-    }),
-  })
-  const { slug } = useParams()
-  const organizationSlug: string = slug ?? (typeof orgSlug === 'string' ? orgSlug : '')
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const { slug, orgSlug } = useParams()
+  const organizationSlug: string = slug ?? orgSlug ?? ''
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled

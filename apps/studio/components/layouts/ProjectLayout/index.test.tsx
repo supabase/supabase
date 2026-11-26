@@ -1,9 +1,4 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
+import { RouterContextProvider } from '@tanstack/react-router'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useState, type ReactNode } from 'react'
@@ -13,6 +8,7 @@ import { MobileSheetProvider, useMobileSheet } from '../Navigation/NavigationBar
 import { ProjectLayout } from './index'
 import type { MobileMenuContentProps } from './LayoutHeader/MobileMenuContent'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
+import { createTestRouter } from '@/tests/lib/custom-render'
 
 const { mockRoute, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
   () => ({
@@ -273,10 +269,7 @@ const ResourceMenuHarness = () => {
 }
 
 const renderWithRouter = (ui: ReactNode) => {
-  const router = createRouter({
-    routeTree: createRootRoute(),
-    history: createMemoryHistory({ initialEntries: [mockRoute.url] }),
-  })
+  const router = createTestRouter(mockRoute.url)
   return render(<RouterContextProvider router={router}>{ui}</RouterContextProvider>)
 }
 

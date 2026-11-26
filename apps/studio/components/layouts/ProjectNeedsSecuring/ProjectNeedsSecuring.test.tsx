@@ -1,18 +1,11 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  RouterContextProvider,
-} from '@tanstack/react-router'
+import { createRootRoute, createRoute } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import type { MouseEventHandler, ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectNeedsSecuring } from './ProjectNeedsSecuring'
-import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { render } from '@/tests/helpers'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 
 const {
   mockUseFlag,
@@ -32,7 +25,7 @@ const {
   mockUseLocalStorageQuery: vi.fn(),
 }))
 
-const createTestRouter = async (initialUrl: string) => {
+const createProjectRouter = async (initialUrl: string) => {
   const rootRoute = createRootRoute()
   const projectHomeRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -46,12 +39,10 @@ const createTestRouter = async (initialUrl: string) => {
     getParentRoute: () => rootRoute,
     path: '/project/$ref/database/policies',
   })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([projectHomeRoute, tablesRoute, policiesRoute]),
-    history: createMemoryHistory({ initialEntries: [initialUrl] }),
-    parseSearch,
-    stringifySearch,
-  })
+  const router = createTestRouter(
+    initialUrl,
+    rootRoute.addChildren([projectHomeRoute, tablesRoute, policiesRoute])
+  )
   await router.load()
   return router
 }
@@ -200,14 +191,13 @@ describe('ProjectNeedsSecuring', () => {
   })
 
   it('renders the security gate when an exposed table has RLS disabled and the project has not been dismissed', async () => {
-    const router = await createTestRouter(initialUrl)
+    const router = await createProjectRouter(initialUrl)
 
-    render(
-      <RouterContextProvider router={router}>
-        <ProjectNeedsSecuring>
-          <div data-testid="project-children">Project content</div>
-        </ProjectNeedsSecuring>
-      </RouterContextProvider>
+    customRender(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>,
+      { router }
     )
 
     expect(screen.getByText('Your project needs securing')).toBeInTheDocument()
@@ -225,14 +215,13 @@ describe('ProjectNeedsSecuring', () => {
   })
 
   it('navigates to the table policies page when a table row is clicked', async () => {
-    const router = await createTestRouter(initialUrl)
+    const router = await createProjectRouter(initialUrl)
 
-    render(
-      <RouterContextProvider router={router}>
-        <ProjectNeedsSecuring>
-          <div data-testid="project-children">Project content</div>
-        </ProjectNeedsSecuring>
-      </RouterContextProvider>
+    customRender(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>,
+      { router }
     )
 
     fireEvent.click(screen.getByText('invoices'))
@@ -268,14 +257,13 @@ describe('ProjectNeedsSecuring', () => {
     ['the feature flag is disabled', () => mockUseFlag.mockReturnValue(false)],
   ])('renders the project content when %s', async (_, arrange) => {
     arrange()
-    const router = await createTestRouter(initialUrl)
+    const router = await createProjectRouter(initialUrl)
 
-    render(
-      <RouterContextProvider router={router}>
-        <ProjectNeedsSecuring>
-          <div data-testid="project-children">Project content</div>
-        </ProjectNeedsSecuring>
-      </RouterContextProvider>
+    customRender(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>,
+      { router }
     )
 
     expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
