@@ -67,8 +67,6 @@ const VersionRowBadge = ({
     case 'expiry-due':
       label = 'Queued'
       break
-    case 'retained':
-      return null
   }
 
   return (

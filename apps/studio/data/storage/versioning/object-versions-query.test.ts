@@ -55,8 +55,8 @@ describe('toObjectVersions', () => {
 
   it('labels the oldest upload and treats the rest as overwrites', () => {
     const versions = toObjectVersions([
-      object({ version: 'a', created_at: '2026-01-01T00:00:00Z' }),
-      object({ version: 'b', created_at: '2026-02-01T00:00:00Z' }),
+      object({ version: 'a', created_at: '2026-01-01T00:00:00Z', archived_at: '2026-02-01' }),
+      object({ version: 'b', created_at: '2026-02-01T00:00:00Z', archived_at: '2026-03-01' }),
       object({ version: 'c', created_at: '2026-03-01T00:00:00Z' }),
     ])
 
@@ -69,7 +69,11 @@ describe('toObjectVersions', () => {
 
   it('labels delete markers and does not count them as the initial upload', () => {
     const versions = toObjectVersions([
-      object({ version: 'upload', created_at: '2026-01-01T00:00:00Z' }),
+      object({
+        version: 'upload',
+        created_at: '2026-01-01T00:00:00Z',
+        archived_at: '2026-02-01',
+      }),
       object({
         version: 'marker',
         created_at: '2026-02-01T00:00:00Z',
