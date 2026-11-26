@@ -1,7 +1,7 @@
 ---
 title: 'MCP with scoped OAuth access'
 subtitle: 'Connect MCP clients using project-scoped and member-bound OAuth grants'
-description: 'Learn how the Supabase MCP server enforces scoped OAuth grants, read-only SQL fallback, and missing-scope errors for static OAuth apps and the stdio package.'
+description: 'Learn how the hosted Supabase MCP server enforces scoped OAuth grants, project and branch access, read-only SQL fallback, and missing-scope error recovery.'
 ---
 
 Understanding how the hosted Model Context Protocol (MCP) server enforces scoped OAuth grants helps you pick the right scopes, connection URL, and error recovery path. For how to configure a manual OAuth app for an MCP client, see [Manual OAuth app](/docs/guides/ai-tools/mcp#manual-oauth-app).
@@ -73,12 +73,6 @@ For a static app using scoped access, the server checks whether re-authenticatin
 | Member's role was lowered or membership was removed, while the token still holds the scope.                            | Tool error in an HTTP `200` response from the live permission check.      | An organization Owner or Administrator restores the member's role or membership. Re-authenticating alone doesn't restore access.  |
 
 Returning a tool error in an HTTP `200` response when re-authenticating can't help prevents MCP clients from looping back to the consent screen. When an AI agent hits a grant or permission denial, ask the user to update their grant or role, retry only after the grant or connection changes, and never ask for the OAuth client secret in chat.
-
-## Using `@supabase/mcp-server-supabase` over stdio
-
-The `@supabase/mcp-server-supabase` npm package connects to the Management API over stdio and is separate from the Supabase CLI local MCP endpoint.
-
-Token scopes and project restrictions don't remove tools from the package's tool list. Tool visibility still follows the configured feature groups, `--project-ref`, and `--read-only`. When you run the package with a scoped token, Management API calls that need scopes or projects outside the grant fail with a permission error. Tools that don't call the Management API, such as `get_project_url`, still return a value even if the token can't access that project.
 
 ## Related resources
 
