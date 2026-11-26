@@ -2958,6 +2958,29 @@ export interface CustomDomainStepSubmittedEvent {
 }
 
 /**
+ * Triggered when a user copies the name or value of a DNS record shown in the custom domain
+ * verification step.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface CustomDomainDnsRecordCopiedEvent {
+  action: 'custom_domain_dns_record_copied'
+  properties: {
+    /**
+     * The type of DNS record that was copied
+     */
+    recordType: 'CNAME' | 'TXT'
+    /**
+     * Whether the record name or the record value was copied
+     */
+    field: 'name' | 'value'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Triggered when a create merge request is clicked for a branch.
  *
  * @group Events
@@ -5437,6 +5460,7 @@ export type TelemetryEvent =
   | ProjectLifecycleActionSubmittedEvent
   | ProjectComplianceModeUpdatedEvent
   | CustomDomainStepSubmittedEvent
+  | CustomDomainDnsRecordCopiedEvent
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
