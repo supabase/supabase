@@ -1,6 +1,6 @@
-import { getPreferredClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { useQuery } from '@tanstack/react-query'
 
+import { getPreferredClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'

@@ -1,10 +1,10 @@
-import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { useQuery } from '@tanstack/react-query'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationType } from '../DestinationPanel.types'
+import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import {
   replicationClustersQueryOptions,

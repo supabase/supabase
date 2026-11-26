@@ -39,8 +39,8 @@ import {
   useIsPipelinesSnowflakeEnabled,
 } from './useIsPipelinesEnabled'
 import { usePipelineList } from './usePipelineList'
-import { useReplicationClusters } from './useReplicationClusters'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { useReplicationClusters } from './useReplicationClusters'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'

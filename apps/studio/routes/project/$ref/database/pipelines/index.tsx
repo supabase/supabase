@@ -15,6 +15,7 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
