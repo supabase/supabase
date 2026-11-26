@@ -25,9 +25,3 @@ export const replicationClustersQueryOptions = () =>
     // consumer mounts would put the pipeline pages back into their loading state in a loop.
     retryOnMount: false,
   })
-
-// Default-cluster requests retain the API's omission semantics.
-export const toRequestClusterId = (
-  clusterId: string | null | undefined,
-  defaultClusterId: string | undefined
-) => (clusterId === null || clusterId === defaultClusterId ? undefined : clusterId)
