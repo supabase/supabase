@@ -7,6 +7,8 @@ import { beforeEach, expect, it, vi } from 'vitest'
 
 import { replicationKeys } from '@/data/replication/keys'
 import { Route } from '@/routes/project/$ref/database/pipelines/new'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { renderRoute } from '@/tests/lib/route-render'
 
@@ -100,12 +102,25 @@ vi.mock('./PipelineCreationFlow', () => ({
   ),
 }))
 
-const pipelinesList = { to: '/project/$ref/database/pipelines', params: { ref: 'default' } }
-const renderPage = (options?: { queryClient?: QueryClient }) =>
+const pipelinesList = {
+  to: '/project/$ref/database/pipelines',
+  params: { ref: 'default' },
+  search: { cluster_id: undefined },
+}
+const renderPage = ({
+  queryClient,
+  clusterId,
+}: { queryClient?: QueryClient; clusterId?: string } = {}) =>
   renderRoute(Route, {
     routeId: '/project/$ref/database/pipelines/new',
     url: '/project/default/database/pipelines/new',
-    ...options,
+    renderOptions: {
+      wrapper: ({ children }) => (
+        <CustomWrapper queryClient={queryClient}>
+          <ReplicationClusterProvider clusterId={clusterId}>{children}</ReplicationClusterProvider>
+        </CustomWrapper>
+      ),
+    },
   })
 
 const mockSources = (sources: components['schemas']['SourcesResponse_Output']['sources']) =>
@@ -175,6 +190,26 @@ it('returns through the shared router without reloading the toast host', async (
   await renderPage()
   fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
   expect(state.navigate).toHaveBeenCalledWith(pipelinesList)
+})
+
+it('returns to the selected cluster when closing the wizard', async () => {
+  await renderPage({ clusterId: 'eu-west-1' })
+  fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
+  expect(state.navigate).toHaveBeenCalledWith({
+    ...pipelinesList,
+    search: { cluster_id: 'eu-west-1' },
+  })
+})
+
+it('returns to the selected cluster when direct entry is unavailable', async () => {
+  mockSources([])
+  await renderPage({ clusterId: 'eu-west-1' })
+  expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
+  expect(state.navigate).toHaveBeenCalledWith({
+    ...pipelinesList,
+    search: { cluster_id: 'eu-west-1' },
+    replace: true,
+  })
 })
 
 it.each(['disabled', 'error'])(

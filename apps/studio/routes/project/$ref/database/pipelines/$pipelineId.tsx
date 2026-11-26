@@ -5,6 +5,7 @@ import { useContext, useEffect } from 'react'
 import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from '@/components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/$pipelineId')({
   component: DatabasePipelinesPage,
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/project/$ref/database/pipelines/$pipeline
 
 function DatabasePipelinesPage() {
   const navigate = useNavigate()
+  const clusterId = useReplicationClusterId()
   const { ref: projectRef } = Route.useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
@@ -21,10 +23,11 @@ function DatabasePipelinesPage() {
       void navigate({
         to: '/project/$ref/database/pipelines',
         params: { ref: projectRef },
+        search: { cluster_id: clusterId },
         replace: true,
       })
     }
-  }, [navigate, hasLoaded, projectRef, hasPipelinesDestinationAccess])
+  }, [navigate, hasLoaded, projectRef, hasPipelinesDestinationAccess, clusterId])
 
   return (
     <>

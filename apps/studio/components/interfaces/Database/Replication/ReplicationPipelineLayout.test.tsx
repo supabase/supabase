@@ -1,4 +1,10 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
@@ -7,10 +13,12 @@ import { HttpResponse } from 'msw'
 import { ReactNode, useRef, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { PipelineClusterScope } from './PipelineClusterScope'
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
 import type { DestinationWireResponse, PipelineWireResponse } from '@/data/replication/api-types'
 import { replicationKeys } from '@/data/replication/keys'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import {
   PipelineRequestStatusProvider,
   PipelineStatusRequestStatus,
@@ -29,10 +37,6 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => routeParams,
 }))
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}))
-
 vi.mock('next/link', () => ({
   default: ({
     href,
@@ -45,12 +49,31 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-const renderLayout = (children?: ReactNode, queryClient?: QueryClient) =>
-  customRender(
-    <PipelineRequestStatusProvider>
+const renderWithRouter = (
+  component: React.ReactElement,
+  options?: Parameters<typeof customRender>[1]
+) => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/project/default/database/pipelines/42'] }),
+    parseSearch,
+    stringifySearch,
+  })
+  return {
+    ...customRender(
+      <RouterContextProvider router={router}>{component}</RouterContextProvider>,
+      options
+    ),
+    router,
+  }
+}
+
+const renderLayout = (children?: ReactNode, queryClient?: QueryClient, clusterId?: string) =>
+  renderWithRouter(
+    <PipelineClusterScope>
       <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
-    </PipelineRequestStatusProvider>,
-    { queryClient }
+    </PipelineClusterScope>,
+    { queryClient, nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined } }
   )
 
 const TableResetFixture = () => {
@@ -135,10 +158,14 @@ const DESTINATION: DestinationResponse = {
 }
 
 const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
+  const requestedClusters: (string | null)[] = []
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id',
-    response: () => HttpResponse.json<PipelineResponse>({ ...PIPELINE, id }),
+    response: ({ request }) => {
+      requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+      return HttpResponse.json<PipelineResponse>({ ...PIPELINE, id })
+    },
   })
   addAPIMock({
     method: 'get',
@@ -172,6 +199,7 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
         ],
       }),
   })
+  return requestedClusters
 }
 
 const mockStatus = (name: PipelineStatusResponse['status']['name'], id: string | number = 42) =>
@@ -262,7 +290,7 @@ describe('ReplicationPipelineLayout', () => {
     mockStatus('stopped', '42')
     mockVersion(false, '42')
 
-    customRender(
+    renderWithRouter(
       <PipelineRequestStatusProvider>
         <ReplicationPipelineLayout />
       </PipelineRequestStatusProvider>,
@@ -293,7 +321,7 @@ describe('ReplicationPipelineLayout', () => {
       },
     })
 
-    customRender(
+    renderWithRouter(
       <PipelineRequestStatusProvider>
         <ReplicationPipelineLayout />
       </PipelineRequestStatusProvider>,
@@ -314,8 +342,8 @@ describe('ReplicationPipelineLayout', () => {
     expect(await screen.findByText('Stopped')).toBeVisible()
   })
 
-  test('deletes an unknown pipeline through the existing shutdown and cleanup flow', async () => {
-    mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+  test('deletes an unknown pipeline and returns to its cluster', async () => {
+    const requestedClusters = mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
     mockStatus('started', '42')
     mockVersion(false, '42')
     addAPIMock({
@@ -339,8 +367,12 @@ describe('ReplicationPipelineLayout', () => {
         }),
     })
     const queryClient = new QueryClient()
-    renderLayout(undefined, queryClient)
+    const clusterId = 'eu-west-1'
+    const { router } = renderLayout(undefined, queryClient, clusterId)
+    const listHref = '/project/default/database/pipelines?cluster_id=eu-west-1'
     await screen.findByRole('img', { name: 'Unknown destination' })
+    expect(requestedClusters).toEqual([clusterId])
+    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
     const dialog = await screen.findByRole('dialog')
@@ -352,22 +384,27 @@ describe('ReplicationPipelineLayout', () => {
     fireEvent.submit(dialog.querySelector('form')!)
     await screen.findByText('Stopping')
     await act(() =>
-      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelinesStatus('default', '42') })
+      queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus('default', '42', clusterId),
+      })
     )
     expect(within(dialog).getByRole('button', { name: 'Deleting…' })).toBeDisabled()
 
     mockStatus('stopped', '42')
     await act(() =>
-      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelinesStatus('default', '42') })
+      queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus('default', '42', clusterId),
+      })
     )
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(router.history.location.href).toBe(listHref)
   })
 
   test.each([42, '42', '003l8j9rxqi6c8rd5mcx1w2ya'])(
     'renders pipeline %s and stops it using its original ID',
     async (pipelineId) => {
       routeParams.pipelineId = String(pipelineId)
-      mockPipeline(pipelineId)
+      const requestedClusters = mockPipeline(pipelineId)
       mockVersion(false, pipelineId)
       mockStatus('started', pipelineId)
       addAPIMock({
@@ -382,9 +419,12 @@ describe('ReplicationPipelineLayout', () => {
         },
       })
 
-      renderLayout()
+      const queryClient = new QueryClient()
+      queryClient.setQueryData(replicationKeys.clusters(), { default_cluster_id: '1', regions: [] })
+      renderLayout(undefined, queryClient, '1')
 
       expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
+      expect(requestedClusters).toEqual([null])
       expect(await screen.findByText('Running')).toBeVisible()
 
       await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
