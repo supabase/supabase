@@ -13,9 +13,9 @@ import {
 export const Route = createFileRoute('/api/platform/props/project/$ref/api')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        // Platform specific endpoint
-        const response = {
+      // Platform specific endpoint
+      GET: () =>
+        Response.json({
           project: {
             ...DEFAULT_PROJECT,
             api_key_supabase_encrypted: '',
@@ -77,10 +77,7 @@ export const Route = createFileRoute('/api/platform/props/project/$ref/api')({
               },
             ],
           },
-        }
-
-        return Response.json(response, { status: 200 })
-      },
+        }),
     }),
   },
 })

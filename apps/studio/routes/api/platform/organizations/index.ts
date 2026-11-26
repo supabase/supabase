@@ -5,9 +5,9 @@ import { createApiHandlers } from '@/lib/api/apiWrapper'
 export const Route = createFileRoute('/api/platform/organizations/')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        // Platform specific endpoint
-        const response = [
+      // Platform specific endpoint
+      GET: () =>
+        Response.json([
           {
             id: 1,
             name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
@@ -18,9 +18,7 @@ export const Route = createFileRoute('/api/platform/organizations/')({
               name: 'Enterprise',
             },
           },
-        ]
-        return Response.json(response, { status: 200 })
-      },
+        ]),
     }),
   },
 })

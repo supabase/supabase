@@ -6,9 +6,9 @@ import { DEFAULT_PROJECT } from '@/lib/constants/api'
 export const Route = createFileRoute('/api/platform/profile/')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        // Platform specific endpoint
-        const response = {
+      // Platform specific endpoint
+      GET: () =>
+        Response.json({
           id: 1,
           primary_email: 'johndoe@supabase.io',
           username: 'johndoe',
@@ -23,9 +23,7 @@ export const Route = createFileRoute('/api/platform/profile/')({
               projects: [{ ...DEFAULT_PROJECT, connectionString: '' }],
             },
           ],
-        }
-        return Response.json(response, { status: 200 })
-      },
+        }),
     }),
   },
 })

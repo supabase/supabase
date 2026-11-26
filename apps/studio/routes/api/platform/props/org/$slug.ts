@@ -5,9 +5,9 @@ import { createApiHandlers } from '@/lib/api/apiWrapper'
 export const Route = createFileRoute('/api/platform/props/org/$slug')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        // Platform specific endpoint
-        const response = {
+      // Platform specific endpoint
+      GET: () =>
+        Response.json({
           members: [],
           products: [],
           customer: {
@@ -19,10 +19,7 @@ export const Route = createFileRoute('/api/platform/props/org/$slug')({
             total_team_projects: 0,
             total_payg_projects: 0,
           },
-        }
-
-        return Response.json(response, { status: 200 })
-      },
+        }),
     }),
   },
 })

@@ -13,7 +13,7 @@ export const Route = createFileRoute('/api/platform/auth/$ref/users/')({
         const { data, error } = await supabase.auth.admin.createUser(body)
 
         if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
-        return Response.json(data.user, { status: 200 })
+        return Response.json(data.user)
       },
     }),
   },

@@ -9,8 +9,8 @@ type ResponseData =
 export const Route = createFileRoute('/api/platform/organizations/$slug/billing/subscription')({
   server: {
     handlers: createApiHandlers({
-      GET: () => {
-        const response: ResponseData = {
+      GET: () =>
+        Response.json({
           current_period_end: 0,
           current_period_start: 0,
           next_invoice_at: 0,
@@ -25,10 +25,7 @@ export const Route = createFileRoute('/api/platform/organizations/$slug/billing/
           billing_via_partner: false,
           billing_partner: 'aws_marketplace',
           customer_balance: 0,
-        }
-
-        return Response.json(response, { status: 200 })
-      },
+        } satisfies ResponseData),
     }),
   },
 })

@@ -9,7 +9,7 @@ type ResponseData =
 export const Route = createFileRoute('/api/platform/integrations/github/connections')({
   server: {
     handlers: createApiHandlers({
-      GET: () => Response.json({ connections: [] } satisfies ResponseData, { status: 200 }),
+      GET: () => Response.json({ connections: [] } satisfies ResponseData),
     }),
   },
 })

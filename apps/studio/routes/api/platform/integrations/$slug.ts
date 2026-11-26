@@ -9,7 +9,7 @@ type ResponseData =
 export const Route = createFileRoute('/api/platform/integrations/$slug')({
   server: {
     handlers: createApiHandlers({
-      GET: () => Response.json([] satisfies ResponseData, { status: 200 }),
+      GET: () => Response.json([] satisfies ResponseData),
     }),
   },
 })

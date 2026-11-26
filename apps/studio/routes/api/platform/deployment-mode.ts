@@ -7,13 +7,7 @@ import { IS_CLI } from '@/lib/constants'
 export const Route = createFileRoute('/api/platform/deployment-mode')({
   server: {
     handlers: createApiHandlers({
-      GET: () =>
-        Response.json(
-          {
-            is_cli_mode: IS_CLI,
-          } satisfies DeploymentModeResponse,
-          { status: 200 }
-        ),
+      GET: () => Response.json({ is_cli_mode: IS_CLI } satisfies DeploymentModeResponse),
     }),
   },
 })

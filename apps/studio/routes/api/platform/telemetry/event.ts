@@ -6,7 +6,7 @@ export const Route = createFileRoute('/api/platform/telemetry/event')({
   server: {
     handlers: createApiHandlers({
       // Platform specific endpoint
-      POST: () => Response.json({}, { status: 200 }),
+      POST: () => Response.json({}),
     }),
   },
 })
