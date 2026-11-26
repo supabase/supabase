@@ -1,18 +1,9 @@
 import { Search } from 'lucide-react'
-import { useSyncExternalStore } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import { openKbSearch } from './KbSearch'
 
-const subscribeToNothing = () => () => {}
-
-const getIsMac = () => /Mac|iPhone|iPad/.test(navigator.userAgent)
-
-const getIsMacOnServer = () => false
-
 export const HeroSearch = () => {
-  const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
-
   return (
     <button
       type="button"
@@ -26,7 +17,7 @@ export const HeroSearch = () => {
     >
       <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
       <span className="flex-1 truncate">Search guides</span>
-      <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
+      <KeyboardShortcut keys={['Meta', 'K']} />
     </button>
   )
 }

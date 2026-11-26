@@ -4,11 +4,11 @@ declare module '*.css' {
 }
 
 declare module '*.svg' {
-  const content: any
+  const content: string | { src: string }
   export default content
 }
 
 declare module '*.png' {
-  const content: import('next/image').StaticImageData
+  const content: string | { src: string }
   export default content
 }

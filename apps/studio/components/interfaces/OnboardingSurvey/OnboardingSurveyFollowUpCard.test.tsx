@@ -1,4 +1,10 @@
 import { QueryClient } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  type AnyRouter,
+} from '@tanstack/react-router'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -18,11 +24,11 @@ import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProv
 import { organizationKeys } from '@/data/organizations/keys'
 import { castOrganizationSlugResponseToOrganization } from '@/data/organizations/organization-query'
 import { castOrganizationResponseToOrganization } from '@/data/organizations/organizations-query'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type OrganizationDetailResponse = components['schemas']['OrganizationSlugResponse_Output']
@@ -108,14 +114,26 @@ const cachedQueryClient = (organization: OrganizationResponse, createdAt: string
 const renderCard = ({
   organization = createMockOrganizationResponse({ slug: ORG_SLUG }),
   queryClient,
-}: { organization?: OrganizationResponse; queryClient?: QueryClient } = {}) => {
+  initialUrl = `/org/${ORG_SLUG}`,
+}: {
+  organization?: OrganizationResponse
+  queryClient?: QueryClient
+  initialUrl?: string
+} = {}) => {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
     response: () => HttpResponse.json<OrganizationResponse[]>([organization]),
   })
 
-  return customRender(
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
+
+  const result = customRender(
     <BannerStackProvider>
       <OnboardingSurveyFollowUpCard />
       <BannerStack />
@@ -123,11 +141,14 @@ const renderCard = ({
     </BannerStackProvider>,
     {
       queryClient,
+      router,
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
       }),
     }
   )
+
+  return { ...result, router }
 }
 
 const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
@@ -145,7 +166,6 @@ describe('OnboardingSurveyFollowUpCard', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     vi.setSystemTime(new Date('2026-10-30T10:00:00.000Z'))
     track.mockClear()
-    routerMock.setCurrentUrl(`/org/${ORG_SLUG}`)
   })
 
   afterEach(() => {
@@ -194,13 +214,14 @@ describe('OnboardingSurveyFollowUpCard', () => {
   it('stays out of the way on project creation pages', async () => {
     markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'PERSONAL' })
     const requests = mockSurveyEndpoint(204)
-    routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
 
-    renderCard()
+    const { router } = renderCard({ initialUrl: `/new/${ORG_SLUG}` })
     await advance(1000)
     expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
 
-    act(() => routerMock.setCurrentUrl(`/org/${ORG_SLUG}`))
+    await act(async () => {
+      await router.navigate<AnyRouter, string>({ to: `/org/${ORG_SLUG}` })
+    })
     expect(await screen.findByRole('button', { name: 'Answer' })).toBeInTheDocument()
     expect(requests).toEqual([])
   })

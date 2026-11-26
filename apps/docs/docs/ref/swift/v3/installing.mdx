@@ -1,0 +1,103 @@
+---
+id: installing
+title: 'Installing'
+slug: installing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/docs/ref/swift/v3/installing.mdx
+---
+
+### Install using Swift Package Manager
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    v3 needs Xcode 26.0 or later and Swift 6.2 or later. It supports iOS 16, macOS 13, tvOS 16, watchOS 9, and visionOS 1 or later.
+
+    The package exposes multiple libraries. Add `Supabase` to get all of them, or add only the ones you need:
+
+    - `Auth`
+    - `Functions`
+    - `PostgREST`
+    - `Realtime`
+    - `Storage`
+
+    In `Package.swift`, replace `YOUR_TARGET_NAME` with the name of your target.
+
+    If you use Xcode, follow [Apple's dependencies guide](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app) to add supabase-swift to your project. Use `https://github.com/supabase/supabase-swift.git` for the URL and `3.0.0-alpha.2` for the version. Xcode picks a prerelease version only when the version rule names one.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="swift"
+      queryGroup="framework"
+    >
+      <TabPanel id="swift" label="Package.swift">
+
+        ```swift
+        // swift-tools-version:6.2
+        let package = Package(
+            ...
+            dependencies: [
+                ...
+                .package(
+                    url: "https://github.com/supabase/supabase-swift.git",
+                    from: "3.0.0-alpha.2"
+                ),
+            ],
+            targets: [
+                .target(
+                    name: "YOUR_TARGET_NAME",
+                    dependencies: [
+                        .product(
+                            name: "Supabase", // Auth, Functions, PostgREST, Realtime, or Storage
+                            package: "supabase-swift"
+                        ),
+                    ]
+                )
+            ]
+        )
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Enable Data API access
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    supabase-swift uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
+
+    In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions that your app queries or calls. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+
+    Alternatively, grant the permissions with SQL. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+    In the SQL, replace `YOUR_TABLE` and `YOUR_FUNCTION` with the names of your table and function.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```sql
+    -- Before granting access to client roles, make sure Row Level Security (RLS)
+    -- is enabled and create the policies required for each role's allowed operations.
+    alter table public.YOUR_TABLE enable row level security;
+    -- create policy ... on public.YOUR_TABLE ...;
+
+    -- Grant least-privilege access to tables after RLS and policies are in place
+    grant select on public.YOUR_TABLE to anon;
+    grant select, insert, update, delete on public.YOUR_TABLE to authenticated;
+    grant all on public.YOUR_TABLE to service_role;
+
+    -- Grant execute on functions after verifying any table access they rely on
+    grant execute on function public.YOUR_FUNCTION to authenticated, service_role;
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

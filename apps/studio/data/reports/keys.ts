@@ -21,6 +21,7 @@ type SharedApiReportMetricParams<
 }
 
 export const reportKeys = {
+  charts: (projectRef: string | undefined) => ['projects', projectRef, 'report-v2'] as const,
   apiMetric: (
     projectRef: string | undefined,
     queryName: string,

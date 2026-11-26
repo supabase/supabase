@@ -24,7 +24,6 @@ import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 import { HeadingSlotProvider } from '~/layouts/HeadingSlot'
 import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
 import { RightRailProvider } from '~/layouts/RightRail'
-import { SidebarTopSlotProvider, useSidebarTopSlot } from '~/layouts/SidebarTopSlot'
 import { UpdatedAtSlotProvider } from '~/layouts/UpdatedAtSlot'
 // End of third-party imports
 
@@ -90,7 +89,6 @@ const NavContainer = memo(function NavContainer({
   className,
 }: NavContainerProps) {
   const mobileMenuOpen = useMenuMobileOpen()
-  const { setTarget: setTopSlot } = useSidebarTopSlot()
 
   return (
     <nav
@@ -110,14 +108,15 @@ const NavContainer = memo(function NavContainer({
       )}
     >
       {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
-      <div ref={setTopSlot} className="hidden lg:block shrink-0" />
       <div className="hidden lg:block shrink-0 px-4 bg-background">
-        <DocsSidebarNavTop className="-mx-4 flex border-b px-4 py-2.5" />
+        <DocsSidebarNavTop className="-mx-4 flex px-4 pt-2" />
       </div>
       <ScrollRoot className="flex min-h-0 flex-1 flex-col">
         <ScrollViewport
+          // firefox makes a scroll container a tab stop, but the links inside already scroll it
+          tabIndex={-1}
           className={cn(
-            'relative',
+            'docs-sidebar-scroll relative scroll-pt-8',
             'overscroll-contain',
             'lg:backdrop-blur-sm lg:backdrop-filter bg-background'
           )}
@@ -143,7 +142,7 @@ const NavContainer = memo(function NavContainer({
         <ScrollBar />
       </ScrollRoot>
       <GlobalMenuDrawerFooter className="shrink-0 border-t bg-background px-6 py-4 lg:hidden" />
-      <DocsSidebarResources className="hidden lg:flex shrink-0 border-t py-3 pl-6 pr-4" />
+      <DocsSidebarResources className="hidden lg:flex shrink-0 border-t py-2 pl-6 pr-4" />
     </nav>
   )
 })
@@ -278,21 +277,19 @@ function TopNavSkeleton({ children }: PropsWithChildren) {
   return (
     <HeadingSlotProvider value={headingSlot}>
       <UpdatedAtSlotProvider value={updatedAtSlot}>
-        <SidebarTopSlotProvider>
-          <div className="group/docs flex flex-col h-full w-full">
-            <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
-              {isLayoutV2 ? (
-                <DesktopTopNavBar
-                  headingSlotRef={setHeadingSlot}
-                  updatedAtSlotRef={setUpdatedAtSlot}
-                />
-              ) : (
-                <LegacyTopNavBar />
-              )}
-            </div>
-            {children}
+        <div className="group/docs flex flex-col h-full w-full">
+          <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+            {isLayoutV2 ? (
+              <DesktopTopNavBar
+                headingSlotRef={setHeadingSlot}
+                updatedAtSlotRef={setUpdatedAtSlot}
+              />
+            ) : (
+              <LegacyTopNavBar />
+            )}
           </div>
-        </SidebarTopSlotProvider>
+          {children}
+        </div>
       </UpdatedAtSlotProvider>
     </HeadingSlotProvider>
   )

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -12,6 +12,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { Loading } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 
@@ -87,7 +88,11 @@ function IntegrationPage() {
         </PageContainer>
       )
     } else {
-      return <Component />
+      return (
+        <Suspense fallback={<Loading />}>
+          <Component />
+        </Suspense>
+      )
     }
   }, [isIntegrationsLoading, id, integration, Component])
 

@@ -1,4 +1,5 @@
 import { useFlag } from 'common'
+import { ClockIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -13,8 +14,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
@@ -104,14 +107,26 @@ export const ProjectCreationFooter = ({
   }, [cancelAction])
 
   return (
-    <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
+    <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center py-3">
       {showAdditionalCosts && (
-        <div className="col-span-4">
-          <div className="flex justify-between text-sm">
-            <span>Additional costs</span>
-            <div className="text-primary flex gap-1 items-center font-mono font-medium">
-              <span role="status">${displayedAdditionalMonthlySpend}/m</span>
-              <InfoTooltip side="top" className="max-w-[450px] p-0">
+        <div className="col-span-7">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base text-foreground">Compute cost</span>
+            <span
+              role="status"
+              className="text-base font-mono font-medium text-warning"
+              translate="no"
+            >
+              +${displayedAdditionalMonthlySpend}/mo
+            </span>
+          </div>
+          <div className="mt-1 flex items-center gap-1.5 text-sm text-foreground-light">
+            <ClockIcon size={14} className="shrink-0" aria-hidden="true" />
+            <Tooltip>
+              <TooltipTrigger className="text-left underline decoration-dotted underline-offset-4">
+                Billed hourly, busy or idle
+              </TooltipTrigger>
+              <TooltipContent side="top" align="start" className="max-w-[450px] p-0">
                 <div className="p-4 text-sm text-foreground-light space-y-1">
                   <p>
                     Each project includes a dedicated Postgres instance running on its own server.
@@ -202,15 +217,15 @@ export const ProjectCreationFooter = ({
                     </TableRow>
                   </TableBody>
                 </Table>
-              </InfoTooltip>
-            </div>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       )}
 
       <div
         className={cn(
-          showAdditionalCosts ? 'col-span-8' : 'col-span-12',
+          showAdditionalCosts ? 'col-span-5' : 'col-span-12',
           'flex items-center gap-x-2 ml-auto'
         )}
       >
