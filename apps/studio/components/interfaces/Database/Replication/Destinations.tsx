@@ -216,7 +216,7 @@ export const Destinations = () => {
   }
   const warningTitle = getWarningTitle()
   const unavailableInformation = [
-    isRegionsError && 'Region information',
+    isRegionsError && 'the region list',
     isSourcesError && 'setup details',
     hasClusterErrors &&
       `results from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
@@ -232,7 +232,7 @@ export const Destinations = () => {
         ? `${unavailableInformation.slice(0, -1).join(', ')}${unavailableInformation.length > 2 ? ',' : ''} and ${unavailableInformation.at(-1)}`
         : (unavailableInformation[0] ?? 'Pipeline information')
     const verb = unavailableInformation.length === 1 && isRegionsError ? 'is' : 'are'
-    return `Some pipeline information could not be loaded. ${information.charAt(0).toUpperCase()}${information.slice(1)} ${verb} unavailable.`
+    return `${information.charAt(0).toUpperCase()}${information.slice(1)} ${verb} unavailable.`
   }
   const pipelineListStatus = hasListErrors ? `Warning: ${warningTitle}` : ''
 
@@ -422,7 +422,7 @@ export const Destinations = () => {
                 ))}
               </ul>
             )}
-            {sortedDestinations.length > 0 && <p>Pipelines from other regions are still shown.</p>}
+            {hasVisibleOtherRegions && <p>Pipelines from other regions are still shown.</p>}
             {isSourcesError && checkLocalPipelinesNotSetUp(sourcesError) && (
               <p>Configure the replication API to manage pipelines in local development.</p>
             )}
