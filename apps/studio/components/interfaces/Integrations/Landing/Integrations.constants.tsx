@@ -10,7 +10,6 @@ import {
   WebhookIcon,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -463,11 +462,10 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: ['pg_graphql'],
     name: `GraphQL`,
     icon: ({ className, ...props } = {}) => (
-      <Image
-        fill
+      <img
         src={`${BASE_PATH}/img/graphql.svg`}
         alt="GraphiQL"
-        className={cn('p-2', className)}
+        className={cn('w-full h-full p-2', className)}
         {...props}
       />
     ),
@@ -519,7 +517,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     source: 'Official' as const,
     name: `${w.label} Wrapper`,
     icon: ({ className, ...props } = {}) => (
-      <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
+      <img src={w.icon} alt={w.name} className={cn('w-full h-full p-2', className)} {...props} />
     ),
     requiredExtensions: ['wrappers', 'supabase_vault'],
     description: w.description,
@@ -575,11 +573,10 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
     name: `Stripe Sync Engine`,
     status: 'alpha',
     icon: ({ className, ...props } = {}) => (
-      <Image
-        fill
+      <img
         src={`${BASE_PATH}/img/icons/stripe-icon.svg`}
         alt={'Stripe Logo'}
-        className={cn('p-2', className)}
+        className={cn('w-full h-full p-2', className)}
         {...props}
       />
     ),
