@@ -1,11 +1,11 @@
 ---
 id: 'build-a-supabase-oauth-integration'
 title: 'Build a Supabase OAuth integration'
-subtitle: "This guide steps through building a Supabase Integration using OAuth2 and the management API, allowing you to manage users' organizations and projects on their behalf."
-description: 'Build a Supabase OAuth integration using OAuth2 and the Management API.'
+subtitle: "This guide steps through building a Supabase Integration using OAuth 2.0 and the management API, allowing you to manage users' organizations and projects on their behalf."
+description: 'Build a Supabase OAuth integration using OAuth 2.0 and the Management API.'
 ---
 
-Using OAuth2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](/docs/reference/api/introduction) on behalf of the user.
+Using OAuth 2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](/docs/reference/api/introduction) on behalf of the user.
 
 ## Create an OAuth app
 
@@ -21,7 +21,7 @@ In your user interface, add a "Connect Supabase" button to kick off the OAuth fl
 
 Once you've published your OAuth App on Supabase, you can use the OAuth 2.0 protocol get authorization from Supabase users to manage their organizations and projects.
 
-You can use your preferred OAuth2 client or follow the steps below. You can see an example implementation in TypeScript using Supabase Edge Functions [on our GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
+You can use your preferred OAuth 2.0 client or follow the steps below. You can see an example implementation in TypeScript using Supabase Edge Functions [on our GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
 ### Redirecting to the authorize URL
 
@@ -72,7 +72,7 @@ If your application need to support dynamically generated Redirect URLs, check o
 
 </Admonition>
 
-As per OAuth2 spec, provide the client id and client secret as basic auth header:
+As per OAuth 2.0 spec, provide the client id and client secret as basic auth header:
 
 - `client_id`: The unique client ID identifying your OAuth App.
 - `client_secret`: The secret that authenticates your OAuth App to Supabase.
