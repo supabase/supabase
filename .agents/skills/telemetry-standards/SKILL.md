@@ -134,6 +134,8 @@ Telemetry only runs for visitors who accepted analytics. Consent does not make i
 
 ## Required Pattern
 
+**Never use `data-attr` (or any other `data-*` attribute) to send PostHog events.** Track every event with an explicit `track()` call from `useTrack`, defined in `packages/common/telemetry-constants.ts`. PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`), so a `data-attr` sends nothing, and it bypasses event typing and the review rules in this skill. A click you want measured gets a `track()` call. Don't add new `data-attr` attributes, and replace existing ones with `track()` when touching that code. Any that remain must keep a static string value, never built from user-defined names, in case autocapture is enabled later.
+
 Import `useTrack` from `@/lib/telemetry/track` (within `apps/studio/`).
 
 ```typescript
@@ -156,7 +158,6 @@ const MyComponent = () => {
 
 Where the `track()` call goes:
 
-- **`data-attr` is not tracking.** PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`), so the attribute sends nothing. A click you want measured gets a `track()` call. Keep any `data-attr` value a static string, never built from user-defined names, in case autocapture is enabled later.
 - **Mutation outcomes.** Don't track in the callbacks passed as the second argument to `mutate()` (`onSuccess`, `onError`): they are skipped if the component unmounts first. Track around `await mutateAsync()` (after it for success, in a `catch` for failure), or in the callbacks passed to the mutation hook itself (`useXMutation({ onSuccess, onError })`) when the hook always calls them: some return early, on a 202 for example. The selected project can change before the response arrives, so attribute the event to the mutation's own project or org (from its variables, or from the response for a create) with the third `track()` argument, for example `{ project: variables.projectRef }`.
 - **One meaning per event.** When one event name fires from several places, every call site fires on the same kind of user action, so the counts are comparable. Don't mix a `copy` event handler on a DOM element, which also fires on keyboard and partial-selection copies, with a Copy button's click callback under one event name: track the same action in both, or add a property that tells them apart.
 - **Submitted values.** Capture what the user submitted at submit time, not in the success callback. A form can stay editable while the request is in flight, so reading it on success can report a value that was not the one sent.
@@ -229,7 +230,7 @@ When reviewing a PR, flag a break of any of these as a **required change**, even
 5. **Feature flags and experiment exposure**: [Feature Flag Measurement](#feature-flag-measurement)
 6. **User-defined names or identifiers in properties**: [Privacy: User-Defined Names and Identifiers](#privacy-user-defined-names-and-identifiers)
 7. **Secrets, project content, URL state or consent**: [Privacy: Secrets, Project Content and URL State](#privacy-secrets-project-content-and-url-state) and [Consent and Transport](#consent-and-transport)
-8. **Tracking placement**: the placement rules under [Required Pattern](#required-pattern)
+8. **Tracking placement**: the placement rules under [Required Pattern](#required-pattern), including no new `data-attr` or other `data-*` attribute used for tracking
 9. **Org-level events**: a project-scoped event reused on an organization-level page ([Event Definitions](#event-definitions))
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
