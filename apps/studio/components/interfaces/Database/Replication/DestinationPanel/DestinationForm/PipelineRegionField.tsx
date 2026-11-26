@@ -107,7 +107,12 @@ const PipelineRegionSelect = ({
               {region.region_code && (
                 <RegionFlag className="w-5 shrink-0" region={region.region_code} />
               )}
-              {label}
+              <span>
+                {region.region_name}
+                {region.region_code && (
+                  <span className="text-foreground-lighter"> ({region.region_code})</span>
+                )}
+              </span>
             </span>
           </SelectItem>
         )

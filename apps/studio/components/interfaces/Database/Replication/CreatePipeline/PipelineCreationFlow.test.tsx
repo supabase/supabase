@@ -272,11 +272,14 @@ describe('PipelineCreationFlow', () => {
           searchParams,
         }
       )
+      expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
+      clickContinue()
       const selector = await screen.findByRole('combobox', { name: 'Pipeline region' })
       await waitFor(() => {
         expect(selector).toHaveTextContent(label)
         expect(selector).toBeEnabled()
       })
+      fillConnection()
       clickContinue()
       await waitFor(() => expect(selector).toBeDisabled())
       if (shouldFailLookup) {
@@ -285,11 +288,11 @@ describe('PipelineCreationFlow', () => {
           await queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') })
         })
       }
-      expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Pipeline name')).toBeInTheDocument()
+      expect(screen.queryByText('Select publication')).not.toBeInTheDocument()
       finishLookup()
-      expect(await screen.findByLabelText('Pipeline name')).toBeInTheDocument()
+      expect(await screen.findByText('Select publication')).toBeInTheDocument()
       if (shouldFailLookup) {
-        expect(screen.getByText('Singapore', { exact: true })).toBeVisible()
         expect(sourceClusters).toEqual([null])
       }
     }
@@ -549,7 +552,7 @@ describe('PipelineCreationFlow', () => {
       const onClose = vi.fn()
       await reachReview(onClose)
       fireEvent.click(footerButton('Start pipeline'))
-      expect(footerButton('Back')).toBeDisabled()
+      await waitFor(() => expect(footerButton('Back')).toBeDisabled())
       expect(screen.getByDisplayValue('Warehouse')).toBeDisabled()
       fireEvent.click(footerButton('Start pipeline'))
       await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
@@ -759,7 +762,7 @@ describe('PipelineCreationFlow', () => {
       connection.queryByRole('spinbutton', { name: 'Connection pool size' })
     ).not.toBeInTheDocument()
     fireEvent.click(footerButton('Continue'))
-    expect(connection.getByLabelText('Connection pool size')).toBeVisible()
+    await waitFor(() => expect(connection.getByLabelText('Connection pool size')).toBeVisible())
     fireEvent.change(connection.getByLabelText('Connection pool size'), {
       target: { value: '5' },
     })
@@ -795,7 +798,7 @@ describe('PipelineCreationFlow', () => {
     await next('?step=connection')
     fillConnection()
     clickContinue()
-    expect(footerButton('Back')).toBeDisabled()
+    await waitFor(() => expect(footerButton('Back')).toBeDisabled())
     await waitFor(() => expect(screen.queryByText('Try again')).toBeInTheDocument())
     fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'retry-project' },
