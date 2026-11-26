@@ -13,7 +13,7 @@ export const aiTools: NavMenuConstant = {
   title: 'AI tools',
   url: '/guides/ai-tools',
   items: [
-    { name: 'Agent setup', url: '/guides/ai-tools/agent-setup' },
+    { name: 'Agent setup', url: '/guides/ai-tools/agent-setup', enabled: agentPluginEnabled },
     { name: 'Agent Plugin', url: '/guides/ai-tools/plugins', enabled: agentPluginEnabled },
     { name: 'MCP server', url: '/guides/ai-tools/mcp' },
     { name: 'Agent Skills', url: '/guides/ai-tools/ai-skills', enabled: agentSkillsEnabled },

@@ -2494,7 +2494,11 @@ export const ai_tools: NavMenuConstant = {
   enabled: aiToolsEnabled,
   items: [
     { name: 'Overview', url: '/guides/ai-tools' },
-    { name: 'Agent setup', url: '/guides/ai-tools/agent-setup' as `/${string}` },
+    {
+      name: 'Agent setup',
+      url: '/guides/ai-tools/agent-setup' as `/${string}`,
+      enabled: agentPluginEnabled,
+    },
     {
       name: 'Agent Plugin',
       url: '/guides/ai-tools/plugins' as `/${string}`,
