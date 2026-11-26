@@ -12,6 +12,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -30,6 +31,27 @@ const mockRegions = (regions = [SINGAPORE, FRANKFURT]) =>
         default_cluster_id: SINGAPORE.cluster_id,
         regions,
       }),
+  })
+
+const mockProject = (region?: string) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      region === undefined
+        ? HttpResponse.json<APIErrorBody>(
+            { message: 'Project details unavailable' },
+            { status: 500 }
+          )
+        : HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+            ...createMockProject({ ref: 'default', region }),
+            connectionString: null,
+            db_host: 'db.default.supabase.co',
+            high_availability: false,
+            integration_source: null,
+            restUrl: 'https://default.supabase.co',
+            updated_at: '2026-01-01T00:00:00.000Z',
+          }),
   })
 
 const mockPanelResources = (
@@ -110,6 +132,7 @@ const renderPanel = (clusterId?: string) => {
 
 test('retries source discovery and opens creation when only another region is enabled', async () => {
   mockRegions()
+  mockProject(FRANKFURT.region_code)
   const unavailableClusters = new Set([FRANKFURT.cluster_id])
   mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
   renderPanel()
@@ -122,4 +145,50 @@ test('retries source discovery and opens creation when only another region is en
   await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
   expect(await screen.findByLabelText('Pipeline name')).toBeVisible()
   expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+})
+
+test('opens the panel with a source only in a non-default region', async () => {
+  mockRegions()
+  mockProject(FRANKFURT.region_code)
+  mockPanelResources(new Set([FRANKFURT.cluster_id]))
+  renderPanel()
+
+  expect(await screen.findByText('Frankfurt')).toBeVisible()
+})
+
+test('uses the default region when the project region lookup fails', async () => {
+  mockRegions()
+  mockProject()
+  mockPanelResources(new Set([null]))
+  renderPanel()
+
+  expect(await screen.findByText('Singapore')).toBeVisible()
+})
+
+test('prepares the source in the preferred region before loading its publications', async () => {
+  mockRegions()
+  mockProject(FRANKFURT.region_code)
+  const enabledClusters = new Set<string | null>([null])
+  mockPanelResources(enabledClusters)
+  const writes: (string | null)[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/tenants-sources',
+    response: ({ request }) => {
+      const cluster = clusterFrom(request)
+      writes.push(cluster)
+      enabledClusters.add(cluster)
+      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+        tenant_id: 'default',
+        source_id: 1,
+      })
+    },
+  })
+  renderPanel()
+
+  expect(await screen.findByText('Frankfurt')).toBeVisible()
+  await userEvent.click(await screen.findByText('Select publication'))
+  expect(await screen.findByText('frankfurt')).toBeVisible()
+  expect(writes).toEqual([FRANKFURT.cluster_id])
+  expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
 })
