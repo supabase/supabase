@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import Head from 'next/head'
 import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -225,7 +224,7 @@ export function ApiAuthorizationValidScreen({
 
     return (
       <>
-        <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+        {pageTitle && <title>{pageTitle}</title>}
         <ApiAuthorizationApprovedScreen
           requester={effectiveRequester}
           organization={approvedOrganization}
@@ -236,7 +235,7 @@ export function ApiAuthorizationValidScreen({
 
   return (
     <>
-      <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+      {pageTitle && <title>{pageTitle}</title>}
       <ApiAuthorizationMainView
         auth_id={auth_id}
         approvalState={effectiveApprovalState}

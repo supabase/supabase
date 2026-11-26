@@ -1,6 +1,5 @@
-import { useBreakpoint } from 'common'
+import { FrameworkImage, useBreakpoint } from 'common'
 import { Play } from 'lucide-react'
-import Image from 'next/image'
 import React, { ReactNode } from 'react'
 import { Dialog, DialogContent, DialogTrigger } from 'ui'
 
@@ -55,7 +54,7 @@ export function ExpandableVideo({
         <Play strokeWidth={2} className="w-5 h-5" />
         <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
       </div>
-      <Image
+      <FrameworkImage
         src={imgUrl ?? '/images/blur.png'}
         // no fallback as alt text here would repeat it
         alt={imgAltText ?? ''}

@@ -1,11 +1,10 @@
-import Image from 'next/image'
 import { cn } from 'ui'
 
 import type { IdentityProviderDisplay } from '@/lib/external-identity-providers'
 
 /**
  * Renders a monochrome identity-provider mark as a CSS mask so it inherits the current theme's
- * foreground color. The provider SVGs use `currentColor`, which a plain `<img>`/`next/image` would
+ * foreground color. The provider SVGs use `currentColor`, which a plain `<img>` would
  * not respect (it would render the icon's literal fill and need a `dark:invert` hack). Masking tints
  * any provider mark correctly in every theme, regardless of how its SVG is colored.
  *
@@ -54,5 +53,5 @@ export const IdentityProviderIcon = ({
   display.hasMonochromeIcon ? (
     <ProviderIcon src={display.iconPath} alt={`${display.displayName} icon`} size={size} />
   ) : (
-    <Image src={display.iconPath} width={size} height={size} alt={`${display.displayName} icon`} />
+    <img src={display.iconPath} width={size} height={size} alt={`${display.displayName} icon`} />
   )

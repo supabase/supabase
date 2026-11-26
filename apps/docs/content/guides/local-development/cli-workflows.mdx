@@ -78,7 +78,7 @@ In your project root:
 supabase init
 ```
 
-This creates `./supabase/config.toml`. If you already have a project directory with application code, run this at the root. The `supabase/` directory will sit alongside your app code.
+This creates `./supabase/config.jsonc`. If you already have a project directory with application code, run this at the root. The `supabase/` directory will sit alongside your app code.
 
 ### Step 2: Authenticate
 
@@ -416,7 +416,7 @@ For multi-environment setups with CI/CD (feature branches, staging, production),
 
 | Command                                   | What it does                                                                                                    |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `supabase init`                           | Creates `./supabase/config.toml`                                                                                |
+| `supabase init`                           | Creates `./supabase/config.jsonc`                                                                               |
 | `supabase start`                          | Starts the local stack, applies migrations + seed                                                               |
 | `supabase stop`                           | Stops the local stack (data persists until `db reset`)                                                          |
 | `supabase db reset`                       | Destroys local DB, applies all migrations + seed from scratch                                                   |

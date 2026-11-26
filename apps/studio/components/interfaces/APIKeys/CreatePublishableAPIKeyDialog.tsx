@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { PlusIcon } from 'lucide-react'
-import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -40,8 +40,7 @@ export interface CreatePublishableAPIKeyDialogProps {
 }
 
 export const CreatePublishableAPIKeyDialog = () => {
-  const params = useParams()
-  const projectRef = params?.ref as string
+  const { ref: projectRef } = useParams()
   const formRef = useRef<HTMLFormElement>(null)
 
   const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
