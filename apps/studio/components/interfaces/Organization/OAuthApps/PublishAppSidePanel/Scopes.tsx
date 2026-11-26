@@ -1,43 +1,10 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { ChevronDownIcon } from 'lucide-react'
-import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from 'ui'
+import type { Dispatch, SetStateAction } from 'react'
 
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
+import { AccessLevelDropdown, type AccessLevel } from './AccessLevelDropdown'
 
-const ScopeDropdownCheckboxItem = ({
-  children,
-  scopeName,
-  scopes,
-  onChange,
-}: PropsWithChildren<{
-  scopeName: OAuthScope
-  scopes: OAuthScope[]
-  onChange: (v: OAuthScope[]) => void
-}>) => {
-  return (
-    <DropdownMenuCheckboxItem
-      checked={scopes.includes(scopeName)}
-      onCheckedChange={(checked) => {
-        if (checked) {
-          onChange([...scopes, scopeName])
-        } else {
-          onChange([...scopes.filter((s) => s !== scopeName)])
-        }
-      }}
-    >
-      {children}
-    </DropdownMenuCheckboxItem>
-  )
-}
+const accessLevels: AccessLevel[] = ['No access', 'Read only', 'Write only', 'Read and write']
 
 const Scope = ({
   title,
@@ -54,47 +21,36 @@ const Scope = ({
   scopes: OAuthScope[]
   setScopes: Dispatch<SetStateAction<OAuthScope[]>>
 }) => {
-  let accessDescription = 'Access: No access'
-  if (scopes.includes(readScopeName)) {
-    accessDescription = 'Access: Read-only'
-  }
-  if (scopes.includes(writeScopeName)) {
-    accessDescription = 'Access: Write-only'
-  }
-  if (scopes.includes(readScopeName) && scopes.includes(writeScopeName)) {
-    accessDescription = 'Access: Read and write'
+  const hasRead = scopes.includes(readScopeName)
+  const hasWrite = scopes.includes(writeScopeName)
+  let accessLevel: AccessLevel = 'No access'
+  if (hasRead) accessLevel = 'Read only'
+  if (hasWrite) accessLevel = hasRead ? 'Read and write' : 'Write only'
+
+  const handleAccessChange = (level: AccessLevel) => {
+    setScopes((current) => {
+      const next = current.filter((scope) => scope !== readScopeName && scope !== writeScopeName)
+      if (level === 'Read only' || level === 'Read and write') next.push(readScopeName)
+      if (level === 'Write only' || level === 'Read and write') next.push(writeScopeName)
+      return next
+    })
   }
 
   return (
     <div
-      className="flex flex-row justify-between p-4 border first:rounded-t last:rounded-b gap-x-2"
+      className="flex flex-wrap items-start justify-between gap-3 p-4 border first:rounded-t last:rounded-b"
       key={title}
     >
       <div className="flex flex-col">
         <span className="text-foreground text-sm">{title}</span>
         <span className="text-foreground-light text-xs capitalize-sentence">{description}</span>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button iconRight={<ChevronDownIcon />}>
-            <p>{accessDescription}</p>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuLabel>Select an access level</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <ScopeDropdownCheckboxItem scopeName={readScopeName} scopes={scopes} onChange={setScopes}>
-            Read
-          </ScopeDropdownCheckboxItem>
-          <ScopeDropdownCheckboxItem
-            scopeName={writeScopeName}
-            scopes={scopes}
-            onChange={setScopes}
-          >
-            Write
-          </ScopeDropdownCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <AccessLevelDropdown
+        permission={title}
+        levels={accessLevels}
+        value={accessLevel}
+        onChange={handleAccessChange}
+      />
     </div>
   )
 }
