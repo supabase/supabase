@@ -95,12 +95,10 @@ at hand — they cite each other where context matters.
 
 ## How to use during a chat
 
-1. **Check for drift.** For each reference file the answer uses, find its
-   `Verified at` commit and run
-   `git log --oneline <commit>..HEAD -- apps/docs ':!apps/docs/content'`.
-   If a commit touches code the answer depends on, read that code before
-   you answer. A file with no `Verified at` line isn't verified yet:
-   check each claim you use against the code.
+1. **Check for drift.** For each reference file you use, run
+   `git log --oneline <Verified at>..HEAD -- apps/docs ':!apps/docs/content'`
+   and read each commit that touches code the answer depends on. A file
+   with no `Verified at` line is unverified.
 2. **Start by reading** `adding-features.md` and `app-map.md` if the
    question touches design choices or unfamiliar code paths. They're
    small on purpose — read both, don't skim.
@@ -123,10 +121,10 @@ file inaccurate, or a generally-applicable lesson emerges from a PR
 review, open a pull request against this repo to update the relevant
 file, same as any other in-repo change.
 
-When an answer finds a stale fact, list it under a "Skill corrections"
-heading at the end of the answer. Edit the reference file only after the
-user approves. When you check the whole file, add or move its
-`Verified at` line to the commit you checked.
+List each stale fact under "Skill corrections" at the end of the answer.
+With the user's approval, fix it in their open PR if that PR changes
+`apps/docs`, else in a new PR. After you check a whole file, set its
+`Verified at` line to that commit.
 
 Keep each canonical file under ~250 lines; split before they bloat.
 Capture only what a future contributor would benefit from knowing — if
