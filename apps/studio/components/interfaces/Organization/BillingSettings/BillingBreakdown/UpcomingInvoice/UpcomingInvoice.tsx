@@ -117,7 +117,7 @@ function UpcomingInvoiceBreakdown({
       <Accordion type="multiple" defaultValue={['current-costs']}>
         <InvoiceSection
           value="current-costs"
-          title="Costs to Date"
+          title="Costs to date"
           tooltip="Fixed fees and usage costs accumulated from the start of the billing cycle up until now."
           amount={invoice.currentCosts.actualInElapsedCycle}
         >

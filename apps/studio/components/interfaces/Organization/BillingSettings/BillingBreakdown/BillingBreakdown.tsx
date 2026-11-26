@@ -92,15 +92,9 @@ const BillingBreakdown = () => {
       <PageSectionContent className="flex flex-col gap-6">
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
-        ) : (
-          <>
-            {isErrorSubscription && (
-              <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
-            )}
-
-            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
-          </>
-        )}
+        ) : invoiceFeatureEnabled ? (
+          <UpcomingInvoice slug={orgSlug} />
+        ) : null}
       </PageSectionContent>
     </PageSection>
   )
