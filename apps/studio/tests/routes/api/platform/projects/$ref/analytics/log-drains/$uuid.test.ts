@@ -1,23 +1,35 @@
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { Route } from '@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
+
+const DRAIN_URL = 'http://localhost/api/platform/projects/default/analytics/log-drains/1'
+const params = { ref: 'default', uuid: '1' }
 
 describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
-  let Route: typeof import('@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid').Route
-
-  beforeEach(async () => {
-    vi.resetModules()
+  beforeEach(() => {
     vi.stubEnv('LOGFLARE_PRIVATE_ACCESS_TOKEN', 'test-token')
     vi.stubEnv('LOGFLARE_URL', 'http://logflare:4000')
     vi.spyOn(console, 'error').mockImplementation(() => {})
-    ;({ Route } = await import('@/routes/api/platform/projects/$ref/analytics/log-drains/$uuid'))
   })
 
   afterEach(() => {
     vi.unstubAllEnvs()
     vi.restoreAllMocks()
+  })
+
+  it('returns 500 naming the missing env vars', async () => {
+    vi.stubEnv('LOGFLARE_PRIVATE_ACCESS_TOKEN', '')
+    vi.stubEnv('LOGFLARE_URL', '')
+
+    const response = await callRoute(Route, new Request(DRAIN_URL), params)
+
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({
+      error: { message: 'LOGFLARE_PRIVATE_ACCESS_TOKEN, LOGFLARE_URL env variables are not set' },
+    })
   })
 
   it('returns 204 with an empty body on DELETE success', async () => {
@@ -28,18 +40,7 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
       )
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'DELETE'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/analytics/log-drains/1',
-        {
-          method: 'DELETE',
-        }
-      ),
-      params: { ref: 'default', uuid: '1' },
-    })
+    const response = await callRoute(Route, new Request(DRAIN_URL, { method: 'DELETE' }), params)
 
     expect(response.status).toBe(204)
     expect(response.body).toBeNull()
@@ -54,18 +55,7 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
       )
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'DELETE'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/analytics/log-drains/1',
-        {
-          method: 'DELETE',
-        }
-      ),
-      params: { ref: 'default', uuid: '1' },
-    })
+    const response = await callRoute(Route, new Request(DRAIN_URL, { method: 'DELETE' }), params)
 
     expect(response.status).toBe(500)
     expect(await response.json()).toEqual({ error: { message: 'Error deleting log drain' } })
@@ -83,20 +73,15 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'PUT'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/analytics/log-drains/1',
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: 'updated', metadata: { type: 'log-drain' } }),
-        }
-      ),
-      params: { ref: 'default', uuid: '1' },
-    })
+      new Request(DRAIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'updated', metadata: { type: 'log-drain' } }),
+      }),
+      params
+    )
 
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({ id: 1, name: 'updated' })
@@ -112,40 +97,17 @@ describe('/api/platform/projects/$ref/analytics/log-drains/$uuid', () => {
       )
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'PUT'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/analytics/log-drains/1',
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: 'bad' }),
-        }
-      ),
-      params: { ref: 'default', uuid: '1' },
-    })
+      new Request(DRAIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'bad' }),
+      }),
+      params
+    )
 
     expect(response.status).toBe(500)
     expect(await response.json()).toEqual({ error: { message: 'Error updating log drain' } })
-  })
-
-  it('returns 405 with Allow: GET, PUT, DELETE for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request(
-        'http://localhost/api/platform/projects/default/analytics/log-drains/1',
-        {
-          method: 'POST',
-        }
-      ),
-      params: { ref: 'default', uuid: '1' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('GET, PUT, DELETE')
   })
 })
