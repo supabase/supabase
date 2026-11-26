@@ -12,7 +12,10 @@ export type ReplicationCluster = {
 /** Clusters that pipelines belong to, with the default first. */
 export const useReplicationClusters = ({ enabled = true } = {}) => {
   const options = replicationClustersQueryOptions()
-  const { data, isPending } = useQuery({ ...options, enabled: enabled && options.enabled })
+  const { data, isPending, error, refetch } = useQuery({
+    ...options,
+    enabled: enabled && options.enabled,
+  })
   const clusters: ReplicationCluster[] = (data?.regions ?? []).map((region) => ({
     clusterId: region.cluster_id,
     regionName: region.region_name,
@@ -30,6 +33,8 @@ export const useReplicationClusters = ({ enabled = true } = {}) => {
   }
   return {
     clusters,
+    error,
+    refetch,
     hasMultipleRegions: clusters.length > 1,
     isDiscovering: enabled && options.enabled && isPending,
   }
