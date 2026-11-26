@@ -10,7 +10,6 @@ import { expect, test } from 'vitest'
 import { DestinationPanel } from './DestinationPanel'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { OrganizationsData } from '@/data/organizations/organizations-query'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -21,26 +20,23 @@ const SINGAPORE = { cluster_id: '1', region_code: 'ap-southeast-1', region_name:
 const FRANKFURT = { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' }
 const clusterFrom = (request: Request) => new URL(request.url).searchParams.get('cluster_id')
 
-const mockRegions = (regions = [SINGAPORE, FRANKFURT]) =>
+const mockRegions = (isUnavailable = () => false) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/regions',
     response: () =>
-      HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
-        default_cluster_id: SINGAPORE.cluster_id,
-        regions,
-      }),
+      isUnavailable()
+        ? HttpResponse.json<APIErrorBody>({ message: 'Regions unavailable' }, { status: 503 })
+        : HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+            default_cluster_id: SINGAPORE.cluster_id,
+            regions: [SINGAPORE, FRANKFURT],
+          }),
   })
 
 const mockPanelResources = (
   enabledClusters: Set<string | null>,
   unavailableClusters = new Set<string | null>()
 ) => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/replication/:ref/destinations',
-    response: { destinations: [] },
-  })
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
@@ -81,7 +77,7 @@ const mockPanelResources = (
   })
 }
 
-const renderPanel = (clusterId?: string) => {
+const renderPanel = () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), [])
   customRender(
@@ -90,36 +86,38 @@ const renderPanel = (clusterId?: string) => {
         hasLoaded: true,
         configcat: {
           etlEnableBigQueryPrivateAlpha: 'all',
-          etlEnableDucklakePrivateAlpha: '',
-          etlEnableSnowflakePrivateAlpha: '',
-          etlEnableClickHousePrivateAlpha: '',
           pipelineCreationWizard: false,
         },
         posthog: {},
       }}
     >
-      <ReplicationClusterProvider clusterId={clusterId}>
-        <PipelineRequestStatusProvider>
-          <DestinationPanel />
-        </PipelineRequestStatusProvider>
-      </ReplicationClusterProvider>
+      <PipelineRequestStatusProvider>
+        <DestinationPanel />
+      </PipelineRequestStatusProvider>
     </FeatureFlagContext.Provider>,
     { queryClient, nuqs: { hasMemory: true, searchParams: '?destinationType=BigQuery' } }
   )
 }
 
-test('retries source discovery and opens creation when only another region is enabled', async () => {
-  mockRegions()
-  const unavailableClusters = new Set([FRANKFURT.cluster_id])
-  mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
-  renderPanel()
+test.each(['regions', 'sources'])(
+  'retries %s discovery and uses the source in its own cluster',
+  async (failure) => {
+    let isRegionsUnavailable = failure === 'regions'
+    mockRegions(() => isRegionsUnavailable)
+    const unavailableClusters = new Set(failure === 'sources' ? [FRANKFURT.cluster_id] : [])
+    mockPanelResources(new Set([FRANKFURT.cluster_id]), unavailableClusters)
+    renderPanel()
 
-  expect(await screen.findByText('Failed to retrieve pipeline sources')).toBeVisible()
-  expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
-  expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
+    expect(await screen.findByText('Failed to retrieve pipeline sources')).toBeVisible()
+    expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
 
-  unavailableClusters.clear()
-  await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
-  expect(await screen.findByLabelText('Pipeline name')).toBeVisible()
-  expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
-})
+    unavailableClusters.clear()
+    isRegionsUnavailable = false
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await screen.findByLabelText('Pipeline name')).toBeVisible()
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('frankfurt')).toBeVisible()
+    expect(screen.queryByText('Enable Pipelines')).not.toBeInTheDocument()
+  }
+)

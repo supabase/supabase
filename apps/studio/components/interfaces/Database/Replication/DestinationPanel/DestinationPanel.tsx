@@ -35,7 +35,7 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
+import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
@@ -89,6 +89,7 @@ export const DestinationPanel = () => {
   const canCheckCreation = visible && !editMode && !isAccessLoading && hasPipelinesDestinationAccess
   const {
     hasSource,
+    clusterId: sourceClusterId,
     isPending: isSourceAvailabilityPending,
     error: sourceAvailabilityError,
     retry: retrySourceAvailability,
@@ -184,6 +185,9 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
+            <p role="status" aria-live="polite" className="sr-only">
+              {isSourceAvailabilityPending ? 'Checking pipeline sources' : ''}
+            </p>
             {(isAccessLoading || isEditLoading || isSourceAvailabilityPending) && (
               <SheetSection>
                 <GenericSkeletonLoader />
@@ -229,15 +233,17 @@ export const DestinationPanel = () => {
               </div>
             )}
             {showDestinationForm && (
-              <DestinationForm
-                visible={visible}
-                selectedType={destinationType ?? 'BigQuery'}
-                existingDestination={existingDestination}
-                typeSelection={pipelinesTypeSelection}
-                checkIsDirtyRef={checkIsDirtyRef}
-                onClose={onClose}
-                onCancel={confirmOnClose}
-              />
+              <ReplicationClusterProvider clusterId={editMode ? clusterId : sourceClusterId}>
+                <DestinationForm
+                  visible={visible}
+                  selectedType={destinationType ?? 'BigQuery'}
+                  existingDestination={existingDestination}
+                  typeSelection={pipelinesTypeSelection}
+                  checkIsDirtyRef={checkIsDirtyRef}
+                  onClose={onClose}
+                  onCancel={confirmOnClose}
+                />
+              </ReplicationClusterProvider>
             )}
           </div>
         </SheetContent>
