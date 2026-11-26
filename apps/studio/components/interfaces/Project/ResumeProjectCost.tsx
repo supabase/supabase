@@ -14,6 +14,7 @@ import {
   mapComputeSizeNameToAddonVariantId,
 } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { formatRoundedCurrency } from '@/components/interfaces/Organization/BillingSettings/Subscription/PlanChangeSummary.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -59,7 +60,7 @@ const CostInfoTooltip = ({
   className = 'underline decoration-dotted underline-offset-4',
 }: {
   children: ReactNode
-  note: string
+  note: ReactNode
   docsHref: string
   docsLabel: string
   className?: string
@@ -68,35 +69,38 @@ const CostInfoTooltip = ({
     <TooltipTrigger className={className}>{children}</TooltipTrigger>
     <TooltipContent side="bottom" className="flex w-72 flex-col gap-y-2 p-3">
       <p className="text-foreground-light">{note}</p>
-      <a
-        href={docsHref}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center gap-x-1 text-foreground underline underline-offset-2"
-      >
+      <InlineLink href={docsHref} className="flex items-center gap-x-1">
         {docsLabel}
         <ExternalLinkIcon size={12} strokeWidth={1.5} />
-      </a>
+      </InlineLink>
     </TooltipContent>
   </Tooltip>
 )
 
-const getCreditNote = ({
+const getCreditStatus = ({
   isCovered,
   hasActiveProjects,
 }: {
   isCovered: boolean
   hasActiveProjects: boolean
 }) => {
-  const amount = formatRoundedCurrency(MONTHLY_COMPUTE_CREDIT)
-  if (isCovered) {
-    return `Your plan's ${amount} compute credits cover this project, so resuming it adds no compute cost. ${HOURLY_BILLING_NOTE}`
-  }
-  if (hasActiveProjects) {
-    return `Your plan's ${amount} compute credits are already used by another active project. ${HOURLY_BILLING_NOTE}`
-  }
-  return `Your plan's ${amount} compute credits are applied to this project. ${HOURLY_BILLING_NOTE}`
+  if (isCovered) return 'cover this project, so resuming it adds no compute cost.'
+  if (hasActiveProjects) return 'are already used by another active project.'
+  return 'are applied to this project.'
 }
+
+const CreditNote = ({
+  isCovered,
+  hasActiveProjects,
+}: {
+  isCovered: boolean
+  hasActiveProjects: boolean
+}) => (
+  <>
+    Your plan’s <span translate="no">{formatRoundedCurrency(MONTHLY_COMPUTE_CREDIT)}</span> compute
+    credits {getCreditStatus({ isCovered, hasActiveProjects })} {HOURLY_BILLING_NOTE}
+  </>
+)
 
 export const ResumeProjectCost = () => {
   const { ref } = useParams()
@@ -165,7 +169,7 @@ export const ResumeProjectCost = () => {
     hasActiveProjects,
   })
 
-  const creditNote = getCreditNote({ isCovered, hasActiveProjects })
+  const creditNote = <CreditNote isCovered={isCovered} hasActiveProjects={hasActiveProjects} />
   const showCreditBreakdown = !isCovered && credit > 0
   const computeLabel = `${computeVariant.name} compute`
 
