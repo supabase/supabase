@@ -1,16 +1,13 @@
-import { useParams } from 'common'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { cloneElement, Dispatch, ReactNode, SetStateAction, useEffect } from 'react'
-import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
+import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react'
+import { Badge, cn, ResizablePanel, usePanelRef } from 'ui'
 
-import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
+import { FilterSideBarFooter } from './FilterSideBarFooter'
 import { useDataTable } from './providers/DataTableProvider'
-import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { UserLogFilterControl } from '@/components/interfaces/UnifiedLogs/components/UserLogFilterControl'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { SidebarBreadcrumb } from '@/components/layouts/Navigation/SidebarBreadcrumb'
@@ -46,7 +43,6 @@ export function FilterSideBar({
   onReset,
   onExitSection,
 }: FilterSideBarProps) {
-  const { ref } = useParams()
   const { table } = useDataTable()
   const [user, setUser] = useQueryState('user', parseAsString)
   const shouldReduceMotion = useReducedMotion()
@@ -143,26 +139,8 @@ export function FilterSideBar({
                   dateRangeDisabled={dateRangeDisabled}
                   itemsAfter={{ level: <UserLogFilterControl /> }}
                 />
-                <FeaturePreviewSidebarPanel
-                  className="mx-1.5 mb-2"
-                  title="Capture your logs"
-                  description="Send logs to your preferred observability or storage platform."
-                  illustration={
-                    <div className="flex items-center gap-4">
-                      {LOG_DRAIN_TYPES.filter((t) =>
-                        ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
-                      ).map((type) =>
-                        cloneElement(type.icon, { height: 20, width: 20, key: type.value })
-                      )}
-                    </div>
-                  }
-                  actions={
-                    <Button asChild>
-                      <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
-                    </Button>
-                  }
-                />
               </div>
+              <FilterSideBarFooter />
             </motion.div>
           )}
         </AnimatePresence>
