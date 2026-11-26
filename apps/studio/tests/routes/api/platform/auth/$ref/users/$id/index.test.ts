@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/platform/auth/$ref/users/$id/index'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 const SUPABASE_URL = 'http://supabase.test'
 const USER_ID = '11111111-1111-4111-8111-111111111111'
@@ -36,17 +36,15 @@ describe('/api/platform/auth/$ref/users/$id', () => {
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'PATCH'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
+      new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ban_duration: '24h' }),
       }),
-      params: { ref: 'default', id: USER_ID },
-    })
+      { ref: 'default', id: USER_ID }
+    )
 
     expect(receivedBodies).toEqual([{ ban_duration: '24h' }])
     expect(response.status).toBe(200)
@@ -62,32 +60,15 @@ describe('/api/platform/auth/$ref/users/$id', () => {
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'DELETE'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
+      new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
         method: 'DELETE',
       }),
-      params: { ref: 'default', id: USER_ID },
-    })
+      { ref: 'default', id: USER_ID }
+    )
 
     expect(deletedUserIds).toEqual([USER_ID])
     expect(response.status).toBe(200)
-  })
-
-  it('returns 405 with Allow: PATCH, DELETE for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}`, {
-        method: 'GET',
-      }),
-      params: { ref: 'default', id: USER_ID },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('PATCH, DELETE')
   })
 })

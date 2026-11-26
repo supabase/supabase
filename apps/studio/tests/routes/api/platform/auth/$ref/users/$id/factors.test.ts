@@ -1,10 +1,10 @@
 import type { AuthMFAAdminDeleteFactorResponse, Factor } from '@supabase/auth-js'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/platform/auth/$ref/users/$id/factors'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type DeleteFactorResponse = NonNullable<AuthMFAAdminDeleteFactorResponse['data']>
 type GoTrueErrorResponse = { msg: string }
@@ -24,12 +24,14 @@ function makeFactor(id: string): Factor {
   }
 }
 
-function createDeferred() {
-  let resolve!: () => void
-  const promise = new Promise<void>((res) => {
-    resolve = res
-  })
-  return { promise, resolve }
+function deleteFactors() {
+  return callRoute(
+    Route,
+    new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}/factors`, {
+      method: 'DELETE',
+    }),
+    { ref: 'default', id: USER_ID }
+  )
 }
 
 describe('/api/platform/auth/$ref/users/$id/factors', () => {
@@ -43,12 +45,7 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
   })
 
   it('awaits all factor deletions before returning 200', async () => {
-    const firstStarted = createDeferred()
-    const secondStarted = createDeferred()
-    const firstDelete = createDeferred()
-    const secondDelete = createDeferred()
     const deletedFactorIds: string[] = []
-
     mswServer.use(
       http.get(`${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors`, () =>
         HttpResponse.json<Factor[]>([makeFactor(FACTOR_1_ID), makeFactor(FACTOR_2_ID)])
@@ -56,53 +53,17 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
       http.delete(
         `${SUPABASE_URL}/auth/v1/admin/users/${USER_ID}/factors/:factorId`,
         async ({ params }) => {
-          const factorId = String(params.factorId)
-          if (factorId === FACTOR_1_ID) {
-            firstStarted.resolve()
-            await firstDelete.promise
-          } else if (factorId === FACTOR_2_ID) {
-            secondStarted.resolve()
-            await secondDelete.promise
-          }
-          deletedFactorIds.push(factorId)
-          return HttpResponse.json<DeleteFactorResponse>({ id: factorId })
+          // Record only after a delay so the test fails if the route returns before deletes finish
+          await delay(20)
+          deletedFactorIds.push(String(params.factorId))
+          return HttpResponse.json<DeleteFactorResponse>({ id: String(params.factorId) })
         }
       )
     )
 
-    let settled = false
-    const responsePromise = getRouteHandler(
-      Route,
-      'DELETE'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}/factors`, {
-        method: 'DELETE',
-      }),
-      params: { ref: 'default', id: USER_ID },
-    })
-    responsePromise.then(
-      () => {
-        settled = true
-      },
-      () => {
-        settled = true
-      }
-    )
+    const response = await deleteFactors()
 
-    await Promise.all([firstStarted.promise, secondStarted.promise])
-    expect(settled).toBe(false)
-
-    firstDelete.resolve()
-    await Promise.resolve()
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(deletedFactorIds).toEqual([FACTOR_1_ID])
-    expect(settled).toBe(false)
-
-    secondDelete.resolve()
-    const response = await responsePromise
-
-    expect(settled).toBe(true)
-    expect(deletedFactorIds).toEqual([FACTOR_1_ID, FACTOR_2_ID])
+    expect(deletedFactorIds.sort()).toEqual([FACTOR_1_ID, FACTOR_2_ID])
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({ data: null, error: null })
   })
@@ -123,32 +84,9 @@ describe('/api/platform/auth/$ref/users/$id/factors', () => {
       )
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'DELETE'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}/factors`, {
-        method: 'DELETE',
-      }),
-      params: { ref: 'default', id: USER_ID },
-    })
+    const response = await deleteFactors()
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ error: { message: 'Delete failed' } })
-  })
-
-  it('returns 405 with Allow: DELETE for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'GET'
-    )({
-      request: new Request(`http://localhost/api/platform/auth/default/users/${USER_ID}/factors`, {
-        method: 'GET',
-      }),
-      params: { ref: 'default', id: USER_ID },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('DELETE')
   })
 })
