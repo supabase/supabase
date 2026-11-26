@@ -61,10 +61,7 @@ import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePrevie
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import {
-  getReplicationRegionLabel,
-  useReplicationClusterGroups,
-} from '@/data/replication/clusters-query'
+import { useReplicationClusters } from './useReplicationClusters'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -95,8 +92,10 @@ const LIFECYCLE_BY_STATUS: Partial<
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
   const clusterId = useReplicationClusterId()
-  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
-  const region = groups.find((group) => group.clusterId === clusterId)?.region
+  const { clusters, hasMultipleRegions } = useReplicationClusters()
+  const region = clusters.find(
+    (cluster) => (cluster.isDefault ? undefined : cluster.clusterId) === clusterId
+  )
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const navigate = useNavigate()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -340,10 +339,14 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     </span>
                     <span className="inline-flex items-center gap-1 text-foreground-light">
                       <span>Pipeline region:</span>
-                      {region.region_code && (
-                        <RegionFlag className="w-4" region={region.region_code} />
+                      {region.regionCode && (
+                        <RegionFlag className="w-4" region={region.regionCode} />
                       )}
-                      <span>{getReplicationRegionLabel(region)}</span>
+                      <span>
+                        {region.regionCode
+                          ? `${region.regionName} (${region.regionCode})`
+                          : region.regionName}
+                      </span>
                     </span>
                   </>
                 )}

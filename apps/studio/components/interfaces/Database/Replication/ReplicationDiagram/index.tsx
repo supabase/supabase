@@ -9,14 +9,13 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { SmoothstepEdge } from './Edges'
 import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
-import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import { useReplicationClusters } from '@/components/interfaces/Database/Replication/useReplicationClusters'
 import {
   replicationDestinationsQueryOptions,
   type ReplicationDestinationsData,
 } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import type { StudioError } from '@/lib/errors/studio-errors'
-
 
 export const ReplicationDiagram = () => {
   return (
@@ -38,7 +37,18 @@ const ReplicationDiagramContent = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
 
-  const { groups } = useReplicationClusterGroups()
+  const { clusters } = useReplicationClusters()
+  const groups = clusters.map((cluster) => ({
+    clusterId: cluster.isDefault ? undefined : cluster.clusterId,
+    region:
+      cluster.regionName === undefined
+        ? undefined
+        : {
+            cluster_id: cluster.clusterId ?? '',
+            region_name: cluster.regionName,
+            region_code: cluster.regionCode,
+          },
+  }))
   const combineDestinations = useCallback(
     (results: UseQueryResult<ReplicationDestinationsData, StudioError>[]) => ({
       destinations: results.flatMap((result, index) => {
