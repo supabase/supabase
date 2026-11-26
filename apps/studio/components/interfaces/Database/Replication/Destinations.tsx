@@ -131,7 +131,7 @@ export const Destinations = () => {
     ({ visibleDestinations }) => visibleDestinations.length > 0
   )
   const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
-  const shouldShowTable = hasDestinations || (hasMultipleRegions && hasClusterErrors)
+  const shouldShowTable = hasDestinations
   const tableColumnCount = 6
 
   const retryRegion = ({
