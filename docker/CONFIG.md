@@ -800,7 +800,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_ADMIN_SERVER_HOST` | string | Self-hosted | Hostname for the PostgREST admin server. | Defaults to `server-host` value |
 | `PGRST_ADMIN_SERVER_PORT` | integer | Both | Port for the PostgREST admin server. The admin server is disabled unless a port is set, and it must differ from `PGRST_SERVER_PORT`. | No default (admin server disabled when unset) |
 | `PGRST_APP_SETTINGS_*` | string | Self-hosted | Arbitrary settings exposed to PostgreSQL via `current_setting('app.settings.<name>')`. The suffix after `PGRST_APP_SETTINGS_` becomes the setting name (case-insensitive). | Used for `PGRST_APP_SETTINGS_JWT_EXP` in self-hosted |
-| `PGRST_CLIENT_ERROR_VERBOSITY` | enum | Self-hosted | Controls verbosity of client-facing error responses. | Default: `verbose` (other value: `minimal`) |
 | `PGRST_DB_AGGREGATES_ENABLED` | boolean | Self-hosted | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. Disabled by default due to potential performance risks. | Default: `false` |
 | `PGRST_DB_ANON_ROLE` | string | Both | Database role used for unauthenticated requests. When unset, anonymous access is blocked. | No default |
 | `PGRST_DB_CHANNEL` | string | Self-hosted | Postgres `NOTIFY` channel name used for schema cache and config reloading. | Default: `pgrst` |
@@ -822,13 +821,9 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_DB_ROOT_SPEC` | string | Self-hosted | Schema-qualified function used to override the OpenAPI response at the API root. | No default; alias `PGRST_ROOT_SPEC` |
 | `PGRST_DB_SCHEMA` | string (CSV) | Self-hosted | Deprecated alias for `PGRST_DB_SCHEMAS`. | Deprecated; use `PGRST_DB_SCHEMAS` |
 | `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of database schemas exposed by the REST API. `pg_catalog` and `information_schema` are not allowed. | Default: `public` |
-| `PGRST_DB_TIMEZONE_ENABLED` | boolean | Self-hosted | Enables the `Prefer: timezone` header for querying `pg_timezone_names`. | Default: `true` |
 | `PGRST_DB_TX_END` | enum | Self-hosted | Controls how database transactions are terminated. Allowed values: `commit`, `commit-allow-override`, `rollback`, `rollback-allow-override`. | Default: `commit` |
 | `PGRST_DB_URI` | URL | Both | PostgreSQL connection string (URI or key/value). Prefix with `@` to load from a file. Defaults read libpq env vars. | Default: `postgresql://`; required |
 | `PGRST_DB_USE_LEGACY_GUCS` | boolean | Self-hosted | Toggles legacy text-based GUCs versus JSON GUCs for request context. | Deprecated; removed in PostgREST v12 (still set in self-hosted docker-compose) |
-| `PGRST_INTERNAL_SCHEMA_CACHE_LOAD_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted while loading the schema cache. | Internal; no default |
-| `PGRST_INTERNAL_SCHEMA_CACHE_QUERY_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted during schema cache query. | Internal; no default |
-| `PGRST_INTERNAL_SCHEMA_CACHE_RELATIONSHIP_LOAD_SLEEP` | integer (ms) | Self-hosted | Internal test hook: sleep (ms) inserted while loading schema cache relationships. | Internal; no default |
 | `PGRST_JWT_AUD` | string | Self-hosted | Expected value of the `aud` claim in JWTs. Must be a string or valid URI. | No default |
 | `PGRST_JWT_CACHE_MAX_ENTRIES` | integer (count) | Self-hosted | Maximum entries in the JWT validation cache. Set to `0` to disable caching. | Default: `1000` |
 | `PGRST_JWT_ROLE_CLAIM_KEY` | string | Self-hosted | JSPath expression locating the role claim inside the JWT. | Default: `.role`; alias `PGRST_ROLE_CLAIM_KEY` |
