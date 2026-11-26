@@ -37,6 +37,48 @@ describe('FilterBar', () => {
   const mockOnFilterChange = vi.fn()
   const mockOnFreeformTextChange = vi.fn()
 
+  it.each(['operator', 'enter', 'option'] as const)(
+    'applies a typed value once when committing with %s',
+    async (commitWith) => {
+      const user = userEvent.setup()
+      const onApply = vi.fn()
+      function EditableFilterBar() {
+        const [filters, setFilters] = useState<FilterGroup>({
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '!=', value: '' }],
+        })
+        return (
+          <FilterBar
+            filterProperties={mockFilterProperties.map((property) =>
+              property.name === 'name' && commitWith === 'option'
+                ? { ...property, options: ['jaeger'] }
+                : property
+            )}
+            filters={filters}
+            onFilterChange={setFilters}
+            onApply={onApply}
+            freeformText=""
+            onFreeformTextChange={vi.fn()}
+          />
+        )
+      }
+      render(<EditableFilterBar />)
+      await user.click(screen.getByLabelText('Value for Name'))
+      await user.paste('jaeger')
+      expect(onApply).not.toHaveBeenCalled()
+      if (commitWith === 'enter') await user.keyboard('{Enter}')
+      if (commitWith === 'option') await user.click(screen.getByRole('option', { name: 'jaeger' }))
+      await user.click(screen.getByLabelText('Operator for Name'))
+      await waitFor(() =>
+        expect(onApply).toHaveBeenCalledExactlyOnceWith({
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '!=', value: 'jaeger' }],
+        })
+      )
+      expect(screen.getByLabelText('Operator for Name')).toHaveFocus()
+    }
+  )
+
   it.each([
     { keys: '{Enter}', propertyName: 'status' },
     { keys: '{ArrowDown}{Enter}', propertyName: 'attribute.status' },
