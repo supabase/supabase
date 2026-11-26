@@ -1,5 +1,5 @@
-import { useParams } from 'common'
-import dayjs from 'dayjs'
+import { useParams } from "common";
+import dayjs from "dayjs";
 import {
   PageSection,
   PageSectionContent,
@@ -7,41 +7,45 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns/PageSection'
+} from "ui-patterns/PageSection";
 
-import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoice'
-import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { NoPermission } from '@/components/ui/NoPermission'
-import { SparkBar } from '@/components/ui/SparkBar'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { UpcomingInvoice } from "./UpcomingInvoice/UpcomingInvoice";
+import { InlineLink } from "@/components/ui/InlineLink";
+import { NoPermission } from "@/components/ui/NoPermission";
+import { SparkBar } from "@/components/ui/SparkBar";
+import { useOrgSubscriptionQuery } from "@/data/subscriptions/org-subscription-query";
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckPermissionsV2,
+} from "@/hooks/misc/useCheckPermissionsV2";
+import { useIsFeatureEnabled } from "@/hooks/misc/useIsFeatureEnabled";
+import { useSelectedOrganizationQuery } from "@/hooks/misc/useSelectedOrganization";
+import { MANAGED_BY } from "@/lib/constants/infrastructure";
 
 const BillingBreakdown = () => {
-  const { slug: orgSlug } = useParams()
+  const { slug: orgSlug } = useParams();
 
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery();
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ);
 
-  const {
-    data: subscription,
-    error: subscriptionError,
-    isError: isErrorSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug },
+    { enabled: canReadSubscriptions },
+  );
 
-  const invoiceFeatureEnabled = useIsFeatureEnabled('billing:invoices')
+  const invoiceFeatureEnabled = useIsFeatureEnabled("billing:invoices");
 
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  const billingCycleStart = dayjs
+    .unix(subscription?.current_period_start ?? 0)
+    .utc();
+  const billingCycleEnd = dayjs
+    .unix(subscription?.current_period_end ?? 0)
+    .utc();
 
-  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
-  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
+  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), "days");
+  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, "days");
 
   return (
     <PageSection orientation="horizontal">
@@ -54,13 +58,13 @@ const BillingBreakdown = () => {
               value={daysWithinCycle - daysToCycleEnd}
               max={daysWithinCycle}
               barClass="bg-foreground"
-              labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
+              labelBottom={`${billingCycleStart.format("MMMM DD")} - ${billingCycleEnd.format("MMMM DD")}`}
               bgClass="bg-surface-300"
               labelBottomClass="text-foreground-light! p-1 m-0"
               labelTop={
                 subscription
-                  ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
-                  : ''
+                  ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? "day" : "days"} left`
+                  : ""
               }
               labelTopClass="p-1 m-0"
             />
@@ -69,23 +73,31 @@ const BillingBreakdown = () => {
             {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
               <>
                 <p>
-                  AWS Marketplace sends two invoices each month: one for your fixed subscription
-                  fee, billed on the day you subscribed, and one for your usage charges from the
-                  previous month, billed by the 3rd.
+                  AWS Marketplace sends two invoices each month: one for your
+                  fixed subscription fee, billed on the day you subscribed, and
+                  one for your usage charges from the previous month, billed by
+                  the 3rd.
                 </p>
                 <p>
-                  For a more detailed breakdown, visit the{' '}
-                  <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
+                  For a more detailed breakdown, visit the{" "}
+                  <InlineLink href={`/org/${orgSlug}/usage`}>
+                    usage page.
+                  </InlineLink>
                 </p>
               </>
             ) : (
               <p>
-                Your upcoming invoice will continue to update until the end of your billing cycle on{' '}
-                {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown, visit the{' '}
-                <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
+                Your upcoming invoice will continue to update until the end of
+                your billing cycle on {billingCycleEnd.format("MMMM DD")}. For a
+                more detailed breakdown, visit the{" "}
+                <InlineLink href={`/org/${orgSlug}/usage`}>
+                  usage page.
+                </InlineLink>
               </p>
             )}
-            <p>Add-on changes or new projects may take up to an hour to appear.</p>
+            <p>
+              Add-on changes or new projects may take up to an hour to appear.
+            </p>
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -97,7 +109,7 @@ const BillingBreakdown = () => {
         ) : null}
       </PageSectionContent>
     </PageSection>
-  )
-}
+  );
+};
 
-export default BillingBreakdown
+export default BillingBreakdown;
