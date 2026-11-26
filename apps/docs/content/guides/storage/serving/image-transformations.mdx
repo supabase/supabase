@@ -782,9 +782,9 @@ Deploy an imgproxy container with the following configuration:
 
 ```yaml
 imgproxy:
-  image: darthsim/imgproxy
+  image: ghcr.io/imgproxy/imgproxy
   environment:
-    - IMGPROXY_ENABLE_WEBP_DETECTION=true
+    - IMGPROXY_AUTO_WEBP=true
     - IMGPROXY_JPEG_PROGRESSIVE=true
 ```
 
