@@ -42,6 +42,7 @@ create table public.user_roles (
   unique (user_id, role)
 );
 comment on table public.user_roles is 'Application roles for each user.';
+alter table public.user_roles enable row level security;
 
 -- ROLE PERMISSIONS
 create table public.role_permissions (
@@ -51,7 +52,12 @@ create table public.role_permissions (
   unique (role, permission)
 );
 comment on table public.role_permissions is 'Application permissions for each role.';
+alter table public.role_permissions enable row level security;
 ```
+
+Enable RLS on both tables, because they decide who has which permissions. If your project grants [default privileges](/docs/guides/api/securing-your-api#default-privileges) on new tables, any client, signed in or not, could otherwise read and change them through the Data API. For example, a client could rewrite which permissions each role has.
+
+This guide adds no RLS policies for `anon` or `authenticated`, so those roles can't read or change either table. The auth hook reads `user_roles` through its own policy, which [Create Auth Hook to apply user role](#create-auth-hook-to-apply-user-role) adds. The `authorize` function in [Accessing custom claims in RLS policies](#accessing-custom-claims-in-rls-policies) still reads `role_permissions`. It's a `security definer` function, so it runs as the role that created it. That role also owns the tables, so RLS doesn't apply to it.
 
 <Admonition type="note">
 
