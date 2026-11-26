@@ -75,7 +75,7 @@ create table if not exists public.user_roles (
 alter table public.user_roles enable row level security;
 ```
 
-Enabling [Row Level Security](/docs/guides/database/postgres/row-level-security) without adding policies keeps API clients from reading or changing roles. The hook function can still read the table because it's `security definer`.
+Enabling [Row Level Security](/docs/guides/database/postgres/row-level-security) without adding policies keeps API clients from reading or changing roles. The hook function can still read the table, because it's `security definer` and runs as the role that created it. Both `postgres` and `supabase_admin` bypass RLS.
 
 Then create the hook function:
 
