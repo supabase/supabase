@@ -1,7 +1,7 @@
-import { useIntersectionObserver } from '@uidotdev/usehooks'
-import { useParams } from 'common'
-import { BuildingIcon, UserIcon } from 'lucide-react'
-import { ComponentProps, Fragment, ReactNode, useEffect, useMemo, useRef } from 'react'
+import { useIntersectionObserver } from "@uidotdev/usehooks";
+import { useParams } from "common";
+import { BuildingIcon, UserIcon } from "lucide-react";
+import { ComponentProps, Fragment, ReactNode, useEffect, useMemo, useRef } from "react";
 import {
   Button,
   SheetContent,
@@ -12,29 +12,29 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from "ui";
+import { Admonition } from "ui-patterns/Admonition";
+import { ShimmeringLoader } from "ui-patterns/ShimmeringLoader";
 
-import { formatPermissionName, groupScopesByLevel } from './Consent/OAuthAppsAuthorizeScreen.utils'
-import type { OAuthAppDatabaseAccess, PreviewGrant } from './OAuthAppsAuthorizedPreview'
-import { OAuthGrantAccordion, OAuthGrantAccordionItem } from './OAuthGrantAccordionItem'
-import { AlertError } from '@/components/ui/AlertError'
-import { TOOLTIP_UNDERLINE_CLASS_NAME } from '@/components/ui/tooltip-styles'
-import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
+import { formatPermissionName, groupScopesByLevel } from "./Consent/OAuthAppsAuthorizeScreen.utils";
+import type { OAuthAppDatabaseAccess, PreviewGrant } from "./OAuthAppsAuthorizedPreview";
+import { OAuthGrantAccordion, OAuthGrantAccordionItem } from "./OAuthGrantAccordionItem";
+import { AlertError } from "@/components/ui/AlertError";
+import { TOOLTIP_UNDERLINE_CLASS_NAME } from "@/components/ui/tooltip-styles";
+import { OAuthApproval } from "@/data/oauth-apps/oauth-apps-approvals-query";
 import {
   OAuthAppMemberGrant,
   useOAuthAppMemberGrantsQuery,
-} from '@/data/oauth-apps/oauth-apps-member-grants-query'
-import { pluralize } from '@/lib/helpers'
+} from "@/data/oauth-apps/oauth-apps-member-grants-query";
+import { pluralize } from "@/lib/helpers";
 
 export interface OAuthAppsMemberGrantsDialogProps extends ComponentProps<typeof SheetContent> {
-  onRevoke?: () => void
-  approval?: OAuthApproval
-  previewGrants?: PreviewGrant[]
-  previewScopes?: string[]
-  previewProjects?: { name: string; ref: string }[]
-  databaseAccess?: OAuthAppDatabaseAccess
+  onRevoke?: () => void;
+  approval?: OAuthApproval;
+  previewGrants?: PreviewGrant[];
+  previewScopes?: string[];
+  previewProjects?: { name: string; ref: string }[];
+  databaseAccess?: OAuthAppDatabaseAccess;
 }
 
 export const OAuthAppsMemberGrantsDialogContent = ({
@@ -46,9 +46,9 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   databaseAccess,
   ...props
 }: OAuthAppsMemberGrantsDialogProps) => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const isPreview = previewScopes != null
-  const { slug } = useParams()
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const isPreview = previewScopes != null;
+  const { slug } = useParams();
   const {
     data,
     error,
@@ -60,32 +60,32 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     isFetchingNextPage,
   } = useOAuthAppMemberGrantsQuery(
     { slug, appId: approval?.id },
-    { enabled: Boolean(approval) && !isPreview }
-  )
+    { enabled: Boolean(approval) && !isPreview },
+  );
 
   const [sentinelRef, entry] = useIntersectionObserver({
     root: null,
     threshold: 0,
-    rootMargin: '0px',
-  })
+    rootMargin: "0px",
+  });
 
   useEffect(() => {
     if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage) {
-      fetchNextPage()
+      fetchNextPage();
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage]);
 
   const statusText = useMemo(() => {
-    if (isFetchingNextPage) return 'Loading more grants...'
-    if (isPending) return 'Loading grants...'
-    if (isError) return ''
-    return 'Grants loaded'
-  }, [isPending, isFetchingNextPage, isError])
+    if (isFetchingNextPage) return "Loading more grants...";
+    if (isPending) return "Loading grants...";
+    if (isError) return "";
+    return "Grants loaded";
+  }, [isPending, isFetchingNextPage, isError]);
 
-  const memberGrants = data?.pages.flatMap((page) => page.data) ?? []
-  const isEmpty = memberGrants.length === 0
+  const memberGrants = data?.pages.flatMap((page) => page.data) ?? [];
+  const isEmpty = memberGrants.length === 0;
 
-  if (!approval) return null
+  if (!approval) return null;
 
   return (
     <SheetContent
@@ -94,8 +94,8 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       aria-describedby={undefined}
       {...props}
       onOpenAutoFocus={(event) => {
-        event.preventDefault()
-        titleRef.current?.focus()
+        event.preventDefault();
+        titleRef.current?.focus();
       }}
     >
       <SheetHeader className="border-b pr-12 text-left">
@@ -166,7 +166,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
             ))}
         {!isPreview &&
           memberGrants
-            .filter((grant) => grant.attributes.kind === 'organization_bound')
+            .filter((grant) => grant.attributes.kind === "organization_bound")
             .map((grant) => (
               <GrantAccess
                 key={grant.id}
@@ -180,13 +180,13 @@ export const OAuthAppsMemberGrantsDialogContent = ({
             ))}
         {((isPreview && previewGrants?.some((grant) => grant.member)) ||
           (!isPreview &&
-            memberGrants.some((grant) => grant.attributes.kind === 'member_bound'))) && (
+            memberGrants.some((grant) => grant.attributes.kind === "member_bound"))) && (
           <h2 className="-mx-5 mb-3 mt-8 border-t px-5 pt-6 text-base font-medium">
             Member access
           </h2>
         )}
         <OAuthGrantAccordion
-          key={isPreview ? 'preview' : memberGrants.map((grant) => grant.id).join(',')}
+          key={isPreview ? "preview" : memberGrants.map((grant) => grant.id).join(",")}
           defaultValue={
             isPreview
               ? previewGrants
@@ -194,7 +194,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
                   .slice(0, 1)
                   .map((grant) => grant.id)
               : memberGrants
-                  .filter((grant) => grant.attributes.kind !== 'organization_bound')
+                  .filter((grant) => grant.attributes.kind !== "organization_bound")
                   .slice(0, 1)
                   .map((grant) => grant.id)
           }
@@ -206,7 +206,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
                 <GrantAccess
                   key={grant.id}
                   id={grant.id}
-                  title={grant.member ?? 'Organization access'}
+                  title={grant.member ?? "Organization access"}
                   scopes={grant.scopes}
                   projects={grant.projects}
                   databaseAccess={grant.databaseAccess}
@@ -215,7 +215,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
               ))}
           {!isPreview &&
             memberGrants
-              .filter((grant) => grant.attributes.kind !== 'organization_bound')
+              .filter((grant) => grant.attributes.kind !== "organization_bound")
               .map((grant) => (
                 <GrantAccess
                   key={grant.id}
@@ -224,7 +224,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
                   scopes={grant.attributes.approved_scopes}
                   projects={grant.attributes.projects ?? undefined}
                   icon={
-                    grant.attributes.kind === 'organization_bound' ? (
+                    grant.attributes.kind === "organization_bound" ? (
                       <BuildingIcon size={16} />
                     ) : (
                       <UserIcon size={16} />
@@ -233,14 +233,14 @@ export const OAuthAppsMemberGrantsDialogContent = ({
                   expanded={
                     memberGrants.length === 1 &&
                     !hasNextPage &&
-                    grant.attributes.kind === 'organization_bound'
+                    grant.attributes.kind === "organization_bound"
                   }
                 />
               ))}
         </OAuthGrantAccordion>
         {!isPreview && (
           <p ref={sentinelRef} className="text-sm text-foreground-light">
-            {isFetchingNextPage ? 'Loading...' : ''}
+            {isFetchingNextPage ? "Loading..." : ""}
           </p>
         )}
       </SheetSection>
@@ -252,8 +252,8 @@ export const OAuthAppsMemberGrantsDialogContent = ({
         </SheetFooter>
       )}
     </SheetContent>
-  )
-}
+  );
+};
 
 function GrantAccess({
   id,
@@ -264,27 +264,27 @@ function GrantAccess({
   icon,
   expanded = false,
 }: {
-  id: string
-  title: string
-  scopes: string[]
-  projects?: { name: string; ref: string }[]
-  databaseAccess?: OAuthAppDatabaseAccess
-  expanded?: boolean
-  icon: ReactNode
+  id: string;
+  title: string;
+  scopes: string[];
+  projects?: { name: string; ref: string }[];
+  databaseAccess?: OAuthAppDatabaseAccess;
+  expanded?: boolean;
+  icon: ReactNode;
 }) {
-  const groups = groupScopesByLevel(scopes)
+  const groups = groupScopesByLevel(scopes);
   if (databaseAccess)
-    groups[databaseAccess.mode === 'Read and write' ? 'read-write' : 'read'].push('table_data')
+    groups[databaseAccess.mode === "Read and write" ? "read-write" : "read"].push("table_data");
   const levels = [
-    { label: 'Read and write', permissions: groups['read-write'] },
-    { label: 'Write', permissions: groups.write },
-    { label: 'Read only', permissions: groups.read },
-  ]
-  const count = levels.reduce((total, { permissions }) => total + permissions.length, 0)
+    { label: "Read and write", permissions: groups["read-write"] },
+    { label: "Write", permissions: groups.write },
+    { label: "Read only", permissions: groups.read },
+  ];
+  const count = levels.reduce((total, { permissions }) => total + permissions.length, 0);
   const projectSummary =
     projects == null
-      ? 'All projects'
-      : `${projects.length} ${pluralize(projects.length, 'project')}`
+      ? "All projects"
+      : `${projects.length} ${pluralize(projects.length, "project")}`;
 
   const details = (
     <div className="space-y-6 text-sm">
@@ -303,7 +303,7 @@ function GrantAccess({
           </dl>
         ) : (
           <p className="mt-3 text-foreground-light">
-            {projects ? 'No projects included.' : 'All current and future projects.'}
+            {projects ? "No projects included." : "All current and future projects."}
           </p>
         )}
       </section>
@@ -319,7 +319,7 @@ function GrantAccess({
                   <p className="text-sm text-foreground">
                     {permissions.map((permission, index) => (
                       <Fragment key={permission}>
-                        {index > 0 && ', '}
+                        {index > 0 && ", "}
                         <PermissionLabel permission={permission} />
                       </Fragment>
                     ))}
@@ -328,18 +328,21 @@ function GrantAccess({
               ))}
           </div>
         )}
-        {(databaseAccess || scopes.includes('database:write')) && (
+        {(databaseAccess || scopes.includes("database:write")) && (
           <Admonition
             type="warning"
+            title="Database permissions"
             description={
               <div className="space-y-1">
                 <p>These permissions allow this app to:</p>
                 <ul className="list-disc space-y-1 pl-4">
                   {databaseAccess && <li>Read rows that your access rules normally hide</li>}
-                  {databaseAccess?.mode === 'Read and write' && (
+                  {databaseAccess?.mode === "Read and write" && (
                     <li>Change data and database structure</li>
                   )}
-                  {scopes.includes('database:write') && <li>Run SQL on your database</li>}
+                  {scopes.includes("database:write") && (
+                    <li>Run SQL as postgres and reset the database password</li>
+                  )}
                 </ul>
               </div>
             }
@@ -349,44 +352,44 @@ function GrantAccess({
         {count === 0 && <p className="text-foreground-light">No permissions granted.</p>}
       </section>
     </div>
-  )
+  );
   if (expanded)
     return (
       <div className="-mx-5 mb-8 space-y-4 border-t px-5 pt-6">
         <h2 className="text-base font-medium">{title}</h2>
         {details}
       </div>
-    )
+    );
   return (
     <OAuthGrantAccordionItem
       value={id}
       icon={icon}
       title={title}
-      description={`${projectSummary} · ${count} ${pluralize(count, 'permission')}`}
+      description={`${projectSummary} · ${count} ${pluralize(count, "permission")}`}
     >
       {details}
     </OAuthGrantAccordionItem>
-  )
+  );
 }
 
 const getGrantLabel = (grant: OAuthAppMemberGrant) => {
-  if (grant.attributes.user) return grant.attributes.user.email ?? grant.attributes.user.username
-  return 'Organization-wide'
-}
+  if (grant.attributes.user) return grant.attributes.user.email ?? grant.attributes.user.username;
+  return "Organization-wide";
+};
 
 function PermissionLabel({ permission }: { permission: string }) {
   const descriptions: Record<string, string> = {
-    database: 'Access database settings. Write access also allows the app to run SQL.',
-    environment: 'Access project branches.',
-    table_data: 'Connect directly to Postgres to access table data.',
-  }
+    database: "Access database settings. Write access also allows the app to run SQL.",
+    environment: "Access project branches.",
+    table_data: "Connect directly to Postgres to access table data.",
+  };
   const label =
-    permission === 'database'
-      ? 'Database management'
-      : permission === 'table_data'
-        ? 'Table data'
-        : formatPermissionName(permission)
-  if (!descriptions[permission]) return label
+    permission === "database"
+      ? "Database management"
+      : permission === "table_data"
+        ? "Table data"
+        : formatPermissionName(permission);
+  if (!descriptions[permission]) return label;
   return (
     <Tooltip>
       <TooltipTrigger className={TOOLTIP_UNDERLINE_CLASS_NAME}>{label}</TooltipTrigger>
@@ -394,5 +397,5 @@ function PermissionLabel({ permission }: { permission: string }) {
         {descriptions[permission]}
       </TooltipContent>
     </Tooltip>
-  )
+  );
 }
