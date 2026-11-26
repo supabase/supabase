@@ -689,7 +689,7 @@ describe('regions', () => {
     renderRegions()
     await screen.findByText('Could not load pipeline information')
     await screen.findByText(
-      'Some pipeline information could not be loaded. Available regions, setup details, and results from the default region are unavailable.'
+      'Some pipeline information could not be loaded. Region information, setup details, and results from the default region are unavailable.'
     )
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
