@@ -7,12 +7,12 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/emp
   server: {
     handlers: createApiHandlers({
       POST: async ({ params }) => {
-        const { data, error } = await supabase.storage.emptyBucket(params.id as string)
+        const { data, error } = await supabase.storage.emptyBucket(params.id)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

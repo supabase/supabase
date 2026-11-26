@@ -10,7 +10,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
       POST: async ({ request, params }) => {
         const { path } = await parseJsonBody<{ path: string }>(request)
 
-        const { data } = supabase.storage.from(params.id as string).getPublicUrl(path)
+        const { data } = supabase.storage.from(params.id).getPublicUrl(path)
 
         // change the domain name to the SUPABASE_PUBLIC_URL since SUPABASE_URL is not accessible from the client
         const publicUrl = new URL(data.publicUrl)
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
         publicUrl.port = parsed.port
         data.publicUrl = publicUrl.href
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

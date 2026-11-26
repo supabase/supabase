@@ -14,12 +14,12 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
           request
         )
 
-        const { data, error } = await supabase.storage.from(params.id as string).list(path, options)
+        const { data, error } = await supabase.storage.from(params.id).list(path, options)
         if (error) {
           return Response.json({ error: error.message }, { status: 500 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

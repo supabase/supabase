@@ -14,7 +14,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
         }>(request)
 
         const { data, error } = await supabase.storage
-          .from(params.id as string)
+          .from(params.id)
           .createSignedUrl(path, expiresIn)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
         signedUrl.port = parsed.port
         data.signedUrl = signedUrl.href
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

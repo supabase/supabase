@@ -10,15 +10,12 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
       POST: async ({ request, params }) => {
         const { path } = await parseJsonBody<{ path: string }>(request)
 
-        const { data, error } = await supabase.storage.from(params.id as string).download(path)
+        const { data, error } = await supabase.storage.from(params.id).download(path)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return new Response(await data.arrayBuffer(), {
-          status: 200,
-          headers: { 'Content-Type': 'application/octet-stream' },
-        })
+        return new Response(data, { headers: { 'Content-Type': 'application/octet-stream' } })
       },
     }),
   },

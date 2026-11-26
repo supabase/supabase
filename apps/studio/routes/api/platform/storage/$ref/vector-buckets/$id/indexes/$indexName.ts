@@ -9,14 +9,12 @@ export const Route = createFileRoute(
   server: {
     handlers: createApiHandlers({
       DELETE: async ({ params }) => {
-        const { id, indexName } = params
-
         const { data, error } = await supabase.storage.vectors
-          .from(id as string)
-          .deleteIndex(indexName as string)
+          .from(params.id)
+          .deleteIndex(params.indexName)
 
         if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

@@ -10,12 +10,12 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
       DELETE: async ({ request, params }) => {
         const { paths } = await parseJsonBody<{ paths: string[] }>(request)
 
-        const { data, error } = await supabase.storage.from(params.id as string).remove(paths)
+        const { data, error } = await supabase.storage.from(params.id).remove(paths)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

@@ -7,14 +7,14 @@ export const Route = createFileRoute('/api/platform/storage/$ref/vector-buckets/
   server: {
     handlers: createApiHandlers({
       GET: async ({ params }) => {
-        const { data, error } = await supabase.storage.vectors.getBucket(params.id as string)
+        const { data, error } = await supabase.storage.vectors.getBucket(params.id)
         if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
-        return Response.json(data.vectorBucket, { status: 200 })
+        return Response.json(data.vectorBucket)
       },
       DELETE: async ({ params }) => {
-        const { data, error } = await supabase.storage.vectors.deleteBucket(params.id as string)
+        const { data, error } = await supabase.storage.vectors.deleteBucket(params.id)
         if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

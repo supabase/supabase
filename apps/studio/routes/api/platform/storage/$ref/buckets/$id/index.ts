@@ -14,12 +14,12 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/')(
   server: {
     handlers: createApiHandlers({
       GET: async ({ params }) => {
-        const { data, error } = await supabase.storage.getBucket(params.id as string)
+        const { data, error } = await supabase.storage.getBucket(params.id)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
       PATCH: async ({ request, params }) => {
         const {
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/')(
           file_size_limit: fileSizeLimit,
         } = await parseJsonBody<UpdateBucketBody>(request)
 
-        const { data, error } = await supabase.storage.updateBucket(params.id as string, {
+        const { data, error } = await supabase.storage.updateBucket(params.id, {
           public: isPublicBucket,
           allowedMimeTypes,
           fileSizeLimit,
@@ -37,15 +37,15 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/')(
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
       DELETE: async ({ params }) => {
-        const { data, error } = await supabase.storage.deleteBucket(params.id as string)
+        const { data, error } = await supabase.storage.deleteBucket(params.id)
         if (error) {
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

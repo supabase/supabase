@@ -14,7 +14,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/$id/obj
         }>(request)
 
         const { data, error } = await supabase.storage
-          .from(params.id as string)
+          .from(params.id)
           .createSignedUrls(path, expiresIn)
 
         if (error) {

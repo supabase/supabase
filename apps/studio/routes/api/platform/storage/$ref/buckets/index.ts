@@ -1,36 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 
 import { parseJsonBody } from '@/lib/api/apiHelpers'
 import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-const parseAsInt = (value: string | null): number | undefined =>
-  value ? parseInt(value, 10) : undefined
-
-const parseAsString = (value: string | null): string | undefined => value || undefined
-
-const parseAsStringEnum = <T extends string>(
-  value: string | null,
-  validValues: readonly T[]
-): T | undefined => {
-  return value && validValues.includes(value as T) ? (value as T) : undefined
-}
-
-const parseStoragePaginationParams = (request: Request) => {
-  const { searchParams } = new URL(request.url)
-
-  const limit = parseAsInt(searchParams.get('limit'))
-  const offset = parseAsInt(searchParams.get('offset'))
-  const search = parseAsString(searchParams.get('search'))
-  const sortColumn = parseAsStringEnum(searchParams.get('sortColumn'), [
-    'id',
-    'created_at',
-    'name',
-  ] as const)
-  const sortOrder = parseAsStringEnum(searchParams.get('sortOrder'), ['asc', 'desc'] as const)
-
-  return { limit, offset, search, sortColumn, sortOrder }
-}
+// Invalid values are dropped rather than rejected
+const listBucketsQuerySchema = z.object({
+  limit: z.coerce.number().int().optional().catch(undefined),
+  offset: z.coerce.number().int().optional().catch(undefined),
+  search: z.string().optional().catch(undefined),
+  sortColumn: z.enum(['id', 'created_at', 'name']).optional().catch(undefined),
+  sortOrder: z.enum(['asc', 'desc']).optional().catch(undefined),
+})
 
 interface CreateBucketBody {
   id: string
@@ -43,9 +25,11 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/')({
   server: {
     handlers: createApiHandlers({
       GET: async ({ request }) => {
-        const { limit, offset, search, sortColumn, sortOrder } =
-          parseStoragePaginationParams(request)
+        const { limit, offset, search, sortColumn, sortOrder } = listBucketsQuerySchema.parse(
+          Object.fromEntries(new URL(request.url).searchParams)
+        )
 
+        // Only pass keys that are set: storage-js serializes a present undefined value as 'undefined'
         const { data, error } = await supabase.storage.listBuckets({
           ...(limit ? { limit } : {}),
           ...(offset ? { offset } : {}),
@@ -57,7 +41,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/')({
           return Response.json({ error: { message: 'Internal Server Error' } }, { status: 500 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
       POST: async ({ request }) => {
         const {
@@ -76,7 +60,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/buckets/')({
           return Response.json({ error: { message: error.message } }, { status: 400 })
         }
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },

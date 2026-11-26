@@ -16,7 +16,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/vector-buckets/
         const { data, error } = await supabase.storage.vectors.listBuckets()
         if (error) return Response.json({ error: { message: error.message } }, { status: 500 })
 
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
       POST: async ({ request }) => {
         const body = await parseJsonBody(request)
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/api/platform/storage/$ref/vector-buckets/
 
         const { data, error } = await supabase.storage.vectors.createBucket(parsed.data.bucketName)
         if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
-        return Response.json(data, { status: 200 })
+        return Response.json(data)
       },
     }),
   },
