@@ -153,7 +153,6 @@ export const Destinations = () => {
   const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
 
   const {
-    data: defaultSources,
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
@@ -179,7 +178,6 @@ export const Destinations = () => {
     )
   const canDisablePipelines = canConfirmDisable && hasExternalReplicationSource
 
-  const isDefaultRegionEnabled = defaultSources?.sources.some(({ name }) => name === projectRef)
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
   const hasListErrors = isRegionsError || isSourcesError || hasClusterErrors
@@ -237,7 +235,7 @@ export const Destinations = () => {
   const pipelineListStatus = hasListErrors ? `Warning: ${warningTitle}` : ''
 
   const canLinkToWizard =
-    isWizardEnabled && hasWizardDestination && !!projectRef && isDefaultRegionEnabled && canCreate
+    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
   const wizardLink = linkOptions({
     to: '/project/$ref/database/pipelines/new',
     params: { ref: projectRef ?? '_' },
@@ -253,7 +251,7 @@ export const Destinations = () => {
 
   const handleAddPipeline = () => {
     if (!canCreate) return
-    if (!isDefaultRegionEnabled) {
+    if (replicationNotEnabled) {
       pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return

@@ -1,24 +1,25 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { useEffect } from 'react'
+import { Button } from 'ui'
 
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { PipelineCreationFlow } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationFlow'
 import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
 import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
+import { usePipelineCreationSourceAvailability } from '@/components/interfaces/Database/Replication/CreatePipeline/usePipelineCreationSourceAvailability'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { AlertError } from '@/components/ui/AlertError'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/new')({
   staticData: { skipProjectLayout: true, skipDatabaseLayout: true },
@@ -33,7 +34,6 @@ function PipelineCreationRoute() {
 
 function PipelineCreationPage() {
   const { ref } = useParams()
-  const clusterId = useReplicationClusterId()
   const navigate = useNavigate()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
@@ -47,16 +47,19 @@ function PipelineCreationPage() {
   const isProjectAccessLoading =
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
-  const sources = useReplicationSourcesQuery(
-    { projectRef: ref, clusterId },
-    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
-  )
-  const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
-  const isAccessLoading =
-    !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
-  const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
+  const {
+    hasSource,
+    isPending: isSourceAvailabilityPending,
+    error: sourceAvailabilityError,
+    retry: retrySourceAvailability,
+  } = usePipelineCreationSourceAvailability({
+    projectRef: ref,
+    enabled: !!ref && !isProjectAccessLoading && canAccessFlow,
+  })
+  const isAccessLoading = !ref || isProjectAccessLoading || isSourceAvailabilityPending
+  const canOpenFlow = canAccessFlow && hasSource
   useEffect(() => {
-    if (!isAccessLoading && !canOpenFlow && ref) {
+    if (!isAccessLoading && !canOpenFlow && !sourceAvailabilityError && ref) {
       void navigate({
         to: '/project/$ref/database/pipelines',
         params: { ref },
@@ -64,7 +67,7 @@ function PipelineCreationPage() {
         replace: true,
       })
     }
-  }, [isAccessLoading, canOpenFlow, isEnabled, ref, navigate])
+  }, [isAccessLoading, canOpenFlow, sourceAvailabilityError, isEnabled, ref, navigate])
   const handleClose = () => {
     if (!ref) return
     void navigate({
@@ -84,6 +87,7 @@ function PipelineCreationPage() {
 
   let statusMessage = 'Pipeline creation ready'
   if (isAccessLoading) statusMessage = 'Loading pipeline creation…'
+  else if (sourceAvailabilityError) statusMessage = 'Pipeline sources unavailable'
   else if (!canOpenFlow) statusMessage = 'Opening Pipelines…'
   const status = (
     <p role="status" aria-label="Pipeline creation status" className="sr-only">
@@ -100,7 +104,19 @@ function PipelineCreationPage() {
           <PipelineCreationHeader onClose={handleClose} onNavigate={handleNavigate} />
           <main className="flex-1">
             {isAccessLoading && <PipelineCreationSkeleton />}
-            {!isAccessLoading && (
+            {sourceAvailabilityError && (
+              <div className="mx-auto w-full max-w-[760px] px-6 py-8">
+                <AlertError
+                  error={sourceAvailabilityError}
+                  subject="Failed to retrieve pipeline sources"
+                  projectRef={ref}
+                  additionalActions={
+                    <Button onClick={() => void retrySourceAvailability()}>Retry</Button>
+                  }
+                />
+              </div>
+            )}
+            {!isAccessLoading && !sourceAvailabilityError && (
               <p className="mx-auto w-full max-w-[760px] px-6 py-8">Returning to Pipelines…</p>
             )}
           </main>

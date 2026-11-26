@@ -3,6 +3,7 @@ import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
+  Button,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -14,6 +15,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { usePipelineCreationSourceAvailability } from '../CreatePipeline/usePipelineCreationSourceAvailability'
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
 import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
@@ -73,7 +75,7 @@ export const DestinationPanel = () => {
     sourceId,
     pipeline,
     statusName,
-    replicationNotEnabled,
+    replicationNotEnabled: isEditSourceMissing,
     type: existingDestinationType,
     destinationFetcher,
   } = useDestinationInformation({ id: edit })
@@ -83,14 +85,26 @@ export const DestinationPanel = () => {
   const invalidExistingDestination = destinationFetcher.error?.code === 404
   const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
   const showNoDestinations = !isAccessLoading && !hasPipelinesDestinationAccess
-  const showEnablement = !isAccessLoading && hasPipelinesDestinationAccess && replicationNotEnabled
   const isEditLoading = editMode && destinationFetcher.isPending
-  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
-  const showDestinationForm =
+  const canCheckCreation = visible && !editMode && !isAccessLoading && hasPipelinesDestinationAccess
+  const {
+    hasSource,
+    isPending: isSourceAvailabilityPending,
+    error: sourceAvailabilityError,
+    retry: retrySourceAvailability,
+  } = usePipelineCreationSourceAvailability({ projectRef, enabled: canCheckCreation })
+  const replicationNotEnabled = editMode ? isEditSourceMissing : !hasSource
+  const canRenderForm =
+    visible &&
     !isAccessLoading &&
-    hasPipelinesDestinationAccess &&
+    !isSourceAvailabilityPending &&
+    !sourceAvailabilityError &&
+    hasPipelinesDestinationAccess
+  const showEnablement = canRenderForm && replicationNotEnabled
+  const showDestinationForm =
+    canRenderForm &&
     !replicationNotEnabled &&
-    canEditDestination
+    (!editMode || canModifyDestination(existingDestinationType))
 
   const existingDestination = editMode
     ? {
@@ -170,7 +184,7 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
-            {(isAccessLoading || isEditLoading) && (
+            {(isAccessLoading || isEditLoading || isSourceAvailabilityPending) && (
               <SheetSection>
                 <GenericSkeletonLoader />
               </SheetSection>
@@ -178,6 +192,18 @@ export const DestinationPanel = () => {
             {isUnknownDestination && (
               <SheetSection>
                 <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {sourceAvailabilityError && (
+              <SheetSection>
+                <AlertError
+                  error={sourceAvailabilityError}
+                  subject="Failed to retrieve pipeline sources"
+                  projectRef={projectRef}
+                  additionalActions={
+                    <Button onClick={() => void retrySourceAvailability()}>Retry</Button>
+                  }
+                />
               </SheetSection>
             )}
             {hasDestinationError && (
