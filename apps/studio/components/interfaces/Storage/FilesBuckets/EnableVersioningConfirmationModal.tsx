@@ -26,19 +26,17 @@ export const EnableVersioningConfirmationModal = ({
     onCancel={onCancel}
     onConfirm={onConfirm}
     alert={{
-      title: 'Object versioning is in Public Alpha',
+      title: 'Storage Object Versioning is in Public Alpha',
       description:
         'This feature may change during development and is not recommended for production workloads.',
     }}
   >
     <div className="space-y-2">
-      <h4 className="text-sm font-medium">Storage usage and retained versions</h4>
       <p className="text-sm text-foreground-light">
         Any retained version counts toward Storage usage and may increase your bill.{' '}
         <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
-          Read about Storage size and pricing
+          Read docs
         </InlineLink>
-        .
       </p>
     </div>
   </ConfirmationModal>

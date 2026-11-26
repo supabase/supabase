@@ -1,6 +1,18 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { AnimatePresence } from 'motion/react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
-import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
+import {
+  Badge,
+  Button,
+  DialogSection,
+  DialogSectionSeparator,
+  FormControl,
+  FormField,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  Switch,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -11,6 +23,7 @@ import {
   toNullableNumber,
 } from './BucketVersioningFields.utils'
 import { LifecyclePolicySection } from './LifecyclePolicySection'
+import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -77,16 +90,14 @@ export const BucketVersioningFields = ({
             <FormItemLayout
               hideMessage
               name="enable_versioning"
-              label={
-                <span className="flex items-center gap-x-2">
-                  Object versioning
-                  <Badge variant="warning">Public Alpha</Badge>
-                </span>
-              }
+              label="Object versioning"
               description={
                 <>
-                  Retains previous versions when an object is overwritten or deleted. Retained
-                  versions count toward Storage usage.{' '}
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <StorageVersioningAlphaPopover />
+                    <span>Retains previous versions when an object is overwritten or deleted.</span>
+                  </div>
+                  Retained versions count toward Storage usage.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
                     Storage size and pricing
                   </InlineLink>
@@ -165,5 +176,46 @@ export const BucketVersioningFields = ({
         </AnimatePresence>
       </DialogSection>
     </>
+  )
+}
+
+const StorageVersioningAlphaPopover = () => {
+  const { selectFeaturePreview } = useFeaturePreviewModal()
+
+  return (
+    <HoverCard openDelay={100}>
+      <HoverCardTrigger asChild>
+        <button
+          type="button"
+          aria-label="Public Alpha feature details"
+          className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Badge variant="warning">Public Alpha</Badge>
+        </button>
+      </HoverCardTrigger>
+      <HoverCardContent side="bottom" align="start" className="w-80 space-y-2">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-foreground">
+            Storage Object Versioning is in Public Alpha
+          </p>
+          <p className="text-xs text-foreground-light">
+            This feature may change during development and is not recommended for production
+            workloads.
+          </p>
+        </div>
+        <p className="text-xs text-foreground-light">
+          Retained versions count toward Storage usage and may increase your bill.{' '}
+          <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
+            Read docs
+          </InlineLink>
+        </p>
+        <Button
+          size="tiny"
+          onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING)}
+        >
+          Review feature
+        </Button>
+      </HoverCardContent>
+    </HoverCard>
   )
 }
