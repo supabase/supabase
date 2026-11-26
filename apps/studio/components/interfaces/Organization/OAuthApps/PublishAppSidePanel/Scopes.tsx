@@ -91,8 +91,8 @@ export const ScopesPanel = ({
         setScopes={setScopes}
       />
       <Scope
-        title="Database"
-        description={PERMISSIONS_DESCRIPTIONS.DATABASE}
+        title="Database management"
+        description="Access database settings. Write access also allows the app to run SQL and reset the database password."
         readScopeName={OAuthScope.DATABASE_READ}
         writeScopeName={OAuthScope.DATABASE_WRITE}
         scopes={scopes}

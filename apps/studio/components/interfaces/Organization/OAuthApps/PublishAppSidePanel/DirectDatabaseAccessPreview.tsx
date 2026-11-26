@@ -32,7 +32,7 @@ export function DirectDatabaseAccessPreview({
         )}
       </div>
       <AccessLevelDropdown
-        permission="Direct database access"
+        permission="Table data"
         levels={accessLevels}
         value={accessLevel}
         disabled={isDisabled}
