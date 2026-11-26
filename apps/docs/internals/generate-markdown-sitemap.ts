@@ -19,7 +19,16 @@ async function generate() {
     })
   )
 
-  const sitemap = `# Supabase Documentation\n\n${links.join('\n')}\n`
+  const sitemap = [
+      '# Supabase Documentation',
+      '',
+      '> Supabase is a Postgres development platform. Each index below lists every page in one area of the docs: a guide section, an SDK, the CLI, or the Management API.',
+      '',
+      'For the complete documentation in a single file, see https://supabase.com/llms-full.txt. For product overviews and pricing, see the site-wide index at https://supabase.com/llms.txt.',
+      '',
+      links.join('\n')
+    ]
+    .join('\n')
   await fs.writeFile(`${MARKDOWN_DIR}/${SITEMAP_FILE}`, sitemap)
   console.log(`Created ${MARKDOWN_DIR}/${SITEMAP_FILE} with ${links.length} links`)
 }
