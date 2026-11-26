@@ -9,12 +9,14 @@ import type { DestinationType } from '../DestinationPanel/DestinationPanel.types
 export const PipelineDataSection = ({
   type,
   form,
+  clusterId,
   onSelectNewPublication,
   revealInvalidSettings = false,
   showLoadError = true,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
+  clusterId?: string
   onSelectNewPublication: () => void
   revealInvalidSettings?: boolean
   showLoadError?: boolean
@@ -25,16 +27,23 @@ export const PipelineDataSection = ({
       <div className="flex flex-col gap-y-4">
         <PublicationSelection
           form={form}
+          clusterId={clusterId}
           onSelectNewPublication={onSelectNewPublication}
           showLoadError={showLoadError}
         />
-        <TableCopySelection form={form} editMode={false} showLoadError={showLoadError} />
+        <TableCopySelection
+          form={form}
+          editMode={false}
+          clusterId={clusterId}
+          showLoadError={showLoadError}
+        />
       </div>
     </div>
     <AdvancedSettings
       type={type}
       form={form}
       group="data"
+      clusterId={clusterId}
       revealInvalidSettings={revealInvalidSettings}
       showLoadError={showLoadError}
     />

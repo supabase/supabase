@@ -85,6 +85,7 @@ describe('BatchRestartDialog', () => {
     customRender(
       <PipelineRequestStatusProvider>
         <BatchRestartDialog
+          clusterId={undefined}
           open
           onOpenChange={onOpenChange}
           mode="errored"
@@ -114,6 +115,7 @@ describe('BatchRestartDialog', () => {
     customRender(
       <PipelineRequestStatusProvider>
         <BatchRestartDialog
+          clusterId={undefined}
           open
           onOpenChange={vi.fn()}
           mode="all"
@@ -133,6 +135,7 @@ describe('BatchRestartDialog', () => {
     customRender(
       <PipelineRequestStatusProvider>
         <RestartTableDialog
+          clusterId={undefined}
           open
           table={table(1, { name: 'following_wal' })}
           tableSyncCopy={{ type: 'skip_all_tables' }}
@@ -348,6 +351,7 @@ const RestartDialogWithStatus = ({
       />
       {target === 'all' ? (
         <BatchRestartDialog
+          clusterId={undefined}
           open
           mode="all"
           tables={[table(1, { name: 'following_wal' })]}
@@ -358,6 +362,7 @@ const RestartDialogWithStatus = ({
         />
       ) : (
         <RestartTableDialog
+          clusterId={undefined}
           open
           table={table(1, { name: 'following_wal' })}
           pipelineStatusName={pipelineStatusName}

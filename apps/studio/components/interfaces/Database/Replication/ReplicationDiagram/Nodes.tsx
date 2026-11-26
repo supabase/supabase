@@ -12,7 +12,6 @@ import { useReplicationDestinationsQuery } from '@/data/replication/destinations
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const NODE_WIDTH = 480
 
@@ -32,10 +31,9 @@ const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: 
 
 export const PrimaryDatabaseNode = () => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef, clusterId })
+  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
   const hasDestinations = (destinationsData?.destinations ?? []).length > 0
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
@@ -59,19 +57,14 @@ export const PrimaryDatabaseNode = () => {
 
 export const ReplicationNode = ({ id }: { id: string }) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
 
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef, clusterId })
+  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
   const destination = (destinationsData?.destinations ?? []).find((x) => x.id.toString() === id)
 
-  const { data: pipelinesData } = useReplicationPipelinesQuery({
-    projectRef,
-    clusterId,
-  })
+  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
   const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id.toString() === id)
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
     projectRef,
-    clusterId,
     pipelineId: pipeline?.id,
   })
   const statusName = getStatusName(pipelineStatusData?.status)

@@ -18,7 +18,6 @@ import {
 } from './TableOptionFields'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type TableOption = NonNullable<DestinationPanelSchemaType['tableOptions']>[number]
 type PartitionBy = TableOption['partitionBy']
@@ -47,6 +46,7 @@ interface TableOptionEditorProps {
   isPublicationColumnsPending?: boolean
   publishedColumnNames?: ReadonlySet<string> | null
   tableId: number
+  clusterId?: string
   onClear?: () => void
 }
 
@@ -60,10 +60,10 @@ const TableOptionEditor = ({
   isPublicationColumnsPending = false,
   publishedColumnNames,
   tableId,
+  clusterId,
   onClear,
 }: TableOptionEditorProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const shouldInitiallyLoadColumns =
@@ -193,7 +193,11 @@ const TableOptionEditor = ({
 
 type SharedRowProps = Pick<
   TableOptionEditorProps,
-  'isPublicationColumnsError' | 'isPublicationColumnsPending' | 'publishedColumnNames' | 'tableId'
+  | 'isPublicationColumnsError'
+  | 'isPublicationColumnsPending'
+  | 'publishedColumnNames'
+  | 'tableId'
+  | 'clusterId'
 >
 
 interface TableOptionRowProps extends SharedRowProps {

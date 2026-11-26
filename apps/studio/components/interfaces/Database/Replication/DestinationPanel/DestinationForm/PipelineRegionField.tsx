@@ -7,7 +7,6 @@ import type { DestinationType } from '../DestinationPanel.types'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 // Keep the existing environment region as a fallback when discovery has no region code.
 export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
@@ -31,9 +30,11 @@ export const getPipelineRegionDescription = (destinationType?: DestinationType) 
 
 export const PipelineRegionField = ({
   destinationType,
+  clusterId: selectedClusterId,
   className,
 }: {
   destinationType?: DestinationType
+  clusterId?: string
   className?: string
 }) => {
   return (
@@ -43,13 +44,18 @@ export const PipelineRegionField = ({
       label="Pipeline region"
       description={getPipelineRegionDescription(destinationType)}
     >
-      <PipelineRegionReadonly className={className} />
+      <PipelineRegionReadonly clusterId={selectedClusterId} className={className} />
     </FormItemLayout>
   )
 }
 
-export const PipelineRegionReadonly = ({ className }: { className?: string }) => {
-  const selectedClusterId = useReplicationClusterId()
+export const PipelineRegionReadonly = ({
+  clusterId: selectedClusterId,
+  className,
+}: {
+  clusterId?: string
+  className?: string
+}) => {
   const { data } = useQuery(replicationClustersQueryOptions())
   const clusterId = selectedClusterId ?? data?.default_cluster_id
   const cluster = data?.regions.find((region) => region.cluster_id === clusterId)

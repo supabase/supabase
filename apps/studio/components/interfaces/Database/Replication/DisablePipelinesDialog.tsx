@@ -17,7 +17,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { classifyError } from '@/data/error-classification'
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface DisablePipelinesDialogProps {
   open: boolean
@@ -39,7 +38,6 @@ export const DisablePipelinesDialog = ({
   canConfirm = true,
 }: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const [failure, setFailure] = useState<DisableFailure | null>(null)
   const { mutateAsync: deleteReplicationTenant } = useDeleteReplicationTenantMutation({
     onError: () => {},
@@ -47,7 +45,7 @@ export const DisablePipelinesDialog = ({
 
   const onConfirm = async () => {
     if (!canConfirm) throw new Error('Pipeline regions could not be verified')
-    const targetClusterIds = failure?.clusterIds ?? clusterIds ?? [clusterId]
+    const targetClusterIds = failure?.clusterIds ?? clusterIds ?? [undefined]
 
     if (!projectRef) {
       const error = classifyError(new Error('Project ref is required'))
