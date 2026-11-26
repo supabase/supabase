@@ -1227,11 +1227,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RUST_LOG` | string | | Filter directive for the Rust logger (e.g. `info`, `base=debug`, `trace`). | Read by `env_logger` / `tracing-subscriber` |
 | `SUPABASE_ANON_KEY` | JWT | Both | Public ("anonymous") Supabase API key. Injected for user functions to call the public API. | Injected for user functions |
 | `SUPABASE_DB_URL` | URL | Both | Postgres connection string. Injected for user functions that connect directly to Postgres. | Injected for user functions |
-| `SUPABASE_INTERNAL_FUNCTIONS_CONFIG` | JSON | CLI | JSON map of per-function options (e.g. `verify_jwt`, `import_map_path`) consumed by the CLI's bundled main service. | Set by CLI; consumed by main service |
-| `SUPABASE_INTERNAL_HOST_PORT` | integer | CLI | Local API port the CLI's bundled main service forwards requests to. | Set by CLI |
-| `SUPABASE_INTERNAL_JWT_SECRET` | JWT | CLI | HS256 secret used by the CLI's bundled main service to verify JWTs from the local stack. | Set by CLI |
-| `SUPABASE_INTERNAL_PUBLISHABLE_KEY` | string | CLI | Opaque API key (publishable) used internally by the CLI's bundled main service. | Set by CLI |
-| `SUPABASE_INTERNAL_SECRET_KEY` | string | CLI | Opaque API key (secret) used internally by the CLI's bundled main service. | Set by CLI |
 | `SUPABASE_JWKS` | JWKS | CLI | JSON Web Key Set (asymmetric + legacy symmetric) used by the bundled main service to verify user JWTs. | Self-hosted can derive this from `SUPABASE_URL`'s `/auth/v1/.well-known/jwks.json`. |
 | `SUPABASE_PUBLIC_URL` | URL | Self-hosted | External/public URL of the Supabase project. Injected for user functions. | Injected for user functions |
 | `SUPABASE_PUBLISHABLE_KEYS` | JSON | Self-hosted | JSON map of opaque publishable API keys (new asymmetric-key format). | Injected for user functions |
