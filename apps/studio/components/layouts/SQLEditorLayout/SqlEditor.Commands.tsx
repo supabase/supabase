@@ -410,12 +410,20 @@ function TableSelector() {
           </>
         )}
       </CommandList>
-      {isSuccess && tables.length > 0 && (
-        <div className="shrink-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light">
+      <div
+        role="status"
+        className={
+          isSuccess && tables.length > 0
+            ? 'shrink-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light'
+            : 'sr-only'
+        }
+      >
+        {isSuccess && tables.length > 0 && (
           <div className="flex items-center gap-x-2">
             {isFetchingNextTablesPage ? (
               <span className="flex items-center gap-2">
-                <Loader2Icon size={14} className="animate-spin" /> Loading...
+                <Loader2Icon size={14} className="motion-safe:animate-spin" aria-hidden />{' '}
+                Loading...
               </span>
             ) : (
               <span>
@@ -425,8 +433,8 @@ function TableSelector() {
               </span>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </CommandWrapper>
   )
 }
