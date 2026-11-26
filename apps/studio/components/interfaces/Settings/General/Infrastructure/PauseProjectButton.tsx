@@ -97,7 +97,6 @@ export const PauseProjectButton = () => {
     <>
       <ButtonTooltip
         icon={<CirclePauseIcon />}
-        data-attr="project-pause"
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}

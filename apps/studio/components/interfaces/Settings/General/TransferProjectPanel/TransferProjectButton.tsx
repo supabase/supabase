@@ -302,7 +302,6 @@ export const TransferProjectButton = () => {
           <Button onClick={() => setIsOpen(false)}>Cancel</Button>
           <Button
             variant="primary"
-            data-attr="project-transfer"
             onClick={() => handleTransferProject()}
             disabled={
               !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg

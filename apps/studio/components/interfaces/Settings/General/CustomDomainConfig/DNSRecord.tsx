@@ -13,22 +13,8 @@ export const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
         <p className="font-mono text-base">{type.toUpperCase()}</p>
       </div>
 
-      <Input
-        readOnly
-        copy
-        containerClassName="flex-1"
-        className="font-mono"
-        value={name}
-        data-attr="custom-domain-dns-copy"
-      />
-      <Input
-        readOnly
-        copy
-        containerClassName="flex-1"
-        className="font-mono"
-        value={value}
-        data-attr="custom-domain-dns-copy"
-      />
+      <Input readOnly copy containerClassName="flex-1" className="font-mono" value={name} />
+      <Input readOnly copy containerClassName="flex-1" className="font-mono" value={value} />
     </div>
   )
 }

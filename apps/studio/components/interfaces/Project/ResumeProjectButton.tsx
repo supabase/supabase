@@ -184,7 +184,6 @@ export const ResumeProjectButton = ({
         className={className}
         size={size}
         variant={variant}
-        data-attr="project-resume"
         disabled={buttonDisabled}
         loading={isRestoring}
         onClick={onSelectRestore}

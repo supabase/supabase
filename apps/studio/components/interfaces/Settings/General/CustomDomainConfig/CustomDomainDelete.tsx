@@ -69,7 +69,6 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
           <Button
             variant="danger"
             icon={<TrashIcon />}
-            data-attr="custom-domain-step"
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
             Delete custom domain

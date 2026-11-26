@@ -182,7 +182,6 @@ export const CustomDomainVerify = () => {
             <Button
               variant="primary"
               icon={<RefreshCwIcon />}
-              data-attr="custom-domain-step"
               onClick={onReverifyCustomDomain}
               loading={!isValidating && isReverifyLoading}
               disabled={isDeleting || isReverifyLoading || isValidating}

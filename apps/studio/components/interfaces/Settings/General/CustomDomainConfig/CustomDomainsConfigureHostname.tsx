@@ -150,7 +150,6 @@ export const CustomDomainsConfigureHostname = () => {
             <Button
               variant="primary"
               type="submit"
-              data-attr="custom-domain-step"
               loading={isSubmitting}
               disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
             >

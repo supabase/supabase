@@ -101,7 +101,6 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
               </Button>
               <Button
                 variant="primary"
-                data-attr="custom-domain-step"
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"

@@ -18,7 +18,6 @@ export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonP
       <ButtonTooltip
         variant={variant}
         disabled={!canDeleteProject}
-        data-attr="project-delete"
         onClick={() => setIsOpen(true)}
         tooltip={{
           content: {

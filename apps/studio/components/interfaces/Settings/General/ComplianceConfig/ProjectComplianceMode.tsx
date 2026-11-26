@@ -110,7 +110,6 @@ export const ComplianceConfig = () => {
                     <div>
                       <Switch
                         size="large"
-                        data-attr="project-compliance-toggle"
                         checked={isSensitive}
                         disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
                         onCheckedChange={toggleIsSensitive}

@@ -112,7 +112,6 @@ export const RestartServerButton = () => {
           <ButtonTooltip
             type="button"
             className="flex-1 px-3 @lg:flex-none"
-            data-attr="project-restart"
             disabled={
               project === undefined || !canRestartProject || !canRestart || projectRestartDisabled
             }
@@ -146,7 +145,6 @@ export const RestartServerButton = () => {
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuItem
                   key="database"
-                  data-attr="project-restart"
                   disabled={isLoading}
                   onClick={() => {
                     setServiceToRestart('database')
@@ -168,7 +166,6 @@ export const RestartServerButton = () => {
         <Button
           icon={<RefreshCwIcon />}
           className="w-full @lg:w-auto"
-          data-attr="project-restart"
           disabled={isLoading}
           onClick={() => {
             setServiceToRestart('database')

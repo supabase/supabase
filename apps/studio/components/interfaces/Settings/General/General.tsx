@@ -235,7 +235,6 @@ export const General = () => {
                           readOnly
                           size="small"
                           value={project.ref}
-                          data-attr="project-settings-copy"
                           onCopy={() =>
                             track('project_settings_value_copied', { field: 'projectRef' })
                           }
@@ -257,7 +256,6 @@ export const General = () => {
                           readOnly
                           size="small"
                           value={project.region}
-                          data-attr="project-settings-copy"
                           onCopy={() => track('project_settings_value_copied', { field: 'region' })}
                         />
                       </FormControl>
@@ -277,7 +275,6 @@ export const General = () => {
                     <Button
                       variant="primary"
                       type="submit"
-                      data-attr="project-name-save"
                       disabled={
                         !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
                       }
