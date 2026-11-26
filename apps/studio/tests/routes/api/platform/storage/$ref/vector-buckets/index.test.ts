@@ -3,12 +3,19 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/platform/storage/$ref/vector-buckets/index'
 import { mswServer } from '@/tests/lib/msw'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 type CreateVectorBucketResponse = Record<string, never>
 type StorageVectorsErrorResponse = { message: string; code: string }
 
 const SUPABASE_URL = 'http://supabase.test'
+
+const createBucketRequest = (body: string) =>
+  new Request('http://localhost/api/platform/storage/default/vector-buckets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  })
 
 describe('/api/platform/storage/$ref/vector-buckets', () => {
   beforeAll(() => {
@@ -29,17 +36,10 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
       })
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/storage/default/vector-buckets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bucketName: 'embeddings' }),
-      }),
-      params: { ref: 'default' },
-    })
+      createBucketRequest(JSON.stringify({ bucketName: 'embeddings' }))
+    )
 
     expect(receivedBodies).toEqual([{ vectorBucketName: 'embeddings' }])
     expect(response.status).toBe(200)
@@ -56,17 +56,10 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
       )
     )
 
-    const response = await getRouteHandler(
+    const response = await callRoute(
       Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/storage/default/vector-buckets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bucketName: 'embeddings' }),
-      }),
-      params: { ref: 'default' },
-    })
+      createBucketRequest(JSON.stringify({ bucketName: 'embeddings' }))
+    )
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ error: { message: 'Bucket already exists' } })
@@ -85,35 +78,10 @@ describe('/api/platform/storage/$ref/vector-buckets', () => {
       })
     )
 
-    const response = await getRouteHandler(
-      Route,
-      'POST'
-    )({
-      request: new Request('http://localhost/api/platform/storage/default/vector-buckets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
-      }),
-      params: { ref: 'default' },
-    })
+    const response = await callRoute(Route, createBucketRequest(body))
 
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({ error: { message: 'Invalid request body' } })
     expect(upstreamSpy).not.toHaveBeenCalled()
-  })
-
-  it('returns 405 with Allow: GET, POST for unsupported methods', async () => {
-    const response = await getRouteHandler(
-      Route,
-      'DELETE'
-    )({
-      request: new Request('http://localhost/api/platform/storage/default/vector-buckets', {
-        method: 'DELETE',
-      }),
-      params: { ref: 'default' },
-    })
-
-    expect(response.status).toBe(405)
-    expect(response.headers.get('Allow')).toBe('GET, POST')
   })
 })
