@@ -660,6 +660,7 @@ describe('regions', () => {
     renderRegions()
 
     expect(await screen.findByText('Could not load results from some regions')).toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     expect(
       screen.getByText('Any pipelines in these regions are missing from this view:')
