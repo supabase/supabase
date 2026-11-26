@@ -13,7 +13,6 @@ import { findFirstErrorMessage, resolvePublishedColumnNames } from './TableOptio
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const tableLabel = (table: { schema: string; name: string }) => `${table.schema}.${table.name}`
 
@@ -74,12 +73,12 @@ const TableOptionsSkeleton = () => (
 
 interface TableOptionsProps {
   control: Control<DestinationPanelSchemaType>
+  clusterId?: string
   showLoadError?: boolean
 }
 
-export const TableOptions = ({ control, showLoadError = true }: TableOptionsProps) => {
+export const TableOptions = ({ control, clusterId, showLoadError = true }: TableOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const publicationName = useWatch({ control, name: 'publicationName' })
   const tableOptions = useWatch({ control, name: 'tableOptions' }) ?? []
@@ -210,6 +209,7 @@ export const TableOptions = ({ control, showLoadError = true }: TableOptionsProp
               isPublicationColumnsPending,
               publishedColumnNames,
               tableId: table.id,
+              clusterId,
             }
 
             return (

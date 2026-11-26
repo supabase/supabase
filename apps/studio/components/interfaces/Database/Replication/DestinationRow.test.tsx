@@ -11,7 +11,6 @@ import { DestinationRow as DestinationRowComponent } from './DestinationRow'
 import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import type { DestinationWireResponse } from '@/data/replication/api-types'
 import { API_URL } from '@/lib/constants'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -30,9 +29,9 @@ type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersion
 // Tooltip/Popover descendants use Web Animations
 mockAnimationsApi()
 
-const DestinationRow = (props: { destinationId: number }) => (
+const DestinationRow = (props: { destinationId: number; clusterId?: string }) => (
   <PipelineRequestStatusProvider>
-    <DestinationRowComponent {...props} />
+    <DestinationRowComponent clusterId={undefined} {...props} />
   </PipelineRequestStatusProvider>
 )
 
@@ -269,9 +268,11 @@ describe('DestinationRow', () => {
         <Table>
           <TableBody>
             {clusterIds.map((clusterId) => (
-              <ReplicationClusterProvider key={clusterId} clusterId={clusterId}>
-                <DestinationRowComponent destinationId={DESTINATION_ID} />
-              </ReplicationClusterProvider>
+              <DestinationRowComponent
+                key={clusterId}
+                destinationId={DESTINATION_ID}
+                clusterId={clusterId}
+              />
             ))}
           </TableBody>
         </Table>
@@ -352,13 +353,11 @@ describe('DestinationRow', () => {
       },
     })
     const renderRow = (clusterId: string) => (
-      <ReplicationClusterProvider clusterId={clusterId}>
-        <Table>
-          <TableBody>
-            <DestinationRow destinationId={DESTINATION_ID} />
-          </TableBody>
-        </Table>
-      </ReplicationClusterProvider>
+      <Table>
+        <TableBody>
+          <DestinationRow destinationId={DESTINATION_ID} clusterId={clusterId} />
+        </TableBody>
+      </Table>
     )
     const { rerender } = customRender(renderRow(originalClusterId))
     await screen.findByRole('button', { name: 'Pipeline options' })

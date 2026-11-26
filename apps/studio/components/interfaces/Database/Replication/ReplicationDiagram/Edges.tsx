@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/ReactFlow/EdgeVisual'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -33,16 +32,15 @@ export const SmoothstepEdge = ({
   data,
 }: EdgeProps) => {
   const { ref: projectRef = 'default' } = useParams()
-  const clusterId = useReplicationClusterId()
   const prefersReducedMotion = useReducedMotion()
   const { identifier, shiftEdgeEnd } = (data || {}) as EdgeData
 
-  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef, clusterId })
+  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
   const pipeline = (pipelinesData?.pipelines ?? []).find(
     (p) => p.destination_id.toString() === identifier
   )
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, clusterId, pipelineId: pipeline?.id },
+    { projectRef, pipelineId: pipeline?.id },
     { enabled: !!pipeline?.id }
   )
   const { getRequestStatus } = usePipelineRequestStatus()

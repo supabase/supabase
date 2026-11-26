@@ -44,7 +44,7 @@ const renderDestinationForm = async () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const view = customRenderHook(
     () => ({
-      ...useDestinationForm({ selectedType: 'BigQuery' }),
+      ...useDestinationForm({ selectedType: 'BigQuery', clusterId: undefined }),
       requestStatus: usePipelineRequestStatus().getRequestStatus('8'),
     }),
     {
