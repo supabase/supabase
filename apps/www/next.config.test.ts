@@ -117,11 +117,11 @@ describe('next.config.mjs', () => {
       expect.arrayContaining([
         expect.objectContaining({
           source: '/builderday',
-          destination: 'https://hackday-seven.vercel.app/builderday',
+          destination: 'https://builderday.vercel.app/builderday',
         }),
         expect.objectContaining({
           source: '/builderday/:path*',
-          destination: 'https://hackday-seven.vercel.app/builderday/:path*',
+          destination: 'https://builderday.vercel.app/builderday/:path*',
         }),
       ])
     )
