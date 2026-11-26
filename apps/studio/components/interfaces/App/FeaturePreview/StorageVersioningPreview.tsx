@@ -18,8 +18,7 @@ export const StorageVersioningPreview = () => {
         use lifecycle policies to expire noncurrent versions automatically.
       </p>
       <Admonition
-        type="warning"
-        title="Storage object versioning is in Public Alpha"
+        title="Object versioning is in public alpha"
         description="This feature may change during development and is not recommended for production workloads."
       />
       <Image
@@ -58,7 +57,7 @@ export const StorageVersioningPreview = () => {
           bucket suspends it but retains its existing versions.
         </p>
       </div>
-      <DocsButton href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-versioning`} />
+      <DocsButton href={`${DOCS_URL}/guides/storage/buckets/object-versioning`} />
     </div>
   )
 }

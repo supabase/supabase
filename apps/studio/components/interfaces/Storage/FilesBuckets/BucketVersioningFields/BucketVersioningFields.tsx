@@ -196,7 +196,7 @@ const StorageVersioningAlphaPopover = () => {
       <HoverCardContent side="bottom" align="start" className="w-80 space-y-2">
         <div className="space-y-1">
           <p className="text-sm font-medium text-foreground">
-            Storage Object Versioning is in Public Alpha
+            Storage object versioning is in public alpha
           </p>
           <p className="text-xs text-foreground-light">
             This feature may change during development and is not recommended for production
@@ -205,7 +205,7 @@ const StorageVersioningAlphaPopover = () => {
         </div>
         <p className="text-xs text-foreground-light">
           Retained versions count toward Storage usage and may increase your bill.{' '}
-          <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
+          <InlineLink href={`${DOCS_URL}/guides/storage/buckets/object-versioning`}>
             Read docs
           </InlineLink>
         </p>

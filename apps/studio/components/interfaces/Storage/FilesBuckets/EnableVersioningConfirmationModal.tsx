@@ -26,7 +26,7 @@ export const EnableVersioningConfirmationModal = ({
     onCancel={onCancel}
     onConfirm={onConfirm}
     alert={{
-      title: 'Storage Object Versioning is in Public Alpha',
+      title: 'Storage object versioning is in public alpha',
       description:
         'This feature may change during development and is not recommended for production workloads.',
     }}
