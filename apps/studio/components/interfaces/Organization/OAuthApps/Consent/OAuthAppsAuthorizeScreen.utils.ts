@@ -1,6 +1,7 @@
 import { capitalize } from 'lodash'
 
-import { OAuthScope } from '@/data/oauth-apps/types'
+import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 export function groupScopesByLevel(scopes: string[]) {
   const read = new Set<string>()
@@ -33,6 +34,7 @@ export function groupScopesByLevel(scopes: string[]) {
 }
 
 export function formatPermissionName(name: string) {
+  if (name === 'database') return 'Database management'
   return name
     .split('_')
     .map((part) => capitalize(part))
@@ -141,4 +143,28 @@ export const extractPermissionAndLevelFromScope = (
 ): [ScopePermission, ScopeLevel] => {
   const [permission, level] = scope.split(':')
   return [permission as ScopePermission, level as ScopeLevel]
+}
+
+type OAuthScopeValidationProjectFailure = Extract<
+  OAuthScopeValidationResult,
+  { scope_target: 'projects' }
+>['failures'][number]
+
+export function getFailedProjects(
+  failure: OAuthScopeValidationResult | null | undefined
+): OAuthScopeValidationProjectFailure[] {
+  if (!failure) return []
+  return failure.scope_target === 'projects' ? failure.failures : []
+}
+
+export function getPreselectedProjectRefs({
+  projectRefs,
+  liveProjects,
+}: {
+  projectRefs: string[] | undefined
+  liveProjects: OrgProject[]
+}): string[] {
+  const liveRefs = new Set(liveProjects.map((project) => project.ref))
+  const candidates = projectRefs?.length ? projectRefs : []
+  return candidates.filter((ref) => liveRefs.has(ref))
 }

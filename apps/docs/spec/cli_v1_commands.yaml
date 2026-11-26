@@ -1,26 +1,18 @@
 clispec: '001'
 info:
   id: cli
-  version: 3.2.0
+  version: 3.3.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
   bugs: https://github.com/supabase/cli/issues
   spec: https://github.com/supabase/spec/cli_v1_commands.yaml
   description: Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
-  tags:
-    - id: quick-start
-      title: Quick Start
-    - id: local-dev
-      title: Local Development
-    - id: management-api
-      title: Management APIs
-    - id: other-commands
-      title: Additional Commands
+  tags: []
 flags:
   - id: agent
     name: --agent <[ auto | yes | no ]>
-    description: 'Override agent detection: yes, no, or auto (default auto)'
+    description: 'Override agent detection: yes, no, or auto'
     default_value: auto
     accepted_values:
       - id: auto
@@ -81,7 +73,7 @@ flags:
         type: '[ env | pretty | json | toml | yaml ]'
   - id: output-format
     name: --output-format <[ text | json | stream-json ]>
-    description: 'Output format: text (default), json, or stream-json (NDJSON)'
+    description: 'Output format: text, json, or stream-json (NDJSON)'
     default_value: text
     accepted_values:
       - id: text
@@ -110,8 +102,7 @@ commands:
     title: supabase backups
     summary: Manage Supabase physical backups
     description: Manage Supabase physical backups.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-backups-list
@@ -135,7 +126,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-backups-restore
     title: supabase backups restore
@@ -152,7 +143,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: timestamp
         name: -t, --timestamp <int>
@@ -162,8 +153,7 @@ commands:
     title: supabase bootstrap
     summary: Bootstrap a Supabase project from a starter template
     description: Bootstrap a Supabase project from a starter template.
-    tags:
-      - quick-start
+    tags: []
     links: []
     usage: supabase bootstrap [template] [flags]
     subcommands: []
@@ -176,8 +166,7 @@ commands:
     title: supabase branches
     summary: Manage preview branches
     description: Manage Supabase preview branches.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-branches-create
@@ -270,7 +259,7 @@ commands:
             type: string
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
       - id: size
         name: --size <string>
@@ -346,7 +335,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-branches-get
     title: supabase branches get
@@ -362,7 +351,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-branches-list
     title: supabase branches list
@@ -375,7 +364,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-branches-pause
     title: supabase branches pause
@@ -388,7 +377,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-branches-unpause
     title: supabase branches unpause
@@ -401,7 +390,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-branches-update
     title: supabase branches update
@@ -430,7 +419,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref>]
-        description: 'Target another project: --remote=<ref>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref>`. Defaults to the linked project.'
         default_value: 'false'
       - id: status
         name: --status <string>
@@ -458,8 +447,7 @@ commands:
     description: |-
       Generate the autocompletion script for supabase for the specified shell.
       See each sub-command's help for details on how to use the generated script.
-    tags:
-      - other-commands
+    tags: []
     links: []
     subcommands:
       - supabase-completion-bash
@@ -482,11 +470,11 @@ commands:
 
       To load completions for every new session, execute once:
 
-      #### Linux:
+      Linux:
 
           supabase completion bash > /etc/bash_completion.d/supabase
 
-      #### macOS:
+      macOS:
 
           supabase completion bash > $(brew --prefix)/etc/bash_completion.d/supabase
 
@@ -562,11 +550,11 @@ commands:
 
       To load completions for every new session, execute once:
 
-      #### Linux:
+      Linux:
 
           supabase completion zsh > "${fpath[1]}/_supabase"
 
-      #### macOS:
+      macOS:
 
           supabase completion zsh > $(brew --prefix)/share/zsh/site-functions/_supabase
 
@@ -584,8 +572,7 @@ commands:
     title: supabase config
     summary: Manage project configurations
     description: Manage Supabase project configurations.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-config-convert
@@ -596,11 +583,13 @@ commands:
     flags: []
   - id: supabase-config-convert
     title: supabase config convert
-    summary: Convert config.toml to config.jsonc
+    summary: Convert config.toml to config.jsonc, or back with --to toml
     description: |
 
 
       Converts `supabase/config.toml` to `supabase/config.jsonc` and moves the TOML file to `supabase/config.toml.bak`. Comments are carried over as `//` comments and the document gets a `$schema` entry, so editors validate it against the hosted config schema.
+
+      `--to json` is the default. For `--to toml`, see [Convert back to TOML](#convert-back-to-toml).
 
       The conversion reads the file as written: values keep their meaning, `env(NAME)` references are copied as text, and nothing is resolved from your environment. Numbers are written in JSON form, so `0x1F` becomes `31` and `1_000` becomes `1000`. The converted document is parsed again and compared with the original before anything is written; if the two differ, the file is not valid UTF-8, or it holds a value JSON cannot represent (a TOML date, `inf` or `nan`), the command refuses and leaves `config.toml` untouched.
 
@@ -614,7 +603,17 @@ commands:
 
       Everyone on the project needs Supabase CLI 3.1.0 or later: older CLIs ignore `config.jsonc` and run with defaults. The command ends with a summary of the files it created, moved and updated, any relocated comments, this compatibility note and the undo command; with `--dry-run` the same summary, as a preview, goes to stderr.
 
-      If only `supabase/config.json` or `supabase/config.jsonc` exists, the command reports that there is nothing to convert and exits 0. It fails when `config.toml` and a JSON config both exist, because the JSON file takes precedence; delete it first to convert `config.toml` again. The legacy global `-o`/`--output` flag is not supported; use `--output-format json|stream-json` for a machine-readable result.
+      If only `supabase/config.json` or `supabase/config.jsonc` exists, the command reports that there is nothing to convert and exits 0; pass `--to toml` to convert it back. It fails when `config.toml` and a JSON config both exist, because the JSON file takes precedence; delete it first to convert `config.toml` again. The legacy global `-o`/`--output` flag is not supported; use `--output-format json|stream-json` for a machine-readable result.
+
+      ## Convert back to TOML
+
+      `--to toml` converts `supabase/config.jsonc` or `supabase/config.json` to `supabase/config.toml` and moves the JSON file to a backup such as `supabase/config.jsonc.bak`. If that backup name is taken, the CLI uses a numbered name such as `config.jsonc.2.bak`. It works for any project, including one created on JSONC.
+
+      The `$schema` entry becomes a `#:schema` line. The CLI carries comments over as `#` comments. Members commented out with `//` become TOML comments such as `# key = value` or `# [section]`. When a value must be inline, such as an array mixing tables and scalars, the CLI moves the original commented-out member above the key. A member inside a `/* */` block comment keeps its JSON syntax behind `#`. Comments that TOML has no place for, such as one inside an array or inline table, move to a nearby line and the command lists each one. Before writing, the CLI parses the TOML and compares its values with the original. If they differ, it stops without writing. It also stops without writing if the file contains `null`, a whole number too large to convert exactly, or nesting too deep to convert.
+
+      If `supabase/config.toml` already exists, the command fails, because converting would overwrite it; move or delete it first. If the project is already on `config.toml`, it reports that there is nothing to convert and exits 0. `--dry-run` prints the TOML to stdout and the summary to stderr in text mode; with `--output-format json`, the TOML is in the result's `content` field. The printed undo command restores the JSON file.
+
+      In an interactive terminal, unless you've opted out of telemetry, the command then asks what made you switch back. The answer is optional and is recorded with the command's telemetry. `--reason editor|third-party-tool|older-cli|ci-or-deploy|ai-agent|preference|other` answers it without the prompt, and requires `--to toml`.
 
       ## Undo
 
@@ -632,11 +631,6 @@ commands:
       - Commit the conversion on its own. The history of the old file stays available with `git log -- supabase/config.toml`.
       - Search the repository, CI workflows and Dockerfiles for `config.toml` and update any references.
       - Bump pinned Supabase CLI versions (for example `supabase/setup-cli`) to 3.1.0 or later.
-
-      ```sh
-      supabase config convert --dry-run
-      supabase config convert
-      ```
     examples:
       - id: example-1
         name: Preview the converted config.jsonc without writing it
@@ -644,6 +638,9 @@ commands:
       - id: example-2
         name: Convert supabase/config.toml to supabase/config.jsonc
         code: supabase config convert
+      - id: example-3
+        name: Convert supabase/config.jsonc back to supabase/config.toml
+        code: supabase config convert --to toml
     tags: []
     links: []
     usage: supabase config convert [flags]
@@ -651,8 +648,45 @@ commands:
     flags:
       - id: dry-run
         name: --dry-run
-        description: Print the converted config.jsonc to stdout without writing any file.
+        description: Print the converted configuration to stdout without writing files.
         default_value: 'false'
+      - id: reason
+        name: --reason <string>
+        description: Why you're switching back to TOML. The CLI uses this choice only for usage telemetry.
+        default_value: ''
+        accepted_values:
+          - id: editor
+            name: editor
+            type: string
+          - id: third-party-tool
+            name: third-party-tool
+            type: string
+          - id: older-cli
+            name: older-cli
+            type: string
+          - id: ci-or-deploy
+            name: ci-or-deploy
+            type: string
+          - id: ai-agent
+            name: ai-agent
+            type: string
+          - id: preference
+            name: preference
+            type: string
+          - id: other
+            name: other
+            type: string
+      - id: to
+        name: --to <[ json | toml ]>
+        description: Choose json to write supabase/config.jsonc or toml to write supabase/config.toml.
+        default_value: json
+        accepted_values:
+          - id: json
+            name: json
+            type: '[ json | toml ]'
+          - id: toml
+            name: toml
+            type: '[ json | toml ]'
   - id: supabase-config-diff
     title: supabase config diff
     summary: Diff local config against a remote project
@@ -690,7 +724,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-config-pull
     title: supabase config pull
@@ -770,7 +804,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: remote-label
         name: --remote-label <string>
@@ -810,7 +844,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-config-validate
     title: supabase config validate
@@ -906,13 +940,6 @@ commands:
               files: ^supabase/config\.(toml|jsonc?)$
               pass_filenames: false
       ```
-
-      ```sh
-      supabase config validate
-      supabase config validate --workdir path/to/project
-      supabase config validate --output-format json
-      supabase config validate --resolve-env
-      ```
     examples:
       - id: example-1
         name: Validate supabase/config.toml, config.json or config.jsonc
@@ -939,8 +966,7 @@ commands:
     title: supabase db
     summary: Manage databases
     description: Manage Postgres databases.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-db-advisors
@@ -1003,8 +1029,12 @@ commands:
             type: '[ info | warn | error ]'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: type
         name: --type <[ all | security | performance ]>
         description: 'Type of advisors to check: all, security, performance.'
@@ -1035,7 +1065,7 @@ commands:
 
       In `--from`/`--to`, `remote` means the linked project; passing `--remote` together with `--from` or `--to` is an error. The deprecated aliases still work there and warn: `--project-ref` points a `remote` side at the project it names, and the rest change nothing. Explicit `--from`/`--to` mode always uses pg-delta. In this mode, `-f` is ignored and stdout (or `--output`) is a flattened representation for review, not a portable apply script. Do not apply it directly with plain `psql -f`: transactional units can contain `SET LOCAL` preambles that only take effect inside a transaction, while plans that mix transactional and non-transactional units cannot safely be wrapped in one transaction. To create an applicable migration, use normal target mode with `supabase db diff -f <name>`, then apply it through `supabase db reset` locally or `supabase db push --remote` against the linked project. These paths preserve the plan's per-unit transaction semantics.
 
-      By default, all schemas in the target database are diffed. Use the `--schema public,extensions` flag to restrict diffing to a subset of schemas.
+      By default, all schemas in the target database are diffed; `--schema` restricts the diff to the listed schemas.
 
       pg-delta is the default diff engine for all projects. To fall back to the legacy migra engine, set `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or pass `--use-migra` for a single run.
 
@@ -1050,38 +1080,12 @@ commands:
       - Changes to publication
       - Views with `security_invoker` attributes
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db diff -f my_table
-        response: |
-          Target: local stack (127.0.0.1:54322)
-          Creating shadow database...
-          Applying migration 20230425064254_remote_commit.sql...
-          Diffing schemas: auth,extensions,public,storage
-          Finished supabase db diff on branch main.
-
-          No schema changes found
-      - id: linked-project
-        name: Against linked project
-        code: supabase db diff -f my_table --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Creating shadow database...
-          Diffing schemas: auth,extensions,public,storage
-          Finished supabase db diff on branch main.
-
-          WARNING: The diff tool is not foolproof, so you may need to manually rearrange and modify the generated migration.
-          Run supabase db reset to verify that the new migration does not generate errors.
-      - id: specific-schema
-        name: For a specific schema
-        code: supabase db diff -f my_table --schema auth
-        response: |
-          Target: local stack (127.0.0.1:54322)
-          Creating shadow database...
-          Diffing schemas: auth
-          Finished supabase db diff on branch main.
-
-          No schema changes found
+      - id: example-1
+        name: Save local schema changes as a new migration
+        code: supabase db diff -f add_profiles
+      - id: example-2
+        name: Diff only the public and extensions schemas
+        code: supabase db diff --schema public,extensions
     tags: []
     links: []
     usage: supabase db diff [flags]
@@ -1101,12 +1105,16 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: strict-coverage
         name: --strict-coverage
         description: Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
@@ -1141,45 +1149,25 @@ commands:
 
       Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, storage, and those created by extensions.
 
-      The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
+      The default dump does not contain any data or custom roles.
 
       ### Note on Privilege Migration
 
-      When restoring to a new project, tables inherit ALL privileges from default privileges in the target database. To preserve specific privileges from your dump, revoke defaults before restoring:
+      When restoring to a new project, tables, functions, and sequences get the default privileges of the target database, which can grant more than your dump. To preserve specific privileges from your dump, revoke defaults before restoring:
 
       ```sql
-      -- Run BEFORE restoring your schema
+      -- Run BEFORE restoring your schema, and again before any later restore into the same database
       ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM anon, authenticated;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon, authenticated;
       ```
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db dump -f supabase/schema.sql
-        response: |
-          Target: local stack (127.0.0.1:54322)
-          Dumping schemas from local database...
-          Dumped schema to supabase/schema.sql.
-      - id: linked-project
-        name: Dump the linked project
-        code: supabase db dump -f supabase/schema.sql --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Dumping schemas from remote database...
-          Dumped schema to supabase/schema.sql.
-      - id: role-only
-        name: Role only
-        code: supabase db dump -f supabase/roles.sql --role-only --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Dumping roles from remote database...
-          Dumped schema to supabase/roles.sql.
-      - id: data-only
-        name: Data only
-        code: supabase db dump -f supabase/seed.sql --data-only --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Dumping data from remote database...
-          Dumped schema to supabase/seed.sql.
+      - id: example-1
+        name: Dump data from the local database without schema definitions
+        code: supabase db dump --data-only
+      - id: example-2
+        name: Dump custom roles from the local database
+        code: supabase db dump --role-only
     tags: []
     links: []
     usage: supabase db dump [flags]
@@ -1211,7 +1199,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: role-only
         name: --role-only
@@ -1221,6 +1209,10 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: use-copy
         name: --use-copy
         description: Use copy statements in place of inserts.
@@ -1239,8 +1231,6 @@ commands:
 
       Runs the `plpgsql_check` extension against the local database (native or container) to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
 
-      To lint against specific schemas only, pass in the `--schema` flag.
-
       The `--fail-on` flag can be used to control when the command should exit with a non-zero status code. The possible values are:
 
       - `none` (default): Always exit with a zero status code, regardless of lint results.
@@ -1249,30 +1239,15 @@ commands:
 
       This flag is particularly useful in CI/CD pipelines where you want to fail the build based on certain lint conditions.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db lint
-        response: |
-          Linting schema: public
-
-          No schema errors found
-      - id: schema-warnings
-        name: Warnings for a specific schema
-        code: supabase db lint --level warning --schema storage
-        response: |
-          Linting schema: storage
-          [
-            {
-              "function": "storage.search",
-              "issues": [
-                {
-                  "level": "warning",
-                  "message": "unused variable \"_bucketid\"",
-                  "sqlState": "00000"
-                }
-              ]
-            }
-          ]
+      - id: example-1
+        name: Lint only the public schema
+        code: supabase db lint --schema public
+      - id: example-2
+        name: Exit with a non-zero status if warnings or errors are found
+        code: supabase db lint --fail-on warning
+      - id: example-3
+        name: Exit with a non-zero status only if errors are found
+        code: supabase db lint --fail-on error
     tags: []
     links: []
     usage: supabase db lint [flags]
@@ -1305,12 +1280,16 @@ commands:
             type: '[ warning | error ]'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-db-pull
     title: supabase db pull
     summary: Pull schema from a database
@@ -1357,39 +1336,6 @@ commands:
       When pg-delta returns zero statements, the CLI writes a debug bundle under `supabase/.temp/pgdelta/v2/debug/<timestamp>-diff/` containing the source/desired catalog snapshots, the plan, and coverage diagnostics. Catalog files are not written during normal `db pull` runs.
 
       For TLS tracing without disabling SSL, use `SUPABASE_SSL_DEBUG=true` alongside `PGDELTA_DEBUG=1`.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db pull --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          ◇  Update the remote migration history table on project My Project (abcdefghijklmnopqrst) · production?
-          │  Yes
-          Schema written to supabase/migrations/20240414044403_remote_schema.sql
-          Repaired migration history: [20240414044403] => applied
-          Finished supabase db pull.
-      - id: local-studio
-        name: Local studio
-        code: supabase db pull
-        response: |
-          Target: local stack (127.0.0.1:54322)
-          Creating shadow database...
-          Seeding globals from roles.sql...
-          Applying migration 20240414044403_remote_schema.sql...
-          Diffing schemas...
-          No schema changes found
-          The remote database is already in sync with your local migrations — nothing to pull.
-      - id: custom-schemas
-        name: Custom schemas
-        code: supabase db pull --schema public,extensions --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Creating shadow database...
-          Seeding globals from roles.sql...
-          Applying migration 20240414044403_remote_schema.sql...
-          Diffing schemas: public,extensions
-          No schema changes found
-          The remote database is already in sync with your local migrations — nothing to pull.
     tags: []
     links: []
     usage: supabase db pull [migration name] [flags]
@@ -1416,12 +1362,16 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: strict-coverage
         name: --strict-coverage
         description: Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
@@ -1443,28 +1393,10 @@ commands:
       The first time this command is run, a migration history table will be created under `supabase_migrations.schema_migrations`. After successfully applying a migration, a new row will be inserted into the migration history table with timestamp as its unique id. Subsequent pushes will skip migrations that have already been applied.
 
       If you need to mutate the migration history table, such as deleting existing entries or inserting new entries without actually running the migration, use the `migration repair` command.
-
-      Use the `--dry-run` flag to view the list of changes before applying.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db push --remote
-        response: |
-          Linked project is up to date.
-      - id: self-hosted
-        name: Self hosted
-        code: supabase db push --remote="postgres://user:pass@db.example.com:5432/postgres"
-        response: |
-          Pushing migration 20230410135622_create_employees_table.sql...
-          Finished supabase db push.
-      - id: dry-run
-        name: Dry run
-        code: supabase db push --dry-run --remote
-        response: |
-          DRY RUN: migrations will *not* be pushed to the database.
-          Would push migration 20230410135622_create_employees_table.sql...
-          Would push migration 20230425064254_my_table.sql...
-          Finished supabase db push.
+      - id: example-1
+        name: Preview changes to the local database without applying them
+        code: supabase db push --dry-run
     tags: []
     links: []
     usage: supabase db push [flags]
@@ -1492,12 +1424,16 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: skip-vault
         name: --skip-vault
         description: Skip updating vault secrets from the config file.
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-db-query
     title: supabase db query
     summary: Execute a SQL query against the database
@@ -1551,8 +1487,12 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets a database to current migrations
@@ -1577,15 +1517,12 @@ commands:
 
       If you combine `--sql-paths` with `--remote`, the override seed files are applied to the selected remote database after migrations. Use this only when you intend to seed that remote target.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase db reset
-        response: |
-          Resetting database...
-          Initializing schema...
-          Applying migration 20220810154537_create_employees_table.sql...
-          Seeding data supabase/seed.sql...
-          Finished supabase db reset on branch main.
+      - id: example-1
+        name: Reset the local database without running seed scripts
+        code: supabase db reset --no-seed
+      - id: example-2
+        name: Reset the local database using seed files relative to supabase/
+        code: supabase db reset --sql-paths seed.sql --sql-paths fixtures/test.sql
     tags: []
     links: []
     usage: supabase db reset [flags]
@@ -1601,12 +1538,16 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: sql-paths
         name: --sql-paths <strings>
         description: Override db.seed.sql_paths for this reset. May be repeated; each value accepts a SQL file path or glob pattern relative to the supabase directory and force-enables seeding.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: version
         name: --version <string>
         description: Reset up to the specified version.
@@ -1668,7 +1609,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: reset
         name: --reset
@@ -1686,6 +1627,10 @@ commands:
         name: --no-cache
         description: Disable catalog cache and force fresh shadow database setup.
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: strict-coverage
         name: --strict-coverage
         description: Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
@@ -1701,33 +1646,6 @@ commands:
       When no declarative schema exists yet, the command offers to run `generate` first, exporting from the local database. To start from a linked project or a database URL, run `generate --remote` or `generate --remote=<url>` yourself first. After computing the diff, you can optionally name the migration and apply it to the local database.
 
       Enabled by default. When `[experimental.pgdelta] enabled = false` is set in config, pass the `--experimental` flag to run it.
-    examples:
-      - id: with-pg-delta
-        name: Sync declarative schema with pg-delta
-        code: |
-          # After editing declarative schema files, generate a migration:
-          supabase db schema declarative sync --experimental
-        response: |
-          Creating shadow database...
-          Applying declarative schemas via pg-delta...
-          Applied 239 statements in 1 round(s).
-          Enter a name for this migration (press Enter to keep 'declarative_sync'): add_updated_at
-          Created new migration at supabase/migrations/20260317194051_add_updated_at.sql
-          Apply this migration to local database? [Y/n]
-          Target: local stack (127.0.0.1:54322)
-          Applying migration 20260317194051_add_updated_at.sql...
-          Migration applied successfully.
-      - id: generate-first
-        name: Generate declarative schema from migrations
-        code: |
-          supabase db schema declarative sync --experimental
-        response: |
-          No declarative schema found. Generate a new one ? [Y/n]
-          Reset local database to match migrations first? (local data will be lost) [y/N] y
-          Resetting database...
-          ...
-          Declarative schema written to supabase/schemas
-          Finished supabase db schema declarative generate.
     tags: []
     links: []
     usage: supabase db schema declarative sync [flags]
@@ -1736,6 +1654,10 @@ commands:
       - id: apply
         name: --apply
         description: Apply the generated migration to the local database without prompting.
+        default_value: 'false'
+      - id: fail-on-destructive
+        name: --fail-on-destructive
+        description: Exit non-zero without writing a migration when sync warns about destructive changes, like DROP TABLE or DROP COLUMN.
         default_value: 'false'
       - id: file
         name: -f, --file <string>
@@ -1761,6 +1683,10 @@ commands:
         name: --no-cache
         description: Disable catalog cache and force fresh shadow database setup.
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: strict-coverage
         name: --strict-coverage
         description: Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
@@ -1778,12 +1704,15 @@ commands:
         name: --from-backup <string>
         description: Path to a logical backup file.
         default_value: ''
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
     description: Manage custom domain names for Supabase projects. Use of custom domains and vanity subdomains is mutually exclusive.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-domains-activate
@@ -1816,7 +1745,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-domains-create
     title: supabase domains create
@@ -1838,7 +1767,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-domains-delete
     title: supabase domains delete
@@ -1855,7 +1784,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-domains-get
     title: supabase domains get
@@ -1872,7 +1801,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-domains-reverify
     title: supabase domains reverify
@@ -1889,14 +1818,13 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-encryption
     title: supabase encryption
     summary: Manage encryption keys
     description: Manage encryption keys of Supabase projects
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-encryption-get-root-key
@@ -1913,7 +1841,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-encryption-update-root-key
     title: supabase encryption update-root-key
@@ -1926,14 +1854,13 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-feedback
     title: supabase feedback
     summary: Send feedback to the Supabase team
     description: Send feedback about the Supabase CLI to the Supabase team.
-    tags:
-      - other-commands
+    tags: []
     links: []
     subcommands:
       - supabase-feedback-add
@@ -1994,8 +1921,7 @@ commands:
       Edge Functions are written in TypeScript and run on Deno compatible edge runtime, which is a secure runtime with no package management needed, fast cold starts, and built-in security.
 
       Commands that change the hosted project — `functions deploy` (including `--prune`) and `functions delete` — print the `Target:` line, then ask for confirmation before changing anything; the default answer is no. `functions deploy` asks one question covering every function it will deploy and every function `--prune` will delete. Piped answers are never read, so scripts, JSON runs and agents must pass `--yes` or set `SUPABASE_YES` in the shell (a `SUPABASE_YES` in `supabase/.env` does not count). `functions list` and `functions download` only read and never ask.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-functions-delete
@@ -2023,7 +1949,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-functions-deploy
     title: supabase functions deploy
@@ -2059,7 +1985,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: use-api
         name: --use-api
@@ -2083,7 +2009,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: use-api
         name: --use-api
@@ -2107,7 +2033,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-functions-new
     title: supabase functions new
@@ -2210,6 +2136,10 @@ commands:
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
@@ -2225,8 +2155,7 @@ commands:
       The types respect relationships, constraints, and custom types defined in your database schema.
 
       `--linked`, `--project-ref`, `--db-url` and `--local` still work in v3 but are deprecated and removed in v4; use `--remote`. `--project-id` is also deprecated; use `--remote=<ref>`.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-gen-bearer-jwt
@@ -2270,8 +2199,10 @@ commands:
       Securely generate a private JWT signing key for use in the CLI or to import in the dashboard.
 
       Supported algorithms:
-        ES256 - ECDSA with P-256 curve and SHA-256 (recommended)
-        RS256 - RSA with SHA-256
+
+      ES256 - ECDSA with P-256 curve and SHA-256 (recommended)
+
+      RS256 - RSA with SHA-256
     examples:
       - id: example-1
         name: Generate an ES256 signing key and print it to stdout
@@ -2326,7 +2257,7 @@ commands:
     flags:
       - id: lang
         name: --lang <[ typescript | go | python | swift | dart ]>
-        description: Output language of the generated types. (default typescript)
+        description: Output language of the generated types.
         default_value: typescript
         accepted_values:
           - id: typescript
@@ -2346,19 +2277,23 @@ commands:
             type: '[ typescript | go | python | swift | dart ]'
       - id: query-timeout
         name: --query-timeout <string>
-        description: Maximum timeout allowed for the database query. (default 15s)
+        description: Maximum timeout allowed for the database query.
         default_value: 15s
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: swift-access-control
         name: --swift-access-control <[ internal | public ]>
-        description: Access control for Swift generated types. (default internal)
+        description: Access control for Swift generated types.
         default_value: internal
         accepted_values:
           - id: internal
@@ -2367,6 +2302,10 @@ commands:
           - id: public
             name: public
             type: '[ internal | public ]'
+      - id: swift-typegen-source
+        name: --swift-typegen-source <string>
+        description: 'Where to build supabase-typegen from: a supabase-swift version (3.0.0-alpha.1), a branch (main), a full commit SHA, or a local checkout (./supabase-swift). Default: the supabase-swift pin in the nearest Package.resolved, else the latest 3.x release.'
+        default_value: ''
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -2381,22 +2320,12 @@ commands:
 
       In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
 
-      To use OrioleDB as the Postgres storage engine, run `supabase init --use-orioledb`. The command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
+      With `--use-orioledb`, the command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase init
-        response: Finished supabase init.
-      - id: from-workdir
-        name: Initialize from an existing directory
-        code: supabase init --workdir .
-        response: Finished supabase init.
-      - id: with-orioledb
-        name: Initialize with OrioleDB
+      - id: example-1
+        name: Initialize a project using OrioleDB as the Postgres storage engine
         code: supabase init --use-orioledb
-        response: Finished supabase init.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase init [flags]
     subcommands: []
@@ -2417,8 +2346,7 @@ commands:
     title: supabase inspect
     summary: Inspect project tools
     description: Tools to inspect your Supabase project.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-inspect-db
@@ -2473,8 +2401,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-blocking
     title: supabase inspect db blocking
     summary: Show blocking queries
@@ -2495,8 +2427,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-calls
     title: supabase inspect db calls
     summary: Show queries by call count
@@ -2523,8 +2459,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-collation-drift
     title: supabase inspect db collation-drift
     summary: Show indexes affected by collation version drift
@@ -2547,8 +2487,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-db-stats
     title: supabase inspect db db-stats
     summary: Show database stats
@@ -2560,8 +2504,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-index-stats
     title: supabase inspect db index-stats
     summary: Show index stats
@@ -2573,8 +2521,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-locks
     title: supabase inspect db locks
     summary: Show exclusive locks
@@ -2597,8 +2549,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-long-running-queries
     title: supabase inspect db long-running-queries
     summary: Show long-running queries
@@ -2621,8 +2577,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-outliers
     title: supabase inspect db outliers
     summary: Show query outliers by time
@@ -2650,8 +2610,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-replication-slots
     title: supabase inspect db replication-slots
     summary: Show replication slots
@@ -2675,8 +2639,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-role-stats
     title: supabase inspect db role-stats
     summary: Show role stats
@@ -2688,8 +2656,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-table-stats
     title: supabase inspect db table-stats
     summary: Show table stats
@@ -2701,8 +2673,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-toast-sizes
     title: supabase inspect db toast-sizes
     summary: Show TOAST table sizes and dead chunk counts
@@ -2727,8 +2703,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-traffic-profile
     title: supabase inspect db traffic-profile
     summary: Show traffic profile
@@ -2763,8 +2743,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-vacuum-stats
     title: supabase inspect db vacuum-stats
     summary: Show vacuum stats
@@ -2793,8 +2777,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-db-xid-age
     title: supabase inspect db xid-age
     summary: Show XID age for user tables
@@ -2819,8 +2807,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-inspect-report
     title: supabase inspect report
     summary: Generate a CSV output for all inspect commands
@@ -2836,14 +2828,17 @@ commands:
         default_value: '.'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-issue
     title: supabase issue
     summary: Open GitHub issue forms
     description: Open Supabase CLI GitHub issue forms.
-    tags:
-      - other-commands
+    tags: []
     links: []
     subcommands:
       - supabase-issue-bug
@@ -2996,26 +2991,13 @@ commands:
 
       Passing `--remote` to commands like `db dump`, `db push`, and `db pull` targets the linked project, so it must be linked first.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase link ********************
-        response: |
-          Enter your database password (or leave blank to skip): ********
-          Finished supabase link.
-      - id: without-password
-        name: Link without database password
-        code: supabase link ******************** <<< ""
-        response: |
-          Enter your database password (or leave blank to skip):
-          Finished supabase link.
-      - id: using-alternate-dns
-        name: Link using DNS-over-HTTPS resolver
-        code: supabase link ******************** --dns-resolver https
-        response: |
-          Enter your database password (or leave blank to skip):
-          Finished supabase link.
-    tags:
-      - local-dev
+      - id: example-1
+        name: Link to a project by ref
+        code: supabase link abcdefghijklmnopqrst
+      - id: example-2
+        name: Link to a branch of the currently linked project by name
+        code: supabase link my-branch
+    tags: []
     links: []
     usage: supabase link [ref-or-branch] [flags]
     subcommands: []
@@ -3043,16 +3025,7 @@ commands:
       The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
 
       > The Management API client retries retryable failures up to 5 times by default. Set `SUPABASE_API_MAX_RETRIES` to change that. It counts retries after the first attempt, so `0` sends each request once.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase login
-        response: |
-          You can generate an access token from https://supabase.com/dashboard/account/tokens
-          Enter your access token: sbp_****************************************
-          Finished supabase login.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase login [flags]
     subcommands: []
@@ -3073,8 +3046,7 @@ commands:
     title: supabase logout
     summary: Log out and delete access tokens locally
     description: Log out and delete access tokens locally.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase logout [flags]
     subcommands: []
@@ -3096,9 +3068,7 @@ commands:
       - id: example-4
         name: Query hosted logs with SQL from stdin
         code: cat errors.sql | supabase logs --remote --file - --output-format json
-    tags:
-      - management-api
-      - local-dev
+    tags: []
     links: []
     usage: supabase logs [subcommand] [flags]
     subcommands:
@@ -3154,11 +3124,11 @@ commands:
             type: string
       - id: limit
         name: --limit <int>
-        description: Initial filtered history count (default 100, maximum 1000). SQL controls its own LIMIT.
-        default_value: '0'
+        description: Initial filtered history count (maximum 1000). SQL controls its own LIMIT.
+        default_value: '100'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote log source: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: resource
         name: --resource <string>
@@ -3182,11 +3152,7 @@ commands:
         default_value: ''
       - id: stack
         name: --stack <string>
-        description: Select a local stack by name.
-        default_value: ''
-      - id: stack-id
-        name: --stack-id <string>
-        description: Select a local stack by ID.
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
         default_value: ''
       - id: to
         name: --to <string>
@@ -3203,7 +3169,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote log source: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: service
         name: --service <string>
@@ -3211,18 +3177,13 @@ commands:
         default_value: ''
       - id: stack
         name: --stack <string>
-        description: Select a local stack by name.
-        default_value: ''
-      - id: stack-id
-        name: --stack-id <string>
-        description: Select a local stack by ID.
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
         default_value: ''
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
     description: Manage database migration scripts.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-migration-down
@@ -3248,8 +3209,12 @@ commands:
         default_value: '1'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-migration-fetch
     title: supabase migration fetch
     summary: Fetch migration files from history table
@@ -3261,8 +3226,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-migration-list
     title: supabase migration list
     summary: List local files and the target database's migration history
@@ -3280,24 +3249,6 @@ commands:
       Local migrations are stored in `supabase/migrations` directory while the target database tracks applied migrations in the `supabase_migrations.schema_migrations` table. The second column is headed `Remote` for a project or database URL passed with `--remote`, and `Local DB` for the local database. Only the timestamps are compared to identify any differences.
 
       In case of discrepancies between the local and remote migration history, you can resolve them using the `migration repair` command.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase migration list --remote
-        response: |2
-                LOCAL      │     REMOTE     │     TIME (UTC)
-          ─────────────────┼────────────────┼──────────────────────
-                           │ 20230103054303 │ 2023-01-03 05:43:03
-                           │ 20230103093141 │ 2023-01-03 09:31:41
-            20230222032233 │                │ 2023-02-22 03:22:33
-      - id: with-db-url
-        name: Connect to self-hosted database
-        code: supabase migration list --remote='postgres://postgres[:percent_encoded_password]@db.example.com[:port]/postgres'
-        response: |2
-                LOCAL      │     REMOTE     │     TIME (UTC)
-          ─────────────────┼────────────────┼──────────────────────
-            20230103054303 │ 20230103054303 │ 2023-01-03 05:43:03
-            20230103093141 │ 20230103093141 │ 2023-01-03 09:31:41
     tags: []
     links: []
     usage: supabase migration list [flags]
@@ -3309,8 +3260,12 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-migration-new
     title: supabase migration new
     summary: Create an empty migration script
@@ -3322,17 +3277,6 @@ commands:
       A `supabase/migrations` directory will be created if it does not already exists in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
 
       Outputs from other commands like `db diff` may be piped to `migration new <name>` via stdin.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase migration new schema_test
-        response: |
-          Created new migration at supabase/migrations/20230306095710_schema_test.sql.
-      - id: pipe-stdin
-        name: With statements piped from stdin
-        code: echo "create schema if not exists test;" | supabase migration new schema_test
-        response: |
-          Created new migration at supabase/migrations/20230306095710_schema_test.sql.
     tags: []
     links: []
     usage: supabase migration new <migration name> [flags]
@@ -3410,21 +3354,6 @@ commands:
         ─────────────────┼────────────────┼──────────────────────
           20240414044403 │ 20240414044403 │ 2024-04-14 04:44:03
       ```
-    examples:
-      - id: basic-usage
-        name: Mark a migration as reverted
-        code: supabase migration repair 20230103054303 --status reverted --yes --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Confirmed by --yes: Mark 1 migration as reverted on project My Project (abcdefghijklmnopqrst) · production
-          Repaired migration history: [20230103054303] => reverted
-      - id: mark-applied
-        name: Mark a migration as applied
-        code: supabase migration repair 20230222032233 --status applied --yes --remote
-        response: |
-          Target: project My Project (abcdefghijklmnopqrst) · production
-          Confirmed by --yes: Mark 1 migration as applied on project My Project (abcdefghijklmnopqrst) · production
-          Repaired migration history: [20230222032233] => applied
     tags: []
     links: []
     usage: supabase migration repair [version] ... [flags]
@@ -3436,8 +3365,12 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: status
         name: --status <[ applied | reverted ]>
         description: Version status to update.
@@ -3469,6 +3402,10 @@ commands:
       Squashing rewrites your local migration files. When the target is a hosted database (`--remote` or `--remote=<ref|branch|url>`), it also resets the remote migration history table to the squashed migration. That asks for confirmation before any file is changed (the default answer is No); pass `--yes` to confirm in scripts and other non-interactive runs. With the default local target it only squashes the files and suggests running `supabase migration repair --status applied --remote` for the remote history.
 
       `--linked`, `--project-ref`, `--db-url` and `--local` still work in v3 but are deprecated and removed in v4; use `--remote`.
+    examples:
+      - id: example-1
+        name: Squash local migrations up to the specified version
+        code: supabase migration squash --version 20240414044403
     tags: []
     links: []
     usage: supabase migration squash [flags]
@@ -3480,8 +3417,12 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
       - id: version
         name: --version <string>
         description: Squash up to the specified version.
@@ -3501,8 +3442,12 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-network-bans
     title: supabase network-bans
     summary: Manage network bans
@@ -3514,8 +3459,7 @@ commands:
       The subcommands help you view the current bans, and unblock IPs if desired.
 
       `remove` asks for confirmation (default No) before unblocking. Pass `--yes` to confirm without asking; JSON, stream-json, `-o` and non-interactive runs fail without it.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-network-bans-get
@@ -3532,7 +3476,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3554,7 +3498,7 @@ commands:
         default_value: '[]'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3565,8 +3509,7 @@ commands:
     title: supabase network-restrictions
     summary: Manage network restrictions
     description: Manage network restrictions.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-network-restrictions-get
@@ -3583,7 +3526,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3613,7 +3556,7 @@ commands:
         default_value: '[]'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3623,9 +3566,8 @@ commands:
   - id: supabase-notebooks
     title: supabase notebooks
     summary: Manage Supabase notebooks
-    description: 'Manage Supabase notebooks: SQL and markdown cells stored with your project, kept in supabase/notebooks/<name>.json.'
-    tags:
-      - management-api
+    description: 'Manage Supabase notebooks: SQL and markdown cells stored with your project, kept in `supabase/notebooks/<name>.json`.'
+    tags: []
     links: []
     subcommands:
       - supabase-notebooks-pull
@@ -3649,7 +3591,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-notebooks-push
     title: supabase notebooks push
@@ -3669,14 +3611,13 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-orgs
     title: supabase orgs
     summary: Manage Supabase organizations
     description: Manage Supabase organizations
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-orgs-create
@@ -3704,8 +3645,7 @@ commands:
     title: supabase postgres-config
     summary: Manage Postgres database config
     description: Manage Postgres database config.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-postgres-config-delete
@@ -3731,7 +3671,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3749,7 +3689,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3780,11 +3720,11 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
-        description: If true, replaces all existing overrides with the ones provided. If false (default), merges existing overrides with the ones provided.
+        description: Replace all existing overrides with the ones provided. Omit this flag to merge overrides instead.
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -3804,8 +3744,7 @@ commands:
       Project management via CLI is especially useful for automation scripts and when you need to provision environments in a repeatable way.
 
       Commands that change your account or projects ask for confirmation first: `create` defaults to yes, `delete` defaults to no. Pass `--yes` (or set `SUPABASE_YES` in your shell) to confirm in scripts and CI; without it, a run that cannot prompt fails before making any change.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-projects-api-keys
@@ -3831,7 +3770,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: reveal
         name: --reveal
@@ -4033,32 +3972,6 @@ commands:
 
       Storage bucket definitions are not pulled by this command: the Management API doesn't currently return enough detail (file size limits, allowed MIME types, the storage backend path) to populate `storage.buckets` config faithfully.
 
-      ## Example
-
-      ```sh
-      supabase pull
-      ```
-
-      Pulls config, database schema, and functions from the linked project, fetching migration history first if `supabase/migrations` is empty.
-
-      ```sh
-      supabase pull --remote=staging
-      ```
-
-      Pulls from the `staging` branch of the linked project.
-
-      ```sh
-      supabase pull --dry-run
-      ```
-
-      Prints the full confirmation body — the target header, the real config diff (or "No config differences found."), the migration-history/database/functions lines (including the Docker mention and, if applicable, the uncommitted-changes warning) — without writing or changing anything.
-
-      ```sh
-      supabase pull --remote-label staging
-      ```
-
-      Pulls into the `[remotes.staging]` block instead of whatever block the target would otherwise reuse or create.
-
       Machine-readable output is available through `--output-format json|stream-json` — a single object (`schema_version`, `target`, `dry_run`, `confirmed`, `wrote`, `step_order`, `steps`, `counts`) with one entry per step under `steps`, keyed `config`, `migration_history`, `db`, and `functions`, each carrying its own `status` (`changed`, `unchanged`, `skipped`, `planned`, or `failed`), the paths it wrote, and a step-specific `detail` object. `target` carries `kind: "linked"`, `project_ref`, `environment` (`production`, `branch`, or `unverified`), `project_name` and `parent_project_ref` when known, and `branch` when `--remote` named one. The legacy global `-o`/`--output` flag is not supported by this command; use `--output-format json|stream-json` instead.
     examples:
       - id: example-1
@@ -4070,8 +3983,13 @@ commands:
       - id: example-3
         name: Preview what would be pulled without writing anything
         code: supabase pull --dry-run
-    tags:
-      - other-commands
+      - id: example-4
+        name: Write pulled config into the remotes.staging block
+        code: supabase pull --remote-label staging
+      - id: example-5
+        name: Fetch migration history, replacing matching local migration files
+        code: supabase pull --with-migration-history
+    tags: []
     links: []
     usage: supabase pull [flags]
     subcommands: []
@@ -4086,7 +4004,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: remote-label
         name: --remote-label <string>
@@ -4114,8 +4032,7 @@ commands:
       Secrets can be set individually or loaded from .env files for convenience.
 
       `secrets set` and `secrets unset` print the `Target:` line, then ask for confirmation before changing anything; the default answer is no, and the question lists the secret names (never their values). Piped answers are never read, so scripts, JSON runs and agents must pass `--yes` or set `SUPABASE_YES` in the shell (a `SUPABASE_YES` in `supabase/.env` does not count). `secrets unset --dry-run` and `secrets list` only read and never ask.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-secrets-list
@@ -4140,7 +4057,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-secrets-set
     title: supabase secrets set
@@ -4164,7 +4081,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-secrets-unset
     title: supabase secrets unset
@@ -4198,14 +4115,13 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-seed
     title: supabase seed
     summary: Seed a Supabase project
     description: Seed a Supabase project from its config file.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-seed-buckets
@@ -4221,14 +4137,17 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote Storage API: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote Storage API: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-services
     title: supabase services
     summary: Show versions of all Supabase services
     description: Show versions of all Supabase services.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase services [flags]
     subcommands: []
@@ -4237,8 +4156,7 @@ commands:
     title: supabase snippets
     summary: Manage Supabase SQL snippets
     description: Manage Supabase SQL snippets.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-snippets-download
@@ -4259,7 +4177,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-snippets-list
     title: supabase snippets list
@@ -4279,14 +4197,13 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-ssl-enforcement
     title: supabase ssl-enforcement
     summary: Manage SSL enforcement
     description: Manage SSL enforcement configuration.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-ssl-enforcement-get
@@ -4303,7 +4220,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -4329,7 +4246,7 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -4340,8 +4257,7 @@ commands:
     title: supabase sso
     summary: Manage Single Sign-On (SSO) authentication
     description: Manage Single Sign-On (SSO) authentication for projects.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-sso-add
@@ -4356,30 +4272,9 @@ commands:
     summary: Add a new SSO identity provider
     description: Add and configure a new connection to a SSO identity provider to your Supabase project.
     examples:
-      - id: basic-usage
-        name: Add with Metadata URL
-        code: |-
-          supabase sso add \
-            --type saml \
-            --metadata-url 'https://...' \
-            --domains company.com \
-            --remote=abcdefghijklmnopqrst
-        response: |-
-          Information about the added identity provider. You can use
-          company.com as the domain name on the frontend side to initiate a SSO
-          request to the identity provider.
-      - id: with-xml
-        name: Add with Metadata File
-        code: |-
-          supabase sso add \
-            --type saml \
-            --metadata-file /path/to/metadata/file.xml \
-            --domains company.com \
-            --remote=abcdefghijklmnopqrst
-        response: |-
-          Information about the added identity provider. You can use
-          company.com as the domain name on the frontend side to initiate a SSO
-          request to the identity provider.
+      - id: example-1
+        name: Add a new SAML SSO provider
+        code: supabase sso add --type saml --metadata-url 'https://...' --domains example.com --remote=mwjylndxudmiehsxhmmz
     tags: []
     links: []
     usage: supabase sso add [flags]
@@ -4389,6 +4284,10 @@ commands:
         name: --attribute-mapping-file <string>
         description: File containing a JSON mapping between SAML attributes to custom JWT claims.
         default_value: ''
+      - id: dedicated-scope
+        name: --dedicated-scope
+        description: Scope the SAML entity ID, metadata URL and ACS URL to this identity provider instead of the shared project-wide URLs.
+        default_value: 'false'
       - id: domains
         name: --domains <strings>
         description: Comma separated list of email domains to associate with the added identity provider.
@@ -4420,7 +4319,7 @@ commands:
             type: string
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: skip-url-validation
         name: --skip-url-validation
@@ -4440,10 +4339,9 @@ commands:
     summary: Returns the SAML SSO settings required for the identity provider
     description: Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
     examples:
-      - id: basic-usage
-        name: Show project information
-        code: supabase sso info --remote=abcdefghijklmnopqrst
-        response: Information about your project's SAML 2.0 configuration.
+      - id: example-1
+        name: Get SSO info for a project
+        code: supabase sso info --remote=mwjylndxudmiehsxhmmz
     tags: []
     links: []
     usage: supabase sso info [flags]
@@ -4451,7 +4349,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-sso-list
     title: supabase sso list
@@ -4468,21 +4366,16 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-sso-remove
     title: supabase sso remove
     summary: Remove an existing SSO identity provider
     description: Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
     examples:
-      - id: basic-usage
-        name: Remove a provider
-        code: |-
-          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --remote=abcdefghijklmnopqrst
-        response: |-
-          Information about the removed identity provider. It's a good idea to
-          save this in case you need it later on.
+      - id: example-1
+        name: Remove an SSO provider by ID
+        code: supabase sso remove b5ae62f9-ef1d-4f11-a02b-731c8bbb11e8 --remote=mwjylndxudmiehsxhmmz
     tags: []
     links: []
     usage: supabase sso remove <provider-id> [flags]
@@ -4490,30 +4383,16 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-sso-show
     title: supabase sso show
     summary: Show information about an SSO identity provider
     description: Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
     examples:
-      - id: basic-usage
-        name: Show information
-        code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --remote=abcdefghijklmnopqrst
-        response: Information about the identity provider in pretty output.
-      - id: metadata-output
-        name: Get raw SAML 2.0 Metadata XML
-        code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --metadata \
-            --remote=abcdefghijklmnopqrst
-        response: |-
-          Raw SAML 2.0 XML assigned to this identity provider. This is the
-          version used in the authentication project, and if using a SAML 2.0
-          Metadata URL it may change depending on the caching information
-          contained within the metadata.
+      - id: example-1
+        name: Show SSO provider details
+        code: supabase sso show b5ae62f9-ef1d-4f11-a02b-731c8bbb11e8 --remote=mwjylndxudmiehsxhmmz
     tags: []
     links: []
     usage: supabase sso show <provider-id> [flags]
@@ -4525,34 +4404,16 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
   - id: supabase-sso-update
     title: supabase sso update
     summary: Update information about an SSO identity provider
     description: Update the configuration settings of a already added SSO identity provider.
     examples:
-      - id: basic-usage
-        name: Replace domains
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --domains new-company.com,new-company.net \
-            --remote=abcdefghijklmnopqrst
-        response: Information about the updated provider.
-      - id: add-domains
-        name: Add an additional domain
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --add-domains company.net \
-            --remote=abcdefghijklmnopqrst
-        response: Information about the updated provider.
-      - id: remove-domains
-        name: Remove a domain
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --remove-domains company.org \
-            --remote=abcdefghijklmnopqrst
-        response: Information about the updated provider.
+      - id: example-1
+        name: Update an SSO provider's domains
+        code: supabase sso update b5ae62f9-ef1d-4f11-a02b-731c8bbb11e8 --add-domains example.com --remote=mwjylndxudmiehsxhmmz
     tags: []
     links: []
     usage: supabase sso update <provider-id> [flags]
@@ -4597,7 +4458,7 @@ commands:
             type: string
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: remove-domains
         name: --remove-domains <strings>
@@ -4617,37 +4478,14 @@ commands:
 
       Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
 
-      All service containers are started by default. You can exclude those not needed by passing in `-x` flag. To exclude multiple containers, either pass in a comma separated string, such as `-x gotrue,imgproxy`, or specify `-x` flag multiple times.
+      All service containers are started by default. The `-x` flag accepts comma-separated service names or repeated occurrences.
 
       > It is recommended to have at least 7GB of RAM to start all services.
 
       Health checks are automatically added to verify the started containers. Use `--ignore-health-check` flag to ignore these errors.
 
       > If the CLI is running inside a dev container with the Docker socket bind-mounted, set the `SUPABASE_SERVICES_HOSTNAME` environment variable to the hostname reachable from inside that container, such as `host.docker.internal`.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase start
-        response: |
-          Creating custom roles supabase/roles.sql...
-          Applying migration 20220810154536_employee.sql...
-          Seeding data supabase/seed.sql...
-          Started supabase local development setup.
-      - id: without-studio
-        name: Start containers without studio and imgproxy
-        code: supabase start -x studio,imgproxy
-        response: |
-          Excluding container: supabase/studio:20221214-4eecc99
-          Excluding container: darthsim/imgproxy:v3.8.0
-          Started supabase local development setup.
-      - id: ignore-health-check
-        name: Ignore service health checks
-        code: supabase start --ignore-health-check
-        response: |
-          service not healthy: [supabase_storage_cli]
-          Started supabase local development setup.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase start [flags]
     subcommands: []
@@ -4672,43 +4510,13 @@ commands:
 
       You can export the connection parameters for [initializing supabase-js](https://supabase.com/docs/reference/javascript/initializing) locally by specifying the `-o env` flag. Supported parameters include `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY`.
     examples:
-      - id: basic-usage
-        name: Basic usage
+      - id: example-1
+        name: Show local Supabase status
         code: supabase status
-        response: |
-          supabase local development setup is running.
-
-                   API URL: http://127.0.0.1:54321
-               GraphQL URL: http://127.0.0.1:54321/graphql/v1
-                    DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
-                Studio URL: http://127.0.0.1:54323
-               Mailpit URL: http://127.0.0.1:54324
-                JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
-                  anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-          service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
-      - id: output-env
-        name: Format status as environment variables
-        code: supabase status -o env
-        response: |
-          ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-          API_URL="http://127.0.0.1:54321"
-          DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-          GRAPHQL_URL="http://127.0.0.1:54321/graphql/v1"
-          JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
-          SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
-          STUDIO_URL="http://127.0.0.1:54323"
-      - id: output-custom-name
-        name: Customize the names of exported variables
-        code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
-        response: |
-          Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
-          SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-          DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-          GRAPHQL_URL="http://127.0.0.1:54321/graphql/v1"
-          JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
-          SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
-    tags:
-      - local-dev
+      - id: example-2
+        name: Output status as JSON
+        code: supabase status --output-format json
+    tags: []
     links: []
     usage: supabase status [flags]
     subcommands: []
@@ -4731,19 +4539,10 @@ commands:
 
       Use the `--all` flag to stop all local Supabase projects instances on the machine. Use with caution with `--no-backup` as it will delete all supabase local projects data.
     examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase stop
-        response: |
-          Stopped supabase local development setup.
-          Local data are backed up to docker volume.
-      - id: clean-up
-        name: Clean up local data after stopping
-        code: supabase stop --no-backup
-        response: |
-          Stopped supabase local development setup.
-    tags:
-      - local-dev
+      - id: example-1
+        name: Stop all local Supabase projects on this machine
+        code: supabase stop --all
+    tags: []
     links: []
     usage: supabase stop [flags]
     subcommands: []
@@ -4764,8 +4563,7 @@ commands:
     title: supabase storage
     summary: Manage Supabase Storage objects
     description: Manage Supabase Storage objects.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-storage-cp
@@ -4794,15 +4592,15 @@ commands:
     flags:
       - id: cache-control
         name: --cache-control <string>
-        description: Custom Cache-Control header for HTTP upload. (default "max-age=3600")
+        description: Custom Cache-Control header for HTTP upload.
         default_value: max-age=3600
       - id: content-type
         name: --content-type <string>
-        description: Custom Content-Type header for HTTP upload. (default "auto-detect")
+        description: Custom Content-Type header for HTTP upload.
         default_value: auto-detect
       - id: jobs
         name: -j, --jobs <integer>
-        description: Maximum number of parallel jobs. (default 1)
+        description: Maximum number of parallel jobs.
         default_value: '1'
       - id: recursive
         name: -r, --recursive
@@ -4810,13 +4608,17 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote Storage API: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote Storage API: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-storage-ls
     title: supabase storage ls
     summary: List objects by path prefix
@@ -4836,13 +4638,17 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote Storage API: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote Storage API: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-storage-mv
     title: supabase storage mv
     summary: Move objects from src to dst path
@@ -4862,13 +4668,17 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote Storage API: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote Storage API: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-storage-rm
     title: supabase storage rm
     summary: Remove objects by file path
@@ -4891,19 +4701,22 @@ commands:
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target a remote Storage API: the linked project, or --remote=<ref|branch>.'
+        description: 'Target a remote Storage API: the linked project, or `--remote=<ref|branch>`.'
         default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-telemetry
     title: supabase telemetry
     summary: Manage telemetry
     description: Manage CLI telemetry settings.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-telemetry-disable
@@ -4941,8 +4754,7 @@ commands:
     title: supabase test
     summary: Run tests on local Supabase containers
     description: Run tests on local Supabase containers.
-    tags:
-      - local-dev
+    tags: []
     links: []
     subcommands:
       - supabase-test-db
@@ -4967,16 +4779,6 @@ commands:
       Runs `pg_prove` in a container with unit test files volume mounted from `supabase/tests` directory. The test file can be suffixed by either `.sql` or `.pg` extension.
 
       Since each test is wrapped in its own transaction, it will be individually rolled back regardless of success or failure.
-    examples:
-      - id: basic-usage
-        name: Basic usage
-        code: supabase test db
-        response: |
-          /tmp/supabase/tests/nested/order_test.pg .. ok
-          /tmp/supabase/tests/pet_test.sql .......... ok
-          All tests successful.
-          Files=2, Tests=2,  6 wallclock secs ( 0.03 usr  0.01 sys +  0.05 cusr  0.02 csys =  0.11 CPU)
-          Result: PASS
     tags: []
     links: []
     usage: supabase test db [path] ... [flags]
@@ -4984,8 +4786,12 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        description: 'Target a remote database: the linked project, or `--remote=<ref|branch|url>`.'
         default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name, else by ID or unique ID prefix (defaults to SUPABASE_STACK, else the current project stack).
+        default_value: ''
   - id: supabase-test-new
     title: supabase test new
     summary: Create a new test file
@@ -5007,8 +4813,7 @@ commands:
     title: supabase unlink
     summary: Unlink a Supabase project
     description: Unlink a Supabase project.
-    tags:
-      - local-dev
+    tags: []
     links: []
     usage: supabase unlink [flags]
     subcommands: []
@@ -5024,8 +4829,7 @@ commands:
       Usage of vanity subdomains and custom domains is mutually exclusive.
 
       `activate` and `delete` ask for confirmation, with a default of No. Pass `--yes` (or set `SUPABASE_YES` in the shell) to run without a prompt, which JSON output and non-interactive runs require.
-    tags:
-      - management-api
+    tags: []
     links: []
     subcommands:
       - supabase-vanity-subdomains-activate
@@ -5049,7 +4853,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -5072,7 +4876,7 @@ commands:
         default_value: ''
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -5090,7 +4894,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -5108,7 +4912,7 @@ commands:
     flags:
       - id: remote
         name: --remote[=<ref|branch>]
-        description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        description: 'Target another project: `--remote=<ref|branch>`. Defaults to the linked project.'
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -5126,8 +4930,7 @@ commands:
       - id: example-2
         name: Show the current user as JSON
         code: supabase whoami --output-format json
-    tags:
-      - management-api
+    tags: []
     links: []
     usage: supabase whoami [flags]
     subcommands: []

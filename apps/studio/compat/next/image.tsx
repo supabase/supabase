@@ -8,7 +8,7 @@ import {
   type SyntheticEvent,
 } from 'react'
 
-import { BASE_PATH } from '@/lib/constants'
+import { applyBasePath } from '@/lib/internal-url'
 
 // Next/Image is a smart wrapper around `<img>` that handles automatic
 // resizing, lazy loading, blur placeholders, and a CDN loader. Under
@@ -42,19 +42,6 @@ interface ImageProps extends Omit<ComponentPropsWithoutRef<'img'>, 'src' | 'alt'
   blurDataURL?: string
   unoptimized?: boolean
   onLoadingComplete?: (img: HTMLImageElement) => void
-}
-
-function applyBasePath(src: string): string {
-  if (!BASE_PATH) return src
-  // Schemes (http:, https:, data:, blob:) and protocol-relative URLs.
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
-  // Already prefixed — happens when callers manually prepend BASE_PATH
-  // (several studio components do this today).
-  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
-  // Absolute app path — prepend.
-  if (src.startsWith('/')) return `${BASE_PATH}${src}`
-  // Relative path — leave alone.
-  return src
 }
 
 function resolveSrc(

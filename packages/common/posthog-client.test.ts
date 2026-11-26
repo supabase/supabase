@@ -17,6 +17,8 @@ const posthog = vi.hoisted(() => ({
   opt_out_capturing: vi.fn(),
   opt_in_capturing: vi.fn(),
   has_opted_out_capturing: vi.fn(() => false),
+  get_session_id: vi.fn(),
+  onSessionId: vi.fn(),
 }))
 
 vi.mock('posthog-js', () => ({ default: posthog }))
@@ -89,6 +91,32 @@ describe('PostHogClient consent', () => {
     client.reset()
 
     expect(posthog.opt_out_capturing).not.toHaveBeenCalled()
+  })
+
+  it('stops writing the session_id cookie once opted out', async () => {
+    const client = await loadClient()
+    client.init()
+    initConfig().loaded(posthog)
+    const onSessionChange = posthog.onSessionId.mock.calls[0][0]
+
+    onSessionChange('session-before-opt-out')
+    client.optOut()
+    onSessionChange('session-after-opt-out')
+
+    expect(document.cookie).toContain('session_id=session-before-opt-out')
+  })
+
+  it('stops writing the session_id cookie after an opt-out stored by another tab', async () => {
+    const client = await loadClient()
+    client.init()
+    initConfig().loaded(posthog)
+    const onSessionChange = posthog.onSessionId.mock.calls[0][0]
+
+    onSessionChange('session-before-other-tab')
+    posthog.has_opted_out_capturing.mockReturnValue(true)
+    onSessionChange('session-after-other-tab')
+
+    expect(document.cookie).toContain('session_id=session-before-other-tab')
   })
 
   it('opts in before flushing calls queued from an earlier opted-out session', async () => {

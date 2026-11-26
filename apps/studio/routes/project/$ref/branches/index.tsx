@@ -3,12 +3,20 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useState, type PropsWithChildren } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { CreateBranchButton } from '@/components/interfaces/BranchManagement/CreateBranchButton'
 import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -89,9 +97,9 @@ function BranchesPage() {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <div className="space-y-4">
               {branchesGrant.status === 'denied' && (
                 <NoPermission resourceText="view this project's branches" />
@@ -132,9 +140,9 @@ function BranchesPage() {
                 </>
               )}
             </div>
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       <DeleteBranchModal
         branch={selectedBranchToDelete}
@@ -160,13 +168,22 @@ function BranchesPage() {
 
 const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
   return (
-    <PageLayout
-      title="Branches"
-      subtitle="Manage your database preview branches and deployments"
-      primaryActions={<CreateBranchButton />}
-      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
-    >
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Branches</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your database preview branches and deployments
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
+            <CreateBranchButton />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
       {children}
-    </PageLayout>
+    </>
   )
 }

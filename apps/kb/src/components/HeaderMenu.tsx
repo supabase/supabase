@@ -1,10 +1,20 @@
+import { logOut, useUser } from 'common/auth'
 import { House, LifeBuoy } from 'lucide-react'
 import { useState } from 'react'
 import { DropdownMenuItem, DropdownMenuSeparator, GithubIcon } from 'ui'
-import { TopNavDropdown, TopNavThemeGroup } from 'ui-patterns/TopNav/TopNavDropdown'
+import {
+  TopNavAccountItems,
+  TopNavDropdown,
+  TopNavSignOutItem,
+  TopNavThemeGroup,
+} from 'ui-patterns/TopNav/TopNavDropdown'
 
 export interface HeaderMenuProps {
   className?: string
+}
+
+interface SignOutItemProps {
+  onSignOut: () => void
 }
 
 type ThemeChoice = 'system' | 'dark' | 'light'
@@ -21,9 +31,9 @@ const isThemeChoice = (value: string | null): value is ThemeChoice =>
 const readStoredChoice = (): ThemeChoice => {
   try {
     const stored = localStorage.getItem('theme')
-    return isThemeChoice(stored) ? stored : 'dark'
+    return isThemeChoice(stored) ? stored : 'system'
   } catch {
-    return 'dark'
+    return 'system'
   }
 }
 
@@ -60,19 +70,56 @@ export const useThemeChoice = () => {
 
 export const HeaderMenu = ({ className }: HeaderMenuProps) => {
   const { choice, onChoiceChange } = useThemeChoice()
+  const [statusMessage, setStatusMessage] = useState('')
+
+  const handleSignOut = async () => {
+    await logOut()
+    setStatusMessage('Signed out')
+  }
 
   return (
-    <TopNavDropdown className={className}>
-      {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
-        <DropdownMenuItem key={href} asChild className="gap-2">
-          <a href={href} target="_blank" rel="noreferrer noopener">
-            <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
-            {label}
-          </a>
-        </DropdownMenuItem>
-      ))}
+    <>
+      <TopNavDropdown className={className}>
+        <AccountItems />
+        {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
+          <DropdownMenuItem key={href} asChild className="gap-2">
+            <a href={href} target="_blank" rel="noreferrer noopener">
+              <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+              {label}
+            </a>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <TopNavThemeGroup value={choice} onValueChange={onChoiceChange} />
+        <SignOutItem onSignOut={handleSignOut} />
+      </TopNavDropdown>
+      <span role="status" className="sr-only">
+        {statusMessage}
+      </span>
+    </>
+  )
+}
+
+const AccountItems = () => {
+  const user = useUser()
+  if (!user) return null
+
+  return (
+    <>
+      <TopNavAccountItems email={user.email} />
       <DropdownMenuSeparator />
-      <TopNavThemeGroup value={choice} onValueChange={onChoiceChange} />
-    </TopNavDropdown>
+    </>
+  )
+}
+
+const SignOutItem = ({ onSignOut }: SignOutItemProps) => {
+  const user = useUser()
+  if (!user) return null
+
+  return (
+    <>
+      <DropdownMenuSeparator />
+      <TopNavSignOutItem onSelect={onSignOut} />
+    </>
   )
 }

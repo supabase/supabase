@@ -9,12 +9,12 @@ This guide explains how to run more than one local Supabase project on one machi
 
 In this guide, a local project is the set of Supabase services running on your machine for one app, the same thing `supabase start` gives you. Your app is your own code, in the directory where you ran `supabase init`.
 
-With the default ports, `supabase start` runs one local project per machine. Every app's generated `config.toml` uses the same ports, so a second local project fails with a port conflict. The `supabase stack` commands assign each local project its own ports and keep its data separate.
+With the default ports, `supabase start` runs one local project per machine. Every app's generated config file uses the same ports, so a second local project fails with a port conflict. The `supabase stack` commands assign each local project its own ports and keep its data separate.
 
 This guide covers:
 
 - [How local projects stay isolated](#how-local-projects-stay-isolated) explains which directories, branches, and names get their own local project. Read it first if you use a monorepo or run several agents.
-- [Turn on the stack commands](#turn-on-the-stack-commands) and [Remove fixed ports from config.toml](#remove-fixed-ports-from-configtoml) are one-time setup for each app.
+- [Turn on the stack commands](#turn-on-the-stack-commands) and [Remove fixed ports from the config file](#remove-fixed-ports-from-configtoml) are one-time setup for each app.
 - [Start a local project in each app directory or worktree](#start-a-local-project-in-each-app-directory-or-worktree) through [Stop and destroy local projects](#stop-and-destroy-local-projects) cover day-to-day use.
 - [Differences from the default `supabase start`](#differences-from-the-default-supabase-start) and [Limitations](#limitations) list what changes when you switch.
 
@@ -28,7 +28,7 @@ The `supabase stack` commands are experimental. Their flags and output can chang
 
 Every local project has an identity made from three parts:
 
-- **Project root**: the nearest directory, starting from your current directory and walking up, that contains `supabase/config.toml`. Without a config file, the project root is the current directory.
+- **Project root**: the nearest directory, starting from your current directory and walking up, that contains `supabase/config.toml`, `supabase/config.json`, or `supabase/config.jsonc`. Without a config file, the project root is the current directory.
 - **Git branch**: if the project root is in a git repository, the current branch is part of the identity. The CLI reads it from the `.git` metadata, so git doesn't need to be installed.
 - **Name**: an optional name that you pass with `--stack`.
 
@@ -43,7 +43,7 @@ Everything else shares one local project. Packages in a monorepo get separate lo
 
 Local projects for the same project root also share the project files in its `supabase/` directory. For example, Studio saves SQL snippets to `supabase/snippets`, so the `dev` and `test` local projects of one app see the same snippets.
 
-The CLI assigns ports for each local project from the range 20000 to 32767 and keeps them stable across restarts. Ports written in `config.toml` are used as written, so see [Remove fixed ports from config.toml](#remove-fixed-ports-from-configtoml) first.
+The CLI assigns ports for each local project from the range 20000 to 32767 and keeps them stable across restarts. Ports written in your config file are used as written, so see [Remove fixed ports from the config file](#remove-fixed-ports-from-configtoml) first.
 
 ## Before you begin
 
@@ -51,22 +51,22 @@ You need:
 
 - Supabase CLI v2.119.0 or later. See [Install and run the CLI](/docs/guides/local-development/cli/getting-started).
 - A container engine or a supported platform. The Docker runtime needs a running Docker or Podman engine, and is the recommended runtime for several local projects at the same time. The native runtime needs no container engine but runs only on macOS on Apple silicon and on Linux for `amd64` and `arm64`. See [Choose a runtime](#choose-a-runtime).
-- An app directory initialized with `supabase init`, or a directory without a `supabase/config.toml`. Without a config file, the local project starts with default settings and doesn't create a config file.
+- An app directory initialized with `supabase init`, or a directory without a config file. Without a config file, the local project starts with default settings and doesn't create a config file.
 
 ## Turn on the stack commands
 
-The `supabase stack` commands exist only when the `[experimental] stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
+The `supabase stack` commands exist only when the `experimental.stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
 
-1. In `supabase/config.toml` in your app directory, add `stack = true` under the existing `[experimental]` table. If your `config.toml` doesn't have an `[experimental]` table, add one:
+1. In your app directory, open your config file (`supabase/config.toml`, `supabase/config.jsonc`, or `supabase/config.json`) and set `experimental.stack` to `true`. If the file doesn't have an `experimental` entry yet, add one:
 
-   ```toml
+   ```toml supabase/config.toml
    [experimental]
    stack = true
    ```
 
-   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
+   In `config.toml`, don't add a second `[experimental]` table: a duplicate table makes the file invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
 
-   In a directory without a `config.toml`, set the environment variable instead:
+   In a directory without a config file, set the environment variable instead:
 
    ```bash
    export SUPABASE_EXPERIMENTAL_STACK=1
@@ -86,30 +86,30 @@ The setting also routes the local targets of the `db`, `migration`, `test`, `gen
 
 The environment variable takes precedence over the config file. Set `SUPABASE_EXPERIMENTAL_STACK=0` to use the default commands for one session without editing the file.
 
-## Remove fixed ports from config.toml
+## Remove fixed ports from the config file [#remove-fixed-ports-from-configtoml]
 
-`supabase init` writes fixed ports into `config.toml`. The CLI treats a port in the file as an exact request. Two local projects that both request port `54321` can't run at the same time.
+`supabase init` writes fixed ports into the config file. The CLI treats a port in the file as an exact request. Two local projects that both request port `54321` can't run at the same time.
 
-For a new app, run `init` with the setting turned on. The CLI writes `[experimental] stack = true` and leaves the port keys out:
+For a new app, run `init` with the setting turned on. The CLI sets `stack` to `true` under `experimental` in `config.jsonc` and leaves the port keys out:
 
 ```bash
 SUPABASE_EXPERIMENTAL_STACK=1 supabase init
 ```
 
-For an app that already has a `config.toml`, remove the port lines from each app that you want to run in parallel:
+For an app that already has a config file, remove the port lines from each app that you want to run in parallel:
 
-1. Open `supabase/config.toml` in your app directory.
-2. Delete or comment out these keys:
-   - `port` under `[api]`, `[db]`, `[db.pooler]`, `[studio]`, `[local_smtp]`, and `[analytics]`
-   - `shadow_port` under `[db]`
-   - `inspector_port` under `[edge_runtime]`
-   - `smtp_port` and `pop3_port` under `[local_smtp]`, and `vector_port` under `[analytics]`, if you set them. `supabase init` writes the SMTP ports commented out.
+1. Open your config file in your app directory.
+2. Delete these keys, each with its value. In JSON or JSONC, also remove the comma the deleted key leaves behind. In `config.toml`, you can comment them out instead:
+   - `port` under `api`, `db`, `db.pooler`, `studio`, `local_smtp`, and `analytics`
+   - `shadow_port` under `db`
+   - `inspector_port` under `edge_runtime`
+   - `smtp_port` and `pop3_port` under `local_smtp`, and `vector_port` under `analytics`, if you set them. `supabase init` writes the SMTP ports commented out.
 3. Save the file and commit it, so everyone on the team gets the same behavior.
 
 If you already started a local project with the fixed ports:
 
 1. Stop it with `supabase stop`.
-2. Remove the port keys from `config.toml`.
+2. Remove the port keys from your config file.
 3. Run `supabase start` again.
 
 In CLI v2.121.0 or later, `supabase start` applies the port change to the stopped local project and prints each moved endpoint, such as `api: 54321 → 26199`. The local project keeps its data.
@@ -152,7 +152,7 @@ supabase start --exclude studio,mail
 
 The database can't be excluded. Studio needs the REST API, so to exclude `rest`, exclude `studio` too. Excluding `studio` also removes the MCP server, because Studio serves `/mcp`.
 
-Running `supabase start` again on a running local project keeps its current settings and prints `Stack is already running with its current services`. To apply a change to `config.toml`, `--exclude`, or `--eager`, stop the local project and start it again. Starting without `--exclude` restores the services enabled in `config.toml`.
+Running `supabase start` again on a running local project keeps its current settings and prints `Stack is already running with its current services`. To apply a change to your config file, `--exclude`, or `--eager`, stop the local project and start it again. Starting without `--exclude` restores the services enabled in your config file.
 
 In CLI v2.121.0 or later, stopping and starting also applies port changes. A change to the Postgres major version always needs a new local project. Start one with a different `--stack` name, or run `supabase stack destroy` and start again.
 
@@ -286,7 +286,7 @@ Keep these differences in mind when you turn the setting on for an app that used
 
 ## Limitations
 
-- Some `config.toml` settings aren't supported. `supabase start` fails with a message that names the setting. The unsupported settings are:
+- Some config settings aren't supported. `supabase start` fails with a message that names the setting. The unsupported settings are:
   - `api.tls`
   - The Analytics GCP settings, and Analytics backends other than Postgres
   - Custom Auth email templates with `content_path`

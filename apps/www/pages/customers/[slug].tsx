@@ -18,9 +18,6 @@ import { Button } from 'ui'
 import { AiTools } from '@/components/AiTools'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
-// table of contents extractor
-const toc = require('markdown-toc')
-
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_customers')
   return {
@@ -60,7 +57,6 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }

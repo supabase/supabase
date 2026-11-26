@@ -1,3 +1,4 @@
+import { LLMS_TXT_URL } from 'common/markdown-affordance'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const reference = vi.hoisted(() => ({
@@ -34,6 +35,15 @@ async function html(path: string) {
 
 beforeEach(() => {
   reference.sections = []
+})
+
+describe('crawler reference html', () => {
+  it('points agents at llms.txt before the navigation', async () => {
+    reference.sections = [section('introduction', 'Introduction')]
+    const page = await html('/reference/javascript/introduction')
+    expect(page).toContain(`href="${LLMS_TXT_URL}"`)
+    expect(page.indexOf(LLMS_TXT_URL)).toBeLessThan(page.indexOf('<nav>'))
+  })
 })
 
 describe('crawler reference aliases', () => {

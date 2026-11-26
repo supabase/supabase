@@ -1,0 +1,34 @@
+---
+title: 'Transfer a Vercel-managed project'
+description: 'Move a Supabase project out of an organization managed through the Vercel Marketplace and into a Supabase-managed organization, then reconnect it to Vercel.'
+---
+
+Move a project out of an organization managed through the [Vercel Marketplace](/docs/guides/integrations/vercel-marketplace) and into a Supabase-managed organization. To transfer a project into a Vercel-managed organization, use the steps in [Transfer a project](/docs/guides/platform/project-transfer) with that organization as the target.
+
+## Prerequisites
+
+Before you move a project out of a Vercel-managed organization, check that you meet the following requirements:
+
+- You're an **Owner** of the Vercel-managed organization. Your role comes from your Vercel team. See [How your Vercel team maps to Supabase](/docs/guides/integrations/vercel-marketplace#how-your-vercel-team-maps-to-supabase).
+- You meet the other [project transfer requirements](/docs/guides/platform/project-transfer/requirements), including a role for the whole organization in the target organization.
+
+## Procedure
+
+To move projects from a Vercel-managed organization to a Supabase-managed organization, follow these steps:
+
+1. Transfer each project, with the steps in [Transfer a project](/docs/guides/platform/project-transfer). The transfer removes the linked storage resource from your Vercel project, and the project stops accepting tokens that Vercel issued for your team.
+2. On the target organization's [**Integrations**](/dashboard/org/_/integrations) page, click **Install Vercel integration**, then click **Add new project connection** for each project. Reconnect the integration to restore environment variables. The Management API has no endpoint for the Vercel integration, so use the Dashboard for this step.
+3. After every project is out of the Vercel-managed organization, uninstall the Marketplace integration in Vercel.
+
+   <Admonition type="danger">
+
+   Uninstalling the Vercel Marketplace integration deletes every project still in the Vercel-managed organization. Transfer every project you want to keep before you uninstall the integration.
+
+   </Admonition>
+
+## Next steps
+
+After the move, use these pages:
+
+- [Changes after a project transfer](/docs/guides/platform/project-transfer/what-changes): check what the transfer changed for billing, access, and access tokens.
+- [Troubleshoot a project transfer](/docs/guides/platform/project-transfer/troubleshooting): find the cause and the fix for a message that blocks the transfer.

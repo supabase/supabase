@@ -73,6 +73,7 @@ import { NotFoundPage } from '@/components/interfaces/App/NotFoundPage'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { ServerErrorPage } from '@/components/interfaces/App/ServerErrorPage'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
+import { StudioFrameworkProvider } from '@/components/interfaces/App/StudioFrameworkProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -370,51 +371,53 @@ function RootComponent() {
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <NuqsAdapter>
-        <AuthProvider>
-          <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
-            <ProfileProvider>
-              <TimezoneProvider>
-                <TimestampInfoTimezoneBridge>
-                  <DynamicTitle />
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider>
-                        <DevToolbarProvider apiUrl={API_URL}>
-                          <AiAssistantStateContextProvider>
-                            <CommandProvider>
-                              <BannerStackProvider>
-                                <FeaturePreviewContextProvider>
-                                  <MainScrollContainerProvider>
-                                    <RecoveryReminderController href={location.href}>
-                                      {canRenderPage ? <Outlet /> : <ShellFallback />}
-                                    </RecoveryReminderController>
-                                  </MainScrollContainerProvider>
-                                  <GlobalShortcuts />
-                                  <StudioCommandMenu />
-                                  <FeaturePreviewModal />
-                                  <IndirectTaxDeclarationModal />
-                                </FeaturePreviewContextProvider>
-                              </BannerStackProvider>
-                              <Toaster />
-                              <ToastErrorTracker />
-                              <MonacoThemeProvider />
-                              <AppearanceSettingsProvider />
-                            </CommandProvider>
-                          </AiAssistantStateContextProvider>
-                          <DevToolbar extraTabs={devToolbarExtraTabs} />
-                          <DevToolbarTrigger />
-                        </DevToolbarProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                  <Telemetry />
-                </TimestampInfoTimezoneBridge>
-              </TimezoneProvider>
-            </ProfileProvider>
-          </FeatureFlagProviderWithOrgContext>
-        </AuthProvider>
-      </NuqsAdapter>
+      <StudioFrameworkProvider>
+        <NuqsAdapter>
+          <AuthProvider>
+            <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
+              <ProfileProvider>
+                <TimezoneProvider>
+                  <TimestampInfoTimezoneBridge>
+                    <DynamicTitle />
+                    <TooltipProvider>
+                      <RouteValidationWrapper>
+                        <ThemeProvider>
+                          <DevToolbarProvider apiUrl={API_URL}>
+                            <AiAssistantStateContextProvider>
+                              <CommandProvider>
+                                <BannerStackProvider>
+                                  <FeaturePreviewContextProvider>
+                                    <MainScrollContainerProvider>
+                                      <RecoveryReminderController href={location.href}>
+                                        {canRenderPage ? <Outlet /> : <ShellFallback />}
+                                      </RecoveryReminderController>
+                                    </MainScrollContainerProvider>
+                                    <GlobalShortcuts />
+                                    <StudioCommandMenu />
+                                    <FeaturePreviewModal />
+                                    <IndirectTaxDeclarationModal />
+                                  </FeaturePreviewContextProvider>
+                                </BannerStackProvider>
+                                <Toaster />
+                                <ToastErrorTracker />
+                                <MonacoThemeProvider />
+                                <AppearanceSettingsProvider />
+                              </CommandProvider>
+                            </AiAssistantStateContextProvider>
+                            <DevToolbar extraTabs={devToolbarExtraTabs} />
+                            <DevToolbarTrigger />
+                          </DevToolbarProvider>
+                        </ThemeProvider>
+                      </RouteValidationWrapper>
+                    </TooltipProvider>
+                    <Telemetry />
+                  </TimestampInfoTimezoneBridge>
+                </TimezoneProvider>
+              </ProfileProvider>
+            </FeatureFlagProviderWithOrgContext>
+          </AuthProvider>
+        </NuqsAdapter>
+      </StudioFrameworkProvider>
       <TelemetryTagManager />
     </ErrorBoundary>
   )
@@ -435,7 +438,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {children}
         {!isTestEnv && (
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            // Hidden unless the page is loaded with ?tanstack-devtools in the URL.
+            config={{ position: 'bottom-right', requireUrlFlag: true }}
             plugins={[
               {
                 name: 'TanStack Router',

@@ -9,32 +9,7 @@ import {
 import { useMemo } from 'react'
 
 import { getRouterEventsProxy } from './_router-events'
-import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
-
-// Next's pages-router exposes `router.pathname` as the route *pattern*
-// (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
-// route id uses `$param` — convert so legacy code that does
-// `router.pathname.endsWith('/sql/[id]')` keeps working.
-//
-// Also strip the trailing slash TanStack appends to index-route ids
-// (`/project/$ref/`). Next's pages-router never includes a trailing
-// slash, so consumers like `router.pathname.split('/')[3]` (used in
-// the project sidebar's active-route check) silently see an empty
-// string for index pages instead of `undefined`, and the home icon
-// stops highlighting. The root path stays `/` either way.
-function toNextPathPattern(routeId: string) {
-  // Strip TanStack's layout-route segments — they're prefixed with `_`
-  // (`_app`, `_auth`, etc.) and don't appear in the URL or in Next's
-  // `router.pathname`. Without this, downstream code that derives a path
-  // segment from `pathname.split('/')[N]` indexes into the wrong slot —
-  // e.g. Sidebar uses index 3 to pick the active route, expecting
-  // `/org/[slug]/general` but receiving `/_app/org/[slug]/general` and
-  // ending up with `[slug]` instead of `general`.
-  const withoutLayoutSegments = routeId.replace(/\/_[a-zA-Z0-9_]+(?=\/|$)/g, '')
-  const withBracketParams = withoutLayoutSegments.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
-  if (withBracketParams === '' || withBracketParams === '/') return '/'
-  return withBracketParams.replace(/\/$/, '')
-}
+import { isAbsoluteUrl, splitInternalUrl, toRoutePattern } from '@/lib/internal-url'
 
 // Normalise TanStack's `router.basepath` to Next's `router.basePath`
 // shape: '' for "no basePath" or '/path' for "configured" (leading
@@ -73,8 +48,8 @@ function serializeQuery(query: UrlObject['query']): string {
 // `query`, then drops the consumed keys from the query string — e.g.
 // `push({ pathname: '/project/[ref]/editor/[id]', query: { ref, id, foo } })`
 // resolves to `/project/<ref>/editor/<id>?foo=...`. `router.pathname` here is
-// the bracketed route *pattern* (see toNextPathPattern) and callers like
-// useUrlState push it back verbatim, so without this a sort/filter update on a
+// the bracketed route *pattern* (see toRoutePattern) and callers may push
+// it back verbatim, so without this a sort/filter update on a
 // dynamic route would navigate TanStack to a LITERAL `/project/[ref]/...`,
 // which matches no project (ref === '[ref]') and bounces to a "project not
 // found" redirect. Mirrors Next's behaviour so those pushes stay on-page.
@@ -237,7 +212,7 @@ function toRelativeSameOrigin(url: string): string {
 // no direct equivalent for any of them (shallow, locale, scroll,
 // unstable_skipClientCache). Notably `shallow` is a no-op here, NOT a
 // push-vs-replace signal: callers pass `push(url, as, { shallow: true })`
-// expecting a normal history push (e.g. useUrlState, MonacoEditor). Whether
+// expecting a normal history push (e.g. MonacoEditor). Whether
 // a navigation replaces is decided solely by which method is called
 // (push vs replace) via the internal `_replace` flag below.
 type TransitionOptions = {
@@ -263,7 +238,7 @@ export function useRouter() {
   const search = useSearch({ strict: false })
 
   return useMemo(() => {
-    const pathPattern = toNextPathPattern(leafRouteId)
+    const pathPattern = toRoutePattern(leafRouteId)
 
     // Both push and replace accept Next's (url, as?, options?) signature.
     // `as` is the legacy alias path (mostly obsolete in modern Next; ignored

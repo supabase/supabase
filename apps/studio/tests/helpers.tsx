@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
 import type { Organization } from '@/types'
 
@@ -48,7 +49,7 @@ export const clickDropdown = (elem: HTMLElement) => {
   )
 }
 
-export const createMockOrganization = (details: Partial<Organization>): Organization => {
+export const createMockOrganization = (details: Partial<Organization> = {}): Organization => {
   const base: Organization = {
     id: 1,
     name: 'Organization 1',
@@ -124,6 +125,38 @@ export const createMockProject = (details: Partial<ProjectInfoInfinite>): Projec
     is_physical_backups_enabled: false,
     organization_slug: 'slug',
     preview_branch_refs: [],
+  }
+
+  return Object.assign(base, details)
+}
+
+type OrgProjectComputeSize = OrgProject['databases'][number]['infra_compute_size']
+
+/** An org project with a single primary database, as returned by the org projects endpoint. */
+export const createMockOrgProject = ({
+  computeSize = 'micro',
+  ...details
+}: Partial<OrgProject> & { computeSize?: OrgProjectComputeSize }): OrgProject => {
+  const ref = details.ref ?? 'abcdefghijklmnopqrst'
+  const base: OrgProject = {
+    ref,
+    name: 'Project 1',
+    status: 'ACTIVE_HEALTHY',
+    cloud_provider: 'AWS',
+    region: 'us-east-1',
+    inserted_at: '2026-01-01T00:00:00Z',
+    is_branch: false,
+    integration_source: null,
+    databases: [
+      {
+        identifier: ref,
+        infra_compute_size: computeSize,
+        region: 'us-east-1',
+        status: 'ACTIVE_HEALTHY',
+        type: 'PRIMARY',
+        cloud_provider: 'AWS',
+      },
+    ],
   }
 
   return Object.assign(base, details)

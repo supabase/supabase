@@ -36,7 +36,7 @@ If you use a custom IAM role, see the [required permissions](#custom-iam-permiss
 
 ## Configure BigQuery as a destination
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines, select **BigQuery**, and configure the publication and initial sync. Then enter:
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines and select **BigQuery**. In the **Pipeline creation wizard** preview, enter the settings below on **Connection** and click **Continue** to validate them before choosing the publication and initial sync on **Data**. In the destination form, configure the connection and data settings together.
 
 | Field                   | Value                                                                            |
 | ----------------------- | -------------------------------------------------------------------------------- |
@@ -105,8 +105,6 @@ Choose a supported Postgres replica identity:
 
 BigQuery upserts require complete new rows. Postgres can omit unchanged out-of-line TOAST values; `REPLICA IDENTITY FULL` supplies the old row so Pipelines can reconstruct them.
 
-If replication fails on a partial update row, set full replica identity and restart the pipeline. The change affects only new WAL: incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
 Check a table's current replica identity:
 
 ```sql
@@ -122,13 +120,25 @@ where n.nspname = 'public' and c.relname = 'your_table';
 
 The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
 
-Set full replica identity when a table has toasted columns and update replication must be reliable:
+Before setting `REPLICA IDENTITY FULL`, check the [column lists](/docs/guides/database/replication/pipelines#selecting-specific-columns) in every publication that sends updates or deletes for this table. Full replica identity requires omitting the list entirely. Remove a list only if all columns can be replicated to the publication's subscribers.
+
+Run the following SQL using the source project's [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 alter table public.your_table replica identity full;
 ```
 
-`REPLICA IDENTITY FULL` increases WAL volume by logging the complete old row for updates and deletes.
+For a partitioned table, run the statement on the parent and each partition. Postgres applies replica identity per table. `REPLICA IDENTITY FULL` increases WAL volume by logging the complete old row for updates and deletes.
+
+If replication has already failed on a partial update, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected table after changing its replica identity. The change applies only to new write-ahead log (WAL) records. The reset lets the table resume from a new replication position past the incompatible update.
+
+<Admonition type="danger">
+
+A table reset **replaces the replicated data** in BigQuery when replication resumes. Include the table in **Initial sync** before resetting if you need to copy its current source rows again.
+
+Obsolete backing tables can remain in the dataset after a reset. If you need physical deletion, verify that BigQuery removed them.
+
+</Admonition>
 
 ## Column names
 
@@ -147,7 +157,9 @@ Pipelines supports:
 
 New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
 
-Adding `NOT NULL` keeps an existing destination column nullable. Changes to published columns can require a table reset. For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+Adding `NOT NULL` keeps an existing destination column nullable. Changes to published columns can require a table reset.
+
+Replication can continue after a source type change that keeps the same BigQuery column type. If the change requires a different BigQuery type, Pipelines stops replication for the whole pipeline before updating the destination table. Use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the affected table.
 
 ### Column defaults
 

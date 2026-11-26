@@ -1,18 +1,17 @@
 'use client'
 
+import { getPrereleaseStage, REFERENCES } from '~/content/navigation.references'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-
 import {
   Badge,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { REFERENCES } from '~/content/navigation.references'
 
 const RevVersionDropdown = ({
   library,
@@ -29,6 +28,12 @@ const RevVersionDropdown = ({
   if (!versions || versions.length <= 1) {
     return null
   }
+
+  const prereleaseVersions = versions.flatMap((version) => {
+    const stage = getPrereleaseStage(library, version)
+    return stage ? [{ version, stage }] : []
+  })
+  const stableVersions = versions.filter((version) => !getPrereleaseStage(library, version))
 
   const onSelectVersion = (version: string) => {
     if (version === versions[0]) {
@@ -63,7 +68,7 @@ const RevVersionDropdown = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">
         <DropdownMenuLabel className="text-xs">Stable releases</DropdownMenuLabel>
-        {versions.map((version, index) => (
+        {stableVersions.map((version) => (
           <DropdownMenuItem
             key={version}
             onClick={() => onSelectVersion(version)}
@@ -72,9 +77,29 @@ const RevVersionDropdown = ({
             <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
               Version {version}.0
             </span>
-            {index === 0 && <Badge>Latest</Badge>}
+            {version === versions[0] && <Badge>Latest</Badge>}
           </DropdownMenuItem>
         ))}
+        {prereleaseVersions.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Prereleases</DropdownMenuLabel>
+            {prereleaseVersions.map(({ version, stage }) => (
+              <DropdownMenuItem
+                key={version}
+                onClick={() => onSelectVersion(version)}
+                className="justify-between flex"
+              >
+                <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
+                  Version {version}.0
+                </span>
+                <Badge variant="warning" className="capitalize">
+                  {stage}
+                </Badge>
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

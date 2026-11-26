@@ -1,12 +1,33 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { AlertTriangleIcon, GitBranchIcon, XIcon } from 'lucide-react'
+import { AlertTriangleIcon, GitBranchIcon, GitMergeIcon, XIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, NavMenu, NavMenuItem } from 'ui'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  Button,
+  cn,
+  NavMenu,
+  NavMenuItem,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -18,10 +39,7 @@ import { DatabaseDiffPanel } from '@/components/interfaces/BranchManagement/Data
 import { EdgeFunctionsDiffPanel } from '@/components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from '@/components/interfaces/BranchManagement/OutOfDateNotice'
 import { WorkflowLogsCard } from '@/components/interfaces/BranchManagement/WorkflowLogsCard'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
-import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -38,6 +56,8 @@ import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
+
+const LAYOUT_SIZE = 'default'
 
 export const Route = createFileRoute('/project/$ref/merge')({
   component: ProjectMergeRoute,
@@ -321,16 +341,6 @@ function MergePage() {
     })
   }
 
-  const breadcrumbs = useMemo(
-    () => [
-      {
-        label: 'Merge requests',
-        href: `/project/${project?.ref}/branches/merge-requests`,
-      },
-    ],
-    [project?.ref]
-  )
-
   const currentTab = tabParam || 'database'
 
   const navigationItems = useMemo(() => {
@@ -360,161 +370,174 @@ function MergePage() {
 
   if (branchesGrant.status === 'denied') {
     return (
-      <PageLayout>
-        <ScaffoldContainer size="full">
-          <NoPermission resourceText="view this project's branches" />
-        </ScaffoldContainer>
-      </PageLayout>
+      <PageContainer size={LAYOUT_SIZE}>
+        <NoPermission resourceText="view this project's branches" />
+      </PageContainer>
     )
   }
 
   if (branchesGrant.status === 'error') {
     return (
-      <PageLayout>
-        <ScaffoldContainer size="full">
-          <AlertError
-            error={branchesGrant.error}
-            subject="Failed to check your permissions to view branches"
-          />
-        </ScaffoldContainer>
-      </PageLayout>
+      <PageContainer size={LAYOUT_SIZE}>
+        <AlertError
+          error={branchesGrant.error}
+          subject="Failed to check your permissions to view branches"
+        />
+      </PageContainer>
     )
   }
 
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
-      <PageLayout>
-        <ScaffoldContainer size="full">
-          <div className="flex items-center flex-col justify-center w-full py-16">
-            <ProductEmptyState title="Merge Request">
-              <p className="text-sm text-foreground-light">
-                You can only review changes when on a preview branch
-              </p>
-            </ProductEmptyState>
-          </div>
-        </ScaffoldContainer>
-      </PageLayout>
+      <PageContainer size={LAYOUT_SIZE} className="h-full">
+        <PageSection className="flex items-center justify-center h-full">
+          <EmptyStatePresentational
+            icon={GitMergeIcon}
+            title="Merge requests are only available on preview branches"
+            description="Switch to a preview branch to review and merge its changes."
+          />
+        </PageSection>
+      </PageContainer>
     )
   }
 
   const hasGHProductionDeployEnabled = !!ghConnection && Boolean(mainBranch?.git_branch)
 
   return (
-    <PageLayout
-      title={<MergeTitle />}
-      subtitle={<MergeSubtitle />}
-      breadcrumbs={breadcrumbs}
-      primaryActions={
-        <MergeActions
-          isWorkflowRunning={isWorkflowRunning}
-          isSubmitting={isMerging || isSubmitting}
-          canMerge={mergeBranchGrant.status === 'granted' && diffGrant.status === 'granted'}
-          onSelectMerge={() => setShowConfirmDialog(true)}
-        />
-      }
-      size="full"
-      className="h-full border-b-0 pb-0"
-    >
-      <div className="border-b">
-        <ScaffoldContainer size="full">
-          {hasGHProductionDeployEnabled ? (
-            <Admonition
-              type="default"
-              title="Branch cannot be merged as deploy to production from GitHub is enabled"
-              className="my-4"
-            >
-              <p className="text-balance">
-                Branches should be managed via GitHub to prevent drifts in migrations from your
-                repository's state. You may either move your schema changes to a GitHub pull
-                request, or disable "Deploy to production" in the{' '}
-                <InlineLink href={`/project/${parentProjectRef}/settings/integrations`}>
-                  GitHub integration settings
-                </InlineLink>
-                .
-              </p>
-            </Admonition>
-          ) : isBranchOutOfDateOverall && !currentWorkflowRunId ? (
-            <OutOfDateNotice
-              isBranchOutOfDateMigrations={isBranchOutOfDateMigrations}
-              missingMigrationsCount={missingMigrationsCount}
-              hasMissingFunctions={hasMissingFunctions}
-              missingFunctionsCount={missingFunctionsCount}
-              hasOutOfDateFunctions={hasOutOfDateFunctions}
-              outOfDateFunctionsCount={outOfDateFunctionsCount}
-              hasEdgeFunctionModifications={hasEdgeFunctionModifications}
-              modifiedFunctionsCount={modifiedFunctionsCount}
-              isPushing={isPushing}
-              canPush={pushBranchGrant.status === 'granted'}
-              onPush={handlePush}
+    <div className="flex h-full min-h-full w-full flex-col items-stretch">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/project/$ref/branches/merge-requests" params={{ ref }}>
+                Merge requests
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size={LAYOUT_SIZE} className="pt-6">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>
+              <MergeTitle />
+            </PageHeaderTitle>
+            <PageHeaderDescription>
+              <MergeSubtitle />
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <MergeActions
+              isWorkflowRunning={isWorkflowRunning}
+              isSubmitting={isMerging || isSubmitting}
+              canMerge={mergeBranchGrant.status === 'granted' && diffGrant.status === 'granted'}
+              onSelectMerge={() => setShowConfirmDialog(true)}
             />
-          ) : currentWorkflowRunId ? (
-            <div className="my-6">
-              <WorkflowLogsCard
-                workflowRun={currentWorkflowRun}
-                logs={workflowRunLogs}
-                isLoading={!workflowRunLogs && !!currentWorkflowRunId}
-                onClose={clearWorkflowRun}
-                overrideTitle={hasCurrentWorkflowFailed ? 'Workflow failed' : undefined}
-                overrideDescription={
-                  hasCurrentWorkflowFailed
-                    ? 'Consider creating a fresh branch from the latest production branch to resolve potential conflicts.'
-                    : undefined
-                }
-                overrideIcon={
-                  hasCurrentWorkflowFailed ? (
-                    <AlertTriangleIcon
-                      size={16}
-                      strokeWidth={1.5}
-                      className="text-destructive shrink-0"
-                    />
-                  ) : undefined
-                }
-                overrideAction={
-                  hasCurrentWorkflowFailed ? (
-                    <Button
-                      asChild
-                      icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
-                      className="shrink-0"
-                    >
-                      <Link to="/project/$ref/branches" params={{ ref: parentProjectRef }}>
-                        Create new branch
-                      </Link>
-                    </Button>
-                  ) : hasCurrentWorkflowCompleted ? (
-                    <Button
-                      onClick={handleCloseBranch}
-                      disabled={deleteBranchGrant.status !== 'granted'}
-                      loading={isDeleting}
-                      icon={<XIcon size={16} strokeWidth={1.5} />}
-                      className="shrink-0"
-                    >
-                      Close branch
-                    </Button>
-                  ) : undefined
-                }
-              />
-            </div>
-          ) : null}
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
 
-          <NavMenu className="mt-4 border-none">
-            {navigationItems.map((item) => (
-              <NavMenuItem key={item.label} active={item.active}>
-                <Link
-                  to="/project/$ref/merge"
-                  params={{ ref }}
-                  search={item.search}
-                  className={cn('inline-flex items-center gap-2', item.active && 'text-foreground')}
-                >
-                  {item.label}
-                </Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </ScaffoldContainer>
-      </div>
+      <PageContainer size={LAYOUT_SIZE}>
+        {hasGHProductionDeployEnabled ? (
+          <Admonition
+            type="default"
+            title="Branch cannot be merged as deploy to production from GitHub is enabled"
+            className="my-4"
+          >
+            <p className="text-balance">
+              Branches should be managed via GitHub to prevent drifts in migrations from your
+              repository's state. You may either move your schema changes to a GitHub pull request,
+              or disable "Deploy to production" in the{' '}
+              <InlineLink href={`/project/${parentProjectRef}/settings/integrations`}>
+                GitHub integration settings
+              </InlineLink>
+              .
+            </p>
+          </Admonition>
+        ) : isBranchOutOfDateOverall && !currentWorkflowRunId ? (
+          <OutOfDateNotice
+            isBranchOutOfDateMigrations={isBranchOutOfDateMigrations}
+            missingMigrationsCount={missingMigrationsCount}
+            hasMissingFunctions={hasMissingFunctions}
+            missingFunctionsCount={missingFunctionsCount}
+            hasOutOfDateFunctions={hasOutOfDateFunctions}
+            outOfDateFunctionsCount={outOfDateFunctionsCount}
+            hasEdgeFunctionModifications={hasEdgeFunctionModifications}
+            modifiedFunctionsCount={modifiedFunctionsCount}
+            isPushing={isPushing}
+            canPush={pushBranchGrant.status === 'granted'}
+            onPush={handlePush}
+          />
+        ) : currentWorkflowRunId ? (
+          <div className="my-6">
+            <WorkflowLogsCard
+              workflowRun={currentWorkflowRun}
+              logs={workflowRunLogs}
+              isLoading={!workflowRunLogs && !!currentWorkflowRunId}
+              onClose={clearWorkflowRun}
+              overrideTitle={hasCurrentWorkflowFailed ? 'Workflow failed' : undefined}
+              overrideDescription={
+                hasCurrentWorkflowFailed
+                  ? 'Consider creating a fresh branch from the latest production branch to resolve potential conflicts.'
+                  : undefined
+              }
+              overrideIcon={
+                hasCurrentWorkflowFailed ? (
+                  <AlertTriangleIcon
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-destructive shrink-0"
+                  />
+                ) : undefined
+              }
+              overrideAction={
+                hasCurrentWorkflowFailed ? (
+                  <Button
+                    asChild
+                    icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+                    className="shrink-0"
+                  >
+                    <Link to="/project/$ref/branches" params={{ ref: parentProjectRef }}>
+                      Create new branch
+                    </Link>
+                  </Button>
+                ) : hasCurrentWorkflowCompleted ? (
+                  <Button
+                    onClick={handleCloseBranch}
+                    disabled={deleteBranchGrant.status !== 'granted'}
+                    loading={isDeleting}
+                    icon={<XIcon size={16} strokeWidth={1.5} />}
+                    className="shrink-0"
+                  >
+                    Close branch
+                  </Button>
+                ) : undefined
+              }
+            />
+          </div>
+        ) : null}
+      </PageContainer>
 
-      <ScaffoldContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
+      <PageNav size={LAYOUT_SIZE}>
+        <NavMenu>
+          {navigationItems.map((item) => (
+            <NavMenuItem key={item.label} active={item.active}>
+              <Link
+                to="/project/$ref/merge"
+                params={{ ref }}
+                search={item.search}
+                className={cn('inline-flex items-center gap-2', item.active && 'text-foreground')}
+              >
+                {item.label}
+              </Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
+      </PageNav>
+
+      <PageContainer size={LAYOUT_SIZE} className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
         <div className="flex min-h-0 flex-1 flex-col">
           {currentTab === 'database' ? (
             <DatabaseDiffPanel
@@ -528,7 +551,7 @@ function MergePage() {
             <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
           )}
         </div>
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ConfirmationModal
         visible={showConfirmDialog}
@@ -545,6 +568,6 @@ function MergePage() {
         onCancel={() => setShowConfirmDialog(false)}
         loading={isMerging || isSubmitting}
       />
-    </PageLayout>
+    </div>
   )
 }
