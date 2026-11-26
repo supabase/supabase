@@ -1,17 +1,17 @@
 ---
-id: "config-as-code"
-title: "Managing remote config as code"
+id: 'config-as-code'
+title: 'Managing remote config as code'
 description: "Keep a hosted project's settings in your config file and sync them with the CLI using config diff, pull, and push."
 subtitle: "Keep a hosted project's settings in your config file and sync them with the CLI using config diff, pull, and push."
 ---
 
-Your config file (`supabase/config.toml`, or `supabase/config.jsonc`) already defines your local stack. The `supabase config` commands use the same file for a hosted project. You can see what differs between the file and the project, pull the project's settings into the file, and push the file's settings to the project. Your project settings then go through review and deploy like the rest of your code.
+Your config file (`supabase/config.toml` or `supabase/config.jsonc`) already defines your local stack. The `supabase config` commands use the same file for a hosted project: `diff` shows what differs, `pull` copies the project's settings into the file, and `push` applies the file to the project. Your project settings then go through review like the rest of your code.
 
-This guide covers the CLI workflow for hosted projects. For the local stack and `env()` secrets, refer to [Managing config and secrets](/docs/guides/local-development/managing-config). For every key the file supports, refer to the [CLI config reference](/docs/guides/local-development/cli/config).
+For the local stack and `env()` secrets, refer to [Managing config and secrets](/docs/guides/local-development/managing-config). For every key the file supports, refer to the [CLI config reference](/docs/guides/local-development/cli/config).
 
 <Admonition type="note" label="What these commands change">
 
-`config diff`, `config pull`, and `config push` act on **project settings**, such as Auth, Storage, the Data API, and database settings. They do not change your database schema or data. For schema changes, use `db diff`, `db pull`, and `db push` with migrations. Refer to [Local development workflow](/docs/guides/local-development/cli-workflows).
+These commands change **project settings**, such as Auth, Storage, the Data API, and database settings. They do not change your schema or data. For schema, use `db diff`, `db pull`, and `db push` with migrations. Refer to [Local development workflow](/docs/guides/local-development/cli-workflows).
 
 </Admonition>
 
@@ -23,89 +23,64 @@ This guide uses CLI v3 syntax. In v2, these commands used `--project-ref` instea
 
 ## Before you begin
 
-You need the CLI installed, authenticated, and linked to a project:
+Install the CLI, log in, and link a project:
 
 ```bash
-# Authenticate (opens a browser)
 supabase login
-
-# Link to the hosted project
 supabase link <project-ref>
 ```
 
-Find your project ref in the Dashboard URL: `https://supabase.com/dashboard/project/<project-ref>`. When you pass no flag, the `config` commands use the linked project. A `SUPABASE_PROJECT_ID` environment variable takes priority over the link. To use a different project or a branch, pass `--remote=<project-ref>` or `--remote=<branch>`. Refer to [Targeting a branch](#targeting-a-branch).
+Your project ref is in the Dashboard URL: `https://supabase.com/dashboard/project/<project-ref>`. With no flag, the `config` commands use `SUPABASE_PROJECT_ID` if it is set, and the linked project if it is not. To target another project or a branch, refer to [Targeting a branch](#targeting-a-branch).
 
 <Admonition type="note" label="`supabase` vs. `npx supabase`">
 
-How you run the CLI depends on how you installed it:
-
-- Installed globally with **Homebrew or Scoop**: run `supabase <command>`.
-- Added as a **project dependency** with npm, pnpm, yarn, or bun: run it through your package runner, for example `npx supabase <command>` (or `pnpm supabase`, `yarn supabase`, `bunx supabase`).
-
-Every example here uses `supabase <command>`. Change it to the form that matches your install.
+The examples use `supabase <command>`, which works when you install the CLI with Homebrew or Scoop. If you added the CLI as a project dependency, run it through your package runner, for example `npx supabase <command>`, `pnpm supabase`, `yarn supabase`, or `bunx supabase`.
 
 </Admonition>
 
 ### Secrets and environment variables
 
-Do not put secret values in your config file. Reference them with `env()`, as described in [Managing config and secrets](/docs/guides/local-development/managing-config).
+Do not put secret values in your config file. Reference them with `env()`, as described in [Managing config and secrets](/docs/guides/local-development/managing-config). For branches, refer to [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches).
 
-- `config diff` and `config pull` never read secret values back. The platform masks them, and the CLI prints a `Note:` that lists the masked keys.
-- `config pull` also skips any value that is an `env()` reference, so it does not replace your references with literal values.
-- `config push` resolves each secret that your file declares and compares it with the hosted value. It sends the secret only when the two differ.
-
-For branches, refer to [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches).
+- `config diff` and `config pull` never read secret values. The platform masks them, and the CLI prints a `Note:` that lists the masked keys.
+- `config pull` skips `env()` references, so it does not replace them with literal values.
+- `config push` resolves each declared secret and sends it only when it differs from the hosted value.
 
 ### Values from environment variables
 
-Environment variables can override values in your config file. Refer to [Running commands against local and hosted projects](/docs/guides/local-development/local-and-hosted-projects#value-origin). The config commands show where each overridden value came from:
-
-- `config diff` labels the value, for example `(from SUPABASE_AUTH_SITE_URL)` or `(from SUPABASE_AUTH_SITE_URL in supabase/.env.local)`.
-- `config push` prints `Pushing N values set by environment variables: …` before it asks for confirmation.
-
-The local side of `config diff` is what `config push` sends, overrides included.
+Environment variables can override values in your file. `config diff` labels each override, for example `(from SUPABASE_AUTH_SITE_URL in supabase/.env.local)`, and `config push` prints `Pushing N values set by environment variables: …` before it asks. The local side of `config diff` is what `config push` sends. Refer to [Seeing where a value came from](/docs/guides/local-development/local-and-hosted-projects#value-origin).
 
 ## Key commands at a glance
 
-| Command                                  | What it does                                                         |
-| ---------------------------------------- | -------------------------------------------------------------------- |
-| `supabase config diff`                   | Shows differences between your config file and a project (read-only) |
-| `supabase config diff --exit-code`       | Same, but exits `2` when it finds a difference (for CI)              |
-| `supabase config pull`                   | Writes a project's settings into your config file                    |
-| `supabase config pull --dry-run`         | Shows what a pull writes, without writing                            |
-| `supabase config push`                   | Applies the settings your file declares to a project                 |
-| `supabase config push --remote=<branch>` | Targets a branch or another project (works on all three commands)    |
-| `supabase link <branch>`                 | Links the CLI to a branch of the current project by name             |
+| Command                              | What it does                                                         |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| `supabase config diff`               | Shows differences between your config file and a project (read-only) |
+| `supabase config diff --exit-code`   | Same, but exits `2` when it finds a difference (for CI)              |
+| `supabase config pull`               | Writes a project's settings into your config file                    |
+| `supabase config pull --dry-run`     | Shows what a pull writes, without writing                            |
+| `supabase config push`               | Applies the settings your file declares to a project                 |
+| `--remote=<project-ref or branch>`   | Targets another project or a branch (all three commands)             |
 
 ## See what differs
 
-`supabase config diff` compares your config file with a hosted project and reports the differences. It is read-only. It never changes your file or the project.
+`supabase config diff` compares your config file with a hosted project. It never changes your file or the project.
 
 ```bash
-# Diff against the linked project
 supabase config diff
-
-# Diff against a branch
 supabase config diff --remote=staging
 ```
 
 The CLI labels each difference:
 
 - `[update]`: the setting is in both, with different values.
-- `[remote-only]`: the setting is on the project, but not in your file. This label also shows a setting that your file does not declare, when the project's value differs from the default.
-- `[local-only]`: the setting is in your file, but not on the project.
+- `[remote-only]`: the setting is on the project but not in your file. This includes an undeclared setting whose hosted value differs from the default.
+- `[local-only]`: the setting is in your file but not on the project.
 
-The diff compares only settings that a hosted project has. Local-stack sections, such as `[studio]`, `[analytics]`, ports, and `[realtime]`, never show as differences.
-
-<Admonition type="note">
-
-`config diff` also compares `db.major_version` and the pooler settings in `[db.pooler]`. `config push` cannot write these. Change them in the Dashboard. Refer to [What `config push` can write](#what-config-push-can-write).
-
-</Admonition>
+Local-stack sections, such as `[studio]`, `[analytics]`, `[realtime]`, and ports, never show as differences. `db.major_version` and `[db.pooler]` do show, but `config push` cannot write them. Change those in the Dashboard.
 
 ### Checking for drift in CI
 
-Pass `--exit-code` to make `config diff` exit with status `2` when it finds a difference. Errors exit with status `1`. A CI job can then fail when a project drifts from the file in your repo:
+With `--exit-code`, `config diff` exits with status `2` when it finds a difference, and `1` on an error. A CI job can then fail when a project drifts from your repo:
 
 ```bash
 supabase config diff --remote=<project-ref> --exit-code
@@ -115,35 +90,28 @@ For machine-readable output, add `--output-format json` or `--output-format stre
 
 ## Pull remote config into your file
 
-`supabase config pull` writes a project's current settings into your config file. Use it to capture the settings of an existing project, or to add a change that someone made in the Dashboard.
+`supabase config pull` writes a project's current settings into your config file. Use it to start from an existing project, or to bring in a change that someone made in the Dashboard.
 
 ```bash
-# Show what a pull writes, without writing anything
 supabase config pull --dry-run
-
-# Pull from the linked project
 supabase config pull
-
-# Pull from a branch into a [remotes.<name>] block
 supabase config pull --remote=staging
 ```
 
-How pull works:
-
 - **Preview.** `--dry-run` lists each difference and whether pull writes or skips it. It writes nothing and asks nothing.
-- **Confirmation.** In a terminal, pull asks before it writes. The default answer is Yes. Without a terminal, pull uses the default and writes.
-- **Small edits.** Pull changes only the values that differ. It keeps your comments, ordering, and other keys. This works for `config.toml`, `config.json`, and `config.jsonc`.
-- **Uncommitted changes.** If your config file has uncommitted git changes, pull does not write. Pass `--force` to write anyway. `--yes` does not override this check.
-- **Secrets.** Pull never writes secret values. Refer to [Secrets and environment variables](#secrets-and-environment-variables).
+- **Confirmation.** In a terminal, pull asks first, and the default answer is Yes. Without a terminal, pull uses the default and writes.
+- **Small edits.** Pull changes only the values that differ, and keeps your comments, ordering, and other keys. This works for `config.toml`, `config.json`, and `config.jsonc`.
+- **Uncommitted changes.** If your config file has uncommitted git changes, pull does not write. Pass `--force` to write anyway. `--yes` does not skip this check.
+- **Secrets.** Pull never writes secret values.
 
 <Admonition type="note" label="Where pulled values go">
 
-Pull picks where to write values in this order:
+Pull writes to the first match in this list:
 
-1. `--remote-label <name>` writes into `[remotes.<name>]`.
-2. A `[remotes.<name>]` block whose `project_id` matches the target gets the values.
-3. A branch target creates a `[remotes.<branch-name>]` block at the end of the file.
-4. Any other target writes to the top level of the file.
+1. `[remotes.<name>]`, when you pass `--remote-label <name>`.
+2. A `[remotes.<name>]` block whose `project_id` matches the target.
+3. A new `[remotes.<branch-name>]` block at the end of the file, for a branch target.
+4. The top level of the file.
 
 Refer to [Branch configuration](/docs/guides/deployment/branching/configuration) for how `[remotes]` blocks work.
 
@@ -151,37 +119,34 @@ Refer to [Branch configuration](/docs/guides/deployment/branching/configuration)
 
 ## Push local config to a project
 
-`supabase config push` applies the settings your config file declares to the linked project, or to the project or branch that `--remote` names.
+`supabase config push` applies the settings your config file declares to the target project.
 
 ```bash
-# Push to the linked project
 supabase config push
-
-# Push to a branch
 supabase config push --remote=staging
 ```
 
-Push reads the project's current settings, compares them with your file, and sends only the values that differ. Settings that your file does not declare keep their hosted values. Some settings must be sent as a group, such as SMTP or an OAuth provider. When one value in a group changes, push sends the group and uses the hosted values for the rest of it.
+Push compares your file with the project and sends only the values that differ. Settings that your file does not declare keep their hosted values. Some settings, such as SMTP or an OAuth provider, must be sent as a group. When one value in a group changes, push sends the group and uses the hosted values for the rest.
 
-Push prints the diff for each resource, then asks one question for all of them. The default answer is No.
+Push prints the diff for each resource, then asks one question that names the resources and the target. The default answer is No.
 
 <Admonition type="caution" label="Preview before you push">
 
 `config push` has no `--dry-run` flag. Run `supabase config diff` first and review the output.
 
-The file that `supabase init` creates holds local development values, such as `site_url = "http://127.0.0.1:3000"` and OAuth providers with `enabled = false`. If you push that file unchanged, those values replace the settings on your hosted project. For an existing project, run `supabase config pull` before your first push.
+The file that `supabase init` creates holds local development values, such as `site_url = "http://127.0.0.1:3000"` and OAuth providers with `enabled = false`. If you push that file unchanged, those values replace your hosted settings. For an existing project, run `supabase config pull` before your first push.
 
 </Admonition>
 
 ### Pushing from CI or an agent
 
-Push asks only in a terminal with text output, and not when an AI coding agent runs it. In any other run, push fails before it changes anything, unless you give consent:
+Push asks only in a terminal with text output, and never when an AI coding agent runs it. In any other run, push fails before it changes anything, unless you pass `--yes`:
 
 ```bash
 supabase config push --remote=<project-ref> --yes
 ```
 
-You can also export `SUPABASE_YES=1` in your shell. A `SUPABASE_YES` in a `.env` file does not count. Piped input, such as `echo y |`, does not confirm anything. Refer to [When the CLI can't ask](/docs/guides/local-development/local-and-hosted-projects#cannot-ask).
+You can also export `SUPABASE_YES=1` in your shell. `SUPABASE_YES` in a `.env` file does not count, and piped input such as `echo y |` does not confirm anything. Refer to [When the CLI can't ask](/docs/guides/local-development/local-and-hosted-projects#cannot-ask).
 
 ### What `config push` can write
 
@@ -197,20 +162,20 @@ Push writes these sections, in this order:
 | Storage              | `[storage]`                 | Includes S3 protocol, image transformation, analytics, and vector |
 | Database webhooks    | `[experimental.webhooks]`   | Enable only                                                       |
 
-Push does **not** write other settings, even when they are valid in the file. This includes the database major version, `[db.pooler]`, compute size, and custom domains. Change those in the Dashboard. Storage buckets and Edge Functions have their own commands: `supabase seed buckets` and `supabase functions deploy`.
+Push does **not** write other settings, even when they are valid in the file. This includes the database major version, `[db.pooler]`, compute size, and custom domains. Change those in the Dashboard. For Storage buckets and Edge Functions, use `supabase seed buckets` and `supabase functions deploy`.
 
-When a push enables a paid add-on, such as phone MFA, push prints the cost before it asks.
+When a push enables a paid add-on, such as phone MFA, it prints the cost before it asks.
 
 <Admonition type="note" label="The Dashboard stays editable">
 
-You can still change settings in the Dashboard after you manage a project from the file. A Dashboard change shows as a difference the next time you run `config diff`, and `config pull` adds it to the file. A later `config push` replaces the hosted value with the value in your file, so pull Dashboard changes before you push.
+You can still change settings in the Dashboard. A Dashboard change shows in the next `config diff`, and `config pull` adds it to your file. A `config push` replaces the hosted value with the value in your file, so pull Dashboard changes before you push.
 {/* NEEDS REVIEW: the CLI code confirms drift-then-pull and that push replaces declared hosted values. "No lock on the Dashboard" is product intent (Config Driven Development PRFAQ, MARKET-1590), not checked in platform code. Confirm with the PM. */}
 
 </Admonition>
 
 ## Targeting a branch
 
-All three commands accept `--remote=<value>`. The value can be a project ref, or the name or UUID of a branch of the linked project. A value of exactly 20 lowercase letters is always a project ref.
+All three commands accept `--remote=<value>`. The value is a project ref, or the name or UUID of a branch of the linked project. A value of exactly 20 lowercase letters is always a project ref.
 
 ```bash
 supabase config diff --remote=my-preview-branch
@@ -218,18 +183,12 @@ supabase config pull --remote=my-preview-branch
 supabase config push --remote=my-preview-branch
 ```
 
-Write the value with `=`. A bare `--remote` means the linked project, and it does not read the next word as a value.
+Use `=`. A bare `--remote` means the linked project, and it does not read the next word as its value.
 
-You can also link the CLI to a branch by name:
-
-```bash
-supabase link my-preview-branch
-```
-
-`config push` names the resources and the target in its confirmation question, so check the target before you answer.
+To link the CLI to a branch instead, run `supabase link my-preview-branch`.
 
 ## Deploying config on merge
 
 If you use [Branching](/docs/guides/deployment/branching) with the GitHub integration, you do not need `config push` for branches. When you push a config change to git, the integration applies it to the matching Supabase branch. Refer to [Branch configuration](/docs/guides/deployment/branching/configuration) and the [GitHub integration](/docs/guides/deployment/branching/github-integration).
 
-For every key the file supports, refer to the [CLI config reference](/docs/guides/local-development/cli/config). For every command and flag, refer to the [CLI reference](/docs/reference/cli).
+For every command and flag, refer to the [CLI reference](/docs/reference/cli).
