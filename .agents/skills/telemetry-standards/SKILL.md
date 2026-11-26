@@ -54,6 +54,7 @@ enabled, disabled, copied, exposed, failed, converted, closed, completed, applie
 - PascalCase properties
 - Inconsistent names across similar events (e.g., `assistantType` in one event, `aiType` in a related event)
 - Mixing camelCase and snake_case within the same event
+- A name another event already sends with a different type. PostHog keeps one type per property name across the whole project, so values of another type can read as empty in insights. Generic names (`step`, `type`, `status`, `count`) collide most: search `packages/common/telemetry-constants.ts` for the name first
 
 ## What NOT to Track
 
