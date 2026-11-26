@@ -661,7 +661,7 @@ describe('regions', () => {
       '/platform/replication/regions',
       '/platform/replication/:ref/sources',
       '/platform/replication/:ref/destinations',
-    ]) {
+    ] as const) {
       addAPIMock({
         method: 'get',
         path,
