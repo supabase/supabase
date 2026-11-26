@@ -27,6 +27,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
@@ -63,10 +64,19 @@ export const CreatePublishableAPIKeyDialog = () => {
     },
   })
 
+  const track = useTrack()
   const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
   const canCreateAPIKeys = createGrant.status === 'granted'
 
-  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation({
+    // Hook-level so the event still fires if the dialog unmounts before the request finishes
+    onSuccess: (_data, variables) =>
+      track(
+        'api_key_created',
+        { keyType: 'publishable', source: 'create_dialog' },
+        { project: variables.projectRef }
+      ),
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     if (!createGrant.grant) {
@@ -175,6 +185,7 @@ export const CreatePublishableAPIKeyDialog = () => {
               variant="primary"
               form={FORM_ID}
               type="submit"
+              data-attr="api-key-create"
               loading={isCreatingAPIKey}
               disabled={!canCreateAPIKeys}
             >
