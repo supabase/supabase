@@ -1,4 +1,3 @@
-import { useReplicationClusters } from './useReplicationClusters'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
@@ -40,6 +39,7 @@ import {
   useIsPipelinesSnowflakeEnabled,
 } from './useIsPipelinesEnabled'
 import { usePipelineList } from './usePipelineList'
+import { useReplicationClusters } from './useReplicationClusters'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
