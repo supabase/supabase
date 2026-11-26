@@ -18,10 +18,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { HIGH_AVAILABILITY_INSTANCE_SIZE, sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { HourlyBillingPanel } from '@/components/interfaces/Organization/BillingSettings/Subscription/HourlyBillingPanel'
-import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
-import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { formatHourlyRate, formatRoundedCurrency } from './PlanChangeSummary.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
 /**
@@ -90,62 +91,58 @@ export const HourlyBillingPanel = ({
         />
       </CollapsibleTrigger>
 
-      <CollapsibleContent className="px-3 pb-3">
-        <p className="text-sm text-foreground-light">
-          Each project is a dedicated server. It bills{' '}
-          <span translate="no">{formatHourlyRate(hourlyRate)}</span> for every hour it is
-          provisioned, busy or idle
-          {perProjectMonthlyPrice !== null && (
-            <span>
-              , which adds up to about{' '}
-              <span translate="no">{formatRoundedCurrency(perProjectMonthlyPrice)}/mo</span>
-            </span>
-          )}
-          <span>.</span>{' '}
-          <a
-            href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-            onClick={onComputeDocsClick}
+      <CollapsibleContent className="overflow-hidden data-open:animate-collapsible-down data-closed:animate-collapsible-up motion-reduce:animate-none">
+        <div className="px-3 pb-3">
+          <p className="text-sm text-foreground-light">
+            Each project is a dedicated server. It bills{' '}
+            <span translate="no">{formatHourlyRate(hourlyRate)}</span> for every hour it is
+            provisioned, busy or idle
+            {perProjectMonthlyPrice !== null && (
+              <span>
+                , which adds up to about{' '}
+                <span translate="no">{formatRoundedCurrency(perProjectMonthlyPrice)}/mo</span>
+              </span>
+            )}
+            <span>.</span>{' '}
+            <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
+              Learn about compute
+            </InlineLink>
+          </p>
+
+          <div className="mt-3 flex h-10 items-end gap-1" aria-hidden="true">
+            {HOURLY_ACTIVITY.map((activity, hour) => {
+              const isCurrentHour = hour === readoutHour
+
+              return activity === 0 ? (
+                <span
+                  key={hour}
+                  className={cn(
+                    'h-full flex-1 rounded-xs border transition-colors duration-150',
+                    isCurrentHour
+                      ? 'border-solid border-foreground-light bg-foreground-muted/30'
+                      : 'border-dashed border-foreground-muted'
+                  )}
+                />
+              ) : (
+                <span
+                  key={hour}
+                  className={cn(
+                    'flex-1 rounded-xs transition-colors duration-150',
+                    ACTIVITY_HEIGHT[activity],
+                    isCurrentHour ? 'bg-foreground' : 'bg-foreground-muted/60'
+                  )}
+                />
+              )
+            })}
+          </div>
+
+          <p
+            className="mt-1.5 text-right text-xs text-foreground-lighter tabular-nums"
+            translate="no"
           >
-            Learn about compute
-          </a>
-        </p>
-
-        <div className="mt-3 flex h-10 items-end gap-1" aria-hidden="true">
-          {HOURLY_ACTIVITY.map((activity, hour) => {
-            const isCurrentHour = hour === readoutHour
-
-            return activity === 0 ? (
-              <span
-                key={hour}
-                className={cn(
-                  'h-full flex-1 rounded-xs border transition-colors duration-150',
-                  isCurrentHour
-                    ? 'border-solid border-foreground-light bg-foreground-muted/30'
-                    : 'border-dashed border-foreground-muted'
-                )}
-              />
-            ) : (
-              <span
-                key={hour}
-                className={cn(
-                  'flex-1 rounded-xs transition-colors duration-150',
-                  ACTIVITY_HEIGHT[activity],
-                  isCurrentHour ? 'bg-foreground' : 'bg-foreground-muted/60'
-                )}
-              />
-            )
-          })}
+            {`${String(readoutHour).padStart(2, '0')}:00 · ${formatHourlyRate(hourlyRate * elapsedHours)} billed`}
+          </p>
         </div>
-
-        <p
-          className="mt-1.5 text-right text-xs text-foreground-lighter tabular-nums"
-          translate="no"
-        >
-          {`${String(readoutHour).padStart(2, '0')}:00 · ${formatHourlyRate(hourlyRate * elapsedHours)} billed`}
-        </p>
       </CollapsibleContent>
     </Collapsible>
   )
