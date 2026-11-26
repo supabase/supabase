@@ -31,7 +31,6 @@ const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-
 // needed by app source.
 const nextShims: Record<string, string> = {
   'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
-  'next/dynamic': path.join(compatRoot, 'dynamic.tsx'),
   'next/link': path.join(compatRoot, 'link.tsx'),
   'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),

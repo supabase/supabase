@@ -9,8 +9,7 @@ import {
   WarehouseIcon,
   WebhookIcon,
 } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { ComponentType, ReactNode } from 'react'
+import { ComponentType, lazy, ReactNode } from 'react'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -136,6 +135,108 @@ const authorSupabase = {
   websiteUrl: 'https://supabase.com',
 }
 
+const QueuePage = lazy(() =>
+  import('../Queues/QueuePage').then((mod) => ({ default: mod.QueuePage }))
+)
+const QueuesOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Queues/OverviewTab').then((mod) => ({
+    default: mod.QueuesOverviewTab,
+  }))
+)
+const QueuesTab = lazy(() =>
+  import('../Queues/QueuesTab').then((mod) => ({ default: mod.QueuesTab }))
+)
+const QueuesSettings = lazy(() =>
+  import('../Queues/QueuesSettings').then((mod) => ({ default: mod.QueuesSettings }))
+)
+
+const CronJobPage = lazy(() =>
+  import('../CronJobs/CronJobPage').then((mod) => ({ default: mod.CronJobPage }))
+)
+const CronOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then((mod) => ({
+    default: mod.CronOverviewTab,
+  }))
+)
+const CronjobsTab = lazy(() =>
+  import('../CronJobs/CronJobsTab').then((mod) => ({ default: mod.CronjobsTab }))
+)
+
+const VaultOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Vault/OverviewTab').then((mod) => ({
+    default: mod.VaultOverviewTab,
+  }))
+)
+const SecretsManagement = lazy(() =>
+  import('../Vault/Secrets/SecretsManagement').then((mod) => ({ default: mod.SecretsManagement }))
+)
+
+const WebhooksOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Webhooks/OverviewTab').then((mod) => ({
+    default: mod.WebhooksOverviewTab,
+  }))
+)
+const WebhooksListTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Webhooks/ListTab').then((mod) => ({
+    default: mod.WebhooksListTab,
+  }))
+)
+
+const DataApiOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/DataApi/OverviewTab').then((mod) => ({
+    default: mod.DataApiOverviewTab,
+  }))
+)
+const DataApiSettingsTab = lazy(() =>
+  import('@/components/interfaces/Integrations/DataApi/SettingsTab').then((mod) => ({
+    default: mod.DataApiSettingsTab,
+  }))
+)
+const DataApiDocsTab = lazy(() =>
+  import('@/components/interfaces/Integrations/DataApi/DocsTab').then((mod) => ({
+    default: mod.DataApiDocsTab,
+  }))
+)
+
+const WarehouseOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Warehouse/OverviewTab').then((mod) => ({
+    default: mod.WarehouseOverviewTab,
+  }))
+)
+
+const GraphQLOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then((mod) => ({
+    default: mod.GraphQLOverviewTab,
+  }))
+)
+const GraphiQLTab = lazy(() =>
+  import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then((mod) => ({
+    default: mod.GraphiQLTab,
+  }))
+)
+
+const WrapperOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Wrappers/OverviewTab').then((mod) => ({
+    default: mod.WrapperOverviewTab,
+  }))
+)
+const WrappersTab = lazy(() =>
+  import('@/components/interfaces/Integrations/Wrappers/WrappersTab').then((mod) => ({
+    default: mod.WrappersTab,
+  }))
+)
+
+const StripeSyncEngineOverviewTab = lazy(() =>
+  import('@/components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
+    (mod) => ({ default: mod.StripeSyncEngineOverviewTab })
+  )
+)
+const StripeSyncSettingsPage = lazy(() =>
+  import('@/components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+    (mod) => ({ default: mod.StripeSyncSettingsPage })
+  )
+)
+
 const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'queues',
@@ -174,28 +275,15 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     ],
     navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
-        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
-          loading: Loading,
-        })
+        return QueuePage
       }
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Queues/OverviewTab').then(
-                (mod) => mod.QueuesOverviewTab
-              ),
-            { loading: Loading }
-          )
+          return QueuesOverviewTab
         case 'queues':
-          return dynamic(() => import('../Queues/QueuesTab').then((mod) => mod.QueuesTab), {
-            loading: Loading,
-          })
+          return QueuesTab
         case 'settings':
-          return dynamic(
-            () => import('../Queues/QueuesSettings').then((mod) => mod.QueuesSettings),
-            { loading: Loading }
-          )
+          return QueuesSettings
       }
       return null
     },
@@ -231,25 +319,13 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     ],
     navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
-        return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
-          loading: Loading,
-        })
+        return CronJobPage
       }
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
-                (mod) => mod.CronOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return CronOverviewTab
         case 'jobs':
-          return dynamic(() => import('../CronJobs/CronJobsTab').then((mod) => mod.CronjobsTab), {
-            loading: Loading,
-          })
+          return CronjobsTab
       }
       return null
     },
@@ -281,22 +357,9 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
-                (mod) => mod.VaultOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return VaultOverviewTab
         case 'secrets':
-          return dynamic(
-            () => import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
-            {
-              loading: Loading,
-            }
-          )
+          return SecretsManagement
       }
       return null
     },
@@ -328,25 +391,9 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Webhooks/OverviewTab').then(
-                (mod) => mod.WebhooksOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return WebhooksOverviewTab
         case 'webhooks':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Webhooks/ListTab').then(
-                (mod) => mod.WebhooksListTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return WebhooksListTab
       }
       return null
     },
@@ -387,35 +434,11 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/DataApi/OverviewTab').then(
-                (mod) => mod.DataApiOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return DataApiOverviewTab
         case 'settings':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/DataApi/SettingsTab').then(
-                (mod) => mod.DataApiSettingsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return DataApiSettingsTab
         case 'docs':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/DataApi/DocsTab').then(
-                (mod) => mod.DataApiDocsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return DataApiDocsTab
       }
       return null
     },
@@ -442,15 +465,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     ],
     navigate: ({ pageId = 'overview' }) => {
       if (pageId === 'overview') {
-        return dynamic(
-          () =>
-            import('@/components/interfaces/Integrations/Warehouse/OverviewTab').then(
-              (mod) => mod.WarehouseOverviewTab
-            ),
-          {
-            loading: Loading,
-          }
-        )
+        return WarehouseOverviewTab
       }
       return null
     },
@@ -485,25 +500,9 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
-                (mod) => mod.GraphQLOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return GraphQLOverviewTab
         case 'graphiql':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
-                (mod) => mod.GraphiQLTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return GraphiQLTab
       }
       return null
     },
@@ -538,25 +537,9 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Wrappers/OverviewTab').then(
-                (mod) => mod.WrapperOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return WrapperOverviewTab
         case 'wrappers':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/Wrappers/WrappersTab').then(
-                (mod) => mod.WrappersTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return WrappersTab
       }
       return null
     },
@@ -601,21 +584,9 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
     navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
-                (mod) => mod.StripeSyncEngineOverviewTab
-              ),
-            { loading: Loading }
-          )
+          return StripeSyncEngineOverviewTab
         case 'settings':
-          return dynamic(
-            () =>
-              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
-                (mod) => mod.StripeSyncSettingsPage
-              ),
-            { loading: Loading }
-          )
+          return StripeSyncSettingsPage
       }
       return null
     },
