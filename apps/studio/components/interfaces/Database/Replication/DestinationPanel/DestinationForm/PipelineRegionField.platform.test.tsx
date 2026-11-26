@@ -24,7 +24,7 @@ test('shows the API default region as read-only information', async () => {
       }),
   })
 
-  customRender(<PipelineRegionField />)
+  customRender(<PipelineRegionField onRegionChange={() => {}} />)
 
   const region = screen.getByText(PIPELINE_REGION.displayName).closest('[aria-live="polite"]')
   expect(region).toHaveAttribute('aria-atomic', 'true')
