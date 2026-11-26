@@ -591,9 +591,9 @@ describe('regions', () => {
     renderRegions()
 
     expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
-    expect(await screen.findByText('Could not load results from Frankfurt')).toBeInTheDocument()
+    expect(await screen.findByText('Could not load pipelines from Frankfurt')).toBeInTheDocument()
     expect(
-      screen.getByText('Any pipelines in this region are missing from this view. Please try again.')
+      screen.getByText('Pipelines from Frankfurt are missing from this view.')
     ).toBeInTheDocument()
 
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
@@ -601,7 +601,7 @@ describe('regions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
     expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
-    expect(screen.queryByText('Could not load results from Frankfurt')).not.toBeInTheDocument()
+    expect(screen.queryByText('Could not load pipelines from Frankfurt')).not.toBeInTheDocument()
   })
 
   test('uses one loading row and one warning for several unavailable regions', async () => {
@@ -638,7 +638,7 @@ describe('regions', () => {
     } finally {
       pending.resolve()
     }
-    await screen.findByText('Could not load results from some regions')
+    await screen.findByText('Could not load pipelines from some regions')
     expect(screen.queryByText('Loading pipelines from remaining regions')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     const defaultRequests = requests.filter((cluster) => cluster === 'omitted').length
@@ -649,7 +649,9 @@ describe('regions', () => {
     }
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
     await waitFor(() =>
-      expect(screen.queryByText('Could not load results from some regions')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Could not load pipelines from some regions')
+      ).not.toBeInTheDocument()
     )
     expect(requests.filter((cluster) => cluster === 'omitted')).toHaveLength(defaultRequests)
   })
@@ -687,9 +689,11 @@ describe('regions', () => {
       })
     }
     renderRegions()
-    await screen.findByText('Failed to retrieve pipeline regions')
-    await screen.findByText('Failed to retrieve pipeline enablement status')
-    await screen.findByText('Could not load results from one region')
+    await screen.findByText('Could not load pipeline information')
+    await screen.findByText(
+      'Available regions, Pipelines enablement status, and pipelines from the default region are unavailable.'
+    )
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     unavailable = false
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
@@ -703,11 +707,13 @@ describe('regions', () => {
     mockRegionResources({ failingClusters: new Set(['omitted', '2']) })
     renderRegions()
 
-    expect(await screen.findByText('Could not load results from some regions')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Could not load pipelines from some regions')
+    ).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
     expect(
-      screen.getByText('Any pipelines in these regions are missing from this view:')
+      screen.getByText('Pipelines from these regions are missing from this view.')
     ).toBeInTheDocument()
     expect(screen.getAllByRole('listitem').some((item) => item.textContent === 'Singapore')).toBe(
       true
@@ -730,7 +736,7 @@ describe('regions', () => {
         HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
       )
     }
-    await screen.findByText('Could not load results from Frankfurt')
+    await screen.findByText('Could not load pipelines from Frankfurt')
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
   })
 
