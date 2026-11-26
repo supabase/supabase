@@ -1,18 +1,10 @@
-import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
 
+import { AccessLevelDropdown, type AccessLevel } from './AccessLevelDropdown'
 import type { FormSchemaWithOAuthAppScopedGrants } from './PublishAppSidePanel.utils'
 
-const accessLevels = ['No access', 'Read-only', 'Read and write']
+const accessLevels: AccessLevel[] = ['No access', 'Read only', 'Read and write']
 
 export function DirectDatabaseAccessPreview({
   isPreviewMemberBound,
@@ -21,7 +13,7 @@ export function DirectDatabaseAccessPreview({
 }) {
   const { control } = useFormContext<FormSchemaWithOAuthAppScopedGrants>()
   const isMemberBound = useWatch({ control, name: 'member_bound_grant' })
-  const [accessLevel, setAccessLevel] = useState('No access')
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>('No access')
   const isDisabled = isPreviewMemberBound || isMemberBound
 
   return (
@@ -40,27 +32,13 @@ export function DirectDatabaseAccessPreview({
         )}
         <p className="text-xs text-foreground-light">Local preview. This permission isn’t saved.</p>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            disabled={isDisabled}
-            iconRight={<ChevronDownIcon />}
-            aria-label={`Direct database access: ${isDisabled ? 'Unavailable' : accessLevel}`}
-          >
-            {isDisabled ? 'Unavailable' : accessLevel}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuRadioGroup value={accessLevel} onValueChange={setAccessLevel}>
-            {accessLevels.map((level) => (
-              <DropdownMenuRadioItem key={level} value={level}>
-                {level}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <AccessLevelDropdown
+        permission="Direct database access"
+        levels={accessLevels}
+        value={accessLevel}
+        disabled={isDisabled}
+        onChange={setAccessLevel}
+      />
     </div>
   )
 }
