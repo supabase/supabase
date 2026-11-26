@@ -160,6 +160,11 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
     ensureRegionSource,
   ])
 
+  let sourceStatus = ''
+  if (isSourceAvailabilityPending) sourceStatus = 'Checking pipeline sources'
+  else if (isCreatingSource) sourceStatus = 'Preparing pipeline region'
+  else if (chosenClusterId !== null && !regionSourceError) sourceStatus = 'Pipeline region is ready'
+
   const onClose = () => {
     checkIsDirtyRef.current = () => false
     setDestinationType(null)
@@ -229,7 +234,7 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
             </SheetHeader>
 
             <p role="status" aria-live="polite" className="sr-only">
-              {isSourceAvailabilityPending ? 'Checking pipeline sources' : ''}
+              {sourceStatus}
             </p>
             {(isAccessLoading || isEditLoading || isCreationLoading) && (
               <SheetSection>
@@ -305,7 +310,8 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
                   onCancel={confirmOnClose}
                   preferredClusterId={preferredCluster.clusterId}
                   onRegionChange={handleRegionChange}
-                  isPreparingRegion={isCreatingSource || regionSourceError !== null}
+                  isPreparingRegion={isCreatingSource}
+                  hasRegionPreparationError={regionSourceError !== null}
                 />
               </>
             )}
