@@ -159,6 +159,7 @@ const SQLEditorMainView = () => {
         id={id}
         snippetName={snippetName}
         className={cn(isDiffOpen && 'hidden')}
+        showPasteButton={!isDiffOpen}
         editorRef={editorRef}
         monacoRef={monacoRef}
         executeQuery={runQuery}

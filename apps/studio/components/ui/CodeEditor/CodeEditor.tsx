@@ -3,13 +3,17 @@ import { merge, noop } from 'lodash'
 import { Loader2Icon } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { RefObject, useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { toast } from 'sonner'
+import { Button, cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import {
   alignEditor,
   BASE_MONACO_EDITOR_OPTIONS,
   getEditorValueOrSelection,
+  isIOSDevice,
+  pasteClipboardIntoEditor,
+  shouldShowPasteButton,
 } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -19,6 +23,9 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
+
+const PASTE_FAILED_MESSAGE = 'Unable to read the clipboard. Copy the text again and retry.'
+const PASTE_EMPTY_MESSAGE = 'Your clipboard is empty'
 
 const DEFAULT_ACTIONS = {
   runQuery: { enabled: false, callback: noop },
@@ -51,6 +58,16 @@ interface CodeEditorProps {
   options?: EditorProps['options']
   value?: string
   placeholder?: string
+  /**
+   * Shows a Paste button over an empty, editable editor on iOS, where Monaco's touch layer
+   * swallows the long-press that would normally open the native paste menu. Emptiness follows
+   * `value` when it is provided; otherwise it is tracked from `defaultValue` and edits.
+   * Intended for uncontrolled (`defaultValue`) editors; a controlled editor should only opt in
+   * when `value` is the source of truth for its content. Swapping only `path` (`id`) without
+   * remounting does not reset the tracked emptiness, so callers that switch documents must
+   * remount (the SQL editor panel does so via `key`).
+   */
+  showPasteButton?: boolean
   /* Determines what actions to add for code editor context menu */
   actions?: Partial<{
     runQuery: CodeEditorActions
@@ -81,6 +98,7 @@ export const CodeEditor = ({
   options,
   value,
   placeholder,
+  showPasteButton = false,
   actions,
   editorRef: editorRefProps,
   monacoRef: monacoRefProps,
@@ -113,6 +131,33 @@ export const CodeEditor = ({
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
 
+  // Whitespace counts as content: only a truly zero-length document is "empty".
+  const [isUncontrolledEmpty, setIsUncontrolledEmpty] = useState((defaultValue ?? '').length === 0)
+  const [isEditorMounted, setIsEditorMounted] = useState(false)
+  const isEmpty = value !== undefined ? value.length === 0 : isUncontrolledEmpty
+  const [isIOS, setIsIOS] = useState(false)
+  const [hasClipboard, setHasClipboard] = useState(false)
+  const canShowPasteButton = shouldShowPasteButton({
+    showPasteButton,
+    isIOS,
+    isEmpty,
+    isReadOnly,
+    hasClipboard,
+    isEditorMounted,
+  })
+
+  useEffect(() => {
+    setIsIOS(isIOSDevice(navigator))
+    setHasClipboard(typeof navigator.clipboard?.readText === 'function')
+  }, [])
+
+  const handlePasteClick = () => {
+    void pasteClipboardIntoEditor(editorRef.current, navigator.clipboard).then((result) => {
+      if (result === 'failed') toast.error(PASTE_FAILED_MESSAGE)
+      if (result === 'empty') toast.info(PASTE_EMPTY_MESSAGE)
+    })
+  }
+
   const optionsMerged = merge(
     {
       ...BASE_MONACO_EDITOR_OPTIONS,
@@ -129,11 +174,13 @@ export const CodeEditor = ({
   const handleMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
+    setIsEditorMounted(true)
     alignEditor(editor)
 
     hasValue.current = editor.createContextKey('hasValue', false)
     hasValue.current.set(value !== undefined && value.trim().length > 0)
     setShowPlaceholder(showPlaceholderDefault)
+    setIsUncontrolledEmpty(editor.getValue().length === 0)
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
       if (commandMenuHotkeyEnabledRef.current) {
@@ -196,6 +243,7 @@ export const CodeEditor = ({
       hasValue.current.set((value ?? '').length > 0)
     }
     setShowPlaceholder(!value)
+    setIsUncontrolledEmpty(!value)
     onInputChange(value)
   }
 
@@ -271,6 +319,11 @@ export const CodeEditor = ({
         onMount={handleMount}
         onChange={onChangeContent}
       />
+      {canShowPasteButton && (
+        <Button className="absolute bottom-3 right-4 z-10" onClick={handlePasteClick}>
+          Paste
+        </Button>
+      )}
       {placeholder !== undefined && (
         <div
           className={cn(
