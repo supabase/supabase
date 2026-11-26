@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { FrameworkImage } from 'common'
 import { cn } from 'ui'
 
 interface TweetCard {
@@ -23,11 +23,12 @@ export function TweetCard(props: TweetCard) {
         <div className="flex items-center gap-2">
           {props.img_url ? (
             <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
-              <Image
+              <FrameworkImage
                 src={props.img_url}
                 width="64"
                 height="64"
-                alt={`${props.handle} twitter image`}
+                alt=""
+                aria-hidden="true"
               />
             </div>
           ) : (

@@ -45,9 +45,11 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
-const KEYWORDS_PARAM_PATTERN = /([?&]keywords=)[^&#]*/g
+const KEYWORDS_PARAM_PATTERN = /([?&](?:keywords|schema)=)[^&#]*/g
 
-// Studio's Auth users page keeps its search term, often an end user's email, in `keywords`.
+// URL params whose values are customer data:
+// - `keywords`: Studio's Auth users page keeps its search term, often an end user's email, here.
+// - `schema`: Studio's database pages keep the selected schema name here, which a customer names.
 export function redactUrlKeywords(url: string) {
   return url.replace(KEYWORDS_PARAM_PATTERN, '$1redacted')
 }

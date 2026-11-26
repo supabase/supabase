@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -16,7 +15,7 @@ export const StorageVersioningPreview = () => {
         versions automatically and keep storage costs in check.
       </p>
 
-      <Image
+      <img
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
         height={900}

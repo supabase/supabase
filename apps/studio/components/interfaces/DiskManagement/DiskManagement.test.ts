@@ -16,12 +16,29 @@ import {
   calculateMaxIopsForComputeSize,
   calculateMaxThroughput,
   calculateThroughputPrice,
+  canRightSizeDisk,
   mapAddOnVariantIdToComputeSize,
   mapComputeSizeNameToAddonVariantId,
 } from './DiskManagement.utils'
 import { DiskType } from './ui/DiskManagement.constants'
 
 describe('DiskManagement utils', () => {
+  describe('canRightSizeDisk', () => {
+    test('returns true when the disk is larger than 8 GB', () => {
+      expect(canRightSizeDisk(9)).toBe(true)
+      expect(canRightSizeDisk(200)).toBe(true)
+    })
+
+    test('returns false when the disk is 8 GB or smaller', () => {
+      expect(canRightSizeDisk(8)).toBe(false)
+      expect(canRightSizeDisk(1)).toBe(false)
+    })
+
+    test('returns false when the disk size is unknown', () => {
+      expect(canRightSizeDisk(undefined)).toBe(false)
+    })
+  })
+
   describe('mapComputeSizeNameToAddonVariantId', () => {
     test('maps known infra sizes to addon variant ids', () => {
       expect(mapComputeSizeNameToAddonVariantId('4xlarge')).toBe('ci_4xlarge')

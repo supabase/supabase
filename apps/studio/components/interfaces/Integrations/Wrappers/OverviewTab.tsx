@@ -2,6 +2,8 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
@@ -9,7 +11,6 @@ import { AddWrapperButton } from './AddWrapperButton'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -98,11 +99,11 @@ export const WrapperContent = () => {
 
   if (!wrapperMeta) {
     return (
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth>
+      <PageContainer>
+        <PageSection>
           <p className="text-sm text-foreground-light">Unsupported integration type</p>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection>
+      </PageContainer>
     )
   }
 

@@ -20,11 +20,11 @@ import {
   generateCommandClassNames,
   TextHighlighter,
   useCommandMenuTelemetryContext,
-  useCrossCompatRouter,
   useQuery,
   useSetCommandMenuOpen,
   useSetQuery,
 } from '../..'
+import { useCrossCompatRouter } from '../../api/hooks/useCrossCompatRouter'
 import { BASE_PATH } from '../shared/constants'
 
 const questions = [

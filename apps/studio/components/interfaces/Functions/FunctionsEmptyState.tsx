@@ -5,10 +5,10 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { PageSectionTitle } from 'ui-patterns/PageSection'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
@@ -44,7 +44,7 @@ export const FunctionsEmptyState = () => {
     : 'Add your first edge function'
 
   return (
-    <>
+    <div>
       <Card>
         <CardHeader>
           <CardTitle>{emptyStateTitle}</CardTitle>
@@ -149,9 +149,7 @@ export const FunctionsEmptyState = () => {
       </Card>
       {IS_PLATFORM && (
         <>
-          <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
-            Start with a template
-          </ScaffoldSectionTitle>
+          <PageSectionTitle className="mb-4 mt-12">Start with a template</PageSectionTitle>
           <ResourceList>
             {templates.map((template) => (
               <ResourceItem
@@ -173,7 +171,7 @@ export const FunctionsEmptyState = () => {
           </ResourceList>
         </>
       )}
-    </>
+    </div>
   )
 }
 

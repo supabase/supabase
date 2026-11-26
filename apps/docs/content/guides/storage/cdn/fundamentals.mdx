@@ -1,35 +1,56 @@
 ---
 id: 'storage-cdn'
 title: 'Storage CDN'
-description: 'Learn how Supabase Storage caches objects with a CDN.'
+description: 'Learn how Supabase Storage caches objects on a CDN, how a cache hit differs from a cache miss, and why public buckets cache better than private buckets.'
 sidebar_label: 'CDN'
 ---
 
-All assets uploaded to Supabase Storage are cached on a Content Delivery Network (CDN) to improve the latency for users all around the world. CDNs are a geographically distributed set of servers or **nodes** which cache content from an **origin server**. For Supabase Storage, the origin is the storage server running in the [same region as your project](/dashboard/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service (DDoS) and other application attacks.
+Knowing how the Storage cache works tells you why a first request is slower than the next one, and why public buckets cache better than private buckets. For how to remove an object from the cache, see [Purge CDN cache](/docs/guides/storage/cdn/purge-cdn-cache).
 
-## Example
+## How caching works
 
-The following example shows how a CDN helps with performance.
+Supabase Storage caches every object you upload on a Content Delivery Network (CDN), to lower latency for users around the world. A CDN is a geographically distributed set of servers or _nodes_ which cache content from an _origin server_. For Supabase Storage, the origin is the storage server running in the [same region as your project](/dashboard/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service (DDoS) and other application attacks.
 
-A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API are routed to the CDN first.
+For example, take a project in Singapore. Every request to its Storage API goes to the CDN first:
 
-A user from the United States requests an object and is routed to the U.S. CDN. At this point, that CDN node does not have the object in its cache and pings the origin server in Singapore.
-![CDN cache miss](/docs/img/cdn-cache-miss.png)
+1. A user in the United States requests an object and is routed to the U.S. CDN node. The node doesn't have the object in its cache yet, so it fetches it from the origin server in Singapore.
 
-Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
-![CDN cache hit](/docs/img/cdn-cache-hit.png)
+   ![Sequence diagram of a cache miss. The client sends a request to the Supabase CDN, which forwards it to the Supabase Storage server. The server returns the asset, the CDN caches it, and the CDN sends the response to the client.](/docs/img/cdn-cache-miss.png)
+
+2. Another user in the United States requests the same object. The U.S. node serves it directly from its cache, without routing the request back to Singapore.
+
+   ![Sequence diagram of a cache hit. The client sends a request to the Supabase CDN, which responds from its cache. The request never reaches the Supabase Storage server.](/docs/img/cdn-cache-hit.png)
+
+A CDN works similar to a library system. When a branch doesn't have the book you ask for, it orders a copy from the central library, then keeps it on the shelf for the next reader. A CDN node does the same with your objects.
 
 <Admonition type="note">
 
-Note that CDNs might still evict your object from their cache if it has not been requested for a while from a specific region. For example, if no user from United States requests your object, it will be removed from the CDN cache even if we set a very long cache control duration.
+A CDN can still evict your object from its cache if no one in a region has requested it for a while. For example, if no user in the United States requests your object, the U.S. CDN node removes it from its cache, even with a long cache-control duration.
 
 </Admonition>
 
-The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
+The `cf-cache-status` response header shows the cache status of each request:
+
+| Status | Meaning                                                                |
+| ------ | ---------------------------------------------------------------------- |
+| `MISS` | The CDN node didn't have the object, so it fetched it from the origin. |
+| `HIT`  | The CDN node served the object from its cache.                         |
+
+When you measure cache hits in your logs, `STALE`, `REVALIDATED`, and `UPDATING` also count as hits. For how to query them, see [Cache metrics](/docs/guides/storage/cdn/metrics).
 
 ## Public vs private buckets
 
-Objects in public buckets do not require any authorization to access objects. This leads to a better cache hit rate compared to private buckets.
+Public buckets cache better than private buckets, because Storage checks each user's permissions for objects in a private bucket. The following table compares the two when two users request the same object from the same region:
 
-For private buckets, permissions for accessing each object is checked on a per user level. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them.
-On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
+|                           | Public bucket | Private bucket                                                     |
+| ------------------------- | ------------- | ------------------------------------------------------------------ |
+| Authorization             | None          | Checked for each object and user                                   |
+| Result for the first user | Cache miss    | Cache miss                                                         |
+| Result for the next user  | Cache hit     | Cache miss, because each user can have different security policies |
+| Cache hit rate            | Higher        | Lower                                                              |
+
+## Related resources
+
+- [Purge CDN cache](/docs/guides/storage/cdn/purge-cdn-cache): remove a stale object from the cache.
+- [Smart CDN](/docs/guides/storage/cdn/smart-cdn): how Storage invalidates cached objects when they change.
+- [Storage buckets](/docs/guides/storage/buckets/fundamentals): choose between public and private buckets.

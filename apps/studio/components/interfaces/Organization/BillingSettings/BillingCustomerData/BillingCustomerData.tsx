@@ -7,6 +7,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
@@ -15,11 +23,6 @@ import {
   getAddressElementAppearanceOptions,
   STRIPE_ELEMENT_FONTS,
 } from '@/components/interfaces/Billing/Payment/Payment.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -172,19 +175,19 @@ export const BillingCustomerData = () => {
   )
 
   return (
-    <ScaffoldSection ref={ref}>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
-          <p className="text-sm text-foreground-light m-0">
-            Changes will be reflected in every upcoming invoice, past invoices are not affected
-          </p>
-          <p className="text-sm text-foreground-light m-0">
-            A Tax ID is only required for registered businesses.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+    <PageSection ref={ref} orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Billing Address &amp; Tax ID</PageSectionTitle>
+          <PageSectionDescription className="space-y-2">
+            <p>
+              Changes will be reflected in every upcoming invoice, past invoices are not affected
+            </p>
+            <p>A Tax ID is only required for registered businesses.</p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent className="flex flex-col gap-6">
         {selectedOrganization && isPartnerBilledOrganization ? (
           <PartnerManagedResource
             managedBy={selectedOrganization?.managed_by}
@@ -257,7 +260,7 @@ export const BillingCustomerData = () => {
             )}
           </>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }

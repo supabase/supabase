@@ -53,7 +53,7 @@ They're stored in a new system table: `storage.buckets_iceberg`. These buckets a
   src="/images/blog/launch-week-15/day-2-analytics-buckets/img4.png"
 />
 
-After creating the bucket, we're met with connection details. Copy the `WAREHOUSE`, `VAULT_TOKEN`, and `CATALOG_URI` values and and create an Iceberg namespace and table using your preferred method. The example below uses pyiceberg to create a namespace `market` with table `prices`:
+After creating the bucket, we're met with connection details. Copy the `WAREHOUSE`, `VAULT_TOKEN`, and `CATALOG_URI` values and create an Iceberg namespace and table using your preferred method. The example below uses pyiceberg to create a namespace `market` with table `prices`:
 
 ```python
 import datetime

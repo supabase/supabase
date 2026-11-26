@@ -1,3 +1,9 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -26,10 +32,6 @@ const { mockTabsState, mockEditorType } = vi.hoisted(() => ({
 
 vi.mock('common', () => ({
   useParams: () => ({ ref: 'default' }),
-}))
-
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/project/default/editor/1',
 }))
 
 vi.mock('@/state/tabs', () => ({
@@ -86,12 +88,23 @@ describe('EditorBaseLayout browser title', () => {
     }
   })
 
-  it('prefers the live tab label over stale metadata when composing the title entity', () => {
-    render(
-      <EditorBaseLayout title="Tables" product="Table Editor">
-        <div>Page content</div>
-      </EditorBaseLayout>
+  const renderEditorLayout = (initialUrl = '/project/default/editor/1') => {
+    const router = createRouter({
+      routeTree: createRootRoute(),
+      history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    })
+
+    return render(
+      <RouterContextProvider router={router}>
+        <EditorBaseLayout title="Tables" product="Table Editor">
+          <div>Page content</div>
+        </EditorBaseLayout>
+      </RouterContextProvider>
     )
+  }
+
+  it('prefers the live tab label over stale metadata when composing the title entity', () => {
+    renderEditorLayout()
 
     expect(JSON.parse(screen.getByTestId('browser-title').textContent ?? '{}')).toEqual({
       section: 'Tables',
@@ -102,11 +115,7 @@ describe('EditorBaseLayout browser title', () => {
   it('falls back to metadata when a tab does not have a label yet', () => {
     mockTabsState.tabsMap['r-1'].label = undefined
 
-    render(
-      <EditorBaseLayout title="Tables" product="Table Editor">
-        <div>Page content</div>
-      </EditorBaseLayout>
-    )
+    renderEditorLayout()
 
     expect(JSON.parse(screen.getByTestId('browser-title').textContent ?? '{}')).toEqual({
       section: 'Tables',

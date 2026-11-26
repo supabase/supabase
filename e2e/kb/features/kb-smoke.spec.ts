@@ -8,6 +8,28 @@ test('home page links to guides', async ({ page }) => {
   await expect(page.locator('a[href^="/kb/guides/"]').first()).toBeVisible()
 })
 
+for (const { path, canvas } of [
+  { path: '/kb', canvas: '[data-warp-canvas]' },
+  { path: '/kb/topics/migration', canvas: '[data-frame-glyphs]' },
+]) {
+  test(`hero on ${path} draws without react`, async ({ page }) => {
+    await page.route('**/_astro/client.*.js', (route) => route.abort())
+    await page.goto(path)
+    await expect(page.locator(canvas)).toHaveAttribute('width', /^[1-9]/)
+    await expect
+      .poll(() =>
+        page.locator(canvas).evaluate(
+          (element: HTMLCanvasElement) =>
+            element
+              .getContext('2d')
+              ?.getImageData(0, 0, element.width, element.height)
+              .data.some((value, index) => index % 4 === 3 && value > 0) ?? false
+        )
+      )
+      .toBe(true)
+  })
+}
+
 test('topic page links to a guide that renders', async ({ page }) => {
   await page.goto('/kb/topics/migration')
   await page.locator('a[href^="/kb/guides/"]').first().click()

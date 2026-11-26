@@ -121,8 +121,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
-  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-    `free-micro-upgrade-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-at-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
@@ -146,8 +146,6 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
   IA_NAV_FLAG: 'docs-ia-mvp-v1',
   DOCS_PAGE_ACTION: 'docs.ui.page-action',
-
-  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
   /**
    * WWW
@@ -175,7 +173,6 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
-  LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.DOCS_PAGE_ACTION,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,

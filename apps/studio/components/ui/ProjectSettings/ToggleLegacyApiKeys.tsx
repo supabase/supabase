@@ -29,6 +29,7 @@ import {
   useGrant,
   type GrantResult,
 } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
@@ -203,10 +204,19 @@ const ToggleApiKeysModal = ({
   toggleGrant: GrantResult<'PUT /v1/projects/{ref}/api-keys/legacy'>
 }) => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
-    useToggleLegacyAPIKeysMutation()
+    useToggleLegacyAPIKeysMutation({
+      // Hook-level so the event still fires if the modal unmounts before the request finishes
+      onSuccess: (_data, variables) =>
+        track(
+          'legacy_api_keys_updated',
+          { enabled: variables.enabled },
+          { project: variables.projectRef }
+        ),
+    })
 
   const onToggleLegacyAPIKeysEnabled = () => {
     if (!toggleGrant.grant) {

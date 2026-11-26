@@ -1,11 +1,17 @@
 'use client'
 
 import { isFeatureEnabled } from 'common'
+import { logOut, useUser } from 'common/auth'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
-import { TopNavDropdown, TopNavThemeGroup } from 'ui-patterns/TopNav/TopNavDropdown'
+import {
+  TopNavAccountItems,
+  TopNavDropdown,
+  TopNavSignOutItem,
+  TopNavThemeGroup,
+} from 'ui-patterns/TopNav/TopNavDropdown'
 
 import MenuIconPicker from './MenuIconPicker'
 
@@ -49,9 +55,21 @@ const menu = [
 
 const DocsTopNavDropdown = () => {
   const { theme, setTheme } = useTheme()
+  const user = useUser()
+
+  const handleSignOut = async () => {
+    await logOut()
+    window.location.reload()
+  }
 
   return (
     <TopNavDropdown>
+      {user ? (
+        <>
+          <TopNavAccountItems email={user.email} />
+          <DropdownMenuSeparator />
+        </>
+      ) : null}
       {menu.map((menuSection) => (
         <Fragment key={menuSection[0].label}>
           {menuSection.map((sectionItem) => (
@@ -66,6 +84,12 @@ const DocsTopNavDropdown = () => {
         </Fragment>
       ))}
       <TopNavThemeGroup value={theme} onValueChange={setTheme} />
+      {user ? (
+        <>
+          <DropdownMenuSeparator />
+          <TopNavSignOutItem onSelect={handleSignOut} />
+        </>
+      ) : null}
     </TopNavDropdown>
   )
 }

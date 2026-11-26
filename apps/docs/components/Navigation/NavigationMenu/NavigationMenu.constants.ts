@@ -224,6 +224,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      icon: 'reference',
       menuItems: [
         [
           {
@@ -2104,6 +2105,14 @@ export const storage: NavMenuConstant = {
           url: '/guides/storage/buckets/creating-buckets' as `/${string}`,
         },
         {
+          name: 'Object Versioning',
+          url: '/guides/storage/buckets/object-versioning' as `/${string}`,
+        },
+        {
+          name: 'Lifecycle Policies',
+          url: '/guides/storage/buckets/lifecycle-policies' as `/${string}`,
+        },
+        {
           name: 'Security',
           url: '/guides/storage/security',
           items: [
@@ -3592,6 +3601,17 @@ export const reference_swift_v1 = {
 }
 
 export const reference_swift_v2 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase-swift',
+    repo: 'https://github.com/supabase/supabase-swift',
+  },
+}
+
+export const reference_swift_v3 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',

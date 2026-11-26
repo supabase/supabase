@@ -1,8 +1,8 @@
 'use client'
 
+import { FrameworkLink } from 'common'
 import dayjs from 'dayjs'
 import { ChevronRight, HelpCircle } from 'lucide-react'
-import Link from 'next/link'
 import * as React from 'react'
 import { useContext } from 'react'
 import {
@@ -94,10 +94,10 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
                 asChild
               >
                 {href ? (
-                  <Link href={href}>
+                  <FrameworkLink href={href}>
                     <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
                     <span className="sr-only">More information</span>
-                  </Link>
+                  </FrameworkLink>
                 ) : (
                   <span>
                     <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />

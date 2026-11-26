@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { Badge, cn } from 'ui'
 
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
 
@@ -21,7 +21,7 @@ interface NavigationItemProps
 
 export const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
   const { setOpen } = useMobileMenu()
-  const { framework } = useFramework()
+  const { framework } = useFrameworkPreference()
   const pathname = usePathname()
 
   const pathParts = pathname.split('/')

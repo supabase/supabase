@@ -1,6 +1,5 @@
 import { ChevronsUpDownIcon, LightbulbIcon } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
@@ -22,11 +21,8 @@ interface QueryDetailProps {
 }
 
 // Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
-const SqlMonacoBlock = dynamic(
-  () => import('./SqlMonacoBlock').then(({ SqlMonacoBlock }) => SqlMonacoBlock),
-  {
-    ssr: false,
-  }
+const SqlMonacoBlock = lazy(() =>
+  import('./SqlMonacoBlock').then(({ SqlMonacoBlock }) => ({ default: SqlMonacoBlock }))
 )
 
 export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: QueryDetailProps) => {
@@ -98,10 +94,12 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             isExpanded ? 'h-[348px]' : 'h-[120px]'
           )}
         >
-          <SqlMonacoBlock
-            value={query}
-            wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
-          />
+          <Suspense fallback={null}>
+            <SqlMonacoBlock
+              value={query}
+              wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
+            />
+          </Suspense>
           {isLinterWarning && (
             <Alert
               variant="default"

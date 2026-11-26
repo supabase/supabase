@@ -74,6 +74,8 @@ Append `?download=true` to the Metadata URL to download the Metadata XML file. T
 
 Alternatively, you can use the `supabase sso info --remote=<your-project>` [command](/docs/reference/cli/supabase-sso-info) to get setup information for your project.
 
+These values are shared by every connection in your project. If your identity provider doesn't allow the same `EntityID` in more than one application, such as Microsoft Entra, use a [dedicated scope](#use-a-dedicated-scope-for-a-connection) for each connection.
+
 ### User accounts and identities
 
 User accounts and identities created via SSO differ from regular (email, phone, password, social sign-in...) accounts in these ways:
@@ -92,9 +94,9 @@ You can use information about the SSO identity provider in Row Level Security po
 Here are some commonly used statements to extract SSO related information from the user's JWT:
 
 - `auth.jwt()#>>'{amr,0,method}'`
-  Returns the name of the last method used to verify the identity of this user. With SAML SSO this is `sso/saml`.
-- `auth.jwt()#>>'{amr,0,provider}'`
-  Returns the UUID of the SSO identity provider used by the user to sign in.
+  Returns the name of the most recent method used to verify the identity of this user. After a SAML SSO sign-in this is `sso/saml`. After an MFA step it is the MFA method, such as `totp`.
+- `auth.jwt()->'amr'`
+  Returns the authentication methods for the session. Find the entry whose `method` is `sso/saml` and read its `provider` to get the UUID of the SSO identity provider used to sign in. The policy example below shows the full lookup.
 - `auth.jwt()#>>'{user_metadata,iss}'`
   Returns the identity provider's SAML 2.0 `EntityID`
 
@@ -119,16 +121,29 @@ create table organization_settings (
   -- billing plan (paid, Free, Enterprise)
   billing_plan text
 );
+
+alter table organization_settings enable row level security;
 ```
 
-You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management:
+You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management. Restrictive policies only filter rows that a permissive policy allows, so the example adds a permissive `SELECT` policy and keeps the restrictive policy to limit rows to the user's SSO identity provider:
 
 ```sql
+CREATE POLICY "Authenticated can view organization settings."
+  ON organization_settings
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
 CREATE POLICY "View organization settings."
   ON organization_settings
   AS RESTRICTIVE
   USING (
-    sso_provider_id = (select auth.jwt()#>>'{amr,0,provider}')
+    sso_provider_id = (
+      select (entry->>'provider')::uuid
+      from jsonb_array_elements(coalesce(auth.jwt()->'amr', '[]'::jsonb)) as entry
+      where entry->>'method' = 'sso/saml'
+      limit 1
+    )
   );
 ```
 
@@ -259,6 +274,37 @@ Calling [`SignInWithSSO`](/docs/reference/csharp/auth-signinwithsso) starts the 
 </TabPanel>
 </$Show>
 </Tabs>
+
+### Use a dedicated scope for a connection
+
+By default, every SAML connection in a project shares one `EntityID`, Metadata URL, and ACS URL. Microsoft Entra requires a unique `EntityID` for each application in a tenant, so the shared values work for only one Entra application.
+
+A connection with a dedicated scope has its own `EntityID`, Metadata URL, and ACS URL, so you can register one identity provider application for each connection.
+
+| Name                        | Shared (default)                                                 | Dedicated scope                                                                   |
+| --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `EntityID` and Metadata URL | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/saml/metadata` | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/YOUR_PROVIDER_ID/saml/metadata` |
+| ACS URL                     | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/saml/acs`      | `https://YOUR_PROJECT_REF.supabase.co/auth/v1/sso/YOUR_PROVIDER_ID/saml/acs`      |
+
+To set a dedicated scope, add the `--dedicated-scope` flag when you [add the connection](/docs/reference/cli/supabase-sso-add). You can't change it later with `supabase sso update`.
+
+```bash
+supabase sso add --type saml --remote=YOUR_PROJECT_REF \
+  --metadata-url 'https://company.com/idp/saml/metadata' \
+  --domains company.com \
+  --dedicated-scope
+```
+
+`supabase sso show YOUR_PROVIDER_ID --remote=YOUR_PROJECT_REF` prints the connection's `SP ENTITY ID` and `SP ACS URL`. `supabase sso info` prints only the shared values.
+
+#### Set up the identity provider application
+
+The dedicated URLs contain the provider ID, which exists only after you add the connection. If your identity provider needs the URLs when you create the application, such as Okta, start with the shared values and then switch:
+
+1. Create the application in the identity provider with the shared `EntityID` and ACS URL from `supabase sso info`.
+2. Add the connection with `--dedicated-scope`, using the application's Metadata URL.
+3. Run `supabase sso show` and copy the `SP ENTITY ID` and `SP ACS URL`.
+4. Edit the application to use those values.
 
 ### Understanding attribute mappings
 

@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
 import { OAuthAppsAuthorizeApproveData } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
@@ -221,6 +221,61 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
+  test('blocks organization-wide authorization when preflight reports insufficient permissions', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsAuthorizeRequestData>(
+          createMockRequest({ project_scoping_mode: false })
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({ slug: 'northwind-traders', name: 'Northwind Traders' }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsPreflightValidationData>(
+          createMockPreflight({
+            validation_failure: {
+              scope_target: 'all_projects',
+              role: { name: 'read-only' },
+              failed_scopes: ['database:write'],
+            },
+          })
+        ),
+    })
+    const approve = vi.fn(() => HttpResponse.json<OAuthAppsAuthorizeApproveData>({ url: '' }))
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: approve,
+    })
+
+    renderScreen()
+
+    expect(
+      await screen.findByText('You don’t have permission to authorize this application')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Permissions requested' })).not.toBeInTheDocument()
+    const authorize = screen.getByRole('button', { name: 'Authorize Vercel' })
+    expect(authorize).toBeDisabled()
+    fireEvent.click(authorize)
+    expect(approve).not.toHaveBeenCalled()
+  })
+
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
@@ -311,8 +366,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
-    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
+    expect(screen.getByRole('heading', { name: 'Read only' }).parentElement).toHaveTextContent(
+      'Secrets, Projects, Edge Functions, Storage'
+    )
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -377,7 +437,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/test@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared, exactly once, without the member-bound copy', async () => {
+  test('keeps organization-bound consent focused on the requested access', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -422,17 +482,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
+    await screen.findByText('Permissions requested')
     expect(
-      screen.getAllByText(
-        'Have them authorize Vercel from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
-      )
-    ).toHaveLength(1)
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/This authorization will appear in Authorized apps/)
-    ).toBeInTheDocument()
+      screen.queryByText('Some requested permissions exceed your role')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
@@ -464,9 +518,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     expect(
-      await screen.findByText(/No admin approval is needed if your role permits this access/)
+      await screen.findByText(/The app can only use the permissions listed below/)
     ).toBeInTheDocument()
-    expect(screen.getByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
   })
@@ -666,7 +720,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    expect(screen.getByRole('radio', { name: 'Selected projects only' })).toBeChecked()
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox', { name: 'Projects' })).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -721,7 +776,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeChecked()
+      expect(screen.getByRole('radio', { name: 'All current and future projects' })).toBeChecked()
     })
     await enabledAuthorizeButton()
   })
@@ -863,7 +918,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText(/northwind-storefront/)).not.toBeInTheDocument()
   })
 
-  test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
+  test('reconsent groups added, removed, and unchanged permissions by access level', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -909,19 +964,15 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    await screen.findByText('Already granted (2)')
-    const findSpanWithText = (text: string) =>
-      screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
-    await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
-    await findSpanWithText('Edge Functions (New)')
-    await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
-
-    expect(screen.queryByText('Database')).toBeNull()
-    fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    const readWrite = await screen.findByRole('list', { name: 'Read and write' })
+    const read = screen.getByRole('list', { name: 'Read only' })
+    expect(readWrite).toHaveTextContent('EnvironmentAdded')
+    expect(readWrite).toHaveTextContent('AnalyticsAdded')
+    expect(read).toHaveTextContent('AnalyticsRemoved')
+    expect(readWrite).toHaveTextContent('SecretsRemoved')
+    expect(read).toHaveTextContent('SecretsAdded')
+    expect(read).toHaveTextContent('RestRemoved')
+    expect(readWrite).toHaveTextContent('Database managementUnchanged')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {
@@ -1052,11 +1103,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
       response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
     })
     addAPIMock({
-      path: '/platform/oauth/authorizations/:id',
-      method: 'get',
-      response: () => HttpResponse.json<OAuthAppsAuthorizeRequestData>(createMockRequest()),
-    })
-    addAPIMock({
       path: '/platform/organizations/:slug/oauth/authorizations/:id',
       method: 'post',
       response: async () => {
@@ -1069,6 +1115,224 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     await selectProject('northwind-cms')
+    fireEvent.click(await enabledAuthorizeButton())
+    expect(await screen.findByText('Authorizing...')).toBeInTheDocument()
+    expect(screen.getByText("Don't close this window.")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('You can return to Vercel to continue')).toBeInTheDocument()
+  })
+
+  test('if the request has approved_organization_slug, it should take precedence over the provided organization slug and so does approved_project_refs', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsAuthorizeRequestData>(
+          createMockRequest({
+            approved_organization_slug: 'the-approved-organization-slug',
+            approved_project_refs: [
+              'approved-organization-project-1',
+              'approved-organization-project-2',
+            ],
+          })
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            id: 2,
+            slug: 'northwind-traders',
+            name: 'Northwind Traders',
+          }),
+          createMockOrganization({
+            slug: 'the-approved-organization-slug',
+            name: 'Approved Organization',
+          }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OrgProjectsResponse>(
+          createMockOrganizationProjects([
+            createMockOrganizationProject({
+              ref: 'approved-organization-project-1',
+              name: 'Approved Project 1',
+            }),
+            createMockOrganizationProject({
+              ref: 'not-approved-organization',
+              name: 'not-approved',
+            }),
+            createMockOrganizationProject({
+              ref: 'approved-organization-project-2',
+              name: 'Approved Project 2',
+            }),
+          ])
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        return HttpResponse.json<OAuthAppsAuthorizeApproveData>({
+          url: '',
+        })
+      },
+    })
+    renderScreen({
+      organizationSlug: 'northwind-traders',
+      projectRef: 'northwindstorefront1',
+    })
+
+    await screen.findByText('Approved Organization')
+    await screen.findByText('Approved Project 1')
+    await screen.findByText('Approved Project 2')
+    fireEvent.click(await enabledAuthorizeButton())
+    expect(await screen.findByText('Authorizing...')).toBeInTheDocument()
+    expect(screen.getByText("Don't close this window.")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    expect(screen.getByText('You can return to Vercel to continue')).toBeInTheDocument()
+  })
+
+  test('if the request has approved_organization_slug, it should take precedence over the provided organization slug and select all projects when approved_project_refs is not set', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsAuthorizeRequestData>(
+          createMockRequest({
+            approved_organization_slug: 'the-approved-organization-slug',
+          })
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            id: 2,
+            slug: 'northwind-traders',
+            name: 'Northwind Traders',
+          }),
+          createMockOrganization({
+            slug: 'the-approved-organization-slug',
+            name: 'Approved Organization',
+          }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OrgProjectsResponse>(
+          createMockOrganizationProjects([
+            createMockOrganizationProject({
+              ref: 'organization-project-1',
+              name: 'Project 1',
+            }),
+            createMockOrganizationProject({
+              ref: 'organization-project-2',
+              name: 'Project 2',
+            }),
+          ])
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        return HttpResponse.json<OAuthAppsAuthorizeApproveData>({
+          url: '',
+        })
+      },
+    })
+    renderScreen({
+      organizationSlug: 'northwind-traders',
+      projectRef: 'northwindstorefront1',
+    })
+
+    await screen.findByText('Approved Organization')
+    fireEvent.click(await enabledAuthorizeButton())
+    expect(await screen.findByText('Authorizing...')).toBeInTheDocument()
+    expect(screen.getByText("Don't close this window.")).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+
+    expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
+    await screen.findByText('All projects, including ones created later')
+    expect(screen.getByText('You can return to Vercel to continue')).toBeInTheDocument()
+  })
+
+  test('preselect the provided organization slug and project ref', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsAuthorizeRequestData>(createMockRequest()),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            id: 1,
+            slug: 'northwind-traders',
+            name: 'Northwind Traders',
+          }),
+          createMockOrganization({
+            id: 2,
+            slug: 'the-approved-organization-slug',
+            name: 'Approved Organization',
+          }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        return HttpResponse.json<OAuthAppsAuthorizeApproveData>({
+          url: '',
+        })
+      },
+    })
+    renderScreen({
+      organizationSlug: 'northwind-traders',
+      projectRef: 'northwindstorefront1',
+    })
+
+    await screen.findByText('Northwind Traders')
+    await screen.findByText('northwind-storefront')
     fireEvent.click(await enabledAuthorizeButton())
     expect(await screen.findByText('Authorizing...')).toBeInTheDocument()
     expect(screen.getByText("Don't close this window.")).toBeInTheDocument()

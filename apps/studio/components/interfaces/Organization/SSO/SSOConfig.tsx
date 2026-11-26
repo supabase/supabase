@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
@@ -14,7 +16,6 @@ import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
 import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
@@ -233,8 +234,8 @@ export const SSOConfig = () => {
   }, [enableSpInitiated])
 
   return (
-    <ScaffoldContainer size="small" className="px-6 xl:px-10">
-      <ScaffoldSection isFullWidth>
+    <PageContainer size="small">
+      <PageSection>
         {isLoadingEntitlement || (hasAccessToSso && isLoadingSSOConfig) ? (
           <Card>
             <CardContent>
@@ -455,7 +456,7 @@ export const SSOConfig = () => {
             </TextConfirmModal>
           </>
         ) : null}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

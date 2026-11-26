@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
+import { Separator } from 'ui'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -10,7 +11,6 @@ import {
 
 import { Documents } from '@/components/interfaces/Organization/Documents/Documents'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -50,7 +50,7 @@ function OrgDocumentsPage() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <ScaffoldDivider />
+      <Separator />
       <Documents />
     </>
   )

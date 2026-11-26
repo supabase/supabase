@@ -1,10 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic.js'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
 import { Admonition } from '../Admonition'
-import { SqlToRestProps } from './sql-to-rest'
+import type { SqlToRestProps } from './sql-to-rest'
 
 function FallbackComponent({ error }: FallbackProps) {
   if (error instanceof Error && error.message === 'WebAssembly is not defined') {
@@ -26,12 +26,22 @@ function FallbackComponent({ error }: FallbackProps) {
 }
 
 // Lazy load client side to prevent hydration issues when browser produces an error
-const SqlToRest = dynamic(() => import('./sql-to-rest'), { ssr: false })
+const SqlToRest = lazy(() => import('./sql-to-rest'))
 
 export default function SqlToRestWithFallback(props: SqlToRestProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return null
+
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
-      <SqlToRest {...props} />
+      <Suspense fallback={null}>
+        <SqlToRest {...props} />
+      </Suspense>
     </ErrorBoundary>
   )
 }

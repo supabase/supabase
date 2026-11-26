@@ -743,9 +743,9 @@ var data = await supabase.Storage.From("bucket").Download("image.jpg", new Trans
 
 ### Limits
 
-- Width and height must be an integer value between 1-2500.
-- The image size cannot exceed 25MB.
-- The image resolution cannot exceed 50MP.
+- Width and height must be an integer value between 1-3000.
+- The image size cannot exceed 50MB.
+- The image resolution cannot exceed 110MP.
 
 ### Supported image formats
 
@@ -782,9 +782,9 @@ Deploy an imgproxy container with the following configuration:
 
 ```yaml
 imgproxy:
-  image: darthsim/imgproxy
+  image: ghcr.io/imgproxy/imgproxy
   environment:
-    - IMGPROXY_ENABLE_WEBP_DETECTION=true
+    - IMGPROXY_AUTO_WEBP=true
     - IMGPROXY_JPEG_PROGRESSIVE=true
 ```
 

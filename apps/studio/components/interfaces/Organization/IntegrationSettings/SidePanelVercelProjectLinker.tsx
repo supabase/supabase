@@ -1,5 +1,6 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
+import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { SidePanel } from 'ui'
 
@@ -7,12 +8,12 @@ import { type ForeignProject } from '../../Integrations/VercelGithub/VercelGithu
 import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
 import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from '@/components/interfaces/Markdown'
-import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { getFrameworkIconUrl } from '@/lib/integration-utils'
 import { EMPTY_ARR } from '@/lib/void'
@@ -60,7 +61,13 @@ export const SidePanelVercelProjectLinker = () => {
       const frameworkIconUrl = getFrameworkIconUrl(project?.framework)
 
       return !frameworkIconUrl ? (
-        vercelIcon
+        <div className="flex items-center justify-center rounded-sm bg-black p-1 text-white">
+          <InlineSVG
+            src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+            title="Vercel Icon"
+            className="w-3"
+          />
+        </div>
       ) : (
         <img src={frameworkIconUrl} width={21} height={21} alt={`icon`} />
       )

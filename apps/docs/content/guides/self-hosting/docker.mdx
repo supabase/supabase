@@ -123,7 +123,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.8.4 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.5 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -140,7 +140,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.4\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.5\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -154,7 +154,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.4 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.5 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -176,7 +176,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.4\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.5\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -339,7 +339,7 @@ Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart 
 sh run.sh restart functions
 ```
 
-The main worker loads each function from disk per request, so a restart is enough to pick up new or changed function code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
+A restart stops the running function workers, so the next request to each function starts a worker from the new or changed code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
 
 See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
@@ -579,7 +579,7 @@ See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide f
 
 ### Using file backend in Storage on macOS
 
-By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
+By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly, for example uploads failing with `The file system does not support extended attributes or has the feature disabled`. Use a named Docker volume instead, and mount it in both the `storage` and `imgproxy` services, since `imgproxy` reads the same files to transform images.
 
 ### Configuring Supabase AI Assistant
 

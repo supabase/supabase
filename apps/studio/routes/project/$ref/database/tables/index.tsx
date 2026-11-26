@@ -1,13 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { TableList } from '@/components/interfaces/Database/Tables/TableList'
 import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { useTableActions } from '@/components/interfaces/TableGridEditor/useTableActions'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -31,26 +37,32 @@ function DatabaseTables() {
 
   return (
     <>
-      <PageLayout
-        title="Database Tables"
-        size="large"
-        primaryActions={isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
-      >
-        <PageContainer size="large">
-          <PageSection>
-            {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Tables</PageHeaderTitle>
+          </PageHeaderSummary>
+          {isAutoEnableRLSMinimized && (
+            <PageHeaderAside>
+              <AutoEnableRLSNotice iconOnly />
+            </PageHeaderAside>
+          )}
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        <PageSection>
+          {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
 
-            <PageSectionContent>
-              <TableList
-                onAddTable={snap.onAddTable}
-                onEditTable={(table) => editTable(table.id)}
-                onDeleteTable={(table) => deleteTable(table.id)}
-                onDuplicateTable={(table) => duplicateTable(table.id)}
-              />
-            </PageSectionContent>
-          </PageSection>
-        </PageContainer>
-      </PageLayout>
+          <PageSectionContent>
+            <TableList
+              onAddTable={snap.onAddTable}
+              onEditTable={(table) => editTable(table.id)}
+              onDeleteTable={(table) => deleteTable(table.id)}
+              onDuplicateTable={(table) => duplicateTable(table.id)}
+            />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       <DeleteConfirmationDialogs />
       <SidePanelEditor includeColumns />

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { AlertCircleIcon, ArrowUpRightIcon, CheckCircle2Icon } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
@@ -57,12 +56,13 @@ export const GitHubStatus = () => {
           <p className="mt-0.5 text-xs text-foreground-lighter flex items-center gap-2">
             {isConnected ? (
               <>
-                <Image
+                <img
                   className="dark:invert"
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={16}
                   height={16}
-                  alt="GitHub"
+                  alt=""
+                  aria-hidden="true"
                 />
                 {githubConnection?.repository.name}
               </>
@@ -75,7 +75,7 @@ export const GitHubStatus = () => {
 
       <HoverCardContent side="right" align="start" className="w-80 p-4 space-y-2">
         <div className="flex items-center gap-2 text-sm">
-          <Image
+          <img
             className="dark:invert"
             src={`${BASE_PATH}/img/icons/github-icon.svg`}
             width={20}

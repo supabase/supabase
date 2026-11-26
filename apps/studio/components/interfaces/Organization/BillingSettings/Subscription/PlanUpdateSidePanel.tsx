@@ -1,17 +1,19 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { isEqual } from 'lodash'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
-import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
+import { PlanUpgradeSuccessView } from './PlanUpgradeSuccessView'
+import { SubscriptionPlanUpdateView } from './SubscriptionPlanUpdateView'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
+import type { PlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
@@ -93,8 +95,30 @@ const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
   return `stripe projects ${action} supabase/${currentTier}`
 }
 
+/**
+ * Sends the panel opened event once per open. On a page load that lands on the panel, the
+ * organization resolves after the panel is visible, so the event waits for its plan.
+ */
+const useTrackPanelOpened = (isOpen: boolean, currentPlan: string | undefined) => {
+  const track = useTrack()
+  const [source] = useQueryState('source')
+
+  const onOpened = useEffectEvent(() => {
+    track('studio_pricing_side_panel_opened', { currentPlan, origin: source ?? undefined })
+  })
+
+  const isReady = isOpen && currentPlan !== undefined
+  useEffect(() => {
+    if (isReady) onOpened()
+  }, [isReady])
+}
+
+const UPGRADED_FROM_PLAN_IDS = ['free', 'pro'] as const
+
+const parseUpgradedFromPlanId = (planId: string | undefined) =>
+  UPGRADED_FROM_PLAN_IDS.find((id) => id === planId) ?? null
+
 export const PlanUpdateSidePanel = () => {
-  const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
@@ -102,12 +126,11 @@ export const PlanUpdateSidePanel = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-  const track = useTrack()
-
-  const originalPlanRef = useRef<string>(undefined)
 
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
+  /** The plan the organization was on when the user picked a new one. */
+  const [planIdBeforeChange, setPlanIdBeforeChange] = useState<string>()
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
   const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
@@ -116,9 +139,13 @@ export const PlanUpdateSidePanel = () => {
   const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
   const debouncedAddress = useDebounce(billingAddress, 1000)
   const debouncedTaxId = useDebounce(billingTaxId, 1000)
+  // Until the debounce settles the preview prices an older address than the one on screen,
+  // and submitting would charge an amount the customer never reviewed.
+  const isBillingPreviewPending =
+    !isEqual(billingAddress, debouncedAddress) || !isEqual(billingTaxId, debouncedTaxId)
 
   const handleAddressChange = useCallback(
-    (address: CustomerAddress) => setLatestAddress(address),
+    (address: CustomerAddress | null) => setLatestAddress(address ?? undefined),
     []
   )
 
@@ -135,12 +162,16 @@ export const PlanUpdateSidePanel = () => {
 
   const { panel, setPanel } = useOrgSettingsPanel()
   const visible = panel === 'subscriptionPlan'
+  const isUpgradeComplete = panel === 'planUpgraded'
   // Panel was already open when the page loaded (deep link), so skip the entry animation delay
   const [isOpenedViaUrl] = useState(visible)
 
   const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery(
+    { slug },
+    { enabled: visible || isUpgradeComplete }
+  )
   const orgProjects =
     useMemo(
       () => orgProjectsData?.pages.flatMap((page) => page.projects),
@@ -150,8 +181,20 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
+  const [source, setSource] = useQueryState('source')
+
+  // Carries the pre-upgrade plan to the success screen. Kept in the URL so it survives anything
+  // that remounts this panel after the subscription refetch, including a reload.
+  const [upgradedFromPlanId, setUpgradedFromPlanId] = useQueryState(
+    'upgradedFrom',
+    parseAsStringLiteral(UPGRADED_FROM_PLAN_IDS)
+  )
+
   const onClose = () => {
     setPanel(null)
+    setUpgradedFromPlanId(null)
+    // A reopen from the billing page would otherwise report the previous entry point as its origin.
+    setSource(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -171,11 +214,7 @@ export const PlanUpdateSidePanel = () => {
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
 
-  const onPanelOpened = useEffectEvent(
-    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
-      track('studio_pricing_side_panel_opened', properties)
-    }
-  )
+  useTrackPanelOpened(visible, selectedOrganization?.plan.name)
 
   useEffect(() => {
     if (visible) {
@@ -183,25 +222,18 @@ export const PlanUpdateSidePanel = () => {
       setLatestAddress(undefined)
       setLatestTaxId(undefined)
       setUseAsDefaultBillingAddress(true)
-      const source = Array.isArray(router.query.source)
-        ? router.query.source[0]
-        : router.query.source
-      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
-        currentPlan: subscription?.plan?.name,
-      }
-      if (source) {
-        properties.origin = source
-      }
-      onPanelOpened(properties)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
-  useEffect(() => {
-    if (visible && isSuccessSubscription && subscription.plan.id) {
-      originalPlanRef.current = subscription.plan.id
-    }
-  }, [visible, isSuccessSubscription, subscription?.plan.id])
+  // Recorded on selection, while the subscription still reports the current plan. A successful
+  // change refetches it before the success screen opens.
+  const handleSelectTier = (tier: 'tier_free' | 'tier_pro' | 'tier_team') => {
+    setPlanIdBeforeChange(subscription?.plan.id)
+    setSelectedTier(tier)
+  }
+
+  // tier_free goes through the cancellation flow instead of the plan update view
+  const isConfirmingPlanChange = selectedTier !== undefined && selectedTier !== 'tier_free'
 
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
@@ -246,14 +278,59 @@ export const PlanUpdateSidePanel = () => {
       isPartnerBilledOrganization={isPartnerBilledOrganization}
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
-      entryDelay={contentDelay}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
-      onSelectTier={setSelectedTier}
+      onSelectTier={handleSelectTier}
     />
   )
 
+  const planChangeProps = {
+    selectedTier,
+    onClose: () => setSelectedTier(undefined),
+    planMeta,
+    subscriptionPreviewQueryResult: subscriptionPreviewData,
+    projects: orgProjects,
+    currentPlanMeta,
+    onAddressChange: handleAddressChange,
+    onTaxIdChange: handleTaxIdChange,
+    isBillingPreviewPending,
+    useAsDefaultBillingAddress,
+    onUseAsDefaultBillingAddressChange: handleUseAsDefaultBillingAddressChange,
+  }
+
+  // Upgrades land on the post-upgrade screen; anything else returns to the billing page.
+  const handlePlanChangeSuccess = ({ changeType }: { changeType: PlanChangeType }) => {
+    if (changeType === 'upgrade') {
+      setPanel('planUpgraded')
+      setUpgradedFromPlanId(parseUpgradedFromPlanId(planIdBeforeChange))
+    } else {
+      onClose()
+    }
+  }
+
+  // Read from the refreshed subscription so the screen also survives a reload of its URL.
+  const upgradedPlanId =
+    subscription?.plan.id === 'pro' || subscription?.plan.id === 'team'
+      ? subscription.plan.id
+      : undefined
+
   return (
     <>
+      {isUpgradeComplete && upgradedPlanId && slug && (
+        <PlanUpgradeSuccessView
+          planId={upgradedPlanId}
+          previousPlanId={upgradedFromPlanId ?? undefined}
+          organizationName={selectedOrganization?.name}
+          organizationSlug={slug}
+          projects={orgProjects}
+          isSpendCapEnabled={subscription?.usage_billing_enabled === false}
+          onManageSpendCap={() => {
+            setPanel('costControl')
+            setUpgradedFromPlanId(null)
+          }}
+          onClose={onClose}
+        />
+      )}
+
       {visible && (
         <PlanUpdateFullScreenShell
           organizationName={selectedOrganization?.name}
@@ -272,23 +349,17 @@ export const PlanUpdateSidePanel = () => {
         onDowngrade={() => setSelectedTier(undefined)}
       />
 
-      <SubscriptionPlanUpdateDialog
-        selectedTier={selectedTier}
-        onClose={() => setSelectedTier(undefined)}
-        onSuccess={onClose}
-        planMeta={planMeta}
-        subscriptionPreviewQueryResult={subscriptionPreviewData}
-        projects={orgProjects}
-        currentPlanMeta={currentPlanMeta}
-        onAddressChange={handleAddressChange}
-        onTaxIdChange={handleTaxIdChange}
-        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
-        onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
-      />
+      {isConfirmingPlanChange && (
+        <SubscriptionPlanUpdateView
+          {...planChangeProps}
+          onSuccess={handlePlanChangeSuccess}
+          origin={source ?? undefined}
+        />
+      )}
 
       <UpgradeSurveyModal
         visible={showUpgradeSurvey}
-        originalPlan={originalPlanRef.current}
+        originalPlan={planIdBeforeChange}
         subscription={subscription}
         onClose={(success?: boolean) => {
           setShowUpgradeSurvey(false)

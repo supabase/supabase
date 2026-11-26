@@ -429,10 +429,13 @@ export const mapAddOnVariantIdToComputeSize = (
   return addonVariantToComputeSize[parsed.data]
 }
 
-export const formatNumber = (num: number): string => {
-  return num.toLocaleString('en-US')
+// A Postgres upgrade right-sizes disks down to 1.2x the database size, with a minimum of 8 GB
+const MIN_RIGHT_SIZED_DISK_GB = 8
+
+export const canRightSizeDisk = (diskSizeGb: number | undefined): boolean => {
+  return (diskSizeGb ?? 0) > MIN_RIGHT_SIZED_DISK_GB
 }
 
-export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
-  return plan !== 'free' && infraComputeSize === 'nano'
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString('en-US')
 }

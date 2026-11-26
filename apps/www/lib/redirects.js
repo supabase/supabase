@@ -1046,6 +1046,7 @@ module.exports = [
   { permanent: true, source: '/signup', destination: '/dashboard/sign-up' },
   { permanent: true, source: '/about', destination: '/company' },
   { permanent: true, source: '/startups', destination: '/solutions/startups' },
+  { permanent: true, source: '/partners/startups', destination: '/solutions/startups' },
   {
     permanent: true,
     source: '/legal/subprocessors',
@@ -1096,5 +1097,15 @@ module.exports = [
     permanent: true,
     source: '/changelog/rss.xml',
     destination: '/changelog-rss.xml',
+  },
+  {
+    permanent: true,
+    source: '/builder-day',
+    destination: '/builderday',
+  },
+  {
+    permanent: true,
+    source: '/builder-day/:path*',
+    destination: '/builderday/:path*',
   },
 ]
