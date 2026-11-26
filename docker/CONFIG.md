@@ -1251,7 +1251,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Analytics
 
-> The `analytics` container runs [logflare/logflare](https://github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
+> The `analytics` container runs [logflare/logflare](https://github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.logs.yml`, the optional override that adds the `analytics` and `vector` containers. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
 > **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) **are reachable by default**. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them.
 >
@@ -1263,11 +1263,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_SINGLE_TENANT` | boolean | Both | Run Logflare in single-tenant mode (no per-tenant isolation, no signup flow). | Default: `true`. Self-hosted: `true` |
+| `LOGFLARE_SINGLE_TENANT` | boolean | Both | Run Logflare in single-tenant mode (no per-tenant isolation, no signup flow). | Default: `false`. Self-hosted: `true` |
 | `LOGFLARE_SUPABASE_MODE` | boolean | Both | Enable the Supabase preset: auto-creates the default source, wires the `analytics` container to the Supabase stack. | Default: `false`. Self-hosted: `true` |
-| `LOGFLARE_PUBLIC_ACCESS_TOKEN` | string | Both | Public API token used by ingestion clients (e.g. the `vector` container) to push log events. Falls back to `LOGFLARE_API_KEY`. | Required in single-tenant mode |
+| `LOGFLARE_PUBLIC_ACCESS_TOKEN` | string | Self-hosted | Public API token used by ingestion clients (e.g. the `vector` container) to push log events. Falls back to `LOGFLARE_API_KEY`. | Required in single-tenant mode |
 | `LOGFLARE_PRIVATE_ACCESS_TOKEN` | string | Both | Private API token used by Studio server-side (and the management API) to query logs and run analytics endpoints. | Required in single-tenant mode |
-| `LOGFLARE_FEATURE_FLAG_OVERRIDE` | string | Both | Comma-separated `key=value` pairs overriding feature flags at boot. Self-hosted sets `multibackend=true` so the Postgres backend is reachable. | E.g. `multibackend=true` |
+| `LOGFLARE_FEATURE_FLAG_OVERRIDE` | string | Both | Comma-separated `key=value` pairs overriding feature flags at boot (lowercased). Self-hosted sets `multibackend=true`, which shows the backend management UI in Logflare's own web pages; the Postgres backend itself is selected by `POSTGRES_BACKEND_URL`. | E.g. `multibackend=true` |
 | `LOGFLARE_NODE_HOST` | string | Both | Hostname used to form the Erlang `RELEASE_NODE` (`<name>@<host>`). The single-node default is fine for most self-hosted setups. | Default: `127.0.0.1`. |
 | `LOGFLARE_API_KEY` | string | | Legacy fallback name for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | Deprecated; prefer `LOGFLARE_PUBLIC_ACCESS_TOKEN` |
 
@@ -1278,85 +1278,92 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `DB_HOSTNAME` | string | Both | Hostname for Logflare's metadata Postgres. | Self-hosted: from `POSTGRES_HOST` |
-| `DB_PORT` | integer | Both | Port for Logflare's metadata Postgres. | Self-hosted: from `POSTGRES_PORT` |
+| `DB_PORT` | integer | Both | Port for Logflare's metadata Postgres. | Default: `5432`. Self-hosted: from `POSTGRES_PORT` |
 | `DB_DATABASE` | string | Both | Database name for Logflare's metadata Postgres. | Self-hosted: `_supabase` |
 | `DB_SCHEMA` | string | Both | Postgres schema used for Logflare metadata tables (set as `search_path`). | Self-hosted: `_analytics` |
 | `DB_USERNAME` | string | Both | Postgres user for Logflare's metadata connection. | Self-hosted: `supabase_admin` |
 | `DB_PASSWORD` | string | Both | Postgres password for the metadata connection. | Self-hosted: from `POSTGRES_PASSWORD` |
-| `DB_POOL_SIZE` | integer (count) | Self-hosted | Ecto connection pool size for the metadata Postgres. | Default: `10` |
-| `DB_SSL` | boolean | Self-hosted | Enable SSL/TLS for the metadata Postgres connection (requires cert files). | Default: `false` |
+| `DB_URL` | URL | | Connection URI for Logflare's metadata Postgres (`postgres://user:pass@host:port/db`). Values in the URI override the matching `DB_HOSTNAME`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE`; variables the URI omits stay in effect. | Query params: `ssl`, `pool_size`, `auth` (`password` or `aws_iam`), `aws_region`. Self-hosted uses the individual `DB_*` variables instead |
+| `DB_POOL_SIZE` | integer (count) | | Ecto connection pool size for the metadata Postgres. | Default: `10` |
+| `DB_SSL` | boolean | | Enable TLS 1.2/1.3 with server certificate verification for the metadata Postgres connection. Takes effect only if the files at `DB_SSL_CA_CERT_PATH`, `DB_SSL_CLIENT_CERT_PATH` and `DB_SSL_CLIENT_KEY_PATH` all exist; otherwise the connection stays unencrypted. | Default: `false` |
+| `DB_SSL_CA_CERT_PATH` | path | | CA certificate used to verify the metadata Postgres server when `DB_SSL=true`. | Default: `db-server-ca.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `DB_SSL_CLIENT_CERT_PATH` | path | | Client certificate presented to the metadata Postgres when `DB_SSL=true`. | Default: `db-client-cert.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `DB_SSL_CLIENT_KEY_PATH` | path | | Private key for `DB_SSL_CLIENT_CERT_PATH`. | Default: `db-client-key.pem` (relative to `/opt/app/rel/logflare/bin`) |
 
 ### Postgres backend (log storage)
 
-> When `LOGFLARE_FEATURE_FLAG_OVERRIDE=multibackend=true`, Logflare stores log events in a separate Postgres backend rather than BigQuery. Self-hosted points this at the same `db` container, schema `_analytics`.
+> With `LOGFLARE_SINGLE_TENANT=true` and `POSTGRES_BACKEND_URL` set, Logflare stores log events in a Postgres backend rather than BigQuery. Self-hosted points this at the same `db` container, database `_supabase`, schema `_analytics`.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `POSTGRES_BACKEND_URL` | URL | Both | Connection URL for the Postgres log-storage backend. | Required when `multibackend=true` |
+| `POSTGRES_BACKEND_URL` | URL | Both | Connection URL for the Postgres log-storage backend. Setting it selects the Postgres backend over BigQuery. | Read only when `LOGFLARE_SINGLE_TENANT=true` |
 | `POSTGRES_BACKEND_SCHEMA` | string | Both | Schema in the Postgres backend that holds log tables. | Self-hosted: `_analytics` |
 
 ### BigQuery backend (log storage)
 
-> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` / `POSTGRES_BACKEND_SCHEMA` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` in `docker-compose.yml`, mount a `gcloud.json` service-account key, and set `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` in the `.env` file.
+> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` and `POSTGRES_BACKEND_SCHEMA` in `docker-compose.logs.yml`, uncomment `GOOGLE_PROJECT_ID`, `GOOGLE_PROJECT_NUMBER` and the `gcloud.json` service-account key volume there, and set both IDs in the `.env` file. Logflare reads the Google credentials only when the Postgres backend isn't configured.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOOGLE_PROJECT_ID` | string | Self-hosted | Google Cloud project ID hosting the BigQuery dataset. | Commented out in compose |
-| `GOOGLE_PROJECT_NUMBER` | string | Self-hosted | Numeric Google Cloud project number. | Commented out in compose |
-| `GOOGLE_DATASET_ID_APPEND` | string | Self-hosted | Suffix appended to BigQuery dataset IDs. | Default: `_default` |
-| `GOOGLE_DATASET_LOCATION` | string | Self-hosted | BigQuery dataset location (e.g. `US`, `EU`). | Default: `US` |
-| `GOOGLE_SERVICE_ACCOUNT` | string | Self-hosted | Service-account email used for BigQuery operations. | |
-| `LOGFLARE_BIGQUERY_MANAGED_SA_POOL` | integer (count) | Self-hosted | Number of managed service accounts in the BigQuery SA pool. | Default: `0` |
-| `LOGFLARE_BQ_WRITE_API_POOL_SIZE` | integer (count) | Self-hosted | Connection pool size for the BigQuery Write API. | Default: `10` |
+| `GOOGLE_PROJECT_ID` | string | Both | Google Cloud project ID hosting the BigQuery dataset. | Commented out in compose. CLI: with the BigQuery backend only |
+| `GOOGLE_PROJECT_NUMBER` | string | Both | Numeric Google Cloud project number. | Commented out in compose. CLI: with the BigQuery backend only |
+| `GOOGLE_APPLICATION_CREDENTIALS` | path | | Path to the Google service-account key file used for BigQuery. | Default: `gcloud.json` (relative to `/opt/app/rel/logflare/bin`, where the commented-out compose volume mounts it). Ignored when `GOOGLE_APPLICATION_CREDENTIALS_JSON` is set |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | JSON | | Google service-account key as inline JSON, used for BigQuery instead of a key file. | Takes precedence over `GOOGLE_APPLICATION_CREDENTIALS` |
+| `GOOGLE_DATASET_ID_APPEND` | string | CLI | Suffix appended to BigQuery dataset IDs. | Default: `_default`. CLI: `_prod` (BigQuery backend only) |
+| `GOOGLE_DATASET_LOCATION` | string | | BigQuery dataset location (e.g. `US`, `EU`). | Default: `US` |
+| `GOOGLE_SERVICE_ACCOUNT` | string | | Service-account email used for BigQuery operations. | |
+| `LOGFLARE_BIGQUERY_MANAGED_SA_POOL` | integer (count) | | Number of managed service accounts in the BigQuery SA pool. | Default: `0` |
+| `LOGFLARE_BQ_WRITE_API_POOL_SIZE` | integer (count) | | Connection pool size for the BigQuery Write API. | Default: `10` |
 
 ### Server / Phoenix endpoint
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `PHX_HTTP_PORT` | integer | Self-hosted | HTTP port the Phoenix endpoint binds to. | Default: `4000` |
-| `PHX_HTTP_IP` | string | Self-hosted | Bind IP for the HTTP endpoint. | |
-| `PHX_URL_HOST` | string | Self-hosted | External host used to build absolute URLs. | |
-| `PHX_URL_SCHEME` | string | Self-hosted | URL scheme (`http`/`https`). | |
-| `PHX_URL_PORT` | integer | Self-hosted | External URL port. | |
-| `PHX_SECRET_KEY_BASE` | string | Self-hosted | Phoenix session signing/encryption key. | Required in production; baked into the image for self-host |
-| `PHX_CHECK_ORIGIN` | string (CSV) | Self-hosted | Comma-separated list of allowed origins for CSRF check. | |
-| `PHX_LIVE_VIEW_SIGNING_SALT` | string | Self-hosted | Salt used for Phoenix LiveView token signing. | |
-| `LOGFLARE_GRPC_PORT` | integer | Self-hosted | Port for the gRPC server (used for trace ingestion / OTLP). | Default: `50051` |
-| `LOGFLARE_ENABLE_GRPC_SSL` | boolean | Self-hosted | Enable TLS for the gRPC server. | Default: `false` |
-| `LOGFLARE_ENABLE_LIVE_DASHBOARD` | boolean | Self-hosted | Expose Phoenix LiveDashboard at `/admin`. | Default: `false` |
-| `LOGFLARE_HTTP_CONNECTION_POOLS` | string (CSV) | Self-hosted | Comma-separated list of HTTP pool providers to enable. | Default: `all` |
-| `LOGFLARE_PUBSUB_POOL_SIZE` | integer (count) | Self-hosted | PubSub connection pool size. | Default: `56` |
-| `LOGFLARE_NODE_SHUTDOWN_CODE` | string | Self-hosted | Shutdown identifier code. | |
+| `PHX_HTTP_PORT` | integer | | HTTP port the Phoenix endpoint binds to. | Default: `4000` |
+| `PHX_HTTP_IP` | string | | Bind IP for the HTTP endpoint. | |
+| `PHX_URL_HOST` | string | | External host used to build absolute URLs. | |
+| `PHX_URL_SCHEME` | string | | URL scheme (`http`/`https`). | |
+| `PHX_URL_PORT` | integer | | External URL port. | |
+| `PHX_SECRET_KEY_BASE` | string | | Phoenix session signing/encryption key. | Required in production; baked into the image for self-host |
+| `PHX_CHECK_ORIGIN` | string (CSV) | | Comma-separated list of allowed origins for CSRF check. | |
+| `PHX_LIVE_VIEW_SIGNING_SALT` | string | | Salt used for Phoenix LiveView token signing. | |
+| `LOGFLARE_GRPC_PORT` | integer | | Port for the gRPC server (used for trace ingestion / OTLP). | Default: `50051` |
+| `LOGFLARE_ENABLE_GRPC_SSL` | boolean | | Enable TLS for the gRPC server. Takes effect only if the files at `LOGFLARE_TLS_CERT_PATH` and `LOGFLARE_TLS_KEY_PATH` both exist; otherwise the server stays plaintext. | Default: `false` |
+| `LOGFLARE_TLS_CERT_PATH` | path | | TLS certificate for the gRPC server when `LOGFLARE_ENABLE_GRPC_SSL=true`. | Default: `cert.pem` (relative to `/opt/app/rel/logflare/bin`) |
+| `LOGFLARE_TLS_KEY_PATH` | path | | Private key for `LOGFLARE_TLS_CERT_PATH`. | Default: `cert.key` (relative to `/opt/app/rel/logflare/bin`) |
+| `LOGFLARE_HTTP_CONNECTION_POOLS` | string (CSV) | | Comma-separated list of HTTP pool providers to enable. | Default: `all` |
+| `LOGFLARE_PUBSUB_POOL_SIZE` | integer (count) | | PubSub connection pool size. | Default: `56` |
+| `LOGFLARE_NODE_SHUTDOWN_CODE` | string | | Shared secret for `PUT /admin/shutdown`: a request whose `lf-shutdown-code` header matches it shuts down a Logflare node. | Unset: every shutdown request is rejected (401) |
 
 ### Logging
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_LOG_LEVEL` | enum | CLI | Logger level (`debug`, `info`, `warning`, `error`). | Default: `info` |
-| `LOGFLARE_LOGGER_JSON` | boolean | Self-hosted | Emit JSON-formatted log lines instead of plain text. | Default: `false` |
-| `LOGFLARE_LOGGER_BACKEND_URL` | URL | Self-hosted | URL of a remote Logflare logger backend (forwards Logflare's own logs there). | |
-| `LOGFLARE_LOGGER_BACKEND_API_KEY` | string | Self-hosted | API key for the remote logger backend. | |
-| `LOGFLARE_LOGGER_BACKEND_SOURCE_ID` | string | Self-hosted | Source ID for the remote logger backend. | |
+| `LOGFLARE_LOG_LEVEL` | enum | CLI | Logger level (`debug`, `info`, `warning`, `error`). | Default: `info`. `warn` is accepted as `warning`; other values keep the default. The image compiles out `debug` log calls |
+| `LOGFLARE_LOGGER_JSON` | boolean | | Emit JSON-formatted log lines instead of plain text. | Default: `false` |
+| `LOGFLARE_LOGGER_BACKEND_URL` | URL | | URL of a remote Logflare logger backend (forwards Logflare's own logs there). | |
+| `LOGFLARE_LOGGER_BACKEND_API_KEY` | string | | API key for the remote logger backend. | |
+| `LOGFLARE_LOGGER_BACKEND_SOURCE_ID` | string | | Source ID for the remote logger backend. | |
 
 ### Telemetry / Observability
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_OTEL_ENDPOINT` | URL | Self-hosted | OTLP collector endpoint. Presence enables tracing. | |
-| `LOGFLARE_OTEL_SAMPLE_RATIO` | number (ratio) | Self-hosted | Default sampling ratio (0.0-1.0) for OTel traces. | Default: `1.0` |
-| `LOGFLARE_OTEL_INGEST_SAMPLE_RATIO` | number (ratio) | Self-hosted | Sampling ratio for ingest-path traces (falls back to default). | |
-| `LOGFLARE_OTEL_ENDPOINT_SAMPLE_RATIO` | number (ratio) | Self-hosted | Sampling ratio for endpoint-path traces (falls back to default). | |
-| `LOGFLARE_OTEL_SOURCE_UUID` | string | Self-hosted | Source UUID header attached to OTel exports. | |
-| `LOGFLARE_OTEL_ACCESS_TOKEN` | string | Self-hosted | Access token header attached to OTel exports. | |
-| `LOGFLARE_HEALTH_MAX_MEMORY_UTILIZATION` | number (ratio) | Self-hosted | Memory utilization threshold (0.0-1.0) reported by the health check. | Default: `0.80` |
-| `LOGFLARE_ALERTS_ENABLED` | boolean | Self-hosted | Enable the alerting subsystem. | Default: `true` |
+| `LOGFLARE_OTEL_ENDPOINT` | URL | | OTLP collector endpoint. Presence enables tracing. | |
+| `LOGFLARE_OTEL_SAMPLE_RATIO` | number (ratio) | | Default sampling ratio (0.0-1.0) for OTel traces. | Default: `1.0`. Other values fail at boot |
+| `LOGFLARE_OTEL_INGEST_SAMPLE_RATIO` | number (ratio) | | Sampling ratio for ingest-path traces (falls back to default). | Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_OTEL_ENDPOINT_SAMPLE_RATIO` | number (ratio) | | Sampling ratio for endpoint-path traces (falls back to default). | Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_OTEL_SOURCE_UUID` | string | | Source UUID header attached to OTel exports. | |
+| `LOGFLARE_OTEL_ACCESS_TOKEN` | string | | Access token header attached to OTel exports. | |
+| `LOGFLARE_HEALTH_MAX_MEMORY_UTILIZATION` | number (ratio) | | Memory threshold for `/health` and `/ready`: once the BEAM's memory use divided by the host's total memory reaches it, they return 503. | Default: `0.95`. Must be 0.0-1.0; other values fail at boot |
+| `LOGFLARE_ALERTS_ENABLED` | boolean | | Enable the alerting subsystem. | Default: `true` |
 
 ### Encryption
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `LOGFLARE_DB_ENCRYPTION_KEY` | string | Self-hosted | Primary base64 key used to encrypt sensitive columns. | Image fallback baked in |
-| `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` | string | Self-hosted | Previously-active key, kept for decryption during rotation. | |
+| `LOGFLARE_DB_ENCRYPTION_KEY` | string | | Primary base64 key used to encrypt sensitive columns. | Image fallback baked in |
+| `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` | string | | Previously-active key, kept for decryption during rotation. | |
 
 ---
 
