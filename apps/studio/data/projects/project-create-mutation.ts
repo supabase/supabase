@@ -5,6 +5,7 @@ import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-proje
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 import type { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
+import { useInvalidateFreeProjectLimitChecks } from '@/data/organizations/free-project-limit-check-query'
 import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { PROVIDERS } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
@@ -99,11 +100,16 @@ export const useProjectCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
 
   return useMutation<ProjectCreateData, StudioError, ProjectCreateVariables>({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
-      await Promise.all([invalidateProjectsQuery(), invalidatePermissionsQueryV2(queryClient)])
+      await Promise.all([
+        invalidateProjectsQuery(),
+        invalidatePermissionsQueryV2(queryClient),
+        invalidateFreeProjectLimitChecks(),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
+import { useInvalidateFreeProjectLimitChecks } from '@/data/organizations/free-project-limit-check-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -27,9 +28,12 @@ export const useProjectPauseMutation = ({
   UseCustomMutationOptions<ProjectPauseData, StudioError, ProjectPauseVariables>,
   'mutationFn'
 > = {}) => {
+  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+
   return useMutation<ProjectPauseData, StudioError, ProjectPauseVariables>({
     mutationFn: (vars) => pauseProject(vars),
     async onSuccess(data, variables, context) {
+      await invalidateFreeProjectLimitChecks()
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

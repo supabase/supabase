@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { organizationKeys } from './keys'
@@ -45,3 +45,17 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
     enabled: enabled && typeof slug !== 'undefined',
     ...options,
   })
+
+/**
+ * Free project limits are shared across all of a user's orgs, so this invalidates the cached
+ * check for every org, not just one.
+ */
+export const useInvalidateFreeProjectLimitChecks = () => {
+  const queryClient = useQueryClient()
+
+  return () =>
+    queryClient.invalidateQueries({
+      predicate: ({ queryKey }) =>
+        queryKey[0] === 'organizations' && queryKey[2] === 'free-project-limit-check',
+    })
+}
