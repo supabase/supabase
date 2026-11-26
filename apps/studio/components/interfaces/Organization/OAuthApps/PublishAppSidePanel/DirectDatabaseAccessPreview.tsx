@@ -25,19 +25,16 @@ export function DirectDatabaseAccessPreview({
             ? 'Only organization-bound apps can request direct database access.'
             : 'Connect directly to Postgres to access table data using your app’s access token.'}
         </p>
-        {!isDisabled && accessLevel !== 'No access' && (
-          <p className="text-xs text-foreground-light">
-            Database role: <code>example_partner_user</code>
-          </p>
-        )}
       </div>
-      <AccessLevelDropdown
-        permission="Table data"
-        levels={accessLevels}
-        value={accessLevel}
-        disabled={isDisabled}
-        onChange={setAccessLevel}
-      />
+      <div className={isDisabled ? 'cursor-not-allowed' : undefined}>
+        <AccessLevelDropdown
+          permission="Table data"
+          levels={accessLevels}
+          value={accessLevel}
+          disabled={isDisabled}
+          onChange={setAccessLevel}
+        />
+      </div>
     </div>
   )
 }
