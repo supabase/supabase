@@ -394,9 +394,11 @@ export const Destinations = () => {
               )}
               {hasClusterErrors && (
                 <li>
-                  {failedRegions.length === 1
-                    ? 'Any pipelines in this region are missing from this view. Please try again.'
-                    : 'Any pipelines in these regions are missing from this view:'}
+                  <span>
+                    {failedRegions.length === 1
+                      ? 'Any pipelines in this region are missing from this view. Please try again.'
+                      : 'Any pipelines in these regions are missing from this view:'}
+                  </span>
                   <ul className="list-disc pl-5">
                     {failedRegions.map(({ cluster }) => (
                       <li key={cluster.clusterId ?? 'default'}>
