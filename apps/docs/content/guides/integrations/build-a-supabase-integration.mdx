@@ -3,11 +3,11 @@ title: 'Build a Supabase integration'
 description: "Register an OAuth app, build the install flow, and call the Management API to read and change your users' Supabase projects and organizations on their behalf."
 ---
 
-Build an integration that connects to your users' Supabase projects, so they can set up your product in the Supabase Dashboard. This guide takes you from start to a Partner Catalog listing to an OAuth integration that reads and writes user projects through the Management API.
+Build an integration that connects to your users' Supabase projects, so they can set up your product from the Supabase Dashboard. This guide covers two paths: a Partner Catalog listing, and an OAuth integration that reads and changes user projects through the Management API.
 
 ## The path at a glance
 
-Apply to the Partners program first, then decide whether you want to be part of the Partner Catalog or build an integration. Each step opens that section.
+Apply to the Partners program first, then decide whether you want to be part of the Partner Catalog or build an integration. Select a step to go to its section.
 
 ### Partner Catalog path
 
@@ -19,20 +19,20 @@ Apply to the Partners program first, then decide whether you want to be part of 
 
 ## Apply to the Partners program
 
-Supabase lists companies that meet the [listing criteria](/docs/guides/integrations/partner-catalog).
-
-When you apply, choose **Marketplace Partner** as the partnership type.
+Supabase lists companies that meet the [listing criteria](/docs/guides/integrations/partner-catalog). When you apply, choose **Marketplace Partner** as the partnership type.
 
 [Apply to the Partners program](/partners)
 
 ## Choose: Partner Catalog or Integration
 
+The following table compares the two ways to reach Supabase users.
+
 |                      | Partner Catalog                                                                                                                                                                                                                                                                                                                                                                                     | Integration                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | What you build       | A landing page with a setup guide for integrating your product with Supabase                                                                                                                                                                                                                                                                                                                        | An OAuth app, an install flow, and Management API calls                                                                                                                                                                                                                                                                                                                                                                              |
 | What users see       | A listing in the Partner Catalog with an **Add integration** button                                                                                                                                                                                                                                                                                                                                 | A listing in the Integrations tab in the user's Supabase Dashboard with an **Install integration** button                                                                                                                                                                                                                                                                                                                            |
-| Where it lives       | A page on supabase.com, outside the Dashboard<br /><Image alt="Partner Catalog index page on supabase.com, outside the Dashboard" src={{ dark: '/docs/img/guides/integrations/partner-catalog-index.svg', light: '/docs/img/guides/integrations/partner-catalog-index--light.svg' }} width={360} height={196} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} />    | A tab inside the Supabase Dashboard<br /><Image alt="Integrations tab inside the Supabase Dashboard" src={{ dark: '/docs/img/guides/integrations/integrations-tab.svg', light: '/docs/img/guides/integrations/integrations-tab--light.svg' }} width={360} height={196} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} />                                                                            |
-| What the button does | **Add integration** links out to your landing page<br /><Image alt="Partner Catalog listing page with an Add integration button" src={{ dark: '/docs/img/guides/integrations/partner-catalog-listing.svg', light: '/docs/img/guides/integrations/partner-catalog-listing--light.svg' }} width={360} height={118} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} /> | **Install integration** sends users to your install URL, then into the OAuth flow<br /><Image alt="Integrations tab listing with an Install integration button" src={{ dark: '/docs/img/guides/integrations/integrations-tab-listing.svg', light: '/docs/img/guides/integrations/integrations-tab-listing--light.svg' }} width={360} height={118} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} /> |
+| Where it lives       | A page on supabase.com, outside the Dashboard<br /><Image alt="Wireframe of the Partner Catalog index page on supabase.com: a heading, an Apply as a Partner button, and a grid of partner cards grouped by category" src={{ dark: '/docs/img/guides/integrations/partner-catalog-index.svg', light: '/docs/img/guides/integrations/partner-catalog-index--light.svg' }} width={360} height={196} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} />    | A tab inside the Supabase Dashboard<br /><Image alt="Wireframe of the Integrations tab in the Supabase Dashboard: a list of integrations grouped by category" src={{ dark: '/docs/img/guides/integrations/integrations-tab.svg', light: '/docs/img/guides/integrations/integrations-tab--light.svg' }} width={360} height={196} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} />                                                                            |
+| What the button does | **Add integration** links out to your landing page<br /><Image alt="Wireframe of a Partner Catalog listing: the partner name and an Add integration button that links out to the partner site" src={{ dark: '/docs/img/guides/integrations/partner-catalog-listing.svg', light: '/docs/img/guides/integrations/partner-catalog-listing--light.svg' }} width={360} height={118} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} /> | **Install integration** sends users to your install URL, then into the OAuth flow<br /><Image alt="Wireframe of an Integrations tab listing: the partner name and an Install integration button" src={{ dark: '/docs/img/guides/integrations/integrations-tab-listing.svg', light: '/docs/img/guides/integrations/integrations-tab-listing--light.svg' }} width={360} height={118} className="rounded-md" style={{ width: 240, maxWidth: '100%', height: 'auto' }} /> |
 
 ## Partner Catalog: Build your landing page
 
@@ -40,7 +40,7 @@ Use this path for a Partner Catalog listing. The **Add integration** button on y
 
 <ContentListings id="build-integration-landing-page-build" />
 
-When it's complete, [share it with your partner manager](#publish).
+When your landing page is ready, [share it with your partner manager](#publish).
 
 ## Integration
 
