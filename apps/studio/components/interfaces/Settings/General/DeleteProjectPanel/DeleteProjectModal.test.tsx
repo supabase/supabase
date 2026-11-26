@@ -1,13 +1,14 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { act } from 'react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DeleteProjectModal } from './DeleteProjectModal'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { createMockOrganization } from '@/tests/helpers'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
@@ -97,6 +98,7 @@ const deleteProject = async () => {
 describe('DeleteProjectModal', () => {
   beforeEach(() => {
     vi.spyOn(toast, 'error')
+    vi.spyOn(toast, 'success')
   })
 
   test('sends the exit survey before deleting a paid project', async () => {
@@ -122,5 +124,53 @@ describe('DeleteProjectModal', () => {
 
     await waitFor(() => expect(calls).toEqual(['survey', 'delete']))
     expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  test('does not redirect when the user left the deleted project before deletion finished', async () => {
+    mockSubscription('free')
+    let resolveDelete: () => void = () => {}
+    const deleteResponse = new Promise<void>((resolve) => {
+      resolveDelete = resolve
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
+    })
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/projects/:ref',
+      response: async () => {
+        await deleteResponse
+        return HttpResponse.json<{ id: number; name: string; ref: string }>({
+          id: 1,
+          name: PROJECT.name,
+          ref: PROJECT.ref,
+        })
+      },
+    })
+    const router = createTestRouter(`/project/${PROJECT.ref}/settings/general`)
+
+    const { unmount } = customRender(
+      <DeleteProjectModal
+        visible
+        onClose={vi.fn()}
+        project={PROJECT}
+        organization={ORGANIZATION}
+      />,
+      { router }
+    )
+    fireEvent.change(await screen.findByPlaceholderText('Type the project name in here'), {
+      target: { value: PROJECT.name },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'I understand, delete this project' }))
+
+    // Leaving the page unmounts the modal, so its last render still saw the deleted project
+    unmount()
+    await act(() => router.navigate({ to: '/project/$ref', params: { ref: 'other-project' } }))
+    resolveDelete()
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalled())
+    expect(router.state.location.pathname).toBe('/project/other-project')
   })
 })
