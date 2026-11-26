@@ -9,6 +9,10 @@ import staticRedirects from './static-redirects.json'
 // Some guides are dedicated Next.js routes rather than MDX files
 const GUIDE_ROUTES_DIRECTORY = join(import.meta.dirname, '..', '..', 'app', 'guides')
 
+// Guides fetched from external repos at build time (gitignored, see .gitignore), so their
+// files are absent from a fresh checkout and cannot be checked here
+const FEDERATED_GUIDES = ['graphql', 'deployment/terraform', 'deployment/ci']
+
 type Redirect = { source: string; destination: string }
 
 const allRedirects: Redirect[] = [...staticRedirects, ...dynamicRedirects]
@@ -52,6 +56,11 @@ describe('docs redirects', () => {
     const missing = staticRedirects
       // Only check internal guide destinations (external URLs and reference pages are skipped)
       .filter((r) => r.destination.startsWith(prefix))
+      // Skip federated guides, whose content is not in the repo
+      .filter((r) => {
+        const path = r.destination.slice(prefix.length)
+        return !FEDERATED_GUIDES.some((guide) => path === guide || path.startsWith(`${guide}/`))
+      })
       // Keep redirects whose destination has no page: strip the query/hash, then look for
       // guides/<path>.mdx, guides/<path>/index.mdx, or an app/guides/<path>/page.tsx route
       .filter((r) => {
