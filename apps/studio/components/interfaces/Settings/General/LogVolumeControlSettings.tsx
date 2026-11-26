@@ -30,6 +30,7 @@ import {
   useLogVolumeControl,
   type LogVolumeControl,
 } from './useLogVolumeControl'
+import { AlertError } from '@/components/ui/AlertError'
 
 const FORM_ID = 'log-volume-control-form'
 
@@ -52,7 +53,7 @@ interface LogVolumeControlFormProps {
 }
 
 const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
-  const { logVolumeControl, setLogVolumeControl, isLoading, isSaving } =
+  const { logVolumeControl, setLogVolumeControl, isLoading, isSaving, isError, error } =
     useLogVolumeControl(projectRef)
 
   const form = useForm<FormValues>({
@@ -81,6 +82,12 @@ const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
           <Card>
             <CardContent>
               <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+        ) : isError ? (
+          <Card>
+            <CardContent>
+              <AlertError error={error} subject="Failed to retrieve log volume control" />
             </CardContent>
           </Card>
         ) : (

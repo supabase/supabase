@@ -10,7 +10,7 @@ export type LogVolumeControl = (typeof LOG_VOLUME_CONTROL_VALUES)[number]
 const logVolumeControlSchema = z.enum(LOG_VOLUME_CONTROL_VALUES)
 
 export const useLogVolumeControl = (projectRef?: string) => {
-  const { data, isLoading } = useQuery(logSettingsQueryOptions({ projectRef }))
+  const { data, isLoading, isError, error } = useQuery(logSettingsQueryOptions({ projectRef }))
   const { mutate, isPending: isSaving } = useLogSettingsUpdateMutation()
 
   const parsed = logVolumeControlSchema.safeParse(data?.debug_mode)
@@ -21,5 +21,5 @@ export const useLogVolumeControl = (projectRef?: string) => {
     mutate({ projectRef, payload: { debug_mode: value } }, { onSuccess })
   }
 
-  return { logVolumeControl, setLogVolumeControl, isLoading, isSaving }
+  return { logVolumeControl, setLogVolumeControl, isLoading, isSaving, isError, error }
 }
