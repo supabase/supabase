@@ -185,7 +185,6 @@ export const CreatePublishableAPIKeyDialog = () => {
               variant="primary"
               form={FORM_ID}
               type="submit"
-              data-attr="api-key-create"
               loading={isCreatingAPIKey}
               disabled={!canCreateAPIKeys}
             >
