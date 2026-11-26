@@ -1,0 +1,67 @@
+---
+title: 'Verify Expo Preview isolation'
+description: 'Check that your Expo Preview build and downloaded update both use your test Supabase project, then verify that tenant rows and private files stay isolated.'
+topics: ['Tutorials', 'Auth', 'Database', 'Storage']
+---
+
+Before you release an Expo app that uses Supabase, check the project it reaches from both the installed Preview build and a downloaded Preview update. Then confirm that a tenant can read and write its own test data and that another tenant's data stays private.
+
+## Prerequisites
+
+Prepare the app and project before generating artifacts.
+
+- An Expo app configured for Expo Application Services (EAS) Update. Follow the [Expo Update setup guide](https://docs.expo.dev/eas-update/getting-started/).
+- A separate hosted Supabase project your team controls, with the database and Storage policies you plan to release. Follow the [Expo guide to setting up Supabase environments](https://docs.expo.dev/guides/using-supabase/#set-up-environments).
+
+## Prepare the Preview fixtures
+
+Use fresh synthetic fixtures so you can recognize the data returned by this run. The Expo environment supplies bundle variables. The channel controls which update the build can receive.
+
+1. Record the Preview project's API hostname from its connection settings. In the Expo Services `preview` environment, set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to that project's URL and publishable key. Set both `environment` and `channel` to `preview` in the `preview` build profile in `eas.json`. For configuration details, see [Expo's guide to environment variables](https://docs.expo.dev/eas/environment-variables/usage/).
+2. Create two ordinary sign-in accounts, one in the synthetic Amber tenant and one in the synthetic Blue tenant. Give each tenant a row with a known ID and a file with distinguishable contents in your private bucket. If your policies scope access by folder prefix, use paths such as `amber/probe.txt` and `blue/probe.txt`. Record both row IDs and object paths.
+3. Run the checks through the same Supabase client and request paths the app uses. For checks your app does not expose in its screens, use a Preview-only diagnostic that calls the same Data API and Storage client with the signed-in user's session. Keep secret and `service_role` keys out of the app bundle and the test client. See which keys belong in a public client in the [API keys guide](/docs/guides/getting-started/api-keys).
+
+## Verify the build and downloaded update
+
+Record the running bundle and the destination for each artifact before testing tenant access.
+
+1. Build with `eas build --profile preview` and install it on a clean test device or simulator.
+2. Before publishing the candidate update, launch the app and confirm that `Updates.isEmbeddedLaunch` from `expo-updates` is `true`. If the device already has a downloaded update, use a fresh install and start offline to confirm the embedded launch. Bring it online for the fixture checks.
+3. Before signing in, compare the hostname passed to the Supabase client with the expected Preview hostname. During the checks, confirm the observed Auth, Data API, and Storage request destinations through Preview project logs or host-only request logging in your test build. Successful sign-in and a read of the fixture you seeded establish that the project's URL and publishable key work together. Run the [tenant checks](#verify-tenant-access) on this embedded bundle.
+4. Confirm the `preview` channel points to the intended branch and is reserved for test builds. Publish with `eas update --channel preview --environment preview --message "Verify Preview isolation"`. Use a compatible runtime version for the installed build. See [Expo's deployment guide](https://docs.expo.dev/eas-update/deployment/) for channel and runtime details.
+5. After the update downloads, reopen the app. Confirm that `Updates.isEmbeddedLaunch` is `false` and that `Updates.updateId` matches the published update for that device's platform. Follow [Expo's update ID guide](https://docs.expo.dev/eas-update/trace-update-id-expo-dashboard/) to match that ID to its group. Recheck the hostname and repeat the [tenant checks](#verify-tenant-access) from the downloaded bundle.
+
+## Verify tenant access
+
+Sign out before switching accounts so each run starts with a fresh session. Record the starting values for both tenants. Use new write values and upload filenames for each artifact. Follow the operations in order and compare each result with the expected outcome.
+
+| Operation                                                                                                           | Expected result                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| As Amber, read the Amber row by ID, change an allowed field, and read it again.                                     | The expected fixture comes back with the new value.                                                           |
+| As Amber, read the Blue row by its known ID and try changing the same field.                                        | The read returns no Blue row and the write changes no Blue row.                                               |
+| As Amber, list the Amber folder, download its known file, and upload a new file in that folder.                     | The list includes the fixture, the download has the expected contents, and the new file is readable as Amber. |
+| As Amber, list the Blue folder, download the known Blue file directly, and attempt a new upload to the Blue folder. | The list exposes no Blue files, the direct download returns no file, and the upload is denied.                |
+| As Blue, read the Blue row, download the Blue file, and check for the attempted upload.                             | The Blue row still has its starting value, the Blue file is unchanged, and the attempted upload is absent.    |
+
+Repeat with the accounts swapped to check both directions. A policy can filter out the target of an update without returning an error. The final read as the owning tenant confirms the persisted value.
+
+If your app creates signed URLs, also confirm that the owning tenant can create one and the other tenant cannot create one for the same object. Anyone holding a valid signed URL can use it until it expires. Run the direct download check with the authenticated Storage client and keep signed URLs out of the evidence. See how these requests are authorized in the [Storage access control guide](/docs/guides/storage/security/access-control).
+
+## Record the release decision
+
+For each platform, record the build ID, platform update ID, channel, and runtime version. Include the expected and observed API hostnames, the schema or migration revision, and pass or fail for each fixture check on each artifact. Record fixture aliases and outcomes without collecting API keys, session tokens, or raw request headers.
+
+Hold the release in any of these cases.
+
+- Either bundle reaches a different project, or you can't confirm that the candidate update ran.
+- A cross-tenant action succeeds or an allowed action fails.
+- An outage, failed sign-in, or unexplained request failure leaves the result inconclusive.
+
+Correct the cause, then rerun the affected checks on both artifacts before proceeding.
+
+## Next steps
+
+Make the policy checks repeatable as your schema changes.
+
+- Use [pgTAP to test Row Level Security](/docs/guides/database/postgres/testing-row-level-security) for fast regression checks on tenant policies.
+- Add [application-level database tests](/docs/guides/local-development/testing/overview#application-level-testing) to exercise policies through the client your app uses.
