@@ -3038,6 +3038,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/log-settings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project log settings */
+    get: operations['LogSettingsController_getLogSettings']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates project log settings */
+    patch: operations['LogSettingsController_updateLogSettings']
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/metrics': {
     parameters: {
       query?: never
@@ -12672,6 +12690,13 @@ export interface components {
       updated_at: string
       volumeSizeGb?: number | null
     }
+    ProjectLogSettingsResponse_Output: {
+      /**
+       * @description Which logs the project keeps: every log, or only errors
+       * @enum {string}
+       */
+      debug_mode: 'all' | 'errors_only'
+    }
     ProjectMembersResponse_Output: {
       members: {
         primary_email: string
@@ -15817,6 +15842,13 @@ export interface components {
     }
     UpdateProjectBody: {
       name: string
+    }
+    UpdateProjectLogSettingsBody: {
+      /**
+       * @description Which logs the project keeps: every log, or only errors
+       * @enum {string}
+       */
+      debug_mode?: 'all' | 'errors_only'
     }
     UpdatePublicationBody: {
       /** @description Publication tables */
@@ -28391,6 +28423,110 @@ export interface operations {
         content?: never
       }
       /** @description Failed to test log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogSettingsController_getLogSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectLogSettingsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch log settings */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogSettingsController_updateLogSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateProjectLogSettingsBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectLogSettingsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update log settings */
       500: {
         headers: {
           [name: string]: unknown

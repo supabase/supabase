@@ -52,7 +52,8 @@ interface LogVolumeControlFormProps {
 }
 
 const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
-  const { logVolumeControl, setLogVolumeControl, isLoading } = useLogVolumeControl(projectRef)
+  const { logVolumeControl, setLogVolumeControl, isLoading, isSaving } =
+    useLogVolumeControl(projectRef)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -62,9 +63,10 @@ const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
   const { isDirty } = form.formState
 
   const onSubmit = (values: FormValues) => {
-    setLogVolumeControl(values.logVolumeControl)
-    form.reset(values)
-    toast.success('Log volume control updated')
+    setLogVolumeControl(values.logVolumeControl, () => {
+      form.reset(values)
+      toast.success('Log volume control updated')
+    })
   }
 
   return (
@@ -125,7 +127,13 @@ const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
                       Cancel
                     </Button>
                   )}
-                  <Button form={FORM_ID} variant="primary" type="submit" disabled={!isDirty}>
+                  <Button
+                    form={FORM_ID}
+                    variant="primary"
+                    type="submit"
+                    disabled={!isDirty || isSaving}
+                    loading={isSaving}
+                  >
                     Save changes
                   </Button>
                 </CardFooter>

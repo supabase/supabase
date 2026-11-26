@@ -1,20 +1,25 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { logSettingsQueryOptions } from '@/data/log-settings/log-settings-query'
+import { useLogSettingsUpdateMutation } from '@/data/log-settings/log-settings-update-mutation'
 
 export const LOG_VOLUME_CONTROL_VALUES = ['all', 'errors_only'] as const
 export type LogVolumeControl = (typeof LOG_VOLUME_CONTROL_VALUES)[number]
 
 const logVolumeControlSchema = z.enum(LOG_VOLUME_CONTROL_VALUES)
 
-// TODO(DEBUG-266): UI-only until the backend supports filtering by log volume control, see the RFC: Log Volume Control project in Linear.
 export const useLogVolumeControl = (projectRef?: string) => {
-  const [storedValue, setLogVolumeControl, { isLoading }] = useLocalStorageQuery<LogVolumeControl>(
-    LOCAL_STORAGE_KEYS.LOG_VOLUME_CONTROL(projectRef ?? '_'),
-    'all'
-  )
-  const parsed = logVolumeControlSchema.safeParse(storedValue)
+  const { data, isLoading } = useQuery(logSettingsQueryOptions({ projectRef }))
+  const { mutate, isPending: isSaving } = useLogSettingsUpdateMutation()
+
+  const parsed = logVolumeControlSchema.safeParse(data?.debug_mode)
   const logVolumeControl: LogVolumeControl = parsed.success ? parsed.data : 'all'
-  return { logVolumeControl, setLogVolumeControl, isLoading }
+
+  const setLogVolumeControl = (value: LogVolumeControl, onSuccess?: () => void) => {
+    if (!projectRef) return
+    mutate({ projectRef, payload: { debug_mode: value } }, { onSuccess })
+  }
+
+  return { logVolumeControl, setLogVolumeControl, isLoading, isSaving }
 }
