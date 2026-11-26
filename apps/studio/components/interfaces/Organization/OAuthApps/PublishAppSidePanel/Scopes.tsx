@@ -1,5 +1,5 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 import { AccessLevelDropdown, type AccessLevel } from './AccessLevelDropdown'
@@ -38,7 +38,7 @@ const Scope = ({
 
   return (
     <div
-      className="flex flex-wrap items-start justify-between gap-3 p-4 border first:rounded-t last:rounded-b"
+      className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_10rem] items-start gap-3 p-4 border first:rounded-t last:rounded-b"
       key={title}
     >
       <div className="flex flex-col">
@@ -58,7 +58,9 @@ const Scope = ({
 export const ScopesPanel = ({
   scopes,
   setScopes,
+  databaseAccessPermission,
 }: {
+  databaseAccessPermission?: ReactNode
   scopes: OAuthScope[]
   setScopes: Dispatch<SetStateAction<OAuthScope[]>>
 }) => {
@@ -96,6 +98,7 @@ export const ScopesPanel = ({
         scopes={scopes}
         setScopes={setScopes}
       />
+      {databaseAccessPermission}
       <Scope
         title="Domains"
         description={PERMISSIONS_DESCRIPTIONS.DOMAINS}

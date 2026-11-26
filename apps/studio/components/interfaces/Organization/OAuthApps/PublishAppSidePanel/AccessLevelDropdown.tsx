@@ -30,6 +30,7 @@ export function AccessLevelDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
+          className="w-40 justify-between shrink-0"
           disabled={disabled}
           iconRight={<ChevronDownIcon />}
           aria-label={`${permission}: ${label}`}

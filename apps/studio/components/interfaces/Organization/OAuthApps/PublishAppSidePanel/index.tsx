@@ -1,6 +1,6 @@
-import { useLocation } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { EditIcon, UploadIcon } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -36,13 +36,13 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { AuthorizationSection } from './Authorization'
-import { DirectDatabaseAccessPreview } from './DirectDatabaseAccessPreview'
 import {
   AuthorizationValues,
   getAuthorizationChanges,
   hasAuthorizationChanges,
 } from './Authorization.utils'
 import { AuthorizationConfirmDialog } from './AuthorizationConfirmDialog'
+import { DirectDatabaseAccessPreview } from './DirectDatabaseAccessPreview'
 import {
   formSchema,
   FormSchema,
@@ -562,16 +562,22 @@ export const PublishAppSidePanel = ({
               <DocsButton href={`${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`} />
             </div>
 
-            {visible && isDatabaseAccessPreview && (
-              <DirectDatabaseAccessPreview
-                key={selectedApp?.id}
-                isPreviewMemberBound={
-                  databaseAccessPreview === 'member-bound' ||
-                  selectedApp?.grant_kind === 'member_bound'
-                }
-              />
-            )}
-            <ScopesPanel scopes={scopes} setScopes={setScopes} />
+            <ScopesPanel
+              scopes={scopes}
+              setScopes={setScopes}
+              databaseAccessPermission={
+                visible &&
+                isDatabaseAccessPreview && (
+                  <DirectDatabaseAccessPreview
+                    key={selectedApp?.id}
+                    isPreviewMemberBound={
+                      databaseAccessPreview === 'member-bound' ||
+                      selectedApp?.grant_kind === 'member_bound'
+                    }
+                  />
+                )
+              }
+            />
           </div>
 
           <AlertDialog open={showPreview} onOpenChange={(open) => setShowPreview(open)}>

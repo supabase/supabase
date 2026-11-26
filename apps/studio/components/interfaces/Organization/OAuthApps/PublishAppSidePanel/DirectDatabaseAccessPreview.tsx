@@ -17,20 +17,19 @@ export function DirectDatabaseAccessPreview({
   const isDisabled = isPreviewMemberBound || isMemberBound
 
   return (
-    <div className="mb-4 flex flex-wrap items-start justify-between gap-3 rounded border p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_10rem] items-start gap-3 border p-4">
       <div className="space-y-1">
-        <p className="text-sm text-foreground">Direct database access</p>
+        <p className="text-sm text-foreground">Table data</p>
         <p className="text-xs text-foreground-light">
           {isDisabled
             ? 'Only organization-bound apps can request direct database access.'
-            : 'Connect to project databases using your app’s access token.'}
+            : 'Connect directly to Postgres to access table data using your app’s access token.'}
         </p>
         {!isDisabled && accessLevel !== 'No access' && (
           <p className="text-xs text-foreground-light">
             Database role: <code>example_partner_user</code>
           </p>
         )}
-        <p className="text-xs text-foreground-light">Local preview. This permission isn’t saved.</p>
       </div>
       <AccessLevelDropdown
         permission="Direct database access"
