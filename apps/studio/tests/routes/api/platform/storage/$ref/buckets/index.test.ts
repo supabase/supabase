@@ -1,27 +1,39 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/api/platform/storage/$ref/buckets/index'
+import { mswServer } from '@/tests/lib/msw'
 import { callRoute } from '@/tests/lib/server-route'
 
-const mocks = vi.hoisted(() => ({
-  listBuckets: vi.fn(),
-}))
+type ListBucketsResponse = Array<{ id: string; name: string }>
 
-vi.mock('@/lib/api/self-hosted-admin', () => ({
-  selfHostedSupabaseAdmin: {
-    storage: {
-      listBuckets: mocks.listBuckets,
-    },
-  },
-}))
+const SUPABASE_URL = 'http://supabase.test'
+
+const PAGINATION_PARAMS = ['limit', 'offset', 'sortColumn', 'sortOrder']
+
+function mockListBuckets(buckets: ListBucketsResponse) {
+  const received: URLSearchParams[] = []
+  mswServer.use(
+    http.get(`${SUPABASE_URL}/storage/v1/bucket`, ({ request }) => {
+      received.push(new URL(request.url).searchParams)
+      return HttpResponse.json<ListBucketsResponse>(buckets)
+    })
+  )
+  return received
+}
 
 describe('/api/platform/storage/$ref/buckets', () => {
-  beforeEach(() => {
-    mocks.listBuckets.mockReset()
+  beforeAll(() => {
+    vi.stubEnv('SUPABASE_URL', SUPABASE_URL)
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'test-service-role-key')
   })
 
-  it('parses pagination query parameters and passes them to listBuckets', async () => {
-    mocks.listBuckets.mockResolvedValue({ data: [{ id: 'avatars' }], error: null })
+  afterAll(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('forwards pagination query parameters to the storage API', async () => {
+    const received = mockListBuckets([{ id: 'avatars', name: 'avatars' }])
 
     const response = await callRoute(
       Route,
@@ -31,19 +43,20 @@ describe('/api/platform/storage/$ref/buckets', () => {
       { ref: 'default' }
     )
 
-    expect(mocks.listBuckets).toHaveBeenCalledWith({
-      limit: 10,
-      offset: 5,
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual([{ id: 'avatars', name: 'avatars' }])
+    expect(received).toHaveLength(1)
+    expect(Object.fromEntries(received[0])).toEqual({
+      limit: '10',
+      offset: '5',
       search: 'ava',
       sortColumn: 'name',
       sortOrder: 'desc',
     })
-    expect(response.status).toBe(200)
-    expect(await response.json()).toEqual([{ id: 'avatars' }])
   })
 
   it('drops invalid query parameters instead of rejecting the request', async () => {
-    mocks.listBuckets.mockResolvedValue({ data: [], error: null })
+    const received = mockListBuckets([])
 
     const response = await callRoute(
       Route,
@@ -53,7 +66,10 @@ describe('/api/platform/storage/$ref/buckets', () => {
       { ref: 'default' }
     )
 
-    expect(mocks.listBuckets).toHaveBeenCalledWith({})
     expect(response.status).toBe(200)
+    expect(received).toHaveLength(1)
+    for (const param of PAGINATION_PARAMS) {
+      expect(received[0].has(param)).toBe(false)
+    }
   })
 })
