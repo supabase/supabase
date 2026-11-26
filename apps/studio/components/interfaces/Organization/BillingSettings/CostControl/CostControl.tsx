@@ -1,7 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Alert, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -151,8 +150,9 @@ export const CostControl = () => {
                   <div className="flex flex-col md:flex-row gap-6">
                     <div>
                       <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow-sm">
-                        <Image
-                          alt="Spend Cap"
+                        <img
+                          alt=""
+                          aria-hidden="true"
                           width={160}
                           height={96}
                           src={

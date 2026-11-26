@@ -27,7 +27,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import ChooseFunctionForm from './ChooseFunctionForm'
+import { ChooseFunctionForm } from './ChooseFunctionForm'
 import {
   TRIGGER_ENABLED_MODES,
   TRIGGER_EVENTS,

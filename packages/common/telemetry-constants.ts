@@ -2043,10 +2043,6 @@ export interface StudioPricingPlanCtaClickedEvent {
      */
     currentPlan?: string
     /**
-     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
-     */
-    planUpdateRedesignEnabled: boolean
-    /**
      * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
      */
     origin?: string
@@ -4494,7 +4490,8 @@ export interface AccessTokenDoneButtonClickedEvent {
 
 /**
  * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
- * `placement` identifying which one (the user dropdown or the org project-list usage card).
+ * `placement` identifying which one (the user dropdown, the org project-list usage card, or the
+ * Free plan badge next to the organization name in the header).
  *
  * @group Events
  * @source studio
@@ -4502,7 +4499,7 @@ export interface AccessTokenDoneButtonClickedEvent {
 export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
-    placement: 'user_dropdown' | 'org_projects_list'
+    placement: 'user_dropdown' | 'org_projects_list' | 'org_plan_badge'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }

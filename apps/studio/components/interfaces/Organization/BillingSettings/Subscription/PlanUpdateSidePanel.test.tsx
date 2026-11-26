@@ -9,7 +9,6 @@ import { customRender } from '@/tests/lib/custom-render'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
-const mockFlags = vi.hoisted(() => ({}) as Record<string, boolean>)
 const mockTrack = vi.hoisted(() => vi.fn())
 const mockSubscriptionPlan = vi.hoisted(() => ({ id: 'free', name: 'Free' }))
 
@@ -18,7 +17,6 @@ vi.mock('common', async (importOriginal) => {
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
-    useFlag: (name: string) => mockFlags[name] ?? false,
   }
 })
 
@@ -160,13 +158,8 @@ vi.mock('./PlanUpgradeSuccessView', () => ({
   ),
 }))
 
-vi.mock('./SubscriptionPlanUpdateDialog', () => ({
-  SubscriptionPlanUpdateDialog: () => <div data-testid="plan-update-dialog" />,
-}))
-
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
-    for (const key of Object.keys(mockFlags)) delete mockFlags[key]
     mockTrack.mockClear()
     Object.assign(mockSubscriptionPlan, { id: 'free', name: 'Free' })
     mockSelectedOrganization.mockReturnValue(
@@ -320,24 +313,13 @@ describe('PlanUpdateSidePanel', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Upgrade to Pro' }))
     }
 
-    it('keeps the dialog while the redesign flag is off', async () => {
-      await selectPro()
-
-      expect(screen.getByTestId('plan-update-dialog')).toBeInTheDocument()
-      expect(screen.queryByTestId('plan-update-view')).not.toBeInTheDocument()
-    })
-
-    it('shows the redesigned full-screen view when the flag is on', async () => {
-      mockFlags.billingPlanUpdateRedesign = true
-
+    it('shows the full-screen plan update view', async () => {
       await selectPro()
 
       expect(screen.getByTestId('plan-update-view')).toBeInTheDocument()
-      expect(screen.queryByTestId('plan-update-dialog')).not.toBeInTheDocument()
     })
 
     it('remembers the plan from before the upgrade after the subscription refetches', async () => {
-      mockFlags.billingPlanUpdateRedesign = true
       const { rerender } = render(<PlanUpdateSidePanel />)
       await userEvent.click(screen.getByRole('button', { name: 'Upgrade to Pro' }))
 

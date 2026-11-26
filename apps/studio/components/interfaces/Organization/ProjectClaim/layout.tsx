@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { PropsWithChildren, ReactNode } from 'react'
 import { cn, Separator } from 'ui'
 
@@ -19,7 +18,7 @@ export const ProjectClaimLayout = ({
       <div className="flex flex-row justify-between mx-auto w-full h-[52px] items-center px-4">
         <div className="flex items-center gap-2">
           <span className="sr-only">Supabase</span>
-          <Image
+          <img
             src={`${BASE_PATH}/img/supabase-logo.svg`}
             alt="Supabase Logo"
             height={20}
