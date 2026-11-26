@@ -114,7 +114,7 @@ describe('pipeline version updates', () => {
       customRender(
         <PipelineRequestStatusProvider>
           <StatusView />
-          <UpdateVersionModal visible pipeline={pipeline} onClose={onClose} />
+          <UpdateVersionModal clusterId={undefined} visible pipeline={pipeline} onClose={onClose} />
         </PipelineRequestStatusProvider>,
         { queryClient }
       )

@@ -49,6 +49,7 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
+import { useUrlReplicationClusterId } from './PipelineClusterScope'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import {
@@ -73,7 +74,6 @@ import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutati
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { splitInternalUrl } from '@/lib/internal-url'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -90,22 +90,26 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
+  const navigate = useNavigate()
   const { ref: projectRef, pipelineId } = useParams()
-  const clusterId = useReplicationClusterId()
+  const clusterId = useUrlReplicationClusterId()
   const { clusters, hasMultipleRegions } = useReplicationClusters()
   const region = clusters.find(
     (cluster) => (cluster.isDefault ? undefined : cluster.clusterId) === clusterId
   )
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-  const navigate = useNavigate()
+
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
   const [, setEdit] = useQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus({
+    clusterId,
+  })
   const requestStatus = getRequestStatus(pipelineId)
   const isPipelineRequestPending = isRequestPending(pipelineId)
 
@@ -482,7 +486,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       {!isUnknownDestination && (canModify || pipelineError) && children}
 
-      <DestinationPanel />
+      <DestinationPanel clusterId={clusterId} />
 
       <DeleteDestination
         visible={showDeleteDestination}
@@ -494,6 +498,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       <UpdateVersionModal
         visible={canModify && showUpdateVersionModal}
+        clusterId={clusterId}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />

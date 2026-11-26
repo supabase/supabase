@@ -5,7 +5,6 @@ import { HttpResponse } from 'msw'
 import { afterEach, expect, test, vi } from 'vitest'
 
 import { ReplicationDiagram } from '.'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -86,11 +85,9 @@ test('draws destinations as their regions load and keeps the primary database in
   })
 
   customRender(
-    <ReplicationClusterProvider clusterId="2">
-      <PipelineRequestStatusProvider>
-        <ReplicationDiagram />
-      </PipelineRequestStatusProvider>
-    </ReplicationClusterProvider>
+    <PipelineRequestStatusProvider>
+      <ReplicationDiagram />
+    </PipelineRequestStatusProvider>
   )
 
   try {

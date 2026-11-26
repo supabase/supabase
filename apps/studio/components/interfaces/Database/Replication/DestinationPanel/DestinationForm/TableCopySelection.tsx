@@ -20,12 +20,12 @@ import {
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface TableCopySelectionProps {
   showLoadError?: boolean
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  clusterId?: string
 }
 
 const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) =>
@@ -36,10 +36,10 @@ const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${sc
 export const TableCopySelection = ({
   form,
   editMode,
+  clusterId,
   showLoadError = true,
 }: TableCopySelectionProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const [publicationName, tableSyncCopyMode, tableSyncCopyTableIds] = useWatch({

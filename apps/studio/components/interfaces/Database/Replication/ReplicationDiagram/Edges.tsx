@@ -18,7 +18,6 @@ import { RegionFlag } from '@/components/ui/RegionFlag'
 import type { ReplicationRegion } from '@/data/replication/clusters-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -36,11 +35,7 @@ type ReplicationEdgeProps = EdgeProps<Edge<EdgeData, 'smoothstep'>>
 export const SmoothstepEdge = (props: ReplicationEdgeProps) => {
   if (!props.data) return null
 
-  return (
-    <ReplicationClusterProvider clusterId={props.data.clusterId}>
-      <ScopedSmoothstepEdge {...props} data={props.data} />
-    </ReplicationClusterProvider>
-  )
+  return <ScopedSmoothstepEdge {...props} data={props.data} />
 }
 
 const ScopedSmoothstepEdge = ({
@@ -55,9 +50,8 @@ const ScopedSmoothstepEdge = ({
   data,
 }: ReplicationEdgeProps & { data: EdgeData }) => {
   const { ref: projectRef = 'default' } = useParams()
-  const clusterId = useReplicationClusterId()
   const prefersReducedMotion = useReducedMotion()
-  const { destinationId, region, shiftEdgeEnd } = data
+  const { destinationId, clusterId, region, shiftEdgeEnd } = data
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef, clusterId })
   const pipeline = pipelinesData?.pipelines.find((p) => p.destination_id === destinationId)
@@ -65,7 +59,7 @@ const ScopedSmoothstepEdge = ({
     { projectRef, clusterId, pipelineId: pipeline?.id },
     { enabled: !!pipeline?.id }
   )
-  const { getRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus } = usePipelineRequestStatus({ clusterId })
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
