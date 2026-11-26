@@ -93,24 +93,24 @@ export const buildIntegrationOauthBuild: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Create an OAuth app',
+      title: '1. Create an OAuth app',
       href: '/guides/integrations/build-a-supabase-oauth-integration',
       description:
         "In your organization's settings, open the OAuth Apps tab and click Add application.",
     },
     {
-      title: 'Choose scopes',
+      title: '2. Choose scopes',
       href: '/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
       description: 'Request only the permissions your integration needs.',
     },
     {
-      title: 'Build the redirect endpoint',
+      title: '3. Build the redirect endpoint',
       href: '/guides/integrations/partner-integration-guide',
       description:
         'Handle the users that the Install integration button sends to your install URL.',
     },
     {
-      title: 'Implement the OAuth flow',
+      title: '4. Implement the OAuth flow',
       href: '/guides/integrations/build-a-supabase-oauth-integration#show-a-connect-supabase-button',
       description:
         'Send users to Supabase to approve access, exchange the code for tokens, and refresh them.',
