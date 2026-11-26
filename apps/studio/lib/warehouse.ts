@@ -31,9 +31,10 @@ export function getWarehouseFlightSqlConnectionString(projectRef: string): strin
   return `flightsql://postgres:${PASSWORD_PLACEHOLDER}@${endpoint}:443?tls=enabled`
 }
 
-export function getWarehouseUsqlCommand(projectRef: string): string {
+export function getWarehouseDatabowCommand(projectRef: string): string {
   const endpoint = getWarehouseFlightSqlEndpoint(projectRef)
-  return `usql -X -W 'flightsql://postgres@${endpoint}:443?tls=enabled'`
+  return `# Install Databow: https://docs.columnar.tech/databow/installation/
+databow --driver flightsql --uri 'grpc+tls://${endpoint}:443' --username postgres --password '${PASSWORD_PLACEHOLDER}'`
 }
 
 /** Environment variables the DuckLake setup script reads secrets from. */
