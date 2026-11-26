@@ -27,9 +27,9 @@ builds it on each request.
 | --------------------- | ------------------------------------------------ | ------------------------------------------------- |
 | `llms.txt` route      | `apps/www/app/llms.txt/route.ts`                 | `https://supabase.com/llms.txt`                   |
 | `llms-full.txt` route | `apps/www/app/llms-full.txt/route.ts`            | `https://supabase.com/llms-full.txt`              |
-| Guide middleware      | `apps/docs/middleware.ts`                        | — (lines ~16–38: negotiate, rewrite to guides-md) |
-| WWW middleware        | `apps/www/middleware.ts`                         | Product-page markdown negotiation                 |
-| Negotiation logic     | `packages/common/markdown-negotiation.ts`        | Shared by both middleware files                   |
+| Guide proxy           | `apps/docs/proxy.ts`                             | — (lines ~16–38: negotiate, rewrite to guides-md) |
+| WWW proxy             | `apps/www/proxy.ts`                              | Product-page markdown negotiation                 |
+| Negotiation logic     | `packages/common/markdown-negotiation.ts`        | Shared by both proxies                            |
 | Guides markdown API   | `apps/docs/app/api/guides-md/[...slug]/route.ts` | Reads `public/markdown/guides/` at runtime        |
 | Markdown manifest     | `apps/docs/public/markdown/manifest.json`        | Slugs eligible for `.md` negotiation              |
 
@@ -47,7 +47,7 @@ flowchart TB
   end
 
   subgraph docsServe ["apps/docs runtime"]
-    mw["middleware.ts"]
+    mw["proxy.ts"]
     guidesMd["api/guides-md"]
     crawlers["api/crawlers"]
     gql["api/graphql searchDocs"]
@@ -72,7 +72,7 @@ flowchart TB
 | ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
 | `/llms.txt`                              | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                           |
 | `/llms-full.txt`                         | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews            |
-| `/docs/guides/<path>.md`                 | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`           |
+| `/docs/guides/<path>.md`                 | `apps/docs` | Proxy → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`                |
 | `/docs/markdown/reference/<lib>.md`      | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                  |
 | `/docs/docs.tar.gz`                      | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                         |
 | `/docs/api/graphql` (`searchDocs`)       | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md) |
@@ -90,7 +90,7 @@ Every guide exists in two forms from the same MDX source:
 | **HTML**     | Live MDX render (`partialsRemark`, React components)                 | Humans in a browser                  |
 | **Markdown** | Prebuild (`generate-guides-markdown.ts` → `public/markdown/guides/`) | Live-fetch agents and bulk downloads |
 
-`apps/docs/middleware.ts` is the bouncer for guide requests. It calls
+`apps/docs/proxy.ts` handles guide requests. It calls
 `negotiateMarkdown()` from `packages/common/markdown-negotiation.ts` and
 checks `public/markdown/manifest.json` before serving markdown.
 
@@ -134,7 +134,7 @@ Agents that don't know a specific URL can start from:
 ## Content negotiation
 
 Shared logic lives in `packages/common/markdown-negotiation.ts`, used by
-both `apps/docs/middleware.ts` and `apps/www/middleware.ts`.
+both `apps/docs/proxy.ts` and `apps/www/proxy.ts`.
 
 Markdown is served when:
 
