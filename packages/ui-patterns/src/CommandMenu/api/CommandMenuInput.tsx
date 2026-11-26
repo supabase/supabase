@@ -89,9 +89,13 @@ const CommandMenuInput = forwardRef<
     [telemetryContext]
   )
 
+  // A menu reset empties the input without a change event, so the pending send
+  // reads what the user last typed instead of the current value
+  const typedValueRef = useRef('')
+
   const debouncedTelemetry = useDebounce(
     useCallback(() => {
-      inputTelemetryEvent(currentValue)
+      if (typedValueRef.current.trim()) inputTelemetryEvent(typedValueRef.current)
       previousValueRef.current = currentValue
     }, [inputTelemetryEvent, currentValue]),
     INPUT_TYPED_EVENT_DEBOUNCE_TIME
@@ -101,6 +105,7 @@ const CommandMenuInput = forwardRef<
     (newValue: string) => {
       if (!isControlled) setInputValue(newValue)
       onValueChange?.(newValue)
+      typedValueRef.current = newValue
 
       // Only trigger telemetry if the user is adding characters (not removing with backspace)
       const isAddingCharacters = newValue.length > previousValueRef.current.length

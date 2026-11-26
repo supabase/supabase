@@ -31,20 +31,6 @@ vi.mock('next/router', async () => (await import('./lib/route-aware-hooks')).moc
 vi.mock('next/compat/router', async () =>
   (await import('./lib/route-aware-hooks')).mockNextRouter()
 )
-vi.mock('next/navigation', async () => {
-  const actual = await vi.importActual('next/navigation')
-  const { routeAwareHook } = await import('./lib/route-aware-hooks')
-  const compat = await import('@/compat/next/navigation')
-  return {
-    ...actual,
-    useRouter: routeAwareHook(compat.useRouter, () => ({ push: vi.fn(), replace: vi.fn() })),
-    usePathname: routeAwareHook(
-      compat.usePathname,
-      () => require('next-router-mock').useRouter().asPath.split(/[?#]/, 1)[0]
-    ),
-    useSearchParams: routeAwareHook(compat.useSearchParams, () => ({ get: vi.fn() })),
-  }
-})
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()

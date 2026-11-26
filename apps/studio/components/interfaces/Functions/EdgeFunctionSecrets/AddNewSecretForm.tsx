@@ -258,7 +258,7 @@ export const AddNewSecretForm = () => {
                       <FormItemLayout
                         label="Value"
                         layout="flex-row-reverse"
-                        description="Supports multi-line values such as PEM keys, JSON, or functions."
+                        description="Supports multi-line values such as PEM keys, JSON, or functions. Secrets can’t be retrieved once saved."
                       >
                         <FormControl>
                           <div className="relative w-full">

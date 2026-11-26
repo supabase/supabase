@@ -1,11 +1,21 @@
-import { useRouter } from 'next/navigation'
+import type { AnyRouter, UseNavigateResult } from '@tanstack/react-router'
 import type { NextRouter } from 'next/router'
 
 import { BASE_PATH } from './constants'
+import { splitInternalUrl } from './internal-url'
 
-type Router = NextRouter | ReturnType<typeof useRouter>
+type Router = NextRouter | UseNavigateResult<string>
 
 const MIDDLE_MOUSE_BUTTON = 1
+
+const navigateToUrl = (url: string, router: Router) => {
+  if (typeof router === 'function') {
+    const { to, search, hash } = splitInternalUrl(url)
+    void router<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
+  } else {
+    router.push(url)
+  }
+}
 
 /**
  * Creates a navigation handler that supports keyboard, modifier clicks, and middle mouse button.
@@ -17,13 +27,13 @@ const MIDDLE_MOUSE_BUTTON = 1
  * - Performs normal navigation on regular click
  *
  * @param url - The relative URL to navigate to (e.g., "/project/123/functions/my-function")
- * @param router - Next.js router instance (supports both Pages Router and App Router)
+ * @param router - Next.js Pages Router instance or TanStack Router navigate function
  * @returns Event handler function for onClick, onAuxClick, and onKeyDown
  *
  * @example
  * ```tsx
- * const router = useRouter()
- * const handleNavigation = createNavigationHandler(`/project/${ref}/functions/${slug}`, router)
+ * const navigate = useNavigate()
+ * const handleNavigation = createNavigationHandler(`/project/${ref}/functions/${slug}`, navigate)
  *
  * <TableRow
  *   onClick={handleNavigation}
@@ -44,7 +54,7 @@ export const createNavigationHandler = (url: string, router: Router) => {
         if (isModifierKey) {
           window.open(`${BASE_PATH}${url}`, '_blank')
         } else {
-          router.push(url)
+          navigateToUrl(url, router)
         }
       }
       return
@@ -70,6 +80,6 @@ export const createNavigationHandler = (url: string, router: Router) => {
     // Regular left click only. Other aux buttons (e.g. right-click) must not navigate.
     if ('button' in event && event.button !== 0) return
 
-    router.push(url)
+    navigateToUrl(url, router)
   }
 }

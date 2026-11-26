@@ -44,7 +44,7 @@ describe('docs proxy — /guides/* content negotiation', () => {
     expect(md.headers.get('cache-control')).toBe('no-store')
     const body = await md.text()
     expect(body).toContain('<https://supabase.com/docs/guides/doesnotexist>')
-    expect(body).toContain('<https://supabase.com/llms.txt>')
+    expect(body).toContain('<https://supabase.com/docs/llms.txt>')
     const accept = makeRequest('/docs/guides/doesnotexist', { accept: 'text/markdown' })
     expect(proxy(accept).headers.get(REWRITE_HEADER)).toBeNull()
   })

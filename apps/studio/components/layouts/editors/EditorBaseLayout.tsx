@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -25,7 +25,7 @@ export const EditorBaseLayout = ({
   browserTitle,
 }: ExplorerLayoutProps) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
 

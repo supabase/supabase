@@ -145,6 +145,24 @@ export function removeFromGroup(group: FilterGroup, path: number[]): FilterGroup
   }
 }
 
+/**
+ * Removes the condition at `path` and any nested group that removal leaves empty, so the last
+ * condition of a group takes the group with it. The root group is kept even when empty.
+ */
+export function removeConditionAndEmptiedGroups(group: FilterGroup, path: number[]): FilterGroup {
+  if (path.length === 1) return removeFromGroup(group, path)
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.flatMap((condition, i) => {
+      if (i !== current) return [condition]
+      const updated = removeConditionAndEmptiedGroups(condition as FilterGroup, rest)
+      return updated.conditions.length === 0 ? [] : [updated]
+    }),
+  }
+}
+
 export function addFilterToGroup(
   group: FilterGroup,
   path: number[],

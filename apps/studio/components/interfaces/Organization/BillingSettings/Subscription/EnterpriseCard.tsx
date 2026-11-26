@@ -9,9 +9,15 @@ export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
   liftedSide?: 'left' | 'right'
+  origin?: string
 }
 
-export const EnterpriseCard = ({ plan, isCurrentPlan, liftedSide }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({
+  plan,
+  isCurrentPlan,
+  liftedSide,
+  origin,
+}: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const track = useTrack()
 
@@ -19,6 +25,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, liftedSide }: EnterpriseCa
     track('studio_pricing_plan_cta_clicked', {
       selectedPlan: 'Enterprise',
       currentPlan: selectedOrganization?.plan.name,
+      origin,
     })
 
   return (

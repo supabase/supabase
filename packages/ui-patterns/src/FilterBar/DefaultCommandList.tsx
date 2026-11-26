@@ -16,6 +16,9 @@ export type DefaultCommandListProps = {
   grouped?: boolean
 }
 
+const isPropertyItem = (item?: MenuItem) =>
+  !!item && !item.isAction && !item.isFreeformSearch && item.value !== '__new_group__'
+
 export function DefaultCommandList({
   items,
   highlightedIndex,
@@ -73,7 +76,7 @@ export function DefaultCommandList({
           {showGroupHeaders && groupData.group && (
             <GroupHeader label={OPERATOR_GROUP_LABELS[groupData.group]} />
           )}
-          {groupData.items.map(({ item, index }, itemIndex) => (
+          {groupData.items.map(({ item, index }) => (
             <Fragment key={`${item.value}-${item.label}`}>
               {item.propertyGroupLabel &&
                 item.propertyGroupLabel !== items[index - 1]?.propertyGroupLabel && (
@@ -82,7 +85,9 @@ export function DefaultCommandList({
                     <GroupHeader label={item.propertyGroupLabel} />
                   </>
                 )}
-              {item.value === '__new_group__' && itemIndex > 0 && <GroupSeparator />}
+              {item.value === '__new_group__' && isPropertyItem(items[index - 1]) && (
+                <GroupSeparator />
+              )}
               <CommandListItem
                 showSelection={showSelection}
                 item={item}
@@ -91,6 +96,9 @@ export function DefaultCommandList({
                 onSelect={onSelect}
                 setRef={setItemRef(index)}
               />
+              {item.value === '__new_group__' && isPropertyItem(items[index + 1]) && (
+                <GroupSeparator />
+              )}
             </Fragment>
           ))}
         </div>

@@ -84,7 +84,7 @@ Specific traps to watch for. One-liner per item.
 - `pnpm build --filter=docs` runs markdown generation. A failure in
   `generate-guides-markdown.ts` blocks the build — read its console output
   rather than the cryptic CI error.
-- `pnpm format` from the repo root catches most prettier drift. Run it
+- `pnpm format` from the repo root catches most oxfmt drift. Run it
   before opening a PR; CI is unforgiving.
 - Auto-import sorting can silently shuffle imports across files you didn't
   touch. Reset those files (`git checkout master -- <path>`) before pushing.

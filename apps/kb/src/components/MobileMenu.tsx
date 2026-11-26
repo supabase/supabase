@@ -1,9 +1,10 @@
 import { useState, type RefObject } from 'react'
-import { Button } from 'ui'
+import { MobileNavAccountActions } from 'ui-patterns/MobileNav/MobileNavAccountActions'
 import { MobileNavDrawer } from 'ui-patterns/MobileNav/MobileNavDrawer'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 
-import { SIGN_UP_URL, type NavMenu } from '../lib/nav'
+import { type NavMenu } from '../lib/nav'
 import { EXTERNAL_LINKS } from './HeaderMenu'
 
 export interface MobileMenuProps {
@@ -44,9 +45,10 @@ export const MobileMenu = ({
       toggleRef={toggleRef}
       className={className}
       footer={
-        <Button variant="primary" block className="h-8 text-sm" asChild>
-          <a href={SIGN_UP_URL}>Sign up</a>
-        </Button>
+        <SignedInSwitch
+          signedIn={<MobileNavAccountActions isLoggedIn />}
+          signedOut={<MobileNavAccountActions isLoggedIn={false} />}
+        />
       }
     >
       <nav aria-label="Menu" className="flex flex-col gap-6">

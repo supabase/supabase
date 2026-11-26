@@ -64,6 +64,7 @@ export function PlanCards({
               plan={plan}
               isCurrentPlan={isCurrentPlan}
               liftedSide={liftedSide}
+              origin={source}
             />
           )
         }
@@ -88,6 +89,7 @@ export function PlanCards({
               track('studio_pricing_plan_cta_clicked', {
                 selectedPlan: plan.name,
                 currentPlan: currentSubscriptionPlanName,
+                origin: source,
               })
             }
           />

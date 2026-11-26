@@ -16,6 +16,7 @@ const Note = ({ icon, children }: { icon: ReactNode; children: ReactNode }) => (
 interface PlanChangeNotesProps {
   /** Any project the customer could move to Micro, used to link Infrastructure settings. */
   exampleProjectRef?: string
+  onProjectTransferDocsClick: () => void
 }
 
 /**
@@ -23,7 +24,10 @@ interface PlanChangeNotesProps {
  * in the org is billed, compute size does not change on its own, and the plan renews
  * until they cancel it. Only rendered for an upgrade from the Free plan.
  */
-export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => (
+export const PlanChangeNotes = ({
+  exampleProjectRef,
+  onProjectTransferDocsClick,
+}: PlanChangeNotesProps) => (
   <ul className="space-y-3">
     <Note icon={<ClockIcon size={16} />}>
       <span className="text-foreground">Projects never pause.</span> Every project bills around the
@@ -33,6 +37,7 @@ export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => 
         target="_blank"
         rel="noreferrer"
         className="underline"
+        onClick={onProjectTransferDocsClick}
       >
         Transfer
       </a>{' '}
