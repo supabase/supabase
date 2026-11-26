@@ -16,6 +16,7 @@ interface SqlRunButtonProps {
    * to stay reachable.
    */
   disabledReason?: string
+  'data-attr'?: string
 }
 
 export const SqlRunButton = ({
@@ -25,6 +26,7 @@ export const SqlRunButton = ({
   className,
   onClick,
   disabledReason,
+  'data-attr': dataAttr,
 }: SqlRunButtonProps) => {
   return (
     <ButtonTooltip
@@ -33,6 +35,7 @@ export const SqlRunButton = ({
       variant="primary"
       size="tiny"
       data-testid="sql-run-button"
+      data-attr={dataAttr}
       iconRight={
         isExecuting ? (
           <Loader2Icon className="animate-spin" size={10} strokeWidth={1.5} />

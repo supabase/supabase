@@ -617,3 +617,12 @@ export function resolveDiffKeyAction(
       return { type: 'none' }
   }
 }
+
+/**
+ * Tells how the user ran a Monaco editor action registered with `editor.addAction`.
+ * Monaco's context menu passes the model URI to the action's `run` callback, while a
+ * keybinding (or the command palette) passes no arguments.
+ */
+export function getEditorActionTrigger(args: readonly unknown[]): 'context_menu' | 'shortcut' {
+  return args[0] === undefined ? 'shortcut' : 'context_menu'
+}

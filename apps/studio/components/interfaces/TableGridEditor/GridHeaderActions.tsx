@@ -383,7 +383,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             </Popover>
           )}
 
-          <RoleImpersonationPopover header="View data as a role" align="center" />
+          <RoleImpersonationPopover
+            header="View data as a role"
+            align="center"
+            telemetrySurface="table_editor"
+          />
 
           <DropdownMenu>
             <Tooltip>

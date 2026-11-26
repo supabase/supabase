@@ -1,6 +1,7 @@
 import { Loader2Icon } from 'lucide-react'
 import { Button, KeyboardShortcut } from 'ui'
 
+import { useTrack } from '@/lib/telemetry/track'
 import { hasUnsavedChanges, isSaving } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -13,6 +14,7 @@ interface SqlSaveButtonProps {
 export const SqlSaveButton = ({ id, className }: SqlSaveButtonProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { requestSave } = useSqlEditorSaveCoordinator()
+  const track = useTrack()
 
   const status = snapV2.snippets[id]?.snippet.status
   const saving = isSaving(status)
@@ -20,10 +22,14 @@ export const SqlSaveButton = ({ id, className }: SqlSaveButtonProps) => {
 
   return (
     <Button
-      onClick={() => requestSave(id)}
+      onClick={() => {
+        requestSave(id)
+        track('sql_editor_save_clicked', { trigger: 'button' })
+      }}
       disabled={!isDirty}
       size="tiny"
       data-testid="sql-save-button"
+      data-attr="sql-editor-save-button"
       iconRight={
         saving ? (
           <Loader2Icon className="animate-spin" size={10} strokeWidth={1.5} />

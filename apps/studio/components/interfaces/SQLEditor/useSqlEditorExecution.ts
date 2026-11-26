@@ -152,7 +152,7 @@ export function useSqlEditorExecution({
         grant: unguarded.migrating,
       })
 
-      track('sql_editor_query_run_button_clicked', { source: 'database' })
+      track('sql_editor_query_run_button_clicked', { source: 'database', hasSelection })
     },
     [
       editor,
@@ -169,6 +169,7 @@ export function useSqlEditorExecution({
       databases,
       eventTriggers,
       limit,
+      hasSelection,
       track,
     ]
   )

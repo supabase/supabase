@@ -42,7 +42,9 @@ function mockLogsAllOtel(rows: unknown[] = []) {
 /** Renders the hook with ClickHouse logs enabled by default; pass
  *  `{ otelLegacyLogs: false }` to exercise the not-available-yet guard. */
 function renderLogsExecution(flags: Record<string, boolean> = { otelLegacyLogs: true }) {
-  return renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID }), { flags })
+  return renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID, hasSelection: false }), {
+    flags,
+  })
 }
 
 beforeEach(() => {

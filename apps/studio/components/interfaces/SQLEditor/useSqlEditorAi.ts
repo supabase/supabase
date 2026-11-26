@@ -275,6 +275,8 @@ export function useSqlEditorAi({
         afterSelection: string
       }
     ) => {
+      track('sql_editor_inline_ai_submitted', { hasSelection: promptState.hasSelection })
+
       try {
         setPromptState((prev) => ({
           ...prev,
@@ -318,7 +320,7 @@ export function useSqlEditorAi({
         setPromptState((prev) => ({ ...prev, isLoading: false }))
       }
     },
-    [complete, fetchAttributeKeys, isClickhouse, setPromptState]
+    [complete, fetchAttributeKeys, isClickhouse, promptState.hasSelection, setPromptState, track]
   )
 
   const handleDiffEditorMount = useCallback(

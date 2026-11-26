@@ -14,14 +14,14 @@ import {
   useSqlEditorSessionSnapshot,
 } from '@/state/sql-editor/sql-editor-session-state'
 
-type UseLogsSqlExecutionArgs = { id: string }
+type UseLogsSqlExecutionArgs = { id: string; hasSelection: boolean }
 
 /**
  * Logs counterpart to `useSqlEditorExecution`. Runs a promoted
  * `SafeLogSqlFragment` against the analytics OTEL endpoint with the snippet's
  * active time range attached as request params.
  */
-export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
+export function useLogsSqlExecution({ id, hasSelection }: UseLogsSqlExecutionArgs) {
   const { ref: projectRef } = useParams()
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
   const track = useTrack()
@@ -55,9 +55,9 @@ export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
 
       mutate({ projectRef, sql, range, endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint })
 
-      track('sql_editor_query_run_button_clicked', { source: 'logs' })
+      track('sql_editor_query_run_button_clicked', { source: 'logs', hasSelection })
     },
-    [id, isExecuting, isOtelLogsEnabled, mutate, projectRef, track]
+    [id, hasSelection, isExecuting, isOtelLogsEnabled, mutate, projectRef, track]
   )
 
   return { executeLogsQuery, isExecuting }

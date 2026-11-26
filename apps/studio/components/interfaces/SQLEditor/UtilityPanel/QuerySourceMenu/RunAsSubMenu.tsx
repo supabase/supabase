@@ -1,6 +1,9 @@
 import { DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from 'ui'
 
-import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
+import {
+  RoleImpersonationSelectorInterface,
+  type RoleImpersonationSelectorProps,
+} from '@/components/interfaces/RoleImpersonationSelector'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationController,
@@ -8,7 +11,7 @@ import {
 
 const SERVICE_ROLE_LABEL = 'postgres'
 
-type RunAsSubMenuProps =
+type RunAsSubMenuProps = (
   | {
       controlled?: false
     }
@@ -16,6 +19,8 @@ type RunAsSubMenuProps =
       controlled: true
       state: RoleImpersonationController
     }
+) &
+  Pick<RoleImpersonationSelectorProps, 'telemetrySurface'>
 
 export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
   const globalState = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
@@ -36,6 +41,7 @@ export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
         <RoleImpersonationSelectorInterface
           header="Run SQL query as a role"
           serviceRoleLabel={SERVICE_ROLE_LABEL}
+          telemetrySurface={props.telemetrySurface}
           state={state}
         />
       </DropdownMenuSubContent>

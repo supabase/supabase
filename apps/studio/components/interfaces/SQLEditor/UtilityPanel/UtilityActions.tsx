@@ -40,6 +40,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
@@ -73,6 +74,7 @@ export const UtilityActions = ({
   className,
 }: UtilityActionsProps) => {
   const { ref } = useParams()
+  const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
@@ -109,14 +111,39 @@ export const UtilityActions = ({
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
+    track('sql_editor_setting_updated', { setting: 'intellisense', enabled: !intellisenseEnabled })
     toast.success(
       `Successfully ${intellisenseEnabled ? 'disabled' : 'enabled'} intellisense. ${intellisenseEnabled ? 'Please refresh your browser for changes to take place.' : ''}`
     )
   }
 
+  const toggleConfirmUnsavedChanges = (checked: boolean) => {
+    setConfirmUnsavedChanges(checked)
+    track('sql_editor_setting_updated', { setting: 'confirm_unsaved_changes', enabled: checked })
+  }
+
+  const updateFavorite = (nextIsFavorite: boolean) => {
+    saveFavorite(id, nextIsFavorite)
+    track('sql_editor_snippet_favorite_updated', { isFavorite: nextIsFavorite, trigger: 'toolbar' })
+  }
+
+  const prettifyFromToolbar = () => {
+    prettifyQuery()
+    track('sql_editor_prettify_clicked', { trigger: 'toolbar' })
+  }
+
   const onSelectDatabase = (databaseId: string) => {
     sessionSnap.resetResult(id)
     setLastSelectedDb(databaseId)
+    track('sql_editor_database_updated', {
+      databaseType: databaseId === ref ? 'primary' : 'read_replica',
+    })
+  }
+
+  const updateRowLimit = (value: string) => {
+    const rowLimit = Number(value)
+    sessionSnap.setLimit(rowLimit)
+    track('sql_editor_row_limit_updated', { rowLimit })
   }
 
   return (
@@ -145,6 +172,7 @@ export const UtilityActions = ({
             className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
             checked={intellisenseEnabled}
             onCheckedChange={toggleIntellisense}
+            data-attr="sql-editor-setting-toggle"
           >
             <KeyboardIcon size={14} className="text-foreground-light" />
             Intellisense enabled
@@ -153,7 +181,8 @@ export const UtilityActions = ({
             <DropdownMenuCheckboxItem
               className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
               checked={confirmUnsavedChanges}
-              onCheckedChange={setConfirmUnsavedChanges}
+              onCheckedChange={toggleConfirmUnsavedChanges}
+              data-attr="sql-editor-setting-toggle"
             >
               <TriangleAlertIcon size={14} className="text-foreground-light" />
               Confirm on discard
@@ -162,7 +191,11 @@ export const UtilityActions = ({
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-x-2" onClick={() => saveFavorite(id, !isFavorite)}>
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => updateFavorite(!isFavorite)}
+                data-attr="sql-editor-favorite-button"
+              >
                 <HeartIcon
                   size={14}
                   strokeWidth={2}
@@ -178,8 +211,9 @@ export const UtilityActions = ({
           )}
           <DropdownMenuItemTooltip
             className="justify-between"
-            onClick={prettifyQuery}
+            onClick={prettifyFromToolbar}
             disabled={isLogs}
+            data-attr="sql-editor-prettify-button"
             tooltip={{
               content: {
                 side: 'left',
@@ -216,6 +250,7 @@ export const UtilityActions = ({
               className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
               checked={intellisenseEnabled}
               onCheckedChange={toggleIntellisense}
+              data-attr="sql-editor-setting-toggle"
             >
               <KeyboardIcon size={14} className="text-foreground-light" />
               Intellisense enabled
@@ -224,7 +259,8 @@ export const UtilityActions = ({
               <DropdownMenuCheckboxItem
                 className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
                 checked={confirmUnsavedChanges}
-                onCheckedChange={setConfirmUnsavedChanges}
+                onCheckedChange={toggleConfirmUnsavedChanges}
+                data-attr="sql-editor-setting-toggle"
               >
                 <TriangleAlertIcon size={14} className="text-foreground-light" />
                 Confirm on discard
@@ -240,8 +276,9 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={() => saveFavorite(id, false)}
+                  onClick={() => updateFavorite(false)}
                   className="px-1"
+                  data-attr="sql-editor-favorite-button"
                   icon={<HeartIcon className="fill-primary-bright stroke-none" />}
                   aria-label="Remove from favorites"
                 />
@@ -249,8 +286,9 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={() => saveFavorite(id, true)}
+                  onClick={() => updateFavorite(true)}
                   className="px-1"
+                  data-attr="sql-editor-favorite-button"
                   icon={<HeartIcon className="fill-none stroke-foreground-light" />}
                   aria-label="Add to favorites"
                 />
@@ -264,9 +302,10 @@ export const UtilityActions = ({
 
         <ButtonTooltip
           variant="text"
-          onClick={prettifyQuery}
+          onClick={prettifyFromToolbar}
           disabled={isLogs}
           className="px-1"
+          data-attr="sql-editor-prettify-button"
           icon={<AlignLeftIcon strokeWidth={2} className="text-foreground-light" />}
           aria-label="Prettify SQL"
           tooltip={{
@@ -307,12 +346,16 @@ export const UtilityActions = ({
                 serviceRoleLabel="postgres"
                 header="Run SQL query as a role"
                 variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
+                telemetrySurface="sql_editor"
               />
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}>
+                <Button
+                  iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}
+                  data-attr="sql-editor-row-limit"
+                >
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>
@@ -320,7 +363,7 @@ export const UtilityActions = ({
               <DropdownMenuContent className="w-40" align="end">
                 <DropdownMenuRadioGroup
                   value={sessionSnap.limit.toString()}
-                  onValueChange={(val) => sessionSnap.setLimit(Number(val))}
+                  onValueChange={updateRowLimit}
                 >
                   {ROWS_PER_PAGE_OPTIONS.map((option) => (
                     <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
@@ -345,6 +388,7 @@ export const UtilityActions = ({
                 : undefined
             }
             className={isManualSaveEnabled ? 'rounded-l-none' : undefined}
+            data-attr="sql-editor-run-button"
             onClick={executeQuery}
           />
         </div>

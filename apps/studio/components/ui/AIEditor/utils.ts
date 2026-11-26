@@ -6,6 +6,8 @@ export type EditorSelection = {
   afterSelection: string
   startLineNumber: number
   endLineNumber: number
+  /** Whether the user selected text. Without a selection, `selection` holds the whole model. */
+  hasSelection: boolean
 }
 
 export function getEditorSelectionParts(
@@ -28,6 +30,7 @@ export function getEditorSelectionParts(
       afterSelection: '',
       startLineNumber: selection.startLineNumber,
       endLineNumber: selection.endLineNumber,
+      hasSelection: false,
     }
   }
 
@@ -43,5 +46,6 @@ export function getEditorSelectionParts(
     afterSelection: afterLines.length > 0 ? '\n' + afterLines.join('\n') : '',
     startLineNumber: selection.startLineNumber,
     endLineNumber: selection.endLineNumber,
+    hasSelection: true,
   }
 }

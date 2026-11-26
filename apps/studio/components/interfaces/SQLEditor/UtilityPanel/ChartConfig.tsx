@@ -27,6 +27,7 @@ import BarChart from '@/components/ui/Charts/BarChart'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 type Results = { rows: readonly any[] }
 
@@ -55,6 +56,7 @@ export const ChartConfig = ({
   onConfigChange,
 }: ChartConfigProps) => {
   const { ref } = useParams()
+  const track = useTrack()
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
@@ -105,6 +107,7 @@ export const ChartConfig = ({
     const newY = config.xKey
     const newX = config.yKey
     onConfigChange({ ...config, xKey: newX, yKey: newY })
+    track('sql_editor_chart_config_updated', { setting: 'flip' })
   }
 
   if (!resultKeys.length) {
@@ -172,6 +175,7 @@ export const ChartConfig = ({
               size="tiny"
               onClick={onFlip}
               disabled={!canFlip}
+              data-attr="sql-editor-chart-config"
               icon={<ArrowUpDownIcon size="15" className="text-foreground-lighter" />}
               tooltip={{
                 content: {
@@ -218,9 +222,12 @@ export const ChartConfig = ({
             value={config.xKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, xKey: value })
+              track('sql_editor_chart_config_updated', { setting: 'x_axis' })
             }}
           >
-            <SelectTrigger>{config.xKey || 'Select X Axis'}</SelectTrigger>
+            <SelectTrigger data-attr="sql-editor-chart-config">
+              {config.xKey || 'Select X Axis'}
+            </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {resultKeys.map((key) => (
@@ -239,9 +246,12 @@ export const ChartConfig = ({
             value={config.yKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, yKey: value })
+              track('sql_editor_chart_config_updated', { setting: 'y_axis' })
             }}
           >
-            <SelectTrigger>{config.yKey || 'Select Y Axis'}</SelectTrigger>
+            <SelectTrigger data-attr="sql-editor-chart-config">
+              {config.yKey || 'Select Y Axis'}
+            </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {yAxisKeys.map((key) => (
@@ -259,7 +269,11 @@ export const ChartConfig = ({
               id="cumulative"
               name="cumulative"
               checked={config.cumulative}
-              onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
+              data-attr="sql-editor-chart-config"
+              onClick={() => {
+                onConfigChange({ ...config, cumulative: !config.cumulative })
+                track('sql_editor_chart_config_updated', { setting: 'cumulative' })
+              }}
             />
             Cumulative
           </Label>
@@ -269,7 +283,11 @@ export const ChartConfig = ({
               id="showLabels"
               name="showLabels"
               checked={config.showLabels}
-              onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
+              data-attr="sql-editor-chart-config"
+              onClick={() => {
+                onConfigChange({ ...config, showLabels: !config.showLabels })
+                track('sql_editor_chart_config_updated', { setting: 'show_labels' })
+              }}
             />
             Show labels
           </Label>
@@ -279,7 +297,11 @@ export const ChartConfig = ({
               id="showGrid"
               name="showGrid"
               checked={config.showGrid}
-              onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
+              data-attr="sql-editor-chart-config"
+              onClick={() => {
+                onConfigChange({ ...config, showGrid: !config.showGrid })
+                track('sql_editor_chart_config_updated', { setting: 'show_grid' })
+              }}
             />
             Show grid
           </Label>
