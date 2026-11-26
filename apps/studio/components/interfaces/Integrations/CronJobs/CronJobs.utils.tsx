@@ -266,14 +266,11 @@ export const parseCronJobCommand = (
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
-  if (command.toLocaleLowerCase().match(regexDBFunction)) {
-    const [schemaName, functionName] = command
-      .replace(/^select\s+/i, '')
-      .replace(/\(.*\);*/, '')
-
-      .trim()
-      .split('.')
+  // The SQL function form rebuilds the command as `select schema.function()`, so only a command that is
+  // exactly that call is parsed into it. Anything else is edited as a SQL snippet.
+  const dbFunctionMatch = command.match(/^select\s+([a-z0-9_]+)\.([a-z0-9_]+)\s*\(\)\s*;?$/i)
+  if (dbFunctionMatch) {
+    const [, schemaName, functionName] = dbFunctionMatch
 
     return {
       type: 'sql_function',
