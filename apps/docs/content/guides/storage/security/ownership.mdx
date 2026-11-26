@@ -28,7 +28,7 @@ on storage.objects
 for delete
 to authenticated
 using (
-    owner_id = (select auth.uid()::text)
+    owner_id = (select auth.jwt()->>'sub')
 );
 ```
 

@@ -88,7 +88,7 @@ for select
 to authenticated
 using (
   storage.allow_only_operation('object.list')
-  and owner_id = (select auth.uid()::text)
+  and owner_id = (select auth.jwt()->>'sub')
 );
 ```
 
@@ -112,6 +112,6 @@ using (
     'object.list',
     'storage.object.get_authenticated'
   ])
-  and owner_id = (select auth.uid()::text)
+  and owner_id = (select auth.jwt()->>'sub')
 );
 ```

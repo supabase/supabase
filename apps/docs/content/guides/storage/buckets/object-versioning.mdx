@@ -227,7 +227,7 @@ for select
 to authenticated
 using (
   bucket_id = 'avatars'
-  and owner_id = (select auth.uid()::text)
+  and owner_id = (select auth.jwt()->>'sub')
   and archived_at is null
 );
 ```
