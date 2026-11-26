@@ -855,8 +855,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `ACCESS_TOKEN_THROTTLE_MS` | integer (ms) | | Minimum interval (ms) between applying `access_token` refresh messages on a channel. A refresh that arrives sooner is held and applied when the interval ends; if several arrive, the latest one is applied. | Default: `10000` (10 seconds). Only set in production builds. |
 | `API_JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
-| `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. |
+| `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. The API also accepts `API_JWT_SECRET_NEXT`. When unset, the self-host seed uses `super-secret-jwt-token-with-at-least-32-characters-long` for the tenant. |
+| `API_JWT_SECRET_NEXT` | string | | Second HS256 secret accepted by the tenant management API. A token signed with either `API_JWT_SECRET` or this secret is accepted. | No default. Not used by the self-host seed: the seeded tenant's JWT secret is `API_JWT_SECRET`. |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
 | `APP_NAME` | string | Both | Application/node name. Used to build the Phoenix endpoint URL host, libcluster DNS basename, and Erlang `RELEASE_NODE`. | Required - raises `APP_NAME not available` if empty. Default: empty (build) / `realtime` (Erlang release script). |
 | `BROADCAST_POOL_SIZE` | integer (count) | Self-hosted | Number of processes used to relay Phoenix.PubSub messages across the cluster. | Default: `10`. |
@@ -864,8 +866,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `CLIENT_PRESENCE_MAX_CALLS` | integer (count) | Self-hosted | Maximum presence calls allowed per client (per WebSocket) within the time window. | Default: `5`. |
 | `CLIENT_PRESENCE_WINDOW_MS` | integer (ms) | Self-hosted | Time window (ms) for per-client presence rate limiting. | Default: `30000`. |
 | `CLUSTER` | string | Self-hosted | Cluster name added to log metadata. | No default. Read by `Realtime.Application.start/2`. |
-| `CLUSTER_SECRET_ID` | string | Self-hosted | AWS Secrets Manager secret ID holding the cluster CA cert/key. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
-| `CLUSTER_SECRET_REGION` | string | Self-hosted | AWS region for `CLUSTER_SECRET_ID`. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
 | `CLUSTER_STRATEGIES` | string (CSV) | Self-hosted | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. An empty value disables cluster discovery. | Default: `POSTGRES`. The self-hosted compose sets it empty, since a single node has no peers to discover. |
 | `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a WebSocket connection error to the client. Slows down reconnect storms. | Default: `2000` (2 seconds). |
 | `CONNECT_PARTITION_SLOTS` | integer (count) | Self-hosted | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | Default: `System.schedulers_online() * 2`. |
@@ -873,7 +873,9 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DASHBOARD_PASSWORD` | string | Self-hosted | Password for admin dashboard basic auth. | Default: random hex string generated at boot. |
 | `DASHBOARD_USER` | string | Self-hosted | Username for admin dashboard basic auth. | Default: random hex string generated at boot. |
 | `DB_AFTER_CONNECT_QUERY` | string | Both | SQL query executed after every Postgres connection is established. | No default. Self-host sets `SET search_path TO _realtime`. |
-| `DB_ENC_KEY` | string | Both | Key used to encrypt sensitive fields in the `_realtime.tenants` and `_realtime.extensions` tables. | Recommended: 16 characters. Required (consumed as `db_enc_key` by the app config). |
+| `DB_ENC_KEY` | string | Both | AES-128-ECB key used to encrypt sensitive fields in the `_realtime.tenants` and `_realtime.extensions` tables. | Required. Must be 16 bytes (AES-128 key). Still needed after enabling `DB_ENC_WRITE_GCM`, to decrypt values not yet re-encrypted to GCM. |
+| `DB_ENC_KEY_GCM` | string | | AES-256-GCM key for the tenant secrets stored in `_realtime` (tenant JWT secret and the `postgres_cdc_rls` connection settings). Used for new writes when `DB_ENC_WRITE_GCM=true`, and to decrypt any value already stored as GCM (`g1:` prefix). | No default. Must be exactly 32 bytes or boot fails. Once values are stored as GCM, they can't be decrypted without this key. |
+| `DB_ENC_WRITE_GCM` | boolean | | When `true` and `DB_ENC_KEY_GCM` is set, new writes of tenant secrets use AES-256-GCM instead of the legacy AES-128-ECB cipher (`DB_ENC_KEY`). Existing ECB values are re-encrypted to GCM in the background when a tenant is loaded, if the `gcm_encryption_backfill` feature flag is on (the self-host seed enables it). | Default: `false`. Accepts `true`/`false`/`1`/`0`. If `true` without `DB_ENC_KEY_GCM`, Realtime logs a warning at boot and keeps using ECB. |
 | `DB_HOST` | string | Both | Primary Postgres host. | Default: `127.0.0.1`. |
 | `DB_IP_VERSION` | enum | Self-hosted | Forces the IP version for Postgres connections. Accepted: `ipv4`, `ipv6`. | When unset, IP version is auto-detected from `DB_HOST`. |
 | `DB_MASTER_REGION` | string | Self-hosted | Overrides the primary region for region-aware routing and tenant placement. | When unset, the current `REGION` is used. |
@@ -885,14 +887,17 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DB_QUEUE_TARGET` | integer (ms) | Self-hosted | Ecto pool queue target in ms. | Default: `5000`. |
 | `DB_REPLICA_HOST` | string | Self-hosted | Hostname for the main replica Postgres pool. | When set, enables the `Realtime.Repo.Replica` connection pool. |
 | `DB_REPLICA_POOL_SIZE` | integer (count) | Self-hosted | Number of connections in the replica pool(s). | Default: `5`. |
-| `DB_SSL` | boolean | Self-hosted | Enable SSL for Postgres connections. | Default: `false`. Accepts `true`/`false`/`1`/`0`. |
+| `DB_SSL` | boolean | | Enable SSL for Postgres connections. | Default: `false`. Accepts `true`/`false`/`1`/`0`. The self-host seed also uses it for the tenant's `ssl_enforced` setting. |
 | `DB_SSL_CA_CERT` | path | Self-hosted | Path to a CA trust store used when `DB_SSL=true`. Enables server certificate verification. | When unset and `DB_SSL=true`, falls back to `verify: :verify_none`. |
 | `DB_USER` | string | Both | Postgres user. | Default: `supabase_admin`. |
 | `DISABLE_HEALTHCHECK_LOGGING` | boolean | Self-hosted | Disables request logging for `/healthcheck` and `/api/tenants/:tenant_id/health`. | Default: `false`. |
-| `DNS_NODES` | string | CLI | DNS query used by the libcluster `DNS` strategy. | No default. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `DNS_NODES` | string | CLI | DNS query used by the libcluster `DNS` strategy. | No default. Empty, `''` and `""` count as unset, which skips the `DNS` strategy. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `ERL_AFLAGS` | string | Both | Extra flags for the Erlang VM, read by the Erlang runtime. Compose and the CLI use it to choose the distribution protocol: `-proto_dist inet_tcp` (IPv4) or `-proto_dist inet6_tcp` (IPv6). | Image default: `-proto_dist inet6_tcp`. The self-hosted compose sets `-proto_dist inet_tcp`. `run.sh` appends TLS distribution flags when `GENERATE_CLUSTER_CERTS` is set. |
 | `GEN_RPC_SOCKET_IP` | string | Self-hosted | IP address the internal gen_rpc listener binds to. | Default: `0.0.0.0`. Must be a valid IPv4/IPv6 address or the service refuses to start. The self-hosted compose sets `127.0.0.1` so the listener is not reachable from other containers on a single node. |
-| `HTTP_DYNAMIC_BUFFER_MAX` | integer (bytes) | Self-hosted | Maximum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MIN`. |
-| `HTTP_DYNAMIC_BUFFER_MIN` | integer (bytes) | Self-hosted | Minimum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MAX`. |
+| `GEN_RPC_TCP_CLIENT_PORT` | integer | | TCP port gen_rpc connects to on peer nodes for inter-node RPC. | Default: `5369`. Should match the peers' `GEN_RPC_TCP_SERVER_PORT`. Ignored when `GEN_RPC_SSL_SERVER_PORT` is set. |
+| `GEN_RPC_TCP_SERVER_PORT` | integer | | TCP port the internal gen_rpc listener binds to (on `GEN_RPC_SOCKET_IP`) for inter-node RPC. | Default: `5369`. Ignored when `GEN_RPC_SSL_SERVER_PORT` is set. |
+| `HTTP_DYNAMIC_BUFFER_MAX` | integer (bytes) | | Maximum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | No default. Must be set together with `HTTP_DYNAMIC_BUFFER_MIN`, or boot fails. |
+| `HTTP_DYNAMIC_BUFFER_MIN` | integer (bytes) | | Minimum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | No default. Must be set together with `HTTP_DYNAMIC_BUFFER_MAX`, or boot fails. |
 | `JANITOR_CHILDREN_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for each janitor child task. | Default: `5000`. Only used when `RUN_JANITOR=true`. |
 | `JANITOR_CHUNK_SIZE` | integer (count) | Self-hosted | Number of tenants processed per chunk per janitor task. | Default: `10`. |
 | `JANITOR_MAX_CHILDREN` | integer (count) | Self-hosted | Maximum number of concurrent janitor task children. | Default: `5`. |
@@ -906,7 +911,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `LOGFLARE_LOGGER_BACKEND_URL` | URL | Self-hosted | Endpoint for the Logflare logger backend. | Default: `https://api.logflare.app`. |
 | `LOGFLARE_SOURCE_ID` | string | Self-hosted | Logflare source ID. | Required when `LOGS_ENGINE=logflare`. |
 | `LOGS_ENGINE` | string | Self-hosted | Log backend selector. Set to `logflare` to enable the Logflare HTTP backend. | When unset, standard logger output is used. |
-| `MAX_CONNECTIONS` | integer (count) | Self-hosted | Soft maximum number of WebSocket connections. | Default: `16384`. |
+| `MAX_CONNECTIONS` | integer (count) | | Soft maximum number of WebSocket connections. | Default: `1000`. |
 | `MAX_HEADER_LENGTH` | integer (bytes) | CLI | Maximum HTTP header value length (bytes). | Default: `4096`. |
 | `METRICS_CLEANER_SCHEDULE_TIMER_IN_MS` | integer (ms) | Self-hosted | Interval (ms) between metrics cleaner runs. | Default: 30 minutes. |
 | `METRICS_JWT_SECRET` | string | Both | Secret used to sign JWTs for the metrics endpoints. | Required - the app raises an exception if unset. |
@@ -920,27 +925,33 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `METRICS_PUSHER_USER` | string | Self-hosted | Username used for Basic auth on metrics pushes. | Default: `realtime`. |
 | `METRICS_RPC_TIMEOUT_IN_MS` | integer (ms) | Self-hosted | Timeout (ms) for RPC calls that fetch metrics from other nodes. | Default: 15 seconds. |
 | `METRICS_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from accessing the metrics endpoints. | Default: empty list. |
+| `NO_CHANNEL_TIMEOUT_IN_MS` | integer (ms) | | Time (ms) a WebSocket can stay connected without any joined channel before Realtime closes it (close code `1001`, `No channels joined`). The timer starts on connect and restarts when the socket leaves its last channel. | Default: 10 minutes. |
+| `NODE_NAME` | string | | Name part of the Erlang node name (`RELEASE_NODE=<NODE_NAME>@<ip>`), set by the release script `rel/env.sh.eex`. | Default: `APP_NAME`, then `realtime`. |
+| `POD_IP` | string | | IP address used as the host part of the Erlang node name (`RELEASE_NODE=<name>@<POD_IP>`), set by the release script `rel/env.sh.eex`. Other cluster nodes reach this node at that address. | Default: `127.0.0.1`. Ignored when `AWS_EXECUTION_ENV=AWS_ECS_FARGATE`. |
 | `PORT` | integer | Both | HTTP listener port. | Default: `4000`. |
 | `PROM_POLL_RATE` | integer (ms) | Self-hosted | Poll interval (ms) for PromEx metrics collection. | Default: `5000`. |
 | `REALTIME_IP_VERSION` | enum | Self-hosted | Forces the HTTP listener IP version. Accepted: `ipv4`, `ipv6`. | When unset, IPv6 is preferred when available. |
 | `REBALANCE_CHECK_INTERVAL_IN_MS` | integer (ms) | Self-hosted | Interval (ms) used to check whether a process is in the right region. | Default: 10 minutes. |
-| `REGION` | string | Self-hosted | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | No default. Also rendered in the admin dashboard layout. |
+| `REGION` | string | | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | Default: `local`. Log metadata and the admin dashboard layout read the variable directly, so they show nothing when it's unset. |
 | `REGION_MAPPING` | JSON | Self-hosted | Custom mapping of platform regions to tenant regions, as a JSON object with string keys and values. | When unset, the hardcoded default mapping is used. Must be a JSON object or boot fails. |
 | `RELEASE_COOKIE` | string | Self-hosted | Erlang distribution cookie: the shared secret cluster nodes use to trust each other. | When unset, the self-hosted Realtime entrypoint (`volumes/realtime/docker-entrypoint.sh`) generates a random ephemeral cookie on start. Set it explicitly (same value on every node, 63 characters or fewer) only for a multi-node cluster; when discovery is enabled it also serves as the libcluster Postgres `LISTEN` channel name, which Postgres caps at 63 bytes. |
 | `REQUEST_ID_BAGGAGE_KEY` | string | Self-hosted | OTEL Baggage key used as the request ID. | Default: `request-id`. |
+| `RLIMIT_NOFILE` | integer (count) | Both | Soft limit for open file descriptors, which `run.sh` applies with `ulimit -Sn` before starting the server. | No default: unset or empty keeps the container's limit. The self-hosted compose sets `10000`. The container runs as `nobody`, so the value can't go above the container's hard limit. |
 | `RPC_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for generic RPC calls. | Default: 30 seconds. |
 | `RUN_JANITOR` | boolean | Both | Enable the tenant janitor and metrics cleaner tasks. | Default: `false`. |
 | `SECRET_KEY_BASE` | string | Both | Secret used by Phoenix to sign cookies and tokens. | Required - recommended length: 64 characters. |
-| `SEED_SELF_HOST` | boolean | Both | If `true`, `run.sh` runs `Realtime.Release.seeds/1` to create the default tenant. | Default: not set (no seeding). Self-host enables this on first boot. |
+| `SEED_SELF_HOST` | boolean | Both | If `true`, `run.sh` runs `Realtime.Release.seeds/1` to create the default tenant. | Default: unset (no seeding). Only the exact value `true` enables it. The self-hosted compose sets it, so the seed runs on every start: it deletes and re-creates the tenant, and globally enables the `gcm_encryption_backfill` and `broadcast_persistence` feature flags. |
+| `SELF_HOST_TENANT_DB_HOST` | string | | Database host stored in the seeded self-host tenant's `postgres_cdc_rls` settings: the database Realtime connects to for that tenant. | Default: `DB_HOST`, then `host.docker.internal`. Used only by the seed script (`SEED_SELF_HOST=true`). |
+| `SELF_HOST_TENANT_DB_PORT` | string | | Database port stored in the seeded self-host tenant's `postgres_cdc_rls` settings. | Default: `DB_PORT`, then `5433`. Used only by the seed script (`SEED_SELF_HOST=true`). |
 | `SELF_HOST_TENANT_NAME` | string | Self-hosted | Tenant external_id used by the self-host seed script. | Default: `realtime-dev`. Must be URL-safe. |
-| `SLOT_NAME_SUFFIX` | string | CLI | Suffix appended to the default replication slot name `supabase_realtime_replication_slot`. | Allowed: lowercase letters, numbers, underscore. Combined name must be 64 characters or fewer. |
+| `SLOT_NAME_SUFFIX` | string | | Suffix appended to Realtime's replication slot names: `supabase_realtime_replication_slot_<suffix>` (Postgres Changes) and `supabase_realtime_messages_replication_slot_<suffix>` (Broadcast from Database). | No default. Allowed: lowercase letters, numbers, underscore. Postgres caps slot names at 63 characters, so the suffix can be at most 19 characters. |
 | `TENANT_CACHE_EXPIRATION_IN_MS` | integer (ms) | Self-hosted | TTL (ms) for the in-process tenant cache. | Default: 30 seconds. |
 | `TENANT_MAX_BYTES_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum bytes per second (used when a tenant is first created). | Default: `100000`. |
 | `TENANT_MAX_CHANNELS_PER_CLIENT` | integer (count) | Self-hosted | Default per-tenant maximum channels per client (used when a tenant is first created). | Default: `100`. |
 | `TENANT_MAX_CONCURRENT_USERS` | integer (count) | Self-hosted | Default per-tenant maximum concurrent users per channel (used when a tenant is first created). | Default: `200`. |
 | `TENANT_MAX_EVENTS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum events per second (used when a tenant is first created). | Default: `100`. |
 | `TENANT_MAX_JOINS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum channel joins per second (used when a tenant is first created). | Default: `100`. |
-| `USERS_SCOPE_SHARDS` | integer (count) | Self-hosted | Number of partitions used by the Beacon `users` scope. | Default: `5`. |
+| `USERS_SCOPE_SHARDS` | integer (count) | | Number of partitions used by the `Forum.Census` `users` scope. | Default: `5`. |
 | `WEBSOCKET_MAX_HEAP_SIZE` | integer (bytes) | Self-hosted | Maximum heap (bytes) for each WebSocket transport process; the process is killed if exceeded. | Default: `50000000` (50 MB). |
 
 ---
