@@ -9,15 +9,15 @@ Your config file (`supabase/config.toml` or `supabase/config.jsonc`) already def
 
 For the local stack and `env()` secrets, refer to [Managing config and secrets](/docs/guides/local-development/managing-config). For every key the file supports, refer to the [CLI config reference](/docs/guides/local-development/cli/config).
 
-<Admonition type="note" label="What these commands change">
+<Admonition type="note" label="What the config commands change">
 
-These commands change **project settings**, such as Auth, Storage, the Data API, and database settings. They do not change your schema or data. For schema, use `db diff`, `db pull`, and `db push` with migrations. Refer to [Local development workflow](/docs/guides/local-development/cli-workflows).
+The `config` commands change **project settings**, such as Auth, Storage, the Data API, and database settings. They do not change your schema or data. For schema, use `db diff`, `db pull`, and `db push` with migrations. Refer to [Local development workflow](/docs/guides/local-development/cli-workflows).
 
 </Admonition>
 
 <Admonition type="note" label="CLI v3">
 
-This guide uses CLI v3 syntax. In v2, these commands used `--project-ref` instead of `--remote`, and `config push` asked once for each resource. Refer to [Migrating to CLI v3](/docs/guides/local-development/cli/migrating-to-v3).
+This guide uses CLI v3 syntax. In v2, the `config` commands used `--project-ref` instead of `--remote`, and `config push` asked once for each resource. Refer to [Migrating to CLI v3](/docs/guides/local-development/cli/migrating-to-v3).
 
 </Admonition>
 
@@ -73,7 +73,7 @@ supabase config diff --remote=staging
 The CLI labels each difference:
 
 - `[update]`: the setting is in both, with different values.
-- `[remote-only]`: the setting is on the project but not in your file. This includes an undeclared setting whose hosted value differs from the default.
+- `[remote-only]`: the setting is on the project but not in your file. The label also marks an undeclared setting whose hosted value differs from the default.
 - `[local-only]`: the setting is in your file but not on the project.
 
 Local-stack sections, such as `[studio]`, `[analytics]`, `[realtime]`, and ports, never show as differences. `db.major_version` and `[db.pooler]` do show, but `config push` cannot write them. Change those in the Dashboard.
@@ -100,7 +100,7 @@ supabase config pull --remote=staging
 
 - **Preview.** `--dry-run` lists each difference and whether pull writes or skips it. It writes nothing and asks nothing.
 - **Confirmation.** In a terminal, pull asks first, and the default answer is Yes. Without a terminal, pull uses the default and writes.
-- **Small edits.** Pull changes only the values that differ, and keeps your comments, ordering, and other keys. This works for `config.toml`, `config.json`, and `config.jsonc`.
+- **Small edits.** Pull changes only the values that differ, and keeps your comments, ordering, and other keys. Small edits work in `config.toml`, `config.json`, and `config.jsonc`.
 - **Uncommitted changes.** If your config file has uncommitted git changes, pull does not write. Pass `--force` to write anyway. `--yes` does not skip this check.
 - **Secrets.** Pull never writes secret values.
 
@@ -162,7 +162,7 @@ Push writes these sections, in this order:
 | Storage              | `[storage]`                 | Includes S3 protocol, image transformation, analytics, and vector |
 | Database webhooks    | `[experimental.webhooks]`   | Enable only                                                       |
 
-Push does **not** write other settings, even when they are valid in the file. This includes the database major version, `[db.pooler]`, compute size, and custom domains. Change those in the Dashboard. For Storage buckets and Edge Functions, use `supabase seed buckets` and `supabase functions deploy`.
+Push does **not** write other settings, such as the database major version, `[db.pooler]`, compute size, and custom domains, even when they are valid in the file. Change those settings in the Dashboard. For Storage buckets and Edge Functions, use `supabase seed buckets` and `supabase functions deploy`.
 
 When a push enables a paid add-on, such as phone MFA, it prints the cost before it asks.
 
