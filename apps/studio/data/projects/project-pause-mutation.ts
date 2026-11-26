@@ -28,7 +28,7 @@ export const useProjectPauseMutation = ({
   UseCustomMutationOptions<ProjectPauseData, StudioError, ProjectPauseVariables>,
   'mutationFn'
 > = {}) => {
-  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
 
   return useMutation<ProjectPauseData, StudioError, ProjectPauseVariables>({
     mutationFn: (vars) => pauseProject(vars),

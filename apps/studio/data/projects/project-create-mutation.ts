@@ -6,7 +6,7 @@ import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-quer
 import type { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
 import { useInvalidateFreeProjectLimitChecks } from '@/data/organizations/free-project-limit-check-query'
-import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
+import { useInvalidatePermissionsV2Query } from '@/data/permissions/permissions-query-v2'
 import { PROVIDERS } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -98,16 +98,16 @@ export const useProjectCreateMutation = ({
   UseCustomMutationOptions<ProjectCreateData, StudioError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
-  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
+  const { invalidatePermissionsQuery } = useInvalidatePermissionsV2Query()
 
   return useMutation<ProjectCreateData, StudioError, ProjectCreateVariables>({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
         invalidateProjectsQuery(),
-        invalidatePermissionsQueryV2(queryClient),
+        invalidatePermissionsQuery(),
         invalidateFreeProjectLimitChecks(),
       ])
       await onSuccess?.(data, variables, context)

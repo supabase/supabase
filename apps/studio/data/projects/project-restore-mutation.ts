@@ -39,7 +39,7 @@ export const useProjectRestoreMutation = ({
   UseCustomMutationOptions<ProjectRestoreData, StudioError, ProjectRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
 
   return useMutation<ProjectRestoreData, StudioError, ProjectRestoreVariables>({
     mutationFn: (vars) => restoreProject(vars),

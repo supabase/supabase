@@ -48,7 +48,7 @@ export const useProjectCloneMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
 
   return useMutation<ProjectCloneData, StudioError, ProjectCloneVariables>({
     mutationFn: (vars) => triggerClone(vars),

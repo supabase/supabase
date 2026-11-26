@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
+import { useCallback } from 'react'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -52,10 +53,11 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
  */
 export const useInvalidateFreeProjectLimitChecks = () => {
   const queryClient = useQueryClient()
-
-  return () =>
-    queryClient.invalidateQueries({
+  const invalidateFreeProjectLimitChecks = () => {
+    return queryClient.invalidateQueries({
       predicate: ({ queryKey }) =>
         queryKey[0] === 'organizations' && queryKey[2] === 'free-project-limit-check',
     })
+  }
+  return { invalidateFreeProjectLimitChecks }
 }

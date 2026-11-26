@@ -35,7 +35,7 @@ export const useProjectDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
-  const invalidateFreeProjectLimitChecks = useInvalidateFreeProjectLimitChecks()
+  const { invalidateFreeProjectLimitChecks } = useInvalidateFreeProjectLimitChecks()
 
   return useMutation<ProjectDeleteData, StudioError, ProjectDeleteVariables>({
     mutationFn: (vars) => deleteProject(vars),
