@@ -42,7 +42,6 @@ import { usePipelineList } from './usePipelineList'
 import { useReplicationClusters } from './useReplicationClusters'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
@@ -102,7 +101,6 @@ export const Destinations = () => {
     isSuccess: isRegionsSuccess,
     isError: isRegionsError,
     isFetching: isRetryingDiscovery,
-    error: regionsError,
     refetch: refetchRegions,
   } = useQuery(replicationClustersQueryOptions())
   const [sort, setSort] = useState<DestinationSort>('name:asc')
@@ -188,6 +186,21 @@ export const Destinations = () => {
 
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
+  const hasListErrors = isRegionsError || isSourcesError || hasClusterErrors
+  const isRetryingList =
+    isRetryingDiscovery ||
+    failedRegions.some(isRetryingRegion) ||
+    (isSourcesError && clusterResults[0].sourcesResult.isFetching)
+  const retryList = () => {
+    if (isRegionsError) void refetchRegions()
+    failedRegions.forEach(retryRegion)
+    if (
+      isSourcesError &&
+      !failedRegions.some(({ sourcesResult }) => sourcesResult === clusterResults[0].sourcesResult)
+    ) {
+      void refetchSources()
+    }
+  }
   const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
@@ -357,63 +370,43 @@ export const Destinations = () => {
           {pipelineListStatus || loadingStatus}
         </p>
 
-        {isRegionsError && (
-          <AlertError
-            error={regionsError}
-            projectRef={projectRef}
-            subject="Failed to retrieve pipeline regions"
-            additionalActions={
-              <Button loading={isRetryingDiscovery} onClick={() => void refetchRegions()}>
-                Retry
-              </Button>
-            }
-          />
-        )}
-
-        {isSourcesError && (
-          <AlertError
-            layout="responsive"
-            projectRef={projectRef}
-            error={sourcesError}
-            subject={sourceErrorTitle}
-            hideContactSupport={checkLocalPipelinesNotSetUp(sourcesError)}
-            description={
-              checkLocalPipelinesNotSetUp(sourcesError)
-                ? 'Configure the replication API to manage pipelines in local development.'
-                : undefined
-            }
-            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
-          />
-        )}
-
-        {hasClusterErrors && (
+        {hasListErrors && (
           <Admonition
             type="warning"
             layout="responsive"
-            title={failedRegionTitle}
-            description={
-              failedRegions.length === 1
-                ? 'Any pipelines in this region are missing from this view. Please try again.'
-                : 'Any pipelines in these regions are missing from this view:'
-            }
+            title={hasClusterErrors ? failedRegionTitle : 'Could not load pipeline information'}
+            description="Some pipeline information is unavailable. Retry to load the missing information."
             actions={
-              <Button
-                loading={failedRegions.some(isRetryingRegion)}
-                onClick={() => failedRegions.forEach(retryRegion)}
-              >
+              <Button loading={isRetryingList} onClick={retryList}>
                 Retry
               </Button>
             }
           >
-            {failedRegions.length > 1 && (
-              <ul className="list-disc pl-5 space-y-1">
-                {failedRegions.map(({ cluster }) => (
-                  <li key={cluster.clusterId ?? 'default'}>
-                    {cluster.regionName ?? 'Default region'}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul className="list-disc pl-5 space-y-1">
+              {isRegionsError && <li>Failed to retrieve pipeline regions</li>}
+              {isSourcesError && (
+                <li>
+                  {sourceErrorTitle}
+                  {checkLocalPipelinesNotSetUp(sourcesError) && (
+                    <p>Configure the replication API to manage pipelines in local development.</p>
+                  )}
+                </li>
+              )}
+              {hasClusterErrors && (
+                <li>
+                  {failedRegions.length === 1
+                    ? 'Any pipelines in this region are missing from this view. Please try again.'
+                    : 'Any pipelines in these regions are missing from this view:'}
+                  <ul className="list-disc pl-5">
+                    {failedRegions.map(({ cluster }) => (
+                      <li key={cluster.clusterId ?? 'default'}>
+                        {cluster.regionName ?? 'Default region'}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              )}
+            </ul>
           </Admonition>
         )}
 

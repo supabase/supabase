@@ -13,6 +13,7 @@ import { useQueryState } from 'nuqs'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
+import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
@@ -594,7 +595,6 @@ describe('regions', () => {
     expect(
       screen.getByText('Any pipelines in this region are missing from this view. Please try again.')
     ).toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
 
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
     failingClusters.clear()
@@ -652,6 +652,50 @@ describe('regions', () => {
       expect(screen.queryByText('Could not load results from some regions')).not.toBeInTheDocument()
     )
     expect(requests.filter((cluster) => cluster === 'omitted')).toHaveLength(defaultRequests)
+  })
+
+  test('combines discovery, source and regional failures behind one retry action', async () => {
+    let unavailable = true
+    mockRegionResources({ hasDestinations: false })
+    for (const path of [
+      '/platform/replication/regions',
+      '/platform/replication/:ref/sources',
+      '/platform/replication/:ref/destinations',
+    ]) {
+      addAPIMock({
+        method: 'get',
+        path,
+        response: () => {
+          if (unavailable)
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Service unavailable' },
+              { status: 503 }
+            )
+          if (path.endsWith('/regions'))
+            return HttpResponse.json<ReplicationClustersData>({
+              default_cluster_id: '1',
+              regions: [],
+            })
+          if (path.endsWith('/sources'))
+            return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+              sources: [],
+            })
+          return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+            destinations: [],
+          })
+        },
+      })
+    }
+    renderRegions()
+    await screen.findByText('Failed to retrieve pipeline regions')
+    await screen.findByText('Failed to retrieve pipeline enablement status')
+    await screen.findByText('Could not load results from one region')
+    expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
+    unavailable = false
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+    )
   })
 
   test('shows regional errors instead of the empty state when all regions fail', async () => {
