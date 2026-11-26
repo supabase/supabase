@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import { Badge } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
@@ -10,11 +10,13 @@ import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
   includedInPlan?: boolean
+  descriptionFooter?: ReactNode
 }
 
 export const SectionContent = ({
   section,
   includedInPlan,
+  descriptionFooter,
   children,
 }: PropsWithChildren<SectionContent>) => {
   const { name, description, links } = section
@@ -37,6 +39,7 @@ export const SectionContent = ({
                         {value}
                       </p>
                     ))}
+                    {descriptionFooter}
                   </div>
                 </div>
                 {links && links.length > 0 && (
