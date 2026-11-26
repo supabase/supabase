@@ -736,10 +736,129 @@ describe('regions', () => {
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
   })
 
-  test('keeps multi-region disablement unavailable', async () => {
+  const mockRegionalDisable = (enabledClusters = new Set(['omitted', '2'])) => {
+    const requests: string[] = []
+    const failingClusters = new Set<string>()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: ({ request }) => sourcesResponse(enabledClusters.has(clusterOf(request))),
+    })
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/replication/:ref/tenants',
+      response: ({ request }) => {
+        const cluster = clusterOf(request)
+        requests.push(cluster)
+        if (failingClusters.has(cluster))
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Cluster unavailable' },
+            { status: 503 }
+          )
+        enabledClusters.delete(cluster)
+        return HttpResponse.json<Record<string, never>>({}, { status: 200 })
+      },
+    })
+
+    return { requests, failingClusters }
+  }
+
+  const openDisableDialog = async () => {
+    await screen.findByRole('heading', { name: 'Add a pipeline' })
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    const menuItem = await screen.findByRole('menuitem', { name: 'Disable Pipelines' })
+    expect(menuItem).not.toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(menuItem)
+
+    return await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
+  }
+
+  test('enables the default region before opening the wizard when only another region is enabled', async () => {
+    options.wizard = true
+    const enabledClusters = new Set(['2'])
     mockRegions()
-    isEnabled = true
+    mockRegionalDisable(enabledClusters)
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        enabledClusters.add(clusterOf(request))
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          source_id: 42,
+          tenant_id: 'tenant',
+        })
+      },
+    })
+    const { router } = renderRegions()
+
+    const disableDialog = await openDisableDialog()
+    fireEvent.click(within(disableDialog).getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(disableDialog).not.toBeInTheDocument())
+
+    expect(screen.queryByRole('link', { name: 'Add pipeline' })).not.toBeInTheDocument()
+    addPipeline()
+    expect(router.history.location.href).toBe(listPath)
+    const enableDialog = await screen.findByRole('dialog', { name: 'Enable Pipelines' })
+    fireEvent.click(within(enableDialog).getByRole('button', { name: 'Enable' }))
+
+    await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
+    expect(enabledClusters).toEqual(new Set(['2', 'omitted']))
+  })
+
+  test('disables Pipelines in each region with a project source', async () => {
+    mockRegions([
+      SINGAPORE,
+      FRANKFURT,
+      { cluster_id: '3', region_code: 'us-east-1', region_name: 'Virginia' },
+    ])
+    const { requests } = mockRegionalDisable()
     renderRegions()
+
+    const dialog = await openDisableDialog()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Pipelines' }))
+
+    await waitFor(() => expect(dialog).not.toBeInTheDocument())
+    expect(requests).toEqual(['omitted', '2'])
+  })
+
+  test('reports partial disablement and retries only failed regions', async () => {
+    mockRegions()
+    const { requests, failingClusters } = mockRegionalDisable()
+    failingClusters.add('2')
+    renderRegions()
+
+    const dialog = await openDisableDialog()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Pipelines' }))
+
+    expect(
+      await within(dialog).findByText('Pipelines disabled in some regions')
+    ).toBeInTheDocument()
+    expect(requests).toEqual(['omitted', '2'])
+
+    failingClusters.clear()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Retry' }))
+
+    await waitFor(() => expect(dialog).not.toBeInTheDocument())
+    expect(requests).toEqual(['omitted', '2', '2'])
+  })
+
+  test('keeps disablement unavailable until region discovery succeeds', async () => {
+    let canDiscoverRegions = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/regions',
+      response: () =>
+        canDiscoverRegions
+          ? regionsResponse([SINGAPORE, FRANKFURT])
+          : HttpResponse.json<APIErrorBody>({ message: 'Regions unavailable' }, { status: 503 }),
+    })
+    const { requests } = mockRegionalDisable()
+    renderRegions()
+
+    expect(await screen.findByText('Could not load pipeline information')).toBeInTheDocument()
     await screen.findByRole('heading', { name: 'Add a pipeline' })
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
       button: 0,
@@ -749,8 +868,34 @@ describe('regions', () => {
       'aria-disabled',
       'true'
     )
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    expect(requests).toEqual([])
+
+    canDiscoverRegions = true
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry' }))
+    expect(await openDisableDialog()).toBeInTheDocument()
   })
 
+  test('retries failed non-default source reads before allowing disablement', async () => {
+    mockRegions()
+    isEnabled = true
+    let canReadSource = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: ({ request }) =>
+        clusterOf(request) === '2' && !canReadSource
+          ? HttpResponse.json<APIErrorBody>({ message: 'Cluster unavailable' }, { status: 503 })
+          : sourcesResponse(true),
+    })
+    renderRegions()
+
+    expect(await screen.findByText('Could not load results from Frankfurt')).toBeInTheDocument()
+
+    canReadSource = true
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await openDisableDialog()).toBeInTheDocument()
+  })
   test('blocks an open disable dialog when a pipeline appears', async () => {
     mockRegions([SINGAPORE])
     isEnabled = true

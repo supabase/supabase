@@ -95,7 +95,7 @@ export const Destinations = () => {
     })
   )
 
-  const { clusters, hasMultipleRegions } = useReplicationClusters()
+  const { clusters } = useReplicationClusters()
   const {
     isLoading: isDiscoveringRegions,
     isSuccess: isRegionsSuccess,
@@ -177,8 +177,7 @@ export const Destinations = () => {
       ({ destinationsResult, pipelinesResult, sourcesResult }) =>
         destinationsResult.isSuccess && pipelinesResult.isSuccess && sourcesResult.isSuccess
     )
-  const canDisablePipelines =
-    canConfirmDisable && hasExternalReplicationSource && !hasMultipleRegions
+  const canDisablePipelines = canConfirmDisable && hasExternalReplicationSource
 
   const isDefaultRegionEnabled = defaultSources?.sources.some(({ name }) => name === projectRef)
   const canCreate = isSourcesSuccess && !isCreationGateLoading
@@ -360,9 +359,7 @@ export const Destinations = () => {
                       <p className="text-foreground-lighter">
                         {hasRegionalPipelines
                           ? 'Delete all pipelines first'
-                          : hasMultipleRegions
-                            ? 'Multi-region disablement is unavailable'
-                            : 'Check every region first'}
+                          : 'Check every region first'}
                       </p>
                     )}
                   </div>
@@ -381,7 +378,9 @@ export const Destinations = () => {
           >
             <ButtonTooltip
               tooltip={{
-                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+                content: {
+                  text: isSourcesError && !canCreate ? sourceErrorTitle : undefined,
+                },
               }}
               variant="primary"
               icon={<PlusIcon />}
@@ -507,7 +506,9 @@ export const Destinations = () => {
           >
             <ButtonTooltip
               tooltip={{
-                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+                content: {
+                  text: isSourcesError && !canCreate ? sourceErrorTitle : undefined,
+                },
               }}
               variant="default"
               icon={<PlusIcon />}
@@ -533,7 +534,8 @@ export const Destinations = () => {
       />
 
       <DisablePipelinesDialog
-        canConfirm={canConfirmDisable && !hasMultipleRegions}
+        canConfirm={canConfirmDisable}
+        clusterIds={clustersWithProjectSource}
         open={showDisablePipelinesDialog}
         setOpen={setShowDisablePipelinesDialog}
       />
