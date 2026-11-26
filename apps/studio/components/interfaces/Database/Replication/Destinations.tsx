@@ -200,6 +200,12 @@ export const Destinations = () => {
     : 'Failed to retrieve pipeline enablement status'
 
   const failedRegionName = failedRegions[0]?.cluster.regionName ?? 'the default region'
+  const hasVisibleOtherRegions =
+    hasClusterErrors &&
+    sortedDestinations.some(
+      ({ cluster }) =>
+        !failedRegions.some((failed) => failed.cluster.clusterId === cluster.clusterId)
+    )
 
   const hasGeneralErrors = isRegionsError || isSourcesError
   const getWarningTitle = () => {
