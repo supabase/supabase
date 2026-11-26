@@ -179,7 +179,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_API_HOST` | string | Both | Bind address for the API server. |  |
 | `GOTRUE_API_MAX_REQUEST_DURATION` | string (duration) |  | Maximum total duration of a single API request. | Default: `10s` |
 | `GOTRUE_API_PORT` | integer | Both | TCP port for the API server. | Default: `8081`. Alias of `PORT` |
-| `PORT` | integer (count) |  | TCP port for the API server (bare alias). | Default: `8081` |
+| `PORT` | integer |  | TCP port for the API server (bare alias). | Default: `8081` |
 | `GOTRUE_API_REQUEST_ID_HEADER` | string |  | HTTP header name to read the request ID from. | Alias of `REQUEST_ID_HEADER` |
 | `REQUEST_ID_HEADER` | string |  | HTTP header name to read the request ID from (bare alias). |  |
 
@@ -218,7 +218,6 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_JWT_KEYS` | JWKS | Both | JSON array of JWKs used for signing/verification. | Required when using the new API keys and new auth. |
 | `GOTRUE_JWT_SECRET` | string | Both | Symmetric HS256 signing secret. | Required |
 | `GOTRUE_JWT_VALID_METHODS` | string (CSV) | CLI | Allowed JWT signing methods (e.g. `HS256,RS256`). |  |
-| `GOTRUE_JWT_VALIDMETHODS` | string (CSV) | CLI | Alternate spelling seen in CLI; same field. | Alias artifact; prefer `GOTRUE_JWT_VALID_METHODS` |
 
 ### Site / Redirect
 
@@ -317,7 +316,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `GOTRUE_EXTERNAL_ALLOWED_ID_TOKEN_ISSUERS` | string (CSV) |  | Additional issuers accepted when verifying external ID tokens. | Defaults include `https://appleid.apple.com`, `https://accounts.google.com` |
 | `GOTRUE_EXTERNAL_APPLE_API_URL` | URL |  | Override Apple OAuth API endpoint. |  |
-| `GOTRUE_EXTERNAL_APPLE_CLIENT_ID` | string (CSV) | CLI | Apple OAuth client ID(s) (comma-separated). |  |
+| `GOTRUE_EXTERNAL_APPLE_CLIENT_ID` | string (CSV) | CLI | Apple OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_APPLE_EMAIL_OPTIONAL` | boolean | CLI | Allow accounts without an email from Apple. |  |
 | `GOTRUE_EXTERNAL_APPLE_ENABLED` | boolean | CLI | Enable the Apple provider. |  |
 | `GOTRUE_EXTERNAL_APPLE_REDIRECT_URI` | URL | CLI | Override redirect URI for Apple. |  |
@@ -325,7 +324,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_APPLE_SKIP_NONCE_CHECK` | boolean | CLI | Skip OIDC nonce check for Apple. |  |
 | `GOTRUE_EXTERNAL_APPLE_URL` | URL |  | Override Apple OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_AZURE_API_URL` | URL |  | Override Azure API endpoint. |  |
-| `GOTRUE_EXTERNAL_AZURE_CLIENT_ID` | string (CSV) | Self-hosted | Azure OAuth client ID. | Commented out in compose |
+| `GOTRUE_EXTERNAL_AZURE_CLIENT_ID` | string (CSV) | Self-hosted | Azure OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences. Commented out in compose |
 | `GOTRUE_EXTERNAL_AZURE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Azure. |  |
 | `GOTRUE_EXTERNAL_AZURE_ENABLED` | boolean | Self-hosted | Enable the Azure provider. | Commented out in compose |
 | `GOTRUE_EXTERNAL_AZURE_REDIRECT_URI` | URL | Self-hosted | Override redirect URI for Azure. | Commented out in compose |
@@ -352,7 +351,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_EMAIL_ENABLED` | boolean | Both | Enable email/password authentication. When disabled, OAuth providers can still be used to sign up / sign in. | Default: `true` |
 | `GOTRUE_EXTERNAL_EMAIL_MAGIC_LINK_ENABLED` | boolean |  | Enable email magic links. | Default: `true` |
 | `GOTRUE_EXTERNAL_FACEBOOK_API_URL` | URL |  | Override Facebook API endpoint. |  |
-| `GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID` | string |  | Facebook OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID` | string (CSV) |  | Facebook OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_FACEBOOK_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Facebook. |  |
 | `GOTRUE_EXTERNAL_FACEBOOK_ENABLED` | boolean |  | Enable the Facebook provider. |  |
 | `GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI` | URL |  | Override redirect URI for Facebook. |  |
@@ -393,7 +392,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_GITLAB_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for GitLab. |  |
 | `GOTRUE_EXTERNAL_GITLAB_URL` | URL |  | Override GitLab OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_GOOGLE_API_URL` | URL |  | Override Google API endpoint. |  |
-| `GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID` | string | Self-hosted | Google OAuth client ID. | Commented out in compose |
+| `GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID` | string (CSV) | Self-hosted | Google OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences. Commented out in compose |
 | `GOTRUE_EXTERNAL_GOOGLE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Google. |  |
 | `GOTRUE_EXTERNAL_GOOGLE_ENABLED` | boolean | Self-hosted | Enable the Google provider. | Commented out in compose |
 | `GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI` | URL | Self-hosted | Override redirect URI for Google. | Commented out in compose |
@@ -402,7 +401,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_GOOGLE_URL` | URL |  | Override Google OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_IOS_BUNDLE_ID` | string |  | Apple iOS bundle ID for the Apple provider. |  |
 | `GOTRUE_EXTERNAL_KAKAO_API_URL` | URL |  | Override Kakao API endpoint. |  |
-| `GOTRUE_EXTERNAL_KAKAO_CLIENT_ID` | string |  | Kakao OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_KAKAO_CLIENT_ID` | string (CSV) |  | Kakao OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_KAKAO_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Kakao. |  |
 | `GOTRUE_EXTERNAL_KAKAO_ENABLED` | boolean |  | Enable the Kakao provider. |  |
 | `GOTRUE_EXTERNAL_KAKAO_REDIRECT_URI` | URL |  | Override redirect URI for Kakao. |  |
@@ -410,7 +409,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_KAKAO_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Kakao. |  |
 | `GOTRUE_EXTERNAL_KAKAO_URL` | URL |  | Override Kakao OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_API_URL` | URL |  | Override Keycloak API endpoint. |  |
-| `GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID` | string |  | Keycloak OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_KEYCLOAK_CLIENT_ID` | string (CSV) |  | Keycloak OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Keycloak. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_ENABLED` | boolean |  | Enable the Keycloak provider. |  |
 | `GOTRUE_EXTERNAL_KEYCLOAK_REDIRECT_URI` | URL |  | Override redirect URI for Keycloak. |  |
@@ -442,7 +441,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_NOTION_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Notion. |  |
 | `GOTRUE_EXTERNAL_NOTION_URL` | URL |  | Override Notion OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_OIDC_PROVIDER_CACHE_TTL` | string (duration) |  | Cache lifetime for OIDC discovery documents. | Default: `1h` |
-| `GOTRUE_EXTERNAL_REDIRECT_URL` | URL |  | Global override of OAuth redirect URL. |  |
+| `GOTRUE_EXTERNAL_REDIRECTURL` | URL |  | Global override of OAuth redirect URL. | No underscore between `REDIRECT` and `URL` (the field isn't split into words) |
 | `GOTRUE_EXTERNAL_SKIP_NONCE_CHECK` | string | Self-hosted | Listed (commented) in compose but does not map to a configuration field. | Commented out in compose; no effect - use per-provider `*_SKIP_NONCE_CHECK` |
 | `GOTRUE_EXTERNAL_SLACK_API_URL` | URL |  | Override Slack API endpoint. |  |
 | `GOTRUE_EXTERNAL_SLACK_CLIENT_ID` | string |  | Legacy Slack OAuth client ID. |  |
@@ -461,7 +460,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_SLACK_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Slack. |  |
 | `GOTRUE_EXTERNAL_SLACK_URL` | URL |  | Override Slack OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_API_URL` | URL |  | Override Snapchat API endpoint. |  |
-| `GOTRUE_EXTERNAL_SNAPCHAT_CLIENT_ID` | string |  | Snapchat OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_SNAPCHAT_CLIENT_ID` | string (CSV) |  | Snapchat OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_SNAPCHAT_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Snapchat. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_ENABLED` | boolean |  | Enable the Snapchat provider. |  |
 | `GOTRUE_EXTERNAL_SNAPCHAT_REDIRECT_URI` | URL |  | Override redirect URI for Snapchat. |  |
@@ -493,7 +492,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_TWITTER_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Twitter. |  |
 | `GOTRUE_EXTERNAL_TWITTER_URL` | URL |  | Override Twitter OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_API_URL` | URL |  | Override Vercel Marketplace API endpoint. |  |
-| `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_CLIENT_ID` | string |  | Vercel Marketplace OAuth client ID. |  |
+| `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_CLIENT_ID` | string (CSV) |  | Vercel Marketplace OAuth client ID(s). | Comma-separated; the first ID is used for the OAuth flow, all are accepted as ID token audiences |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_EMAIL_OPTIONAL` | boolean |  | Allow accounts without an email from Vercel Marketplace. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_ENABLED` | boolean |  | Enable the Vercel Marketplace provider. |  |
 | `GOTRUE_EXTERNAL_VERCEL_MARKETPLACE_REDIRECT_URI` | URL |  | Override redirect URI for Vercel Marketplace. |  |
@@ -536,6 +535,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_CUSTOM_OAUTH_ENABLED` | boolean |  | Enable user-defined custom OAuth/OIDC providers. | Default: `true` |
+| `GOTRUE_CUSTOM_OAUTH_EXTERNAL_URL` | URL |  | Base URL for the callback of custom OAuth/OIDC providers (`<url>/callback`). | Default: `API_EXTERNAL_URL`. An invalid URL stops Auth from starting |
 | `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | integer (count) |  | Maximum number of custom providers allowed. | Default: `0` (unlimited) |
 | `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Self-hosted | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
 | `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Self-hosted | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
@@ -585,10 +585,16 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_MFA_PHONE_TEMPLATE` | string |  | Template string for MFA phone OTP messages. |  |
 | `GOTRUE_MFA_PHONE_VERIFY_ENABLED` | boolean | Both | Allow verifying a phone MFA factor. | Default: `false`, commented out in compose |
 | `GOTRUE_MFA_RATE_LIMIT_CHALLENGE_AND_VERIFY` | number |  | Rate limit for MFA challenge + verify. | Default: `15` |
+| `GOTRUE_MFA_RECOVERY_CODES_CODE_LENGTH` | integer |  | Length of each MFA recovery code (characters). | Default: `16`. Range 13-32, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_COUNT` | integer (count) |  | Number of recovery codes generated per set. | Default: `10`. Range 4-16, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_ENROLL_ENABLED` | boolean |  | Allow generating MFA recovery codes. | Default: `false` |
+| `GOTRUE_MFA_RECOVERY_CODES_LOCKOUT_DURATION` | string (duration) |  | How long recovery code verification stays locked after too many failed attempts. | Default: `15m`. Range 1m-24h, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_MAX_VERIFY_ATTEMPTS` | integer (count) |  | Failed recovery code attempts before verification is locked. | Default: `5`. Range 3-15, checked when recovery codes are enabled |
+| `GOTRUE_MFA_RECOVERY_CODES_VERIFY_ENABLED` | boolean |  | Allow verifying an MFA recovery code. | Default: `false` |
 | `GOTRUE_MFA_TOTP_ENROLL_ENABLED` | boolean | Both | Allow enrolling a TOTP MFA factor. | Default: `true`, commented out in compose |
 | `GOTRUE_MFA_TOTP_VERIFY_ENABLED` | boolean | Both | Allow verifying a TOTP MFA factor. | Default: `true`, commented out in compose |
-| `GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED` | string | CLI | Allow enrolling a WebAuthn MFA factor. | Default: `false` |
-| `GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED` | string | CLI | Allow verifying a WebAuthn MFA factor. | Default: `false` |
+| `GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED` | boolean | CLI | Allow enrolling a WebAuthn MFA factor. | Default: `false` |
+| `GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED` | boolean | CLI | Allow verifying a WebAuthn MFA factor. | Default: `false` |
 
 ### WebAuthn / Passkey
 
@@ -610,6 +616,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SAML_ENABLED` | boolean | Self-hosted | Enable SAML SSO. | Commented out in compose |
 | `GOTRUE_SAML_EXTERNAL_URL` | URL | Self-hosted | External URL used in SAML metadata (defaults to `API_EXTERNAL_URL`). | Commented out in compose |
 | `GOTRUE_SAML_PRIVATE_KEY` | string | Self-hosted | Base64-encoded PKCS#1 RSA private key (>= 2048 bits). | Commented out in compose |
+| `GOTRUE_SAML_PRIVATE_KEY_NEXT` | string |  | Next SAML key for key rotation, in the same format as `GOTRUE_SAML_PRIVATE_KEY`. Its certificate is published in the SAML metadata next to the current one, and it's tried when decrypting encrypted assertions. | While set, the metadata cache lifetime drops to 60 seconds |
 | `GOTRUE_SAML_RATE_LIMIT_ASSERTION` | number | Self-hosted | Rate limit for SAML assertion submissions. | Default: `15`, commented out in compose |
 | `GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD` | string (duration) | Self-hosted | Lifetime of SAML RelayState. | Default: `2m`, commented out in compose |
 
@@ -618,25 +625,25 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_HOOK_AFTER_USER_CREATED_ENABLED` | boolean |  | Enable the after-user-created hook. |  |
-| `GOTRUE_HOOK_AFTER_USER_CREATED_SECRETS` | string |  | Standard webhook secrets (pipe-separated) for after-user-created hook. |  |
+| `GOTRUE_HOOK_AFTER_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for after-user-created hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_AFTER_USER_CREATED_URI` | string |  | URI of the after-user-created hook (pg-functions or https). |  |
 | `GOTRUE_HOOK_BEFORE_USER_CREATED_ENABLED` | boolean |  | Enable the before-user-created hook. |  |
-| `GOTRUE_HOOK_BEFORE_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for the before-user-created hook. |  |
+| `GOTRUE_HOOK_BEFORE_USER_CREATED_SECRETS` | string |  | Standard webhook secrets for the before-user-created hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_BEFORE_USER_CREATED_URI` | string |  | URI of the before-user-created hook. |  |
 | `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED` | boolean | Self-hosted | Enable the custom access token hook. | Commented out in compose |
-| `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_SECRETS` | string | Self-hosted | Standard webhook secrets for the custom access token hook. | Commented out in compose |
+| `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_SECRETS` | string | Self-hosted | Standard webhook secrets for the custom access token hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI` | string | Self-hosted | URI of the custom access token hook. | Commented out in compose |
 | `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED` | boolean | Self-hosted | Enable the MFA verification attempt hook. | Commented out in compose |
-| `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the MFA verification attempt hook. |  |
+| `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the MFA verification attempt hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI` | string | Self-hosted | URI of the MFA verification attempt hook. | Commented out in compose |
 | `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED` | boolean | Self-hosted | Enable the password verification attempt hook. | Commented out in compose |
-| `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the password verification attempt hook. |  |
+| `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS` | string |  | Standard webhook secrets for the password verification attempt hook. | Separate multiple secrets with `\|`, not `,` |
 | `GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI` | string | Self-hosted | URI of the password verification attempt hook. | Commented out in compose |
 | `GOTRUE_HOOK_SEND_EMAIL_ENABLED` | boolean | Self-hosted | Enable the send-email hook. | Commented out in compose |
-| `GOTRUE_HOOK_SEND_EMAIL_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-email hook. | Commented out in compose |
+| `GOTRUE_HOOK_SEND_EMAIL_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-email hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_SEND_EMAIL_URI` | string | Self-hosted | URI of the send-email hook. | Commented out in compose |
 | `GOTRUE_HOOK_SEND_SMS_ENABLED` | boolean | Self-hosted | Enable the send-SMS hook. | Commented out in compose |
-| `GOTRUE_HOOK_SEND_SMS_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-SMS hook. | Commented out in compose |
+| `GOTRUE_HOOK_SEND_SMS_SECRETS` | string | Self-hosted | Standard webhook secrets for the send-SMS hook. | Separate multiple secrets with `\|`, not `,`. Commented out in compose |
 | `GOTRUE_HOOK_SEND_SMS_URI` | string | Self-hosted | URI of the send-SMS hook. | Commented out in compose |
 
 ### Rate limits
@@ -678,8 +685,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of `key_id:base64-key` used to decrypt previously encrypted columns. |  |
-| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | string |  | Enable column-level encryption for new writes. |  |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_DECRYPTION_KEYS` | string |  | Map of key ID to key, used to decrypt previously encrypted columns. | Format: `key_id:key,key_id:key` |
+| `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPT` | boolean |  | Enable column-level encryption for new writes. |  |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY` | string |  | Active encryption key (256-bit, base64-RawURL-encoded). |  |
 | `GOTRUE_SECURITY_DB_ENCRYPTION_ENCRYPTION_KEY_ID` | string |  | ID of the active encryption key. |  |
 | `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED` | boolean | CLI | Allow admins to link identities manually. | Default: `false` |
@@ -726,7 +733,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `GOTRUE_LOG_DISABLE_COLORS` | boolean |  | Disable ANSI color in log output. |  |
-| `GOTRUE_LOG_FIELDS` | JSON |  | Static log fields (JSON object) attached to every log line. |  |
 | `GOTRUE_LOG_FILE` | path |  | Path to a file to write logs to. |  |
 | `GOTRUE_LOG_LEVEL` | string |  | Logger level (`panic`, `fatal`, `error`, `warn`, `info`, `debug`). |  |
 | `GOTRUE_LOG_QUOTE_EMPTY_FIELDS` | boolean |  | Quote empty log field values. |  |
@@ -751,7 +757,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_TRACING_OTEL_EXPORTER_OTLP_PROTOCOL` | string |  | OTLP protocol for tracing. | Default: `http/protobuf`. Alias of `OTEL_EXPORTER_OTLP_PROTOCOL` |
 | `GOTRUE_TRACING_PORT` | string |  | OpenTelemetry collector port. |  |
 | `GOTRUE_TRACING_SERVICE_NAME` | string |  | Service name reported in traces. | Default: `gotrue` |
-| `GOTRUE_TRACING_TAGS` | JSON |  | Comma-separated `k=v` pairs attached to all spans. |  |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | string |  | OTLP protocol (bare alias, applies to metrics and tracing). | Default: `http/protobuf` |
 | `OTEL_EXPORTER_PROMETHEUS_HOST` | string |  | Prometheus host (bare alias). | Default: `0.0.0.0` |
 | `OTEL_EXPORTER_PROMETHEUS_PORT` | string |  | Prometheus port (bare alias). | Default: `9100` |
@@ -763,7 +768,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_RELOADING_GRACE_PERIOD_INTERVAL` | string (duration) |  | Idle period before processing a config reload (debounce). | Default: `5s` |
 | `GOTRUE_RELOADING_NOTIFY_ENABLED` | boolean |  | Use filesystem notifications to detect config changes. | Default: `true` |
 | `GOTRUE_RELOADING_POLLER_INTERVAL` | string (duration) |  | Polling interval when notifications are disabled. | Default: `10s` |
-| `GOTRUE_RELOADING_POLLERENABLED` | string |  | Enable filesystem polling for config changes (name is intentionally unsplit). | Default: `false` |
+| `GOTRUE_RELOADING_POLLERENABLED` | boolean |  | Enable filesystem polling for config changes (name is intentionally unsplit). | Default: `false` |
 | `GOTRUE_RELOADING_SIGNAL_ENABLED` | boolean |  | Trigger a config reload on receiving a Unix signal. | Default: `false` |
 | `GOTRUE_RELOADING_SIGNAL_NUMBER` | integer (count) |  | Unix signal number to listen for. | Default: `10` (SIGUSR1) |
 
@@ -771,7 +776,13 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `GOTRUE_EXPERIMENTAL_PROVIDERS_WITH_OWN_LINKING_DOMAIN` | string |  | Providers that do not participate in email-similarity identity linking. | Experimental |
+| `GOTRUE_EXPERIMENTAL_CREATE_EMAIL_IDENTITY_ON_PASSWORD_SET_ENABLED` | boolean |  | Create the missing `email` identity when a password is added to a user that has none (e.g. one who signed up with an OAuth provider). | Default: `false`. Experimental |
+| `GOTRUE_EXPERIMENTAL_CURSOR_PAGINATION_ENABLED` | boolean |  | Use cursor-based (keyset) pagination for `GET /admin/users` when no `page` query parameter is given. | Default: `false`. Experimental |
+| `GOTRUE_EXPERIMENTAL_ENABLE_OTT_AS_SOURCE_OF_TRUTH` | boolean |  | Verify typed OTPs against `auth.one_time_tokens` instead of the token columns in `auth.users`, with no fallback. | Default: `false`. Experimental |
+| `GOTRUE_EXPERIMENTAL_ONE_TIME_TOKEN_EXPIRES_AT_WRITE_ENABLED` | boolean |  | Set `expires_at` on `auth.one_time_tokens` rows when a one-time token is created. | Default: `false`. Experimental; nothing reads the column yet (v2.198.0) |
+| `GOTRUE_EXPERIMENTAL_PROVIDER_LINKING_DOMAINS` | string (CSV) |  | Map providers to account-linking domains. Providers in the same domain link to each other by email, separately from the default email-linked pool and from SSO. | Format: `provider=domain,provider=domain` (`=`, since custom provider names contain `:`). Experimental |
+| `GOTRUE_EXPERIMENTAL_PROVIDERS_WITH_OWN_LINKING_DOMAIN` | string (CSV) |  | Providers that do not participate in email-similarity identity linking. | Experimental. Deprecated: use `GOTRUE_EXPERIMENTAL_PROVIDER_LINKING_DOMAINS`; each listed provider is mapped to a domain of its own name |
+| `GOTRUE_EXPERIMENTAL_SCIM_ENABLED` | boolean |  | Enable the `/scim/v2` routes. | Default: `false`. Experimental; no per-provider SCIM setup yet (v2.198.0) |
 | `GOTRUE_INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST` | boolean |  | Always create user-search indexes on startup. | Default: `false` |
 | `GOTRUE_INDEX_WORKER_MAX_USERS_THRESHOLD` | integer (count) |  | Create user-search indexes only if user count is at or below this threshold. | Default: `0` (disabled) |
 | `GOTRUE_INTERNAL_HTTP_TIMEOUT` | string (duration) |  | HTTP client timeout used by external OAuth and SMS provider calls. | Read via `os.Getenv`, not envconfig |
