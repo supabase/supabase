@@ -37,7 +37,9 @@ export const useLogSettingsUpdateMutation = ({
   return useMutation<LogSettingsData, LogSettingsError, LogSettingsUpdateVariables>({
     mutationFn: updateLogSettings,
     async onSuccess(data, variables, context) {
-      queryClient.setQueryData(logSettingsKeys.detail(variables.projectRef), data)
+      const queryKey = logSettingsKeys.detail(variables.projectRef)
+      await queryClient.cancelQueries({ queryKey })
+      queryClient.setQueryData(queryKey, data)
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {
