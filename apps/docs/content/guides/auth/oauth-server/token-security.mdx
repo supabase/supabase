@@ -337,12 +337,12 @@ USING (
 Track and review which clients have access:
 
 ```sql
--- View OAuth clients and the users with a session refreshed in the last 30 days
+-- View OAuth clients and users with a session refreshed in the last 30 days
 SELECT
   oc.id AS client_id,
   oc.client_name,
   oc.created_at,
-  COUNT(DISTINCT s.user_id) as active_users
+  COUNT(DISTINCT s.user_id) as users_with_recent_sessions
 FROM auth.oauth_clients oc
 LEFT JOIN auth.sessions s
   ON s.oauth_client_id = oc.id
