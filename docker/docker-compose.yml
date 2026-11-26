@@ -393,6 +393,8 @@ services:
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
+      # Signed upload URLs are valid for 2 hours (Storage's default is 60 seconds)
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: 7200
       STORAGE_BACKEND: file
       # S3 bucket when using S3 backend, directory name when using 'file'
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}

@@ -1101,7 +1101,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `TUS_USE_FILE_VERSION_SEPARATOR` | boolean |  | Include the object version in TUS storage keys. | Default: `false` |
 | `UPLOAD_FILE_SIZE_LIMIT` | integer (bytes) | CLI | Max upload size in bytes. | Required |
 | `UPLOAD_FILE_SIZE_LIMIT_STANDARD` | integer (bytes) | CLI | Max size in bytes for non-resumable uploads. | Default: `0` (disabled) |
-| `UPLOAD_SIGNED_URL_EXPIRATION_TIME` | integer (seconds) |  | Default lifetime (seconds) of signed upload URLs. | Default: `60` |
+| `UPLOAD_SIGNED_URL_EXPIRATION_TIME` | integer (seconds) | Self-hosted | Default lifetime (seconds) of signed upload URLs. | Default: `60`; `docker-compose.yml` sets `7200` |
 
 ### Rate limiting
 
