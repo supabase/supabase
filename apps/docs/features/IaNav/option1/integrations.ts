@@ -18,6 +18,10 @@ export const integrations: NavMenuConstant = {
       name: 'Build your own integration',
       items: [
         {
+          name: 'Build a Supabase integration',
+          url: '/guides/integrations/build-a-supabase-integration',
+        },
+        {
           name: 'Supabase OAuth Integration',
           items: [
             { name: 'Overview', url: '/guides/integrations/build-a-supabase-oauth-integration' },

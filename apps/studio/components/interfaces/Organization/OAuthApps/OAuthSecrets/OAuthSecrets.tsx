@@ -45,7 +45,7 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
           <span className="text-sm text-foreground-light">
             For handling callbacks in the OAuth 2.0 flow. Learn more{' '}
             <InlineLink
-              href={`${DOCS_URL}/guides/integrations/build-a-supabase-integration#handling-the-callback`}
+              href={`${DOCS_URL}/guides/integrations/build-a-supabase-oauth-integration#handling-the-callback`}
             >
               here
             </InlineLink>
