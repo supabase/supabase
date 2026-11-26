@@ -360,8 +360,6 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
-      rest:
-        condition: service_started
       imgproxy:
         condition: service_started
     healthcheck:
@@ -381,7 +379,6 @@ services:
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
-      POSTGREST_URL: http://rest:3000
 
       # Legacy symmetric HS256 key
       AUTH_JWT_SECRET: ${JWT_SECRET}
@@ -399,7 +396,6 @@ services:
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
       # S3 Backend configuration
       #GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
-      #GLOBAL_S3_PROTOCOL: https
       #GLOBAL_S3_FORCE_PATH_STYLE: "true"
       #AWS_ACCESS_KEY_ID: your-access-key-id
       #AWS_SECRET_ACCESS_KEY: your-secret-access-key
