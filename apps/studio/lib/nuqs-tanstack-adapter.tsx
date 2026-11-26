@@ -40,25 +40,22 @@ export function buildSearchUpdateArgs(
 }
 
 function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
-  const search = useLocation({
+  const searchKey = useLocation({
     select: (state) =>
-      Object.fromEntries(Object.entries(state.search).filter(([key]) => watchKeys.includes(key))),
+      new URLSearchParams(
+        Object.entries(state.search)
+          .filter(([key]) => watchKeys.includes(key))
+          .flatMap(([key, value]): Array<[string, string]> => {
+            if (Array.isArray(value)) return value.map((v) => [key, String(v)])
+            if (typeof value === 'object' && value !== null) return [[key, JSON.stringify(value)]]
+            return [[key, String(value)]]
+          })
+      ).toString(),
   })
   const pathname = useLocation({ select: (state) => state.pathname })
   const navigate = useNavigate()
 
-  const searchParams = useMemo(
-    () =>
-      new URLSearchParams(
-        Object.entries(search).flatMap(([key, value]): Array<[string, string]> => {
-          if (Array.isArray(value)) return value.map((v) => [key, String(v)])
-          if (typeof value === 'object' && value !== null) return [[key, JSON.stringify(value)]]
-          return [[key, String(value)]]
-        })
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search, watchKeys.join(',')]
-  )
+  const searchParams = useMemo(() => new URLSearchParams(searchKey), [searchKey])
 
   const updateUrl = useCallback(
     (search: URLSearchParams, options: AdapterOptions) => {

@@ -25,6 +25,7 @@ import type { Suggestion } from './ColumnEditor.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 const MAX_SUGGESTIONS = 3
+const EMPTY_SUGGESTIONS: Suggestion[] = []
 
 interface InputWithSuggestionsProps {
   label?: string
@@ -53,7 +54,7 @@ const InputWithSuggestions = ({
   layout,
   disabled = false,
   value = '',
-  suggestions = [],
+  suggestions = EMPTY_SUGGESTIONS,
   suggestionsTooltip,
   suggestionsHeader,
   onChange = noop,
