@@ -18,6 +18,7 @@ type ValidateDestinationParams = {
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
   tableSyncCopy?: TableSyncCopyConfig
+  clusterId?: string
 }
 
 type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse_Output']
@@ -34,13 +35,14 @@ async function validateDestination(
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
     tableSyncCopy,
+    clusterId,
   }: ValidateDestinationParams,
   signal?: AbortSignal
 ): Promise<ValidateDestinationResponse> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/destinations/validate', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     body: {
       config: buildCreateDestinationApiConfig(destinationConfig),
       source_id: sourceId,
