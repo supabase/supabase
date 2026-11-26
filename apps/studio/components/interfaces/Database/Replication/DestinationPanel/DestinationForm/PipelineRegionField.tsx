@@ -24,19 +24,10 @@ const DESTINATION_REGION_HINT: Record<DestinationType, string> = {
   ClickHouse: 'Choose a nearby ClickHouse cluster where possible.',
 }
 
-export const getPipelineRegionDescription = (
-  destinationType?: DestinationType,
-  hasMultipleRegions = false
-) => {
-  const destinationHint = destinationType
+export const getPipelineRegionDescription = (destinationType?: DestinationType) =>
+  destinationType
     ? DESTINATION_REGION_HINT[destinationType]
     : 'Choose a nearby destination region where possible.'
-  const regionNote = hasMultipleRegions
-    ? 'This pipeline runs from this region.'
-    : 'All pipelines run from this region.'
-
-  return `${regionNote} ${destinationHint}`
-}
 
 export const PipelineRegionField = ({
   destinationType,
@@ -69,7 +60,7 @@ export const PipelineRegionField = ({
       isReactForm={false}
       layout="horizontal"
       label="Pipeline region"
-      description={getPipelineRegionDescription(destinationType, hasMultipleRegions)}
+      description={getPipelineRegionDescription(destinationType)}
     >
       {canSelectRegion ? (
         <PipelineRegionSelect
