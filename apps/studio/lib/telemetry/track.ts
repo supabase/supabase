@@ -1,13 +1,11 @@
-import { sendTelemetryEvent } from 'common'
+import { sendTelemetryEvent, useFramework } from 'common'
 import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
 import { useCallback } from 'react'
 
 import { useLatest } from '@/hooks/misc/useLatest'
-import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL } from '@/lib/constants'
-import { toRoutePattern } from '@/lib/internal-url'
 
 type EventMap = {
   [E in TelemetryEvent as E['action']]: E
@@ -32,12 +30,12 @@ type HasProperties<A extends keyof EventMap> = EventMap[A] extends { properties:
 export const useTrack = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const routePattern = useRoutePattern()
+  const { pathname } = useFramework()
 
   const latest = useLatest({
     projectRef: project?.ref,
     orgSlug: org?.slug,
-    pathname: toRoutePattern(routePattern),
+    pathname,
   })
 
   const track = useCallback(
