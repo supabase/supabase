@@ -439,7 +439,7 @@ services:
       IMGPROXY_FORMAT_QUALITY: jpeg=80,avif=62,webp=80
       # Source limits. All frames of an animation count toward the resolution
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
-      IMGPROXY_MAX_SRC_FILE_SIZE: 50000000
+      IMGPROXY_MAX_SRC_FILE_SIZE: 52428800
       IMGPROXY_MAX_ANIMATION_FRAMES: 150
 
   meta:
