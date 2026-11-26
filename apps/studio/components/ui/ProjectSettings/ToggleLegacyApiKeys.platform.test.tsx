@@ -85,7 +85,11 @@ describe('ToggleLegacyApiKeysPanel grants', () => {
     await userEvent.click(screen.getByRole('button', { name: /Confirm to disable/ }))
 
     await waitFor(() =>
-      expect(mockTrack).toHaveBeenCalledWith('legacy_api_keys_updated', { enabled: false })
+      expect(mockTrack).toHaveBeenCalledWith(
+        'legacy_api_keys_updated',
+        { enabled: false },
+        { project: 'default' }
+      )
     )
     expect(mockTrack).toHaveBeenCalledTimes(1)
   })

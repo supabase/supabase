@@ -48,6 +48,11 @@ export const CreateNewAPIKeysButton = () => {
           type: 'publishable',
           name: 'default',
         })
+        track(
+          'api_key_created',
+          { keyType: 'publishable', source: 'initial_setup' },
+          { project: projectRef }
+        )
       } catch (error: any) {
         setError(`Failed to create the default publishable key: ${error.message}`)
         throw error
@@ -61,6 +66,11 @@ export const CreateNewAPIKeysButton = () => {
           type: 'secret',
           name: 'default',
         })
+        track(
+          'api_key_created',
+          { keyType: 'secret', source: 'initial_setup' },
+          { project: projectRef }
+        )
       } catch (error: any) {
         setError(
           `The default publishable key was created, but the default secret key failed: ${error.message}`
@@ -68,7 +78,6 @@ export const CreateNewAPIKeysButton = () => {
         throw error
       }
 
-      track('api_key_created', { keyType: 'initial_pair', source: 'initial_setup' })
       setCreateKeysDialogOpen(false)
       toast.success('Successfully created a new set of API keys!')
     } catch (error) {

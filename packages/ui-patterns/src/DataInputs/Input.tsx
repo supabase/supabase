@@ -20,6 +20,8 @@ export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> 
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
+  /** Called only after the Copy button writes to the clipboard, not on native copy events */
+  onCopied?: () => void
   /** Called when the user clicks the Reveal button (only when `reveal` is set) */
   onReveal?: () => void
   icon?: any
@@ -41,6 +43,7 @@ const Input = forwardRef<
       reveal = false,
       actions,
       onCopy,
+      onCopied,
       onReveal,
       iconContainerClassName,
       containerClassName,
@@ -60,6 +63,7 @@ const Input = forwardRef<
           setCopyLabel('Copy')
         }, 3000)
         onCopy?.()
+        onCopied?.()
       })
     }
 

@@ -69,7 +69,15 @@ export const CreatePublishableAPIKeyDialog = () => {
   const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
   const canCreateAPIKeys = createGrant.status === 'granted'
 
-  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation({
+    // Hook-level so the event still fires if the dialog unmounts before the request finishes
+    onSuccess: (_data, variables) =>
+      track(
+        'api_key_created',
+        { keyType: 'publishable', source: 'create_dialog' },
+        { project: variables.projectRef }
+      ),
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     if (!createGrant.grant) {
@@ -86,7 +94,6 @@ export const CreatePublishableAPIKeyDialog = () => {
       },
       {
         onSuccess: () => {
-          track('api_key_created', { keyType: 'publishable', source: 'create_dialog' })
           form.reset(defaultValues)
           onOpenChange(false)
         },

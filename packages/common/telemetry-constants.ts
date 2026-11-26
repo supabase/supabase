@@ -5054,8 +5054,9 @@ export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
 }
 
 /**
- * User copied an API key on the API keys pages: a publishable or secret key, or a legacy
- * anon or service_role key. Not fired when the copy is blocked by missing permissions or fails.
+ * User copied an API key with its Copy button on the API keys pages: a publishable or secret key,
+ * or a legacy anon or service_role key. Keyboard copies from the key input are not counted. Not
+ * fired when the copy is blocked by missing permissions or the clipboard write fails.
  *
  * @group Events
  * @source studio
@@ -5090,8 +5091,9 @@ export interface ApiKeyRevealClickedEvent {
 }
 
 /**
- * An API key was successfully created, either from the create dialog or the first-time setup
- * that creates a default publishable and secret key pair.
+ * An API key was successfully created, either from the create dialog or the first-time setup.
+ * The first-time setup creates a default publishable and secret key and fires once per key, so a
+ * failed secret key doesn't lose the publishable key's event.
  *
  * @group Events
  * @source studio
@@ -5100,8 +5102,8 @@ export interface ApiKeyRevealClickedEvent {
 export interface ApiKeyCreatedEvent {
   action: 'api_key_created'
   properties: {
-    /** Which key was created. `initial_pair` is the default publishable and secret key pair. */
-    keyType: 'publishable' | 'secret' | 'initial_pair'
+    /** Which key was created */
+    keyType: 'publishable' | 'secret'
     /** Where the user created the key */
     source: 'create_dialog' | 'initial_setup'
   }

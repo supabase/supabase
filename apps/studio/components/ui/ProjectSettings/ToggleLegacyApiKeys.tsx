@@ -208,7 +208,15 @@ const ToggleApiKeysModal = ({
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
-    useToggleLegacyAPIKeysMutation()
+    useToggleLegacyAPIKeysMutation({
+      // Hook-level so the event still fires if the modal unmounts before the request finishes
+      onSuccess: (_data, variables) =>
+        track(
+          'legacy_api_keys_updated',
+          { enabled: variables.enabled },
+          { project: variables.projectRef }
+        ),
+    })
 
   const onToggleLegacyAPIKeysEnabled = () => {
     if (!toggleGrant.grant) {
@@ -223,7 +231,6 @@ const ToggleApiKeysModal = ({
       { projectRef, grant: toggleGrant.grant, enabled },
       {
         onSuccess: () => {
-          track('legacy_api_keys_updated', { enabled })
           toast.success(
             enabled
               ? 'Your anon and service_role keys have been re-enabled!'
