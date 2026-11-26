@@ -18,7 +18,7 @@ export const integrations: NavMenuConstant = {
       name: 'Build your own integration',
       items: [
         {
-          name: 'Build a Supabase integration',
+          name: 'Build a Supabase Integration',
           url: '/guides/integrations/build-a-supabase-integration',
         },
         {
