@@ -15,14 +15,16 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -40,7 +42,6 @@ import { usePipelineList } from './usePipelineList'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { useReplicationClusters } from './useReplicationClusters'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
@@ -99,7 +100,8 @@ export const Destinations = () => {
     isLoading: isDiscoveringRegions,
     isSuccess: isRegionsSuccess,
     isError: isRegionsError,
-    error: regionsError,
+    isFetching: isRetryingDiscovery,
+    refetch: refetchRegions,
   } = useQuery(replicationClustersQueryOptions())
   const [sort, setSort] = useState<DestinationSort>('name:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
@@ -128,11 +130,27 @@ export const Destinations = () => {
   )
   const hasClusterErrors = clusterResults.some(({ error }) => error !== null)
   const shouldShowTable = hasDestinations
-  const shouldShowNoResults =
-    !isDestinationsLoading &&
-    !hasClusterErrors &&
-    sortedDestinations.length === 0 &&
-    hasDestinations
+  const tableColumnCount = 6
+
+  const retryRegion = ({
+    destinationsResult,
+    pipelinesResult,
+    sourcesResult,
+  }: (typeof clusterResults)[number]) => {
+    if (destinationsResult.isError) void destinationsResult.refetch()
+    if (pipelinesResult.isError) void pipelinesResult.refetch()
+    if (sourcesResult.isError) void sourcesResult.refetch()
+  }
+  const isRetryingRegion = ({
+    destinationsResult,
+    pipelinesResult,
+    sourcesResult,
+  }: (typeof clusterResults)[number]) =>
+    destinationsResult.isFetching || pipelinesResult.isFetching || sourcesResult.isFetching
+
+  const failedRegions = clusterResults.filter(({ error }) => error !== null)
+  const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
+  const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
 
   const {
     data: defaultSources,
@@ -165,9 +183,59 @@ export const Destinations = () => {
   const isDefaultRegionEnabled = defaultSources?.sources.some(({ name }) => name === projectRef)
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
+  const hasListErrors = isRegionsError || isSourcesError || hasClusterErrors
+  const isRetryingList =
+    isRetryingDiscovery ||
+    failedRegions.some(isRetryingRegion) ||
+    (isSourcesError && clusterResults[0].sourcesResult.isFetching)
+  const retryList = () => {
+    if (isRegionsError) void refetchRegions()
+    failedRegions.forEach(retryRegion)
+    if (
+      isSourcesError &&
+      !failedRegions.some(({ sourcesResult }) => sourcesResult === clusterResults[0].sourcesResult)
+    ) {
+      void refetchSources()
+    }
+  }
   const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
+
+  const failedRegionName = failedRegions[0]?.cluster.regionName ?? 'the default region'
+  const hasVisibleOtherRegions =
+    hasClusterErrors &&
+    sortedDestinations.some(
+      ({ cluster }) =>
+        !failedRegions.some((failed) => failed.cluster.clusterId === cluster.clusterId)
+    )
+  const hasGeneralErrors = isRegionsError || isSourcesError
+  const getWarningTitle = () => {
+    if (hasGeneralErrors) return 'Could not load pipeline information'
+    if (failedRegions.length === 1) return `Could not load results from ${failedRegionName}`
+    return 'Could not load results from some regions'
+  }
+  const warningTitle = getWarningTitle()
+  const unavailableInformation = [
+    isRegionsError && 'the region list',
+    isSourcesError && 'setup details',
+    hasClusterErrors &&
+      `results from ${failedRegions.length === 1 ? failedRegionName : 'some regions'}`,
+  ].filter((item): item is string => Boolean(item))
+  const getWarningDescription = () => {
+    if (!hasGeneralErrors) {
+      return failedRegions.length === 1
+        ? 'Any pipelines in this region are missing from this view.'
+        : 'Any pipelines in the following regions are missing from this view:'
+    }
+    const information =
+      unavailableInformation.length > 1
+        ? `${unavailableInformation.slice(0, -1).join(', ')}${unavailableInformation.length > 2 ? ',' : ''} and ${unavailableInformation.at(-1)}`
+        : (unavailableInformation[0] ?? 'Pipeline information')
+    const verb = unavailableInformation.length === 1 && isRegionsError ? 'is' : 'are'
+    return `${information.charAt(0).toUpperCase()}${information.slice(1)} ${verb} unavailable.`
+  }
+  const pipelineListStatus = hasListErrors ? `Warning: ${warningTitle}` : ''
 
   const canLinkToWizard =
     isWizardEnabled && hasWizardDestination && !!projectRef && isDefaultRegionEnabled && canCreate
@@ -331,38 +399,35 @@ export const Destinations = () => {
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {/* Mounted whether or not it has anything to say, so the update is announced */}
         <p role="status" aria-live="polite" className="sr-only">
-          {isDestinationsLoading ? 'Loading pipelines' : ''}
+          {pipelineListStatus || loadingStatus}
         </p>
 
-        {isRegionsError && (
-          <AlertError
-            error={regionsError}
-            projectRef={projectRef}
-            subject="Failed to retrieve pipeline regions"
-          />
-        )}
-
-        {isSourcesError && (
-          <AlertError
+        {hasListErrors && (
+          <Admonition
+            type="warning"
             layout="responsive"
-            projectRef={projectRef}
-            error={sourcesError}
-            subject={sourceErrorTitle}
-            hideContactSupport={checkLocalPipelinesNotSetUp(sourcesError)}
-            description={
-              checkLocalPipelinesNotSetUp(sourcesError)
-                ? 'Configure the replication API to manage pipelines in local development.'
-                : undefined
+            title={warningTitle}
+            description={getWarningDescription()}
+            actions={
+              <Button loading={isRetryingList} onClick={retryList}>
+                Retry
+              </Button>
             }
-            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
-          />
-        )}
-
-        {hasClusterErrors && (
-          <AlertError
-            error={clusterResults.find(({ error }) => error)?.error}
-            subject="Failed to retrieve pipelines"
-          />
+          >
+            {failedRegions.length > 1 && (
+              <ul className="list-disc pl-5 space-y-1">
+                {failedRegions.map(({ cluster }) => (
+                  <li key={cluster.clusterId ?? 'default'}>
+                    {cluster.regionName ?? 'Default region'}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {hasVisibleOtherRegions && <p>Pipelines from other regions are still shown.</p>}
+            {isSourcesError && checkLocalPipelinesNotSetUp(sourcesError) && (
+              <p>Configure the replication API to manage pipelines in local development.</p>
+            )}
+          </Admonition>
         )}
 
         {isDestinationsLoading && !shouldShowTable && (
@@ -413,7 +478,21 @@ export const Destinations = () => {
                       />
                     </ReplicationClusterProvider>
                   ))}
-                  {shouldShowNoResults && <TableRowNoResults colSpan={6} search={filterString} />}
+                  {pendingRegions.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={tableColumnCount}>
+                        <span className="sr-only">Loading pipelines from remaining regions</span>
+                        <ShimmeringLoader />
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {!isDestinationsLoading &&
+                    !hasClusterErrors &&
+                    sortedDestinations.length === 0 &&
+                    hasDestinations && (
+                      <TableRowNoResults colSpan={tableColumnCount} search={filterString} />
+                    )}
                 </TableBody>
               </Table>
             </CardContent>
