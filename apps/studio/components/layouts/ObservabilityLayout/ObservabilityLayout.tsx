@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -21,7 +21,7 @@ const ObservabilityLayoutContent = ({
   children,
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
@@ -33,7 +33,7 @@ const ObservabilityLayoutContent = ({
   const prevPathnameRef = useRef(pathname)
 
   useEffect(() => {
-    const isQueryPerformancePage = pathname?.includes('/query-performance')
+    const isQueryPerformancePage = pathname.includes('/query-performance')
 
     if (
       isQueryPerformancePage &&

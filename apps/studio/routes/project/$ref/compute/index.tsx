@@ -61,7 +61,7 @@ function ComputePage() {
 
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>{PRODUCT_NAME}</PageHeaderTitle>
@@ -72,7 +72,7 @@ function ComputePage() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent className="flex flex-col gap-y-8">
             <AlphaNotice

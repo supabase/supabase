@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { Separator } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
@@ -10,7 +11,6 @@ import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
@@ -22,7 +22,7 @@ export const Documents = () => {
       return (
         <Fragment key={doc.id}>
           <CustomDocument doc={doc} />
-          {idx !== organizationLegalDocuments.length - 1 && <ScaffoldDivider />}
+          {idx !== organizationLegalDocuments.length - 1 && <Separator />}
         </Fragment>
       )
     })
@@ -34,37 +34,37 @@ export const Documents = () => {
         <DPA />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="tia">
         <TIA />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="soc2">
         <SOC2 />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="iso27001">
         <ISO27001 />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="hipaa">
         <HIPAA />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer id="security-questionnaire">
         <SecurityQuestionnaire />
       </PageContainer>
 
-      <ScaffoldDivider />
+      <Separator />
 
       <PageContainer>
         <PageSection>

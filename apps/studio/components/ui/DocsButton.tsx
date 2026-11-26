@@ -8,9 +8,18 @@ interface DocsButtonProps {
   topic?: string
   /** Custom button text, e.g. to distinguish multiple docs buttons side by side. */
   label?: string
+  /** PostHog autocapture identifier for this link */
+  'data-attr'?: string
 }
 
-export const DocsButton = ({ href, abbrev = true, className, topic, label }: DocsButtonProps) => {
+export const DocsButton = ({
+  href,
+  abbrev = true,
+  className,
+  topic,
+  label,
+  'data-attr': dataAttr,
+}: DocsButtonProps) => {
   return (
     <Button
       asChild
@@ -20,6 +29,7 @@ export const DocsButton = ({ href, abbrev = true, className, topic, label }: Doc
       onClick={(e) => e.stopPropagation()}
     >
       <a
+        data-attr={dataAttr}
         target="_blank"
         rel="noopener noreferrer"
         href={href}

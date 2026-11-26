@@ -1,0 +1,214 @@
+---
+id: upgrade-guide
+title: Upgrade to supabase-swift v3
+description: 'Upgrade a Swift app from supabase-swift v2 to v3. Create the client with a configuration, log with swift-log, catch errors by module, and apply the renames.'
+---
+
+Upgrade your app from supabase-swift v2 to v3 and fix the compile errors that the upgrade causes. v3 renames many public types and methods, so most errors come from a rename. This page covers the changes that affect every app.
+
+For the full list, including the changes that still compile but behave differently, see the supabase-swift repository on GitHub. It has the [v3 migration guide](https://github.com/supabase/supabase-swift/blob/main/V3_MIGRATION.md) and the [module guides](https://github.com/supabase/supabase-swift/tree/main/docs/migrations/v3) for Auth, PostgREST, Storage, Functions, and Realtime.
+
+## Upgrade the client library
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    1. Install Xcode 26.0 or later. v3 needs Swift 6.2 or later, which Xcode 26.0 includes.
+    2. Update the supabase-swift package requirement to `3.0.0-alpha.2`.
+    3. If your app pins swift-crypto below 4.0.0, raise the pin to 4.0.0 or later. v3 needs swift-crypto 4.0.0 or later.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```swift
+    .package(url: "https://github.com/supabase/supabase-swift", from: "3.0.0-alpha.2")
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Create the client with a configuration
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    v3 renames `SupabaseClientOptions` to `SupabaseClient.Configuration`, and the initializer label is `configuration:`. The nested types drop their `Options` suffix, and `db` is renamed to `database`.
+
+    In v3, every client initializer throws when the URL has no scheme or no host. Add `try`.
+
+    Headers are `HTTPFields`. Write each key as an `HTTPField.Name`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+  <Tabs
+    scrollable
+    size="small"
+    type="underlined"
+    defaultActiveId="v2"
+    queryGroup="version"
+  >
+    <TabPanel id="v2" label="Before">
+
+      ```swift
+      let client = SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        options: SupabaseClientOptions(
+          db: .init(schema: "app"),
+          global: .init(headers: ["x-app": "demo"])
+        )
+      )
+      ```
+
+    </TabPanel>
+    <TabPanel id="v3" label="After">
+
+      ```swift
+      var configuration = SupabaseClient.Configuration()
+      configuration.database.schema = "app"
+      configuration.global.headers = [HTTPField.Name("x-app")!: "demo"]
+
+      let client = try SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        configuration: configuration
+      )
+      ```
+
+    </TabPanel>
+
+  </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Use swift-log for logging
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    In v3, every `logger:` parameter takes a `Logging.Logger` from the [swift-log](https://github.com/apple/swift-log) package on GitHub. v3 removes `SupabaseLogger` and `OSLogSupabaseLogger`. Add swift-log to your package and `import Logging` where you build the logger.
+
+    When you pass no logger, debug builds log warnings and errors to stderr. Release builds stay silent.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```swift
+    import Logging
+    import Supabase
+
+    var logger = Logger(label: "myapp")
+    logger.logLevel = .debug
+
+    let client = try SupabaseClient(
+      supabaseURL: url,
+      supabaseKey: key,
+      configuration: .init(global: .init(logger: logger))
+    )
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Replace `fetch` closures and `URLSession` options
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    v3 replaces the `fetch` closures and the `URLSession` options with a transport and middleware. Every client sends requests through one `ClientTransport` behind an ordered list of `ClientMiddleware`. Both go in one `HTTPClientConfiguration`, passed as `http:`. `URLSessionTransport(session:)` wraps the `URLSession` that you used in v2.
+
+    In v3, the SDK sets the request timeout itself: 60 seconds, or 150 seconds for Functions. To change it, set `HTTPClientConfiguration(timeout:)`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+  <Tabs
+    scrollable
+    size="small"
+    type="underlined"
+    defaultActiveId="v2"
+    queryGroup="version"
+  >
+    <TabPanel id="v2" label="Before">
+
+      ```swift
+      let client = SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        options: .init(global: .init(session: mySession))
+      )
+      ```
+
+    </TabPanel>
+    <TabPanel id="v3" label="After">
+
+      ```swift
+      let client = try SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        configuration: .init(
+          global: .init(http: .init(transport: URLSessionTransport(session: mySession)))
+        )
+      )
+      ```
+
+    </TabPanel>
+
+  </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Catch errors by module
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    v3 removes `HTTPError`. Each module throws its own error type: `AuthError`, `PostgrestError`, `StorageError`, `FunctionsError`, or `RealtimeError`. Each one conforms to `SupabaseError` and has a `kind`, a `code`, the `response`, and an `underlyingError`.
+
+    The SDK wraps a `URLError` or `DecodingError` in the module error and keeps the original in `underlyingError`. In v3, a canceled task throws `CancellationError` in every module.
+
+    Errors that your own transport or middleware throws reach you unchanged. Keep the handlers for those errors.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```swift
+    do {
+      try await supabase.from("todos").insert(todo).execute()
+    } catch PostgrestError.Code.uniqueViolation {
+      showDuplicate()
+    } catch PostgrestError.Kind.transport {
+      showOfflineBanner()
+    } catch let error as any SupabaseError {
+      if let response = error.response {
+        print(response.status.code, String(decoding: response.body, as: UTF8.self))
+      }
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Other renames and removals
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    v3 also renames the following methods, types, and arguments:
+
+    - `AnyJSON` is renamed to `JSONValue`. Numbers are one case, `.number(JSONNumber)`, which keeps every digit.
+    - `supabase.realtimeV2` is renamed to `supabase.realtime`, and `supabase.channel(_:)` is `async`.
+    - `supabase.handle(_:)` is renamed to `supabase.handleRedirect(_:)`.
+    - Methods that only read a value drop their `get` prefix. For example, `getPublicURL` is `publicURL`.
+    - Arguments that name an identifier are `id:`, and acronyms keep their capitals, as in `factorID`.
+
+    v3 removes the following:
+
+    - `supabase.database`. Use `supabase.from(_:)`, `supabase.rpc(_:)`, and `supabase.schema(_:)`.
+    - Every type, method, and property that was deprecated in v2.55.4.
+
+  </RefSubLayout.Details>
+</RefSubLayout.EducationRow>

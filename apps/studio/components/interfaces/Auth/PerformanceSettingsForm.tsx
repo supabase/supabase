@@ -21,11 +21,16 @@ import {
   SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { convertPoolSize, isAllocationUnit } from './PerformanceSettingsForm.utils'
-import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -179,43 +184,47 @@ export const PerformanceSettingsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   if (isLoadingAuthConfig || isLoadingEntitlement) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <GenericSkeletonLoader />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        {promptUpgrade && (
+      {promptUpgrade && (
+        <PageSection>
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
             primaryText="Only available on the Pro Plan and above"
             secondaryText="Upgrade to the Pro Plan to configure Auth server performance settings."
           />
-        )}
-      </ScaffoldSection>
+        </PageSection>
+      )}
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Request duration</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
 
         <Form {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
@@ -283,10 +292,14 @@ export const PerformanceSettingsForm = () => {
             </Card>
           </form>
         </Form>
-      </ScaffoldSection>
+      </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Connection management</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
 
         <Form {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
@@ -422,7 +435,7 @@ export const PerformanceSettingsForm = () => {
             </Card>
           </form>
         </Form>
-      </ScaffoldSection>
+      </PageSection>
     </>
   )
 }

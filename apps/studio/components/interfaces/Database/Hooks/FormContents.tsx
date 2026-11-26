@@ -1,7 +1,6 @@
 import type { PGTrigger } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import Image from 'next/legacy/image'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -254,12 +253,12 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         showIndicator={false}
                       >
                         <div className="flex items-center gap-5">
-                          <Image
-                            alt={webhook.label}
+                          <img
+                            alt=""
+                            aria-hidden="true"
                             src={webhook.icon}
-                            layout="fixed"
-                            width="32"
-                            height="32"
+                            width={32}
+                            height={32}
                           />
                           <div className="flex-col space-y-0">
                             <div className="flex space-x-2">

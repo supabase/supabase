@@ -17,9 +17,11 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +48,11 @@ export const CreateNewAPIKeysButton = () => {
           type: 'publishable',
           name: 'default',
         })
+        track(
+          'api_key_created',
+          { keyType: 'publishable', source: 'initial_setup' },
+          { project: projectRef }
+        )
       } catch (error: any) {
         setError(`Failed to create the default publishable key: ${error.message}`)
         throw error
@@ -59,6 +66,11 @@ export const CreateNewAPIKeysButton = () => {
           type: 'secret',
           name: 'default',
         })
+        track(
+          'api_key_created',
+          { keyType: 'secret', source: 'initial_setup' },
+          { project: projectRef }
+        )
       } catch (error: any) {
         setError(
           `The default publishable key was created, but the default secret key failed: ${error.message}`
@@ -108,7 +120,9 @@ export const CreateNewAPIKeysButton = () => {
         )}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCreateNewApiKeys}>Create keys</AlertDialogAction>
+          <AlertDialogAction data-attr="api-key-create-initial" onClick={handleCreateNewApiKeys}>
+            Create keys
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

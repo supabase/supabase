@@ -1,15 +1,65 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+  type AnyRouter,
+} from '@tanstack/react-router'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
-import { AuthContext, AuthContext as AuthContextType } from 'common'
+import { AuthContext, AuthContext as AuthContextType, FrameworkProvider } from 'common'
+import { useRouter as useMockRouter } from 'next-router-mock'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { useMemo } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 // End of third-party imports
 
 import { ProfileContext, type ProfileContextType } from '@/lib/profile'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
+
+const TestRouterProvider = ({
+  children,
+  router,
+  initialUrl = '/',
+}: {
+  children: React.ReactNode
+  router?: AnyRouter
+  initialUrl?: string
+}) => {
+  const activeRouter = useMemo(
+    () =>
+      router ??
+      createRouter({
+        routeTree: createRootRoute(),
+        history: createMemoryHistory({ initialEntries: [initialUrl] }),
+        parseSearch,
+        stringifySearch,
+      }),
+    [router, initialUrl]
+  )
+
+  return <RouterContextProvider router={activeRouter}>{children}</RouterContextProvider>
+}
+
+const TestFrameworkProvider = ({ children }: { children: React.ReactNode }) => {
+  const router = useMockRouter()
+  const value = useMemo(
+    () => ({
+      pathname: router.pathname,
+      asPath: router.asPath,
+      isReady: router.isReady,
+      params: router.query,
+      push: (path: string) => router.push(path),
+    }),
+    [router]
+  )
+
+  return <FrameworkProvider value={value}>{children}</FrameworkProvider>
+}
 
 export const CustomWrapper = ({
   children,
@@ -17,12 +67,16 @@ export const CustomWrapper = ({
   nuqs,
   profileContext,
   authContext,
+  router,
+  initialUrl,
 }: {
   children: React.ReactNode
   queryClient?: QueryClient
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
   authContext?: AuthContext
+  router?: AnyRouter
+  initialUrl?: string
 }) => {
   const _queryClient =
     queryClient ??
@@ -34,13 +88,17 @@ export const CustomWrapper = ({
     })
 
   let content = (
-    <QueryClientProvider client={_queryClient}>
-      <NuqsTestingAdapter {...nuqs}>
-        <TooltipProvider>
-          <CommandProvider openKey="">{children}</CommandProvider>
-        </TooltipProvider>
-      </NuqsTestingAdapter>
-    </QueryClientProvider>
+    <TestRouterProvider router={router} initialUrl={initialUrl}>
+      <TestFrameworkProvider>
+        <QueryClientProvider client={_queryClient}>
+          <NuqsTestingAdapter {...nuqs}>
+            <TooltipProvider>
+              <CommandProvider openKey="">{children}</CommandProvider>
+            </TooltipProvider>
+          </NuqsTestingAdapter>
+        </QueryClientProvider>
+      </TestFrameworkProvider>
+    </TestRouterProvider>
   )
 
   if (profileContext) {
@@ -59,6 +117,8 @@ type CustomRenderOpts = RenderOptions & {
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
   authContext?: AuthContextType
+  router?: AnyRouter
+  initialUrl?: string
 }
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
@@ -69,6 +129,8 @@ export const customRender = (component: React.ReactElement, renderOptions?: Cust
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
         authContext: renderOptions?.authContext,
+        router: renderOptions?.router,
+        initialUrl: renderOptions?.initialUrl,
         children,
       }),
     ...renderOptions,
@@ -84,6 +146,8 @@ export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRender
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
         authContext: renderOptions?.authContext,
+        router: renderOptions?.router,
+        initialUrl: renderOptions?.initialUrl,
       }),
     ...renderOptions,
   })
