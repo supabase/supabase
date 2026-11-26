@@ -99,7 +99,11 @@ const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
                         className="[&>div]:md:w-1/2"
                       >
                         <FormControl>
-                          <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                          <RadioGroupStacked
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={isSaving}
+                          >
                             {OPTIONS.map((option) => (
                               <RadioGroupStackedItem
                                 key={option.value}
