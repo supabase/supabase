@@ -1,10 +1,10 @@
-import { ReplicationDiagram } from '.'
 import { screen } from '@testing-library/react'
 import type { platformComponents as components } from 'api-types'
 import { mockResizeObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { afterEach, expect, test, vi } from 'vitest'
 
+import { ReplicationDiagram } from '.'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
