@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import type { PropsWithChildren, ReactNode } from 'react'
+import type { PropsWithChildren } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import AccountLayout from './AccountLayout'
@@ -24,27 +24,6 @@ vi.mock('@/lib/constants', async () => {
 vi.mock('next/router', () => ({
   useRouter: () => mockRouter,
 }))
-
-vi.mock('next/head', async () => {
-  const React = await import('react')
-
-  const Head = ({ children }: { children?: ReactNode }) => {
-    React.useEffect(() => {
-      const titleElement = React.Children.toArray(children).find(
-        (child) => React.isValidElement(child) && child.type === 'title'
-      )
-
-      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
-
-      const titleText = React.Children.toArray(titleElement.props.children).join('')
-      document.title = titleText
-    }, [children])
-
-    return null
-  }
-
-  return { default: Head }
-})
 
 vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
