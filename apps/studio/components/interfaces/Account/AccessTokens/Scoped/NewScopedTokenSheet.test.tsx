@@ -230,7 +230,7 @@ describe('NewScopedTokenSheet', () => {
   const grantProjectSettingsRead = async () => {
     await expandPermissionCategory('Project')
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
-    fireEvent.click(await findOption('Read'))
+    fireEvent.click(await findOption('Read only'))
   }
 
   const fillProjectScopedForm = async () => {
@@ -478,7 +478,7 @@ describe('NewScopedTokenSheet', () => {
 
     await expandPermissionCategory('Project')
     const select = await screen.findByLabelText('Project Settings', { exact: false })
-    expect(select.textContent).toBe('Read')
+    expect(select.textContent).toBe('Read only')
   })
 
   test('warns about full access, and falls back to Custom when a row diverges from the preset', async () => {
@@ -496,7 +496,7 @@ describe('NewScopedTokenSheet', () => {
 
     await expandPermissionCategory('Project')
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
-    fireEvent.click(await findOption('None'))
+    fireEvent.click(await findOption('No access'))
 
     await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'))
     expect(screen.queryByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })).toBeNull()
