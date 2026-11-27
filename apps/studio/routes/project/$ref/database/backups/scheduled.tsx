@@ -126,8 +126,8 @@ const ScheduledBackups = () => {
               description={
                 <div>
                   Your project uses PITR. Backups are still taken daily, with WAL continuously
-                  archived on top of them, so you can restore to any second within your selected
-                  PITR retention period instead of a fixed backup time.{' '}
+                  archived on top of them, so you can restore to a point between the earliest and
+                  latest recovery points for your selected PITR retention period.{' '}
                   <a
                     className="text-primary transition-colors hover:text-primary-hover"
                     href={`${DOCS_URL}/guides/platform/backups`}
