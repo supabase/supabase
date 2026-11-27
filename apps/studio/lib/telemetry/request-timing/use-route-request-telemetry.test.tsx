@@ -45,7 +45,7 @@ let router: ReturnType<typeof createTestRouter>
 let collector: ReturnType<typeof createRequestTimingCollector>
 
 const renderTelemetryHook = () =>
-  renderHook(() => useRouteRequestTelemetry({ apiUrl: API_URL, collector }), {
+  renderHook(() => useRouteRequestTelemetry({ collector }), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <RouterContextProvider router={router}>{children}</RouterContextProvider>
     ),

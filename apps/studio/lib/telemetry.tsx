@@ -30,7 +30,7 @@ export function Telemetry() {
 
   const user = useUser()
 
-  useRouteRequestTelemetry({ apiUrl: API_URL })
+  useRouteRequestTelemetry()
 
   // Project ref from the URL params, mirroring the backend's `request.params.ref`
   const { ref: projectRef } = useParams()

@@ -1,26 +1,12 @@
 import { useRouter } from '@tanstack/react-router'
-import { consentState, sendTelemetryEvent } from 'common'
+import { consentState } from 'common'
 import { useEffect } from 'react'
 import { useSnapshot } from 'valtio'
 
-import {
-  requestTimingCollector,
-  type RequestTimingCollector,
-  type RouteRequestsSummary,
-} from './request-timing-collector'
+import { requestTimingCollector, type RequestTimingCollector } from './request-timing-collector'
 import { toRouteTemplate } from './route-template.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
-
-function sendSummary(apiUrl: string, summary: RouteRequestsSummary, isLeavingPage = false) {
-  // The route template is sent as the pathname so the event never carries a project ref there
-  sendTelemetryEvent(
-    apiUrl,
-    { action: 'route_requests_evaluated', properties: summary },
-    summary.routeTemplate,
-    // As the page is hidden or unloads, there may be no time left to read the access token first
-    { skipAccessToken: isLeavingPage }
-  )
-}
+import { trackRouteVisit } from '@/lib/telemetry/track'
 
 /**
  * Sends one `route_requests_evaluated` event per route visit, for the page loads that were
@@ -34,13 +20,11 @@ function sendSummary(apiUrl: string, summary: RouteRequestsSummary, isLeavingPag
  * stay in the same visit) and when the tab is hidden, since that may be the last chance to send.
  */
 export function useRouteRequestTelemetry({
-  apiUrl,
   collector = requestTimingCollector,
 }: {
-  apiUrl: string
   /** The page load's collector. Only tests pass another, to control what is sampled. */
   collector?: RequestTimingCollector
-}) {
+} = {}) {
   const router = useRouter()
   const { hasConsented, isResolved, showConsentToast } = useSnapshot(consentState)
 
@@ -48,7 +32,6 @@ export function useRouteRequestTelemetry({
   // not consented" alone is not a denial
   const isConsentDenied = isResolved && !hasConsented && !showConsentToast
 
-  const apiUrlRef = useLatest(apiUrl)
   const hasConsentedRef = useLatest(hasConsented)
 
   useEffect(() => {
@@ -60,8 +43,8 @@ export function useRouteRequestTelemetry({
   useEffect(() => {
     if (!hasConsented) return
 
-    collector.drainQueuedSummaries().forEach((summary) => sendSummary(apiUrlRef.current, summary))
-  }, [collector, hasConsented, apiUrlRef])
+    collector.drainQueuedSummaries().forEach((summary) => trackRouteVisit(summary))
+  }, [collector, hasConsented])
 
   useEffect(() => {
     if (!collector.isSampled) return
@@ -78,7 +61,7 @@ export function useRouteRequestTelemetry({
 
       // Only the tab being hidden and the page unloading pass `next`
       const isLeavingPage = next !== undefined
-      if (hasConsentedRef.current) sendSummary(apiUrlRef.current, summary, isLeavingPage)
+      if (hasConsentedRef.current) trackRouteVisit(summary, { isLeavingPage })
       else collector.queueSummary(summary)
     }
 
@@ -102,5 +85,5 @@ export function useRouteRequestTelemetry({
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('pagehide', handlePageHide)
     }
-  }, [collector, router, hasConsentedRef, apiUrlRef])
+  }, [collector, router, hasConsentedRef])
 }
