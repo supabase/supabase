@@ -41,7 +41,7 @@ const Scope = ({
       className="grid grid-cols-1 items-start gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_10rem]"
       key={title}
     >
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <span className="text-sm font-medium text-foreground">{title}</span>
         <span className="text-sm text-foreground-lighter capitalize-sentence">{description}</span>
       </div>
