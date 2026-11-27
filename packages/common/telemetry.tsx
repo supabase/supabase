@@ -25,7 +25,7 @@ import {
 import { TelemetryEvent } from './telemetry-constants'
 import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
-import { setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
+import { redactUrlKeywords, setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -169,7 +169,9 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
-        lastSentUrlRef.current = window.location.pathname + window.location.search
+        lastSentUrlRef.current = redactUrlKeywords(
+          window.location.pathname + window.location.search
+        )
       }
     }
   }, [isReady, enabled, hasAcceptedConsent, slug, ref])
@@ -182,8 +184,9 @@ export const PageTelemetry = ({
     if (!hasSentInitialPageTelemetryRef.current) return
     if (previousRouteKey === null || previousRouteKey === currentRouteKey) return
 
-    // Skip hash-only changes where pathname + search did not change, since `$current_url` drops the hash.
-    const url = window.location.pathname + window.location.search
+    // Skip changes that leave the sent URL the same: `$current_url` drops the hash and carries
+    // redacted query values.
+    const url = redactUrlKeywords(window.location.pathname + window.location.search)
     if (url === lastSentUrlRef.current) return
     lastSentUrlRef.current = url
     sendPageTelemetry()
