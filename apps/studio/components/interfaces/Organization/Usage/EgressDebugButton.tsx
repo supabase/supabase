@@ -44,7 +44,7 @@ export const buildEgressDebugPrompt = ({
     'Use the Supabase MCP to inspect my project directly. If it is not connected, set it up first: https://supabase.com/docs/guides/getting-started/mcp',
     '',
     'Investigate with the MCP tools:',
-    '- query_logs / Logs Explorer: rank API and Storage paths by request count, and find cache misses. Dashboard: ' +
+    '- query_logs / Logs Explorer: rank API and Storage paths by response bytes (sum content_length from response headers, exclude HEAD requests from byte sums), and find cache misses. Dashboard: ' +
       `${dashboard}/logs/explorer`,
     '- execute_sql: inspect pg_stat_statements for the most frequent queries and the average rows they return (this is what Query Performance shows). Dashboard: ' +
       `${dashboard}/database/query-performance`,

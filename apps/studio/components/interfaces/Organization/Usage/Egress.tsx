@@ -44,6 +44,25 @@ const Egress = ({
     },
   }
 
+  // Sum each metric over the billing period to find which egress type is largest.
+  // DataPoint keys are the metric name lowercased (set by dailyUsageToDataPoints).
+  const egressKey = PricingMetric.EGRESS.toLowerCase()
+  const cachedEgressKey = PricingMetric.CACHED_EGRESS.toLowerCase()
+  const egressTotal = chartMeta[PricingMetric.EGRESS].data.reduce(
+    (sum, dp) => sum + Number(dp[egressKey] ?? 0),
+    0
+  )
+  const cachedEgressTotal = chartMeta[PricingMetric.CACHED_EGRESS].data.reduce(
+    (sum, dp) => sum + Number(dp[cachedEgressKey] ?? 0),
+    0
+  )
+  const highestEgressType =
+    egressTotal === 0 && cachedEgressTotal === 0
+      ? null
+      : egressTotal >= cachedEgressTotal
+        ? 'Egress'
+        : 'Cached Egress'
+
   return (
     <UsageSection
       orgSlug={orgSlug}
@@ -54,7 +73,13 @@ const Egress = ({
       currentBillingCycleSelected={currentBillingCycleSelected}
       startDate={startDate}
       endDate={endDate}
-      headerActions={<EgressDebugButton projectRef={projectRef} orgSlug={orgSlug} />}
+      headerActions={
+        <EgressDebugButton
+          projectRef={projectRef}
+          orgSlug={orgSlug}
+          highestEgressType={highestEgressType}
+        />
+      }
     />
   )
 }
