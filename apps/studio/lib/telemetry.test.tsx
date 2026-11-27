@@ -42,7 +42,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: undefined }),
 }))
 
-vi.mock('@sentry/nextjs', () => ({
+vi.mock('@sentry/react', () => ({
   setUser: (...args: unknown[]) => mocks.setUser(...args),
   setTag: (...args: unknown[]) => mocks.setTag(...args),
 }))

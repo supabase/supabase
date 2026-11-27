@@ -4,7 +4,6 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { AuthorizedApps } from './AuthorizedApps'
 import { OAuthAppsAuthorizedList } from './OAuthAppsAuthorizedList'
 import { PublishableApps } from './PublishableApps'
-import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -14,13 +13,12 @@ import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 export const OAuthApps = () => {
   const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage')
   const { hasLoaded } = useFeatureFlags()
-  const shouldShowNewOAuthApps = isScopedOAuthManageEnabled && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
         {hasLoaded ? (
-          shouldShowNewOAuthApps ? (
+          isScopedOAuthManageEnabled ? (
             <OAuthAppsAuthorizedList />
           ) : (
             <AuthorizedApps />

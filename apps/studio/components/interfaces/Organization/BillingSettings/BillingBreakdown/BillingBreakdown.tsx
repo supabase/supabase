@@ -1,14 +1,15 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { UpcomingInvoice } from './UpcomingInvoice'
 import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import { AlertError } from '@/components/ui/AlertError'
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+
+import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoice'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { SparkBar } from '@/components/ui/SparkBar'
@@ -27,12 +28,10 @@ const BillingBreakdown = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
-  const {
-    data: subscription,
-    error: subscriptionError,
-    isPending: isLoadingSubscription,
-    isError: isErrorSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug },
+    { enabled: canReadSubscriptions }
+  )
 
   const invoiceFeatureEnabled = useIsFeatureEnabled('billing:invoices')
 
@@ -43,30 +42,28 @@ const BillingBreakdown = () => {
   const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-6">
-          <p className="text-foreground text-base m-0">Upcoming Invoice</p>
-          <div className="py-2">
-            {selectedOrganization?.managed_by !== MANAGED_BY.AWS_MARKETPLACE && (
-              <SparkBar
-                type="horizontal"
-                value={daysWithinCycle - daysToCycleEnd}
-                max={daysWithinCycle}
-                barClass="bg-foreground"
-                labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
-                bgClass="bg-surface-300"
-                labelBottomClass="text-foreground-light! p-1 m-0"
-                labelTop={
-                  subscription
-                    ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
-                    : ''
-                }
-                labelTopClass="p-1 m-0"
-              />
-            )}
-          </div>
-          <p className="prose text-sm">
+    <PageSection orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary className="gap-4">
+          <PageSectionTitle>Upcoming Invoice</PageSectionTitle>
+          {selectedOrganization?.managed_by !== MANAGED_BY.AWS_MARKETPLACE && (
+            <SparkBar
+              type="horizontal"
+              value={daysWithinCycle - daysToCycleEnd}
+              max={daysWithinCycle}
+              barClass="bg-foreground"
+              labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
+              bgClass="bg-surface-300"
+              labelBottomClass="text-foreground-light! p-1 m-0"
+              labelTop={
+                subscription
+                  ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
+                  : ''
+              }
+              labelTopClass="p-1 m-0"
+            />
+          )}
+          <PageSectionDescription className="space-y-2">
             {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
               <>
                 <p>
@@ -74,48 +71,30 @@ const BillingBreakdown = () => {
                   fee, billed on the day you subscribed, and one for your usage charges from the
                   previous month, billed by the 3rd.
                 </p>
-
                 <p>
                   For a more detailed breakdown, visit the{' '}
                   <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
                 </p>
               </>
             ) : (
-              <>
+              <p>
                 Your upcoming invoice will continue to update until the end of your billing cycle on{' '}
                 {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown, visit the{' '}
                 <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
-              </>
+              </p>
             )}
-          </p>
-          <br />
-          <p className="text-sm text-foreground-light mt-4">
-            Add-on changes or new projects may take up to an hour to appear.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+            <p>Add-on changes or new projects may take up to an hour to appear.</p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent className="flex flex-col gap-6">
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
-        ) : (
-          <>
-            {isLoadingSubscription && (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
-              </div>
-            )}
-
-            {isErrorSubscription && (
-              <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
-            )}
-
-            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
-          </>
-        )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+        ) : invoiceFeatureEnabled ? (
+          <UpcomingInvoice slug={orgSlug} />
+        ) : null}
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

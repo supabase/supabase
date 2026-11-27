@@ -1,18 +1,20 @@
+import { useQuery } from '@tanstack/react-query'
+import { Link as RouterLink } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
 import { HelpCircleIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
-import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import InformationBox from '@/components/ui/InformationBox'
 import {
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
   type DatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 export interface ChooseFunctionFormProps {
   visible: boolean
@@ -20,13 +22,21 @@ export interface ChooseFunctionFormProps {
   onChange: (fn: DatabaseFunction) => void
 }
 
-const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
+export const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { data = [] } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data = [] } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
   const triggerFunctions = data.filter((fn) => fn.return_type === 'trigger')
   const hasPublicSchemaFunctions = triggerFunctions.length >= 1
   const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
@@ -58,14 +68,27 @@ const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFor
             ))}
           </div>
         ) : (
-          <NoFunctionsState />
+          <div className="px-6">
+            <EmptyStatePresentational
+              icon={TerminalIcon}
+              title="No trigger functions found"
+              description="You will need to create a trigger function before you can add it to your trigger."
+            >
+              <Button asChild variant="default">
+                <RouterLink
+                  to="/project/$ref/database/functions"
+                  params={{ ref: project?.ref ?? '' }}
+                >
+                  Create a trigger function
+                </RouterLink>
+              </Button>
+            </EmptyStatePresentational>
+          </div>
         )}
       </div>
     </SidePanel>
   )
 }
-
-export default ChooseFunctionForm
 
 const NoticeBox = () => {
   const { ref } = useParams()
@@ -83,26 +106,6 @@ const NoticeBox = () => {
         }
       />
     </div>
-  )
-}
-
-const NoFunctionsState = () => {
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
-
-  return (
-    <ProductEmptyState
-      title="No Trigger Functions found in database"
-      ctaButtonLabel="Create a trigger function"
-      onClickCta={() => {
-        router.push(`/project/${ref}/database/functions`)
-      }}
-    >
-      <p className="text-sm text-foreground-light">
-        You will need to create a trigger based function before you can add it to your trigger.
-      </p>
-    </ProductEmptyState>
   )
 }
 

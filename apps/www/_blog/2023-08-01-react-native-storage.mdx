@@ -112,7 +112,7 @@ EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-We can now simply read those values from the environment variables and initialize the Supabase client, so create a file at `config/initSupabase.ts` and add the following code:
+We can now simply read those values from the environment variables and initialize the [Supabase client](/docs/reference/javascript/introduction), so create a file at `config/initSupabase.ts` and add the following code:
 
 ```ts
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -486,7 +486,7 @@ Now we can implement the image picker and upload the selected image to Supabase 
 
 Using the image picker from Expo gives us a **URI**, which we can use to read the file from the file system and convert it to a base64 string.
 
-We can then use the `upload()` method from the storage client to upload the file to the storage bucket. Life can be easy.
+We can then use the `upload()` method from the storage client to upload the file to the [storage bucket](/docs/guides/storage/buckets/fundamentals). Life can be easy.
 
 At this point, you should be able to upload files to Supabase Storage, and you can already see them in your UI (or log them to the console).
 

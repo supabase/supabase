@@ -1,13 +1,13 @@
 'use client'
 
 import { type Menu } from '~/data/nav'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type ComponentProps, type MouseEvent, type RefObject } from 'react'
-import { Button } from 'ui'
+import { MobileNavAccountActions } from 'ui-patterns/MobileNav/MobileNavAccountActions'
 import { MobileNavDrawer } from 'ui-patterns/MobileNav/MobileNavDrawer'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
@@ -25,8 +25,6 @@ interface MobileMenuProps {
 }
 
 export const MobileMenu = ({ open, menu, toggleRef, onLinkClick, className }: MobileMenuProps) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const [pickedTitle, setPickedTitle] = useState<string>(menu.primaryNav[0].title)
   const pickedItem = menu.primaryNav.find((menuItem) => menuItem.title === pickedTitle)
@@ -36,6 +34,18 @@ export const MobileMenu = ({ open, menu, toggleRef, onLinkClick, className }: Mo
     if (event.target instanceof Element && event.target.closest('a')) onLinkClick()
   }
 
+  const handleSignInClick = () =>
+    sendTelemetryEvent({
+      action: 'sign_in_button_clicked',
+      properties: { buttonLocation: 'Mobile Nav' },
+    })
+
+  const handleSignUpClick = () =>
+    sendTelemetryEvent({
+      action: 'start_project_button_clicked',
+      properties: { buttonLocation: 'Mobile Nav' },
+    })
+
   return (
     <MobileNavDrawer
       open={open}
@@ -43,48 +53,16 @@ export const MobileMenu = ({ open, menu, toggleRef, onLinkClick, className }: Mo
       onClick={handleDrawerClick}
       className={className}
       footer={
-        isUserLoading ? null : (
-          <div className="flex items-stretch gap-4">
-            {isLoggedIn ? (
-              <Button block className="h-8 text-sm" asChild>
-                <a type={undefined} href="/dashboard/projects">
-                  Dashboard
-                </a>
-              </Button>
-            ) : (
-              <>
-                <Button block className="h-8 text-sm" asChild>
-                  <a
-                    type={undefined}
-                    href="https://supabase.com/dashboard"
-                    onClick={() =>
-                      sendTelemetryEvent({
-                        action: 'sign_in_button_clicked',
-                        properties: { buttonLocation: 'Mobile Nav' },
-                      })
-                    }
-                  >
-                    Sign in
-                  </a>
-                </Button>
-                <Button variant="primary" block className="h-8 text-sm" asChild>
-                  <a
-                    type={undefined}
-                    href="https://supabase.com/dashboard/sign-up"
-                    onClick={() =>
-                      sendTelemetryEvent({
-                        action: 'start_project_button_clicked',
-                        properties: { buttonLocation: 'Mobile Nav' },
-                      })
-                    }
-                  >
-                    Start your project
-                  </a>
-                </Button>
-              </>
-            )}
-          </div>
-        )
+        <SignedInSwitch
+          signedIn={<MobileNavAccountActions isLoggedIn dashboardHref="/dashboard/projects" />}
+          signedOut={
+            <MobileNavAccountActions
+              isLoggedIn={false}
+              onSignInClick={handleSignInClick}
+              onSignUpClick={handleSignUpClick}
+            />
+          }
+        />
       }
     >
       <nav aria-label="Menu" className="flex flex-col gap-6">

@@ -73,16 +73,14 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
 
   // Serialized independently so one entry's MDX failure doesn't drop the others.
   const featuredResults = await Promise.allSettled(
-    firstEntries.map(
-      async (entry): Promise<FeaturedEntry> => ({
-        slug: entry.slug,
-        title: entry.frontmatter.title,
-        created_at: entry.sortDate,
-        source: await mdxSerialize(entry.bodySection),
-        changeType: entry.frontmatter.change_type,
-        affectedProducts: entry.frontmatter.affected_products ?? [],
-      })
-    )
+    firstEntries.map(async (entry): Promise<FeaturedEntry> => ({
+      slug: entry.slug,
+      title: entry.frontmatter.title,
+      created_at: entry.sortDate,
+      source: await mdxSerialize(entry.bodySection),
+      changeType: entry.frontmatter.change_type,
+      affectedProducts: entry.frontmatter.affected_products ?? [],
+    }))
   )
   const featured = featuredResults.flatMap((result) => {
     if (result.status === 'rejected') {

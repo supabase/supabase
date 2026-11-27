@@ -1,11 +1,8 @@
 import { useFeatureFlags, useParams } from 'common'
-import { ArrowUpRightIcon } from 'lucide-react'
-import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
-  Button,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -19,13 +16,17 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
+import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
+import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
 import { DestinationForm } from './DestinationForm'
+import { NoDestinationsAvailable } from './DestinationForm/NoDestinationsAvailable'
 import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
@@ -37,7 +38,7 @@ export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
-  const enablePgReplicate = useIsPipelinesEnabled()
+  const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
   const isAccessLoading = IS_PLATFORM && (!flagsLoaded || isOrganizationPending)
   const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
@@ -74,11 +75,20 @@ export const DestinationPanel = () => {
     type: existingDestinationType,
     destinationFetcher,
   } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
   const invalidExistingDestination = destinationFetcher.error?.code === 404
-  const showAccessRequest = !isAccessLoading && !enablePgReplicate
-  const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
-  const showDestinationForm = !isAccessLoading && enablePgReplicate && !replicationNotEnabled
+  const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
+  const showNoDestinations = !isAccessLoading && !hasPipelinesDestinationAccess
+  const showEnablement = !isAccessLoading && hasPipelinesDestinationAccess && replicationNotEnabled
+  const isEditLoading = editMode && destinationFetcher.isPending
+  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
+  const showDestinationForm =
+    !isAccessLoading &&
+    hasPipelinesDestinationAccess &&
+    !replicationNotEnabled &&
+    canEditDestination
 
   const existingDestination = editMode
     ? {
@@ -158,37 +168,28 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
-            {isAccessLoading && (
+            {(isAccessLoading || isEditLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
               </SheetSection>
             )}
-            {showAccessRequest && (
+            {isUnknownDestination && (
+              <SheetSection>
+                <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {hasDestinationError && (
+              <SheetSection>
+                <AlertError
+                  error={destinationFetcher.error}
+                  subject="Failed to retrieve destination information"
+                  projectRef={projectRef}
+                />
+              </SheetSection>
+            )}
+            {showNoDestinations && (
               <div className="grow overflow-auto min-h-0">
-                {pipelinesTypeSelection}
-                <SheetSection>
-                  <Admonition
-                    type="note"
-                    layout="responsive"
-                    title="Request Pipelines access"
-                    description="Pipelines is in public alpha and available to approved organizations."
-                    actions={
-                      <Button
-                        asChild
-                        variant="primary"
-                        iconRight={<ArrowUpRightIcon size={16} strokeWidth={1.5} />}
-                      >
-                        <Link
-                          target="_blank"
-                          rel="noreferrer"
-                          href="https://forms.supabase.com/pg_replicate"
-                        >
-                          Request access
-                        </Link>
-                      </Button>
-                    }
-                  />
-                </SheetSection>
+                <NoDestinationsAvailable />
               </div>
             )}
             {showEnablement && (

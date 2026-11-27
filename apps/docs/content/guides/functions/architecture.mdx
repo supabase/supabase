@@ -13,10 +13,10 @@ This guide explains the architecture and inner workings of Supabase Edge Functio
 To illustrate how edge functions operate, consider a photo-sharing app where users upload images and apply filters (e.g., grayscale or sepia) before saving them.
 
 - **Workflow Overview**:
-  - A user uploads an original image to Supabase Storage.
+  - A user uploads an original image to [Supabase Storage](/docs/guides/storage/quickstart).
   - When the user selects a filter, the client-side app (using the Supabase JavaScript SDK) invokes an edge function named something like "apply-filter."
   - The edge function:
-    1. Downloads the original image from Supabase Storage.
+    1. Downloads the original image from [Supabase Storage](/docs/guides/storage).
     2. Applies the filter using a library like ImageMagick.
     3. Uploads the processed image back to Storage.
     4. Returns the path to the filtered image to the client.
@@ -34,7 +34,7 @@ Deploying an edge function is straightforward and automated, requiring no manual
 
 - **Steps to Deploy**:
   1. Write the function code in your local Supabase project (e.g., in `supabase/functions/apply-filter/index.ts`).
-  2. Run the command `supabase functions deploy apply-filter` via the Supabase CLI.
+  2. Run the command `supabase functions deploy apply-filter` via the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
   3. The CLI bundles the function and its dependencies into an **ESZip file**—a compact format created by Deno that includes a complete module graph for quick loading and execution.
   4. The bundled file is uploaded to Supabase's backend.
   5. Supabase generates a unique URL for the function, making it accessible globally.
@@ -70,9 +70,9 @@ The core of edge functions' efficiency lies in their execution environment, whic
   3. At the edge, Supabase's **edge runtime** validates the request (e.g., checks authorization).
 
 - **Execution Environment**:
-  - A new **V8 isolate** is spun up for each invocation. V8 is the JavaScript engine used by Chrome and Node.js, providing a lightweight, sandboxed environment.
-  - Each isolate has its own memory heap and execution thread, ensuring complete isolation—no interference between concurrent requests.
-  - The ESZip bundle is loaded into the isolate, and the function code runs.
+  - The function runs in a **V8 isolate**. V8 is the JavaScript engine used by Chrome and Node.js, providing a lightweight, sandboxed environment. A running isolate for the function handles the request when one is available. Otherwise, a new isolate starts.
+  - Each isolate has its own memory heap and execution thread, so one function can't interfere with another. Requests handled by the same isolate share its memory, including state created at the top level of your function.
+  - The ESZip bundle is loaded into the isolate when it starts. Top-level code runs once per isolate, and the request handler runs for each request.
   - After execution, the response (e.g., filtered image path) is sent back to the client.
 
 - **Performance Optimizations**:
@@ -82,7 +82,7 @@ The core of edge functions' efficiency lies in their execution environment, whic
 
 - **Isolation and Security**:
   - Isolates prevent side effects from one function affecting others, enhancing reliability.
-  - No persistent state; each run is stateless, ideal for ephemeral tasks.
+  - No persistent state. An isolate can shut down at any time, so don't rely on in-memory state lasting between requests.
 
 Compared to traditional serverless or monolithic architectures, this setup offers lower latency, automatic scaling, and no infrastructure management, making it perfect for global apps.
 

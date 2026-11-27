@@ -208,7 +208,7 @@ This uses OpenAI's `text-embedding-3-large` model to [generate embeddings](/docs
 
 To test this, make a `POST` request to the function's endpoint while passing in a JSON payload containing the user's query. Here is an example `POST` request using cURL:
 
-```tsx
+```bash
 curl -i --location --request POST \
   'http://127.0.0.1:54321/functions/v1/hybrid-search' \
   --header 'Authorization: Bearer <anonymous key>' \

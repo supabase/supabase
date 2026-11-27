@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { isAbsoluteUrl, splitInternalUrl } from './internal-url'
+import { isAbsoluteUrl, splitInternalUrl, toRoutePattern } from './internal-url'
 
 describe('splitInternalUrl (compat shim URL splitting)', () => {
   it('splits pathname, search, and hash', () => {
@@ -176,5 +176,16 @@ describe('isAbsoluteUrl', () => {
     expect(isAbsoluteUrl('//supabase.com/docs')).toBe(true)
     expect(isAbsoluteUrl('/project/abc')).toBe(false)
     expect(isAbsoluteUrl('?tab=1')).toBe(false)
+  })
+})
+
+describe('toRoutePattern', () => {
+  it.each([
+    ['/_app/project/$ref/sql/$id', '/project/[ref]/sql/[id]'],
+    ['/_app/project/$ref/', '/project/[ref]'],
+    ['/', '/'],
+    ['/_app/project/$ref/functions/$functionSlug/$', '/project/[ref]/functions/[functionSlug]/$'],
+  ])('maps %s to %s', (routeId, expected) => {
+    expect(toRoutePattern(routeId)).toBe(expected)
   })
 })

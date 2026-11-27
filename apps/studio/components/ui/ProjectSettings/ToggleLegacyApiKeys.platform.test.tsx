@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -13,6 +14,9 @@ import {
 } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
+
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
@@ -61,6 +65,33 @@ describe('ToggleLegacyApiKeysPanel grants', () => {
     render(<ToggleLegacyApiKeysPanel />, { profileContext: createMockProfileContext() })
 
     expect(await screen.findByRole('button', { name: 'Disable JWT-based API keys' })).toBeEnabled()
+  })
+
+  it('tracks disabling the legacy keys once the update succeeds', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockLegacyEndpoints()
+    addAPIMock({
+      method: 'put',
+      path: '/v1/projects/:ref/api-keys/legacy',
+      response: { enabled: false },
+    })
+
+    render(<ToggleLegacyApiKeysPanel />, { profileContext: createMockProfileContext() })
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable JWT-based API keys' }))
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    await userEvent.type(screen.getByPlaceholderText('disable'), 'disable')
+    await userEvent.click(screen.getByRole('button', { name: /Confirm to disable/ }))
+
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith(
+        'legacy_api_keys_updated',
+        { enabled: false },
+        { project: 'default' }
+      )
+    )
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('does not request status and shows a message when the read grant is denied', async () => {

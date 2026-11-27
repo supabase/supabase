@@ -4,9 +4,11 @@ What lives where, and what depends on what. **Verify against the live tree
 before acting** — paths drift. Cross-references the per-topic deep dives in
 this folder.
 
+Verified at: 3089aa3f67 (2026-11-25).
+
 ## High-level architecture
 
-`apps/docs` is a **Next.js 15 App Router** site served at **`/docs`**
+`apps/docs` is a **Next.js App Router** site served at **`/docs`**
 (`basePath` in `next.config.mjs`). It combines hand-written MDX guides,
 machine-generated reference docs, troubleshooting content, federated content
 from external repos, and shared monorepo packages (`ui`, `common`,
@@ -66,7 +68,8 @@ flowchart TB
 | `apps/docs/internals/markdown-schema/` | Per-component handlers: JSX → markdown string                                          | File name matches the component name                                                         |
 | `apps/docs/public/markdown/guides/`    | Generated `.md` output; served via `/docs/guides/<path>.md` or `Accept: text/markdown` | Built by `generate-guides-markdown.ts`; see [`llm-agent-surface.md`](./llm-agent-surface.md) |
 | `apps/docs/public/markdown/reference/` | Generated reference `.md` files                                                        | Built by `generate-reference-markdown.ts`                                                    |
-| `apps/docs/middleware.ts`              | Content negotiation for guides; bot rewrite for reference deep links                   | Uses `packages/common/markdown-negotiation.ts`                                               |
+| `apps/docs/proxy.ts`                   | Content negotiation for guides; bot rewrite for reference deep links                   | Uses `packages/common/markdown-negotiation.ts`                                               |
+| `apps/docs/style-guide/`               | Docs content style guide: voice, elements, page structure, word list, templates        | Source of truth for content style; see `apps/docs/style-guide/README.md`                     |
 | `apps/docs/app/api/guides-md/`         | Serves pre-generated guide markdown to agents                                          | Rewritten from `/docs/guides/<path>.md`                                                      |
 | `apps/docs/examples/`                  | Copied from repo root `examples/` at build time                                        | `codegen:examples`                                                                           |
 | `apps/docs/scripts/`                   | Build-time scripts (sitemap, markdown export, embeddings)                              |                                                                                              |
@@ -134,9 +137,7 @@ pattern in production:
 | Markdown handler  | `apps/docs/internals/markdown-schema/ContentListings.ts`               |
 | MDX registration  | `apps/docs/features/docs/MdxBase.shared.tsx`                           |
 
-MDX usage: `<ContentListings id="storage-get-started" />`. For batch
-overview-page migration, see the `audit-content-listings` skill in
-[`docs-agent-skills`](https://github.com/supabase/docs-agent-skills).
+MDX usage: `<ContentListings id="storage-get-started" />`.
 
 When adding a new component that has a markdown representation:
 
@@ -170,6 +171,17 @@ downloads, `llms.txt`), see [`llm-agent-surface.md`](./llm-agent-surface.md).
 Each `SCHEMA` entry receives `{ props, children, node }` and returns the
 markdown string to substitute.
 
+## Layout v2
+
+The `layout-v2:` Tailwind variant styles the new docs layout.
+`styles/globals.css` defines it as `[data-ia-nav='option-1']` on an ancestor.
+The `option-1` variant of the PostHog flag `docs-ia-mvp-v1` turns it on
+(`features/IaNav/constants.ts`, `features/DocsLayout/useDocsLayoutV2.ts`).
+A `?docs-ia-mvp-v1=option-1` query parameter forces it. The shell lives in
+`layouts/` (`MainSkeleton.tsx`, `RightRail.tsx`, `HeadingSlot.tsx`) and
+`components/Navigation/`. The nav tree lives in `features/IaNav/`. See
+[`feature-flags.md`](./feature-flags.md).
+
 ## `<Heading>` and the prose typography contract
 
 - `<Heading>` from `MdxBase.shared.tsx` is the canonical heading component
@@ -196,7 +208,7 @@ commands:
 | Tool                                                | Where     | What it catches                                                                                                |
 | --------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
 | `pnpm test:local:unwatch <path>` (from `apps/docs`) | per-test  | Vitest suite for `lib/` and `data/` schemas; needs local Supabase + DB reset first — see `apps/docs/AGENTS.md` |
-| `pnpm format`                                       | repo root | Prettier — run before opening a PR                                                                             |
+| `pnpm format`                                       | repo root | oxfmt — run before opening a PR                                                                                |
 | `pnpm lint --filter=docs`                           | repo root | ESLint over `apps/docs`                                                                                        |
 | `pnpm typecheck`                                    | repo root | TS across packages                                                                                             |
 | `pnpm build --filter=docs`                          | repo root | Includes markdown generation; failures here block release                                                      |
@@ -230,8 +242,6 @@ Wraps the app with:
   changing URL shapes.
 - **www** (`apps/www`) sometimes embeds docs sections.
 - **PostHog** receives `docs_*` events for analytics.
-- **`docs-agent-skills`** repo (https://github.com/supabase/docs-agent-skills)
-  holds batch audit/conversion skills that drive multi-PR docs migrations.
 - **Federated upstream repos** — see [`federated-docs.md`](./federated-docs.md)
   for the full list (pg_graphql, vecs, wrappers, terraform-provider, setup-cli,
   splinter, agent-skills).

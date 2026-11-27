@@ -51,6 +51,8 @@ export function TOCScrollArea({
     <ScrollRoot {...props} className={cn('flex min-h-0 flex-col ps-px', props.className)}>
       <Primitive.ScrollProvider containerRef={viewRef}>
         <ScrollViewport
+          // firefox makes a scroll container a tab stop, but the links inside already scroll it
+          tabIndex={-1}
           className={cn('relative min-h-0 text-sm', isMenu && 'mt-2 mb-4 mx-4 md:mx-6')}
           ref={viewRef}
         >
@@ -137,7 +139,7 @@ interface TocTreeNode {
 }
 
 // a level 3 heading goes under the level 2 heading before it. a level 3 heading with no level 2 before it stays at the top level
-const toTocTree = (items: TOCItemType[]) =>
+export const toTocTree = (items: TOCItemType[]) =>
   items.reduce<TocTreeNode[]>((tree, item) => {
     const parent = tree.at(-1)
     if (item.depth === 3 && parent?.item.depth === 2) parent.children.push(item)

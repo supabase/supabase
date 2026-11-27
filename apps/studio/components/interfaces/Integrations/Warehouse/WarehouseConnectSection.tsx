@@ -48,7 +48,7 @@ import {
   getDuckLakeSetupScript,
   getWarehouseFlightSqlConnectionString,
   getWarehouseFlightSqlEndpoint,
-  getWarehouseUsqlCommand,
+  getWarehouseDatabowCommand,
   parseWarehouseCatalogUrl,
 } from '@/lib/warehouse'
 
@@ -115,7 +115,7 @@ const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
         language="bash"
         hideLineNumbers
         wrapLongLines
-        value={getWarehouseUsqlCommand(projectRef)}
+        value={getWarehouseDatabowCommand(projectRef)}
       />
     </FieldRow>
   </CardContent>
@@ -345,8 +345,9 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
   const connectionCard = (
     <Card
       className={cn(
+        'relative',
         isSheet &&
-          'relative space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
+          'space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
       )}
     >
       <CardContent className="border-none">

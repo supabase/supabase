@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import React, { FC } from 'react'
+import React, { FC, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 import {
   TopNavMenu,
@@ -16,6 +16,14 @@ import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 import { getMenuGroupLabelByPath } from './NavigationMenu.utils'
 import { IA_NAV_PENDING_CLASS, useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
+
+interface MenuItemLabelProps {
+  title: ReactNode
+  icon?: ReactNode
+  community?: boolean
+  isNew?: boolean
+  experimental?: boolean
+}
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
@@ -124,6 +132,26 @@ const GlobalMenuGroup = ({
   )
 }
 
+export const MenuItemLabel = ({
+  title,
+  icon,
+  community,
+  isNew,
+  experimental,
+}: MenuItemLabelProps) => (
+  <>
+    {icon ? (
+      <span aria-hidden className="flex h-5 shrink-0 items-center self-start">
+        {icon}
+      </span>
+    ) : null}
+    <span className="line-clamp-2 flex-1">{title}</span>
+    {community ? <Badge>Community</Badge> : null}
+    {isNew ? <Badge variant="success">New</Badge> : null}
+    {experimental ? <Badge variant="warning">Experimental</Badge> : null}
+  </>
+)
+
 export const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
@@ -143,19 +171,19 @@ export const MenuItem = React.forwardRef<
         ref={ref}
         className={cn(
           'group/menu-item flex items-center gap-2',
-          'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
+          'w-full flex min-h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md px-2 py-1.5 leading-5 no-underline focus-inset focus-visible:text-foreground',
           className
         )}
         {...props}
       >
         {children ?? (
-          <>
-            {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
-            <span className="flex-1">{title}</span>
-            {community && <Badge>Community</Badge>}
-            {isNew && <Badge variant="success">New</Badge>}
-            {experimental && <Badge variant="warning">Experimental</Badge>}
-          </>
+          <MenuItemLabel
+            title={title}
+            icon={icon ? <MenuIconPicker icon={icon} className="text-foreground-lighter" /> : null}
+            community={community}
+            isNew={isNew}
+            experimental={experimental}
+          />
         )}
       </Link>
     )

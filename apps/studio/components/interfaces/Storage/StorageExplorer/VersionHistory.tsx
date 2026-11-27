@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { MoreVerticalIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -20,6 +21,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { BroomSparklesIcon } from '../BroomSparklesIcon'
 import type { BucketVersioningState, ExpirationMode } from '../StorageVersioning.constants'
 import { computeVersionFate, type VersionFate } from './VersionHistory.utils'
 import { VersionHistoryPolicyRow } from './VersionHistoryPolicyRow'
@@ -38,38 +40,6 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 /** Version IDs are long opaque strings; show enough to tell two rows apart. */
 export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
 
-const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
-  switch (fate.type) {
-    case 'retained':
-      return null
-    case 'expires-in':
-      return (
-        <span className="shrink-0 text-xs text-foreground-lighter">
-          Expires in <span className="text-foreground-light">{fate.days}d</span>
-        </span>
-      )
-    case 'expires-on-next-upload':
-      return (
-        <div className="flex flex-col items-end">
-          <span className="shrink-0 text-xs text-warning-600">Expires on next upload</span>
-          <span className="shrink-0 text-xs text-warning-600">or in {fate.daysRemaining}d</span>
-        </div>
-      )
-    case 'expiry-due':
-      return (
-        <Tooltip>
-          <TooltipTrigger className="shrink-0 text-xs text-destructive">
-            Queued to expire
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-64">
-            Matches the lifecycle policy and will be permanently deleted. This action can take up to
-            24 hours.
-          </TooltipContent>
-        </Tooltip>
-      )
-  }
-}
-
 const VersionRowBadge = ({
   isCurrent,
   isComparing,
@@ -81,12 +51,96 @@ const VersionRowBadge = ({
 }) => {
   if (isCurrent) return <Badge variant="success">Current</Badge>
   if (isComparing) return <Badge variant="success">Comparing</Badge>
-  if (fate) return <VersionFateLabel fate={fate} />
-  return null
+  if (!fate || fate.type === 'retained') return null
+
+  let label: string
+  switch (fate.type) {
+    case 'expires-in':
+      label = `${fate.days}d`
+      break
+    case 'expires-on-next-upload':
+      label = `${fate.daysRemaining}d`
+      break
+    case 'cap-expiry-pending':
+      label = `${fate.daysRemaining}d`
+      break
+    case 'expiry-due':
+      label = 'Queued'
+      break
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        className={cn(
+          'shrink-0 text-xs text-foreground-lighter',
+          fate.type === 'expires-on-next-upload' && 'text-warning-600',
+          fate.type === 'cap-expiry-pending' && 'text-warning-600',
+          fate.type === 'expiry-due' && 'text-destructive'
+        )}
+      >
+        <span className="flex items-center gap-1">
+          <BroomSparklesIcon size={13} />
+          {label}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-64">
+        {versionFateDescription(fate)}
+        {fate.type === 'expiry-due' && (
+          <span>It matches the lifecycle policy and can take up to 24 hours to delete.</span>
+        )}
+      </TooltipContent>
+    </Tooltip>
+  )
 }
+
+const versionFateDescription = (fate: VersionFate) => {
+  switch (fate.type) {
+    case 'retained':
+      return 'Not currently scheduled to expire'
+    case 'expires-in':
+      return `Expires in ${fate.days} ${fate.days === 1 ? 'day' : 'days'}.`
+    case 'expires-on-next-upload':
+      return `Expires on next upload or in ${fate.daysRemaining} ${fate.daysRemaining === 1 ? 'day' : 'days'}.`
+    case 'cap-expiry-pending':
+      return `This version is beyond the limit of ${fate.cap} kept ${fate.cap === 1 ? 'version' : 'versions'} and becomes eligible to expire in ${fate.daysRemaining} ${fate.daysRemaining === 1 ? 'day' : 'days'}.`
+    case 'expiry-due':
+      return 'Queued to expire.'
+  }
+}
+
+const VersionDetailsRow = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div className="flex items-start justify-between gap-x-4 text-xs">
+    <span className="shrink-0 text-foreground-lighter">{label}</span>
+    <span className="min-w-0 break-all text-right text-foreground font-mono tracking-tight">
+      {children}
+    </span>
+  </div>
+)
+
+const VersionDetails = ({ version, fate }: { version: ObjectVersion; fate?: VersionFate }) => (
+  <>
+    <div className="space-y-1 px-2 py-1.5">
+      <VersionDetailsRow label="Version ID">{version.versionId}</VersionDetailsRow>
+      <VersionDetailsRow label="Created at">
+        {dayjs(version.createdAt).format('MMM D, YYYY · HH:mm')}
+      </VersionDetailsRow>
+      {version.archivedAt && (
+        <VersionDetailsRow label="Archived at">
+          {dayjs(version.archivedAt).format('MMM D, YYYY · HH:mm')}
+        </VersionDetailsRow>
+      )}
+      {fate && (
+        <VersionDetailsRow label="Lifecycle">{versionFateDescription(fate)}</VersionDetailsRow>
+      )}
+    </div>
+    <DropdownMenuSeparator />
+  </>
+)
 
 interface VersionActionsMenuProps {
   version: ObjectVersion
+  fate?: VersionFate
   isRestoring: boolean
   onRestore: () => void
   onDelete: () => void
@@ -94,6 +148,7 @@ interface VersionActionsMenuProps {
 
 const VersionActionsMenu = ({
   version,
+  fate,
   isRestoring,
   onRestore,
   onDelete,
@@ -114,7 +169,8 @@ const VersionActionsMenu = ({
           aria-label={isDeleteMarker ? 'Actions for delete marker' : `Actions for version ${label}`}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-72">
+        <VersionDetails version={version} fate={fate} />
         {/* A marker holds no content, so there is nothing to restore to. */}
         {!isDeleteMarker && (
           <>
@@ -208,25 +264,29 @@ export const VersionHistory = ({
   const { expiryDays, maxVersions: cap } = lifecyclePolicy
   const hasPolicy = (cap !== null && cap > 0) || (expiryDays !== null && expiryDays > 0)
 
-  // `versions` arrives newest-first, so the oldest sits at `chronoIndex` 0.
+  // Versions are ordered by archivedAt descending (current first), so the oldest
+  // noncurrent version sits at `chronoIndex` 0.
   const fateByVersionId = useMemo(() => {
     const noncurrentVersions = (versions ?? []).filter((version) => !version.isCurrent)
     const noncurrentCount = noncurrentVersions.length
 
-    return new Map(
-      noncurrentVersions.map((version, index) => [
-        version.versionId,
-        computeVersionFate({
-          daysOld: dayjs().diff(dayjs(version.createdAt), 'day'),
-          chronoIndex: noncurrentCount - 1 - index,
-          noncurrentCount,
-          expiryDays,
-          cap,
-          mode: expirationMode,
-          willRetainVersionOnWrite,
-        }),
-      ])
-    )
+    return noncurrentVersions.reduce((fates, version, index) => {
+      if (version.archivedAt) {
+        fates.set(
+          version.versionId,
+          computeVersionFate({
+            daysOld: dayjs().diff(dayjs(version.archivedAt), 'day'),
+            chronoIndex: noncurrentCount - 1 - index,
+            noncurrentCount,
+            expiryDays,
+            cap,
+            mode: expirationMode,
+            willRetainVersionOnWrite,
+          })
+        )
+      }
+      return fates
+    }, new Map<string, VersionFate>())
   }, [versions, expiryDays, cap, expirationMode, willRetainVersionOnWrite])
 
   const handleRestore = (version: ObjectVersion) => {
@@ -294,7 +354,7 @@ export const VersionHistory = ({
                       !isDeleteMarker && onPreview && 'group-hover:underline'
                     )}
                   >
-                    {dayjs(version.createdAt).format('MMM D, HH:mm')}
+                    {shortVersion(version.versionId)}
                   </span>
                   <span className="block truncate font-mono text-xs text-foreground-lighter">
                     {isDeleteMarker ? 'Delete marker' : formatBytes(version.size)}
@@ -335,6 +395,7 @@ export const VersionHistory = ({
 
                 <VersionActionsMenu
                   version={version}
+                  fate={fateByVersionId.get(version.versionId)}
                   isRestoring={isRestoring}
                   onRestore={() => handleRestore(version)}
                   onDelete={() => setVersionToDelete(version)}

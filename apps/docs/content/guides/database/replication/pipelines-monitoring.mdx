@@ -50,7 +50,7 @@ Click a pipeline in the list to inspect its metrics and table states.
 | **Copied**        | Copy finished; changes made during the copy still need to be applied |
 | **Live**          | Following WAL changes, including catch-up after copying              |
 | **Error**         | Replication encountered an error                                     |
-| **Restarting**    | Restarting replication for the table from scratch                    |
+| **Resetting**     | A table reset request is in progress                                 |
 | **Not Available** | State is temporarily unavailable during a pipeline state change      |
 | **Unknown**       | The Dashboard does not recognize the reported state                  |
 
@@ -70,6 +70,8 @@ These metrics come from Postgres replication slot state. **Lag** measures the ga
 The Dashboard displays **Unavailable** when Postgres returns no `safe_wal_size`. This can mean unlimited retention or unavailable headroom, including a **Lost** slot. A negative value is shown as **Budget exceeded**. Check slot status alongside retention headroom. See [Postgres replication slot metrics](https://www.postgresql.org/docs/current/view-pg-replication-slots.html).
 
 Pipelines keeps sending feedback during slow writes and while WAL reading is paused. It repeats the last safe position without acknowledging unfinished writes. A recent check-in and an active connection can therefore coexist with growing lag.
+
+Reading a change or having a destination accept it is not enough to advance durable progress. Retries can resend recent changes; see [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for how each destination processes replay.
 
 The main slot tracks ongoing replication. [Table-sync slots](#initial-sync-and-table-sync-slots) appear temporarily during initial sync and have the same metrics.
 
@@ -95,7 +97,7 @@ Table errors can pause one table while others continue replicating. Pipeline err
 
 ### Table errors
 
-Open the pipeline, inspect the table error and any scheduled retry, and fix the cause. If replication cannot safely resume from its saved state, [restart replication for the affected tables](#restarting-tables).
+Open the pipeline, inspect the table error and any scheduled retry, and fix the cause. If replication cannot safely resume from its saved state, [reset the affected tables](#restarting-tables).
 
 ### Pipeline errors
 
@@ -121,7 +123,7 @@ Pipelines uses one main slot plus up to one temporary slot per active table-sync
 
 During copying, the table's **WAL backlog** grows from its snapshot boundary. Copying more rows does not advance this WAL position. After copying finishes, the table-sync worker applies accumulated changes and acknowledges progress. The table state distinguishes copying from this catch-up phase; the main slot's lag covers ongoing replication separately.
 
-If a table-sync slot is lost, that table must repeat its initial sync. Automatic retries can recover individual tables; a manual [table restart](#restarting-tables) temporarily stops the whole pipeline.
+If a table-sync slot is lost, that table must repeat its initial sync. Automatic retries can recover individual tables; a manual [table reset](#restarting-tables) temporarily stops the whole pipeline.
 
 To improve copy throughput:
 
@@ -140,9 +142,13 @@ Higher concurrency uses more source connections, and additional workers need mor
 | **Lost**                     | For a table-sync slot, retry the affected table. For the main slot, use the recovery procedure that follows.                                  |
 | **Unknown**                  | Check logs and slot details. If the state persists, contact support with the pipeline ID and error details.                                   |
 
-To recover a lost main slot, open **Edit pipeline > Advanced settings** and set **Invalidated slot behavior** to **Recreate slot**. Review the effects below, then click **Apply and restart pipeline** or **Apply and start pipeline**, depending on its current state.
+Recovering a lost main slot **replaces every destination table**. Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
-**This replaces every destination table.** Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+To recover a lost main slot:
+
+1. In the Supabase Dashboard, open **Edit pipeline > Advanced settings**.
+2. Set **Invalidated slot behavior** to **Recreate slot** and save the changes.
+3. If the pipeline is running or failed, restart it. If it is stopped, start it.
 
 Alternatively, stop and delete the pipeline, then [create a new one](/docs/guides/database/replication/pipelines#setup-overview). Deletion automatically removes that pipeline's main slot, table-sync slots, and saved replication state when the source database is reachable. It leaves source tables, existing destination data, and the [shared Pipelines installation](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines) in place.
 
@@ -153,31 +159,38 @@ Alternatively, stop and delete the pipeline, then [create a new one](/docs/guide
 - Avoid prolonged stops while the source is receiving writes.
 - Schedule bulk writes and initial sync during quieter periods when possible.
 
-## Restarting tables
+## Resetting tables [#restarting-tables]
 
-Restart table replication to rebuild one or more destination tables from scratch, for example after a schema change or an unrecoverable table error. **Restart pipeline** restarts the process using saved replication progress; it does not request a table rebuild. See [pipeline restart and recovery behavior](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) for exceptions during initial sync or lost-slot recovery.
+Use **Reset table** to rebuild a destination table from scratch, for example after an unsupported schema change or an unrecoverable error. Choose the action based on what needs to recover:
 
-When you restart table replication:
+| Action               | Effect                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Restart pipeline** | Restarts the process. Tables that completed initial sync resume from saved progress. Initial syncs interrupted by the restart start again from the beginning. |
+| **Reset table**      | Clears the selected table's saved progress and rebuilds its destination data when replication resumes, even if its initial sync had completed.                |
 
-- **All existing data in the affected destination tables is deleted.** The original Postgres source tables and their rows are unchanged.
-- For tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy), Pipelines copies all current source rows included by the publication again, then resumes ongoing replication. Tables excluded from initial sync resume with new changes only; their existing source rows are not copied.
-- The table restart resets replication progress only for the selected tables.
+Restarting during initial sync also repeats the copy when its rows finished copying but catch-up has not completed. See [pipeline restart and recovery behavior](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery).
+
+When you reset tables:
+
+- **Replication replaces the affected tables' replicated data when it resumes.** This clears any append-only history from the replica. Source tables and their rows are unchanged.
+- Tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy) copy their current published source rows again, then resume ongoing replication. Excluded tables receive new changes only.
+- Saved progress is reset only for the selected tables.
 - Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
-The pipeline stops temporarily to apply the table restart. The Dashboard restarts it automatically, or starts it if it was stopped. Replication for other tables is paused during this process, and their unfinished initial syncs can restart from scratch.
+An active pipeline stops temporarily and restarts automatically to apply the reset. Replication pauses for all tables, and other tables' unfinished initial syncs also start over. **A stopped pipeline stays stopped.** Start it explicitly when you are ready to rebuild the selected tables.
 
-Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Pipelines**.
+Before resetting, use **Edit pipeline** to check **Initial sync**. Include any affected tables whose existing source rows you need to copy again, then save the settings.
 
-### Restart a single table
+### Reset a single table [#restart-a-single-table]
 
-1. Click the restart icon on the table's row.
-2. Review the table name, data replacement, and cost details in the confirmation dialog.
-3. Click **Restart replication**.
+1. Open the table's actions menu and select **Reset table**.
+2. Review the table name, data replacement, and cost details.
+3. Confirm **Reset table**.
 
-### Restart multiple tables
+### Reset multiple tables [#restart-multiple-tables]
 
-1. Click **Restart all tables**, or open the arrow menu beside it and select **Restart failed tables only**.
+1. Click **Reset all tables**, or open **More reset options** and select **Reset failed tables only**.
 2. Review the affected tables, data replacement, and cost details. The failed-tables action affects every table that is failed when the request runs.
-3. Confirm **Restart all tables** or **Restart failed tables**, matching the scope you chose.
+3. Confirm **Reset all tables** or **Reset failed tables**, matching the scope you chose.
 
-If a table restart fails, refresh the pipeline and table states before retrying. Start the pipeline explicitly if it remains **Stopped**.
+A successful reset prepares the tables for rebuilding; it does not mean their copies have finished. Monitor their progress after the pipeline resumes. If a reset fails, refresh the pipeline and table states before retrying.

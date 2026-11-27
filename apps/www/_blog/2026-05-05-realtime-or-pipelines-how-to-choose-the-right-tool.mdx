@@ -122,11 +122,11 @@ Pipelines processes changes in configurable batches with tunable parallelism. It
 Use Realtime when you need to push live updates to your users:
 
 - **Chat applications.** Messages appear instantly for all participants.
-- **Collaborative editing.** See other users' cursors and changes in real time.
+- **Collaborative editing.** See other users' [cursors](/library/docs/nextjs/realtime-cursor) and changes in real time.
 - **Live dashboards.** Charts and metrics update without page refresh.
 - **Notifications.** Alert users when something relevant happens.
 - **Multiplayer features.** Synchronize game state or shared experiences.
-- **Presence tracking.** Show who is online, who is typing, who is viewing a document.
+- **Presence tracking.** Show [who is online](/library/docs/nextjs/realtime-avatar-stack), who is typing, who is viewing a document.
 
 The common thread: a human is watching and needs to see changes as they happen.
 
@@ -143,7 +143,7 @@ The common thread: a system needs the current state of selected production data 
 
 ## The mistake we see most often
 
-Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with supabase-js, subscribe to table changes, and pipe them into another system.
+Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with [supabase-js](/docs/reference/javascript/introduction), subscribe to table changes, and pipe them into another system.
 
 It works great in development. It even works fine in production for a while. Then a WebSocket connection drops for a few seconds and data goes missing. Or the subscribing process restarts and misses a batch of changes. Or load spikes and the sequential RLS authorization checks cannot keep up.
 
@@ -181,4 +181,4 @@ Realtime handles the live experience. Pipelines handles the analytical pipeline.
 
 Realtime is available on all Supabase projects. Check out the [Realtime documentation](/docs/guides/realtime) to get started.
 
-Supabase Pipelines is currently in public alpha. Features and behavior may change as we continue developing the product. If Pipelines isn't available for your organization yet, request access through the Supabase Dashboard or contact your account manager. Read the [Pipelines announcement](/blog/introducing-supabase-pipelines) for more details on how it works.
+Supabase Pipelines is currently in public alpha. Follow the [setup guide](/docs/guides/database/replication/pipelines) to create a pipeline in the Dashboard. Read the [Pipelines announcement](/blog/introducing-supabase-pipelines) for more details on how it works.

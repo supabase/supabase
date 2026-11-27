@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useRouter } from '@tanstack/react-router'
 import { PropsWithChildren, useCallback } from 'react'
 
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
@@ -23,7 +23,7 @@ export function usePrefetchEditorIndexPage() {
     if (!project) return
 
     // Prefetch code
-    router.prefetch(`/project/${project.ref}/editor`)
+    void router.preloadRoute({ to: '/project/$ref/editor', params: { ref: project.ref } })
 
     // Prefetch data
     prefetchSchemas(queryClient, {
@@ -37,6 +37,7 @@ export function usePrefetchEditorIndexPage() {
       connectionString: project?.connectionString,
       sort: entityTypesSort,
       filterTypes: Object.values(ENTITY_TYPE),
+      excludePartitions: true,
     }).catch(() => {
       // eat prefetching errors as they are not critical
     })

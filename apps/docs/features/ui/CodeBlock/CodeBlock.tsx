@@ -3,12 +3,12 @@ import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
 import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
-import { CodeBlockControls } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import {
   CodeBlockFrame,
   CodeBlockTokens,
   type CodeToken,
 } from 'ui-patterns/CodeBlock/CodeBlockFrame'
+import { TrackedCodeBlockControls } from './CodeBlockControls.client'
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
@@ -31,6 +31,7 @@ export async function CodeBlock({
   skipTypeGeneration,
   hideControls = false,
   compact = false,
+  copyId,
 }: PropsWithChildren<{
   className?: string
   lang?: string
@@ -39,6 +40,7 @@ export async function CodeBlock({
   skipTypeGeneration?: boolean
   hideControls?: boolean
   compact?: boolean
+  copyId?: string
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -63,7 +65,15 @@ export async function CodeBlock({
       lang={lang}
       lineCount={tokens.length}
       compact={compact}
-      controls={hideControls ? null : <CodeBlockControls content={code.trim()} />}
+      controls={
+        hideControls ? null : (
+          <TrackedCodeBlockControls
+            content={code.trim()}
+            lang={lang ?? undefined}
+            copyId={copyId}
+          />
+        )
+      }
     >
       <CodeBlockTokens
         lineNumbers={lineNumbers}

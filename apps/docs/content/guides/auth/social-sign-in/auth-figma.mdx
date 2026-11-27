@@ -105,7 +105,7 @@ suspend fun signInWithFigma() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Figma` as the provider:
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/auth-signinwithoauth) with `Provider.Figma` as the provider:
 
 ```c#
 var state = await supabase.Auth.SignIn(Provider.Figma);
@@ -168,7 +168,7 @@ suspend fun signOut() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+When your user signs out, call [SignOut()](/docs/reference/csharp/auth-signout) to remove them from the browser session and any objects from local storage:
 
 ```c#
 await supabase.Auth.SignOut();
@@ -182,4 +182,4 @@ await supabase.Auth.SignOut();
 
 - [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Figma Developers page](https://www.figma.com/developers)
+- [Figma Developers page](https://developers.figma.com/)

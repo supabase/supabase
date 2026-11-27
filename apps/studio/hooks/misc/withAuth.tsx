@@ -1,5 +1,5 @@
-import { useAuth } from 'common'
-import { useRouter } from 'next/router'
+import { useLocation, useNavigate, useRouter } from '@tanstack/react-router'
+import { useAuth, useParams } from 'common'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -7,13 +7,13 @@ import { SessionTimeoutModal } from '@/components/interfaces/SignIn/SessionTimeo
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useSignOut } from '@/lib/auth'
-import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import { isNextPageWithLayout, type NextPageWithLayout } from '@/types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { searchParamsToRecord } from '@/lib/router-search-params'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
 
 export function withAuth<T>(
-  WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
+  WrappedComponent: ComponentType<T>,
   options: {
     /**
      * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
@@ -32,6 +32,9 @@ export function withAuth<T>(
 
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
+    const navigate = useNavigate()
+    const currentPathname = useLocation({ select: (location) => location.pathname })
+    const { ref, organizationSlug } = useParams()
     const signOut = useSignOut()
     const { isLoading, session } = useAuth()
 
@@ -73,32 +76,30 @@ export function withAuth<T>(
     const needsMfaElevation = isLoggedIn && !isCorrectLevel
 
     const redirectToSignIn = useCallback(() => {
-      let pathname = location.pathname
-      if (BASE_PATH) {
-        pathname = pathname.replace(BASE_PATH, '')
-      }
+      const { pathname, searchStr } = router.state.location
 
       if (pathname === '/sign-in' || pathname === '/sign-in-mfa') {
         // If the user is already on the sign in page, we don't need to redirect them
         return
       }
 
-      const searchParams = new URLSearchParams(location.search)
+      const searchParams = new URLSearchParams(searchStr)
       searchParams.set('returnTo', pathname)
+      const search = searchParamsToRecord(searchParams)
 
       if (needsMfaElevation) {
         // Session is valid at AAL1 but needs to be elevated to AAL2. Preserve the session
         // and send the user to the MFA challenge — typically the IdP-initiated SSO path,
         // where the user lands directly on /dashboard without going through /sign-in-mfa.
-        router.push(`/sign-in-mfa?${searchParams.toString()}`)
+        void navigate({ to: '/sign-in-mfa', search })
         return
       }
 
       // Sign out before redirecting to sign in page incase the user is stuck in a loading state
       signOut().finally(() => {
-        router.push(`/sign-in?${searchParams.toString()}`)
+        void navigate({ to: '/sign-in', search })
       })
-    }, [router, signOut, needsMfaElevation])
+    }, [router, navigate, signOut, needsMfaElevation])
 
     useEffect(() => {
       if (!isFinishedLoading) {
@@ -117,7 +118,7 @@ export function withAuth<T>(
           clearTimeout(timeoutIdRef.current)
         }
       }
-    }, [isFinishedLoading, router, redirectToSignIn])
+    }, [isFinishedLoading, redirectToSignIn])
 
     const shouldRedirect = isFinishedLoading && (!isLoggedIn || !isCorrectLevel)
 
@@ -135,11 +136,11 @@ export function withAuth<T>(
     const InnerComponent = WrappedComponent as any
 
     const supportContext =
-      typeof router.query.ref === 'string' && router.pathname.startsWith('/project/')
+      typeof ref === 'string' && currentPathname.startsWith('/project/')
         ? {
-            projectRef: router.query.ref,
-            ...(typeof router.query.organizationSlug === 'string' && {
-              orgSlug: router.query.organizationSlug,
+            projectRef: ref,
+            ...(typeof organizationSlug === 'string' && {
+              orgSlug: organizationSlug,
             }),
           }
         : undefined
@@ -158,10 +159,6 @@ export function withAuth<T>(
   }
 
   WithAuthHOC.displayName = `withAuth(${WrappedComponent.displayName})`
-
-  if (isNextPageWithLayout(WrappedComponent)) {
-    ;(WithAuthHOC as NextPageWithLayout<T, T>).getLayout = WrappedComponent.getLayout
-  }
 
   return WithAuthHOC
 }

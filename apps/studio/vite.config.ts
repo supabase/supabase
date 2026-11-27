@@ -31,15 +31,9 @@ const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-
 // needed by app source.
 const nextShims: Record<string, string> = {
   'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
-  'next/dynamic': path.join(compatRoot, 'dynamic.tsx'),
-  'next/head': path.join(compatRoot, 'head.tsx'),
-  'next/image': path.join(compatRoot, 'image.tsx'),
-  'next/legacy/image': path.join(compatRoot, 'legacy/image.tsx'),
   'next/link': path.join(compatRoot, 'link.tsx'),
-  'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
-  'next/server': path.join(compatRoot, 'server.ts'),
 }
 
 // Combined compat + migration guard:
@@ -47,8 +41,7 @@ const nextShims: Record<string, string> = {
 //   shim (acts like resolve.alias).
 // - Otherwise, if app source imports from `next` or `next/*`, fail the
 //   build so we catch unshimmed usage at build time during the migration.
-// - node_modules imports (e.g. @sentry/nextjs reaching into next) pass
-//   through untouched.
+// - node_modules imports pass through untouched.
 function nextCompat(): Plugin {
   return {
     name: 'studio-next-compat',
@@ -84,14 +77,11 @@ const RAW_TEXT_SPECIFIERS: Record<string, string> = {
 const RAW_TEXT_PREFIX = '\0studio-raw-text:'
 const RAW_TEXT_SUFFIX = '.js'
 
-// Mirror the raw-loader rules from next.config.ts: serve `*.md` files (used
-// by `static-data/integrations/*/overview.md` via
+// Serve `*.md` files (used by `static-data/integrations/*/overview.md` via
 // `static-data/integrations/overviews.ts`) and the Deno typings in
 // `public/deno/*.d.ts` as JS modules whose default export is the file's
-// text. Vite has `?raw` for this, but the query suffix would have to live
-// in shared app source where it breaks the webpack/turbopack raw-loader
-// rule, so the import specifiers stay query-free and this plugin does the
-// conversion for the Vite pipeline.
+// text. The import specifiers stay query-free (no `?raw`) and this plugin
+// does the conversion.
 //
 // The `.d.ts` files can't go through a plain `transform` like the `.md`
 // files do: the dep scanner's native scan pipeline skips JS transform/load
@@ -133,12 +123,11 @@ function rawTextLoader(): Plugin {
 // editorWorkerService / graphql workers on the main thread ("Could not
 // create web worker(s)..." console warning). graphiql also ships
 // `setup-workers/vite`, which imports the same three workers via Vite's
-// `?worker` suffix; importing that unconditionally would break the Next
-// build, so the swap happens here instead of in app source.
+// `?worker` suffix, but those imports don't belong in the server graph, so
+// the swap happens here (client builds only) instead of in app source.
 //
 // SSR resolution is left untouched: neither variant's `getWorker` ever runs
-// during SSR, and the webpack flavor is a plain global assignment while the
-// vite flavor's `?worker` imports don't belong in the server graph.
+// during SSR, and the webpack flavor is a plain global assignment.
 function graphiqlViteWorkers(): Plugin {
   return {
     name: 'studio-graphiql-vite-workers',
@@ -502,8 +491,7 @@ export default defineConfig(({ command, mode }) => {
     'VERCEL_BRANCH_URL',
     // Sentry release (sentry.tanstack.ts): the SDK silently drops session
     // envelopes when the client has no release, so Release Health would send
-    // nothing. The commit SHA is also what withSentryConfig resolves the Next
-    // build's release to, keeping release names aligned across both builds.
+    // nothing.
     'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
@@ -521,13 +509,11 @@ export default defineConfig(({ command, mode }) => {
     ) ?? 'undefined'
 
   // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
-  // It's deliberately unprefixed, and the other two consumers both read it at
-  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
-  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
-  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // It's deliberately unprefixed, and `vercel.ts` reads it at BUILD time
+  // while emitting `vercel.json`, so flipping maintenance has always meant a
   // rebuild/redeploy, never just a server restart. Inline it here on the same
   // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
-  // mirrors those rules for the TanStack runtime — can read it on the client
+  // mirrors those rules for the Node server — can read it on the client
   // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
   // var. Falls back to `''` (not left undefined) so the browser bundle never
   // ends up with a bare `process.env` reference.
@@ -546,6 +532,7 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_USER_FAULT',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
@@ -560,8 +547,7 @@ export default defineConfig(({ command, mode }) => {
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
-  // Self-hosted responses get next.config.ts's security headers via Nitro
-  // route rules. On Vercel they come from vercel.ts: a `/**` header route in
+  // Self-hosted responses get the security headers via Nitro route rules. On Vercel they come from vercel.ts: a `/**` header route in
   // the Build Output config would stop matching before Nitro's asset and
   // skew-cookie rules.
   const securityHeaders = Object.fromEntries(
@@ -590,11 +576,6 @@ export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
-      watch: {
-        // A leftover `.next/` from the retired Next build includes a full
-        // node_modules copy under `.next/standalone`.
-        ignored: ['**/.next/**'],
-      },
     },
     preview: {
       // The prerender step (@tanstack/start-plugin-core) boots `vite preview`
@@ -607,29 +588,6 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       tsconfigPaths: true,
-      alias: [
-        // Blocking requires TanStack's native history API. Keep the original
-        // Next hook for the rollback runtime, which has no TanStack provider.
-        {
-          find: /^@\/hooks\/ui\/usePreventNavigationOnUnsavedChanges$/,
-          replacement: path.resolve(rootDir, 'compat/usePreventNavigationOnUnsavedChanges.ts'),
-        },
-        // `@sentry/nextjs`'s client entry drags in Next runtime internals
-        // (`next/dist/shared/lib/constants`), whose module scope evaluates
-        // `process?.features?.typescript` — optional chaining doesn't guard
-        // an undeclared `process` in the browser, so every built chunk
-        // containing it (e.g. table-editor) crashes at load with
-        // "ReferenceError: process is not defined". Dev is unaffected
-        // because the dev pipeline shims `process`. Point the bare import
-        // at a shim that re-exports `@sentry/react` (same 10.x version —
-        // it's what `@sentry/nextjs` wraps on the client) plus explicit
-        // stand-ins for the Next-only APIs. App source still imports
-        // `@sentry/nextjs`.
-        {
-          find: /^@sentry\/nextjs$/,
-          replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
-        },
-      ],
     },
     ...(basePath && { base: basePath }),
     optimizeDeps: {
@@ -749,10 +707,9 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     css: {
-      // Disable PostCSS auto-discovery: studio's postcss.config.cjs uses
-      // `@tailwindcss/postcss`, but `@tailwindcss/vite` (added below)
-      // handles Tailwind v4 directives directly. Running both plugins on the
-      // same CSS would double-process Tailwind output.
+      // Disable PostCSS auto-discovery: `@tailwindcss/vite` (added below)
+      // handles Tailwind v4 directives directly, and a discovered PostCSS
+      // Tailwind plugin would double-process the output.
       postcss: { plugins: [] },
     },
     ssr: {
@@ -780,10 +737,8 @@ export default defineConfig(({ command, mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      // `@sentry/nextjs` deliberately has no entry here: the resolve.alias
-      // above rewrites it to the `@sentry/react`-backed shim before SSR
-      // resolution ever sees the id, and `@sentry/react` ships real ESM
-      // ("import" condition → build/esm), so plain externalization works.
+      // `@sentry/react` ships real ESM ("import" condition → build/esm), so
+      // plain externalization works and it needs no entry here.
       // `tslib` is inlined for the BUILD only: Nitro's dev runner has no CJS
       // interop for the `tslib.js` that its ESM wrapper default-imports, and
       // every SSR request would 500. Left external in dev, Node loads it.

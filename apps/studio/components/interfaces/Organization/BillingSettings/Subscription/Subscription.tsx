@@ -4,31 +4,34 @@ import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const COMPARE_PLANS_URL = 'https://supabase.com/pricing#compare-plans'
 const AWS_MARKETPLACE_URL = 'https://supabase.com/aws-marketplace'
 
 const Subscription = () => {
   const { slug } = useParams()
-  const snap = useOrgSettingsPageStateSnapshot()
+  const { setPanel } = useOrgSettingsPanel()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
@@ -62,41 +65,47 @@ const Subscription = () => {
 
   return (
     <>
-      <ScaffoldSection>
-        <div className="col-span-12 pb-2">
+      <PageSection orientation="horizontal">
+        <div className="col-span-full">
           <Restriction />
         </div>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-12">
-            <div className="space-y-2 mb-4">
-              <p className="text-foreground text-base m-0">Subscription Plan</p>
-              <p className="text-sm text-foreground-light m-0">
+        <PageSectionMeta>
+          <PageSectionSummary className="gap-6">
+            <div className="flex flex-col gap-1">
+              <PageSectionTitle>Subscription Plan</PageSectionTitle>
+              <PageSectionDescription>
                 Each organization has it's own subscription plan, billing cycle, payment methods and
                 usage quotas.
-              </p>
+              </PageSectionDescription>
             </div>
             <div className="flex flex-col gap-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div className="flex flex-col gap-y-1">
-                <Link href={COMPARE_PLANS_URL} target="_blank" rel="noreferrer">
-                  <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
-                    <p className="m-0 text-sm">Compare plans</p>
-                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
-                  </div>
+                <Link
+                  href={COMPARE_PLANS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+                >
+                  <span className="text-sm">Compare plans</span>
+                  <ExternalLinkIcon size={16} strokeWidth={1.5} />
                 </Link>
                 {canPurchaseThroughAws && (
-                  <Link href={AWS_MARKETPLACE_URL} target="_blank" rel="noreferrer">
-                    <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
-                      <p className="m-0 text-sm">AWS Marketplace</p>
-                      <ExternalLinkIcon size={16} strokeWidth={1.5} />
-                    </div>
+                  <Link
+                    href={AWS_MARKETPLACE_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+                  >
+                    <span className="text-sm">AWS Marketplace</span>
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
                   </Link>
                 )}
               </div>
             </div>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="flex flex-col gap-6">
           {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="view this organization's subscription" />
           ) : (
@@ -122,7 +131,7 @@ const Subscription = () => {
                       <div className="flex space-x-2">
                         <Button
                           className="pointer-events-auto"
-                          onClick={() => snap.setPanelKey('subscriptionPlan')}
+                          onClick={() => setPanel('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
@@ -180,7 +189,7 @@ const Subscription = () => {
                         {currentPlan?.id === 'free' ? (
                           <span>upgrade to a paid plan.</span>
                         ) : (
-                          <span>you can disable Spend Cap under the Cost Control settings.</span>
+                          <span>disable Spend Cap under the Cost Control settings.</span>
                         )}
                       </div>
                     </Admonition>
@@ -189,8 +198,8 @@ const Subscription = () => {
               )}
             </>
           )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
       <PlanUpdateSidePanel />
     </>
   )

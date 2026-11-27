@@ -3,6 +3,7 @@ import { IA_NAV_FLAG, iaNavRoutePrefix, isIaNavVariant } from '~/features/IaNav/
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { MARKDOWN_CONTENT_TYPE } from '~/lib/md-alternates'
 import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
+import { LLMS_TXT_URL } from 'common/markdown-affordance'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -15,7 +16,7 @@ const LLMS_FILE_NAMES: Record<string, string> = { javascript: 'js' }
 
 function markdownUrl(section: string, lib: string | undefined) {
   if (section !== 'reference' || !lib || !REFERENCE_MARKDOWN_LIBS.has(lib)) {
-    return 'https://supabase.com/llms.txt'
+    return LLMS_TXT_URL
   }
   return `https://supabase.com/llms/${LLMS_FILE_NAMES[lib] ?? lib}.txt`
 }

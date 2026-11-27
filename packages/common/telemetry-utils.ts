@@ -1,4 +1,5 @@
 import { IS_PROD } from './constants'
+import { CLICK_ID_KEYS } from './first-referrer-cookie'
 import { isBrowser } from './helpers'
 
 export type TelemetryPlatform = 'studio' | 'www' | 'docs' | 'kb' | 'learn' | 'ui-library'
@@ -45,30 +46,106 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
+// The first-touch code and the attribution models read these values out of the URL. Every other
+// query value can hold customer data or a credential (row filters, search text, invite tokens,
+// OAuth codes).
+const READABLE_URL_PARAMS = new Set<string>([
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+  ...CLICK_ID_KEYS,
+  'bfcid',
+  'dub_id',
+  'campaign_id',
+  'cid',
+  'promo_code',
+])
+
+const URL_HASH_PATTERN = /^((?:https?:\/\/|\/)[^#]*)#[\s\S]*$/
+const URL_PARAM_PATTERN = /([?&#])([^&#]*)/g
+
+function redactUrlParam(param: string, separator: string, nameAndValue: string) {
+  const nameEnd = nameAndValue.indexOf('=')
+  if (nameEnd === -1) return param
+
+  const name = nameAndValue.slice(0, nameEnd)
+  if (/\s/.test(name) || READABLE_URL_PARAMS.has(name)) return param
+
+  return `${separator}${name}=redacted`
+}
+
+export function redactUrlKeywords(url: string) {
+  return url.replace(URL_HASH_PATTERN, '$1').replace(URL_PARAM_PATTERN, redactUrlParam)
+}
+
+type EventProperties = Record<string, unknown>
+
+// posthog-js copies a search-engine referrer's query value into these, outside any URL.
+const REFERRER_QUERY_PROPERTIES = ['ph_keyword', '$initial_ph_keyword']
+
+// posthog-js fills its own URL properties (session entry URL, initial URL, referrers) from the
+// browser, so the outgoing event is cleaned by value instead of by a list of property names.
+export function redactEventUrlKeywords(event: {
+  properties: EventProperties
+  $set?: EventProperties
+  $set_once?: EventProperties
+}) {
+  const { properties } = event
+  const propertyBags = [
+    properties,
+    properties.$set,
+    properties.$set_once,
+    event.$set,
+    event.$set_once,
+  ]
+
+  for (const bag of propertyBags) {
+    if (!bag || typeof bag !== 'object') continue
+
+    for (const key of REFERRER_QUERY_PROPERTIES) delete (bag as EventProperties)[key]
+
+    for (const [key, value] of Object.entries(bag)) {
+      if (typeof value === 'string') (bag as EventProperties)[key] = redactUrlKeywords(value)
+    }
+  }
+}
+
+function getPageLocation() {
+  if (!isBrowser) return { pageUrl: '', search: '' }
+
+  return {
+    pageUrl: redactUrlKeywords(window.location.href),
+    search: redactUrlKeywords(window.location.search),
+  }
+}
+
+let telemetryPageTitleResolver: ((documentTitle: string) => string) | undefined
+
+export function setTelemetryPageTitleResolver(resolver: (documentTitle: string) => string) {
+  telemetryPageTitleResolver = resolver
+}
+
+export function getTelemetryPageTitle() {
+  if (!isBrowser) return ''
+  return telemetryPageTitleResolver ? telemetryPageTitleResolver(document.title) : document.title
+}
+
 export function getSharedTelemetryData(pathname?: string) {
   const sessionId = getPostHogSessionId()
-  const pageUrl = (() => {
-    if (!isBrowser) return ''
-
-    try {
-      const url = new URL(window.location.href)
-      url.hash = ''
-      return url.href
-    } catch {
-      return window.location.href.split('#')[0]
-    }
-  })()
+  const { pageUrl, search } = getPageLocation()
 
   return {
     page_url: pageUrl,
-    page_title: isBrowser ? document?.title : '',
-    pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
+    page_title: getTelemetryPageTitle(),
+    pathname: redactUrlKeywords(pathname ? pathname : isBrowser ? window.location.pathname : ''),
     session_id: sessionId,
     ph: {
-      referrer: isBrowser ? document?.referrer : '',
+      referrer: isBrowser ? redactUrlKeywords(document?.referrer ?? '') : '',
       language: navigator.language ?? 'en-US',
       user_agent: navigator.userAgent,
-      search: isBrowser ? window.location.search : '',
+      search,
       viewport_height: isBrowser ? window.innerHeight : 0,
       viewport_width: isBrowser ? window.innerWidth : 0,
     },

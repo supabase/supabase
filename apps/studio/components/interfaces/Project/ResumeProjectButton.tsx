@@ -21,10 +21,14 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
+import { ResumeProjectCost } from './ResumeProjectCost'
 import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ExceedFreeProjectLimitMembers } from '@/components/ui/ExceedFreeProjectLimitMembers'
+import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
@@ -78,6 +82,12 @@ export const ResumeProjectButton = ({
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
+
+  const { data: orgMembers } = useOrganizationMembersQuery(
+    { slug: orgSlug },
+    { enabled: showFreeProjectLimitWarning }
+  )
+  const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
   const [billingBlockReason, setBillingBlockReason] = useState<string>()
 
   const { can: canResumeProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
@@ -192,11 +202,13 @@ export const ResumeProjectButton = ({
         cancelLabel="Cancel"
       >
         <div className={cn(newProjectInternalOnlyConfiguration && 'flex flex-col gap-y-4')}>
-          <p className="text-sm">
-            {isFreePlan
-              ? 'Your project’s data will be restored to when it was initially paused.'
-              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
-          </p>
+          {isFreePlan ? (
+            <p className="text-sm">
+              Your project’s data will be restored to when it was initially paused.
+            </p>
+          ) : (
+            <ResumeProjectCost />
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onConfirmRestore)}>
               {newProjectInternalOnlyConfiguration && (
@@ -231,26 +243,18 @@ export const ResumeProjectButton = ({
       >
         <DialogContent size="medium" className="gap-0 pb-0" aria-describedby={undefined}>
           <DialogHeader className="border-b">
-            <DialogTitle className="leading-normal">
-              Your organization has members who have exceeded their free project limits
-            </DialogTitle>
+            <DialogTitle className="leading-normal">Unable to resume project</DialogTitle>
           </DialogHeader>
-          <DialogSection className="text-sm">
+          <DialogSection className="flex flex-col gap-y-2 text-sm">
             <p className="text-foreground-light">
-              The following members have reached their maximum limits for the number of active free
-              plan projects within organizations where they are an administrator or owner:
+              Owners and administrators are limited in how many active Free Plan projects they can
+              have across all organizations.
             </p>
-            <ul className="my-4 list-disc list-inside">
-              {(membersExceededLimit ?? []).map((member, idx: number) => (
-                <li key={`member-${idx}`}>
-                  {`${member.username || member.primary_email} (Limit: ${member.free_project_limit} free projects)`}
-                </li>
-              ))}
-            </ul>
-            <p className="text-foreground-light">
-              These members will need to either delete, pause, or upgrade one or more of these
-              projects before you're able to resume this project.
-            </p>
+            <ExceedFreeProjectLimitMembers membersExceededLimit={membersExceededLimit ?? []} />
+            <FreeProjectLimitActions
+              goal="resume this project"
+              hasMultipleMembers={hasMultipleMembers}
+            />
           </DialogSection>
           <DialogFooter>
             <Button type="button" onClick={() => setShowFreeProjectLimitWarning(false)}>

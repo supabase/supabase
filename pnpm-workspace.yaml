@@ -13,6 +13,7 @@ enableGlobalVirtualStore: false
 catalog:
   '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.75.2
+  '@sentry/node': ^10.75.2
   '@sentry/tanstackstart-react': ^10.75.2
   '@supabase/auth-js': 2.117.3
   '@supabase/postgrest-js': 2.117.3
@@ -22,7 +23,7 @@ catalog:
   '@tanstack/react-router': ^1.170.44
   '@tanstack/react-start': ^1.169.2
   '@tanstack/react-table': ^8.21.3
-  '@types/node': ^22.0.0
+  '@types/node': ^26.6.6
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
   # TypeScript 7 has no programmatic API until 7.1, so `typescript` stays aliased
@@ -32,8 +33,8 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^5.0.0
-  '@vitest/ui': ^5.0.0
+  '@vitest/coverage-v8': ^5.1.1
+  '@vitest/ui': ^5.1.1
   cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
@@ -44,6 +45,8 @@ catalog:
   motion: ^11.18.2
   next: ^16.4.3
   next-themes: ^0.4.6
+  # Pin exact version while oxfmt is 0.x so patch releases don't cause surprise CI diffs.
+  oxfmt: 0.79.0
   postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
@@ -57,7 +60,7 @@ catalog:
   valtio: ^2.3.2
   vite: ^8.0.16
   velite: ^0.4.0
-  vitest: ^5.0.0
+  vitest: ^5.1.1
   zod: 3.25.76
 
 allowBuilds:

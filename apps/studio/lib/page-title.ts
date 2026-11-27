@@ -20,16 +20,7 @@ const normalizeTitleSegment = (value?: string) => {
   return `${normalized.slice(0, MAX_SEGMENT_LENGTH - 1).trimEnd()}…`
 }
 
-export const buildStudioPageTitle = (parts: StudioPageTitleParts) => {
-  const orderedParts = [
-    parts.entity,
-    parts.section,
-    parts.surface,
-    parts.project,
-    parts.org,
-    parts.brand,
-  ]
-
+const joinTitleSegments = (orderedParts: Array<string | undefined>) => {
   const segments: string[] = []
 
   orderedParts.forEach((part) => {
@@ -44,3 +35,27 @@ export const buildStudioPageTitle = (parts: StudioPageTitleParts) => {
 
   return segments.join(STUDIO_PAGE_TITLE_SEPARATOR)
 }
+
+const telemetryTitlesByPageTitle = new Map<string, string>()
+
+export const buildStudioPageTitle = (parts: StudioPageTitleParts) => {
+  const pageTitle = joinTitleSegments([
+    parts.entity,
+    parts.section,
+    parts.surface,
+    parts.project,
+    parts.org,
+    parts.brand,
+  ])
+  telemetryTitlesByPageTitle.set(
+    pageTitle,
+    joinTitleSegments([parts.section, parts.surface, parts.brand])
+  )
+
+  return pageTitle
+}
+
+// Customers name the entity, project and org, so analytics gets the title without them. A title
+// this file did not build may hold any of the three and resolves to the brand alone.
+export const toTelemetryPageTitle = (pageTitle: string) =>
+  telemetryTitlesByPageTitle.get(pageTitle) ?? 'Supabase'

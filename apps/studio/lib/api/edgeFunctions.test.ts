@@ -104,9 +104,18 @@ describe('getEdgeFunctionTestUrl', () => {
     'https://uniquetwentychararef.supabase.red/functions/v1/hello-world',
     'https://uniquetwentychararef.supabase.red/functions/v3/hello-world',
     'https://uniquetwentychararef.supabase.co/functions/v1/hello-world?name=a%20b&x=1',
-    "https://uniquetwentychararef.supabase.co/functions/v1/hello/nested/path_~!$&'()*+,;=:@%20|^[]",
+    "https://uniquetwentychararef.supabase.co/functions/v1/hello/nested/path_~!$&'()*+,;=:@%20|[]",
   ])('allows the platform URL %s unchanged', (url) => {
     expect(getEdgeFunctionTestUrl(url, platform)).toBe(url)
+  })
+
+  it('percent-encodes ^ in the path, as the WHATWG URL parser does', () => {
+    expect(
+      getEdgeFunctionTestUrl(
+        'https://uniquetwentychararef.supabase.co/functions/v1/hello/a^b',
+        platform
+      )
+    ).toBe('https://uniquetwentychararef.supabase.co/functions/v1/hello/a%5Eb')
   })
 
   it('normalizes the host case and drops an empty query and the fragment', () => {

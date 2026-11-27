@@ -43,7 +43,7 @@ I will not go into every implementation detail, as it would be long, but you can
 
 ### Auth
 
-For authentication, we used the brand new [anonymous sign-in](https://supabase.com/docs/guides/auth/auth-anonymous) feature to sign in the players automatically in the background. This way, players don’t feel the friction after scanning the QR code and can get started with the game quickly. It also allows us to set a row-level security policy to ensure players have limited read and write permissions in the game.
+For authentication, we used the brand new [anonymous sign-in](https://supabase.com/docs/guides/auth/auth-anonymous) feature to sign in the players automatically in the background. This way, players don’t feel the friction after scanning the QR code and can get started with the game quickly. It also allows us to set a [row-level security](/docs/guides/database/postgres/row-level-security) policy to ensure players have limited read and write permissions in the game.
 
 When a user registers for a game, we check if the user is already signed in, and if not, the app signs them in.
 

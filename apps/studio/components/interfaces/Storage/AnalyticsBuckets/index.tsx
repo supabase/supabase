@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { ChevronRightIcon, SearchIcon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -34,7 +34,7 @@ import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const [filterString, setFilterString] = useState('')
 
@@ -146,7 +146,7 @@ export const AnalyticsBuckets = () => {
                             {analyticsBuckets.map((bucket) => {
                               const handleBucketNavigation = createNavigationHandler(
                                 `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.name)}`,
-                                router
+                                navigate
                               )
 
                               return (

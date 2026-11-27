@@ -530,6 +530,7 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -561,6 +562,7 @@ export interface OnboardingSurveySubmitFailedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -628,6 +630,23 @@ export interface FreeTierGeneralRegionUpgradeClickedEvent {
 export interface FreeTierGeneralRegionDocsLinkClickedEvent {
   action: 'free_tier_general_region_docs_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked a "Docs" button rendered by the shared DocsButton component.
+ *
+ * @group Events
+ * @source studio
+ * @page any page that renders a DocsButton; the page is identified by the pathname sent with every event
+ */
+export interface DocsButtonClickedEvent {
+  action: 'docs_button_clicked'
+  properties: {
+    /** Fixed topic label passed to the button, e.g. the feature the docs link covers. Omitted when the button has no topic. */
+    topic?: string
+  }
+  // Rendered on project, organization, and account pages, so either group can be missing
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -722,8 +741,8 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/realtime/inspector
  */
-export interface RealtimeInspectorBroadcastSentEvent {
-  action: 'realtime_inspector_broadcast_sent'
+export interface RealtimeInspectorBroadcastSubmittedEvent {
+  action: 'realtime_inspector_broadcast_submitted'
   groups: TelemetryGroups
 }
 
@@ -1090,6 +1109,11 @@ export type MarkdownAffordancePageType =
   | 'ask_ai_answer'
 
 /**
+ * Part of the docs page actions split button that a user ran an action from.
+ */
+export type PageActionsOrigin = 'page_actions_button' | 'page_actions_menu'
+
+/**
  * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
  * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
@@ -1104,6 +1128,10 @@ export interface CopyAsMarkdownClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1115,6 +1143,48 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User copied the URL of a page's Markdown version and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface MarkdownUrlCopiedEvent {
+  action: 'markdown_url_copied'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked "View as Markdown" to open a page's Markdown version.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface ViewAsMarkdownClickedEvent {
+  action: 'view_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
 }
 
 /**
@@ -1147,6 +1217,10 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1186,7 +1260,9 @@ export interface DocsAiPromptCopiedEvent {
 }
 
 /**
- * User clicked a curated orientation link from a content listings MDX component.
+ * User clicked a curated orientation link from a content listings MDX component, or a
+ * link card or quickstart link in the getting started stepper (`listingId` is
+ * `getting-started-stepper`).
  *
  * @group Events
  * @source docs
@@ -1218,6 +1294,53 @@ export interface ExampleLinkClickedEvent {
 }
 
 /**
+ * User copied a docs code block with its copy button, and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsCodeCopiedEvent {
+  action: 'docs_code_copied'
+  properties: {
+    /**
+     * Language of the code block, such as `bash` or `ts`.
+     */
+    lang?: string
+    /**
+     * Identifier that a page gives a code block it measures, such as
+     * `getting-started-install`.
+     */
+    copyId?: string
+  }
+}
+
+/**
+ * User picked an option in the getting started stepper: how to start, a framework, or a
+ * feature for the agent prompt.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides/getting-started
+ */
+export interface DocsGettingStartedOptionClickedEvent {
+  action: 'docs_getting_started_option_clicked'
+  properties: {
+    /**
+     * Stepper step the option belongs to.
+     */
+    optionType: 'start' | 'framework' | 'feature'
+    /**
+     * Start option id, framework slug, or feature id.
+     */
+    optionId: string
+    /**
+     * For a feature, true when the click selected it and false when it cleared it.
+     */
+    isSelected?: boolean
+  }
+}
+
+/**
  * User opened the Search V2 dialog.
  *
  * @group Events
@@ -1234,6 +1357,22 @@ export interface DocsSearchV2OpenedEvent {
 }
 
 /**
+ * How a search term is reported. Free text can contain credentials and personal data, so the
+ * term's text is sent only when it is a short letters-only keyword.
+ */
+export interface SearchQueryProperties {
+  /**
+   * The search term, present only when it is a keyword: up to 4 letters-only parts of at most
+   * 16 letters each, joined by single spaces, hyphens or underscores, 40 characters at most.
+   */
+  query?: string
+  /** Length of the search term, trimmed and with repeated whitespace collapsed. */
+  queryLength: number
+  /** Number of whitespace-separated words in the search term. */
+  queryWordCount: number
+}
+
+/**
  * User's search term was sent to the Search V2 endpoint.
  *
  * @group Events
@@ -1241,11 +1380,7 @@ export interface DocsSearchV2OpenedEvent {
  */
 export interface DocsSearchV2SearchSubmittedEvent {
   action: 'docs_search_v2_search_submitted'
-  properties: {
-    /**
-     * The search term sent to the Search V2 endpoint.
-     */
-    query: string
+  properties: SearchQueryProperties & {
     /**
      * Whether the Search V2 endpoint returned at least one result for the query.
      */
@@ -1261,15 +1396,11 @@ export interface DocsSearchV2SearchSubmittedEvent {
  */
 export interface DocsSearchV2ResultClickedEvent {
   action: 'docs_search_v2_result_clicked'
-  properties: {
+  properties: SearchQueryProperties & {
     /**
      * The path of the result that was activated.
      */
     resultPath: string
-    /**
-     * The search term whose results were showing when the result was activated.
-     */
-    query: string
   }
 }
 
@@ -1302,17 +1433,14 @@ export interface KbSearchClosedEvent {
 }
 
 /**
- * A knowledge base search returned, with or without results. The query text is left out
- * because it can contain personal data; only its length is sent.
+ * A knowledge base search returned, with or without results.
  *
  * @group Events
  * @source kb
  */
 export interface KbSearchSubmittedEvent {
   action: 'kb_search_submitted'
-  properties: {
-    /** Length of the trimmed search term. */
-    queryLength: number
+  properties: SearchQueryProperties & {
     /** Number of results the search returned. */
     resultCount: number
     /** Whether the search returned at least one result. */
@@ -1601,8 +1729,8 @@ export interface WwwEventPageCtaClickedEvent {
  * @source www
  * @page /legal/customer-resources/subprocessor-list
  */
-export interface WwwSubprocessorUpdatesSubscribedEvent {
-  action: 'www_subprocessor_updates_subscribed'
+export interface WwwSubprocessorUpdatesFormCompletedEvent {
+  action: 'www_subprocessor_updates_form_completed'
 }
 
 /**
@@ -1863,6 +1991,56 @@ export interface StudioBillingCancelSubscriptionClickedEvent {
 }
 
 /**
+ * User confirmed a downgrade to the Free Plan and was shown the modal saying members
+ * have exceeded their free project limits, which blocks the downgrade.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing or /billing?panel=subscriptionPlan
+ */
+export interface StudioBillingDowngradeBlockedModalOpenedEvent {
+  action: 'studio_billing_downgrade_blocked_modal_opened'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+    /**
+     * Number of organization members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
+  properties: {
+    /**
+     * The plan type of the organization the project is transferred from.
+     */
+    sourcePlan: string
+    /**
+     * The plan type of the selected target organization.
+     */
+    targetPlan: string | null
+    /**
+     * Number of members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -1880,6 +2058,10 @@ export interface StudioPricingPlanCtaClickedEvent {
      * The plan type the org is currently on.
      */
     currentPlan?: string
+    /**
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+     */
+    origin?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -1900,6 +2082,82 @@ export interface StudioPricingSidePanelOpenedEvent {
      */
     origin?: string
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Properties shared by the events on the plan change screen that follows a plan CTA click.
+ */
+export interface StudioPricingPlanChangeProperties {
+  /**
+   * The plan type being changed to, same values as studio_pricing_plan_cta_clicked.
+   */
+  selectedPlan?: string
+  /**
+   * The plan type the org is currently on.
+   */
+  currentPlan?: string
+  /**
+   * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+   */
+  origin?: string
+  /**
+   * Paused projects listed on the plan change bill. Counts the first page of org projects only.
+   */
+  pausedProjectCount: number
+}
+
+/**
+ * User expanded the "Billed every hour, even when idle" explainer on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingComputeBillingExplainerOpenedEvent {
+  action: 'studio_pricing_compute_billing_explainer_opened'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked a docs link on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeDocsLinkClickedEvent {
+  action: 'studio_pricing_plan_change_docs_link_clicked'
+  properties: StudioPricingPlanChangeProperties & {
+    docsLink: 'compute' | 'project_transfer'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the confirm button on the plan change screen in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeConfirmClickedEvent {
+  action: 'studio_pricing_plan_change_confirm_clicked'
+  properties: StudioPricingPlanChangeProperties
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * The plan change submitted from the plan change screen in studio succeeded, including any payment confirmation step.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanChangeCompletedEvent {
+  action: 'studio_pricing_plan_change_completed'
+  properties: StudioPricingPlanChangeProperties
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -2931,8 +3189,8 @@ export interface ConnectSheetOpenedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeSectionRowsMovedEvent {
-  action: 'home_section_rows_moved'
+export interface HomeSectionRowsUpdatedEvent {
+  action: 'home_section_rows_updated'
   properties: {
     /**
      * The section that was moved
@@ -3174,10 +3432,6 @@ export interface AuthUsersSearchSubmittedEvent {
      */
     user_type?: string
     /**
-     * The keywords being searched for
-     */
-    keywords?: string
-    /**
      * The column being filtered on, e.g. email, phone
      * (only included if filtering by a specific column and not all columns)
      */
@@ -3221,11 +3475,12 @@ export interface CommandMenuOpenedEvent {
  */
 export interface CommandMenuSearchSubmittedEvent {
   action: 'command_menu_search_submitted'
-  properties: {
+  properties: Omit<SearchQueryProperties, 'query'> & {
     /**
-     * Search term typed into the command menu input
+     * Search term typed into the command menu input, present only when it is a keyword (see
+     * `SearchQueryProperties`)
      */
-    value: string
+    value?: string
     /**
      * In which app the command input was typed
      */
@@ -3256,7 +3511,8 @@ export interface CommandMenuCommandClickedEvent {
      */
     command_section?: string
     /**
-     * The search query that was active when the command was clicked
+     * The search query that was active when the command was clicked, present only when it is
+     * a keyword (see `SearchQueryProperties`)
      */
     search_query?: string
     /**
@@ -4069,6 +4325,25 @@ export interface FreeMicroUpgradeBannerCtaClickedEvent {
 }
 
 /**
+ * User confirmed moving a Nano project to Micro on the screen shown after upgrading the
+ * organization to a paid plan. Starts the compute change, which restarts the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /org/{slug}/billing?panel=planUpgraded
+ */
+export interface PlanUpgradedMicroComputeUpgradeSubmittedEvent {
+  action: 'plan_upgraded_micro_compute_upgrade_submitted'
+  properties: {
+    /** The paid plan the organization just upgraded to. */
+    planId: 'pro' | 'team'
+    /** Projects on the screen that can still move to Micro, including the confirmed one. */
+    nanoProjectCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -4231,7 +4506,8 @@ export interface AccessTokenDoneButtonClickedEvent {
 
 /**
  * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
- * `placement` identifying which one (the user dropdown or the org project-list usage card).
+ * `placement` identifying which one (the user dropdown, the org project-list usage card, or the
+ * Free plan badge next to the organization name in the header).
  *
  * @group Events
  * @source studio
@@ -4239,7 +4515,7 @@ export interface AccessTokenDoneButtonClickedEvent {
 export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
-    placement: 'user_dropdown' | 'org_projects_list'
+    placement: 'user_dropdown' | 'org_projects_list' | 'org_plan_badge'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -4319,6 +4595,94 @@ export interface UnifiedLogsRowClickedEvent {
       | 'pipelines'
       | 'compute'
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the Unified Logs saved views panel from the sidebar entry or the mobile drawer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewsPanelOpenedEvent {
+  action: 'unified_logs_views_panel_opened'
+  properties: {
+    surface: 'sidebar' | 'mobile_drawer'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User applied a preset or saved view to the Unified Logs filters.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewAppliedEvent {
+  action: 'unified_logs_view_applied'
+  properties: {
+    viewType: 'preset' | 'saved'
+    /** 'select' is a direct row click; 'reset' discards local edits by re-applying the active view. */
+    trigger: 'select' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User created a new saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewCreatedEvent {
+  action: 'unified_logs_view_created'
+  properties: {
+    source: 'new' | 'duplicate' | 'save_as_new'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing saved view's name or content in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewUpdatedEvent {
+  action: 'unified_logs_view_updated'
+  properties: {
+    /** 'content' covers filters and view options (sort, latency range, log type toggles), which are saved and compared together. */
+    updateType: 'name' | 'content'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User deleted a saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewRemovedEvent {
+  action: 'unified_logs_view_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the "this view has been modified" popover without updating, saving, or
+ * resetting.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewModifiedPopoverClosedEvent {
+  action: 'unified_logs_view_modified_popover_closed'
   groups: TelemetryGroups
 }
 
@@ -4685,15 +5049,214 @@ export interface RecoveryCodesDownloadClickedEvent {
 }
 
 /**
+ * Kind of database schema, without the schema name.
+ * `public` is the public schema, `protected` is a schema managed by Supabase
+ * (internal or used by a foreign data wrapper), `custom` is any other schema.
+ */
+export type DatabaseSchemaType = 'public' | 'protected' | 'custom'
+
+/**
+ * User selected a schema in a database schema selector.
+ *
+ * @group Events
+ * @source Studio schema selector (SchemaSelector), when the user picks a schema
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaSelectorUpdatedEvent {
+  action: 'database_schema_selector_updated'
+  properties: {
+    /** Kind of the selected schema */
+    schemaType: DatabaseSchemaType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table in the Find table selector of the schema visualizer.
+ * Fires for selections opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar, Find table result
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerFindTableClickedEvent {
+  action: 'database_schema_visualizer_find_table_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied something from the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar (Copy as SQL, Copy as Markdown, or their keyboard shortcuts), or a table or column menu on the graph (Copy name, Copy as SQL, Copy as Markdown)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerCopiedEvent {
+  action: 'database_schema_visualizer_copied'
+  properties: {
+    /** What was copied: the whole schema, one table, or a name */
+    content:
+      | 'schema_sql'
+      | 'schema_markdown'
+      | 'table_name'
+      | 'table_sql'
+      | 'table_markdown'
+      | 'column_name'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started a download of the schema visualizer graph as an image.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar export menu (Download as PNG or SVG), or their keyboard shortcuts
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerImageDownloadClickedEvent {
+  action: 'database_schema_visualizer_image_download_clicked'
+  properties: {
+    /** Image format of the download */
+    format: 'png' | 'svg'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed Auto layout in the schema visualizer.
+ * Fires for dialogs opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer Auto layout dialog, Apply button
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerAutoLayoutAppliedEvent {
+  action: 'database_schema_visualizer_auto_layout_applied'
+  groups: TelemetryGroups
+}
+
+/**
+ * User chose an edit action in a table or column menu of the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer table menu (Edit table) or column menu (Edit column)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
+  action: 'database_schema_visualizer_node_menu_clicked'
+  properties: {
+    /** Which edit action the user chose */
+    action: 'edit_table' | 'edit_column'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied an API key with its Copy button on the API keys pages: a publishable or secret key,
+ * or a legacy anon or service_role key. Keyboard copies from the key input are not counted. Not
+ * fired when the copy is blocked by missing permissions or the clipboard write fails.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyCopiedEvent {
+  action: 'api_key_copied'
+  properties: {
+    /** Which key was copied */
+    keyType: 'publishable' | 'secret' | 'legacy_anon' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to reveal a secret key (the new secret key or the legacy service_role key).
+ * Publishable and legacy anon keys are always visible and don't fire this event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyRevealClickedEvent {
+  action: 'api_key_reveal_clicked'
+  properties: {
+    /** Which key the user revealed */
+    keyType: 'secret' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully created, either from the create dialog or the first-time setup.
+ * The first-time setup creates a default publishable and secret key and fires once per key, so a
+ * failed secret key doesn't lose the publishable key's event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyCreatedEvent {
+  action: 'api_key_created'
+  properties: {
+    /** Which key was created */
+    keyType: 'publishable' | 'secret'
+    /** Where the user created the key */
+    source: 'create_dialog' | 'initial_setup'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully deleted after the user confirmed in the delete modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyRemovedEvent {
+  action: 'api_key_removed'
+  properties: {
+    /** Which key was deleted */
+    keyType: 'publishable' | 'secret'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Legacy JWT-based API keys (anon and service_role) were successfully disabled or re-enabled.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface LegacyApiKeysUpdatedEvent {
+  action: 'legacy_api_keys_updated'
+  properties: {
+    /** Whether the legacy keys are enabled after the update */
+    enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | AccountRecoveryReminderExposedEvent
+  | DocsButtonClickedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
   | RecoveryCodesCopiedEvent
   | RecoveryCodesDownloadClickedEvent
+  | DatabaseSchemaSelectorUpdatedEvent
+  | DatabaseSchemaVisualizerFindTableClickedEvent
+  | DatabaseSchemaVisualizerCopiedEvent
+  | DatabaseSchemaVisualizerImageDownloadClickedEvent
+  | DatabaseSchemaVisualizerAutoLayoutAppliedEvent
+  | DatabaseSchemaVisualizerNodeMenuClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4735,7 +5298,7 @@ export type TelemetryEvent =
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
-  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorBroadcastSubmittedEvent
   | RealtimeInspectorMessageClickedEvent
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
@@ -4760,10 +5323,14 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
+  | MarkdownUrlCopiedEvent
+  | ViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | ExampleLinkClickedEvent
+  | DocsCodeCopiedEvent
+  | DocsGettingStartedOptionClickedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
@@ -4785,7 +5352,7 @@ export type TelemetryEvent =
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwEventPageCtaClickedEvent
-  | WwwSubprocessorUpdatesSubscribedEvent
+  | WwwSubprocessorUpdatesFormCompletedEvent
   | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
@@ -4811,7 +5378,13 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
+  | StudioBillingDowngradeBlockedModalOpenedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
+  | StudioPricingComputeBillingExplainerOpenedEvent
+  | StudioPricingPlanChangeDocsLinkClickedEvent
+  | StudioPricingPlanChangeConfirmClickedEvent
+  | StudioPricingPlanChangeCompletedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
@@ -4866,7 +5439,7 @@ export type TelemetryEvent =
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
-  | HomeSectionRowsMovedEvent
+  | HomeSectionRowsUpdatedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
@@ -4917,6 +5490,7 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | PlanUpgradedMicroComputeUpgradeSubmittedEvent
   | UpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
@@ -4928,6 +5502,12 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
+  | UnifiedLogsViewsPanelOpenedEvent
+  | UnifiedLogsViewAppliedEvent
+  | UnifiedLogsViewCreatedEvent
+  | UnifiedLogsViewUpdatedEvent
+  | UnifiedLogsViewRemovedEvent
+  | UnifiedLogsViewModifiedPopoverClosedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent
@@ -4943,6 +5523,11 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | ApiKeyCopiedEvent
+  | ApiKeyRevealClickedEvent
+  | ApiKeyCreatedEvent
+  | ApiKeyRemovedEvent
+  | LegacyApiKeysUpdatedEvent
   | WarehouseEnabledEvent
   | WarehouseDisabledEvent
   | RouteRequestsEvaluatedEvent

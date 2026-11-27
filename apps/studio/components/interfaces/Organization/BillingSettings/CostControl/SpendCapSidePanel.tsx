@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
@@ -29,6 +28,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
@@ -36,7 +36,6 @@ import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subsc
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const BILLING_METRIC_CATEGORIES: (keyof typeof pricing)[] = [
   'database',
@@ -77,9 +76,9 @@ export const SpendCapSidePanel = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'costControl'
-  const onClose = () => snap.setPanelKey(undefined)
+  const { panel, setPanel } = useOrgSettingsPanel()
+  const visible = panel === 'costControl'
+  const onClose = () => setPanel(null)
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
@@ -232,9 +231,7 @@ export const SpendCapSidePanel = () => {
                 title="Toggling of the spend cap is only available on the Pro Plan"
                 description="Upgrade your plan to disable the spend cap"
                 actions={
-                  <Button onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                    View available plans
-                  </Button>
+                  <Button onClick={() => setPanel('subscriptionPlan')}>View available plans</Button>
                 }
               />
             )}
@@ -258,8 +255,9 @@ export const SpendCapSidePanel = () => {
                       )}
                       onClick={() => !isFreePlan && setSelectedOption(option.value)}
                     >
-                      <Image
-                        alt="Spend Cap"
+                      <img
+                        alt=""
+                        aria-hidden="true"
                         className={cn(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                           isSelected

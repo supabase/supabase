@@ -4,7 +4,7 @@ title: 'Query plans with explain()'
 description: 'See whether Postgres scans a whole table or uses an index for a slow Data API query.'
 ---
 
-When a Data API query, such as a supabase-js call, is slow, see how Postgres runs it. A query plan shows the steps Postgres takes to answer a query: whether it scans the whole table or uses an index, and how many rows it expects each step to handle. Chain `explain()` to any query, including `rpc()` calls and writes, to get its plan instead of its data.
+When a Data API query, such as a [supabase-js](/docs/reference/javascript/introduction) call, is slow, see how Postgres runs it. A query plan shows the steps Postgres takes to answer a query: whether it scans the whole table or uses an index, and how many rows it expects each step to handle. Chain `explain()` to any query, including `rpc()` calls and writes, to get its plan instead of its data.
 
 Use `explain()` when a query is slower than you expect, or after you add an index, to check that Postgres uses the index.
 

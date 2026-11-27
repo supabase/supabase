@@ -24,8 +24,8 @@
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
     "test:case-hazards": "node scripts/check-case-hazards.mjs",
-    "test:prettier": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --check '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --write '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format:check": "oxfmt --check '{apps,packages,blocks,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "oxfmt '{apps,packages,blocks,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs --filter=docs-search",
     "test:kb": "turbo run test --filter=kb",
     "test:ui": "turbo run test --filter=ui",
@@ -58,14 +58,12 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.1041.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
     "cn": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
     "knip": "6.32.3",
-    "prettier": "^3.8.0",
-    "prettier-plugin-sql-cst": "^0.18.0",
+    "oxfmt": "catalog:",
     "rimraf": "^6.0.0",
     "supabase": "^2.114.0",
     "supports-color": "^8.0.0",
@@ -81,9 +79,16 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "pnpm": "11.13",
-    "node": ">=22.23.4"
+    "pnpm": "12.21",
+    "node": "26.x"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@11.13.1"
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
+  "packageManager": "pnpm@12.21.0"
 }

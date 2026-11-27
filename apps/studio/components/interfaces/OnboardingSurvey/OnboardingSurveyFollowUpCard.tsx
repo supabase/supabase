@@ -1,4 +1,4 @@
-import { usePathname } from 'next/navigation'
+import { useLocation } from '@tanstack/react-router'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -53,6 +53,7 @@ export function OnboardingSurveyFollowUpCard() {
             surface: 'follow_up',
             hasKind: true,
             hasBuilding: false,
+            hasCanCode: false,
           })
           setFailedSkipOrgSlugs((previous) => [...previous, orgSlug])
           reopenFollowUp()
@@ -69,7 +70,7 @@ export function OnboardingSurveyFollowUpCard() {
     if (hasExpired && !isDialogOpen) onExpire()
   }, [hasExpired, isDialogOpen])
 
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const shouldShowCard =
     isEligible && !hasFailedSkip && !isDialogOpen && !isProjectCreationPath(pathname)
 
@@ -82,7 +83,7 @@ export function OnboardingSurveyFollowUpCard() {
     addBanner({
       id: BANNER_ID.ONBOARDING_SURVEY_FOLLOW_UP,
       isDismissed: false,
-      priority: 1,
+      priority: 4,
       content: (
         <BannerCard onDismiss={() => skipFollowUp('follow_up_skip')}>
           <div className="flex flex-col gap-y-4">
@@ -121,7 +122,7 @@ export function OnboardingSurveyFollowUpCard() {
     skipFollowUp('follow_up_closed')
   }
 
-  const handleSubmit = ({ kind, size, building }: OnboardingSurveyFollowUpValues) => {
+  const handleSubmit = ({ kind, size, building, can_code }: OnboardingSurveyFollowUpValues) => {
     if (!orgSlug) return
 
     // Unanswered here, the org keeps the type and size picked on the new-org form
@@ -133,6 +134,7 @@ export function OnboardingSurveyFollowUpCard() {
       surface: 'follow_up' as const,
       hasKind: kind !== '',
       hasBuilding: building !== '',
+      hasCanCode: can_code !== '',
     }
     track('onboarding_survey_submit_button_clicked', surveyProperties)
 
@@ -142,6 +144,7 @@ export function OnboardingSurveyFollowUpCard() {
         kind: answeredKind,
         size: answeredSize,
         building: building || undefined,
+        can_code: can_code || undefined,
       },
       {
         onSuccess: () => {

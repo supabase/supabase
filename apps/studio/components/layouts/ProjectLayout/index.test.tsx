@@ -26,7 +26,6 @@ const {
   mockAddBanner,
   mockDismissBanner,
   mockProjectState,
-  mockResourceWarningsState,
   mockOrgPlanState,
   mockBannerDismissedState,
   mockUseLocalStorageQuery,
@@ -43,7 +42,6 @@ const {
       integration_source: null as string | null,
     },
   },
-  mockResourceWarningsState: { current: undefined as any[] | undefined },
   mockOrgPlanState: {
     current: { id: 'pro', name: 'Pro' } as { id: string; name: string } | undefined,
   },
@@ -55,27 +53,6 @@ vi.mock('next/router', () => ({
   useRouter: () => mockRouter,
 }))
 
-vi.mock('next/head', async () => {
-  const React = await import('react')
-
-  const Head = ({ children }: { children?: ReactNode }) => {
-    React.useEffect(() => {
-      const titleElement = React.Children.toArray(children).find(
-        (child) => React.isValidElement(child) && child.type === 'title'
-      )
-
-      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
-
-      const titleText = React.Children.toArray(titleElement.props.children).join('')
-      document.title = titleText
-    }, [children])
-
-    return null
-  }
-
-  return { default: Head }
-})
-
 vi.mock('common', () => ({
   useParams: () => ({ ref: 'default' }),
   mergeRefs:
@@ -83,8 +60,8 @@ vi.mock('common', () => ({
     (_value: unknown) => {},
   IS_PLATFORM: false,
   LOCAL_STORAGE_KEYS: {
-    FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-      `free-micro-upgrade-banner-dismissed-${ref}`,
+    FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+      `free-micro-upgrade-banner-dismissed-at-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
@@ -196,9 +173,7 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
 }))
 
-vi.mock('@/data/usage/resource-warnings-query', () => ({
-  useResourceWarningsQuery: () => ({ data: mockResourceWarningsState.current }),
-}))
+vi.mock('@/data/usage/resource-warnings-query', () => ({}))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
@@ -318,7 +293,7 @@ describe('ProjectLayout title', () => {
     }
     mockBannerDismissedState.current = false
     mockUseLocalStorageQuery.mockImplementation(() => [
-      mockBannerDismissedState.current,
+      mockBannerDismissedState.current ? new Date().toISOString() : null,
       vi.fn(),
       { isSuccess: true },
     ])
@@ -468,14 +443,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: 'nano',
       integration_source: null,
     }
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: true,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
-      },
-    ]
     mockBannerDismissedState.current = false
   })
 
@@ -490,12 +457,11 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: undefined,
       integration_source: null,
     }
-    mockResourceWarningsState.current = undefined
     mockOrgPlanState.current = { id: 'pro', name: 'Pro' }
     mockBannerDismissedState.current = false
   })
 
-  it('calls addBanner when a paid-plan project is nano and compute is near exhaustion', async () => {
+  it('calls addBanner when a paid-plan project is nano', async () => {
     renderLayout()
 
     await waitFor(() => {
@@ -510,19 +476,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       'the banner was previously dismissed',
       () => {
         mockBannerDismissedState.current = true
-      },
-    ],
-    [
-      'compute warnings are cleared',
-      () => {
-        mockResourceWarningsState.current = [
-          {
-            project: 'default',
-            cpu_exhaustion: false,
-            memory_and_swap_exhaustion: false,
-            disk_space_exhaustion: false,
-          },
-        ]
       },
     ],
     [

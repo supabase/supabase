@@ -1,8 +1,17 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
+import { NavMenu, NavMenuItem } from 'ui'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
 
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 
 export const Route = createFileRoute('/project/$ref/database/triggers')({
   component: TriggersShell,
@@ -11,27 +20,54 @@ export const Route = createFileRoute('/project/$ref/database/triggers')({
   },
 })
 
+const navigationItems = [
+  { label: 'Data', to: '/project/$ref/database/triggers/data' },
+  { label: 'Event', to: '/project/$ref/database/triggers/event' },
+] as const
+
 function TriggersShell() {
   const { ref } = Route.useParams()
-  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_READ
+  const pathname = useLocation({ select: (state) => state.pathname })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: ref },
+    { variant: 'read' }
   )
 
-  if (isPermissionsLoaded && !canReadTriggers) {
+  if (readGrant.status === 'denied') {
     return <NoPermission isFullPage resourceText="view database triggers" />
   }
 
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError error={readGrant.error} subject="Failed to check database triggers permissions" />
+    )
+  }
+
   return (
-    <PageLayout
-      title="Database Triggers"
-      subtitle="Execute actions automatically when database events occur"
-      size="large"
-      navigationItems={[
-        { label: 'Data', href: `/project/${ref}/database/triggers/data` },
-        { label: 'Event', href: `/project/${ref}/database/triggers/event` },
-      ]}
-    >
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Triggers</PageHeaderTitle>
+            <PageHeaderDescription>
+              Execute actions automatically when database events occur
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageNav size="default">
+        <NavMenu>
+          {navigationItems.map((item) => (
+            <NavMenuItem key={item.label} active={pathname === item.to.replace('$ref', ref)}>
+              <Link to={item.to} params={{ ref }}>
+                {item.label}
+              </Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
+      </PageNav>
       <Outlet />
-    </PageLayout>
+    </>
   )
 }

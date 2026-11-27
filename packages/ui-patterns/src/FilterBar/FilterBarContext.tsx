@@ -18,13 +18,14 @@ import {
   FilterOptionObject,
   FilterProperty,
   MenuItem,
+  NewGroupPosition,
 } from './types'
 import { useCommandHandling } from './useCommandHandling'
 import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
   findConditionByPath,
   isAsyncOptionsFunction,
-  removeFromGroup,
+  removeConditionAndEmptiedGroups,
   resolvePropertyChange,
   updateNestedLogicalOperator,
   updateNestedOperator,
@@ -54,7 +55,7 @@ export type FilterBarContextValue = {
   handleInputFocus: (path: number[]) => void
   handleOperatorFocus: (path: number[]) => void
   handleGroupFreeformFocus: (path: number[]) => void
-  handleInputBlur: () => void
+  handleInputBlur: (shouldCommitValue?: boolean) => void
   handleGroupFreeformChange: (path: number[], value: string) => void
   handleLabelClick: (path: number[]) => void
   handlePropertyChange: (path: number[], newPropertyName: string) => void
@@ -69,6 +70,8 @@ export type FilterBarContextValue = {
   optionsError: string | null
 
   supportsOperators: boolean
+  newGroupPosition: NewGroupPosition
+  isRootOperatorLocked: boolean
   variant: FilterBarVariant
   actions?: FilterBarAction[]
   icon?: React.ReactNode
@@ -100,6 +103,10 @@ export type FilterBarRootProps = {
   supportsOperators?: boolean
   /** Logical operator for groups created via "New filter group". Defaults to 'AND'. */
   defaultGroupOperator?: FilterGroup['logicalOperator']
+  /** Where "New filter group" sits in the property menu. Defaults to 'bottom'. */
+  newGroupPosition?: NewGroupPosition
+  /** Prevents toggling the root group's logical operator. Defaults to false. */
+  isRootOperatorLocked?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
   freeformDefaultProperty?: string
@@ -124,6 +131,8 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     isLoading: externalLoading,
     supportsOperators = false,
     defaultGroupOperator,
+    newGroupPosition = 'bottom',
+    isRootOperatorLocked = false,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -139,6 +148,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     onApplyRef.current = onApply
   }, [onApply])
 
+  const hasPendingValueRef = useRef(false)
   const filtersRef = useRef(filters)
   useEffect(() => {
     filtersRef.current = filters
@@ -146,6 +156,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const commitFilters = useCallback(
     (next: FilterGroup) => {
+      hasPendingValueRef.current = false
       onFilterChange(next)
       onApplyRef.current?.(next)
     },
@@ -169,6 +180,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
+      hasPendingValueRef.current = true
       const updatedFilters = updateNestedValue(filters, path, value)
       onFilterChange(updatedFilters)
 
@@ -273,23 +285,26 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     [setActiveInput, setIsCommandMenuVisible, hideTimeoutRef]
   )
 
-  const handleInputBlur = useCallback(() => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-    hideTimeoutRef.current = setTimeout(() => {
-      const activeEl = document.activeElement as HTMLElement | null
-      if (activeEl && rootRef.current && rootRef.current.contains(activeEl)) {
-        return
+  const handleInputBlur = useCallback(
+    (shouldCommitValue = false) => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current)
       }
-      setIsCommandMenuVisible(false)
-      setActiveInput(null)
-      setHighlightedConditionPath(null)
-      // Focus has actually left the FilterBar — fire onApply with the latest filters so any
-      // value typed but never confirmed via Enter still gets pushed downstream.
-      onApplyRef.current?.(filtersRef.current)
-    }, 0)
-  }, [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath])
+      hideTimeoutRef.current = setTimeout(() => {
+        const activeEl = document.activeElement as HTMLElement | null
+        const hasFocusWithin = !!activeEl && !!rootRef.current?.contains(activeEl)
+        if (hasFocusWithin && (!shouldCommitValue || !hasPendingValueRef.current)) return
+        if (!hasFocusWithin) {
+          setIsCommandMenuVisible(false)
+          setActiveInput(null)
+          setHighlightedConditionPath(null)
+        }
+        hasPendingValueRef.current = false
+        onApplyRef.current?.(filtersRef.current)
+      }, 0)
+    },
+    [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath]
+  )
 
   const handleGroupFreeformChange = useCallback(
     (_path: number[], value: string) => {
@@ -341,15 +356,16 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleLogicalOperatorChange = useCallback(
     (path: number[]) => {
+      if (isRootOperatorLocked && path.length === 0) return
       const updatedFilters = updateNestedLogicalOperator(filters, path)
       commitFilters(updatedFilters)
     },
-    [filters, commitFilters]
+    [filters, commitFilters, isRootOperatorLocked]
   )
 
   const handleRemoveCondition = useCallback(
     (path: number[]) => {
-      const updatedFilters = removeFromGroup(filters, path)
+      const updatedFilters = removeConditionAndEmptiedGroups(filters, path)
       commitFilters(updatedFilters)
       setActiveInput(null)
     },
@@ -401,6 +417,8 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     optionsError,
 
     supportsOperators,
+    newGroupPosition,
+    isRootOperatorLocked,
     variant,
     actions,
     icon,

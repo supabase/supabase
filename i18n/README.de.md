@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) ist eine Open-Source-Alternative zu Firebase. Wir bauen die Funktionen von Firebase mit Open-Source-Tools für Unternehmen auf.
 
-- [x] Gehostete Postgres-Datenbank. [Docs](https://supabase.com/docs/guides/database)
+- [x] Gehostete Postgres-Datenbank. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Authentifizierung und Autorisierung. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generierte APIs.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase ist eine Kombination aus Open-Source-Tools. Wir entwickeln die Funktion
 **Architektur**
 
 Supabase ist eine [gehostete Plattform](https://supabase.com/dashboard). Sie können sich anmelden und Supabase verwenden, ohne etwas zu installieren.
-Sie können auch [selbst hosten](https://supabase.com/docs/guides/hosting/overview) und [lokal entwickeln](https://supabase.com/docs/guides/local-development).
+Sie können auch [selbst hosten](https://supabase.com/docs/guides/self-hosting) und [lokal entwickeln](https://supabase.com/docs/guides/local-development).
 
 ![Architektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Sie können auch [selbst hosten](https://supabase.com/docs/guides/hosting/overvi
 - [Realtime](https://github.com/supabase/realtime) ist ein Elixir-Server, mit dem Sie PostgreSQL-Einsätze, -Updates und -Löschvorgänge über Websockets abhören können. Realtime fragt die in Postgres eingebaute Replikationsfunktionalität nach Datenbankänderungen ab, konvertiert die Änderungen in JSON und sendet dann das JSON über Websockets an autorisierte Clients.
 - [PostgREST](http://postgrest.org/) ist ein Webserver, der Ihre PostgreSQL-Datenbank direkt in eine RESTful API verwandelt
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ist eine PostgreSQL-Erweiterung, die eine GraphQL-API bereitstellt
-- [Storage](https://github.com/supabase/storage-api) bietet eine RESTful-Schnittstelle für die Verwaltung von Dateien, die in S3 gespeichert sind, und nutzt Postgres für die Verwaltung von Berechtigungen.
+- [Storage](https://github.com/supabase/storage) bietet eine RESTful-Schnittstelle für die Verwaltung von Dateien, die in S3 gespeichert sind, und nutzt Postgres für die Verwaltung von Berechtigungen.
 - [postgres-meta](https://github.com/supabase/postgres-meta) ist eine RESTful-API für die Verwaltung von Postgres, mit der Sie Tabellen abrufen, Rollen hinzufügen, Abfragen ausführen können usw.
 - [GoTrue](https://github.com/netlify/gotrue) ist eine SWT-basierte API für die Verwaltung von Benutzern und die Ausgabe von SWT-Tokens.
 - [Kong](https://github.com/Kong/kong) ist ein Cloud-natives API-Gateway.
@@ -79,14 +79,14 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
     <th>Client</th>
     <th colspan="5">Feature-Clients (gebündelt im Supabase-Client)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -100,9 +100,9 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ Offiziell ⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -121,12 +121,12 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚 Gemeinschaft 💚</th>
-  
+
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -205,7 +205,7 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

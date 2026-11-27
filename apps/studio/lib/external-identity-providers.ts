@@ -37,7 +37,7 @@ export const GITHUB_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
   iconPath: '/img/icons/github-icon.svg',
   showOnSignIn: true,
   showOnSignUp: true,
-  showInAccountPreferences: false,
+  showInAccountPreferences: true,
 }
 
 export const CHATGPT_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
@@ -47,7 +47,7 @@ export const CHATGPT_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
   iconPath: '/img/icons/openai-icon.svg',
   showOnSignIn: true,
   showOnSignUp: true,
-  showInAccountPreferences: false,
+  showInAccountPreferences: true,
 }
 
 // Registry of every known provider, independent of which are currently enabled. Used for config and

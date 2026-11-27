@@ -1,10 +1,39 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { paths } from 'api-types'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 import { toWebHandler } from '@/compat/next/api'
-import nextHandler from '@/pages/api/platform/projects/[ref]/billing/addons'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
-const handler = toWebHandler(nextHandler)
+const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method } = req
+
+  switch (method) {
+    case 'GET':
+      return handleGet(req, res)
+    default:
+      res.setHeader('Allow', ['GET'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  }
+}
+
+type ResponseData =
+  paths['/platform/projects/{ref}/billing/addons']['get']['responses']['200']['content']['application/json']
+
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+  const response: ResponseData = {
+    ref: '',
+    selected_addons: [],
+    available_addons: [],
+  }
+
+  return res.status(200).json(response)
+}
+
+const webHandler = toWebHandler(nextHandler)
 
 export const Route = createFileRoute('/api/platform/projects/$ref/billing/addons')({
-  server: { handlers: { GET: handler } },
+  server: { handlers: { GET: webHandler } },
 })

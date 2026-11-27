@@ -119,7 +119,7 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          track('realtime_inspector_broadcast_sent')
+          track('realtime_inspector_broadcast_submitted')
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com)是一個開源的 Firebase 替代品。我們正在使用企業級的開源工具構建 Firebase 的功能。
 
-- [x] 托管的 Postgres 資料庫。[文檔](https://supabase.com/docs/guides/database)
+- [x] 托管的 Postgres 資料庫。[文檔](https://supabase.com/docs/guides/database/overview)
 - [x] 認證和授權。[文檔](https://supabase.com/docs/guides/auth)
 - [x] 自動生成的 API。
   - [x] REST.[文檔](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase 是一個開源工具的组合。我們正在使用企業級的開源�
 **架構**
 
 Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註冊並開始使用 Supabase，無需安裝任何東西。
-你也可以[自行托管](https://supabase.com/docs/guides/hosting/overview)和[本地開發](https://supabase.com/docs/guides/local-development)。
+你也可以[自行托管](https://supabase.com/docs/guides/self-hosting)和[本地開發](https://supabase.com/docs/guides/local-development)。
 
 ![架構](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
 - [Realtime](https://github.com/supabase/realtime)是一個 Elixir 服務器，允許你使用 websockets 監聽 PostgreSQL 的插入、更新和刪除。Realtime 對 Postgres 内置的複製功能進行投票，以了解資料庫的數位化，將變化轉换為 JSON，然后通過 websockets 將 JSON 廣播邊授權客户。
 - [PostgREST](http://postgrest.org/)是一個網路服務器，它把你的 PostgreSQL 資料庫直接變成一個 RESTful API。
 - [pg_graphql](http://github.com/supabase/pg_graphql/)是一個 PostgreSQL 邊擴展，暴露了一個 GraphQL API。
-- [Storage](https://github.com/supabase/storage-api) 提供了一個 RESTful 接口來管理存儲在 S3 中的文件，使用 Postgres 來管理權限。
+- [Storage](https://github.com/supabase/storage) 提供了一個 RESTful 接口來管理存儲在 S3 中的文件，使用 Postgres 來管理權限。
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一個用於管理你的 Postgres 的 RESTful API，允許你獲取表、添加角色和運行查詢等。
 - [GoTrue](https://github.com/netlify/gotrue) 是一個基於 SWT 的 API，用於管理用户和發行 SWT 令牌。
 - [Kong](https://github.com/Kong/kong)是一個雲原生 API 網關。
@@ -79,14 +79,14 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <th>客户端</th>
     <th colspan="5">特徵-客户端(捆绑在Supabase客户端中)</th>
   </tr>
-  
+
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -100,9 +100,9 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  
+
   <th colspan="7">⚡️ 官方⚡️</th>
-  
+
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -121,12 +121,12 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  
+
   <th colspan="7">💚社群 💚</th>
-  
+
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -205,7 +205,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-  
+
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->

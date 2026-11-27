@@ -36,7 +36,6 @@ import {
 import { NoticeBar } from './ui/NoticeBar'
 import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
-import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
   useDiskAttributesQuery,
@@ -54,6 +53,7 @@ import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -143,6 +143,7 @@ export function DiskManagementForm({
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
     : undefined
+  const { limits: projectDiskLimits, isPerInstance } = useProjectDiskLimits()
 
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
@@ -164,6 +165,8 @@ export function DiskManagementForm({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
         isSpendCapEnabled,
+        currentComputeSize: computeSize,
+        currentInstanceLimits: isPerInstance ? projectDiskLimits : undefined,
       })
     ),
     defaultValues,
@@ -570,13 +573,7 @@ export function DiskManagementForm({
               transition={{ duration: 0.1, delay: 0.2 }}
               className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
             >
-              <div
-                className={cn(
-                  'mx-auto w-full max-w-[1200px]',
-                  PADDING_CLASSES,
-                  'flex items-center justify-end gap-3'
-                )}
-              >
+              <PageContainer className="flex items-center justify-end gap-3">
                 <BillingChangeBadge
                   show={isDirty}
                   beforePrice={totalBeforePrice}
@@ -595,7 +592,7 @@ export function DiskManagementForm({
                   setIsDialogOpen={setIsDialogOpen}
                   message={message}
                 />
-              </div>
+              </PageContainer>
             </motion.div>
           ) : null}
         </AnimatePresence>

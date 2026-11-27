@@ -1,9 +1,12 @@
-import { Fragment } from 'react'
+import { Fragment, type ComponentProps } from 'react'
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger } from 'ui'
 
 import type { OnboardingSurveyOption } from './OnboardingSurvey.constants'
 
-type OnboardingSurveySelectProps = {
+type OnboardingSurveySelectProps = Omit<
+  ComponentProps<typeof SelectTrigger>,
+  'value' | 'children' | 'className'
+> & {
   value: string
   onValueChange: (value: string) => void
   options: readonly OnboardingSurveyOption[]
@@ -13,18 +16,20 @@ type OnboardingSurveySelectProps = {
 /**
  * Single-choice survey question. The trigger shows only the selected label;
  * the list puts opt-out answers (Prefer not to say) below a divider.
+ * Other props go to the trigger: FormControl passes the id that ties it to its label.
  */
 export function OnboardingSurveySelect({
   value,
   onValueChange,
   options,
   placeholder = 'Select an option',
+  ...triggerProps
 }: OnboardingSurveySelectProps) {
   const selectedOption = options.find((option) => option.value === value)
 
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full">
+      <SelectTrigger {...triggerProps} className="w-full">
         {selectedOption ? (
           <span className="truncate text-foreground">{selectedOption.label}</span>
         ) : (

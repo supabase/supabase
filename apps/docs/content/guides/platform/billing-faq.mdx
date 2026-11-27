@@ -64,7 +64,7 @@ Read more about [Compute usage](/docs/guides/platform/manage-your-usage/compute)
 
 ### What is egress and how is it billed?
 
-Egress refers to the total bandwidth (network traffic) quota available to each organization. This quota can be used for various purposes such as Storage, Realtime, Auth, Functions, Supavisor, Log Drains and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
+Egress refers to the total bandwidth (network traffic) quota available to each organization. This quota can be used for various purposes such as Storage, Realtime, Auth, Functions, [Supavisor](https://supabase.github.io/supavisor/), Log Drains and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
 
 We differentiate between cached (served via our CDN from cache hits) and uncached egress and give quotas for each type and have varying pricing (cached egress is cheaper). Cached egress only applies to Storage.
 
@@ -136,7 +136,7 @@ The Fair Use Policy is generally applied to all projects of the restricted organ
 
 ### How can I remove restrictions applied from the Fair Use Policy?
 
-To remove restrictions, you will need to address the issue that caused the restriction. This could be reducing your usage, paying overdue invoices, updating your payment method, or any other issue that caused the restriction. Once the issue is resolved, the restriction will be lifted.
+To remove restrictions, you will need to address the issue that caused the restriction. This could be reducing your usage, paying overdue invoices, updating your payment method, or any other issue that caused the restriction. Once the issue is resolved, the restriction will be lifted. The support team cannot extend grace periods or make exceptions to applied restrictions.
 
 Restrictions due to usage limits are lifted once your quota refills at the start of the next billing cycle. Note that there may be a short delay after your billing period resets before restrictions are fully lifted. You can see when your current billing cycle ends on the [billing page](/dashboard/org/_/billing) under "Upcoming Invoice". You can also lift restrictions immediately by [upgrading](/dashboard/org/_/billing?panel=subscriptionPlan) to Pro (if on Free Plan) or by [disabling spend cap](/dashboard/org/_/billing?panel=costControl) (if on Pro Plan with spend cap enabled).
 
@@ -294,7 +294,7 @@ If you purchase a prepaid top up or credit package, tax is assessed at the time 
 
 ### Are marketplace purchases affected?
 
-If you use Supabase through a cloud marketplace such as AWS Marketplace or Vercel Marketplace, the marketplace provider handles tax collection and remittance. In those cases, Supabase does not separately charge tax on marketplace-billed invoices.
+If you use Supabase through a cloud marketplace such as AWS Marketplace or [Vercel Marketplace](/docs/guides/integrations/vercel-marketplace), the marketplace provider handles tax collection and remittance. In those cases, Supabase does not separately charge tax on marketplace-billed invoices.
 
 ### Who should I contact with questions about tax?
 

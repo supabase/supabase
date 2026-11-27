@@ -167,10 +167,11 @@ describe('Warehouse Flight SQL connections', () => {
     const hostname = `project-ref.warehouse.${domain}`
     expect(warehouse.getWarehouseFlightSqlEndpoint('project-ref')).toBe(hostname)
     expect(warehouse.getWarehouseFlightSqlConnectionString('project-ref')).toBe(
-      `flightsql://postgres:[YOUR-PASSWORD]@${hostname}:443?tls=enabled`
+      `flightsql://postgres:[YOUR-DATABASE-PASSWORD]@${hostname}:443?tls=enabled`
     )
-    expect(warehouse.getWarehouseUsqlCommand('project-ref')).toBe(
-      `usql -X -W 'flightsql://postgres@${hostname}:443?tls=enabled'`
+    expect(warehouse.getWarehouseDatabowCommand('project-ref')).toBe(
+      `# Install Databow: https://docs.columnar.tech/databow/installation/
+databow --driver flightsql --uri 'grpc+tls://${hostname}:443' --username postgres --password '[YOUR-DATABASE-PASSWORD]'`
     )
   })
 })

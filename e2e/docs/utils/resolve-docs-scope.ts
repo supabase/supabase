@@ -26,6 +26,9 @@ export const GUIDE_LIST_COMPONENT_PAGES = [
   '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
 ]
 
+// the nav disables these guides, so the docs app returns 404 for their html page
+const NAV_DISABLED_PAGES = new Set(['/docs/guides/ai-tools/agent-feedback'])
+
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
 const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/g
 
@@ -270,7 +273,7 @@ export async function resolveDocsScope(
   const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
   const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
   const selectedPages = [...pages]
-    .filter((page) => !requiredPages.has(page))
+    .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
     .sort()
     .slice(0, remainingSlots)
   const sorted = [...selectedRequiredPages, ...selectedPages].sort()
@@ -291,8 +294,9 @@ export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
 
   for (const file of guideFiles) {
     const relFromGuides = normalizeRepoPath(relative(guidesDir, file)).replace(/\.mdx$/, '')
-    if (isFederatedGuideSlug(relFromGuides)) continue
-    pages.add(`${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`)
+    const page = `${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`
+    if (isFederatedGuideSlug(relFromGuides) || NAV_DISABLED_PAGES.has(page)) continue
+    pages.add(page)
   }
 
   return [...pages].sort()

@@ -48,15 +48,16 @@ export const SSLConfiguration = () => {
   const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
   const isSuccess = isHighAvailability || isSSLEnforcementSuccess
   const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
-  const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
-    useSSLEnforcementUpdateMutation({
+  const { mutate: updateSSLEnforcement, isPending: isSubmitting } = useSSLEnforcementUpdateMutation(
+    {
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
         toast.error(`Failed to update SSL enforcement: ${error.message}`)
       },
-    })
+    }
+  )
 
   const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE
@@ -121,9 +122,18 @@ export const SSLConfiguration = () => {
     [sslCertificateUrlTemplate, env]
   )
 
-  const toggleSSLEnforcement = async () => {
+  const setSSLEnforcement = (isTargetEnforced: boolean) => {
     if (!ref) return console.error('Project ref is required')
-    await updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
+    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: isTargetEnforced } })
+  }
+
+  // Only enabling enforcement closes existing connections, so only enabling needs a confirmation
+  const handleSwitchChange = (isChecked: boolean) => {
+    if (isChecked) {
+      setIsConfirmDialogOpen(true)
+    } else {
+      setSSLEnforcement(false)
+    }
   }
 
   return (
@@ -164,7 +174,7 @@ export const SSLConfiguration = () => {
                           size="large"
                           checked={isEnforced}
                           disabled={isSwitchDisabled}
-                          onCheckedChange={() => setIsConfirmDialogOpen(true)}
+                          onCheckedChange={handleSwitchChange}
                         />
                       </div>
                     </TooltipTrigger>
@@ -183,9 +193,8 @@ export const SSLConfiguration = () => {
               <SSLEnforcementConfirmDialog
                 open={isConfirmDialogOpen}
                 onOpenChange={setIsConfirmDialogOpen}
-                isTargetEnforced={!isEnforced}
                 isSubmitting={isSubmitting}
-                onConfirm={toggleSSLEnforcement}
+                onConfirm={() => setSSLEnforcement(true)}
               />
             </FormLayout>
             {isSSLEnforcementSuccess && !sslEnforcementConfiguration.appliedSuccessfully && (

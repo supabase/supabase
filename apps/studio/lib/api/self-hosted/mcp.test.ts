@@ -86,6 +86,40 @@ describe('api/self-hosted/mcp', () => {
     })
   })
 
+  describe('getDevelopmentOperations.generateTypescriptTypes', () => {
+    let generateTypescriptTypesMock: ReturnType<typeof vi.fn>
+    const headers = { Authorization: 'Bearer token' }
+
+    beforeEach(async () => {
+      const generateTypes = await import('./generate-types')
+      generateTypescriptTypesMock = vi.mocked(generateTypes.generateTypescriptTypes)
+      generateTypescriptTypesMock.mockReset()
+      generateTypescriptTypesMock.mockResolvedValue({ types: 'export type T = {}' })
+    })
+
+    it('forwards the requested schemas and the headers to the helper', async () => {
+      const ops = getDevelopmentOperations({ headers })
+      const result = await ops.generateTypescriptTypes('default', {
+        schemas: ['public', 'private'],
+      })
+
+      expect(result).toEqual({ types: 'export type T = {}' })
+      expect(generateTypescriptTypesMock).toHaveBeenCalledWith(
+        expect.objectContaining({ headers, schemas: ['public', 'private'] })
+      )
+    })
+
+    it('calls the helper with schemas undefined when no options are given', async () => {
+      const ops = getDevelopmentOperations({ headers })
+      const result = await ops.generateTypescriptTypes('default')
+
+      expect(result).toEqual({ types: 'export type T = {}' })
+      const [options] = generateTypescriptTypesMock.mock.lastCall!
+      expect(options.headers).toBe(headers)
+      expect(options.schemas).toBeUndefined()
+    })
+  })
+
   describe('getDebuggingOperations', () => {
     let retrieveAnalyticsDataMock: ReturnType<typeof vi.fn>
 

@@ -20,12 +20,12 @@ import {
 
 import { gettingStarted } from '@/config/docs'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '@/config/library'
-import { useFramework } from '@/context/framework-context'
+import { useFrameworkPreference } from '@/context/framework-preference-context'
 import { cn } from '@/lib/utils'
 
 export function CommandMenu({ ...props }: DialogProps) {
   const router = useRouter()
-  const { framework } = useFramework()
+  const { framework } = useFrameworkPreference()
   const [open, setOpen] = React.useState(false)
   const { setTheme } = useTheme()
 
