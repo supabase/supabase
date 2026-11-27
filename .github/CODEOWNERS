@@ -3,11 +3,15 @@
 /packages/shared-data/plans.ts @supabase/billing
 /packages/shared-data/scoped-access-token-permissions.ts @supabase/Dashboard @supabase/docs
 /packages/common/telemetry-constants.ts @supabase/growth-eng
+/packages/common/posthog-client* @supabase/growth-eng
+/packages/common/telemetry-event* @supabase/growth-eng
+/.agents/skills/telemetry-standards/ @supabase/growth-eng
 /packages/dev-tools/ @supabase/growth-eng
 # /packages/pg-meta @supabase/postgres @avallete
 /packages/ui-patterns @supabase/design
 
 /apps/studio/ @supabase/Dashboard
+/apps/studio/lib/session-replay* @supabase/Dashboard @supabase/growth-eng
 
 /apps/docs/ @supabase/docs
 /apps/docs/content/guides/self-hosting* @supabase/docs @supabase/self-hosted
@@ -47,9 +51,3 @@
 /apps/studio/routes/api/ai/                                         @supabase/ai
 
 /packages/shared-data/compute-disk-limits.ts @supabase/platform
-
-# Growth Eng reviews telemetry senders for event volume/cost
-/packages/common/posthog-client*      @supabase/growth-eng
-/packages/common/telemetry-event*     @supabase/growth-eng
-/apps/studio/lib/session-replay*      @supabase/Dashboard @supabase/growth-eng
-/.agents/skills/telemetry-standards/  @supabase/growth-eng
