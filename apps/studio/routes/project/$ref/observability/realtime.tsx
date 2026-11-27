@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -22,6 +21,7 @@ import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { realtimeReports } from '@/data/reports/v2/realtime.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -59,6 +59,7 @@ const RealtimeUsage = () => {
     setShowUpgradePrompt,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const formatDateTime = useFormatDateTime()
   const queryClient = useQueryClient()
   const {
     data,
@@ -177,13 +178,13 @@ const RealtimeUsage = () => {
               {selectedDateRange && (
                 <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_start.date, 'MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_end.date, 'MMM D, h:mma')}
                   </p>
                 </div>
               )}
