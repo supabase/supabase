@@ -1,4 +1,4 @@
-import { useFlag } from 'common'
+import { PERMISSION_MODE_LABEL } from 'shared-data/scoped-access-token-permissions'
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -11,16 +11,13 @@ export function TemporaryAccessPasswordNote() {
     meta: { isGrantMode },
   } = useTemporaryAccessConnection()
 
-  const scopedTokensEnabled = useFlag('scopedPAT')
-
   if (!isGrantMode) return null
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
       Use a <InlineLink href="/account/tokens">personal access token</InlineLink> as the database
-      password.
-      {scopedTokensEnabled &&
-        ' Choose this project and include the “Database token access” permission.'}
+      password. When creating a token, select this project and set “Database token access” to{' '}
+      {`“${PERMISSION_MODE_LABEL.read}”.`}
     </p>
   )
 }
