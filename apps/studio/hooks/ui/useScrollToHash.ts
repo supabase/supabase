@@ -1,3 +1,4 @@
+import { useReducedMotion } from 'motion/react'
 import { useEffect } from 'react'
 
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
@@ -6,14 +7,17 @@ const SCROLL_TIMEOUT_MS = 5000
 
 export const useScrollToHash = () => {
   const mainScrollContainer = useMainScrollContainer()
+  const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
     const hash = window.location.hash.slice(1)
     if (!hash) return
 
+    const behavior = shouldReduceMotion ? 'auto' : 'smooth'
+
     const scrollToElement = (element: HTMLElement) => {
       if (!mainScrollContainer) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        element.scrollIntoView({ behavior, block: 'start' })
         return
       }
 
@@ -24,7 +28,7 @@ export const useScrollToHash = () => {
         mainScrollContainer.getBoundingClientRect().top -
         scrollMarginTop
 
-      mainScrollContainer.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+      mainScrollContainer.scrollTo({ top: Math.max(0, top), behavior })
     }
 
     const tryScroll = () => {
@@ -46,5 +50,5 @@ export const useScrollToHash = () => {
       observer.disconnect()
       clearTimeout(timeout)
     }
-  }, [mainScrollContainer])
+  }, [mainScrollContainer, shouldReduceMotion])
 }
