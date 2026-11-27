@@ -2,6 +2,7 @@ services:
 
   rustfs:
     image: rustfs/rustfs:1.0.6
+    restart: unless-stopped
     environment:
       RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
       RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
