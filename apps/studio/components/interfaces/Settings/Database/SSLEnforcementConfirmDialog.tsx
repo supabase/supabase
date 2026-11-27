@@ -35,9 +35,9 @@ export const SSLEnforcementConfirmDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       {children !== undefined && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="tiny">
         <AlertDialogHeader>
-          <AlertDialogTitle>Updating SSL enforcement involves a brief downtime</AlertDialogTitle>
+          <AlertDialogTitle>Update SSL enforcement?</AlertDialogTitle>
           <AlertDialogDescription>
             A database restart is required for SSL enforcement changes to take place, and this
             involves a few minutes of downtime. Confirm to proceed now?
