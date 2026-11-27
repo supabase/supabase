@@ -16,11 +16,15 @@ reviewing PRs that touch tracking or when implementing new tracking.
 
 **Format:** `[object]_[verb]` in snake_case
 
-**Approved verbs only** (canonical list — derived from `packages/common/telemetry-constants.ts`):
+**Approved verbs only:**
 opened, clicked, submitted, created, removed, updated, evaluated, added,
 enabled, disabled, copied, exposed, failed, closed, completed, applied
 
+This list is the authority. `packages/common/telemetry-constants.ts` still holds older events with other verbs, so don't take a verb from an existing event.
+
 `created` is for a new named resource, `added` for content put into an existing one. `evaluated` is for a decision the system made, not a user action.
+
+`clicked` and `submitted` name the user's action and fire in its handler. The other verbs name a result and fire once it has happened.
 
 **Flag these:**
 
@@ -37,6 +41,7 @@ enabled, disabled, copied, exposed, failed, closed, completed, applied
 **Common mistakes with corrections:**
 
 - `database_saved` → `save_button_clicked` or `database_updated` (unapproved verb)
+- `snippet_moved` → `snippet_folder_updated` (unapproved verb: a move updates where the item lives)
 - `click_backup_button` → `backup_button_clicked` (wrong order)
 - `dashboardViewed` → don't track passive views on page load
 - `component_rendered` → don't track — no user interaction
@@ -159,6 +164,7 @@ Where the `track()` call goes:
 - **Conditionally rendered elements.** A `track()` call on an element that renders only for some items (a link rendered only when the item has an `href`, for example) never fires for the others, and they read as zero. Put the call on an element every item renders.
 - **Debounced or delayed sends.** `useTrack` reads the project, org and pathname when the event is sent, not when the user acted. An event sent from a debounce or timer that outlives a navigation is attributed to the destination page. Send on the action where possible. When the send has to wait, the third argument can pin the project or org, but the page cannot be overridden.
 - **Events sent just before leaving the page.** A request started right before a full-page navigation (an external link, an OAuth redirect) can be cancelled. Add the event's action to `KEEPALIVE_ACTIONS` in `packages/common/telemetry-event.ts`. Never turn keepalive on for every event: the browser's in-flight keepalive budget is small and shared, so other events would be dropped.
+- **Actions that change nothing.** An event named for a result (`closed`, `removed`, `updated`) fires only when the handler changed something. Bulk and menu actions can run on nothing: Close Others with one tab open, a move into the folder the items are already in, a sort set to its current value. Guard the `track()` call on the items that will change, not on the click. A count property reports the items that changed, not the items selected.
 
 ## Feature Flag Measurement
 
@@ -266,4 +272,4 @@ To add tracking for a user action:
 2. **Choose properties**: [Property Standards](#property-standards) and both Privacy sections. Search `packages/common/telemetry-constants.ts` for similar events and match their property names and casing
 3. **Define the event**: [Event Definitions](#event-definitions)
 4. **Call `track()`**: [Required Pattern](#required-pattern), plus [Feature Flag Measurement](#feature-flag-measurement) when a flag gates the behavior
-5. **Verify**: in the browser network tab, the action sends one `telemetry/event` request with the expected properties
+5. **Verify**: in the browser network tab, the action sends one `telemetry/event` request with the expected properties, and the same action with nothing to change (nothing to close, the same value picked again, a cancelled confirmation) sends none
