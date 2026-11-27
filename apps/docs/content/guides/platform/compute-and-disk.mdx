@@ -88,13 +88,15 @@ The following sections explain how these attributes affect disk performance.
 
 ### Compute size
 
-The compute size of your project affects the effective disk throughput and IOPS. The table below shows the baseline (sustained) limits and the burst (maximum) limits for each compute size. These values are minimums: every project of a given compute size gets at least these limits, and depending on the configuration your project runs on, the actual limits can be higher. For instance, an 8XL compute instance has a throughput of at least 1,188 MB/s and IOPS of at least 40,000.
+The compute size of your project affects the effective disk throughput and IOPS. The table below shows the baseline (sustained) limits and the burst (maximum) limits for each compute size. These values describe what the compute instance can deliver, which may be higher depending on how your project is configured. They do not set your disk's IOPS or throughput. See [Provisioned disk throughput and IOPS](#provisioned-disk-throughput-and-iops). For instance, an 8XL compute instance supports a throughput of at least 1,188 MB/s and IOPS of at least 40,000.
 
 <ComputeDiskLimitsTable />
 
+Effective IOPS and throughput are the lower of the instance limits in this table and your disk's provisioned values. On gp3 the disk defaults to 3,000 IOPS and 125 MB/s, so a 4XL on a default disk gets 3,000 IOPS until more is provisioned. Additional IOPS and throughput are billed, see [Disk types](#disk-types) for pricing.
+
 Compute sizes up to 2XL can burst above their baseline for short periods of time, drawing on a disk IO budget. Once the budget is exhausted, performance returns to baseline. If you need consistent disk performance, consider upgrading your compute size.
 
-Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). From 8XL, baseline and maximum are the same, so performance does not depend on burst capacity. If you hit your IOPS or throughput limit, throttling will occur.
+Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. Your disk's IOPS and throughput are configured separately in your project's [Infrastructure settings](/dashboard/project/_/settings/infrastructure). See [Manage Disk IOPS usage](/docs/guides/platform/manage-your-usage/disk-iops) and [Manage Disk Throughput usage](/docs/guides/platform/manage-your-usage/disk-throughput) for pricing. On larger sizes like 4XL and above, baseline and maximum are the same, so performance does not depend on burst capacity. If you hit your IOPS or throughput limit, throttling will occur.
 
 ### Choosing the right compute instance for consistent disk performance
 
