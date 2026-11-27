@@ -1,0 +1,15 @@
+---
+title: How much does egress cost on Supabase?
+topics: ['Platform', 'Database']
+lastEdited: 2026-11-27
+---
+
+Nothing, up to your plan's quota. The Free plan includes for free 5 GB of egress plus 5 GB of cached egress a month, and the Pro and Team plans include 250 GB of each. Beyond that, organizations on the Pro and Team plans pay $0.09 per GB for egress and $0.03 per GB for cached egress. The Free plan is never billed for egress.
+
+Cached egress is data served from the CDN cache, which applies to Storage. If your app serves public files like images or downloads, that traffic can land in the cached quota at the lower rate.
+
+The quota is per organization, not per project. So adding projects doesn't add egress cost until the organization's total passes the quota. As an example, a Pro organization with the spend cap off that uses 400 GB of uncached egress in a month pays $13.50 for the extra 150 GB.
+
+On the Pro plan, the spend cap is on by default, so you are never charged for extra egress unless you turn it off. See [What happens when I go over my egress quota on Supabase?](/kb/faqs/platform/exceed-egress-quota) for what happens instead.
+
+The [pricing page](https://supabase.com/pricing) has the current numbers, and the [egress usage guide](/docs/guides/platform/manage-your-usage/egress) shows where your egress comes from and how to reduce it.
