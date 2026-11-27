@@ -97,6 +97,7 @@ const BRANCH: BranchResponse = {
 
 const CONNECTION: ListGitHubConnectionsResponse['connections'][number] = {
   branch_limit: 0,
+  comment_on_no_changes: true,
   id: CONNECTION_ID,
   inserted_at: '2025-01-01T00:00:00Z',
   installation_id: 1,
