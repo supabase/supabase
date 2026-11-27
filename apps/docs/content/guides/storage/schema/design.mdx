@@ -28,6 +28,8 @@ erDiagram
     bigint file_size_limit
     text[] allowed_mime_types
     text owner_id
+    text versioning_status
+    jsonb lifecycle_configuration
   }
   objects {
     uuid id PK
@@ -39,6 +41,9 @@ erDiagram
     text[] path_tokens
     text version
     text owner_id
+    timestamptz archived_at
+    boolean is_delete_marker
+    boolean is_versioned
   }
   migrations {
     integer id PK
@@ -55,6 +60,8 @@ The schema centers on three tables. Each `buckets` row can own many `objects` ro
 | `buckets`    | Bucket configuration: its `id` and `name`, whether the bucket is `public`, and constraints such as `file_size_limit` and `allowed_mime_types`. |
 | `objects`    | Per-file metadata: the owning `bucket_id`, the object `name` and `path_tokens`, a `metadata` JSON blob, and version information.               |
 | `migrations` | The schema migrations applied to the storage service. This table is standalone.                                                                |
+
+In a bucket with [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, each version of an object is a separate `objects` row, and `archived_at` is `null` only for the current version.
 
 ## Modifying the schema
 

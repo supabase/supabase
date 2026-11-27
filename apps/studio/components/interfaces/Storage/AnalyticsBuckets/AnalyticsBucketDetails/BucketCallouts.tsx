@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
-import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
@@ -31,7 +31,7 @@ export const ExtensionNotInstalled = ({
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Missing required extension">
           <p>
             The Wrappers extension is required in order to query analytics tables.{' '}
@@ -59,7 +59,7 @@ export const ExtensionNotInstalled = ({
             </Link>
           </Button>
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )
@@ -83,7 +83,7 @@ export const ExtensionNeedsUpgrade = ({
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Outdated extension version">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
@@ -108,7 +108,7 @@ export const ExtensionNeedsUpgrade = ({
             </Link>
           </Button>
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )
@@ -131,7 +131,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
           <Button
@@ -151,7 +151,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
             fallback="They're needed to set up the Iceberg Wrapper."
           />
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )

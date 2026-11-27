@@ -58,7 +58,7 @@ For the code view, see [`ask-the-docs` `reference/feature-flags.md`](../ask-the-
 
 ## Related skills
 
-- [`ask-the-docs`](../ask-the-docs/SKILL.md) — IA placement and docs-app architecture (Shape stage). Cross-repo **product** lookup lives here in `universe-lookup.md`, not in `ask-the-docs`.
+- [`ask-the-docs`](../ask-the-docs/SKILL.md) — docs-app architecture and IA placement mechanics, such as nav registration. Cross-repo **product** lookup lives here in `universe-lookup.md`, not in `ask-the-docs`.
 - [`write-the-docs`](../write-the-docs/SKILL.md) — drafting once Frame/Shape are settled
 - [`test-the-docs`](../test-the-docs/SKILL.md) — run snippets against a Docker-isolated local stack; verification report
 - [`edit-the-docs`](../edit-the-docs/SKILL.md) — restructure and improve existing pages

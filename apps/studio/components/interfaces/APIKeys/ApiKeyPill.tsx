@@ -7,6 +7,7 @@ import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } fr
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export function ApiKeyPill({
   apiKey,
@@ -14,6 +15,7 @@ export function ApiKeyPill({
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const [show, setShow] = useState(false)
 
   const isSecret = apiKey.type === 'secret'
@@ -53,6 +55,7 @@ export function ApiKeyPill({
       setShow(false)
       clear()
     } else {
+      track('api_key_reveal_clicked', { keyType: 'secret' })
       setShow(true)
       try {
         await reveal()
@@ -75,6 +78,13 @@ export function ApiKeyPill({
       toast.error('Failed to copy secret API key')
       return ''
     }
+  }
+
+  // Fires after the clipboard write succeeds, so failed writes aren't recorded. A failed reveal
+  // copies an empty string, which isn't a copied key either. Each copy carries its own text, so
+  // overlapping copies can't affect each other.
+  function onCopied(copiedText: string) {
+    if (copiedText) track('api_key_copied', { keyType: apiKey.type })
   }
 
   const isRestricted = isSecret && !isLoadingPermission && !canManageSecretKeys
@@ -139,6 +149,7 @@ export function ApiKeyPill({
             variant="default"
             aria-label="Copy API key"
             asyncText={onCopy}
+            onCopied={onCopied}
             iconOnly
             className="rounded-full px-2 pointer-events-auto"
             disabled={isRestricted || isLoadingPermission}

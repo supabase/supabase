@@ -1,7 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { CheckCircle2Icon, ChevronRightIcon, ChevronsLeftRightIcon } from 'lucide-react'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -98,7 +97,7 @@ export const ProjectClaimConfirm = ({
             </div>
 
             <div className="w-8 h-8">
-              <Image
+              <img
                 src={`${BASE_PATH}/img/supabase-logo.svg`}
                 alt="Supabase Logo"
                 className="w-full h-full"

@@ -1,8 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useEffectEvent, useRef, type PropsWithChildren } from 'react'
+import { lazy, Suspense, useEffect, useEffectEvent, useRef, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -18,17 +17,17 @@ import {
   useSidebarManagerSnapshot,
 } from '@/state/sidebar-manager-state'
 
-const AdvisorPanel = dynamic(() =>
-  import('@/components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
+const AdvisorPanel = lazy(() =>
+  import('@/components/ui/AdvisorPanel/AdvisorPanel').then((m) => ({ default: m.AdvisorPanel }))
 )
-const AIAssistant = dynamic(() =>
-  import('@/components/ui/AIAssistantPanel/AIAssistant').then((m) => m.AIAssistant)
+const AIAssistant = lazy(() =>
+  import('@/components/ui/AIAssistantPanel/AIAssistant').then((m) => ({ default: m.AIAssistant }))
 )
-const EditorPanel = dynamic(() =>
-  import('@/components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
+const EditorPanel = lazy(() =>
+  import('@/components/ui/EditorPanel/EditorPanel').then((m) => ({ default: m.EditorPanel }))
 )
-const HelpPanel = dynamic(() =>
-  import('@/components/ui/HelpPanel/HelpPanel').then((m) => m.HelpPanel)
+const HelpPanel = lazy(() =>
+  import('@/components/ui/HelpPanel/HelpPanel').then((m) => ({ default: m.HelpPanel }))
 )
 
 export const SIDEBAR_KEYS = {
@@ -59,17 +58,46 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
 
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, true)
+  useRegisterSidebar(
+    SIDEBAR_KEYS.AI_ASSISTANT,
+    () => (
+      <Suspense fallback={null}>
+        <AIAssistant />
+      </Suspense>
+    ),
+    {},
+    !!project
+  )
+  useRegisterSidebar(
+    SIDEBAR_KEYS.EDITOR_PANEL,
+    () => (
+      <Suspense fallback={null}>
+        <EditorPanel />
+      </Suspense>
+    ),
+    {},
+    !!project
+  )
+  useRegisterSidebar(
+    SIDEBAR_KEYS.ADVISOR_PANEL,
+    () => (
+      <Suspense fallback={null}>
+        <AdvisorPanel />
+      </Suspense>
+    ),
+    {},
+    true
+  )
   useRegisterSidebar(
     SIDEBAR_KEYS.HELP_PANEL,
     () => (
-      <HelpPanel
-        onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
-        projectRef={project?.ref}
-        supportLinkQueryParams={supportLinkQueryParams}
-      />
+      <Suspense fallback={null}>
+        <HelpPanel
+          onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
+          projectRef={project?.ref}
+          supportLinkQueryParams={supportLinkQueryParams}
+        />
+      </Suspense>
     ),
     {},
     true

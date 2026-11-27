@@ -1,5 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
@@ -11,7 +12,6 @@ import {
   Minimize2Icon,
   SettingsIcon,
 } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button, SuccessCheck, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -24,7 +24,9 @@ import { IS_PLATFORM } from '@/lib/constants'
 
 export const UpgradingState = () => {
   const { ref } = useParams()
-  const queryParams = useSearchParams()
+  const trackingId = useLocation({
+    select: (location) => new URLSearchParams(location.searchStr).get('trackingId'),
+  })
   const { data: project } = useSelectedProjectQuery()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -35,7 +37,7 @@ export const UpgradingState = () => {
     {
       projectRef: ref,
       projectStatus: project?.status,
-      trackingId: queryParams?.get('trackingId'),
+      trackingId,
     },
     {
       enabled: IS_PLATFORM,

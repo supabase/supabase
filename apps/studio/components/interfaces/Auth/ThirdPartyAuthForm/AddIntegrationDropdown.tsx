@@ -1,5 +1,4 @@
 import { ChevronDownIcon } from 'lucide-react'
-import Image from 'next/image'
 import {
   Button,
   cn,
@@ -42,7 +41,7 @@ const ProviderDropdownItem = ({
       className={cn('flex items-center gap-x-2 p-2', disabled && 'cursor-not-allowed')}
       disabled={disabled}
     >
-      <Image src={getIntegrationTypeIcon(type)} width={16} height={16} alt={`${type} icon`} />
+      <img src={getIntegrationTypeIcon(type)} width={16} height={16} alt="" aria-hidden="true" />
       <span>{getIntegrationTypeLabel(type)}</span>
     </DropdownMenuItem>
   )

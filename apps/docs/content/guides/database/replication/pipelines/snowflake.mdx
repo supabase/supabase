@@ -247,7 +247,9 @@ Replicated columns remain nullable in Snowflake, and changes to existing column 
 
 Schema changes also affect stored history. A rename changes the column name in earlier events, and a drop removes its historical values. Adding a column with a supported default can populate older rows. Changing publication column selection can remove values or leave historical gaps; reset the table after such changes before relying on current-state results.
 
-For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support). Keep the primary key and its values stable. Apart from enabling change tracking for a stream, leave managed table and view definitions unchanged. For additional processing, use [separate derived objects](#customize-queries-and-materialization).
+After a source type change, Pipelines usually logs a warning and keeps the existing Snowflake column type. A change to `json` or `jsonb` can stop replication if the existing column uses a type other than `VARIANT`. Use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the affected table.
+
+Keep the primary key and its values stable. Apart from enabling change tracking for a stream, leave managed table and view definitions unchanged. For additional processing, use [separate derived objects](#customize-queries-and-materialization).
 
 ## Query replicated data [#query-and-materialize-current-state]
 

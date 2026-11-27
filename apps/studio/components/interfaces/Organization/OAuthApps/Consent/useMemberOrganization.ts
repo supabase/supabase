@@ -37,6 +37,14 @@ export const useMemberOrganization = ({
   )
 
   return useMemo(() => {
+    if (!request) {
+      return {
+        isPending: true,
+        isError: false,
+        data: null,
+        error: null,
+      }
+    }
     const isProjectScopingModeEnabled = request?.project_scoping_mode
     const needsOrgResolution =
       isProjectScopingModeEnabled && !organizationSlug && projectRef != null

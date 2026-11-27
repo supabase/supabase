@@ -24,7 +24,7 @@ export const Route = createFileRoute('/project/$ref/database/migrations')({
 function MigrationsPage() {
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Migrations</PageHeaderTitle>
@@ -38,7 +38,7 @@ function MigrationsPage() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <Migrations />
