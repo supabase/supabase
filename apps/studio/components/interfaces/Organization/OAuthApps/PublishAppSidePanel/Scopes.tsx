@@ -38,7 +38,7 @@ const Scope = ({
 
   return (
     <div
-      className="grid grid-cols-1 items-start gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_10rem]"
+      className="grid grid-cols-1 items-start gap-3 p-4 sm:gap-5 sm:grid-cols-[minmax(0,1fr)_10rem]"
       key={title}
     >
       <div className="flex min-w-0 flex-col gap-0.5">
