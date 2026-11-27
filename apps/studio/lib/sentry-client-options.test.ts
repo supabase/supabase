@@ -511,7 +511,7 @@ describe('buildSentryClientOptions', () => {
     const { integrations: _next, ...nextRest } = nextOptions
     const { integrations: _tanstack, ...tanstackRest } = tanstackOptions
     expect(Object.keys(nextRest)).toEqual(Object.keys(tanstackRest))
-    expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
+    expect(nextRest.tracesSampler).toBe(tanstackRest.tracesSampler)
     expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
     expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
   })
