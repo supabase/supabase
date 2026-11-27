@@ -19,6 +19,12 @@ import {
   Card,
   CardContent,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -114,12 +120,12 @@ export const JitDbAccessConfiguration = () => {
         const nextEnabled = variables.requestedConfig.state === 'enabled'
 
         if (nextEnabled) {
-          toast.success('Temporary access enabled')
+          toast.success('Token access enabled')
         } else {
           toast.success(
             activeRuleCount > 0
-              ? `Temporary access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
-              : 'Temporary access disabled'
+              ? `Token access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request database access with tokens.`
+              : 'Token access disabled'
           )
         }
       },
@@ -244,13 +250,13 @@ export const JitDbAccessConfiguration = () => {
         return setShowEnableJitDialog(true)
       }
       return void submitJitToggle(true).catch((error) => {
-        toast.error(`Failed to update temporary access: ${getErrorMessage(error)}`)
+        toast.error(`Failed to update token access: ${getErrorMessage(error)}`)
       })
     }
 
     if (!checked && enabled) {
       void submitJitToggle(false).catch((error) => {
-        toast.error(`Failed to update temporary access: ${getErrorMessage(error)}`)
+        toast.error(`Failed to update token access: ${getErrorMessage(error)}`)
       })
     }
   }
@@ -318,12 +324,12 @@ export const JitDbAccessConfiguration = () => {
       ? 'Postgres upgrade required'
       : unavailableReason === 'ssl_enforcement_required'
         ? 'SSL enforcement required'
-        : 'Temporary access unavailable'
+        : 'Token access unavailable'
   const unavailableDescription =
     unavailableReason === 'postgres_upgrade_required'
-      ? 'must be upgraded to Postgres 17 or later before temporary access can be enabled.'
+      ? 'must be upgraded to Postgres 17 or later before token access can be enabled.'
       : unavailableReason === 'ssl_enforcement_required'
-        ? 'must have SSL enforcement enabled before temporary access can be enabled.'
+        ? 'must have SSL enforcement enabled before token access can be enabled.'
         : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
 
   useEffect(() => {
@@ -339,7 +345,7 @@ export const JitDbAccessConfiguration = () => {
           <PageSectionSummary>
             <PageSectionTitle>
               <span className="flex items-center gap-x-4">
-                Temporary access
+                Token access
                 <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS} />
               </span>
             </PageSectionTitle>
@@ -354,8 +360,8 @@ export const JitDbAccessConfiguration = () => {
               title="Managed in the main branch"
               description={
                 <>
-                  Temporary access rules are configured in the main branch and apply across all
-                  preview branches. Return to the{' '}
+                  Member access rules are configured in the main branch and apply across all preview
+                  branches. Return to the{' '}
                   <InlineLink href={`/project/${parentProjectRef}/settings/database`}>
                     main branch
                   </InlineLink>{' '}
@@ -368,7 +374,7 @@ export const JitDbAccessConfiguration = () => {
           {!parentProjectRef && isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
-              subject="Failed to load temporary access"
+              subject="Failed to load token access"
               error={jitDbAccessConfigurationError as { message: string } | null}
               showInstructions={false}
             />
@@ -424,8 +430,9 @@ export const JitDbAccessConfiguration = () => {
               <CardContent className="space-y-4">
                 <FormLayout
                   layout="flex-row-reverse"
-                  label="Allow temporary access"
-                  description="Let project members request temporary database access."
+                  label="Allow token access"
+                  labelClassName="settings-field-title"
+                  description="Allow members and approved apps to connect to this database using access tokens."
                 >
                   <div className="flex w-fit shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
@@ -458,14 +465,14 @@ export const JitDbAccessConfiguration = () => {
                 <Admonition
                   type="warning"
                   layout="horizontal"
-                  title="Temporary access update didn’t apply"
+                  title="Token access update didn’t apply"
                   description={
                     <>
-                      The change didn’t apply. Try enabling or disabling temporary access again, or{' '}
+                      The change didn’t apply. Try enabling or disabling token access again, or{' '}
                       <SupportLink
                         queryParams={{
                           category: SupportCategories.DASHBOARD_BUG,
-                          subject: 'Temporary access was not updated successfully',
+                          subject: 'Token access was not updated successfully',
                         }}
                         className={InlineLinkClassName}
                       >
@@ -485,7 +492,7 @@ export const JitDbAccessConfiguration = () => {
               {isErrorJitMembers && (
                 <AlertError
                   projectRef={ref}
-                  subject="Failed to load temporary access rules"
+                  subject="Failed to load member access rules"
                   error={jitMembersError as { message: string } | null}
                   showInstructions={false}
                 />
@@ -501,6 +508,36 @@ export const JitDbAccessConfiguration = () => {
                 onEditRule={openEditRuleSheet}
                 onDeleteRule={openDeleteDialog}
               />
+
+              <Card>
+                <CardContent className="space-y-4 p-0">
+                  <div className="px-4 pb-2 pt-6">
+                    <h3 className="settings-field-title text-foreground">App access</h3>
+                    <p className="text-sm text-foreground-lighter">
+                      Apps that use access tokens to connect to this database.
+                    </p>
+                  </div>
+                  <Table className="border-t">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>App</TableHead>
+                        <TableHead>Access level</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow className="[&>td]:hover:bg-inherit">
+                        <TableCell colSpan={2}>
+                          <p className="text-sm text-foreground">No apps connected</p>
+                          <p className="text-sm text-foreground-lighter">
+                            Connect through a supported partner app and authorize access to
+                            Supabase.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             </>
           )}
         </PageSectionContent>
@@ -530,9 +567,9 @@ export const JitDbAccessConfiguration = () => {
             <AlertDialogDescription asChild>
               <div className="text-sm">
                 <p>
-                  Enabling temporary access will allow {activeRuleCount} pre-configured member
+                  Enabling token access will allow {activeRuleCount} pre-configured member
                   {activeRuleCount === 1 ? '' : <span>s</span>}{' '}
-                  <span>to request temporary database access immediately.</span>
+                  <span>to request database access with tokens immediately.</span>
                 </p>
               </div>
             </AlertDialogDescription>
@@ -541,7 +578,7 @@ export const JitDbAccessConfiguration = () => {
             <AlertDialogBody>
               <Admonition
                 type="destructive"
-                title="Unable to enable temporary access"
+                title="Unable to enable token access"
                 description={enableJitError}
               />
             </AlertDialogBody>
@@ -553,7 +590,7 @@ export const JitDbAccessConfiguration = () => {
               loading={isUpdatingJitDbAccess}
               onClick={handleConfirmEnableJit}
             >
-              Enable temporary access
+              Enable token access
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

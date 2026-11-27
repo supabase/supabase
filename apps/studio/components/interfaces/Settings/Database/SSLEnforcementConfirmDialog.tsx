@@ -35,18 +35,21 @@ export const SSLEnforcementConfirmDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       {children !== undefined && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="tiny">
         <AlertDialogHeader>
-          <AlertDialogTitle>Updating SSL enforcement involves a brief downtime</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isTargetEnforced ? 'Enforce SSL on connections' : 'Disable SSL enforcement'}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            A database restart is required for SSL enforcement changes to take place, and this
-            involves a few minutes of downtime. Confirm to proceed now?
+            {isTargetEnforced
+              ? 'Enforcing SSL closes existing connections that do not use SSL. Clients must reconnect with SSL. Existing SSL connections stay open.'
+              : 'Disabling SSL enforcement allows clients to connect without SSL. Existing connections stay open.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="warning" disabled={isSubmitting} onClick={onConfirm}>
-            {isTargetEnforced ? 'Enable SSL' : 'Disable SSL'}
+            {isTargetEnforced ? 'Enforce SSL' : 'Disable enforcement'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

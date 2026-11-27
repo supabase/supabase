@@ -1,4 +1,5 @@
 import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useQueryState } from 'nuqs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthorizedApps } from './AuthorizedApps'
@@ -15,6 +16,7 @@ export const OAuthApps = () => {
   const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage')
   const { hasLoaded } = useFeatureFlags()
   const { mock_scenario } = useParams()
+  const [accessApp, setAccessApp] = useQueryState('access_app')
   const showsDatabaseAccessPreview =
     (import.meta.env.DEV || IS_STAGING_OR_LOCAL) &&
     mock_scenario === 'trusted_partner_authorized_apps'
@@ -23,7 +25,11 @@ export const OAuthApps = () => {
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
         {showsDatabaseAccessPreview ? (
-          <OAuthAppsAuthorizedList isPreview />
+          <OAuthAppsAuthorizedList
+            isPreview
+            accessApp={accessApp}
+            onCloseLinkedAccess={() => void setAccessApp(null)}
+          />
         ) : hasLoaded ? (
           isScopedOAuthManageEnabled ? (
             <OAuthAppsAuthorizedList />

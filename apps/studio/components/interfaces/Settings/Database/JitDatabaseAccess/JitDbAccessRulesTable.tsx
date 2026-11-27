@@ -1,4 +1,4 @@
-import { EllipsisVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -49,7 +49,7 @@ export function JitDbAccessRulesTable({
   const addRuleTooltip = !canUpdate
     ? 'Additional permissions required'
     : allProjectMembersHaveRules
-      ? 'All project members already have temporary access rules'
+      ? 'All project members already have member access rules'
       : undefined
 
   if (isLoading) {
@@ -74,9 +74,9 @@ export function JitDbAccessRulesTable({
       <CardContent className="space-y-4 p-0">
         <div className="flex items-center justify-between px-4 pb-2 pt-6">
           <div>
-            <h3 className="text-sm text-foreground">Temporary access rules</h3>
-            <p className="text-sm text-foreground-light">
-              Manage member access, allowed roles, and expiry settings.
+            <h3 className="settings-field-title text-foreground">Member access</h3>
+            <p className="text-sm text-foreground-lighter">
+              Manage which database roles members can use and when their access expires.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export function JitDbAccessRulesTable({
                 <TableCell colSpan={4}>
                   <p className="text-sm text-foreground">No rules yet</p>
                   <p className="text-sm text-foreground-lighter">
-                    Add your first temporary access rule above
+                    Add your first member access rule above
                   </p>
                 </TableCell>
               </TableRow>
@@ -166,10 +166,9 @@ export function JitDbAccessRulesTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            icon={<EllipsisVerticalIcon />}
+                            icon={<MoreVerticalIcon />}
                             aria-label="More actions"
-                            size="tiny"
-                            className="w-7 hit-area-2"
+                            className="px-1"
                             disabled={!canUpdate || disableActions}
                           />
                         </DropdownMenuTrigger>

@@ -13,6 +13,7 @@ import {
   TableRow,
 } from 'ui'
 
+import { OAuthAppAvatar } from './OAuthAppAvatar'
 import type { OAuthAppDatabaseAccess, PreviewGrant } from './OAuthAppsAuthorizedPreview'
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
 import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
@@ -24,6 +25,7 @@ export interface OAuthAppsAuthorizedRowProps {
   canRevoke: boolean
   databaseAccess?: OAuthAppDatabaseAccess
   previewGrants?: PreviewGrant[]
+  onCloseLinkedAccess?: () => void
   previewScopes?: string[]
   previewProjects?: { name: string; ref: string }[]
 }
@@ -33,6 +35,7 @@ export const OAuthAppsAuthorizedRow = ({
   className,
   canRevoke,
   databaseAccess,
+  onCloseLinkedAccess,
   previewScopes,
   previewGrants,
   previewProjects,
@@ -45,7 +48,8 @@ export const OAuthAppsAuthorizedRow = ({
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
 
-  const AccessRoot = dialogContent === 'revoke' ? AlertDialog : Dialog
+  const activeContent = dialogContent ?? (onCloseLinkedAccess ? 'grants' : null)
+  const AccessRoot = activeContent === 'revoke' ? AlertDialog : Dialog
   const openAccess = () => {
     setDialogContent('grants')
     setIsDialogOpen(true)
@@ -65,16 +69,7 @@ export const OAuthAppsAuthorizedRow = ({
       }}
     >
       <TableCell className="pr-2">
-        <div
-          className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-control bg-cover bg-center bg-no-repeat text-xs"
-          style={{
-            backgroundImage: approval.attributes.app.icon
-              ? `url('${approval.attributes.app.icon}')`
-              : 'none',
-          }}
-        >
-          {!!approval.attributes.app.icon ? '' : approval.attributes.app.name[0]}
-        </div>
+        <OAuthAppAvatar name={approval.attributes.app.name} icon={approval.attributes.app.icon} />
       </TableCell>
       <TableCell className="pl-0">
         <div>
@@ -123,9 +118,10 @@ export const OAuthAppsAuthorizedRow = ({
       )}
       <TableCell className="text-right">
         <AccessRoot
-          open={isDialogOpen}
+          open={isDialogOpen || !!onCloseLinkedAccess}
           onOpenChange={(open) => {
             setIsDialogOpen(open)
+            if (!open) onCloseLinkedAccess?.()
             // When users close the dialogs, we need to restore the focus on the menu button
             // Done in a setTimeout because the dialog tries to restore focus on the trigger despite onCloseAutoFocus being cancelled in the dialog contents
             setTimeout(() => {
@@ -165,7 +161,7 @@ export const OAuthAppsAuthorizedRow = ({
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-          {dialogContent === 'grants' && (
+          {activeContent === 'grants' && (
             <OAuthAppsMemberGrantsDialogContent
               approval={approval}
               previewScopes={previewScopes}
@@ -183,7 +179,7 @@ export const OAuthAppsAuthorizedRow = ({
               onCloseAutoFocus={preventDefault}
             />
           )}
-          {dialogContent === 'revoke' && (
+          {activeContent === 'revoke' && (
             <OAuthAppsRevokeDialogContent
               approval={approval}
               databaseAccess={

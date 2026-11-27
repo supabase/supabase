@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useFlag } from 'common'
+import { useFlag, useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -19,6 +19,7 @@ import { DatabaseReadOnlyAlert } from '@/components/interfaces/Settings/Database
 import { ResetDbPassword } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
+import { JitDbAccessPartnerPreview } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessPartnerPreview'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
 import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
 import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
@@ -38,6 +39,12 @@ function DatabaseSettings() {
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const jitDbAccessEnabled = useIsJitDbAccessEnabled()
+  const { mock_scenario } = useParams()
+  const showsLargePartnerPreview = mock_scenario === 'trusted_partner_temporary_access_100_rows'
+  const showsPartnerPreview =
+    import.meta.env.DEV &&
+    (showsLargePartnerPreview || mock_scenario === 'trusted_partner_temporary_access')
+  const showsJitConfiguration = jitDbAccessEnabled && !showsPartnerPreview
   const showNewDiskManagementUI = isAws || isAwsK8s
   const { databaseNetworkRestrictions } = useIsFeatureEnabled(['database:network_restrictions'])
   const databaseLogsConfigurationEnabled = useFlag('databaseLogsConfiguration')
@@ -59,7 +66,10 @@ function DatabaseSettings() {
           <PageContainer size="small" className="flex flex-col gap-8 pb-12">
             <DatabaseReadOnlyAlert />
             <ResetDbPassword />
-            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
+            {showsPartnerPreview && (
+              <JitDbAccessPartnerPreview showLargeList={showsLargePartnerPreview} />
+            )}
+            {showsJitConfiguration && <JitDbAccessConfiguration />}
             <ConnectionPooling />
             <SSLConfiguration />
             {showNewDiskManagementUI ? (
@@ -78,7 +88,11 @@ function DatabaseSettings() {
         <PageContainer size="small" className="pb-12">
           <PageSection>
             <PageSectionContent className="space-y-4 md:space-y-8">
-              <SettingsDatabaseEmptyStateLocal />
+              {showsPartnerPreview ? (
+                <JitDbAccessPartnerPreview showLargeList={showsLargePartnerPreview} />
+              ) : (
+                <SettingsDatabaseEmptyStateLocal />
+              )}
             </PageSectionContent>
           </PageSection>
         </PageContainer>

@@ -24,7 +24,7 @@ export const ResetDbPassword = ({ disabled = false }) => {
         <Card>
           <CardContent className="flex flex-row items-center gap-x-2 justify-between">
             <div className="space-y-0.5">
-              <h3 className="text-sm text-foreground">Reset database password</h3>
+              <h3 className="settings-field-title text-foreground">Reset database password</h3>
               <p className="text-sm text-foreground-light text-balance">
                 The database password isn’t viewable after creation. Resetting it will break any
                 existing connections.

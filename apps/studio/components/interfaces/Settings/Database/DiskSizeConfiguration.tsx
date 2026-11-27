@@ -90,7 +90,9 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                     <div>
                       {currentDiskSize && (
                         <span className="text-foreground-light flex gap-2 items-baseline">
-                          <h4 className="text-foreground">Current Disk Storage</h4>
+                          <h4 className="settings-field-title text-foreground">
+                            Current Disk Storage
+                          </h4>
                         </span>
                       )}
                       <div className="grid grid-cols-2 items-center">

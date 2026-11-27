@@ -20,7 +20,15 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useOAuthApprovalsQuery } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
-export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boolean }) => {
+export const OAuthAppsAuthorizedList = ({
+  isPreview = false,
+  accessApp,
+  onCloseLinkedAccess,
+}: {
+  isPreview?: boolean
+  accessApp?: string | null
+  onCloseLinkedAccess?: () => void
+}) => {
   const { slug } = useParams()
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -135,6 +143,9 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
                         key={approval.id}
                         approval={approval}
                         databaseAccess={databaseAccess}
+                        onCloseLinkedAccess={
+                          approval.id === accessApp ? onCloseLinkedAccess : undefined
+                        }
                         previewScopes={scopes}
                         previewGrants={grants}
                         previewProjects={projects}

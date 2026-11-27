@@ -129,6 +129,22 @@ describe('OAuthAppsAuthorizedList', () => {
     expect(mixed).toHaveTextContent('Run SQL on your database')
   })
 
+  test('opens the access details for the linked app', async () => {
+    const onCloseLinkedAccess = vi.fn()
+    customRender(
+      <OAuthAppsAuthorizedList
+        isPreview
+        accessApp="preview-app-2"
+        onCloseLinkedAccess={onCloseLinkedAccess}
+      />
+    )
+
+    const access = await screen.findByRole('dialog')
+    expect(access).toHaveTextContent('Example Analytics')
+    await userEvent.click(within(access).getByRole('button', { name: 'Close' }))
+    expect(onCloseLinkedAccess).toHaveBeenCalledOnce()
+  })
+
   test('previews database access and the effects of revoking without allowing a revoke', async () => {
     customRender(<OAuthAppsAuthorizedList isPreview />)
 

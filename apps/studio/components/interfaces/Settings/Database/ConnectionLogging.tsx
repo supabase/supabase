@@ -98,6 +98,7 @@ export const ConnectionLogging = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Log connections"
+                        labelClassName="settings-field-title"
                         description="Enables logging for each successful connection to the database"
                         className="[&>div:first-child]:xl:w-1/5"
                       >
@@ -116,6 +117,7 @@ export const ConnectionLogging = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Log disconnections"
+                        labelClassName="settings-field-title"
                         description="Enables logging for the end of each session, including its duration"
                         className="[&>div:first-child]:xl:w-1/5"
                       >

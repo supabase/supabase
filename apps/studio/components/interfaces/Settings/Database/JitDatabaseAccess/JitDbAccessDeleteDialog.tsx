@@ -34,11 +34,11 @@ export function JitDbAccessDeleteDialog({
     <AlertDialog open={!!user} onOpenChange={(open) => !open && !isDeleting && onClose()}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete temporary access rule</AlertDialogTitle>
+          <AlertDialogTitle>Delete member access rule</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-2 text-sm">
               <p>
-                Remove the temporary access rule for{' '}
+                Remove the member access rule for{' '}
                 <strong className="text-foreground">{userDisplayName}</strong>?
               </p>
               <p>
@@ -52,7 +52,7 @@ export function JitDbAccessDeleteDialog({
           <AlertDialogBody>
             <Admonition
               type="destructive"
-              title="Unable to delete temporary access rule"
+              title="Unable to delete member access rule"
               description={error}
             />
           </AlertDialogBody>
