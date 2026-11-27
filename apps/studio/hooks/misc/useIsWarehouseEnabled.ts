@@ -15,8 +15,9 @@ const WAREHOUSE_ALLOW_ALL_SENTINEL = 'all'
 /**
  * Returns whether the Warehouse tab should be shown in the Connect dialog.
  *
- * The API gates every `/platform/warehouse/{ref}/*` call against the same ConfigCat `warehouse`
- * flag, so this mirrors that check client-side and tab visibility matches what the API allows.
+ * The API gates every `/platform/warehouse/{ref}/*` and `/v2/projects/{ref}/warehouse/*` call
+ * against the same ConfigCat `warehouse` flag, so this mirrors that check client-side and tab
+ * visibility matches what the API allows.
  */
 export function useIsWarehouseEnabled(): boolean {
   const { ref: projectRef } = useParams()

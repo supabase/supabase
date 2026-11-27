@@ -24,7 +24,7 @@ import {
 
 import type { WarehouseSetupTable } from './Warehouse.utils'
 import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
-import type { WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-status-query'
+import type { WarehouseSetupStatusData } from '@/data/warehouse/warehouse-setup-status-query'
 
 const TABLE_STATE: Record<
   WarehouseSetupTable['state'],
@@ -131,7 +131,7 @@ export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatu
 )
 
 interface WarehouseEnablingProgressProps {
-  status: WarehouseSetupStatusResponse
+  status: WarehouseSetupStatusData
 }
 
 export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressProps) => {

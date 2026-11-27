@@ -1,35 +1,41 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { warehouseKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import type { V2WarehouseSetupRequest } from './warehouse-setup-api-types'
+import { handleWarehouseV2Error } from './warehouse-v2-error'
+import { post } from '@/data/fetchers'
 import { replicationKeys } from '@/data/replication/keys'
 import { pipelineIdSchema } from '@/data/replication/pipeline-id'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
-export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
+export type WarehouseSetupBody = V2WarehouseSetupRequest['data']['attributes']
 
 export type WarehouseSetupVariables = {
   projectRef: string
   body: WarehouseSetupBody
 }
 
+// Replaces the full replication selection (initial setup and later edits), so the picker's
+// multi-schema selection maps onto it directly. The v2 `enable` route can't: it takes a single
+// schema and rejects a selection that differs from the existing one.
 async function setupWarehouse({ projectRef, body }: WarehouseSetupVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post('/platform/warehouse/{ref}/setup', {
+  const { data, error } = await post('/v2/projects/{ref}/warehouse/setups', {
     params: { path: { ref: projectRef } },
-    body,
+    body: { data: { type: 'warehouse_setup', attributes: body } },
   })
   if (error) {
-    handleError(error)
+    handleWarehouseV2Error(error)
   }
 
+  const { attributes } = data.data
   return {
-    ...data,
-    pipeline_id: data.pipeline_id === null ? null : pipelineIdSchema.parse(data.pipeline_id),
+    ...attributes,
+    pipeline_id:
+      attributes.pipeline_id === null ? null : pipelineIdSchema.parse(attributes.pipeline_id),
   }
 }
 
