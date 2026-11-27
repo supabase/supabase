@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFlag } from 'common'
-import dayjs from 'dayjs'
 import { ArrowRightIcon, LogsIcon, RefreshCwIcon } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -39,6 +38,7 @@ import {
   createUsageReportConfig,
 } from '@/data/reports/v2/auth.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useFormatDateTime } from '@/lib/datetime'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -75,6 +75,7 @@ const AuthUsage = () => {
     setShowUpgradePrompt,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const formatDateTime = useFormatDateTime()
 
   const {
     data,
@@ -261,13 +262,13 @@ const AuthUsage = () => {
               {selectedDateRange && (
                 <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_start.date, 'MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_end.date, 'MMM D, h:mma')}
                   </p>
                 </div>
               )}
