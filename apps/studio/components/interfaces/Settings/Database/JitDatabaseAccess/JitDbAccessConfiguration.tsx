@@ -19,6 +19,12 @@ import {
   Card,
   CardContent,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -504,19 +510,32 @@ export const JitDbAccessConfiguration = () => {
               />
 
               <Card>
-                <CardContent className="space-y-4">
-                  <div className="space-y-1">
-                    <h3 className="settings-field-title">App access</h3>
+                <CardContent className="space-y-4 p-0">
+                  <div className="px-4 pb-2 pt-6">
+                    <h3 className="settings-field-title text-foreground">App access</h3>
                     <p className="text-sm text-foreground-lighter">
                       Apps that use access tokens to connect to this database.
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm text-foreground">No apps connected</p>
-                    <p className="text-sm text-foreground-lighter">
-                      Connect through a supported partner app and authorize access to Supabase.
-                    </p>
-                  </div>
+                  <Table className="border-t">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>App</TableHead>
+                        <TableHead>Access level</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow className="[&>td]:hover:bg-inherit">
+                        <TableCell colSpan={2}>
+                          <p className="text-sm text-foreground">No apps connected</p>
+                          <p className="text-sm text-foreground-lighter">
+                            Connect through a supported partner app and authorize access to
+                            Supabase.
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </>
