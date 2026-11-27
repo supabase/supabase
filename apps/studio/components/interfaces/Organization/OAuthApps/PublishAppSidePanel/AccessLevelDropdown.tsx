@@ -1,12 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 export type AccessLevel = 'No access' | 'Read only' | 'Write' | 'Read and write'
 
@@ -23,36 +15,25 @@ export function AccessLevelDropdown({
   disabled?: boolean
   onChange: (level: AccessLevel) => void
 }) {
-  const label = disabled ? 'Unavailable' : value
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          className="w-40 justify-between shrink-0"
-          disabled={disabled}
-          iconRight={<ChevronDownIcon />}
-          aria-label={`${permission}: ${label}`}
-        >
-          {label}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-40 w-max">
-        <DropdownMenuRadioGroup
-          value={value}
-          onValueChange={(next) => {
-            const level = levels.find((level) => level === next)
-            if (level) onChange(level)
-          }}
-        >
-          {levels.map((level) => (
-            <DropdownMenuRadioItem key={level} value={level}>
-              {level}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Select
+      value={value}
+      disabled={disabled}
+      onValueChange={(next) => {
+        const level = levels.find((level) => level === next)
+        if (level) onChange(level)
+      }}
+    >
+      <SelectTrigger className="w-full sm:w-40" aria-label={permission}>
+        {disabled ? 'Unavailable' : <SelectValue />}
+      </SelectTrigger>
+      <SelectContent align="end">
+        {levels.map((level) => (
+          <SelectItem key={level} value={level}>
+            {level}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }

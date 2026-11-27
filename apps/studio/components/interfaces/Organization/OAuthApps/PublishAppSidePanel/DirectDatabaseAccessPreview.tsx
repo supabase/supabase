@@ -17,9 +17,9 @@ export function DirectDatabaseAccessPreview({
   const isDisabled = isPreviewMemberBound || isMemberBound
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_10rem] items-start gap-3 border p-4">
-      <div className="space-y-1">
-        <p className="text-sm text-foreground">Table data</p>
+    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_10rem] items-start gap-3 p-4">
+      <div className="min-w-0 space-y-1">
+        <p className="text-sm font-medium text-foreground">Table data</p>
         <p className="text-xs text-foreground-light">
           {isDisabled
             ? 'This app uses each person’s permissions. To request direct database access, use an app that an organization owner approves for the whole organization.'
