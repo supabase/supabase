@@ -101,15 +101,13 @@ export function failureReason(cardError: StripeError): string | undefined {
     case 'do_not_honor':
     case 'transaction_not_allowed':
     case 'generic_decline':
+    case 'stolen_card':
+    case 'lost-card':
       return `Your card has been declined by your card issuer. Please contact your card issuer or try a different card. ${internationalChargeInUsdHint}`
     case 'expired_card':
       return 'Your card has expired. Please use a different card.'
     case 'insufficient_funds':
       return 'Your card has insufficient funds. Please make sure your account has sufficient funds or try a different card. Contact your card issuer if you believe this is an error.'
-    case 'lost_card':
-      return 'Your card was reported as lost. Please use a different card.'
-    case 'stolen_card':
-      return 'Your card was reported as stolen. Please use a different card.'
     case 'processing_error':
       return `There was an error processing the payment. Please try again later or use a different card. ${internationalChargeInUsdHint}`
     case 'card_velocity_exceeded':
@@ -122,7 +120,7 @@ export function failureReason(cardError: StripeError): string | undefined {
       return 'Card not supported. Contact your card issuer to make sure your card can be used to make this type of purchase.'
   }
 
-  return undefined
+  return cardError?.message
 }
 
 export const NewPaymentMethodElement = forwardRef(
