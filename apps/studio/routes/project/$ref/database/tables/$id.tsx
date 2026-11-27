@@ -53,7 +53,7 @@ function DatabaseTables() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </PageBreadcrumbs>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>
@@ -62,7 +62,7 @@ function DatabaseTables() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <ColumnList

@@ -46,7 +46,7 @@ function TriggersShell() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Triggers</PageHeaderTitle>
@@ -56,7 +56,7 @@ function TriggersShell() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageNav size="large">
+      <PageNav size="default">
         <NavMenu>
           {navigationItems.map((item) => (
             <NavMenuItem key={item.label} active={pathname === item.to.replace('$ref', ref)}>

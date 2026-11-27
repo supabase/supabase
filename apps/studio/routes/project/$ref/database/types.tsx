@@ -21,7 +21,7 @@ export const Route = createFileRoute('/project/$ref/database/types')({
 function DatabaseEnumeratedTypes() {
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Enumerated Types</PageHeaderTitle>
@@ -31,7 +31,7 @@ function DatabaseEnumeratedTypes() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <EnumeratedTypes />

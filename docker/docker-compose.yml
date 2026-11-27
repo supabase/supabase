@@ -16,11 +16,14 @@ services:
     container_name: supabase-studio
     image: supabase/studio:2026.11.23-sha-4a73166
     restart: unless-stopped
+    init: true
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          "node -e \"fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})\""
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
         ]
       timeout: 10s
       interval: 5s
@@ -134,6 +137,9 @@ services:
 
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      # Without an idle pool size, Auth opens a new database connection for every query
+      GOTRUE_DB_MAX_POOL_SIZE: 10
+      GOTRUE_DB_MAX_IDLE_POOL_SIZE: 10
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
@@ -280,7 +286,6 @@ services:
       # PGRST_JWT_SECRET: ${JWT_JWKS}
       PGRST_JWT_SECRET: ${JWT_JWKS:-${JWT_SECRET}}
 
-      PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
     command:
       [
@@ -357,8 +362,6 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
-      rest:
-        condition: service_started
       imgproxy:
         condition: service_started
     healthcheck:
@@ -378,7 +381,6 @@ services:
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
-      POSTGREST_URL: http://rest:3000
 
       # Legacy symmetric HS256 key
       AUTH_JWT_SECRET: ${JWT_SECRET}
@@ -391,12 +393,12 @@ services:
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: 7200
       STORAGE_BACKEND: file
       # S3 bucket when using S3 backend, directory name when using 'file'
       GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET}
       # S3 Backend configuration
       #GLOBAL_S3_ENDPOINT: https://your-s3-endpoint
-      #GLOBAL_S3_PROTOCOL: https
       #GLOBAL_S3_FORCE_PATH_STYLE: "true"
       #AWS_ACCESS_KEY_ID: your-access-key-id
       #AWS_SECRET_ACCESS_KEY: your-secret-access-key
@@ -431,14 +433,32 @@ services:
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
-      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_USE_ETAG: "false"
       IMGPROXY_AUTO_WEBP: ${IMGPROXY_AUTO_WEBP}
+      IMGPROXY_JPEG_PROGRESSIVE: "true"
+      IMGPROXY_FORMAT_QUALITY: jpeg=80,avif=62,webp=80
+      # Source limits. All frames of an animation count toward the resolution
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
+      IMGPROXY_MAX_SRC_FILE_SIZE: 52428800
+      IMGPROXY_MAX_ANIMATION_FRAMES: 150
 
   meta:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.100.1
     restart: unless-stopped
+    init: true
+    # Defined here because Podman ignores the healthcheck embedded in the image.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:8080/health').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -491,6 +511,8 @@ services:
         "start",
         "--user-worker-request-idle-timeout",
         "150000",
+        "--event-worker",
+        "/home/deno/functions/main/events",
         "--main-service",
         "/home/deno/functions/main"
       ]

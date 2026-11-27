@@ -37,7 +37,6 @@ services:
     environment:
       STORAGE_BACKEND: s3
       GLOBAL_S3_ENDPOINT: http://minio:9000
-      GLOBAL_S3_PROTOCOL: http
       GLOBAL_S3_FORCE_PATH_STYLE: true
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}

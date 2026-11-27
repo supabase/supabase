@@ -63,7 +63,7 @@ function AnalyticsBucketPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </PageBreadcrumbs>
-      <PageHeader>
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderIcon>
             <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">

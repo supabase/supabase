@@ -24,6 +24,10 @@ In the PKCE flow, a redirect is made to your app, with an Auth Code contained in
 
 To maintain the session, these tokens must be stored in a storage medium securely shared between client and server, which is traditionally cookies. Whenever the session is refreshed, the auth and refresh tokens in the shared storage medium must be updated. Supabase client libraries provide a customizable `storage` option when a client is initiated, allowing you to change where tokens are stored.
 
+When the session changes, a client created with `createServerClient` from `@supabase/ssr` writes it through your `setAll` cookie handler. This happens when the client signs a user in, exchanges a code, refreshes the session, or updates the user. The session includes the access token and refresh token. The cookie is named `sb-<project_ref>-auth-token` by default, and a large session is split into numbered cookies such as `sb-<project_ref>-auth-token.0`. Your app must send those cookies, and the cache headers that `setAll` receives, on the response. When the client signs the user out, it clears the cookies through `setAll` in the same way.
+
+On a later request, create a new server client for that request. It reads the session back from the request's cookies through your `getAll` cookie handler. A sign-in on one server route carries over to every route that receives the cookie. You don't need to call `setSession` or pass the refresh token around yourself. For the `getAll` and `setAll` setup in each framework, see [Creating a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client).
+
 ## Frequently asked questions
 
 ### No session on the server side with Next.js route prefetching?

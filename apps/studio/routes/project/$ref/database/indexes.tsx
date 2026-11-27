@@ -26,7 +26,7 @@ export const Route = createFileRoute('/project/$ref/database/indexes')({
 function IndexesPage() {
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Indexes</PageHeaderTitle>
@@ -52,7 +52,7 @@ function IndexesPage() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <Indexes />

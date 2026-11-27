@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiKeyPill } from './ApiKeyPill'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { ALL_FGA_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -23,6 +23,9 @@ vi.mock('common', async () => {
 // assert the value handed to the clipboard without depending on jsdom's
 // document.hasFocus() / navigator.clipboard. Everything else in 'ui' stays real.
 const { mockCopyToClipboard } = vi.hoisted(() => ({ mockCopyToClipboard: vi.fn() }))
+const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
+
 vi.mock('ui', async (importOriginal) => ({
   ...(await importOriginal<typeof import('ui')>()),
   copyToClipboard: mockCopyToClipboard,
@@ -69,7 +72,15 @@ function mockRevealById(onRequest?: () => void) {
 
 describe('ApiKeyPill', () => {
   beforeEach(() => {
-    mockCopyToClipboard.mockClear()
+    mockCopyToClipboard.mockReset()
+    // Mirror the real helper: the callback runs once the text resolves and the write succeeds
+    mockCopyToClipboard.mockImplementation(
+      async (text: string | Promise<string>, onSuccess?: () => void) => {
+        await text
+        onSuccess?.()
+      }
+    )
+    mockTrack.mockClear()
   })
 
   it('masks the secret key by default and does not expose the full key', () => {
@@ -91,6 +102,24 @@ describe('ApiKeyPill', () => {
     fireEvent.click(reveal)
 
     expect(await screen.findByText(FULL.slice(15))).toBeInTheDocument()
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledWith('api_key_reveal_clicked', { keyType: 'secret' })
+  })
+
+  it('does not track a reveal when hiding the key again', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockRevealById()
+    customRender(<ApiKeyPill apiKey={secretKey} />, { profileContext: createMockProfileContext() })
+
+    const reveal = screen.getByRole('button', { name: 'Reveal API key' })
+    await waitFor(() => expect(reveal).toBeEnabled())
+    fireEvent.click(reveal)
+    const hide = await screen.findByRole('button', { name: 'Hide API key' })
+    await waitFor(() => expect(hide).toBeEnabled())
+    fireEvent.click(hide)
+
+    expect(await screen.findByRole('button', { name: 'Reveal API key' })).toBeInTheDocument()
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('copies the full secret key to the clipboard', async () => {
@@ -104,6 +133,58 @@ describe('ApiKeyPill', () => {
 
     await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
+    await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
+    expect(mockTrack).toHaveBeenCalledWith('api_key_copied', { keyType: 'secret' })
+  })
+
+  it('does not track a copy when the clipboard write fails', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockCopyToClipboard.mockImplementation(() => {})
+    customRender(<ApiKeyPill apiKey={publishableKey} />, {
+      profileContext: createMockProfileContext(),
+    })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
+    expect(mockTrack).not.toHaveBeenCalled()
+  })
+
+  it('does not track a copy when revealing the secret key fails', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/api-keys/:id',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Internal error' }, { status: 500 }),
+    })
+    customRender(<ApiKeyPill apiKey={secretKey} />, { profileContext: createMockProfileContext() })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
+    // The mock is called before the reveal request settles, so wait for it to finish
+    await mockCopyToClipboard.mock.results[0].value
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(mockTrack).not.toHaveBeenCalled()
+  })
+
+  it('tracks copying a publishable key', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    customRender(<ApiKeyPill apiKey={publishableKey} />, {
+      profileContext: createMockProfileContext(),
+    })
+
+    const copy = screen.getByRole('button', { name: 'Copy API key' })
+    await waitFor(() => expect(copy).toBeEnabled())
+    fireEvent.click(copy)
+
+    await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
+    expect(mockTrack).toHaveBeenCalledWith('api_key_copied', { keyType: 'publishable' })
   })
 
   it('disables reveal and copy without requesting the key when the grant is denied', async () => {
@@ -131,6 +212,7 @@ describe('ApiKeyPill', () => {
 
     fireEvent.click(reveal)
     expect(requests).not.toHaveBeenCalled()
+    expect(mockTrack).not.toHaveBeenCalled()
   })
 
   it('disables reveal and copy when permissions fail to load', async () => {

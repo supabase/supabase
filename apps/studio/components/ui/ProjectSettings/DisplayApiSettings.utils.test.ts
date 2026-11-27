@@ -3,7 +3,7 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { describe, expect, it } from 'vitest'
 
-import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import { getLastUsedAPIKeys, getLegacyApiKeyType } from './DisplayApiSettings.utils'
 
 // getLastUsedAPIKeys humanizes a duration, which needs both plugins.
 dayjs.extend(duration)
@@ -69,5 +69,17 @@ describe('getLastUsedAPIKeys', () => {
     )
 
     expect(result).toEqual({})
+  })
+})
+
+describe('getLegacyApiKeyType', () => {
+  it('maps the anon and service_role tags to telemetry key types', () => {
+    expect(getLegacyApiKeyType('anon')).toBe('legacy_anon')
+    expect(getLegacyApiKeyType('service_role')).toBe('legacy_service_role')
+  })
+
+  it('returns undefined for unknown or missing tags', () => {
+    expect(getLegacyApiKeyType('other')).toBeUndefined()
+    expect(getLegacyApiKeyType(undefined)).toBeUndefined()
   })
 })

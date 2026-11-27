@@ -1,8 +1,8 @@
 import { AlertCircleIcon } from 'lucide-react'
 import { Alert, AlertTitle } from 'ui'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { PostgrestConfig } from './PostgrestConfig'
-import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
@@ -10,7 +10,7 @@ export const ServiceList = () => {
   const { data: project, isPending: isLoading } = useSelectedProjectQuery()
 
   return (
-    <ScaffoldSection isFullWidth id="api-settings" className="gap-6 py-0!">
+    <PageSection id="api-settings" className="pt-0 last:pb-0">
       {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert variant="destructive">
           <AlertCircleIcon size={16} />
@@ -19,6 +19,6 @@ export const ServiceList = () => {
       ) : (
         <PostgrestConfig />
       )}
-    </ScaffoldSection>
+    </PageSection>
   )
 }

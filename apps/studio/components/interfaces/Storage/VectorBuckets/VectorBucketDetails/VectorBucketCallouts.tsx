@@ -5,7 +5,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
-import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
@@ -24,7 +23,7 @@ export const ExtensionNotInstalled = ({
     (wrappersExtension?.default_version ?? '') < (wrapperMeta.minimumExtensionVersion ?? '')
 
   return (
-    <ScaffoldSection isFullWidth>
+    <>
       <Admonition type="warning" title="Missing required extension">
         <p>
           The Wrappers extension is required in order to query vector tables.{' '}
@@ -50,7 +49,7 @@ export const ExtensionNotInstalled = ({
           </Link>
         </Button>
       </Admonition>
-    </ScaffoldSection>
+    </>
   )
 }
 
@@ -69,7 +68,7 @@ export const ExtensionNeedsUpgrade = ({
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
   return (
-    <ScaffoldSection isFullWidth>
+    <>
       <Admonition type="warning" title="Outdated extension version">
         <p>
           The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
@@ -94,7 +93,7 @@ export const ExtensionNeedsUpgrade = ({
           </Link>
         </Button>
       </Admonition>
-    </ScaffoldSection>
+    </>
   )
 }
 
@@ -114,13 +113,13 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
+    <>
       <Admonition type="warning" title="Missing integration">
         <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
         <Button loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
           Install wrapper
         </Button>
       </Admonition>
-    </ScaffoldSection>
+    </>
   )
 }

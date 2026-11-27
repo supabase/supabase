@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { UnifiedLogs } from './UnifiedLogs'
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { createUnifiedLogsSearch, serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 import {
   EDGE_FUNCTION_LOGS_VIEW,
@@ -253,6 +254,7 @@ describe('UnifiedLogs', () => {
     expect(screen.queryByRole('button', { name: /^(Show|Hide) filters$/ })).not.toBeInTheDocument()
     await user.click(screen.getByTestId('filter-bar-freeform-input'))
     expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'New filter group',
       'Time range',
       'Log Type',
       'Level',
@@ -317,6 +319,203 @@ describe('UnifiedLogs', () => {
       expect(rowQuery).not.toContain("IN ('500')")
     })
   })
+
+  it('applies an OR filter group from the URL to every query and keeps it in the URL', async () => {
+    const queries: string[] = []
+    const onUrlUpdate = vi.fn()
+    const group = 'group:or:status:neq:200,pathname:neq:%2Fhealth'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', { filter: ['level:eq:error', group] }),
+        },
+      }
+    )
+
+    expect(await screen.findByText('No results found', {}, { timeout: 5_000 })).toBeInTheDocument()
+    expect(screen.getByText('OR')).toBeInTheDocument()
+    await waitFor(() => {
+      for (const kind of ['row list', 'severity chart']) {
+        const sql = queries.filter((query) => query.includes(kind)).at(-1)
+        expect(sql).toMatch(
+          /END\) NOT IN \('200'\) OR \(multiIf\([\s\S]*?\)\) NOT IN \('\/health'\)\)/
+        )
+      }
+    })
+    await waitFor(() => {
+      const update = onUrlUpdate.mock.lastCall?.[0]
+      expect(SEARCH_PARAMS_PARSER.filter.parse(update?.searchParams.get('filter') ?? '')).toEqual([
+        'level:eq:error',
+        group,
+      ])
+    })
+  }, 15_000)
+
+  it('does not offer filter groups on the legacy backend', async () => {
+    const user = userEvent.setup()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs hasFilterSideBar={false} />
+      </FeatureFlagContext.Provider>,
+      { nuqs: { hasMemory: true }, queryClient }
+    )
+
+    expect(await screen.findByText('No results found', {}, { timeout: 5_000 })).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0), { timeout: 5_000 })
+    await user.click(screen.getByTestId('filter-bar-freeform-input'))
+    const options = await screen.findAllByRole('option', {}, { timeout: 5_000 })
+    expect(options.map((option) => option.textContent)).toContain('Log Type')
+    expect(options.map((option) => option.textContent)).not.toContain('New filter group')
+  }, 20_000)
+
+  it('lets a filter group be toggled to AND and back to OR', async () => {
+    const user = userEvent.setup()
+    const onUrlUpdate = vi.fn()
+    const group = 'group:or:status:neq:200,pathname:neq:%2Fhealth'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', { filter: [group] }),
+        },
+      }
+    )
+
+    const lastFilterParam = () =>
+      SEARCH_PARAMS_PARSER.filter.parse(
+        onUrlUpdate.mock.lastCall?.[0].searchParams.get('filter') ?? ''
+      )
+
+    await user.click(await screen.findByText('OR', {}, { timeout: 5_000 }))
+    // Applied as two ANDed filters, but the group stays on screen so it can be toggled back.
+    expect(await screen.findByText('AND')).toBeInTheDocument()
+    expect(screen.queryByText('OR')).not.toBeInTheDocument()
+    await waitFor(
+      () => expect(lastFilterParam()).toEqual(['status:neq:200', 'pathname:neq:/health']),
+      {
+        timeout: 5_000,
+      }
+    )
+
+    await user.click(screen.getByText('AND'))
+    expect(await screen.findByText('OR')).toBeInTheDocument()
+    await waitFor(() => expect(lastFilterParam()).toEqual([group]), { timeout: 5_000 })
+  }, 20_000)
+
+  it('stops filtering when the last condition is removed from a group', async () => {
+    const user = userEvent.setup()
+    const onUrlUpdate = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', {
+            filter: ['group:or:status:neq:200', 'method:eq:GET'],
+          }),
+        },
+      }
+    )
+
+    const removeStatus = await screen.findByTestId('filter-remove-status', {}, { timeout: 5_000 })
+    expect(screen.getByPlaceholderText('+ Add filter')).toBeInTheDocument()
+    await user.click(removeStatus)
+    // The emptied group leaves the bar too, instead of lingering as an empty "( )".
+    expect(screen.queryByPlaceholderText('+ Add filter')).not.toBeInTheDocument()
+    await waitFor(
+      () =>
+        expect(
+          SEARCH_PARAMS_PARSER.filter.parse(
+            onUrlUpdate.mock.lastCall?.[0].searchParams.get('filter') ?? ''
+          )
+        ).toEqual(['method:eq:GET']),
+      { timeout: 5_000 }
+    )
+  }, 20_000)
+
+  it('drops filter groups that use unavailable builtins from function URLs', async () => {
+    const onUrlUpdate = vi.fn()
+    const unavailable = 'group:or:status:neq:200,level:eq:error'
+    const available = 'group:or:level:eq:error,attribute.status:eq:runtime-status'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', {
+            filter: [unavailable, available],
+          }),
+        },
+      }
+    )
+
+    await waitFor(
+      () => {
+        const filter = onUrlUpdate.mock.lastCall?.[0].searchParams.get('filter') ?? ''
+        expect(SEARCH_PARAMS_PARSER.filter.parse(filter)).toEqual([available])
+      },
+      { timeout: 5_000 }
+    )
+  }, 15_000)
 
   it('discovers attributes after opening the picker and applies manual keys across requests', async () => {
     const user = userEvent.setup()

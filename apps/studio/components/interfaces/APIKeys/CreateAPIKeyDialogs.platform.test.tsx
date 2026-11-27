@@ -17,14 +17,6 @@ const { mockSetVisible, mockShortcut, mockUseQueryState } = vi.hoisted(() => ({
   mockUseQueryState: vi.fn(),
 }))
 
-vi.mock('next/navigation', async () => {
-  const actual = await vi.importActual<typeof import('next/navigation')>('next/navigation')
-  return {
-    ...actual,
-    useParams: () => ({ ref: 'project-ref' }),
-  }
-})
-
 vi.mock('nuqs', async () => {
   const actual = await vi.importActual<typeof import('nuqs')>('nuqs')
   return {
