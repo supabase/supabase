@@ -298,6 +298,12 @@ Deliveries are at-least-once: Supabase retries failed deliveries, so your endpoi
 
 Deliveries and events may also arrive out of order due to network delays or hiccups. You need to design your webhook listener to account for duplicates and out-of-order events.
 
+## Listing Endpoints
+
+To list all endpoints for an organization or project, use the following endpoints:
+- To list all endpoints for an organization: `GET https://api.supabase.com/v2/organizations/{organization_slug}/webhooks/endpoints`
+- To list all endpoints for a project: `GET https://api.supabase.com/v2/projects/{project_ref}/webhooks/endpoints`
+
 ## Best practices
 
 Best practices for consuming webhook events and building a reliable, production-grade webhook listener:
