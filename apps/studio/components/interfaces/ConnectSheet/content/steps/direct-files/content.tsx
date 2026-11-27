@@ -15,11 +15,12 @@ import {
   buildDotnetConnectionString,
   buildSafeConnectionString,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
   withRequiredSslmode,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { useTemporaryAccessConnection } from '@/components/interfaces/ConnectSheet/TemporaryAccessConnectionProvider'
+import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
@@ -43,20 +44,20 @@ function DirectFilesContent({ state, deploymentMode }: StepContentProps) {
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
+  const {
+    meta: { grantRole, isGrantMode, passwordPlaceholder },
+  } = useTemporaryAccessConnection()
 
   const connectionStrings = useConnectionStringDatabases(deploymentMode)
   const connectionStringPooler =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
 
-  const resolvedConnectionString = useMemo(
-    () =>
-      resolveConnectionString({
-        connectionMethod,
-        useSharedPooler,
-        connectionStringPooler,
-      }),
-    [connectionMethod, useSharedPooler, connectionStringPooler]
-  )
+  const resolvedConnectionString = resolveConnectionString({
+    connectionMethod,
+    useSharedPooler,
+    connectionStringPooler,
+    grantRole,
+  })
 
   const connectionParams = useMemo(
     () => parseConnectionParams(resolvedConnectionString),
@@ -64,8 +65,9 @@ function DirectFilesContent({ state, deploymentMode }: StepContentProps) {
   )
 
   const safeConnectionString = useMemo(
-    () => buildSafeConnectionString(resolvedConnectionString, connectionParams),
-    [resolvedConnectionString, connectionParams]
+    () =>
+      buildSafeConnectionString(resolvedConnectionString, connectionParams, passwordPlaceholder),
+    [resolvedConnectionString, connectionParams, passwordPlaceholder]
   )
 
   const config: DirectFilesConfig | null = useMemo(() => {
@@ -140,7 +142,7 @@ func main() {
               language: 'json',
               code: `{
   "ConnectionStrings": {
-    "DefaultConnection": "${buildDotnetConnectionString(connectionParams)}"
+    "DefaultConnection": "${buildDotnetConnectionString(connectionParams, passwordPlaceholder)}"
   }
 }`,
             },
@@ -215,7 +217,7 @@ except Exception as e:
               language: 'bash',
               code: [
                 `user=${connectionParams.user}`,
-                `password=${PASSWORD_PLACEHOLDER}`,
+                `password=${passwordPlaceholder}`,
                 `host=${connectionParams.host}`,
                 `port=${connectionParams.port}`,
                 `dbname=${connectionParams.database}`,
@@ -229,7 +231,7 @@ except Exception as e:
       default:
         return null
     }
-  }, [connectionType, safeConnectionString, connectionParams])
+  }, [connectionType, safeConnectionString, connectionParams, passwordPlaceholder])
 
   const defaultFile = config?.files[0]?.name ?? ''
   const [activeFile, setActiveFile] = useState(defaultFile)
@@ -271,7 +273,8 @@ except Exception as e:
       ) : (
         codeBlock
       )}
-      {config.passwordInUrl && <PasswordEncodingNote />}
+      {config.passwordInUrl && !isGrantMode && <PasswordEncodingNote />}
+      <TemporaryAccessPasswordNote />
       {/* Persistent live region so screen readers announce the read-only state
           when the load balancer is selected */}
       <p
@@ -281,7 +284,12 @@ except Exception as e:
         {isLoadBalancerSelected &&
           'Replica connections are read-only. Connect to the primary database for writes.'}
       </p>
-      <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
+      <ConnectionParameters
+        parameters={buildConnectionParameters(
+          connectionParams,
+          isGrantMode ? passwordPlaceholder : undefined
+        )}
+      />
     </div>
   )
 }

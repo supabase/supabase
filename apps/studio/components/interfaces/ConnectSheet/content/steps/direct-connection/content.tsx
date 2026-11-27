@@ -22,10 +22,11 @@ import {
   buildPsqlCommand,
   buildSafeConnectionString,
   parseConnectionParams,
-  PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { useTemporaryAccessConnection } from '@/components/interfaces/ConnectSheet/TemporaryAccessConnectionProvider'
+import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -52,6 +53,9 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
   const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
+  const {
+    meta: { grantRole, isGrantMode, passwordPlaceholder },
+  } = useTemporaryAccessConnection()
 
   const connectionSource = state.connectionSource
   const isLoadBalancerSelected =
@@ -63,16 +67,12 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const connectionStrings = useConnectionStringDatabases(deploymentMode)
   const connectionStringPooler: ConnectionStringPooler | undefined =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
-  // Determine which connection string to use
-  const resolvedConnectionString = useMemo(
-    () =>
-      resolveConnectionString({
-        connectionMethod,
-        useSharedPooler,
-        connectionStringPooler,
-      }),
-    [connectionMethod, useSharedPooler, connectionStringPooler]
-  )
+  const resolvedConnectionString = resolveConnectionString({
+    connectionMethod,
+    useSharedPooler,
+    connectionStringPooler,
+    grantRole,
+  })
 
   const connectionParams = useMemo(
     () => parseConnectionParams(resolvedConnectionString),
@@ -80,8 +80,9 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   )
 
   const safeConnectionString = useMemo(
-    () => buildSafeConnectionString(resolvedConnectionString, connectionParams),
-    [resolvedConnectionString, connectionParams]
+    () =>
+      buildSafeConnectionString(resolvedConnectionString, connectionParams, passwordPlaceholder),
+    [resolvedConnectionString, connectionParams, passwordPlaceholder]
   )
 
   const redactedConnectionString = useMemo(() => {
@@ -89,24 +90,24 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
       case 'psql':
         return buildPsqlCommand(connectionParams)
       case 'jdbc':
-        return buildJdbcString(connectionParams)
+        return buildJdbcString(connectionParams, passwordPlaceholder)
       case 'php':
         return `DATABASE_URL=${safeConnectionString}`
       case 'uri':
       default:
         return safeConnectionString
     }
-  }, [connectionType, connectionParams, safeConnectionString])
+  }, [connectionType, connectionParams, passwordPlaceholder, safeConnectionString])
 
   const connectionString = useMemo(() => {
-    if (!temporaryDatabasePassword) return redactedConnectionString
+    if (isGrantMode || !temporaryDatabasePassword) return redactedConnectionString
 
     if (connectionType === 'psql') {
       return redactedConnectionString
     }
 
     return buildConnectionStringWithPassword(redactedConnectionString, temporaryDatabasePassword)
-  }, [connectionType, redactedConnectionString, temporaryDatabasePassword])
+  }, [connectionType, isGrantMode, redactedConnectionString, temporaryDatabasePassword])
 
   const trackCopy = () => {
     const typeConfig = DATABASE_CONNECTION_TYPES.find((t) => t.id === connectionType)
@@ -129,20 +130,23 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
 
   const poolerBadge =
     connectionMethod === 'transaction'
-      ? useSharedPooler || !hasDedicatedPooler
+      ? isGrantMode || useSharedPooler || !hasDedicatedPooler
         ? 'Shared pooler'
         : 'Dedicated pooler'
       : connectionMethod === 'session'
         ? 'Shared pooler'
         : null
 
-  const showPasswordPlaceholder = connectionString.includes(PASSWORD_PLACEHOLDER)
+  const showPasswordPlaceholder = connectionString.includes(passwordPlaceholder)
   const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
   const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && !isHighAvailability
   const titleBadge = isLoadBalancerSelected ? 'Read-only' : poolerBadge
   const showTitleBadge = isLoadBalancerSelected || showPoolerTitle
   const showResetInTitle =
-    deploymentMode.isPlatform && showPasswordPlaceholder && !temporaryDatabasePassword
+    deploymentMode.isPlatform &&
+    !isGrantMode &&
+    showPasswordPlaceholder &&
+    !temporaryDatabasePassword
   const showStringTitleRow = showTitleBadge || showResetInTitle
 
   return (
@@ -176,14 +180,15 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
             {connectionString}
           </CodeBlock>
         </div>
-        {deploymentMode.isPlatform && temporaryDatabasePassword && (
+        {deploymentMode.isPlatform && !isGrantMode && temporaryDatabasePassword && (
           <div className="flex items-center gap-2 border-t px-4 py-3 text-sm text-foreground-light">
             <CheckIcon size={16} className="text-primary shrink-0" />
             <span>New password shown until refresh.</span>
           </div>
         )}
       </div>
-      {showPasswordPlaceholder && <PasswordEncodingNote />}
+      {showPasswordPlaceholder && !isGrantMode && <PasswordEncodingNote />}
+      <TemporaryAccessPasswordNote />
       {/* Persistent live region so screen readers announce the read-only state
           when the load balancer is selected */}
       <p
@@ -205,7 +210,10 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         </p>
       )}
       <ConnectionParameters
-        parameters={buildConnectionParameters(connectionParams)}
+        parameters={buildConnectionParameters(
+          connectionParams,
+          isGrantMode ? passwordPlaceholder : undefined
+        )}
         onCopy={trackCopy}
       />
     </div>

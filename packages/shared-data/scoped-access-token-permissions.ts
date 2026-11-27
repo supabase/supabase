@@ -283,12 +283,12 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_jit': {
     category: 'database',
-    name: 'Database JIT',
-    description: 'Just-in-time database access settings.',
+    name: 'Database token access',
+    description: 'Connect to Postgres with an access token.',
     risk: 'medium',
-    riskReason: 'Read-write can change just-in-time database access settings.',
-    allowsRead: ['Read JIT settings'],
-    allowsWrite: ['Manage JIT settings'],
+    riskReason: 'Read-write can change database token access settings.',
+    allowsRead: ['Connect using an existing database role grant', 'Read token access settings'],
+    allowsWrite: ['Manage token access settings'],
   },
   'project:database_pooling_config': {
     category: 'database',

@@ -8,7 +8,7 @@ import {
   Link2Icon,
   TerminalIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -23,9 +23,12 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
+import { applyTemporaryAccessToConnectionString } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
+import { resolvePopoverDirectConnectionBehavior } from '@/components/interfaces/ConnectSheet/TemporaryAccessConnection.utils'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useActiveTemporaryAccessRoles } from '@/data/jit-db-access/use-active-temporary-access-roles'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -63,6 +66,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
   const isLoadingPermissions = apiKeysGrant.status === 'loading'
@@ -84,6 +88,16 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
   const isHighAvailability = useIsHighAvailability()
+  const {
+    activeRoles,
+    isPending: isLoadingTemporaryAccess,
+    isJitEnabled,
+  } = useActiveTemporaryAccessRoles(projectRef, { enabled: open })
+  const directConnectionBehavior = resolvePopoverDirectConnectionBehavior({
+    isJitEnabled,
+    isPending: isLoadingTemporaryAccess,
+    activeRoles,
+  })
 
   const directConnectionString = useMemo(() => {
     if (
@@ -99,8 +113,13 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       connectionInfo: { ...EMPTY_CONNECTION_INFO, ...connectionInfo },
       metadata: { projectRef },
     }).direct.uri
-    return isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
-  }, [primaryDatabase, projectRef, isHighAvailability])
+    const withSsl = isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
+    return directConnectionBehavior.type === 'copy' && directConnectionBehavior.role
+      ? applyTemporaryAccessToConnectionString(withSsl, {
+          role: directConnectionBehavior.role,
+        })
+      : withSsl
+  }, [primaryDatabase, projectRef, isHighAvailability, directConnectionBehavior])
 
   const cliCommands = useMemo(
     () =>
@@ -117,6 +136,47 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   // the entry entirely on !IS_PLATFORM when the key isn't available. Platform
   // behavior is unchanged.
   const showPublishableKey = IS_PLATFORM || !!publishableKey?.api_key
+
+  const openConnectDirect = () => {
+    setOpen(false)
+    setConnectTab('direct')
+    setShowConnect(true)
+  }
+
+  const directConnectionItem = useMemo(() => {
+    if (directConnectionBehavior.type === 'pending') {
+      return {
+        label: 'Direct connection string',
+        value: '',
+        displayValue: 'Loading connection string...',
+        disabled: true,
+        icon: DatabaseIcon,
+        action: 'copy' as const,
+      }
+    }
+
+    if (directConnectionBehavior.type === 'open-connect') {
+      return {
+        label: 'Direct connection string',
+        value: '',
+        displayValue: 'Multiple roles. Open Connect to choose.',
+        disabled: false,
+        icon: DatabaseIcon,
+        action: 'open-connect' as const,
+      }
+    }
+
+    return {
+      label: 'Direct connection string',
+      value: directConnectionString,
+      displayValue: isLoadingDatabases
+        ? 'Loading connection string...'
+        : directConnectionString || 'Connection string unavailable',
+      disabled: isLoadingDatabases || !directConnectionString,
+      icon: DatabaseIcon,
+      action: 'copy' as const,
+    }
+  }, [directConnectionBehavior.type, directConnectionString, isLoadingDatabases])
 
   const menuItems = useMemo(
     () => [
@@ -150,15 +210,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         : []),
       ...(IS_PLATFORM
         ? [
-            {
-              label: 'Direct connection string',
-              value: directConnectionString,
-              displayValue: isLoadingDatabases
-                ? 'Loading connection string...'
-                : directConnectionString || 'Connection string unavailable',
-              disabled: isLoadingDatabases || !directConnectionString,
-              icon: DatabaseIcon,
-            },
+            directConnectionItem,
             {
               label: 'CLI setup commands',
               value: cliCommands,
@@ -173,9 +225,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       apiKeysGrant.status,
       canReadAPIKeys,
       cliCommands,
-      directConnectionString,
+      directConnectionItem,
       isLoadingApiUrl,
-      isLoadingDatabases,
       isLoadingKeys,
       isLoadingPermissions,
       projectRef,
@@ -219,6 +270,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           <DropdownMenuContent side="bottom" align="center" className="w-80 p-1">
             {menuItems.map((item) => {
               const Icon = item.icon
+              const opensConnect = 'action' in item && item.action === 'open-connect'
 
               return (
                 <DropdownMenuItem
@@ -228,6 +280,10 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                   onSelect={(event) => {
                     event.preventDefault()
                     if (item.disabled) return
+                    if (opensConnect) {
+                      openConnectDirect()
+                      return
+                    }
 
                     copyToClipboard(item.value)
                     setCopiedItem(item.label)
@@ -236,7 +292,9 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                   <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
                   <div className="min-w-0 flex-1">
                     <div className="text-sm text-foreground">
-                      {copiedItem !== item.label ? <span className="sr-only">Copy</span> : null}
+                      {!opensConnect && copiedItem !== item.label ? (
+                        <span className="sr-only">Copy</span>
+                      ) : null}
                       {item.label}
                       {copiedItem === item.label ? (
                         <span className="sr-only">copied to your clipboard</span>
@@ -246,14 +304,16 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                       {item.displayValue}
                     </div>
                   </div>
-                  <div
-                    className={cn(
-                      'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
-                      copiedItem === item.label && 'opacity-100 text-primary'
-                    )}
-                  >
-                    {copiedItem === item.label ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
-                  </div>
+                  {!opensConnect && (
+                    <div
+                      className={cn(
+                        'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
+                        copiedItem === item.label && 'opacity-100 text-primary'
+                      )}
+                    >
+                      {copiedItem === item.label ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
+                    </div>
+                  )}
                 </DropdownMenuItem>
               )
             })}
@@ -267,7 +327,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                   setShowConnect(true)
                 }}
               >
-                Get Connected
+                Get connected
               </Button>
             </div>
           </DropdownMenuContent>

@@ -4,6 +4,8 @@ import type { ConnectionStringMethod } from '../Connect.constants'
 import type { ConnectionStringPooler } from '../Connect.types'
 import {
   appendConnectionStringParams,
+  applyTemporaryAccessToConnectionString,
+  applyTemporaryAccessToPooler,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
   buildDotnetConnectionString,
@@ -14,6 +16,7 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
+  TOKEN_PASSWORD_PLACEHOLDER,
   withRequiredSslmode,
 } from '../ConnectionString.utils'
 
@@ -260,4 +263,79 @@ describe('buildConnectionParameters', () => {
       { key: 'user', value: 'u' },
     ])
   })
+})
+
+describe('applyTemporaryAccessToConnectionString', () => {
+  test.each([PASSWORD_PLACEHOLDER, '[YOUR-PASSWORD]'])(
+    'rewrites a direct URI with the %s password placeholder',
+    (placeholder) => {
+      const uri = `postgresql://postgres:${placeholder}@db.proj.supabase.co:5432/postgres?sslmode=require`
+
+      expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
+      expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
+      expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
+        `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
+      )
+    }
+  )
+
+  test('appends jit on shared pooler URIs once', () => {
+    const uri = `postgresql://postgres.projref:${PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres`
+    const withJit = applyTemporaryAccessToConnectionString(uri, {
+      role: 'analytics',
+      addPoolerJitOption: true,
+    })
+
+    expect(withJit).toBe(
+      `postgresql://analytics.projref:${TOKEN_PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?options=-c%20jit%3dtrue`
+    )
+    expect(
+      applyTemporaryAccessToConnectionString(withJit, {
+        role: 'analytics',
+        addPoolerJitOption: true,
+      })
+    ).toBe(withJit)
+  })
+})
+
+describe('applyTemporaryAccessToPooler', () => {
+  test('uses only direct and shared pooler strings for a granted role', () => {
+    const rewritten = applyTemporaryAccessToPooler(
+      {
+        transactionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@pooler:6543/postgres`,
+        sessionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@pooler:5432/postgres`,
+        transactionDedicated: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@dedicated:6543/postgres`,
+        sessionDedicated: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.host:5432/postgres`,
+        ipv4SupportedForDedicatedPooler: true,
+        direct: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.host:5432/postgres`,
+      },
+      'analytics'
+    )
+
+    expect(rewritten.direct).toBe(
+      `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.host:5432/postgres`
+    )
+    expect(rewritten.transactionShared).toContain('options=-c%20jit%3dtrue')
+    expect(rewritten.sessionShared).toContain('options=-c%20jit%3dtrue')
+    expect(rewritten.transactionDedicated).toBeUndefined()
+    expect(rewritten.sessionDedicated).toBeUndefined()
+  })
+})
+
+test('uses shared transaction pooling with a granted role when a dedicated pooler exists', () => {
+  expect(
+    resolveConnectionString({
+      connectionMethod: 'transaction',
+      useSharedPooler: false,
+      grantRole: 'analytics',
+      connectionStringPooler: {
+        transactionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@shared:6543/postgres`,
+        transactionDedicated: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@dedicated:6543/postgres`,
+        sessionShared: '',
+        ipv4SupportedForDedicatedPooler: true,
+      },
+    })
+  ).toBe(
+    `postgresql://analytics.proj:${TOKEN_PASSWORD_PLACEHOLDER}@shared:6543/postgres?options=-c%20jit%3dtrue`
+  )
 })

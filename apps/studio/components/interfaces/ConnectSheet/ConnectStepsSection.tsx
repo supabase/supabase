@@ -20,6 +20,7 @@ import type {
   ResolvedStep,
   StepContentProps,
 } from './Connect.types'
+import { applyTemporaryAccessToPooler } from './ConnectionString.utils'
 import { ConnectSheetStep } from './ConnectSheetStep'
 import {
   resolveContentPath,
@@ -31,6 +32,7 @@ import {
 } from './ConnectStepsSection.utils'
 import { CopyPromptButton } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
+import { useTemporaryAccessConnection } from './TemporaryAccessConnectionProvider'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -233,6 +235,16 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   const deploymentMode = useDeploymentMode()
   const isHighAvailability = useIsHighAvailability()
   const connectionStringPooler = useConnectionStringPooler(deploymentMode)
+  const {
+    meta: { grantRole },
+  } = useTemporaryAccessConnection()
+  const resolvedConnectionStringPooler = useMemo(
+    () =>
+      grantRole
+        ? applyTemporaryAccessToPooler(connectionStringPooler, grantRole)
+        : connectionStringPooler,
+    [connectionStringPooler, grantRole]
+  )
 
   const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
     'project_addons:dedicated_ipv4_address',
@@ -253,7 +265,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     isIpv4Enabled: projectAddonsDedicatedIpv4Address,
     mode: state.mode,
     connectionMethod: state.connectionMethod,
-    useSharedPooler: state.useSharedPooler,
+    useSharedPooler: grantRole ? true : state.useSharedPooler,
     hasIpv4Addon: !!ipv4Addon,
     isHighAvailability,
   })
@@ -361,7 +373,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
                 contentId={step.content}
                 state={state}
                 projectKeys={projectKeys}
-                connectionStringPooler={connectionStringPooler}
+                connectionStringPooler={resolvedConnectionStringPooler}
                 deploymentMode={deploymentMode}
               />
             </ConnectSheetStep>

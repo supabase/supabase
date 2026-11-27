@@ -21,6 +21,8 @@ import {
   resolveConnectSheetHydration,
 } from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
+import { TemporaryAccessConnectionProvider } from './TemporaryAccessConnectionProvider'
+import { TemporaryAccessRoleField } from './TemporaryAccessRoleField'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
@@ -179,53 +181,62 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <ScrollViewport className="[&>div]:block!">
-            <div className="flex min-w-0 flex-col divide-y">
-              <div className="p-8">
-                <ModeSelector
-                  modes={availableModes}
-                  selected={state.mode}
-                  onChange={handleModeChange}
-                />
-              </div>
-
-              {/* Only framework snippets embed API keys. The server env tab renders its own note
-                  next to the keys it offers to copy. */}
-              {state.mode === 'framework' && (
-                <ApiKeysAccessNote
-                  grant={apiKeysGrant}
-                  fallback="Replace the placeholders with your own keys."
-                  className="px-8 py-4"
-                />
-              )}
-
-              {state.mode === 'warehouse' ? (
-                <WarehouseTab />
-              ) : (
-                <>
-                  {activeFields.length > 0 && (
-                    <div className="p-8">
-                      <ConnectConfigSection
-                        state={state}
-                        activeFields={activeFields}
-                        onFieldChange={handleFieldChange}
-                        getFieldOptions={getFieldOptions}
-                      />
-                    </div>
-                  )}
-
-                  <ConnectStepsSection
-                    steps={resolvedSteps}
-                    state={state}
-                    projectKeys={projectKeys}
+        <TemporaryAccessConnectionProvider key={projectRef} enabled={showConnect} mode={state.mode}>
+          <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <ScrollViewport className="[&>div]:block!">
+              <div className="flex min-w-0 flex-col divide-y">
+                <div className="p-8">
+                  <ModeSelector
+                    modes={availableModes}
+                    selected={state.mode}
+                    onChange={handleModeChange}
                   />
-                </>
-              )}
-            </div>
-          </ScrollViewport>
-          <ScrollBar />
-        </ScrollRoot>
+                </div>
+
+                {/* Only framework snippets embed API keys. The server env tab renders its own note
+                    next to the keys it offers to copy. */}
+                {state.mode === 'framework' && (
+                  <ApiKeysAccessNote
+                    grant={apiKeysGrant}
+                    fallback="Replace the placeholders with your own keys."
+                    className="px-8 py-4"
+                  />
+                )}
+
+                {state.mode === 'warehouse' ? (
+                  <WarehouseTab />
+                ) : (
+                  <>
+                    {activeFields.length > 0 && (
+                      <div className="p-8">
+                        <ConnectConfigSection
+                          state={state}
+                          activeFields={activeFields}
+                          onFieldChange={handleFieldChange}
+                          getFieldOptions={getFieldOptions}
+                          insertAfter={
+                            state.mode === 'direct'
+                              ? { fieldId: 'connectionSource', node: <TemporaryAccessRoleField /> }
+                              : undefined
+                          }
+                        >
+                          {state.mode === 'orm' && <TemporaryAccessRoleField />}
+                        </ConnectConfigSection>
+                      </div>
+                    )}
+
+                    <ConnectStepsSection
+                      steps={resolvedSteps}
+                      state={state}
+                      projectKeys={projectKeys}
+                    />
+                  </>
+                )}
+              </div>
+            </ScrollViewport>
+            <ScrollBar />
+          </ScrollRoot>
+        </TemporaryAccessConnectionProvider>
       </SheetContent>
     </Sheet>
   )
