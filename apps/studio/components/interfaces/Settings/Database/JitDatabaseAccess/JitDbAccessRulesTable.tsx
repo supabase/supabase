@@ -64,7 +64,9 @@ export function JitDbAccessRulesTable({
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
   )
 
-  const { isPending: isLoadingUserJitDbAccess } = useJitDbAccessStatusQuery({ projectRef })
+  const { data: jitDbAccess, isPending: isLoadingUserJitDbAccess } = useJitDbAccessStatusQuery({
+    projectRef,
+  })
 
   if (isLoading || isLoadingUserJitDbAccess) {
     return (
@@ -228,7 +230,7 @@ export function JitDbAccessRulesTable({
         )}
       </CardContent>
 
-      {!canManageJitDbAccess && (
+      {!canManageJitDbAccess && jitDbAccess?.user_id !== undefined && (
         <CardFooter>
           <p className="text-foreground-lighter text-sm">
             You need additional permissions to manage temporary database access
