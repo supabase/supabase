@@ -77,6 +77,8 @@ TO_REF=""
 FROM_REF=""
 
 TARGET_REF=""
+TARGET_SHA=""
+FETCHED_SHA=""
 BASE_REF=""
 BASE_VER=""
 TARGET_VER=""
@@ -181,6 +183,7 @@ fetch_snapshot() {
         && git -C "$_work" fetch --depth=1 --filter=blob:none -q origin "$_ref" 2>/dev/null \
         && git -C "$_work" checkout -q FETCH_HEAD 2>/dev/null \
         && [ -d "$_work/docker" ]; then
+        FETCHED_SHA=$(git -C "$_work" rev-parse HEAD)
         mkdir -p "$_dest"
         cp -rf "$_work/docker/." "$_dest/"
         rm -rf "$_work"
@@ -190,8 +193,11 @@ fetch_snapshot() {
     fi
 }
 
+# Highest self-hosted/v* tag on the remote, or empty when the remote has none.
+# Returns non-zero (printing nothing) when the remote can't be reached.
 latest_release_tag() {
-    git ls-remote --tags --refs "$REPO_URL" 2>/dev/null \
+    _refs=$(git ls-remote --tags --refs "$REPO_URL" 2>/dev/null) || return 1
+    printf '%s\n' "$_refs" \
         | sed 's#^.*refs/tags/##' \
         | grep -E '^self-hosted/v[0-9]' \
         | sort -V | tail -n1
@@ -234,7 +240,9 @@ resolve_target_ref() {
         TARGET_REF="$TO_REF"
         return
     fi
-    TARGET_REF=$(latest_release_tag)
+    if ! TARGET_REF=$(latest_release_tag); then
+        die "Could not reach $REPO_URL to look up release tags. Check your network and retry, or pass --to <tag>."
+    fi
     if [ -n "$TARGET_REF" ]; then
         log "Latest release tag: $TARGET_REF"
     else
@@ -283,6 +291,7 @@ fetch_snapshots() {
     log "Fetching target snapshot ($TARGET_REF)"
     fetch_snapshot "$TARGET_REF" "$TARGET_DIR" \
         || die "Could not fetch target snapshot '$TARGET_REF' from $REPO_URL"
+    TARGET_SHA="$FETCHED_SHA"
 
     if [ "$REPORT_ONLY" = "1" ]; then
         return
@@ -601,11 +610,18 @@ print_summary() {
     log "For what changed in this update, see CHANGELOG.md (from $BASE_REF to $TARGET_REF)."
 }
 
+# Stamp the tag name for a release tag, else the exact commit SHA (as setup.sh
+# does). A branch name would move, and the next update would use the branch's
+# new tip as its merge base.
 write_stamp() {
+    case "$TARGET_REF" in
+        self-hosted/v*) _stamp_ref="$TARGET_REF" ;;
+        *)              _stamp_ref="$TARGET_SHA" ;;
+    esac
     {
         echo "# Supabase self-hosted version stamp. Managed by setup.sh / update.sh."
         echo "# Do not commit or edit by hand. Records the ref this deployment was based on."
-        echo "ref=$TARGET_REF"
+        echo "ref=$_stamp_ref"
     } > "$STAMP_FILE"
 }
 

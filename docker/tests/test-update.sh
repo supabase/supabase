@@ -12,8 +12,9 @@
 # honors .gitignore for user-owned paths, surfaces only the in-window gate
 # entries (base-version entry excluded), and advances the stamp ONLY on a clean
 # apply. Also covers the clean-apply path, default-target resolution, --from,
-# --dry-run, the missing-stamp report-only path, and a malformed manifest being
-# refused.
+# --dry-run, the missing-stamp report-only path, a malformed manifest being
+# refused, a branch target being stamped as its commit, and a failed tag lookup
+# being refused.
 #
 # Usage:
 #   sh tests/test-update.sh        # run from the docker/ directory
@@ -382,6 +383,87 @@ assert_no_line "./update.sh" '^(<<<<<<<|=======|>>>>>>>)'      "no conflict mark
 assert_path_exists "$SELFDEP/update.sh.dist"                   "target's update.sh staged as update.sh.dist"
 assert_file_contains "$SELFDEP/update.sh.dist" "THIS-IS-THE-NEW-UPDATE-SH" "update.sh.dist holds the target's version"
 assert_file_contains "$WORK/self.log" "update.sh.dist"         "summary points the user at update.sh.dist"
+
+echo ""
+echo "=== update.sh: a branch target is stamped as its commit, so the next update applies ==="
+
+# A dedicated upstream: self-hosted/v1.0.0 ships studio:A, and branch "edge"
+# moves A -> B -> C. After updating to "edge" at B, the stamp must record B's
+# commit, not the name "edge". Otherwise the next update to "edge" uses C as its
+# merge base, sees B's lines as user edits, and keeps them.
+MOVSRC="$WORK/movsrc"
+mkdir -p "$MOVSRC/docker"
+cd "$MOVSRC"
+git init -q
+git config user.email t@t.t
+git config user.name t
+printf 'services:\n  studio:\n    image: supabase/studio:A\n' > docker/docker-compose.yml
+printf 'KEEP=1\n' > docker/.env.example
+cp "$DOCKER_DIR/.gitignore" docker/.gitignore
+git add -A && git commit -qm A && git tag self-hosted/v1.0.0
+DEFAULT_BRANCH=$(git symbolic-ref --short HEAD)
+git checkout -q -b edge
+sedi 's/studio:A/studio:B/' docker/docker-compose.yml
+git add -A && git commit -qm B
+B_SHA=$(git rev-parse HEAD)
+
+MOVDEP="$WORK/movdep"
+mkdir -p "$MOVDEP"
+git -C "$MOVSRC" archive self-hosted/v1.0.0 docker | tar -x -C "$MOVDEP" --strip-components=1
+cp "$UPDATE_SH" "$MOVDEP/update.sh"
+cp "$MOVDEP/.env.example" "$MOVDEP/.env"
+printf 'ref=self-hosted/v1.0.0\n' > "$MOVDEP/.supabase-version"
+cd "$MOVDEP"
+rc=0
+SUPABASE_REPO_URL="$MOVSRC" sh ./update.sh --to edge --yes > "$WORK/mov1.log" 2>&1 || rc=$?
+if [ "$rc" = "0" ]; then ok "update to a branch exits 0"; else bad "expected exit 0, got $rc"; fi
+assert_file_contains "docker-compose.yml" "supabase/studio:B"  "branch update applied"
+assert_file_contains ".supabase-version" "ref=$B_SHA"           "branch target stamped as its commit SHA"
+assert_no_line       ".supabase-version" "^ref=edge$"           "branch name not stamped"
+
+cd "$MOVSRC"
+sedi 's/studio:B/studio:C/' docker/docker-compose.yml
+git add -A && git commit -qm C
+cd "$MOVDEP"
+rc=0
+SUPABASE_REPO_URL="$MOVSRC" sh ./update.sh --to edge --yes > "$WORK/mov2.log" 2>&1 || rc=$?
+if [ "$rc" = "0" ]; then ok "update to the moved branch exits 0"; else bad "expected exit 0, got $rc"; fi
+assert_file_contains "docker-compose.yml" "supabase/studio:C"  "moved branch: upstream change applied (merge base was the stamped commit)"
+
+echo ""
+echo "=== update.sh: tag lookup fails -> refuses (dies), writes nothing ==="
+
+# Only 'git ls-remote' fails, as on a network error; every other git call passes
+# through. The default branch has an unreleased change on top of the release.
+# update.sh must stop, not install the default branch and stamp it.
+cd "$MOVSRC"
+git checkout -q "$DEFAULT_BRANCH"
+sedi 's/studio:A/studio:UNRELEASED/' docker/docker-compose.yml
+git add -A && git commit -qm unreleased
+FAKEBIN="$WORK/fakebin"
+mkdir -p "$FAKEBIN"
+REAL_GIT=$(command -v git)
+cat > "$FAKEBIN/git" <<EOF
+#!/bin/sh
+[ "\$1" = "ls-remote" ] && exit 128
+exec "$REAL_GIT" "\$@"
+EOF
+chmod +x "$FAKEBIN/git"
+
+NETDEP="$WORK/netdep"
+mkdir -p "$NETDEP"
+git -C "$MOVSRC" archive self-hosted/v1.0.0 docker | tar -x -C "$NETDEP" --strip-components=1
+cp "$UPDATE_SH" "$NETDEP/update.sh"
+cp "$NETDEP/.env.example" "$NETDEP/.env"
+printf 'ref=self-hosted/v1.0.0\n' > "$NETDEP/.supabase-version"
+cd "$NETDEP"
+rc=0
+PATH="$FAKEBIN:$PATH" SUPABASE_REPO_URL="$MOVSRC" sh ./update.sh --yes > "$WORK/net.log" 2>&1 || rc=$?
+if [ "$rc" != "0" ] && [ "$rc" != "2" ]; then ok "tag lookup failure aborts (die, not a normal exit)"; else bad "expected die (non-0, non-2), got $rc"; fi
+assert_file_contains "$WORK/net.log" "Could not reach"            "tag lookup failure reported"
+assert_file_contains "docker-compose.yml" "supabase/studio:A"     "tag lookup failure: default branch not installed"
+assert_path_absent   "backups"                                    "tag lookup failure: no backup taken"
+assert_file_contains ".supabase-version" "ref=self-hosted/v1.0.0" "tag lookup failure: stamp not advanced"
 
 # --- summary -----------------------------------------------------------------
 
