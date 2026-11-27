@@ -81,6 +81,13 @@ services:
         aliases:
           - envoy
           - kong
+    # Keep Docker's DNS from forwarding lookups for service names that don't
+    # exist yet (e.g. a container that is being recreated) to the host's DNS
+    # servers. If the forwarded response includes DNS cookies, Envoy rejects
+    # Docker's own replies for about 2 minutes.
+    dns_opt:
+      - ndots:1
+    dns_search: .
     healthcheck:
       # Using a TCP port check because this image does not include curl or wget.
       test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/8000'"]
@@ -480,9 +487,6 @@ services:
     volumes:
       - ./volumes/functions:/home/deno/functions:z
       - deno-cache:/root/.cache/deno
-    depends_on:
-      api-gw:
-        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
       interval: 5s
