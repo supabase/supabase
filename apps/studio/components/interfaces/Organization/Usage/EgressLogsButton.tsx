@@ -4,17 +4,33 @@ import { Button } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-// Example egress query: top REST API paths by request count. The user can edit
-// it in the Logs Explorer. Mirrors what an agent would run via MCP `query_logs`.
+// Example egress query: top paths by response bytes over the last 24 hours.
+// Storage paths are grouped by bucket. HEAD requests are excluded from the byte
+// sum (HEAD sends no body but carries a content_length header). The user can
+// edit this in the Logs Explorer. Mirrors what an agent would run via MCP `query_logs`.
 const EGRESS_LOGS_SQL = `select
-  request.path as path,
-  count(*) as count
+  coalesce(
+    concat(
+      regexp_extract(request.path, r'^(/storage/v1/(?:object|render)/(?:public|authenticated)/[^/]+)'),
+      '/*'
+    ),
+    request.path
+  ) as path,
+  count(*) as requests,
+  sum(
+    if(
+      request.method = 'HEAD',
+      0,
+      cast(coalesce(resp_headers.content_length, '0') as int64)
+    )
+  ) as egress_bytes
 from edge_logs
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
-where request.path like '/rest/v1/%'
+  cross join unnest(m.response) as response
+  cross join unnest(response.headers) as resp_headers
 group by path
-order by count desc
+order by egress_bytes desc
 limit 20`
 
 /**
