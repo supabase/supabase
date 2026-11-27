@@ -2,6 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { storageKeys } from '../keys'
+import { compareNewestVersionFirst } from './version-order'
 import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -48,6 +49,7 @@ const MAX_VERSIONS = 1000
 export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
   const versions = objects
     .filter((object) => !!object.version)
+    .sort(compareNewestVersionFirst)
     .map((object) => ({
       versionId: object.version as string,
       size: Number(object.metadata?.size ?? 0),
@@ -58,7 +60,6 @@ export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
       isCurrent: !object.archived_at,
       isDeleteMarker: !!object.is_delete_marker,
     }))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 
   const oldestUploadIndex = versions.reduce(
     (oldest, version, index) => (version.isDeleteMarker ? oldest : index),
