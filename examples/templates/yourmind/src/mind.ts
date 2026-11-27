@@ -112,6 +112,19 @@ export async function saveImage(userId: string, file: File) {
   }
 }
 
+/**
+ * True only when Storage confirms the file is gone: lists its folder and looks
+ * for the name. A failed check throws instead of counting as "gone", unlike
+ * exists(), which can return false for errors that aren't "not found".
+ */
+async function isGone(bucket: ReturnType<typeof supabase.storage.from>, path: string) {
+  const slash = path.lastIndexOf('/')
+  const name = path.slice(slash + 1)
+  const { data, error } = await bucket.list(path.slice(0, slash), { search: name, limit: 100 })
+  if (error) throw error
+  return !data.some((file) => file.name === name)
+}
+
 export async function deleteItem(item: Item) {
   // Remove the image first and only delete the item once Storage confirms it.
   if (item.image_path) {
@@ -121,7 +134,7 @@ export async function deleteItem(item: Item) {
     // An empty result means nothing was removed: either the file is already
     // gone (a retry after the item delete failed), or a policy refused. Only
     // carry on if the file really is gone.
-    if (data.length === 0 && (await bucket.exists(item.image_path)).data) {
+    if (data.length === 0 && !(await isGone(bucket, item.image_path))) {
       throw new Error('Could not delete the image. Try again.')
     }
   }
