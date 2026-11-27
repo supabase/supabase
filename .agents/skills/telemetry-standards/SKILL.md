@@ -119,6 +119,7 @@ Telemetry only runs for visitors who accepted analytics. Consent does not make i
 ## Consent and Transport
 
 - Send events only through `useTrack` (Studio) or the app's `useSendTelemetryEvent`, and pageviews through `PageTelemetry`. They check consent. Never import `posthog-js` outside `packages/common/posthog-client.ts` or post to an analytics endpoint directly
+- Don't add a direct `sendTelemetryEvent` call in Studio. `useStudioCommandMenuTelemetry` is the one caller besides `useTrack`: it forwards events the shared command menu has already built
 - Always pass the real consent state to `posthogClient` methods. Never rely on a parameter default
 - Do not write analytics cookies or storage (ids, attribution, experiment assignment) before the visitor accepts. Anything stored after consent must be cleared in `revokeTrackingConsent` (`packages/common/consent-state.ts`) when consent is withdrawn
 - A new third-party script, pixel or embed that receives visitor data needs a consent gate and a Legal review before it merges. Ask @supabase/growth-eng to route it
@@ -151,6 +152,11 @@ Where the `track()` call goes:
 - **`data-attr` is not tracking.** PostHog autocapture is off (`autocapture: false` in `packages/common/posthog-client.ts`), so the attribute sends nothing. A click you want measured gets a `track()` call. Keep any `data-attr` value a static string, never built from user-defined names, in case autocapture is enabled later.
 - **Mutation outcomes.** Don't track in the callbacks passed as the second argument to `mutate()` (`onSuccess`, `onError`): they are skipped if the component unmounts first. Track around `await mutateAsync()` (after it for success, in a `catch` for failure), or in the callbacks passed to the mutation hook itself (`useXMutation({ onSuccess, onError })`) when the hook always calls them: some return early, on a 202 for example. The selected project can change before the response arrives, so attribute the event to the mutation's own project or org (from its variables, or from the response for a create) with the third `track()` argument, for example `{ project: variables.projectRef }`.
 - **One meaning per event.** When one event name fires from several places, every call site fires on the same kind of user action, so the counts are comparable. Don't mix a `copy` event handler on a DOM element, which also fires on keyboard and partial-selection copies, with a Copy button's click callback under one event name: track the same action in both, or add a property that tells them apart.
+- **Submitted values.** Capture what the user submitted at submit time, not in the success callback. A form can stay editable while the request is in flight, so reading it on success can report a value that was not the one sent.
+- **Dismiss and abandonment events.** Every property must be able to take a different value at that call site. Read it from state that exists while the user is still in the flow, not from a result that is only set after success: otherwise every abandonment reports the same value. The success path (a Done button, for example) must not go through the dismiss handler, or each success also counts as an abandonment.
+- **Conditionally rendered elements.** A `track()` call on an element that renders only for some items (a link rendered only when the item has an `href`, for example) never fires for the others, and they read as zero. Put the call on an element every item renders.
+- **Debounced or delayed sends.** `useTrack` reads the project, org and pathname when the event is sent, not when the user acted. An event sent from a debounce or timer that outlives a navigation is attributed to the destination page. Send on the action where possible, and pass the project or org as the third argument when the send has to wait.
+- **Events sent just before leaving the page.** A request started right before a full-page navigation (an external link, an OAuth redirect) can be cancelled. Add the event's action to `KEEPALIVE_ACTIONS` in `packages/common/telemetry-event.ts`. Never turn keepalive on for every event: the browser's in-flight keepalive budget is small and shared, so other events would be dropped.
 
 ## Feature Flag Measurement
 
@@ -161,7 +167,7 @@ A feature flag that gates behavior needs telemetry on both the flag state and ho
 
 `usePHFlag` returns `undefined` while the PostHog store is still loading. Read the raw flag via `usePHFlag('flagName')`, **not** through wrapper hooks that coerce `undefined` to `false`, and use a conditional spread so the property is omitted (not `false`) until the flag has resolved:
 
-As always, `track()` runs inside the user-action handler — never in the component body or an effect:
+As always, `track()` runs inside the user-action handler — never in the component body or an effect (`_exposed` events excepted, see [What NOT to Track](#what-not-to-track)):
 
 ```typescript
 const track = useTrack()
@@ -173,6 +179,8 @@ const handleSubmit = () => {
   })
 }
 ```
+
+**Experiment exposure.** Send `<experiment_id>_experiment_exposed` through `useTrack` with `experiment_id` and `variant`, once per mount, and only once flags have loaded for the signed-in user (`hasFlagsForSignedInUser` in `packages/common/feature-flags.tsx`): the value held before that belongs to the logged-out visitor.
 
 For string-valued flags (e.g. experiment variants), use `usePHFlag<string>('flagName')`; a flag that may be migrated from boolean to multivariate is typed `usePHFlag<boolean | string>`. `ProjectCreationForm.tsx` (`dataApiRevokeOnCreateDefault`) is the canonical example.
 
@@ -200,26 +208,26 @@ export interface MyFeatureClickedEvent {
 Add the new interface to the `TelemetryEvent` union type so `useTrack` picks it up.
 `@group Events` and `@source` are required on every event; add `@page` when the event fires from a specific page. All three must be accurate.
 
+An event fired from an organization-level page (`/org/[slug]/...`) gets its own event name and `groups: Omit<TelemetryGroups, 'project'>` (see `organization_mfa_enforcement_updated`). Don't reuse a project-scoped event there: no project is selected, so `useTrack` sends it without the project group and the type does not catch it.
+
 ## Review Rules
 
-When reviewing a PR, flag these as **required changes:**
+When reviewing a PR, flag a break of any of these as a **required change**, even when the value looks harmless:
 
-1. **Naming violations** — event not following `[object]_[verb]` snake_case, or using an unapproved verb
-2. **Property violations** — not camelCase, generic names, or inconsistent with similar events
-3. **Unnecessary view tracking** — events that fire on page load without user interaction
-4. **Inaccurate docs** — `@source`/`@page` descriptions that don't match the actual implementation
-5. **Unmeasured feature flags** — a PostHog flag gates new behavior but its value is not captured in any `track()` call, or there is no outcome tracking for the gated behavior
-6. **User-defined names or identifiers in properties** — schema, table, column, function, bucket, policy, project or branch names, SQL or other free text, raw error messages, or extra IDs sent as property values, or a new property typed as plain `string` that could hold one (feature flag values excepted). Required even when the value looks harmless; ask for a count, enum, boolean or category instead
-7. **Secrets, project content, URL state or consent** — a property that can carry a secret or content read from a project; new query-string or hash state holding tokens, user input or row values with no redaction; a send path that bypasses the consent check; analytics storage written before consent
-8. **Tracking placement** — a `track()` call or a `data-attr` that breaks one of the placement rules under [Required Pattern](#required-pattern)
+1. **Naming**: [Event Naming](#event-naming)
+2. **Properties**: [Property Standards](#property-standards). Search `packages/common/telemetry-constants.ts` for similar events and check that property names match
+3. **Passive view tracking**: [What NOT to Track](#what-not-to-track)
+4. **Inaccurate docs**: `@source` or `@page` that doesn't match the implementation ([Event Definitions](#event-definitions))
+5. **Unmeasured feature flags**: [Feature Flag Measurement](#feature-flag-measurement)
+6. **User-defined names or identifiers in properties**: [Privacy: User-Defined Names and Identifiers](#privacy-user-defined-names-and-identifiers)
+7. **Secrets, project content, URL state or consent**: [Privacy: Secrets, Project Content and URL State](#privacy-secrets-project-content-and-url-state) and [Consent and Transport](#consent-and-transport)
+8. **Tracking placement**: the placement rules under [Required Pattern](#required-pattern)
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
 - "This adds a user interaction that may benefit from tracking."
 - Propose the event name following `[object]_[verb]` convention
 - Propose the `useTrack()` call with suggested properties
-
-When checking property consistency, search `packages/common/telemetry-constants.ts` for similar events and verify property names match.
 
 ## Well-Formed Event Examples
 
@@ -251,22 +259,8 @@ track('home_new_experiment_exposed', {
 
 To add tracking for a user action:
 
-1. **Name the event** — `[object]_[verb]` using approved verbs only
-2. **Choose properties** — camelCase preferred for new events; check `packages/common/telemetry-constants.ts` for similar events and match their property names and casing
-3. **Add interface to telemetry-constants.ts** — with `@group Events` and `@source` JSDoc (plus `@page` when page-specific), add to the `TelemetryEvent` union type
-4. **Add to component** — `import { useTrack } from '@/lib/telemetry/track'`, call `track('event_name', { properties })`
-
-### Verification checklist
-
-- [ ] Event name follows `[object]_[verb]` with approved verb
-- [ ] Event name is snake_case
-- [ ] Properties are camelCase and self-explanatory
-- [ ] Event defined in telemetry-constants.ts with accurate `@group Events`, `@source`, and (if page-specific) `@page`
-- [ ] Using the `useTrack` hook
-- [ ] Not tracking passive views/appearances
-- [ ] No PII in event properties (emails, names, IPs, etc.)
-- [ ] No user-defined names or identifiers in properties (schema, table, column, function, bucket, policy, project, branch), and no free text, raw error messages or extra IDs
-- [ ] New properties are typed as string-literal unions, booleans or numbers, not plain `string` (feature flag values excepted)
-- [ ] No secrets or content read from a project in any property
-- [ ] No new query-string or hash state that holds tokens, user input or row values
-- [ ] Property names consistent with similar events
+1. **Name the event**: [Event Naming](#event-naming)
+2. **Choose properties**: [Property Standards](#property-standards) and both Privacy sections. Search `packages/common/telemetry-constants.ts` for similar events and match their property names and casing
+3. **Define the event**: [Event Definitions](#event-definitions)
+4. **Call `track()`**: [Required Pattern](#required-pattern), plus [Feature Flag Measurement](#feature-flag-measurement) when a flag gates the behavior
+5. **Verify**: in the browser network tab, the action sends one `telemetry/event` request with the expected properties
