@@ -99,7 +99,13 @@ export const StatusBanner = ({ signedOut = false }: { signedOut?: boolean } = {}
   return (
     <HeaderBanner
       variant={selection.kind === 'incident' ? 'warning' : 'note'}
-      title={title}
+      title={
+        selection.kind === 'incident' ? (
+          title
+        ) : (
+          <InlineLink href={selection.item.url}>{title}</InlineLink>
+        )
+      }
       description={getBannerDescription({ selection, description, pageUrl })}
       onDismiss={onDismiss}
     />

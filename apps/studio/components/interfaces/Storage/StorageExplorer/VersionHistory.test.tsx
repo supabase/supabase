@@ -66,6 +66,13 @@ const renderHistory = (props: Partial<ComponentProps<typeof VersionHistory>> = {
     />
   )
 
+const mockPublicUrl = () =>
+  addAPIMock({
+    method: 'post',
+    path: '/platform/storage/:ref/buckets/:id/objects/public-url',
+    response: () => Response.json({ publicUrl: 'https://example.com/photo.png' }),
+  })
+
 describe('VersionHistory', () => {
   it('refreshes the listing after a restore, so the row stops showing the old size', async () => {
     addAPIMock({
@@ -78,11 +85,7 @@ describe('VersionHistory', () => {
       path: '/platform/storage/:ref/buckets/:id/objects/move',
       response: () => Response.json({ message: 'ok' }),
     })
-    addAPIMock({
-      method: 'post',
-      path: '/platform/storage/:ref/buckets/:id/objects/public-url',
-      response: () => Response.json({ publicUrl: 'https://example.com/photo.png' }),
-    })
+    mockPublicUrl()
 
     renderHistory()
 
@@ -124,6 +127,74 @@ describe('VersionHistory', () => {
     })
   })
 
+  it('shows version details and calculates expiration from when it was archived', async () => {
+    const archivedAt = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () =>
+        Response.json([
+          ...VERSIONS.slice(0, 1),
+          { ...VERSIONS[1], created_at: '2020-01-01T00:00:00Z', archived_at: archivedAt },
+        ]),
+    })
+    mockPublicUrl()
+
+    renderHistory({ lifecyclePolicy: { expiryDays: 30, maxVersions: null } })
+
+    expect(await screen.findByText('100 bytes')).toBeInTheDocument()
+    const countdown = await screen.findByText('28d')
+    await userEvent.hover(countdown)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Expires in 28 days')
+    await userEvent.unhover(countdown)
+    await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
+
+    expect(await screen.findByText('Archived at')).toBeInTheDocument()
+    expect(screen.getByText('Created at')).toBeInTheDocument()
+    expect(screen.getByText('Lifecycle')).toBeInTheDocument()
+    expect(screen.getByText('Expires in 28 days.')).toBeInTheDocument()
+  })
+
+  it('explains when a version is retained by the current lifecycle policy', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () => Response.json(VERSIONS),
+    })
+    mockPublicUrl()
+
+    renderHistory()
+    await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
+
+    expect(await screen.findByText('Not currently scheduled to expire')).toBeInTheDocument()
+  })
+
+  it('explains that a version beyond the keep limit must reach the count rule age minimum', async () => {
+    const archivedAt = new Date().toISOString()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: () =>
+        Response.json([
+          VERSIONS[0],
+          { ...VERSIONS[1], archived_at: archivedAt },
+          { ...VERSIONS[1], version: 'v-oldest', archived_at: archivedAt },
+        ]),
+    })
+    mockPublicUrl()
+
+    renderHistory({
+      lifecyclePolicy: { expiryDays: 30, maxVersions: 1 },
+      expirationMode: 'or',
+    })
+
+    const countdown = await screen.findByText('1d')
+    await userEvent.hover(countdown)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'beyond the limit of 1 kept version and becomes eligible to expire in 1 day'
+    )
+  })
+
   describe('suspended notice', () => {
     it('promises one last retained version for a file that predates the suspension', async () => {
       addAPIMock({
@@ -131,6 +202,7 @@ describe('VersionHistory', () => {
         path: '/platform/storage/:ref/buckets/:id/objects/list',
         response: () => Response.json(VERSIONS),
       })
+      mockPublicUrl()
       renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
 
       expect(
@@ -144,6 +216,7 @@ describe('VersionHistory', () => {
         path: '/platform/storage/:ref/buckets/:id/objects/list',
         response: () => Response.json(VERSIONS),
       })
+      mockPublicUrl()
       renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
 
       // The versions already listed are still restorable, so the notice has to say so.

@@ -101,7 +101,6 @@ export const NetworkTrafficRenderer = (
         data={data}
         yAxisKey="ingress_mb"
         xAxisKey="timestamp"
-        displayDateInUtc
       />
 
       {organization && (
@@ -165,7 +164,6 @@ export const TotalRequestsChartRenderer = (
       data={data}
       yAxisKey="count"
       xAxisKey="timestamp"
-      displayDateInUtc
     />
   )
 }
@@ -288,7 +286,6 @@ export const ErrorCountsChartRenderer = (
       data={data}
       yAxisKey="count"
       xAxisKey="timestamp"
-      displayDateInUtc
     />
   )
 }
@@ -342,7 +339,6 @@ export const ResponseSpeedChartRenderer = (
       data={data}
       yAxisKey="avg"
       xAxisKey="timestamp"
-      displayDateInUtc
     />
   )
 }

@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import dayjs from 'dayjs'
 import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
@@ -29,6 +28,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useStorageReport } from '@/data/reports/storage-report-query'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { DOCS_URL } from '@/lib/constants'
+import { useFormatDateTime } from '@/lib/datetime'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -50,6 +50,7 @@ function StorageReport() {
     setShowUpgradePrompt,
     selectedDateRange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const formatDateTime = useFormatDateTime()
 
   const report = useStorageReport(selectedDateRange)
 
@@ -101,13 +102,13 @@ function StorageReport() {
               {selectedDateRange && (
                 <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_start.date, 'MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_end.date, 'MMM D, h:mma')}
                   </p>
                 </div>
               )}
@@ -142,7 +143,7 @@ function StorageReport() {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-4">
+        <div className="mt-8 grid @4xl:grid-cols-2 gap-4">
           <ReportWidget
             isLoading={isLoading}
             params={params.totalRequests}

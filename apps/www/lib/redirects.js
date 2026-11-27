@@ -1108,4 +1108,14 @@ module.exports = [
     source: '/builder-day/:path*',
     destination: '/builderday/:path*',
   },
+  {
+    permanent: true,
+    source: '/buildersday',
+    destination: '/builderday',
+  },
+  {
+    permanent: true,
+    source: '/buildersday/:path*',
+    destination: '/builderday/:path*',
+  },
 ]

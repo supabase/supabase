@@ -229,7 +229,7 @@ function BarChart<D extends Datum = Datum>({
         </Chart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
+        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-xs">
           <span>
             {xAxisIsDate
               ? formatChartDate(data[0][xAxisKey] as number | string)

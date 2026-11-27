@@ -5,15 +5,14 @@ import {
   createRouter,
   Outlet,
   RouterProvider,
+  useParams,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { act, render, screen, waitFor } from '@testing-library/react'
-import { useRouter } from 'next/router'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { useTableFilter, useUrlTableFilters } from './useTableFilter'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-
-vi.mock('next/router', () => import('@/compat/next/router'))
 
 const tableA = '/project/default/editor/1?schema=public&filter=name%3Aeq%3ARed'
 const tableB = '/project/default/editor/2?schema=public'
@@ -21,9 +20,8 @@ const tableB = '/project/default/editor/2?schema=public'
 type RenderedState = { id?: string; urlFilters: unknown[]; tableFilters?: unknown[] }
 
 function SidebarItemProbe({ renders }: { renders: RenderedState[] }) {
-  // Same sources as the sidebar's active entity: route params (`query`, what `useParams` from
-  // 'common' reads) for the id, the URL for filters.
-  const id = useRouter().query.id?.toString()
+  // Same sources as the sidebar's active entity: committed route params (`id`) and the URL for filters.
+  const { id } = useParams<AnyRouter, undefined, false>({ strict: false })
   const { filters: urlFilters } = useTableFilter()
   const tableFilters = useUrlTableFilters(Number(id))
   renders.push({ id, urlFilters, tableFilters })

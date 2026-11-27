@@ -74,7 +74,7 @@ export const ProjectHome = () => {
       const newIndex = items.indexOf(String(over.id))
       if (oldIndex === -1 || newIndex === -1) return items
 
-      track('home_section_rows_moved', {
+      track('home_section_rows_updated', {
         section_moved: String(active.id),
         old_position: oldIndex,
         new_position: newIndex,
