@@ -111,7 +111,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
-        name: 'Temporary database access',
+        name: 'Token access',
         category: 'database',
         discussionsUrl: undefined,
         isNew: false,
