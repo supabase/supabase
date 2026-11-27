@@ -54,6 +54,7 @@ const TabsIndicator = ({ className, ...props }: ComponentPropsWithRef<'span'>) =
       'group-data-[tab-indicator-ready]/list:duration-[250ms]',
       'group-data-[tab-indicator-ready]/list:ease-move',
       'motion-reduce:transition-none',
+      'motion-reduce:group-data-[tab-indicator-ready]/list:transition-none',
       className
     )}
     {...props}
