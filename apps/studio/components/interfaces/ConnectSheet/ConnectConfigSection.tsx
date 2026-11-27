@@ -285,7 +285,7 @@ export function ConnectConfigSection({
       {activeFields.map((field) => (
         <Fragment key={field.id}>
           {renderField(field)}
-          {field.id === insertAfter?.fieldId && insertAfter.node}
+          {field.id === insertAfter?.fieldId && <Fragment>{insertAfter.node}</Fragment>}
         </Fragment>
       ))}
     </div>
