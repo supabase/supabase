@@ -741,8 +741,8 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/realtime/inspector
  */
-export interface RealtimeInspectorBroadcastSentEvent {
-  action: 'realtime_inspector_broadcast_sent'
+export interface RealtimeInspectorBroadcastSubmittedEvent {
+  action: 'realtime_inspector_broadcast_submitted'
   groups: TelemetryGroups
 }
 
@@ -1729,8 +1729,8 @@ export interface WwwEventPageCtaClickedEvent {
  * @source www
  * @page /legal/customer-resources/subprocessor-list
  */
-export interface WwwSubprocessorUpdatesSubscribedEvent {
-  action: 'www_subprocessor_updates_subscribed'
+export interface WwwSubprocessorUpdatesFormCompletedEvent {
+  action: 'www_subprocessor_updates_form_completed'
 }
 
 /**
@@ -3189,8 +3189,8 @@ export interface ConnectSheetOpenedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeSectionRowsMovedEvent {
-  action: 'home_section_rows_moved'
+export interface HomeSectionRowsUpdatedEvent {
+  action: 'home_section_rows_updated'
   properties: {
     /**
      * The section that was moved
@@ -5214,7 +5214,7 @@ export type TelemetryEvent =
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
-  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorBroadcastSubmittedEvent
   | RealtimeInspectorMessageClickedEvent
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
@@ -5268,7 +5268,7 @@ export type TelemetryEvent =
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwEventPageCtaClickedEvent
-  | WwwSubprocessorUpdatesSubscribedEvent
+  | WwwSubprocessorUpdatesFormCompletedEvent
   | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
@@ -5355,7 +5355,7 @@ export type TelemetryEvent =
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
-  | HomeSectionRowsMovedEvent
+  | HomeSectionRowsUpdatedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
