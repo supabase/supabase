@@ -5,6 +5,7 @@ import type {
   DeploymentMode,
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { TOKEN_PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
 import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
@@ -106,7 +107,9 @@ const allUsers = await db.select().from(users);
   return (
     <div className="flex flex-col gap-3">
       <MultipleCodeBlock files={files} />
-      <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+      {envCode.includes(TOKEN_PASSWORD_PLACEHOLDER) && (
+        <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+      )}
     </div>
   )
 }

@@ -266,15 +266,18 @@ describe('buildConnectionParameters', () => {
 })
 
 describe('applyTemporaryAccessToConnectionString', () => {
-  test('rewrites a direct URI user and password placeholder', () => {
-    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
+  test.each([PASSWORD_PLACEHOLDER, '[YOUR-PASSWORD]'])(
+    'rewrites a direct URI with the %s password placeholder',
+    (placeholder) => {
+      const uri = `postgresql://postgres:${placeholder}@db.proj.supabase.co:5432/postgres?sslmode=require`
 
-    expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
-    expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
-    expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
-      `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
-    )
-  })
+      expect(applyTemporaryAccessToConnectionString('', { role: 'analytics' })).toBe('')
+      expect(applyTemporaryAccessToConnectionString(uri, { role: '' })).toBe(uri)
+      expect(applyTemporaryAccessToConnectionString(uri, { role: 'analytics' })).toBe(
+        `postgresql://analytics:${TOKEN_PASSWORD_PLACEHOLDER}@db.proj.supabase.co:5432/postgres?sslmode=require`
+      )
+    }
+  )
 
   test('appends jit on shared pooler URIs once', () => {
     const uri = `postgresql://postgres.projref:${PASSWORD_PLACEHOLDER}@aws-0-eu-west-1.pooler.supabase.com:6543/postgres`

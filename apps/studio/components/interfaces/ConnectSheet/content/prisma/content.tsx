@@ -6,6 +6,7 @@ import type {
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { appendConnectionStringParams } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
+import { TOKEN_PASSWORD_PLACEHOLDER } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
 import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
@@ -114,7 +115,9 @@ datasource db {
   return (
     <div className="flex flex-col gap-3">
       <MultipleCodeBlock files={files} />
-      <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+      {envCode.includes(TOKEN_PASSWORD_PLACEHOLDER) && (
+        <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+      )}
     </div>
   )
 }

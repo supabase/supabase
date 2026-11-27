@@ -229,7 +229,10 @@ export const applyTemporaryAccessToConnectionString = (
   if (!uri || !role) return uri
 
   const withRole = replaceUserInConnectionString(uri, role)
-  const withToken = withRole.split(PASSWORD_PLACEHOLDER).join(TOKEN_PASSWORD_PLACEHOLDER)
+  const withToken = withRole.replaceAll(
+    /\[YOUR-(?:DATABASE-)?PASSWORD\]/g,
+    TOKEN_PASSWORD_PLACEHOLDER
+  )
 
   if (!addPoolerJitOption || hasTemporaryAccessPoolerOption(withToken)) {
     return withToken

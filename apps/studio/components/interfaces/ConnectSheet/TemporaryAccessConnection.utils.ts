@@ -7,9 +7,8 @@ export function resolveSelectedTemporaryAccessRole({
   selectedRole: string | null
   activeRoles: string[]
 }): string {
-  if (selectedRole === DATABASE_PASSWORD_VALUE) return DATABASE_PASSWORD_VALUE
   if (selectedRole && activeRoles.includes(selectedRole)) return selectedRole
-  return activeRoles[0] ?? DATABASE_PASSWORD_VALUE
+  return DATABASE_PASSWORD_VALUE
 }
 
 export type PopoverDirectConnectionBehavior =

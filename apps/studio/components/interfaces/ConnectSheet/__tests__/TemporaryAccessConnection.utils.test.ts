@@ -7,13 +7,13 @@ import {
 } from '../TemporaryAccessConnection.utils'
 
 describe('resolveSelectedTemporaryAccessRole', () => {
-  test('defaults to the first grant, keeps opt-out, and falls back when the grant is gone', () => {
+  test('uses a grant only when the user selects it and it remains active', () => {
     expect(
       resolveSelectedTemporaryAccessRole({
         selectedRole: null,
         activeRoles: ['postgres', 'analytics'],
       })
-    ).toBe('postgres')
+    ).toBe(DATABASE_PASSWORD_VALUE)
     expect(
       resolveSelectedTemporaryAccessRole({
         selectedRole: DATABASE_PASSWORD_VALUE,
@@ -23,9 +23,15 @@ describe('resolveSelectedTemporaryAccessRole', () => {
     expect(
       resolveSelectedTemporaryAccessRole({
         selectedRole: 'analytics',
+        activeRoles: ['postgres', 'analytics'],
+      })
+    ).toBe('analytics')
+    expect(
+      resolveSelectedTemporaryAccessRole({
+        selectedRole: 'analytics',
         activeRoles: ['postgres'],
       })
-    ).toBe('postgres')
+    ).toBe(DATABASE_PASSWORD_VALUE)
     expect(
       resolveSelectedTemporaryAccessRole({
         selectedRole: 'analytics',
