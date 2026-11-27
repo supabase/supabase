@@ -13,11 +13,19 @@ You or an agent can check for issues from:
 - CLI: [`supabase issues`](/docs/reference/cli/supabase-issues)
 - Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
 
+The Issues table lists findings from the latest checks. Use [Reports](/docs/guides/observability/reports) to monitor metrics over time.
+
 Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
 
 ## Check issues with the CLI
 
 `supabase issues` requires CLI `v3.5.0-beta.1` or later on the beta channel, or `v4.0.0-next.51` or later on the next channel. Stable `v3.4.0` does not include the command.
+
+If you use the stable CLI, try the beta without changing your installed version:
+
+```sh
+npx --yes supabase@beta issues --help
+```
 
 Run checks against your local database, or use `--remote` for your linked project:
 
@@ -46,7 +54,7 @@ The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command i
 
 <Admonition type="note">
 
-`get_issues` is included in `@supabase/mcp-server-supabase` `v0.20.0` and later. Hosted MCP availability depends on its deployment; check your connection’s tool discovery before using it. Use `get_advisors` when `get_issues` is unavailable.
+`get_issues` is included in `@supabase/mcp-server-supabase` `v0.20.0` and later. Hosted MCP availability depends on its deployment. If your MCP client lists `get_issues`, use it. If it only lists `get_advisors`, use that tool until your server updates.
 
 </Admonition>
 
