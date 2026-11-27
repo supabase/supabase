@@ -214,13 +214,11 @@ print('All indexes:', indexes)
 ```typescript
 const bucket = supabase.storage.vectors.from('embeddings')
 
-const { data: indexes, error } = await bucket.listIndexes()
+const { data, error } = await bucket.listIndexes()
 
 if (!error) {
-  indexes?.forEach((index) => {
-    console.log(`Index: ${index.name}`)
-    console.log(`  Dimension: ${index.dimension}`)
-    console.log(`  Distance: ${index.distanceMetric}`)
+  data.indexes.forEach((index) => {
+    console.log(`Index: ${index.indexName}`)
   })
 }
 ```
@@ -255,13 +253,12 @@ if indexes:
 <TabPanel id="javascript" label="JavaScript">
 
 ```typescript
-const { data: indexDetails, error } = await bucket.getIndex('documents-openai')
+const { data, error } = await bucket.getIndex('documents-openai')
 
-if (!error && indexDetails) {
-  console.log(`Index: ${indexDetails.name}`)
-  console.log(`Created at: ${indexDetails.createdAt}`)
-  console.log(`Dimension: ${indexDetails.dimension}`)
-  console.log(`Distance metric: ${indexDetails.distanceMetric}`)
+if (!error && data) {
+  console.log(`Index: ${data.index.indexName}`)
+  console.log(`Dimension: ${data.index.dimension}`)
+  console.log(`Distance metric: ${data.index.distanceMetric}`)
 }
 ```
 
