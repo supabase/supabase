@@ -40,11 +40,12 @@ The core functionality of `pgRouting` is a set of path finding algorithms includ
 
 {/* prettier-ignore */}
 ```sql
--- Enable the "pgRouting" extension
-create extension pgrouting cascade;
+-- pgRouting requires PostGIS
+create extension if not exists postgis with schema extensions;
+create extension if not exists pgrouting with schema extensions;
 
 -- Disable the "pgRouting" extension
-drop extension if exists pgRouting;
+drop extension if exists pgrouting;
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
