@@ -18,7 +18,7 @@ export function DirectDatabaseAccessPreview({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_10rem] items-start gap-3 p-4">
-      <div className="min-w-0 space-y-1">
+      <div className="flex min-w-0 flex-col gap-0">
         <p className="text-sm font-medium text-foreground">Table data</p>
         <p className="text-sm text-foreground-lighter">
           {isDisabled
