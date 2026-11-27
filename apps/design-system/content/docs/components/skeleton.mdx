@@ -176,7 +176,7 @@ Use `speed` to change how fast the sweep moves. The default is `1`. The drifting
 
 ## Experimental: Hatched
 
-`HatchedSkeleton` stays close to the original skeleton: a plain muted block, with barely-visible 1px diagonal hairlines in the foreground color for a hint of material. A soft band of light crosses it quickly, then rests before the next pass, like the original shimmer.
+`HatchedSkeleton` stays close to the original skeleton: a plain muted block, with barely-visible 1px diagonal hairlines in the foreground color for a hint of material, and a hairline ring in the border color that gives each block a crisp edge against the page. The ring is drawn as an inset shadow, so it never changes the skeleton's size. A soft band of light crosses it quickly, then rests before the next pass, like the original shimmer.
 
 It's pure CSS, with no JavaScript, canvas, or GIF. The hairlines are a static `repeating-linear-gradient`, and the sweep is a `transform` animation on a pseudo-element, so the browser runs it on the compositor without repainting. Like the other sweeps, each instance adds one animated layer. With reduced motion, the light stays still.
 
