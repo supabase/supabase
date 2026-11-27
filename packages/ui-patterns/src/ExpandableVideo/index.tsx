@@ -108,7 +108,7 @@ export function ExpandableVideo({
               </button>
               <div className="video-container rounded-lg! border-none! overflow-hidden!">
                 {imgUrl ? (
-                  <Image
+                  <FrameworkImage
                     src={imgUrl}
                     alt=""
                     fill
