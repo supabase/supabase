@@ -56,11 +56,11 @@ To disable an extension you can call `drop extension`.
 
 ## Example
 
-As an example, we'll solve the [traveling salesperson problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the `pgRouting`'s `pgr_TSPeuclidean` function from some PostGIS coordinates.
+As an example, we'll solve the [traveling salesperson problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the `pgr_TSPeuclidean` function from `pgRouting` on a set of X, Y coordinates.
 
 A summary of the traveling salesperson problem is, given a set of city coordinates, solve for a path that goes through each city and minimizes the total distance traveled.
 
-First we populate a table with some X, Y coordinates
+First we populate a table with some X, Y coordinates:
 
 {/* prettier-ignore */}
 ```sql
