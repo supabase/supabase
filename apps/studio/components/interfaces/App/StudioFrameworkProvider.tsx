@@ -19,6 +19,7 @@ import {
 import { forwardRef, useMemo, type ForwardedRef, type ReactNode } from 'react'
 
 import { applyBasePath, isAbsoluteUrl, splitInternalUrl, toRoutePattern } from '@/lib/internal-url'
+import { navigateToUrl } from '@/lib/navigation'
 
 function normalizeParams(
   search: Record<string, unknown> | undefined,
@@ -126,18 +127,10 @@ export function StudioFrameworkProvider({ children }: { children: ReactNode }) {
       isReady,
       params,
       push: async (path: string) => {
-        const target = resolveSearchOrHashOnlyTarget(path, currentPathname, currentSearch)
-        const { to, search, hash } = splitInternalUrl(target)
-        if (isAbsoluteUrl(to)) {
-          const href = to.startsWith('//') ? new URL(to, window.location.href).href : to
-          await router.navigate({ href, reloadDocument: true })
-          return
-        }
-        await router.navigate<AnyRouter, string>({
-          to,
-          search: search ?? {},
-          hash: hash ?? '',
-        })
+        await navigateToUrl(
+          router.navigate,
+          resolveSearchOrHashOnlyTarget(path, currentPathname, currentSearch)
+        )
       },
     }
   }, [

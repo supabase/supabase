@@ -4,6 +4,7 @@ import {
   createRootRoute,
   createRouter,
   RouterContextProvider,
+  type AnyRoute,
   type AnyRouter,
 } from '@tanstack/react-router'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
@@ -21,6 +22,17 @@ import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
+export const createTestRouter = (
+  initialUrl = '/',
+  routeTree: AnyRoute = createRootRoute()
+): AnyRouter =>
+  createRouter({
+    routeTree,
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+    parseSearch,
+    stringifySearch,
+  })
+
 const TestRouterProvider = ({
   children,
   router,
@@ -30,17 +42,7 @@ const TestRouterProvider = ({
   router?: AnyRouter
   initialUrl?: string
 }) => {
-  const activeRouter = useMemo(
-    () =>
-      router ??
-      createRouter({
-        routeTree: createRootRoute(),
-        history: createMemoryHistory({ initialEntries: [initialUrl] }),
-        parseSearch,
-        stringifySearch,
-      }),
-    [router, initialUrl]
-  )
+  const activeRouter = useMemo(() => router ?? createTestRouter(initialUrl), [router, initialUrl])
 
   return <RouterContextProvider router={activeRouter}>{children}</RouterContextProvider>
 }
@@ -122,23 +124,25 @@ type CustomRenderOpts = RenderOptions & {
 }
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
-  return render(component, {
+  const router = renderOptions?.router ?? createTestRouter(renderOptions?.initialUrl)
+  const result = render(component, {
     wrapper: ({ children }) =>
       CustomWrapper({
         queryClient: renderOptions?.queryClient,
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
         authContext: renderOptions?.authContext,
-        router: renderOptions?.router,
-        initialUrl: renderOptions?.initialUrl,
+        router,
         children,
       }),
     ...renderOptions,
   })
+  return { ...result, router }
 }
 
 export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRenderOpts) => {
-  return renderHook(hook, {
+  const router = renderOptions?.router ?? createTestRouter(renderOptions?.initialUrl)
+  const result = renderHook(hook, {
     wrapper: ({ children }) =>
       CustomWrapper({
         children,
@@ -146,9 +150,9 @@ export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRender
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
         authContext: renderOptions?.authContext,
-        router: renderOptions?.router,
-        initialUrl: renderOptions?.initialUrl,
+        router,
       }),
     ...renderOptions,
   })
+  return { ...result, router }
 }
