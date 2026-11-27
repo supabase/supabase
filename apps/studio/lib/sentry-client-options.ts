@@ -147,6 +147,31 @@ export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?:
   }
 }
 
+/**
+ * Request targets that get `sentry-trace` / `baggage` headers, so a slow dashboard request can be
+ * tied to its backend trace.
+ *
+ * Setting this option replaces the SDK default, so same-origin relative requests are kept
+ * explicitly. The platform API is added as an anchored origin match, and only when it is a
+ * cross-origin absolute URL (on self-hosted it is the relative `/api`, already covered). Never add
+ * third-party hosts here: the headers would leak to them.
+ */
+export function getTracePropagationTargets(
+  apiUrl = process.env.NEXT_PUBLIC_API_URL,
+  isPlatform = IS_PLATFORM
+): RegExp[] {
+  const targets = [/^\/(?!\/)/]
+  if (!isPlatform || !apiUrl) return targets
+
+  try {
+    const { origin } = new URL(apiUrl)
+    targets.push(new RegExp(`^${origin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[/?#]|$)`))
+  } catch {
+    // Malformed env var: fall back to same-origin only rather than failing Sentry init
+  }
+  return targets
+}
+
 export function buildSentryClientOptions({
   includeThirdPartyErrorFilter,
   extraIntegrations = [],
@@ -163,6 +188,9 @@ export function buildSentryClientOptions({
 
     // Enable performance monitoring
     tracesSampleRate: 0.02,
+
+    // Attach `sentry-trace` / `baggage` to platform API requests (FE-3827)
+    tracePropagationTargets: getTracePropagationTargets(),
 
     // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
     // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.

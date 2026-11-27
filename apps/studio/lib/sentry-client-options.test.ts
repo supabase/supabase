@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 
 import {
   buildSentryClientOptions,
+  getTracePropagationTargets,
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
@@ -514,6 +515,44 @@ describe('buildSentryClientOptions', () => {
     expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
     expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
     expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
+  })
+})
+
+describe('getTracePropagationTargets', () => {
+  const matches = (targets: RegExp[], url: string) => targets.some((t) => t.test(url))
+
+  it('propagates to the platform API origin and same-origin relative requests only', () => {
+    const targets = getTracePropagationTargets('https://api.supabase.com/platform', true)
+
+    expect(matches(targets, 'https://api.supabase.com/platform/projects')).toBe(true)
+    expect(matches(targets, 'https://api.supabase.com/v1/projects?x=1')).toBe(true)
+    expect(matches(targets, '/api/ai/sql')).toBe(true)
+  })
+
+  it('does not propagate to third parties or look-alike hosts', () => {
+    const targets = getTracePropagationTargets('https://api.supabase.com/platform', true)
+
+    expect(matches(targets, 'https://api.supabase.com.evil.com/platform')).toBe(false)
+    expect(matches(targets, 'https://evil.com/?u=https://api.supabase.com/')).toBe(false)
+    expect(matches(targets, 'https://apixsupabase.com/')).toBe(false)
+    expect(matches(targets, 'https://us.i.posthog.com/e')).toBe(false)
+    expect(matches(targets, '//evil.com/path')).toBe(false)
+  })
+
+  it('falls back to same-origin only when the API URL is missing or malformed', () => {
+    expect(getTracePropagationTargets('', true)).toHaveLength(1)
+    expect(getTracePropagationTargets('not a url', true)).toHaveLength(1)
+  })
+
+  it('falls back to same-origin only when self-hosted', () => {
+    expect(getTracePropagationTargets('https://api.supabase.com/platform', false)).toHaveLength(1)
+  })
+
+  it('is applied to the shared Sentry options', () => {
+    const { tracePropagationTargets } = buildSentryClientOptions({
+      includeThirdPartyErrorFilter: false,
+    })
+    expect(tracePropagationTargets).toEqual(getTracePropagationTargets())
   })
 })
 
