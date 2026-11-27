@@ -111,7 +111,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.198.0
+    image: supabase/gotrue:v2.199.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -295,7 +295,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.174.6
+    image: supabase/realtime:v2.177.1
     restart: unless-stopped
     depends_on:
       db:
@@ -356,7 +356,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.98.6
+    image: supabase/storage-api:v1.98.7
     restart: unless-stopped
     depends_on:
       db:
@@ -416,7 +416,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: ghcr.io/imgproxy/imgproxy:v4.0.24
+    image: ghcr.io/imgproxy/imgproxy:v4.0.25
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -575,7 +575,7 @@ services:
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.10.1
+    image: supabase/supavisor:2.10.2
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432
