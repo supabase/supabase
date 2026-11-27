@@ -26,7 +26,9 @@ This table shows when Storage checks policies and when uploads expire, for reque
 
 For non-signed uploads, a policy change in the middle of an upload causes the upload to fail if the user is no longer authorized. For signed uploads, policy changes after the signed URL is created don't affect the upload.
 
-You can't revoke a single signed URL. To revoke all signed URLs (upload and download), rotate and revoke the [Storage signing key](/docs/guides/storage/security/signing-keys) used to sign them. After revocation, requests to signed URLs fail, but signed uploads already in progress can continue to completion.
+You can't revoke a single signed URL. To revoke all signed URLs (upload and download), rotate and revoke the [Storage signing key](/docs/guides/storage/security/signing-keys) used to sign them. After revocation, new requests to signed URLs on the old key fail. A signed upload already in progress can finish only the request it's currently sending.
+
+For resumable uploads with a signed URL, this means new requests, for example to upload the next chunk, fail because the `x-signature` token no longer matches the current signing key.
 
 ## Can an upload complete after expiry?
 
