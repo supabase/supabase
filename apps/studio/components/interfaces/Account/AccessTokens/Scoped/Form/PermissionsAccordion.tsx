@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Control } from 'react-hook-form'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
@@ -70,24 +70,25 @@ export const PermissionsAccordion = ({
         />
       )}
 
-      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
-        {categories.map((category, index) => {
+      <Accordion
+        type="multiple"
+        value={openCategories}
+        onValueChange={setOpenCategories}
+        className="overflow-hidden rounded-md border border-default"
+      >
+        {categories.map((category) => {
           const configuredCount = countConfiguredInCategory(selection, category.key, resourceAccess)
           return (
             <AccordionItem
               key={category.key}
               value={category.key}
-              className={cn('border border-default', {
-                'border-b-0': index < categories.length - 1,
-                'rounded-t-md': index === 0,
-                'rounded-b-md': index === categories.length - 1,
-              })}
+              className="border-default last:border-b-0"
             >
-              <AccordionTrigger className="bg-surface-300 first:rounded-t last:rounded-b px-4 py-3 hover:no-underline transition">
+              <AccordionTrigger className="bg-surface-300 px-4 py-3 hover:no-underline transition">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium">{category.name}</span>
-                    <span className="text-xs text-foreground-light">{category.description}</span>
+                    <span className="text-sm text-foreground-lighter">{category.description}</span>
                   </div>
                   {configuredCount > 0 && (
                     <span className="text-xs text-primary font-medium">

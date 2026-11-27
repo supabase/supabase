@@ -74,7 +74,7 @@ export const PermissionRow = ({
   return (
     <div className="grid grid-cols-1 items-start gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
       <div className="min-w-0 flex flex-col gap-1">
-        <span className="flex items-start md:items-center gap-2 flex-col-reverse md:flex-row">
+        <span className="flex items-start md:items-center gap-1.5 flex-col-reverse md:flex-row">
           <Label htmlFor={`${entry.key}-permissions`}>
             <span
               className={cn(
@@ -90,7 +90,7 @@ export const PermissionRow = ({
             <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
           )}
         </span>
-        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-light">
+        <p id={`${entry.key}-permissions-description`} className="text-sm text-foreground-lighter">
           {entry.description}
           {entry.dependencies.length > 0 ? (
             <b>
