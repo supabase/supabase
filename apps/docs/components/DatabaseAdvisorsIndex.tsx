@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { type ComponentPropsWithoutRef } from 'react'
+import { DatabaseAdvisorHeading } from '~/components/DatabaseAdvisorHeading'
 import { healthAdvisors } from '~/data/health-advisors.data'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { components } from '~/features/docs/MdxBase.shared'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { GENERATED_DIRECTORY } from '~/lib/docs'
 import { capitalize } from 'lodash-es'
@@ -24,15 +27,32 @@ export async function DatabaseAdvisorsIndex() {
     )
   }
 
+  const advisors = [...healthAdvisors, ...lints]
+
   return (
     <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:m-0!" queryGroup="lint">
-      {[...healthAdvisors, ...lints].map((lint) => (
-        <TabPanel key={lint.path} id={lint.path} label={capitalize(lint.path.replace(/_/g, ' '))}>
-          <section id={lint.path}>
-            <MDXRemoteBase source={lint.content} />
-          </section>
-        </TabPanel>
-      ))}
+      {advisors.map((lint) => {
+        const renderHeading = (tag: 'h2' | 'h3' | 'h4') =>
+          function AdvisorHeading(props: ComponentPropsWithoutRef<'h2'>) {
+            return <DatabaseAdvisorHeading lintId={lint.path} tag={tag} {...props} />
+          }
+
+        return (
+          <TabPanel key={lint.path} id={lint.path} label={capitalize(lint.path.replace(/_/g, ' '))}>
+            <section id={lint.path}>
+              <MDXRemoteBase
+                source={lint.content}
+                components={{
+                  ...components,
+                  h2: renderHeading('h2'),
+                  h3: renderHeading('h3'),
+                  h4: renderHeading('h4'),
+                }}
+              />
+            </section>
+          </TabPanel>
+        )
+      })}
     </Tabs>
   )
 }

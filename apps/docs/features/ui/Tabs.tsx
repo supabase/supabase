@@ -3,10 +3,12 @@
 import { cva } from 'class-variance-authority'
 import {
   Children,
+  createContext,
   isValidElement,
   ReactElement,
   ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -17,6 +19,10 @@ import { cn, TabsContent, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
 import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
 import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './useTabsWithQueryParams'
+
+const ActiveTabContext = createContext<string | undefined>(undefined)
+
+export const useIsTabActive = (id: string) => useContext(ActiveTabContext) === id
 
 export interface TabsProps {
   children: ReactNode
@@ -265,7 +271,7 @@ export const Tabs = ({
         {addOnAfter}
         {type === 'underlined' ? <TabsIndicator /> : null}
       </TabsList>
-      {childrenArr}
+      <ActiveTabContext.Provider value={activeTab}>{childrenArr}</ActiveTabContext.Provider>
     </TabsRoot>
   )
 }
