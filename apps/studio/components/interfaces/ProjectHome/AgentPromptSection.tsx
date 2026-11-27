@@ -1,12 +1,11 @@
 import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Button, Card, copyToClipboard } from 'ui'
 import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder/utils/getMcpIconSrc'
 
 import { useAgentPrompt } from './useAgentPrompt'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -118,14 +117,6 @@ export const AgentPromptSection = () => {
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const prompt = useAgentPrompt()
-
-  const hasTrackedExposure = useRef(false)
-  useEffect(() => {
-    if (!IS_PLATFORM) return
-    if (hasTrackedExposure.current) return
-    hasTrackedExposure.current = true
-    track('home_connect_section_exposed')
-  }, [track])
 
   const handleOpenConnect = () => {
     setConnectSheetSource('connect_section')

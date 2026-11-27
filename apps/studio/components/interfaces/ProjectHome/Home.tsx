@@ -22,6 +22,7 @@ import { PageSection } from 'ui-patterns/PageSection'
 import { AgentPromptSection } from './AgentPromptSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
+import { HomeConnectExperiment } from './HomeConnectExperiment'
 import { IssuesSection } from './IssuesSection'
 import { NotebooksSection } from './NotebooksSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
@@ -139,7 +140,7 @@ export const ProjectHome = () => {
                     if (id === 'connect' && showConnectSection) {
                       return (
                         <SortableSection gripClassName={SORT_GRIP_CLASS} key={id} id={id}>
-                          <AgentPromptSection />
+                          {IS_PLATFORM ? <HomeConnectExperiment /> : <AgentPromptSection />}
                         </SortableSection>
                       )
                     }
