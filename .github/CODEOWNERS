@@ -11,7 +11,6 @@
 /packages/ui-patterns @supabase/design
 
 /apps/studio/ @supabase/Dashboard
-/apps/studio/lib/session-replay* @supabase/Dashboard @supabase/growth-eng
 
 /apps/docs/ @supabase/docs
 /apps/docs/content/guides/self-hosting* @supabase/docs @supabase/self-hosted
