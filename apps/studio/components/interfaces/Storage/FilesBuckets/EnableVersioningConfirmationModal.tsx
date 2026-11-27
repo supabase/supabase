@@ -28,7 +28,7 @@ export const EnableVersioningConfirmationModal = ({
     alert={{
       title: 'Storage object versioning is in public alpha',
       description:
-        'This feature may change during development and is not recommended for production workloads.',
+        'The behavior of this feature may change during development and is not recommended production use.',
     }}
   >
     <div className="space-y-2">

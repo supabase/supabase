@@ -189,17 +189,11 @@ const StorageVersioningAlphaPopover = () => {
           <p className="text-sm font-medium text-foreground">
             Storage object versioning is in public alpha
           </p>
-          <p className="text-xs text-foreground-light">
-            This feature may change during development and is not recommended for production
-            workloads.
+          <p className="text-xs text-foreground-light text-pretty">
+            The behavior of this feature may change during development and is not recommended
+            production use.
           </p>
         </div>
-        <p className="text-xs text-foreground-light">
-          Retained versions count toward Storage usage and may increase your bill.{' '}
-          <InlineLink href={`${DOCS_URL}/guides/storage/buckets/object-versioning`}>
-            Read docs
-          </InlineLink>
-        </p>
         <Button
           size="tiny"
           onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING)}

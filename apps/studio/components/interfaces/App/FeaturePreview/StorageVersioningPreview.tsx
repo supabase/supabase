@@ -18,7 +18,7 @@ export const StorageVersioningPreview = () => {
       </p>
       <Admonition
         title="Object versioning is in public alpha"
-        description="This feature may change during development and is not recommended for production workloads."
+        description="The behavior of this feature may change during development and is not recommended production use."
       />
       <img
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
