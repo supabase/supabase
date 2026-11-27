@@ -48,7 +48,7 @@ import {
   getDuckLakeSetupScript,
   getWarehouseFlightSqlConnectionString,
   getWarehouseFlightSqlEndpoint,
-  getWarehouseUsqlCommand,
+  getWarehouseDatabowCommand,
   parseWarehouseCatalogUrl,
 } from '@/lib/warehouse'
 
@@ -115,7 +115,7 @@ const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
         language="bash"
         hideLineNumbers
         wrapLongLines
-        value={getWarehouseUsqlCommand(projectRef)}
+        value={getWarehouseDatabowCommand(projectRef)}
       />
     </FieldRow>
   </CardContent>

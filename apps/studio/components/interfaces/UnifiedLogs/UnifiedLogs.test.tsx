@@ -1,8 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { FeatureFlagContext, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -70,6 +70,83 @@ describe('UnifiedLogs', () => {
         }),
     })
   })
+
+  it.each([
+    { hasLoaded: true, isConfigCatStale: false, isCreating: true },
+    { hasLoaded: true, isConfigCatStale: true, isCreating: false },
+    { hasLoaded: false, isConfigCatStale: false, isCreating: false },
+  ])(
+    'applies a typed pathname exclusion with flag state $hasLoaded/$isConfigCatStale',
+    async ({ hasLoaded, isConfigCatStale, isCreating }) => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      const pendingSourceFilters =
+        !hasLoaded || isConfigCatStale
+          ? [
+              'log_type:eq:multigres',
+              'log_type:eq:pipelines',
+              ...(IS_PLATFORM ? ['log_type:eq:compute'] : []),
+            ]
+          : []
+      const queries: string[] = []
+      const onUrlUpdate = vi.fn()
+      const date = [new Date('2026-11-26T10:00:00Z'), new Date('2026-11-26T11:00:00Z')]
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: async ({ request }) => {
+          queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+          return HttpResponse.json<AnalyticsResponse>({ result: [] })
+        },
+      })
+
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{
+            configcat: { otelUnifiedLogs: true },
+            posthog: {},
+            hasLoaded,
+            isConfigCatStale,
+          }}
+        >
+          <UnifiedLogs hasFilterSideBar={false} />
+        </FeatureFlagContext.Provider>,
+        {
+          nuqs: {
+            hasMemory: true,
+            onUrlUpdate,
+            searchParams: serializeUnifiedLogsSearchParams('', {
+              date,
+              filter: isCreating ? [] : [...pendingSourceFilters, 'pathname:ilike:health'],
+            }),
+          },
+        }
+      )
+
+      await screen.findByText('No results found')
+      if (isCreating) {
+        await user.click(screen.getByTestId('filter-bar-freeform-input'))
+        await user.click(screen.getByRole('option', { name: 'Pathname' }))
+        await user.click(screen.getByRole('option', { name: /Not iLike/ }))
+      }
+      const pathnameValue = screen.getByLabelText('Value for Pathname')
+      await user.click(pathnameValue)
+      await user.clear(pathnameValue)
+      await user.paste('jaeger')
+      await user.click(screen.getByLabelText('Operator for Pathname'))
+      if (!isCreating) await user.click(screen.getByRole('option', { name: /Not iLike/ }))
+
+      await waitFor(() => {
+        const update = onUrlUpdate.mock.lastCall?.[0]
+        expect(SEARCH_PARAMS_PARSER.filter.parse(update?.searchParams.get('filter') ?? '')).toEqual(
+          [...pendingSourceFilters, 'pathname:notilike:jaeger']
+        )
+        expect(update?.searchParams.get('date')).toBe(`${date[0].getTime()}-${date[1].getTime()}`)
+        const listQuery = queries.filter((query) => query.includes('row list')).at(-1)
+        expect(listQuery).toContain("NOT ILIKE '%jaeger%'")
+      })
+    }
+  )
 
   it('refreshes pathname options for a sidebar filter change before the URL updates', async () => {
     let pathnameOption: string | null = null
@@ -744,6 +821,43 @@ describe('UnifiedLogs', () => {
     await user.click(screen.getByTestId('filter-bar-freeform-input'))
     expect(await screen.findByRole('option', { name: `Attributes: ${key}` })).toBeVisible()
     expect(discoveryQueries.some((sql) => sql.includes("source = 'postgres_logs'"))).toBe(false)
+  })
+
+  it('restores pending source filters when navigating before a local edit is synchronized', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    const onUrlUpdate = vi.fn()
+    let location = '?filter=log_type:eq:multigres,pathname:ilike:jaeger'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+    const view = customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      wrapper: ({ children }) => (
+        <CustomWrapper nuqs={{ hasMemory: true, searchParams: location, onUrlUpdate }}>
+          <FeatureFlagContext.Provider
+            value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: false }}
+          >
+            {children}
+          </FeatureFlagContext.Provider>
+        </CustomWrapper>
+      ),
+    })
+    await screen.findByText('No results found')
+    await user.click(screen.getByLabelText('Operator for Pathname'))
+    await user.click(screen.getByRole('option', { name: /Not iLike/ }))
+    onUrlUpdate.mockClear()
+    location = '?filter=pathname:ilike:jaeger'
+    view.rerender(<UnifiedLogs hasFilterSideBar={false} />)
+    await waitFor(() => expect(screen.getByLabelText('Operator for Pathname')).toHaveValue('~~*'))
+    expect(screen.queryByLabelText('Value for Log Type')).not.toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(300))
+    expect(
+      onUrlUpdate.mock.calls.every(
+        ([update]) => !update.searchParams.get('filter')?.includes('multigres')
+      )
+    ).toBe(true)
   })
 
   it('restores attribute and date filters when navigating between URLs without remounting', async () => {

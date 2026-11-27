@@ -1,11 +1,10 @@
-import { sendTelemetryEvent, useParams } from 'common'
+import { sendTelemetryEvent, useFramework, useParams } from 'common'
 import type {
   CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -14,7 +13,7 @@ import { API_URL } from '@/lib/constants'
 export function useStudioCommandMenuTelemetry() {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const router = useRouter()
+  const { pathname } = useFramework()
 
   const onTelemetry = useCallback(
     (
@@ -34,10 +33,10 @@ export function useStudioCommandMenuTelemetry() {
             ...(organization?.slug && { organization: organization.slug }),
           },
         },
-        router.pathname
+        pathname
       )
     },
-    [projectRef, organization?.slug, router.pathname]
+    [projectRef, organization?.slug, pathname]
   )
 
   return { onTelemetry }

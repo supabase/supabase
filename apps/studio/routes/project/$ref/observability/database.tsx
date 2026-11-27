@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
 import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -58,6 +57,7 @@ import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDat
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useFormatDateTime } from '@/lib/datetime'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
@@ -96,6 +96,7 @@ const DatabaseUsage = () => {
     setShowUpgradePrompt,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const formatDateTime = useFormatDateTime()
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -266,13 +267,13 @@ const DatabaseUsage = () => {
               {selectedDateRange && (
                 <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_start.date, 'MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_end.date, 'MMM D, h:mma')}
                   </p>
                 </div>
               )}
@@ -285,71 +286,73 @@ const DatabaseUsage = () => {
           </div>
         }
       >
-        {selectedDateRange &&
-          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
-            const chartPreviewData =
-              chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
-            const chartAvailable =
-              !chart.entitlement ||
-              isEntitlementLoading ||
-              entitledFeatures.includes(chart.entitlement)
-            return chartAvailable ? (
-              <LazyComposedChartHandler
-                key={chart.id}
-                {...chart}
-                data={chartPreviewData}
-                highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                syncId="database-charts"
-                showMaxValue={
-                  chart.id === 'client-connections' ||
-                  chart.id === 'client-connections-basic' ||
-                  chart.id === 'pgbouncer-connections'
-                    ? true
-                    : chart.showMaxValue
-                }
-              />
-            ) : (
-              <ReportChartUpsell
-                key={chart.id}
-                report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
-                orgSlug={org?.slug ?? ''}
-              />
-            )
-          })}
-        {selectedDateRange && isReplicaSelected && (
-          <LazyComposedChartHandler
-            id="replication-lag"
-            label="Replication lag"
-            format="s"
-            valuePrecision={2}
-            showTooltip
-            YAxisProps={{
-              width: 50,
-              tickFormatter: (value: number) => `${value}s`,
-            }}
-            attributes={[
-              {
-                attribute: 'physical_replication_lag_physical_replication_lag_seconds',
-                provider: 'infra-monitoring',
-                label: 'Replication lag',
-                tooltip:
-                  'Seconds the read replica is behind its primary. Sustained or growing lag may indicate the replica cannot keep up with write throughput',
-              },
-            ]}
-            interval={selectedDateRange.interval}
-            startDate={selectedDateRange?.period_start?.date}
-            endDate={selectedDateRange?.period_end?.date}
-            updateDateRange={updateDateRange}
-            defaultChartStyle="line"
-            syncId="database-charts"
-          />
-        )}
+        <div className="grid @6xl:grid-cols-2 gap-4">
+          {selectedDateRange &&
+            REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+              const chartPreviewData =
+                chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
+              const chartAvailable =
+                !chart.entitlement ||
+                isEntitlementLoading ||
+                entitledFeatures.includes(chart.entitlement)
+              return chartAvailable ? (
+                <LazyComposedChartHandler
+                  key={chart.id}
+                  {...chart}
+                  data={chartPreviewData}
+                  highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
+                  showMaxValue={
+                    chart.id === 'client-connections' ||
+                    chart.id === 'client-connections-basic' ||
+                    chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
+                />
+              ) : (
+                <ReportChartUpsell
+                  key={chart.id}
+                  report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
+                  orgSlug={org?.slug ?? ''}
+                />
+              )
+            })}
+          {selectedDateRange && isReplicaSelected && (
+            <LazyComposedChartHandler
+              id="replication-lag"
+              label="Replication lag"
+              format="s"
+              valuePrecision={2}
+              showTooltip
+              YAxisProps={{
+                width: 50,
+                tickFormatter: (value: number) => `${value}s`,
+              }}
+              attributes={[
+                {
+                  attribute: 'physical_replication_lag_physical_replication_lag_seconds',
+                  provider: 'infra-monitoring',
+                  label: 'Replication lag',
+                  tooltip:
+                    'Seconds the read replica is behind its primary. Sustained or growing lag may indicate the replica cannot keep up with write throughput',
+                },
+              ]}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              defaultChartStyle="line"
+              syncId="database-charts"
+            />
+          )}
+        </div>
       </ReportStickyNav>
       <section id="database-size-report">
         <ReportWidget

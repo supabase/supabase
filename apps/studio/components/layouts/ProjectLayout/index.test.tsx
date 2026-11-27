@@ -53,27 +53,6 @@ vi.mock('next/router', () => ({
   useRouter: () => mockRouter,
 }))
 
-vi.mock('next/head', async () => {
-  const React = await import('react')
-
-  const Head = ({ children }: { children?: ReactNode }) => {
-    React.useEffect(() => {
-      const titleElement = React.Children.toArray(children).find(
-        (child) => React.isValidElement(child) && child.type === 'title'
-      )
-
-      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
-
-      const titleText = React.Children.toArray(titleElement.props.children).join('')
-      document.title = titleText
-    }, [children])
-
-    return null
-  }
-
-  return { default: Head }
-})
-
 vi.mock('common', () => ({
   useParams: () => ({ ref: 'default' }),
   mergeRefs:

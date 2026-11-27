@@ -95,18 +95,22 @@ at hand — they cite each other where context matters.
 
 ## How to use during a chat
 
-1. **Start by reading** `adding-features.md` and `app-map.md` if the
+1. **Check for drift.** For each reference file you use, run
+   `git log --oneline <Verified at>..HEAD -- apps/docs ':!apps/docs/content'`
+   and read each commit that touches code the answer depends on. A file
+   with no `Verified at` line is unverified.
+2. **Start by reading** `adding-features.md` and `app-map.md` if the
    question touches design choices or unfamiliar code paths. They're
    small on purpose — read both, don't skim.
-2. **Verify before recommending.** Reference content may lag behind the
+3. **Verify before recommending.** Reference content may lag behind the
    live code. Confirm with the actual files (`apps/docs/...`) before
    acting on remembered claims about file paths, function names, or
    behavior.
-3. **Cite the principle**, not just the rule. "Per `adding-features.md`
+4. **Cite the principle**, not just the rule. "Per `adding-features.md`
    § 'Reuse pipelines, don't fork them', this routes through the
    existing markdown-schema handler rather than introducing a side
    path."
-4. **Reach for Mermaid** when explaining architecture, flows, or
+5. **Reach for Mermaid** when explaining architecture, flows, or
    relationships — see [Answering with diagrams](#answering-with-diagrams).
 
 ## Updating the librarian
@@ -116,6 +120,11 @@ When something in `apps/docs` changes in a way that makes a reference
 file inaccurate, or a generally-applicable lesson emerges from a PR
 review, open a pull request against this repo to update the relevant
 file, same as any other in-repo change.
+
+List each stale fact under "Skill corrections" at the end of the answer.
+With the user's approval, fix it in their open PR if that PR changes
+`apps/docs`, else in a new PR. After you check a whole file, set its
+`Verified at` line to that commit.
 
 Keep each canonical file under ~250 lines; split before they bloat.
 Capture only what a future contributor would benefit from knowing — if

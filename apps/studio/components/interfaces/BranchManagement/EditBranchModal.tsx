@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { CheckIcon, Loader2Icon } from 'lucide-react'
-import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -283,7 +282,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                           <div className="flex items-center justify-between w-full gap-4">
                             <span className="flex-1">Sync with Git branch</span>
                             <div className="flex items-center gap-2 text-sm">
-                              <Image
+                              <img
                                 className={cn('dark:invert')}
                                 src={`${BASE_PATH}/img/icons/github-icon.svg`}
                                 width={16}

@@ -225,7 +225,14 @@ const WarehouseSetupPanelContent = ({
   }
 
   if (isWarehouseSettingUp(status)) {
-    return <WarehouseEnablingProgress status={data} />
+    return (
+      <WarehouseEnablingProgress
+        status={data}
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
+        error={setupMutation.error}
+      />
+    )
   }
 
   if (status === 'disabling') {

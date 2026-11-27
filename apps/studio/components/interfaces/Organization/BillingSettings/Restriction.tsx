@@ -1,7 +1,6 @@
+import { Link, useLocation } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { ExternalLinkIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
 
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -14,8 +13,8 @@ export const Restriction = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess: isSuccessOrgUsage } = useOrgUsageQuery({ orgSlug: org?.slug })
 
-  const pathname = usePathname()
-  const isUsagePage = pathname?.endsWith('/usage')
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const isUsagePage = pathname.endsWith('/usage')
 
   const hasExceededAnyLimits = Boolean(
     usage?.usages.find(
@@ -80,16 +79,18 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=${
-                    org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                  }`}
+                  to="/org/$slug/billing"
+                  params={{ slug: org.slug }}
+                  search={{ panel: org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl' }}
                 >
                   {org.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
                 </Link>
               </Button>
               {!isUsagePage && (
                 <Button key="view-usage-button" asChild>
-                  <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
+                  <Link to="/org/$slug/usage" params={{ slug: org.slug }}>
+                    View usage
+                  </Link>
                 </Button>
               )}
               <Button asChild icon={<ExternalLinkIcon />}>
@@ -130,11 +131,12 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=${
-                    org.plan.id === 'free'
-                      ? 'subscriptionPlan&source=fairUseGracePeriodStarted'
-                      : 'costControl&source=fairUseGracePeriodStarted'
-                  }`}
+                  to="/org/$slug/billing"
+                  params={{ slug: org.slug }}
+                  search={{
+                    panel: org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl',
+                    source: 'fairUseGracePeriodStarted',
+                  }}
                 >
                   {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
@@ -142,7 +144,9 @@ export const Restriction = () => {
 
               {!isUsagePage && (
                 <Button key="view-usage-button" asChild>
-                  <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
+                  <Link to="/org/$slug/usage" params={{ slug: org.slug }}>
+                    View usage
+                  </Link>
                 </Button>
               )}
 
@@ -177,18 +181,21 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=${
-                    org.plan.id === 'free'
-                      ? 'subscriptionPlan&source=fairUseGracePeriodOver'
-                      : 'costControl&source=fairUseGracePeriodOver'
-                  }`}
+                  to="/org/$slug/billing"
+                  params={{ slug: org.slug }}
+                  search={{
+                    panel: org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl',
+                    source: 'fairUseGracePeriodOver',
+                  }}
                 >
                   {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
               {!isUsagePage && (
                 <Button key="view-usage-button" asChild>
-                  <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
+                  <Link to="/org/$slug/usage" params={{ slug: org.slug }}>
+                    View usage
+                  </Link>
                 </Button>
               )}
               <Button asChild icon={<ExternalLinkIcon />}>
@@ -224,18 +231,21 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=${
-                    org.plan.id === 'free'
-                      ? 'subscriptionPlan&source=fairUseRestricted'
-                      : 'costControl&source=fairUseRestricted'
-                  }`}
+                  to="/org/$slug/billing"
+                  params={{ slug: org.slug }}
+                  search={{
+                    panel: org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl',
+                    source: 'fairUseRestricted',
+                  }}
                 >
                   {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
               {!isUsagePage && (
                 <Button key="view-usage-button" asChild>
-                  <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
+                  <Link to="/org/$slug/usage" params={{ slug: org.slug }}>
+                    View usage
+                  </Link>
                 </Button>
               )}
               <Button asChild icon={<ExternalLinkIcon />}>

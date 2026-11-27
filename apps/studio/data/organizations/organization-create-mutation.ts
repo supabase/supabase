@@ -95,22 +95,16 @@ export const useOrganizationCreateMutation = ({
 
 export type AwsManagedOrganizationCreateVariables = {
   name: string
-  kind?: string
-  size?: string
   buyerId: string
 }
 
 export async function createAwsManagedOrganization({
   name,
-  kind,
-  size,
   buyerId,
 }: AwsManagedOrganizationCreateVariables) {
   const { data, error } = await post('/platform/organizations/cloud-marketplace', {
     body: {
       name,
-      kind,
-      size,
       buyer_id: buyerId,
     },
   })

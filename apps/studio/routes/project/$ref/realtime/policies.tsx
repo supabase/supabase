@@ -24,7 +24,7 @@ export const Route = createFileRoute('/project/$ref/realtime/policies')({
 function RealtimePoliciesPage() {
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Policies</PageHeaderTitle>
@@ -35,7 +35,7 @@ function RealtimePoliciesPage() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <RealtimePolicies />

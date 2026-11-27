@@ -20,7 +20,6 @@ export interface PlanCardsProps {
   hasOrioleProjects: boolean
   selectedOrganization: Organization | undefined
   showAwsMarketplacePurchase?: boolean
-  isPlanUpdateRedesignEnabled: boolean
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
 }
 
@@ -34,7 +33,6 @@ export function PlanCards({
   hasOrioleProjects,
   selectedOrganization,
   showAwsMarketplacePurchase = false,
-  isPlanUpdateRedesignEnabled,
   onSelectTier,
 }: PlanCardsProps) {
   const router = useRouter()
@@ -66,7 +64,6 @@ export function PlanCards({
               plan={plan}
               isCurrentPlan={isCurrentPlan}
               liftedSide={liftedSide}
-              isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
               origin={source}
             />
           )
@@ -92,7 +89,6 @@ export function PlanCards({
               track('studio_pricing_plan_cta_clicked', {
                 selectedPlan: plan.name,
                 currentPlan: currentSubscriptionPlanName,
-                planUpdateRedesignEnabled: isPlanUpdateRedesignEnabled,
                 origin: source,
               })
             }

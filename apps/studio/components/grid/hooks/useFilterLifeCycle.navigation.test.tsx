@@ -20,8 +20,6 @@ import {
   useTableEditorTableStateSnapshot,
 } from '@/state/table-editor-table'
 
-vi.mock('next/router', () => import('@/compat/next/router'))
-
 const unfiltered = '/project/default/editor/1?schema=public'
 
 // The hooks only read `id`; a foreign table is the smallest complete `Entity`.

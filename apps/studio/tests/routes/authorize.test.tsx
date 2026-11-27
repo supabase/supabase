@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { afterEach, describe, expect, test, vi } from 'vitest'
@@ -130,6 +130,7 @@ describe('/authorize', () => {
 
   afterEach(() => {
     flags.consent = false
+    document.title = ''
   })
 
   test('renders loading interstitial while the authorization request loads', async () => {
@@ -145,6 +146,31 @@ describe('/authorize', () => {
 
     expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
     expect(screen.queryByText(/is connected/)).not.toBeInTheDocument()
+  })
+
+  test('updates the document title with the requester name in the legacy authorize screen', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () => HttpResponse.json<OAuthAppsAuthorizeRequestData>(createMockRequest()),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+            name: 'Northwind Traders',
+          }),
+        ]),
+    })
+
+    await renderAuthorize('/authorize?auth_id=some_id')
+
+    await waitFor(() => {
+      expect(document.title).toBe('Authorize Vercel | Supabase')
+    })
   })
 
   test('correctly select the organization from the organization_slug', async () => {

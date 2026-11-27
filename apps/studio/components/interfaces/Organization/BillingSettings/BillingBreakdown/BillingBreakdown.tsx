@@ -8,10 +8,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { UpcomingInvoice } from './UpcomingInvoice'
-import { AlertError } from '@/components/ui/AlertError'
+import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoice'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { SparkBar } from '@/components/ui/SparkBar'
@@ -30,12 +28,10 @@ const BillingBreakdown = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
-  const {
-    data: subscription,
-    error: subscriptionError,
-    isPending: isLoadingSubscription,
-    isError: isErrorSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug },
+    { enabled: canReadSubscriptions }
+  )
 
   const invoiceFeatureEnabled = useIsFeatureEnabled('billing:invoices')
 
@@ -94,23 +90,9 @@ const BillingBreakdown = () => {
       <PageSectionContent className="flex flex-col gap-6">
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
-        ) : (
-          <>
-            {isLoadingSubscription && (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
-              </div>
-            )}
-
-            {isErrorSubscription && (
-              <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
-            )}
-
-            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
-          </>
-        )}
+        ) : invoiceFeatureEnabled ? (
+          <UpcomingInvoice slug={orgSlug} />
+        ) : null}
       </PageSectionContent>
     </PageSection>
   )

@@ -108,6 +108,25 @@ describe('next.config.mjs', () => {
     )
   })
 
+  it('proxies Builder Day with its basePath prefix intact', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
+
+    expect(afterFiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/builderday',
+          destination: 'https://builderday.vercel.app/builderday',
+        }),
+        expect.objectContaining({
+          source: '/builderday/:path*',
+          destination: 'https://builderday.vercel.app/builderday/:path*',
+        }),
+      ])
+    )
+  })
+
   it('forwards zone prefetches as the page path, so each zone adds the rsc suffix once', async () => {
     // later tests must not get the production rewrites from the module cache
     onTestFinished(() => {

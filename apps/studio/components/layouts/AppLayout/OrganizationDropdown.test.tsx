@@ -1,16 +1,34 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OrganizationDropdown } from './OrganizationDropdown'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganization, render } from '@/tests/helpers'
+import type { Organization } from '@/types'
 
-const { mockUseIsFeatureEnabled, mockUseOrganizationsQuery, mockUseSelectedOrganizationQuery } =
-  vi.hoisted(() => ({
-    mockUseIsFeatureEnabled: vi.fn(),
-    mockUseOrganizationsQuery: vi.fn(),
-    mockUseSelectedOrganizationQuery: vi.fn(),
-  }))
+const {
+  mockUseFlag,
+  mockUseIsFeatureEnabled,
+  mockUseOrganizationsQuery,
+  mockUseSelectedOrganizationQuery,
+} = vi.hoisted(() => ({
+  mockUseFlag: vi.fn(),
+  mockUseIsFeatureEnabled: vi.fn(),
+  mockUseOrganizationsQuery: vi.fn(),
+  mockUseSelectedOrganizationQuery: vi.fn(),
+}))
+
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useFlag: mockUseFlag,
+}))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
@@ -29,9 +47,57 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
 
+// The upgrade badge is a native TanStack `Link`, which needs a router in context.
+const renderDropdown = (props: Parameters<typeof OrganizationDropdown>[0] = {}) => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/org/org-one'] }),
+    parseSearch,
+    stringifySearch,
+  })
+
+  return render(
+    <RouterContextProvider router={router}>
+      <OrganizationDropdown {...props} />
+    </RouterContextProvider>
+  )
+}
+
+const queryUpgradeLink = () => screen.queryByRole('link', { name: /upgrade from the/i })
+
+const expectInlinePlanBadge = (planName: string) => {
+  const organizationLink = screen.getByRole('link', { name: /org one/i })
+  expect(organizationLink).toHaveAttribute('href', '/org/org-one')
+  expect(within(organizationLink).getByText(planName)).toBeInTheDocument()
+  expect(queryUpgradeLink()).toBeNull()
+}
+
+const organizationsWithoutUpgradeLink: Array<{
+  description: string
+  organization: Partial<Organization>
+  planName: string
+}> = [
+  {
+    description: 'a partner-managed org',
+    organization: { managed_by: MANAGED_BY.VERCEL_MARKETPLACE },
+    planName: 'Free',
+  },
+  {
+    description: 'an org with a billing partner',
+    organization: { billing_partner: 'aws_marketplace' },
+    planName: 'Free',
+  },
+  {
+    description: 'an org on a paid plan',
+    organization: { plan: { id: 'pro', name: 'Pro' } },
+    planName: 'Pro',
+  },
+]
+
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
-    mockUseIsFeatureEnabled.mockReturnValue(false)
+    mockUseFlag.mockReturnValue(false)
+    mockUseIsFeatureEnabled.mockImplementation((feature: string) => feature === 'billing:all')
     mockUseOrganizationsQuery.mockReturnValue({
       data: [
         createMockOrganization({ slug: 'org-one', name: 'Org One' }),
@@ -51,7 +117,7 @@ describe('OrganizationDropdown', () => {
       }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     const selectedLink = screen.getByRole('link', { name: /org one/i })
     expect(within(selectedLink).getByTestId('partner-icon')).toBeInTheDocument()
@@ -66,10 +132,59 @@ describe('OrganizationDropdown', () => {
       }),
     })
 
-    render(<OrganizationDropdown />)
+    renderDropdown()
 
     const selectedLink = screen.getByRole('link', { name: /org one/i })
     expect(within(selectedLink).queryByTestId('partner-icon')).toBeNull()
+  })
+
+  it('renders the plan badge as an upgrade link for a Free Supabase-managed org', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    renderDropdown()
+
+    expect(screen.getByRole('link', { name: /upgrade from the free plan/i })).toHaveAttribute(
+      'href',
+      '/org/org-one/billing?panel=subscriptionPlan&source=org_plan_badge'
+    )
+    expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
+  })
+
+  it.each(organizationsWithoutUpgradeLink)(
+    'keeps the plan badge inline for $description',
+    ({ organization, planName }) => {
+      mockUseSelectedOrganizationQuery.mockReturnValue({
+        data: createMockOrganization({ slug: 'org-one', name: 'Org One', ...organization }),
+      })
+
+      renderDropdown()
+
+      expectInlinePlanBadge(planName)
+    }
+  )
+
+  it('keeps the plan badge inline when billing is disabled', () => {
+    mockUseIsFeatureEnabled.mockReturnValue(false)
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    renderDropdown()
+
+    expectInlinePlanBadge('Free')
+  })
+
+  it('keeps the plan badge inline while plan changes are paused', () => {
+    mockUseFlag.mockImplementation((flag: string) => flag === 'disableProjectCreationAndUpdate')
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    renderDropdown()
+
+    expectInlinePlanBadge('Free')
   })
 
   it('renders organization command items as links', () => {
@@ -77,7 +192,7 @@ describe('OrganizationDropdown', () => {
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
-    render(<OrganizationDropdown embedded />)
+    renderDropdown({ embedded: true })
 
     const organizationLink = screen.getByRole('link', { name: /org two/i })
     expect(within(organizationLink).getByRole('option')).toBeInTheDocument()

@@ -1,6 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildStudioPageTitle, STUDIO_PAGE_TITLE_SEPARATOR } from './page-title'
+import {
+  buildStudioPageTitle,
+  STUDIO_PAGE_TITLE_SEPARATOR,
+  toTelemetryPageTitle,
+} from './page-title'
+
+describe('toTelemetryPageTitle', () => {
+  it('keeps the page names and drops what the customer named', () => {
+    const pageTitle = buildStudioPageTitle({
+      entity: 'users',
+      section: 'Tables',
+      surface: 'Database',
+      project: 'Acme Project',
+      org: 'Acme Org',
+      brand: 'Supabase',
+    })
+
+    expect(toTelemetryPageTitle(pageTitle)).toBe(
+      `Tables${STUDIO_PAGE_TITLE_SEPARATOR}Database${STUDIO_PAGE_TITLE_SEPARATOR}Supabase`
+    )
+  })
+
+  it('resolves a title it did not build to the brand', () => {
+    expect(toTelemetryPageTitle('users | Acme Project | Acme Org | Supabase')).toBe('Supabase')
+  })
+})
 
 describe('buildStudioPageTitle', () => {
   it('builds a project-scoped title in most-specific-first order', () => {

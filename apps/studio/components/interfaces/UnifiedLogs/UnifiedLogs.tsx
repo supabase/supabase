@@ -155,7 +155,7 @@ export const UnifiedLogs = ({
   const showMultigresLogs = useShowMultigresLogs()
   const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
   const savedViewsFlag = useFlag(LOGS_SAVED_VIEWS_FLAG)
   const showSavedViews = IS_PLATFORM && savedViewsFlag
@@ -212,17 +212,15 @@ export const UnifiedLogs = ({
     flagsLoaded,
     computeEnabled,
   })
-  const visibleSearchFilters = gateLogTypeFilters(
-    search.filter,
-    getLogTypeVisibility(
-      {
-        multigres: showMultigresLogs,
-        pipelines: canShowPipelinesLogs,
-        compute: computeAvailability.preserveComputeFilter,
-      },
-      scope
-    )
+  const preservedLogTypeVisibility = getLogTypeVisibility(
+    {
+      multigres: showMultigresLogs || !flagsLoaded || !!isConfigCatStale,
+      pipelines: canShowPipelinesLogs,
+      compute: computeAvailability.preserveComputeFilter || (IS_PLATFORM && !!isConfigCatStale),
+    },
+    scope
   )
+  const visibleSearchFilters = gateLogTypeFilters(search.filter, preservedLogTypeVisibility)
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnFilters = buildDefaultColumnFilters({
@@ -278,7 +276,7 @@ export const UnifiedLogs = ({
     }
     return parameters
   }, [search, scope, queryLogTypeVisibility])
-  const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+  const urlFilterScope = JSON.stringify([projectRef, search.filter, search.date, scope])
   const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
   const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
     (filter) => filter.column === 'log_type' && filter.operator === '='
@@ -650,7 +648,7 @@ export const UnifiedLogs = ({
     )
     const update = buildFilterSearchUpdate(offeredColumnFilters, filterFields)
     if (Array.isArray(update.filter)) {
-      update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
+      update.filter = gateLogTypeFilters(update.filter.map(String), preservedLogTypeVisibility)
     }
     setSearch(update)
   }
@@ -658,7 +656,9 @@ export const UnifiedLogs = ({
   useFilterSearchSync({
     applyFilterSearch,
     columnFilters,
-    enabled: computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs,
+    enabled:
+      localFilterOrigin === urlFilterScope ||
+      (computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs),
   })
 
   useEffect(() => {

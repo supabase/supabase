@@ -4,6 +4,13 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 import { Button, Card, CardContent } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -21,11 +28,6 @@ import {
   convertKVStringArrayToJson,
   formatWrapperTables,
 } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
@@ -99,18 +101,18 @@ export const AnalyticBucketDetails = () => {
   return (
     <>
       {isErrorBucket ? (
-        <ScaffoldContainer bottomPadding>
-          <ScaffoldSection isFullWidth>
+        <PageContainer size="default">
+          <PageSection>
             <AlertError subject="Failed to fetch analytics buckets" error={bucketError} />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
       ) : (
-        <ScaffoldContainer bottomPadding>
+        <PageContainer size="default">
           {state === 'loading' ? (
-            <ScaffoldSection isFullWidth>
+            <PageSection>
               <BucketHeader showActions={false} />
               <GenericTableLoader />
-            </ScaffoldSection>
+            </PageSection>
           ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
               bucketName={bucket?.name}
@@ -129,7 +131,7 @@ export const AnalyticBucketDetails = () => {
             <WrapperMissing bucketName={bucket?.name} />
           ) : state === 'added' && wrapperInstance ? (
             <>
-              <ScaffoldSection isFullWidth>
+              <PageSection>
                 <BucketHeader />
 
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
@@ -149,16 +151,18 @@ export const AnalyticBucketDetails = () => {
                     ))}
                   </div>
                 )}
-              </ScaffoldSection>
+              </PageSection>
 
               <SimpleConfigurationDetails bucketName={bucket?.name} />
             </>
           ) : null}
 
-          <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
-            <header>
-              <ScaffoldSectionTitle>Manage</ScaffoldSectionTitle>
-            </header>
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Manage</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
             <Card>
               <CardContent className="flex flex-col md:flex-row md:justify-between gap-y-4 gap-x-8 md:items-center">
                 <div className="flex flex-col">
@@ -177,8 +181,8 @@ export const AnalyticBucketDetails = () => {
                 </Button>
               </CardContent>
             </Card>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
       )}
 
       <DeleteAnalyticsBucketModal

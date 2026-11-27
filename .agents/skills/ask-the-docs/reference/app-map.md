@@ -4,9 +4,11 @@ What lives where, and what depends on what. **Verify against the live tree
 before acting** — paths drift. Cross-references the per-topic deep dives in
 this folder.
 
+Verified at: 3089aa3f67 (2026-11-25).
+
 ## High-level architecture
 
-`apps/docs` is a **Next.js 15 App Router** site served at **`/docs`**
+`apps/docs` is a **Next.js App Router** site served at **`/docs`**
 (`basePath` in `next.config.mjs`). It combines hand-written MDX guides,
 machine-generated reference docs, federated content
 from external repos, and shared monorepo packages (`ui`, `common`,
@@ -64,7 +66,8 @@ flowchart TB
 | `apps/docs/internals/markdown-schema/` | Per-component handlers: JSX → markdown string                                          | File name matches the component name                                                         |
 | `apps/docs/public/markdown/guides/`    | Generated `.md` output; served via `/docs/guides/<path>.md` or `Accept: text/markdown` | Built by `generate-guides-markdown.ts`; see [`llm-agent-surface.md`](./llm-agent-surface.md) |
 | `apps/docs/public/markdown/reference/` | Generated reference `.md` files                                                        | Built by `generate-reference-markdown.ts`                                                    |
-| `apps/docs/middleware.ts`              | Content negotiation for guides; bot rewrite for reference deep links                   | Uses `packages/common/markdown-negotiation.ts`                                               |
+| `apps/docs/proxy.ts`                   | Content negotiation for guides; bot rewrite for reference deep links                   | Uses `packages/common/markdown-negotiation.ts`                                               |
+| `apps/docs/style-guide/`               | Docs content style guide: voice, elements, page structure, word list, templates        | Source of truth for content style; see `apps/docs/style-guide/README.md`                     |
 | `apps/docs/app/api/guides-md/`         | Serves pre-generated guide markdown to agents                                          | Rewritten from `/docs/guides/<path>.md`                                                      |
 | `apps/docs/examples/`                  | Copied from repo root `examples/` at build time                                        | `codegen:examples`                                                                           |
 | `apps/docs/scripts/`                   | Build-time scripts (sitemap, markdown export, embeddings)                              |                                                                                              |
@@ -165,6 +168,17 @@ downloads, `llms.txt`), see [`llm-agent-surface.md`](./llm-agent-surface.md).
 
 Each `SCHEMA` entry receives `{ props, children, node }` and returns the
 markdown string to substitute.
+
+## Layout v2
+
+The `layout-v2:` Tailwind variant styles the new docs layout.
+`styles/globals.css` defines it as `[data-ia-nav='option-1']` on an ancestor.
+The `option-1` variant of the PostHog flag `docs-ia-mvp-v1` turns it on
+(`features/IaNav/constants.ts`, `features/DocsLayout/useDocsLayoutV2.ts`).
+A `?docs-ia-mvp-v1=option-1` query parameter forces it. The shell lives in
+`layouts/` (`MainSkeleton.tsx`, `RightRail.tsx`, `HeadingSlot.tsx`) and
+`components/Navigation/`. The nav tree lives in `features/IaNav/`. See
+[`feature-flags.md`](./feature-flags.md).
 
 ## `<Heading>` and the prose typography contract
 
