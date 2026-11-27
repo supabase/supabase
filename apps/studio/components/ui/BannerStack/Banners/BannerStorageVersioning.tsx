@@ -64,7 +64,6 @@ const BannerStorageVersioning = ({ onDismiss }: { onDismiss: () => void }) => {
   return (
     <BannerCard
       onDismiss={onDismiss}
-      size="wide"
       className="[&>div:last-child]:p-0 [&>div:last-child>div:nth-child(2)>div:first-child>img:first-child]:border-b"
     >
       <div className="flex flex-col">
@@ -76,12 +75,11 @@ const BannerStorageVersioning = ({ onDismiss }: { onDismiss: () => void }) => {
               <Badge variant="warning">Public Alpha</Badge>
             </div>
             <p className="text-sm font-medium">
-              Introducing Storage Object Versioning <br />
+              Storage Object Versioning <br />
               and Lifecycle Policies
             </p>
             <p className="text-xs text-foreground-lighter text-pretty">
-              Preserve and restore versions of files in your buckets, and automatically expire
-              noncurrent versions with lifecycle policies.
+              Retain versions of files and automatically expire them with lifecycle policies.
             </p>
           </div>
           <div className="flex gap-2">
@@ -200,7 +198,7 @@ const VersionHistoryPreview = () => {
 
   return (
     <div className="border-b bg-surface-100 bg-[radial-gradient(oklch(from_var(--foreground-default)_l_c_h/0.02)_1px,transparent_1px)] bg-size-[6px_6px] px-3 pt-3">
-      <div className="rounded-md rounded-b-none border border-b-0 bg-surface-100 p-3 shadow-sm">
+      <div className="rounded-md rounded-b-none border border-b-0 bg-surface-100 p-3 pb-2 shadow-sm">
         <div className="mb-1 flex items-center gap-1 text-[9px] font-medium text-foreground-light">
           <span>Versions</span>
           <span className="text-[8px] text-foreground-lighter">
@@ -213,16 +211,15 @@ const VersionHistoryPreview = () => {
             className="mr-0.5 shrink-0 text-foreground-lighter"
             aria-hidden="true"
           />
-          <span className="rounded-sm border border-strong bg-surface-300 px-1.5 py-0.5">2d</span>
-          <span className="rounded-sm border border-strong border-dashed px-1.5 py-0.5 uppercase tracking-wide">
+          <span className="rounded-sm border border-strong bg-surface-300 px-1 py-0.5">2d</span>
+          <span className="rounded-sm border border-strong border-dashed px-1 py-0.5 uppercase">
             Either
           </span>
-          <span className="rounded-sm border border-strong bg-surface-300 px-1.5 py-0.5">
+          <span className="rounded-sm border border-strong bg-surface-300 px-1 py-0.5">
             2 noncurrent v. retained
           </span>
-          <InfoIcon size={11} className="shrink-0 text-foreground-lighter" aria-hidden="true" />
         </div>
-        <ol className="flex min-h-[6.25rem] flex-col gap-y-0.5">
+        <ol className="flex min-h-[5.5rem] flex-col gap-y-0.5">
           <AnimatePresence initial={false} onExitComplete={() => setIsRemovingVersion(false)}>
             {versions.map((version, index) => {
               const isCurrent = version.isCurrent

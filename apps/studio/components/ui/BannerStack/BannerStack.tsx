@@ -27,7 +27,7 @@ export const BannerStack = () => {
 
   return (
     <motion.div
-      className="fixed bottom-4 right-4 z-50 flex w-80 max-w-[calc(100vw-2rem)] flex-col-reverse items-end gap-2"
+      className="fixed bottom-4 right-4 z-50 flex flex-col-reverse items-end gap-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
@@ -40,7 +40,7 @@ export const BannerStack = () => {
       animate={{ y: isExpanded ? -8 : 0 }}
       transition={transition}
     >
-      <div className="relative w-fit max-w-80">
+      <div className="relative w-full max-w-72">
         <AnimatePresence>
           {!isExpanded &&
             peeks.map((depth) => (
@@ -57,7 +57,7 @@ export const BannerStack = () => {
         </AnimatePresence>
 
         <motion.div
-          className="relative z-10 flex w-fit justify-end"
+          className="relative z-10"
           initial={{ opacity: 0, scale: 0.99, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.99, y: 8 }}
@@ -72,7 +72,7 @@ export const BannerStack = () => {
           extraBanners.map((banner, index) => (
             <motion.div
               key={banner.id}
-              className="flex w-fit max-w-80 justify-end"
+              className="w-full max-w-72"
               initial={{ opacity: 0, scale: 0.98, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 8 }}

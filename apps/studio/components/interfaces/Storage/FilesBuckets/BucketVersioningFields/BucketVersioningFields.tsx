@@ -91,7 +91,8 @@ export const BucketVersioningFields = ({
               hideMessage
               name="enable_versioning"
               label="Object versioning"
-              labelAddon={<StorageVersioningAlphaPopover />}
+              labelOptional={<StorageVersioningAlphaPopover />}
+              className="**:data-[formlayout-id=labelContainer]:flex-row **:data-[formlayout-id=labelContainer]:flex-wrap **:data-[formlayout-id=labelContainer]:items-center **:data-[formlayout-id=labelContainer]:gap-x-2 **:data-[formlayout-id=description]:basis-full"
               description="Retains previous versions when an object is overwritten or deleted"
               layout="flex"
             >

@@ -7,7 +7,6 @@ type Props = {
   description?: string | React.ReactNode
   error?: string | React.ReactNode
   label?: string | React.ReactNode
-  labelAddon?: React.ReactNode
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical' | 'flex' | 'flex-row-reverse'
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -296,7 +295,6 @@ export const FormLayout = React.forwardRef<
       description,
       id,
       label,
-      labelAddon,
       labelOptional,
       layout = 'vertical',
       style,
@@ -394,27 +392,22 @@ export const FormLayout = React.forwardRef<
               className={cn(LabelContainerVariants({ align, labelLayout, flex, layout }))}
               data-formlayout-id={'labelContainer'}
             >
-              {hasLabel && (
-                <div className={labelAddon ? 'flex items-center gap-2' : undefined}>
-                  {isReactForm ? (
-                    <FormLabel
-                      className="text-foreground flex gap-2 items-center wrap-break-word"
-                      data-formlayout-id="formLabel"
-                      htmlFor={id}
-                    >
-                      <LabelContents />
-                    </FormLabel>
-                  ) : (
-                    <Label
-                      className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
-                      data-formlayout-id="label"
-                      htmlFor={props.name || id}
-                    >
-                      <LabelContents />
-                    </Label>
-                  )}
-                  {labelAddon}
-                </div>
+              {hasLabel && isReactForm ? (
+                <FormLabel
+                  className="text-foreground flex gap-2 items-center wrap-break-word"
+                  data-formlayout-id="formLabel"
+                  htmlFor={id}
+                >
+                  <LabelContents />
+                </FormLabel>
+              ) : (
+                <Label
+                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
+                  data-formlayout-id="label"
+                  htmlFor={props.name || id}
+                >
+                  <LabelContents />
+                </Label>
               )}
               {labelOptional && (
                 <span
