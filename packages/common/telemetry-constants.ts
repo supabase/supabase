@@ -3541,7 +3541,8 @@ export interface TableUpdatedEvent {
 }
 
 /**
- * User updated an existing row in the Table Editor via the side panel or inline cell editing.
+ * User saved changes to an existing row from the Table Editor row side panel. Edits queued with
+ * queue operations enabled are not counted.
  *
  * @group Events
  * @source studio
@@ -3553,7 +3554,7 @@ export interface TableEditorRowUpdatedEvent {
     /**
      * How the row edit was performed
      */
-    editMethod: 'side_panel' | 'inline'
+    editMethod: 'side_panel'
   }
   groups: TelemetryGroups
 }

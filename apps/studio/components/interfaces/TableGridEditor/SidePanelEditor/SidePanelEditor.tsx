@@ -284,6 +284,8 @@ export const SidePanelEditor = ({
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
           const row = getRowFromSidePanel(snap.sidePanel)
+          // saveRow is shared with the expanded cell editors and the foreign row selector
+          const isRowEditorSave = snap.sidePanel?.type === 'row'
 
           if (!row) {
             saveRowError = new Error('No row found')
@@ -303,7 +305,9 @@ export const SidePanelEditor = ({
               // updateRow skips onSuccess for queued edits, so this only counts persisted updates
               onSuccess: () => {
                 toast.success('Successfully updated row')
-                track('table_editor_row_updated', { editMethod: 'side_panel' })
+                if (isRowEditorSave) {
+                  track('table_editor_row_updated', { editMethod: 'side_panel' })
+                }
               },
             })
           } catch (error: any) {
