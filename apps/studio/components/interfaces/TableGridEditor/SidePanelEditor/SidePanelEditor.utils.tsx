@@ -914,9 +914,11 @@ export const updateTable = async ({
     includeLint: true,
   })
 
-  track('table_updated', {
-    columnCountChanged: columns.length !== originalColumns.length,
-  })
+  if (!hasError) {
+    track('table_updated', {
+      columnCountChanged: columns.length !== originalColumns.length,
+    })
+  }
 
   return {
     table: await prefetchTableEditor(queryClient, {

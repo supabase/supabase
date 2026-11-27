@@ -24,6 +24,7 @@ import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
 import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const verifyJSON = (value: string) => {
@@ -63,6 +64,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
+  const track = useTrack()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
@@ -141,6 +143,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   const onSelectExpand = () => {
+    track('table_editor_cell_editor_opened', { editorType: 'json' })
     cancelChanges()
     onExpandEditor(column.key, {
       ...row,

@@ -300,9 +300,12 @@ export const SidePanelEditor = ({
               rowIdentifiers: configuration.identifiers,
               payload,
               enumArrayColumns,
-              onSuccess: () => toast.success('Successfully updated row'),
+              // updateRow skips onSuccess for queued edits, so this only counts persisted updates
+              onSuccess: () => {
+                toast.success('Successfully updated row')
+                track('table_editor_row_updated', { editMethod: 'side_panel' })
+              },
             })
-            track('table_editor_row_updated', { editMethod: 'side_panel' })
           } catch (error: any) {
             saveRowError = error
           }

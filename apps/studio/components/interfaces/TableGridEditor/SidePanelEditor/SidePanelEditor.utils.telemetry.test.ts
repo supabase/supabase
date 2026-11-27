@@ -263,5 +263,35 @@ describe('SidePanelEditor.utils telemetry', () => {
         columnCountChanged: true,
       })
     })
+
+    it('does not track table_updated when adding a column fails', async () => {
+      mockCreateDatabaseColumn.mockRejectedValueOnce(new Error('column already exists'))
+
+      const { hasError } = await updateTable({
+        projectRef,
+        connectionString,
+        toastId: 'toast-3',
+        table: baseTable,
+        payload: {},
+        columns: [
+          makeColumnField(),
+          makeColumnField({
+            id: 'new-col-uuid',
+            name: 'email',
+            format: 'text',
+            isPrimaryKey: false,
+            isIdentity: false,
+            isNullable: true,
+            isNewColumn: true,
+          }),
+        ],
+        foreignKeyRelations: [],
+        existingForeignKeyRelations: [],
+        track: mockTrack,
+      })
+
+      expect(hasError).toBe(true)
+      expect(mockTrack).not.toHaveBeenCalled()
+    })
   })
 })
