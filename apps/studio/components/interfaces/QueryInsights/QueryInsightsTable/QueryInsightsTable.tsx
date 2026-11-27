@@ -1,6 +1,6 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
-import { useLocation, useNavigate, useRouter } from '@tanstack/react-router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
@@ -60,7 +60,11 @@ export const QueryInsightsTable = ({
     order: parseAsString,
     source: parseAsArrayOf(parseAsString).withDefault([]),
   })
-  const [searchQuery, setSearchQuery] = useState(urlSearch || '')
+  const searchQuery = urlSearch
+  const setSearchQuery = useCallback(
+    (value: string) => setQueryStates({ search: value || null }),
+    [setQueryStates]
+  )
   const appNameFilter = urlSource
   const setAppNameFilter = (names: string[]) =>
     setQueryStates({ source: names.length ? names : null })
@@ -106,7 +110,6 @@ export const QueryInsightsTable = ({
   const [explainLoadingQuery, setExplainLoadingQuery] = useState<string | null>(null)
 
   const { ref } = useParams()
-  const router = useRouter()
   const navigate = useNavigate()
   const pathname = useLocation({ select: (location) => location.pathname })
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -232,15 +235,13 @@ export const QueryInsightsTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetView, activeSheetRow?.query])
 
+  const prevPathnameRef = useRef(pathname)
   useEffect(() => {
-    return router.subscribe('onBeforeLoad', ({ toLocation }) => {
-      if (toLocation.pathname !== pathname) {
-        setQueryStates({ search: null })
-        onCurrentSelectQuery?.(null)
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, pathname])
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname
+      onCurrentSelectQuery?.(null)
+    }
+  }, [pathname, onCurrentSelectQuery])
 
   const timeConsumedWidth = useMemo(() => {
     if (!explorerItems.length) return 150
@@ -326,13 +327,6 @@ export const QueryInsightsTable = ({
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
-
-  useEffect(() => {
-    if (urlSearch !== searchQuery) {
-      setQueryStates({ search: searchQuery || null })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery])
 
   const errorCount = errors.length
   const indexCount = indexIssues.length

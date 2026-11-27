@@ -3,6 +3,7 @@ import { act, waitFor } from '@testing-library/react'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { QueryInsightsTable } from './QueryInsightsTable'
+import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
 import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -71,31 +72,27 @@ function mockProjectEndpoint() {
 }
 
 describe('QueryInsightsTable route change handling', () => {
-  it('clears search and selected query when navigating to a different pathname, but not on search-only updates', async () => {
+  it('clears selected query on pathname change without mutating destination or history search params', async () => {
     mockProjectEndpoint()
     const onCurrentSelectQuery = vi.fn()
-    const onUrlUpdate = vi.fn()
     const router = createQueryInsightsRouter(
       '/project/default/observability/query-insights?search=select'
     )
     await router.load()
 
     customRender(
-      <QueryInsightsTable
-        data={[]}
-        isLoading={false}
-        currentSelectedQuery="SELECT 1"
-        onCurrentSelectQuery={onCurrentSelectQuery}
-      />,
-      {
-        router,
-        nuqs: { searchParams: '?search=select', onUrlUpdate },
-      }
+      <NuqsAdapter>
+        <QueryInsightsTable
+          data={[]}
+          isLoading={false}
+          currentSelectedQuery="SELECT 1"
+          onCurrentSelectQuery={onCurrentSelectQuery}
+        />
+      </NuqsAdapter>,
+      { router }
     )
 
-    onUrlUpdate.mockClear()
-
-    // Same pathname with updated search params should not reset selection or search
+    // Same pathname with updated search params should not reset selection
     await act(async () => {
       await router.navigate({
         to: '/project/$ref/observability/query-insights',
@@ -105,23 +102,29 @@ describe('QueryInsightsTable route change handling', () => {
     })
 
     expect(onCurrentSelectQuery).not.toHaveBeenCalled()
-    expect(onUrlUpdate).not.toHaveBeenCalled()
+    expect(router.state.location.search).toEqual({ search: 'select', sort: 'calls' })
 
-    // Navigating to a different pathname should clear selection and search query param
+    // Navigating to a different pathname should clear selection without clobbering destination search params
     await act(async () => {
       await router.navigate({
         to: '/project/$ref/logs/postgres-logs',
         params: { ref: 'default' },
+        search: { search: 'from-logs' } as never,
       })
     })
 
     await waitFor(() => expect(onCurrentSelectQuery).toHaveBeenCalledWith(null))
+    expect(router.state.location.search).toEqual({ search: 'from-logs' })
+
+    // Navigating back preserves the previous history entry's search params
+    await act(async () => {
+      router.history.back()
+      await router.load()
+    })
+
     await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          queryString: '',
-        })
-      )
+      expect(router.state.location.pathname).toBe('/project/default/observability/query-insights')
     )
+    expect(router.state.location.search).toEqual({ search: 'select', sort: 'calls' })
   })
 })
