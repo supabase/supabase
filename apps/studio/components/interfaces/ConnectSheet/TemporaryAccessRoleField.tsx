@@ -21,7 +21,7 @@ export function TemporaryAccessPasswordNote({ tokenHref }: { tokenHref?: string 
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Use a {tokenLabel} as the password. For a scoped token, set Database JIT to Read.{' '}
+      Use a {tokenLabel} as the password. For a scoped token, set Database token access to Read.{' '}
       <InlineLink href={`${DOCS_URL}/guides/platform/temporary-access`}>Learn more</InlineLink>
     </p>
   )
