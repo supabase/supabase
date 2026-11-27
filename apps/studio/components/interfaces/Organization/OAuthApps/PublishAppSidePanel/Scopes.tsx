@@ -38,11 +38,11 @@ const Scope = ({
 
   return (
     <div
-      className="flex flex-wrap items-start justify-between gap-3 p-4 border first:rounded-t last:rounded-b"
+      className="grid grid-cols-1 items-start gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_10rem]"
       key={title}
     >
-      <div className="flex flex-col">
-        <span className="text-foreground text-sm">{title}</span>
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="text-sm font-medium text-foreground">{title}</span>
         <span className="text-foreground-light text-xs capitalize-sentence">{description}</span>
       </div>
       <AccessLevelDropdown
@@ -63,7 +63,7 @@ export const ScopesPanel = ({
   setScopes: Dispatch<SetStateAction<OAuthScope[]>>
 }) => {
   return (
-    <div className="-space-y-px">
+    <div className="divide-y divide-default rounded-md border border-default">
       <Scope
         title="Analytics"
         description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
