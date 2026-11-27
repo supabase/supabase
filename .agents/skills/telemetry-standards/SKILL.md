@@ -17,8 +17,10 @@ reviewing PRs that touch tracking or when implementing new tracking.
 **Format:** `[object]_[verb]` in snake_case
 
 **Approved verbs only** (canonical list — derived from `packages/common/telemetry-constants.ts`):
-opened, clicked, submitted, created, removed, updated, intended, evaluated, added,
-enabled, disabled, copied, exposed, failed, converted, closed, completed, applied, sent, moved
+opened, clicked, submitted, created, removed, updated, evaluated, added,
+enabled, disabled, copied, exposed, failed, closed, completed, applied
+
+`created` is for a new named resource, `added` for content put into an existing one. `evaluated` is for a decision the system made, not a user action.
 
 **Flag these:**
 
@@ -155,7 +157,7 @@ Where the `track()` call goes:
 - **Submitted values.** Capture what the user submitted at submit time, not in the success callback. A form can stay editable while the request is in flight, so reading it on success can report a value that was not the one sent.
 - **Dismiss and abandonment events.** Every property must be able to take a different value at that call site. Read it from state that exists while the user is still in the flow, not from a result that is only set after success: otherwise every abandonment reports the same value. The success path (a Done button, for example) must not go through the dismiss handler, or each success also counts as an abandonment.
 - **Conditionally rendered elements.** A `track()` call on an element that renders only for some items (a link rendered only when the item has an `href`, for example) never fires for the others, and they read as zero. Put the call on an element every item renders.
-- **Debounced or delayed sends.** `useTrack` reads the project, org and pathname when the event is sent, not when the user acted. An event sent from a debounce or timer that outlives a navigation is attributed to the destination page. Send on the action where possible, and pass the project or org as the third argument when the send has to wait.
+- **Debounced or delayed sends.** `useTrack` reads the project, org and pathname when the event is sent, not when the user acted. An event sent from a debounce or timer that outlives a navigation is attributed to the destination page. Send on the action where possible. When the send has to wait, the third argument can pin the project or org, but the page cannot be overridden.
 - **Events sent just before leaving the page.** A request started right before a full-page navigation (an external link, an OAuth redirect) can be cancelled. Add the event's action to `KEEPALIVE_ACTIONS` in `packages/common/telemetry-event.ts`. Never turn keepalive on for every event: the browser's in-flight keepalive budget is small and shared, so other events would be dropped.
 
 ## Feature Flag Measurement
@@ -167,7 +169,7 @@ A feature flag that gates behavior needs telemetry on both the flag state and ho
 
 `usePHFlag` returns `undefined` while the PostHog store is still loading. Read the raw flag via `usePHFlag('flagName')`, **not** through wrapper hooks that coerce `undefined` to `false`, and use a conditional spread so the property is omitted (not `false`) until the flag has resolved:
 
-As always, `track()` runs inside the user-action handler — never in the component body or an effect (`_exposed` events excepted, see [What NOT to Track](#what-not-to-track)):
+As always, `track()` runs inside the user-action handler — never in the component body or an effect (experiment `_exposed` events excepted, see [What NOT to Track](#what-not-to-track)):
 
 ```typescript
 const track = useTrack()
@@ -180,7 +182,7 @@ const handleSubmit = () => {
 }
 ```
 
-**Experiment exposure.** Send `<experiment_id>_experiment_exposed` through `useTrack` with `experiment_id` and `variant`, once per mount, and only once flags have loaded for the signed-in user (`hasFlagsForSignedInUser` in `packages/common/feature-flags.tsx`): the value held before that belongs to the logged-out visitor.
+**Experiment exposure.** Send `<experiment_id>_experiment_exposed` through `useTrack` with the `variant`, once per mount, and only once flags have loaded for the signed-in user (`hasFlagsForSignedInUser` from `useFeatureFlags()` in `packages/common/feature-flags.tsx`): the value held before that belongs to the logged-out visitor.
 
 For string-valued flags (e.g. experiment variants), use `usePHFlag<string>('flagName')`; a flag that may be migrated from boolean to multivariate is typed `usePHFlag<boolean | string>`. `ProjectCreationForm.tsx` (`dataApiRevokeOnCreateDefault`) is the canonical example.
 
@@ -218,10 +220,11 @@ When reviewing a PR, flag a break of any of these as a **required change**, even
 2. **Properties**: [Property Standards](#property-standards). Search `packages/common/telemetry-constants.ts` for similar events and check that property names match
 3. **Passive view tracking**: [What NOT to Track](#what-not-to-track)
 4. **Inaccurate docs**: `@source` or `@page` that doesn't match the implementation ([Event Definitions](#event-definitions))
-5. **Unmeasured feature flags**: [Feature Flag Measurement](#feature-flag-measurement)
+5. **Feature flags and experiment exposure**: [Feature Flag Measurement](#feature-flag-measurement)
 6. **User-defined names or identifiers in properties**: [Privacy: User-Defined Names and Identifiers](#privacy-user-defined-names-and-identifiers)
 7. **Secrets, project content, URL state or consent**: [Privacy: Secrets, Project Content and URL State](#privacy-secrets-project-content-and-url-state) and [Consent and Transport](#consent-and-transport)
 8. **Tracking placement**: the placement rules under [Required Pattern](#required-pattern)
+9. **Org-level events**: a project-scoped event reused on an organization-level page ([Event Definitions](#event-definitions))
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
 
