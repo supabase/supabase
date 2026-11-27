@@ -50,7 +50,7 @@ const SubprocessorUpdatesForm = () => {
       }
 
       setStatus('success')
-      sendTelemetryEvent({ action: 'www_subprocessor_updates_form_submitted' })
+      sendTelemetryEvent({ action: 'www_subprocessor_updates_form_completed' })
     } catch (err: any) {
       setStatus('error')
       setErrorMessage(err.message || 'Something went wrong. Please try again.')
