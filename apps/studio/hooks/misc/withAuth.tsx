@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useLocation, useNavigate, useRouter } from '@tanstack/react-router'
 import { useAuth, useParams } from 'common'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -7,7 +7,7 @@ import { SessionTimeoutModal } from '@/components/interfaces/SignIn/SessionTimeo
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useSignOut } from '@/lib/auth'
-import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { IS_PLATFORM } from '@/lib/constants'
 import { searchParamsToRecord } from '@/lib/router-search-params'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
@@ -31,6 +31,7 @@ export function withAuth<T>(
   }
 
   const WithAuthHOC: ComponentType<T> = (props) => {
+    const router = useRouter()
     const navigate = useNavigate()
     const currentPathname = useLocation({ select: (location) => location.pathname })
     const { ref, organizationSlug } = useParams()
@@ -75,17 +76,14 @@ export function withAuth<T>(
     const needsMfaElevation = isLoggedIn && !isCorrectLevel
 
     const redirectToSignIn = useCallback(() => {
-      let pathname = location.pathname
-      if (BASE_PATH) {
-        pathname = pathname.replace(BASE_PATH, '')
-      }
+      const { pathname, searchStr } = router.state.location
 
       if (pathname === '/sign-in' || pathname === '/sign-in-mfa') {
         // If the user is already on the sign in page, we don't need to redirect them
         return
       }
 
-      const searchParams = new URLSearchParams(location.search)
+      const searchParams = new URLSearchParams(searchStr)
       searchParams.set('returnTo', pathname)
       const search = searchParamsToRecord(searchParams)
 
@@ -101,7 +99,7 @@ export function withAuth<T>(
       signOut().finally(() => {
         void navigate({ to: '/sign-in', search })
       })
-    }, [navigate, signOut, needsMfaElevation])
+    }, [router, navigate, signOut, needsMfaElevation])
 
     useEffect(() => {
       if (!isFinishedLoading) {
