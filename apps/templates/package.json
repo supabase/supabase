@@ -1,0 +1,46 @@
+{
+  "name": "templates",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "vite dev --port 3009",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run",
+    "clean": "rimraf .output .turbo tsconfig.tsbuildinfo",
+    "screenshots": "tsx scripts/capture-screenshots.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "catalog:",
+    "@tanstack/react-start": "catalog:",
+    "common": "workspace:*",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@tailwindcss/vite": "4.2.4",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "config": "workspace:*",
+    "eslint": "^9.0.0",
+    "eslint-config-supabase": "workspace:*",
+    "nitro": "3.0.260903-beta",
+    "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
