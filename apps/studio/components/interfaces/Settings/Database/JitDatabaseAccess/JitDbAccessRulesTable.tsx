@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { EllipsisVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
@@ -25,6 +26,7 @@ import type { JitUserRule } from './JitDbAccess.types'
 import { getJitStatusDisplay } from './JitDbAccess.utils'
 import { JitDbAccessInfo } from './JitDbAccessInfo'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useJitDbAccessStatusQuery } from '@/data/jit-db-access/jit-db-access-status-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface JitDbAccessRulesTableProps {
@@ -48,6 +50,8 @@ export function JitDbAccessRulesTable({
   onEditRule,
   onDeleteRule,
 }: JitDbAccessRulesTableProps) {
+  const { ref: projectRef } = useParams()
+
   const addDisabled = disableActions || !canUpdate || allProjectMembersHaveRules
   const addRuleTooltip = !canUpdate
     ? 'Additional permissions required'
@@ -59,7 +63,9 @@ export function JitDbAccessRulesTable({
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
   )
 
-  if (isLoading) {
+  const { isPending: isLoadingUserJitDbAccess } = useJitDbAccessStatusQuery({ projectRef })
+
+  if (isLoading || isLoadingUserJitDbAccess) {
     return (
       <Card>
         <CardContent className="space-y-4 p-4">

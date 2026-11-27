@@ -1,8 +1,7 @@
-import { cn } from '@graphiql/react'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChevronDownIcon } from 'lucide-react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -56,12 +55,14 @@ const SingleRoleAccess = ({ role }: { role: JitRole }) => {
             <span>
               <span>As</span> <code>{role.role}</code>
             </span>
-            <span>·</span>
             {role.expires_at && (
-              <span>
-                Expires on{' '}
-                <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
-              </span>
+              <>
+                <span>·</span>
+                <span>
+                  Expires on{' '}
+                  <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
+                </span>
+              </>
             )}
           </div>
         )
