@@ -124,11 +124,10 @@ describe('computeVersionFate', () => {
     })
 
     it("waits out the cap rule's day floor before calling a version due", () => {
-      // Beyond the cap but written today: the cap rule carries `noncurrent_days: 1`,
-      // so nothing removes it until tomorrow.
+      // Beyond the cap but written today: the count rule's one-day minimum has not passed.
       expect(
         computeVersionFate({ ...base, daysOld: 0, chronoIndex: 0, noncurrentCount: 5 })
-      ).toEqual({ type: 'expires-in', days: 1 })
+      ).toEqual({ type: 'cap-expiry-pending', cap: 3, daysRemaining: 1 })
 
       expect(
         computeVersionFate({ ...base, daysOld: 1, chronoIndex: 0, noncurrentCount: 5 })

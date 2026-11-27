@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
 import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -35,6 +34,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from '@/data/reports/v2/edge-functions.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useFormatDateTime } from '@/lib/datetime'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -94,6 +94,7 @@ const EdgeFunctionsUsage = () => {
     setShowUpgradePrompt,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const formatDateTime = useFormatDateTime()
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -186,13 +187,13 @@ const EdgeFunctionsUsage = () => {
               {selectedDateRange && (
                 <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_start.date, 'MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                    {formatDateTime(selectedDateRange.period_end.date, 'MMM D, h:mma')}
                   </p>
                 </div>
               )}
@@ -258,7 +259,7 @@ const EdgeFunctionsUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-4 pb-8">
+        <div className="mt-8 grid @4xl:grid-cols-2 gap-4 pb-8">
           {selectedDateRange &&
             reportConfig
               .filter((report) => !report.hide)

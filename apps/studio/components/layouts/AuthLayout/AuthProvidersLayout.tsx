@@ -1,6 +1,5 @@
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 import {
@@ -18,7 +17,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const matchRoute = useMatchRoute()
   const { authenticationSignInProviders, authenticationThirdPartyAuth } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -27,13 +26,13 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const navItems = [
     {
       label: 'Supabase Auth',
-      href: `/project/${ref}/auth/providers`,
+      to: '/project/$ref/auth/providers' as const,
     },
     ...(authenticationThirdPartyAuth
       ? [
           {
             label: 'Third-Party Auth',
-            href: `/project/${ref}/auth/third-party`,
+            to: '/project/$ref/auth/third-party' as const,
           },
         ]
       : []),
@@ -56,8 +55,17 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
           <PageNav size="default">
             <NavMenu>
               {navItems.map((item) => (
-                <NavMenuItem key={item.label} active={pathname === item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                <NavMenuItem
+                  key={item.label}
+                  active={!!matchRoute({ to: item.to, params: { ref: ref ?? '_' }, fuzzy: false })}
+                >
+                  <Link
+                    to={item.to}
+                    params={{ ref: ref ?? '_' }}
+                    activeOptions={{ exact: true, includeSearch: false }}
+                  >
+                    {item.label}
+                  </Link>
                 </NavMenuItem>
               ))}
             </NavMenu>

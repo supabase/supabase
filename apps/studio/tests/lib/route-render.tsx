@@ -16,7 +16,10 @@ import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 type RouteNode = { id: string } | { path: string }
 
-type RenderRouteOptions = Omit<Parameters<typeof CustomWrapper>[0], 'children'> & {
+type RenderRouteOptions = Omit<
+  Parameters<typeof CustomWrapper>[0],
+  'children' | 'router' | 'initialUrl'
+> & {
   routeId: string
   url: string
   renderOptions?: RenderOptions
@@ -86,7 +89,11 @@ export async function renderRoute(
   })
   await act(() => router.load())
   const result = render(<RouterProvider router={router} />, {
-    wrapper: ({ children }) => <CustomWrapper {...wrapper}>{children}</CustomWrapper>,
+    wrapper: ({ children }) => (
+      <CustomWrapper {...wrapper} router={router}>
+        {children}
+      </CustomWrapper>
+    ),
     ...renderOptions,
   })
   return { ...result, router }

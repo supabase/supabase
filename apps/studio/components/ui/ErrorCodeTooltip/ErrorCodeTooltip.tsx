@@ -1,6 +1,5 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { useState } from 'react'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -92,7 +91,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
           >
             {docsUrl && (
               <div className="flex items-center gap-1.5">
-                <Image
+                <img
                   src={
                     resolvedTheme?.includes('dark')
                       ? `${BASE_PATH}/img/supabase-dark.svg`

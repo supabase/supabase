@@ -10,7 +10,7 @@ export const Route = createFileRoute('/project/$ref/database/triggers/data')({
 
 function TriggersDataPage() {
   return (
-    <PageContainer size="large">
+    <PageContainer size="default">
       <PageSection>
         <PageSectionContent>
           <TriggersList />

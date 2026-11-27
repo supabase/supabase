@@ -1,6 +1,7 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
+import { AnalyticsBucket, EdgeFunctions, FilesBucket, VectorBucket } from 'icons'
 import {
   Clock5Icon,
   Code2Icon,
@@ -22,8 +23,8 @@ import {
   WebhookIcon,
   ZapIcon,
 } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
+import { AiIconAnimation, Badge } from 'ui'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
@@ -39,13 +40,6 @@ import {
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-
-const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
-const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
-const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFunctions))
-const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
-const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
-const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 

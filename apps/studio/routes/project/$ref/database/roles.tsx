@@ -31,7 +31,7 @@ function DatabaseRoles() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Roles</PageHeaderTitle>
@@ -41,7 +41,7 @@ function DatabaseRoles() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <RolesList />

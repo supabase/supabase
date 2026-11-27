@@ -1,7 +1,6 @@
 import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { Loader2Icon } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useCallback } from 'react'
+import { lazy, Suspense, useCallback } from 'react'
 import { cn } from 'ui'
 
 import { LegacyLogsRewriteBanner } from './LegacyLogsRewriteBanner'
@@ -17,13 +16,11 @@ import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { detectOS } from '@/lib/helpers'
 
 // Load the monaco editor client-side only (does not behave well server-side)
-const MonacoEditor = dynamic(
-  () => import('./MonacoEditor').then(({ MonacoEditor }) => MonacoEditor),
-  { ssr: false }
+const MonacoEditor = lazy(() =>
+  import('./MonacoEditor').then(({ MonacoEditor }) => ({ default: MonacoEditor }))
 )
-const DiffEditor = dynamic(
-  () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
-  { ssr: false }
+const DiffEditor = lazy(() =>
+  import('../../ui/DiffEditor').then(({ DiffEditor }) => ({ default: DiffEditor }))
 )
 
 const generatePlaceholder = (os: string | undefined) =>
@@ -73,12 +70,14 @@ const SQLEditorDiffView = () => {
 
   return (
     <div className="w-full h-full">
-      <DiffEditor
-        language="pgsql"
-        original={defaultSqlDiff.original}
-        modified={defaultSqlDiff.modified}
-        onMount={handleDiffEditorMount}
-      />
+      <Suspense fallback={null}>
+        <DiffEditor
+          language="pgsql"
+          original={defaultSqlDiff.original}
+          modified={defaultSqlDiff.modified}
+          onMount={handleDiffEditorMount}
+        />
+      </Suspense>
       {showWidget && <DiffPromptWidget />}
     </div>
   )
@@ -151,22 +150,24 @@ const SQLEditorMainView = () => {
 
   return (
     <div key={id} className="w-full h-full relative">
-      <MonacoEditor
-        autoFocus
-        placeholder={
-          !promptState.isOpen && !editorRef.current?.getValue() ? generatePlaceholder(os) : ''
-        }
-        id={id}
-        snippetName={snippetName}
-        className={cn(isDiffOpen && 'hidden')}
-        editorRef={editorRef}
-        monacoRef={monacoRef}
-        executeQuery={runQuery}
-        prettifyQuery={prettifyQuery}
-        onHasSelection={setHasSelection}
-        onMount={onMount}
-        onPrompt={openPrompt}
-      />
+      <Suspense fallback={null}>
+        <MonacoEditor
+          autoFocus
+          placeholder={
+            !promptState.isOpen && !editorRef.current?.getValue() ? generatePlaceholder(os) : ''
+          }
+          id={id}
+          snippetName={snippetName}
+          className={cn(isDiffOpen && 'hidden')}
+          editorRef={editorRef}
+          monacoRef={monacoRef}
+          executeQuery={runQuery}
+          prettifyQuery={prettifyQuery}
+          onHasSelection={setHasSelection}
+          onMount={onMount}
+          onPrompt={openPrompt}
+        />
+      </Suspense>
       {editorRef.current && promptState.isOpen && !isDiffOpen && <MainPromptWidget />}
     </div>
   )

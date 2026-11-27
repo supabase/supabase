@@ -1,6 +1,5 @@
 import { IS_PLATFORM } from 'common'
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
@@ -8,8 +7,6 @@ import { Button, StatusIcon } from 'ui'
 import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
-  const router = useRouter()
-
   return (
     <div className="flex gap-3 flex-col w-full">
       <div className="flex gap-3 flex-row">
@@ -29,7 +26,7 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
           onClick={() => {
             // Vercel never pins document navigations to a deployment, so a
             // plain reload lands on the latest one.
-            router.reload()
+            window.location.reload()
           }}
         >
           Refresh

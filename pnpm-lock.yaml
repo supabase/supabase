@@ -6,6 +6,9 @@ importers:
   .:
     configDependencies: {}
     packageManagerDependencies:
+      '@pnpm/exe':
+        specifier: 12.21.0
+        version: 12.21.0
       pnpm:
         specifier: 12.21.0
         version: 12.21.0
@@ -94,6 +97,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@pnpm/exe@12.21.0':
+    resolution: {integrity: sha512-aZvcLcn/p8AM+1atTtszeX6pAEj1MCkaLXExskB0oSsl9+RpgYsBjCBZQuO2rknwcMWzooJ6O8Ejv4nhej7ZpA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   pnpm@12.21.0:
     resolution: {integrity: sha512-Zv2CeO4ok1zpUXktNDZ/869cQyonVkRYIwKVM4NbjaUpu+C+UTCv1W7QcT+4eJ5Hutgtk71a4v5UsVVi1idu8A==}
     engines: {node: '>=18'}
@@ -145,6 +153,24 @@ snapshots:
 
   '@pnpm/exe.win32-x64@12.21.0':
     optional: true
+
+  '@pnpm/exe@12.21.0':
+    optionalDependencies:
+      '@pnpm/exe.android-arm64': 12.21.0
+      '@pnpm/exe.android-x64': 12.21.0
+      '@pnpm/exe.darwin-arm64': 12.21.0
+      '@pnpm/exe.darwin-x64': 12.21.0
+      '@pnpm/exe.freebsd-x64': 12.21.0
+      '@pnpm/exe.linux-arm64': 12.21.0
+      '@pnpm/exe.linux-arm64-musl': 12.21.0
+      '@pnpm/exe.linux-ppc64': 12.21.0
+      '@pnpm/exe.linux-riscv64': 12.21.0
+      '@pnpm/exe.linux-s390x': 12.21.0
+      '@pnpm/exe.linux-x64': 12.21.0
+      '@pnpm/exe.linux-x64-musl': 12.21.0
+      '@pnpm/exe.netbsd-x64': 12.21.0
+      '@pnpm/exe.win32-arm64': 12.21.0
+      '@pnpm/exe.win32-x64': 12.21.0
 
   pnpm@12.21.0:
     optionalDependencies:
@@ -1318,8 +1344,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
-        specifier: ^0.17.0
-        version: 0.17.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+        specifier: ^0.20.0
+        version: 0.20.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -9406,15 +9432,15 @@ packages:
     resolution: {integrity: sha512-6GuizbP4N5xWaxEVUsI+UQpJdmMmn0t3sYNpObo9gCAldvM22gFjnYzRVmkHxp5ylU21azEYmiWVwk9iDgCMkQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.17.0':
-    resolution: {integrity: sha512-uGZM3GQx1vcpurkmRD4sW9WOW8aTTOKbn5/d5/Y5NUiXJXGmepe4Sz7AcCMvlXd4zKbf2zzBd7WiWWL4gR1R/g==}
+  '@supabase/mcp-server-supabase@0.20.0':
+    resolution: {integrity: sha512-YnqSDNc6hMPqg5+7Dul+U52s/ZR3kbiP1oRNKFDymFE6AD9CEl15174PlVCsrlYHK5QrEvMyU+SmRhWXs9wZag==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
 
-  '@supabase/mcp-utils@0.10.0':
-    resolution: {integrity: sha512-AyTUuAZCVOfBVYTpDFrqMQ+rMM3iuXWwC8VIwaqUiE6zwuFND+4AkCdC6L8PuwCehdNWtjBg7lphhwDy7IP0Fg==}
+  '@supabase/mcp-utils@0.11.1':
+    resolution: {integrity: sha512-Hj4dub5pxMY21Midh6igpvs3ifD3f7IZJaMuGr99akcZEg219/4Y8LZsDOHIvMwKhA5BXKW/e4QoiO4fCJTZ2A==}
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
@@ -26359,19 +26385,19 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.17.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.20.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
       '@modelcontextprotocol/node': 2.1.2(@modelcontextprotocol/server@2.4.0)
       '@modelcontextprotocol/server': 2.4.0
-      '@supabase/mcp-utils': 0.10.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+      '@supabase/mcp-utils': 0.11.1(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       common-tags: 1.8.2
       gqlmin: 0.3.1
       graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.25.76
 
-  '@supabase/mcp-utils@0.10.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-utils@0.11.1(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@modelcontextprotocol/server': 2.4.0
       zod: 3.25.76

@@ -1,3 +1,4 @@
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { PropsWithChildren, useMemo } from 'react'
 
@@ -7,7 +8,6 @@ import { toSubMenuSections } from '@/components/layouts/AccountLayout/AccountLay
 import { WithSidebar } from '@/components/layouts/AccountLayout/WithSidebar'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { convertSectionsToProductMenu } from '@/components/ui/ProductMenu/SubMenu.utils'
-import { useCurrentPath } from '@/hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -233,7 +233,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const showPrivateApps = useFlag('privateApps')
   const showAuditLogDrains = useFlag('auditLogsLogDrain')
-  const fullCurrentPath = useCurrentPath()
+  const fullCurrentPath = useLocation({ select: (location) => location.pathname })
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
 
   const {

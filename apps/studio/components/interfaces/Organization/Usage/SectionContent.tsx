@@ -1,11 +1,10 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { Badge } from 'ui'
+import { Badge, Separator } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { CategoryAttribute } from './Usage.constants'
-import { ScaffoldDivider } from '@/components/layouts/Scaffold'
 
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
@@ -62,7 +61,7 @@ export const SectionContent = ({
           </div>
         </div>
       </PageContainer>
-      <ScaffoldDivider />
+      <Separator />
     </>
   )
 }

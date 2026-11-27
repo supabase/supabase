@@ -38,7 +38,7 @@ function ComputeSecretsPage() {
 
   if (!IS_PLATFORM) {
     return (
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent className="space-y-4 md:space-y-8">
             {isCli && (
@@ -76,7 +76,7 @@ function ComputeSecretsPage() {
   }
 
   return (
-    <PageContainer size="large">
+    <PageContainer size="default">
       <PageSection>
         <PageSectionContent className="space-y-4 md:space-y-8">
           <Admonition
@@ -92,7 +92,7 @@ function ComputeSecretsPage() {
 
 const ComputeSecretsPageWrapper = ({ children }: PropsWithChildren) => (
   <div className="w-full min-h-full flex flex-col items-stretch">
-    <PageHeader size="large">
+    <PageHeader size="default">
       <PageHeaderMeta>
         <PageHeaderSummary>
           <PageHeaderTitle>Secrets</PageHeaderTitle>

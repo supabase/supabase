@@ -21,6 +21,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
+import { ResumeProjectCost } from './ResumeProjectCost'
 import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -201,11 +202,13 @@ export const ResumeProjectButton = ({
         cancelLabel="Cancel"
       >
         <div className={cn(newProjectInternalOnlyConfiguration && 'flex flex-col gap-y-4')}>
-          <p className="text-sm">
-            {isFreePlan
-              ? 'Your project’s data will be restored to when it was initially paused.'
-              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
-          </p>
+          {isFreePlan ? (
+            <p className="text-sm">
+              Your project’s data will be restored to when it was initially paused.
+            </p>
+          ) : (
+            <ResumeProjectCost />
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onConfirmRestore)}>
               {newProjectInternalOnlyConfiguration && (
