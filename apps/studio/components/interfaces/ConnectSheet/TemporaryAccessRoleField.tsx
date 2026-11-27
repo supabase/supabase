@@ -1,3 +1,4 @@
+import { PERMISSION_MODE_LABEL } from 'shared-data/scoped-access-token-permissions'
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -21,7 +22,8 @@ export function TemporaryAccessPasswordNote({ tokenHref }: { tokenHref?: string 
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Use a {tokenLabel} as the password. For a scoped token, set Database token access to Read.{' '}
+      Use a {tokenLabel} as the password. For a scoped token, set Database token access to{' '}
+      {PERMISSION_MODE_LABEL.read}.{' '}
       <InlineLink href={`${DOCS_URL}/guides/platform/temporary-access`}>Learn more</InlineLink>
     </p>
   )
