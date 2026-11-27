@@ -3,7 +3,7 @@
 | Permission                       | Access required | Management API endpoint                                                                                             |
 | -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------- |
 | **Project**                      |                 |                                                                                                                     |
-| Project Settings                 | Read only       | [Get JIT access config](/docs/reference/api/v1-get-jit-access-config)                                               |
+| Project settings                 | Read only       | [Get JIT access config](/docs/reference/api/v1-get-jit-access-config)                                               |
 |                                  |                 | [Get postgres upgrade eligibility](/docs/reference/api/v1-get-postgres-upgrade-eligibility)[^1]                     |
 |                                  |                 | [Get postgres upgrade status](/docs/reference/api/v1-get-postgres-upgrade-status)[^1]                               |
 |                                  |                 | [Get project](/docs/reference/api/v1-get-project)                                                                   |
@@ -26,7 +26,7 @@
 |                                  |                 | [Update JIT access config](/docs/reference/api/v1-update-jit-access-config)                                         |
 |                                  |                 | [Update pgsodium config](/docs/reference/api/v1-update-pgsodium-config)                                             |
 |                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^4]                                     |
-| Action Runs                      | Read only       | [Count action runs](/docs/reference/api/v1-count-action-runs)                                                       |
+| Action runs                      | Read only       | [Count action runs](/docs/reference/api/v1-count-action-runs)                                                       |
 |                                  |                 | [Get action run](/docs/reference/api/v1-get-action-run)                                                             |
 |                                  |                 | [Get action run logs](/docs/reference/api/v1-get-action-run-logs)                                                   |
 |                                  |                 | [List action runs](/docs/reference/api/v1-list-action-runs)                                                         |
@@ -34,17 +34,17 @@
 | Advisors                         | Read only       | [Get performance advisors](/docs/reference/api/v1-get-performance-advisors)                                         |
 |                                  |                 | [Get security advisors](/docs/reference/api/v1-get-security-advisors)                                               |
 |                                  |                 | [Run project advisors](/docs/reference/api/v2-run-project-advisors)                                                 |
-| Analytics Config                 | Read only       | [List log drains](/docs/reference/api/v2-list-log-drains)                                                           |
+| Analytics config                 | Read only       | [List log drains](/docs/reference/api/v2-list-log-drains)                                                           |
 |                                  | Read and write  | [Create log drain](/docs/reference/api/v2-create-log-drain)                                                         |
 |                                  |                 | [Delete log drain](/docs/reference/api/v2-delete-log-drain)                                                         |
 |                                  |                 | [Update log drain](/docs/reference/api/v2-update-log-drain)                                                         |
 | Logs                             | Read only       | [Get project logs](/docs/reference/api/v1-get-project-logs)                                                         |
 |                                  |                 | [Get project logs all](/docs/reference/api/v1-get-project-logs-all)                                                 |
 |                                  |                 | [Scrape project metrics](/docs/reference/api/v1-scrape-project-metrics)                                             |
-| Usage Analytics                  | Read only       | [Get project function combined stats](/docs/reference/api/v1-get-project-function-combined-stats)                   |
+| Usage analytics                  | Read only       | [Get project function combined stats](/docs/reference/api/v1-get-project-function-combined-stats)                   |
 |                                  |                 | [Get project usage API count](/docs/reference/api/v1-get-project-usage-api-count)                                   |
 |                                  |                 | [Get project usage request count](/docs/reference/api/v1-get-project-usage-request-count)                           |
-| Platform Webhooks                | Read only       | [Get delivery](/docs/reference/api/v2-projects-ref-webhooks-deliveries-id-get)                                      |
+| Platform webhooks                | Read only       | [Get delivery](/docs/reference/api/v2-projects-ref-webhooks-deliveries-id-get)                                      |
 |                                  |                 | [Get endpoint](/docs/reference/api/v2-projects-ref-webhooks-endpoints-id-get)                                       |
 |                                  |                 | [List deliveries](/docs/reference/api/v2-projects-ref-webhooks-endpoints-id-deliveries-get)                         |
 |                                  |                 | [List endpoints](/docs/reference/api/v2-projects-ref-webhooks-endpoints-get)                                        |
@@ -78,7 +78,7 @@
 |                                  |                 | [Delete login roles](/docs/reference/api/v1-delete-login-roles)                                                     |
 |                                  |                 | [Run a query](/docs/reference/api/v1-run-a-query)                                                                   |
 |                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^4]                                     |
-| Database Config                  | Read only       | [Get postgres config](/docs/reference/api/v1-get-postgres-config)                                                   |
+| Database config                  | Read only       | [Get postgres config](/docs/reference/api/v1-get-postgres-config)                                                   |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  | Read and write  | [Patch postgres config](/docs/reference/api/v1-patch-postgres-config)                                               |
 |                                  |                 | [Update database password](/docs/reference/api/v1-update-database-password)                                         |
@@ -90,10 +90,10 @@
 |                                  |                 | [Invite external JIT access](/docs/reference/api/v1-invite-external-jit-access)                                     |
 |                                  |                 | [List JIT access](/docs/reference/api/v1-list-jit-access)                                                           |
 |                                  |                 | [Update JIT access](/docs/reference/api/v1-update-jit-access)                                                       |
-| Network Bans                     | Read only       | [List all network bans](/docs/reference/api/v1-list-all-network-bans)                                               |
+| Network bans                     | Read only       | [List all network bans](/docs/reference/api/v1-list-all-network-bans)                                               |
 |                                  |                 | [List all network bans enriched](/docs/reference/api/v1-list-all-network-bans-enriched)                             |
 |                                  | Read and write  | [Delete network bans](/docs/reference/api/v1-delete-network-bans)                                                   |
-| Network Restrictions             | Read only       | [Get network restrictions](/docs/reference/api/v1-get-network-restrictions)                                         |
+| Network restrictions             | Read only       | [Get network restrictions](/docs/reference/api/v1-get-network-restrictions)                                         |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  | Read and write  | [Patch network restrictions](/docs/reference/api/v1-patch-network-restrictions)                                     |
 |                                  |                 | [Review network restrictions](/docs/reference/api/v1-review-network-restrictions)                                   |
@@ -104,25 +104,25 @@
 |                                  |                 | [Patch a migration](/docs/reference/api/v1-patch-a-migration)                                                       |
 |                                  |                 | [Rollback migrations](/docs/reference/api/v1-rollback-migrations)                                                   |
 |                                  |                 | [Upsert a migration](/docs/reference/api/v1-upsert-a-migration)                                                     |
-| Connection Pooling               | Read only       | [Get pooler config](/docs/reference/api/v1-get-pooler-config)                                                       |
+| Connection pooling               | Read only       | [Get pooler config](/docs/reference/api/v1-get-pooler-config)                                                       |
 |                                  | Read and write  | [Update pooler config](/docs/reference/api/v1-update-pooler-config)                                                 |
-| Read-only Mode                   | Read only       | [Get read-only mode status](/docs/reference/api/v1-get-readonly-mode-status)                                        |
+| Read-only mode                   | Read only       | [Get read-only mode status](/docs/reference/api/v1-get-readonly-mode-status)                                        |
 |                                  | Read and write  | [Disable read-only mode temporarily](/docs/reference/api/v1-disable-readonly-mode-temporarily)                      |
-| SSL Enforcement                  | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
+| SSL enforcement                  | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get SSL enforcement config](/docs/reference/api/v1-get-ssl-enforcement-config)                                     |
 |                                  | Read and write  | [Update SSL enforcement config](/docs/reference/api/v1-update-ssl-enforcement-config)                               |
-| Database Webhooks                | Read and write  | [Enable database webhook](/docs/reference/api/v1-enable-database-webhook)                                           |
+| Database webhooks                | Read and write  | [Enable database webhook](/docs/reference/api/v1-enable-database-webhook)                                           |
 | **Application services**         |                 |                                                                                                                     |
-| API Keys                         | Read only       | [Get project API key](/docs/reference/api/v1-get-project-api-key)                                                   |
+| API keys                         | Read only       | [Get project API key](/docs/reference/api/v1-get-project-api-key)                                                   |
 |                                  |                 | [Get project API keys](/docs/reference/api/v1-get-project-api-keys)                                                 |
 |                                  |                 | [Get project legacy API keys](/docs/reference/api/v1-get-project-legacy-api-keys)                                   |
 |                                  | Read and write  | [Create project API key](/docs/reference/api/v1-create-project-api-key)                                             |
 |                                  |                 | [Delete project API key](/docs/reference/api/v1-delete-project-api-key)                                             |
 |                                  |                 | [Update project API key](/docs/reference/api/v1-update-project-api-key)                                             |
 |                                  |                 | [Update project legacy API keys](/docs/reference/api/v1-update-project-legacy-api-keys)                             |
-| API Key Secrets                  | Read only       | [Get project API key](/docs/reference/api/v1-get-project-api-key)[^6]                                               |
+| API key secrets                  | Read only       | [Get project API key](/docs/reference/api/v1-get-project-api-key)[^6]                                               |
 |                                  |                 | [Get project API keys](/docs/reference/api/v1-get-project-api-keys)[^6]                                             |
-| Auth Config                      | Read only       | [Get a SSO provider](/docs/reference/api/v1-get-a-sso-provider)                                                     |
+| Auth config                      | Read only       | [Get a SSO provider](/docs/reference/api/v1-get-a-sso-provider)                                                     |
 |                                  |                 | [Get auth service config](/docs/reference/api/v1-get-auth-service-config)                                           |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get project TPA integration](/docs/reference/api/v1-get-project-tpa-integration)                                   |
@@ -134,17 +134,17 @@
 |                                  |                 | [Delete project TPA integration](/docs/reference/api/v1-delete-project-tpa-integration)                             |
 |                                  |                 | [Update a SSO provider](/docs/reference/api/v1-update-a-sso-provider)                                               |
 |                                  |                 | [Update auth service config](/docs/reference/api/v1-update-auth-service-config)[^3]                                 |
-| Auth Signing Keys                | Read only       | [Get legacy signing key](/docs/reference/api/v1-get-legacy-signing-key)                                             |
+| Auth signing keys                | Read only       | [Get legacy signing key](/docs/reference/api/v1-get-legacy-signing-key)                                             |
 |                                  |                 | [Get project signing key](/docs/reference/api/v1-get-project-signing-key)                                           |
 |                                  |                 | [Get project signing keys](/docs/reference/api/v1-get-project-signing-keys)                                         |
 |                                  | Read and write  | [Create legacy signing key](/docs/reference/api/v1-create-legacy-signing-key)                                       |
 |                                  |                 | [Create project signing key](/docs/reference/api/v1-create-project-signing-key)                                     |
 |                                  |                 | [Remove project signing key](/docs/reference/api/v1-remove-project-signing-key)                                     |
 |                                  |                 | [Update project signing key](/docs/reference/api/v1-update-project-signing-key)                                     |
-| Data API Config                  | Read only       | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)                                 |
+| Data API config                  | Read only       | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)                                 |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  | Read and write  | [Update PostgREST service config](/docs/reference/api/v1-update-postgrest-service-config)                           |
-| Data API JWT Secret              | Read only       | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)[^7]                             |
+| Data API JWT secret              | Read only       | [Get PostgREST service config](/docs/reference/api/v1-get-postgrest-service-config)[^7]                             |
 | Edge Functions                   | Read only       | [Get a function](/docs/reference/api/v1-get-a-function)                                                             |
 |                                  |                 | [Get a function body](/docs/reference/api/v1-get-a-function-body)                                                   |
 |                                  |                 | [List all functions](/docs/reference/api/v1-list-all-functions)                                                     |
@@ -153,15 +153,15 @@
 |                                  |                 | [Delete a function](/docs/reference/api/v1-delete-a-function)                                                       |
 |                                  |                 | [Deploy a function](/docs/reference/api/v1-deploy-a-function)                                                       |
 |                                  |                 | [Update a function](/docs/reference/api/v1-update-a-function)                                                       |
-| Edge Function Secrets            | Read only       | [List all secrets](/docs/reference/api/v1-list-all-secrets)                                                         |
+| Edge function secrets            | Read only       | [List all secrets](/docs/reference/api/v1-list-all-secrets)                                                         |
 |                                  | Read and write  | [Bulk create secrets](/docs/reference/api/v1-bulk-create-secrets)                                                   |
 |                                  |                 | [Bulk delete secrets](/docs/reference/api/v1-bulk-delete-secrets)                                                   |
-| Realtime Config                  | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
+| Realtime config                  | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get realtime config](/docs/reference/api/v1-get-realtime-config)                                                   |
 |                                  | Read and write  | [Shutdown realtime](/docs/reference/api/v1-shutdown-realtime)                                                       |
 |                                  |                 | [Update realtime config](/docs/reference/api/v1-update-realtime-config)                                             |
 | Storage                          | Read only       | [List all buckets](/docs/reference/api/v1-list-all-buckets)                                                         |
-| Storage Config                   | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
+| Storage config                   | Read only       | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get storage config](/docs/reference/api/v1-get-storage-config)                                                     |
 |                                  | Read and write  | [Update storage config](/docs/reference/api/v1-update-storage-config)                                               |
 | Compute                          | Read only       | [Get a compute instance](/docs/reference/api/v2-get-a-compute-instance)                                             |
@@ -170,7 +170,7 @@
 |                                  |                 | [Delete a compute instance](/docs/reference/api/v2-delete-a-compute-instance)                                       |
 |                                  |                 | [Deploy a compute instance](/docs/reference/api/v2-deploy-a-compute-instance)                                       |
 | **Infrastructure and delivery**  |                 |                                                                                                                     |
-| Development Branches             | Read only       | [Get a branch](/docs/reference/api/v1-get-a-branch)                                                                 |
+| Development branches             | Read only       | [Get a branch](/docs/reference/api/v1-get-a-branch)                                                                 |
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read and write  | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
@@ -181,7 +181,7 @@
 |                                  |                 | [Reset a branch](/docs/reference/api/v1-reset-a-branch)                                                             |
 |                                  |                 | [Restore a branch](/docs/reference/api/v1-restore-a-branch)                                                         |
 |                                  |                 | [Update a branch config](/docs/reference/api/v1-update-a-branch-config)                                             |
-| Production Branches              | Read only       | [Get a branch](/docs/reference/api/v1-get-a-branch)                                                                 |
+| Production branches              | Read only       | [Get a branch](/docs/reference/api/v1-get-a-branch)                                                                 |
 |                                  |                 | [Get a branch config](/docs/reference/api/v1-get-a-branch-config)                                                   |
 |                                  |                 | [List all branches](/docs/reference/api/v1-list-all-branches)                                                       |
 |                                  | Read and write  | [Create a branch](/docs/reference/api/v1-create-a-branch)                                                           |
@@ -194,7 +194,7 @@
 |                                  |                 | [Reset a branch](/docs/reference/api/v1-reset-a-branch)                                                             |
 |                                  |                 | [Restore a branch](/docs/reference/api/v1-restore-a-branch)                                                         |
 |                                  |                 | [Update a branch config](/docs/reference/api/v1-update-a-branch-config)                                             |
-| Custom Domains                   | Read only       | [Get hostname config](/docs/reference/api/v1-get-hostname-config)                                                   |
+| Custom domains                   | Read only       | [Get hostname config](/docs/reference/api/v1-get-hostname-config)                                                   |
 |                                  | Read and write  | [Activate custom hostname](/docs/reference/api/v1-activate-custom-hostname)                                         |
 |                                  |                 | Delete hostname config                                                                                              |
 |                                  |                 | [Update hostname config](/docs/reference/api/v1-update-hostname-config)                                             |
@@ -202,13 +202,13 @@
 | Add-ons                          | Read only       | [List project add-ons](/docs/reference/api/v1-list-project-addons)                                                  |
 |                                  | Read and write  | [Apply project add-on](/docs/reference/api/v1-apply-project-addon)                                                  |
 |                                  |                 | [Remove project add-on](/docs/reference/api/v1-remove-project-addon)                                                |
-| Disk Config                      | Read only       | [Get database disk](/docs/reference/api/v1-get-database-disk)                                                       |
+| Disk config                      | Read only       | [Get database disk](/docs/reference/api/v1-get-database-disk)                                                       |
 |                                  |                 | [Get disk utilization](/docs/reference/api/v1-get-disk-utilization)                                                 |
 |                                  |                 | [Get project disk auto-scaling config](/docs/reference/api/v1-get-project-disk-autoscale-config)                    |
 |                                  | Read and write  | [Modify database disk](/docs/reference/api/v1-modify-database-disk)                                                 |
-| Read Replicas                    | Read and write  | [Remove a read replica](/docs/reference/api/v1-remove-a-read-replica)                                               |
+| Read replicas                    | Read and write  | [Remove a read replica](/docs/reference/api/v1-remove-a-read-replica)                                               |
 |                                  |                 | [Setup a read replica](/docs/reference/api/v1-setup-a-read-replica)                                                 |
-| Vanity Subdomain                 | Read only       | [Get vanity subdomain config](/docs/reference/api/v1-get-vanity-subdomain-config)                                   |
+| Vanity subdomain                 | Read only       | [Get vanity subdomain config](/docs/reference/api/v1-get-vanity-subdomain-config)                                   |
 |                                  | Read and write  | [Activate vanity subdomain config](/docs/reference/api/v1-activate-vanity-subdomain-config)                         |
 |                                  |                 | [Check vanity subdomain availability](/docs/reference/api/v1-check-vanity-subdomain-availability)                   |
 |                                  |                 | [Deactivate vanity subdomain config](/docs/reference/api/v1-deactivate-vanity-subdomain-config)                     |
@@ -216,24 +216,24 @@
 | Organizations                    | Read only       | [List all organizations](/docs/reference/api/v1-list-all-organizations)                                             |
 |                                  | Read and write  | [Create an organization](/docs/reference/api/v1-create-an-organization)                                             |
 | Projects (account-wide)          | Read only       | [List all projects](/docs/reference/api/v1-list-all-projects)                                                       |
-| SQL Snippets (account-wide)      | Read only       | [Get a snippet](/docs/reference/api/v1-get-a-snippet)                                                               |
+| SQL snippets (account-wide)      | Read only       | [Get a snippet](/docs/reference/api/v1-get-a-snippet)                                                               |
 |                                  |                 | [List all snippets](/docs/reference/api/v1-list-all-snippets)                                                       |
-| Organization Settings            | Read only       | [Get an organization](/docs/reference/api/v1-get-an-organization)                                                   |
+| Organization settings            | Read only       | [Get an organization](/docs/reference/api/v1-get-an-organization)                                                   |
 |                                  |                 | [Get organization entitlements](/docs/reference/api/v1-get-organization-entitlements)                               |
 |                                  | Read and write  | [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role)                           |
 |                                  |                 | [OAuth authorize project claim](/docs/reference/api/v1-oauth-authorize-project-claim)[^2]                           |
 |                                  |                 | [Remove organization members](/docs/reference/api/v2-remove-organization-members)                                   |
 |                                  |                 | [Transfer a project](/docs/reference/api/v2-transfer-a-project)                                                     |
-| Organization Members             | Read only       | [List organization members](/docs/reference/api/v1-list-organization-members)                                       |
+| Organization members             | Read only       | [List organization members](/docs/reference/api/v1-list-organization-members)                                       |
 |                                  |                 | [List organization members](/docs/reference/api/v2-list-organization-members)                                       |
 |                                  |                 | [List organization roles](/docs/reference/api/v2-list-organization-roles)                                           |
 |                                  | Read and write  | [Create organization invitations](/docs/reference/api/v2-create-organization-invitations)                           |
 |                                  |                 | [Delete organization invitations](/docs/reference/api/v2-delete-organization-invitations)                           |
-| Organization Projects            | Read only       | [Get all projects for organization](/docs/reference/api/v1-get-all-projects-for-organization)                       |
+| Organization projects            | Read only       | [Get all projects for organization](/docs/reference/api/v1-get-all-projects-for-organization)                       |
 |                                  |                 | [List organization GitHub connections](/docs/reference/api/v2-list-organization-github-connections)                 |
 |                                  |                 | [List organization projects](/docs/reference/api/v2-list-organization-projects)                                     |
 |                                  | Read and write  | [Create a project](/docs/reference/api/v1-create-a-project)                                                         |
-| Platform Webhooks (organization) | Read only       | [Get delivery](/docs/reference/api/v2-organizations-slug-webhooks-deliveries-id-get)                                |
+| Platform webhooks (organization) | Read only       | [Get delivery](/docs/reference/api/v2-organizations-slug-webhooks-deliveries-id-get)                                |
 |                                  |                 | [Get endpoint](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-id-get)                                 |
 |                                  |                 | [List deliveries](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-id-deliveries-get)                   |
 |                                  |                 | [List endpoints](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-get)                                  |
@@ -244,16 +244,16 @@
 |                                  |                 | [Send test event](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-id-test-post)                        |
 |                                  |                 | [Update endpoint](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-id-patch)                            |
 
-[^1]: Requires **Project Settings** (Read only) and **Database** (Read only).
+[^1]: Requires **Project settings** (Read only) and **Database** (Read only).
 
-[^2]: Requires **Organization Settings** (Read and write) and **Project Settings** (Read and write).
+[^2]: Requires **Organization settings** (Read and write) and **Project settings** (Read and write).
 
-[^3]: Requires **Auth Config** (Read and write) and **Project Settings** (Read and write).
+[^3]: Requires **Auth config** (Read and write) and **Project settings** (Read and write).
 
-[^4]: Requires **Project Settings** (Read and write) and **Database** (Read and write).
+[^4]: Requires **Project settings** (Read and write) and **Database** (Read and write).
 
-[^5]: Requires **Database Config** (Read only), **Database** (Read only), **SSL Enforcement** (Read only), **Network Restrictions** (Read only), **Auth Config** (Read only), **Data API Config** (Read only), **Realtime Config** (Read only), and **Storage Config** (Read only).
+[^5]: Requires **Database config** (Read only), **Database** (Read only), **SSL enforcement** (Read only), **Network restrictions** (Read only), **Auth config** (Read only), **Data API config** (Read only), **Realtime config** (Read only), and **Storage config** (Read only).
 
-[^6]: Requires **API Keys** (Read only) and **API Key Secrets** (Read only).
+[^6]: Requires **API keys** (Read only) and **API key secrets** (Read only).
 
-[^7]: Requires **Data API Config** (Read only) and **Data API JWT Secret** (Read only).
+[^7]: Requires **Data API config** (Read only) and **Data API JWT secret** (Read only).
