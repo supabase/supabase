@@ -142,7 +142,7 @@ function StorageReport() {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-4">
+        <div className="mt-8 grid @4xl:grid-cols-2 gap-4">
           <ReportWidget
             isLoading={isLoading}
             params={params.totalRequests}

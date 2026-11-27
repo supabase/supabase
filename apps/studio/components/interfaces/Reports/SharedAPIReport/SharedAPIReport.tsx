@@ -26,7 +26,7 @@ export function SharedAPIReport({
   sql,
 }: SharedAPIReportWidgetsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid @4xl:grid-cols-2 gap-4">
       {!hiddenReports.includes('totalRequests') && (
         <ReportWidget
           isLoading={isLoading.totalRequests || isRefetching}
