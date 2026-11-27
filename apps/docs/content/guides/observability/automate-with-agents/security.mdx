@@ -1,14 +1,14 @@
 ---
 id: 'automate-with-agents-security'
 title: 'Automate with agents: security'
-subtitle: 'A read-only agent that reviews security issues and authentication and authorization failures each day.'
+subtitle: 'A read-only agent that reviews Security Advisor findings and authentication and authorization failures each day.'
 description: 'Daily review of security findings and access failures'
 ---
 
 ```mermaid
 flowchart TD
-  Schedule([Once per day]) --> Inspect[get_issues and query_logs]
-  Inspect --> Signals["Security issues and access failures"]
+  Schedule([Once per day]) --> Inspect[get_advisors and query_logs]
+  Inspect --> Signals["Advisor findings and access failures"]
   Signals --> Review{Anything new to report?}
   Review -->|Yes| Report[Finding and next step]
   Review -->|No| Silent[Stay silent]
@@ -17,13 +17,11 @@ flowchart TD
 
 ## What it watches
 
-- Security issues at warning and critical severity
+- Security Advisor findings at warning and error level
 - API and Auth authentication and authorization failure rates, compared across the last two complete UTC days
-- RLS and privilege issues
+- RLS and privilege issues identified by advisors
 
-It uses `get_issues` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp).
-
-Check tool discovery before running the prompt. If your MCP server does not expose `get_issues`, use `get_advisors` with its advertised inputs and response format. See [MCP compatibility](/docs/guides/observability/issues#check-issues-with-mcp).
+It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp).
 
 ## When it watches
 
@@ -31,7 +29,7 @@ Check tool discovery before running the prompt. If your MCP server does not expo
 
 ## What it will output
 
-This prompt reports new or changed security issues and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
+This prompt reports new or changed advisor findings and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
 
 If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 
