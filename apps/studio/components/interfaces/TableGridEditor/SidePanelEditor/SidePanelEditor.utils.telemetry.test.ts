@@ -1,4 +1,5 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -7,103 +8,63 @@ import { updateColumn, updateTable } from './SidePanelEditor.utils'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
-
-const mockCreateDatabaseColumn = vi.fn()
-const mockUpdateDatabaseColumn = vi.fn()
-const mockDeleteDatabaseColumn = vi.fn()
-const mockUpdateTableMutation = vi.fn()
-const mockExecuteSql = vi.fn()
-const mockGetTable = vi.fn()
-const mockPrefetchTableEditor = vi.fn()
-const mockInvalidateTableMetadata = vi.fn()
-const mockFetchQuery = vi.fn()
-const mockInvalidateQueries = vi.fn()
-const mockTrack = vi.fn()
-
-vi.mock('@/data/query-client', () => ({
-  getQueryClient: () => ({
-    fetchQuery: mockFetchQuery,
-    invalidateQueries: mockInvalidateQueries,
-  }),
-}))
-
-vi.mock('@/data/database-columns/database-column-create-mutation', () => ({
-  createDatabaseColumn: (...args: unknown[]) => mockCreateDatabaseColumn(...args),
-}))
-
-vi.mock('@/data/database-columns/database-column-update-mutation', () => ({
-  updateDatabaseColumn: (...args: unknown[]) => mockUpdateDatabaseColumn(...args),
-}))
-
-vi.mock('@/data/database-columns/database-column-delete-mutation', () => ({
-  deleteDatabaseColumn: (...args: unknown[]) => mockDeleteDatabaseColumn(...args),
-}))
-
-vi.mock('@/data/tables/table-update-mutation', () => ({
-  updateTable: (...args: unknown[]) => mockUpdateTableMutation(...args),
-}))
-
-vi.mock('@/data/sql/execute-sql-mutation', () => ({
-  executeSql: (...args: unknown[]) => mockExecuteSql(...args),
-}))
-
-vi.mock('@/data/tables/table-retrieve-query', () => ({
-  getTable: (...args: unknown[]) => mockGetTable(...args),
-  getTableQuery: (...args: unknown[]) => mockGetTable(...args),
-}))
-
-vi.mock('@/data/table-editor/table-editor-query', () => ({
-  prefetchTableEditor: (...args: unknown[]) => mockPrefetchTableEditor(...args),
-}))
-
-vi.mock('@/data/tables/table-metadata-invalidation', () => ({
-  invalidateTableMetadata: (...args: unknown[]) => mockInvalidateTableMetadata(...args),
-}))
-
-vi.mock('sonner', () => ({
-  toast: {
-    loading: vi.fn(),
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}))
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const projectRef = 'test-ref'
 const connectionString = 'postgresql://localhost:5432/test'
+const mockTrack = vi.fn()
 
-const baseTable = {
+const idColumn: SafePostgresColumn = {
+  id: '10.1',
+  table_id: 10,
+  schema: 'public',
+  table: 'users',
+  name: 'id',
+  ordinal_position: 1,
+  data_type: 'bigint',
+  format: 'int8',
+  is_identity: true,
+  identity_generation: 'BY DEFAULT',
+  is_generated: false,
+  is_nullable: false,
+  is_updatable: true,
+  is_unique: false,
+  check: null,
+  default_value: null,
+  enums: [],
+  comment: null,
+}
+
+const baseTable: RetrieveTableResult = {
   id: 10,
   name: 'users',
   schema: 'public',
   comment: null,
   rls_enabled: true,
-  primary_keys: [{ name: 'id' }],
+  rls_forced: false,
+  replica_identity: 'DEFAULT',
+  bytes: 0,
+  size: '0 bytes',
+  live_rows_estimate: 0,
+  dead_rows_estimate: 0,
+  primary_keys: [{ table_id: 10, name: 'id', schema: 'public', table_name: 'users' }],
   relationships: [],
-  columns: [
-    {
-      id: '10.1',
-      table_id: 10,
-      schema: 'public',
-      table: 'users',
-      name: 'id',
-      ordinal_position: 1,
-      data_type: 'bigint',
-      format: 'int8',
-      is_identity: true,
-      identity_generation: 'BY DEFAULT',
-      is_generated: false,
-      is_nullable: false,
-      is_updatable: true,
-      is_unique: false,
-      check: null,
-      default_value: null,
-      enums: [],
-      comment: null,
-    },
-  ],
-} as unknown as RetrieveTableResult
+  columns: [idColumn],
+}
 
-const sampleForeignKey: ForeignKey = {
+const arrayColumn: SafePostgresColumn = {
+  ...idColumn,
+  id: '10.2',
+  name: 'tags',
+  data_type: 'ARRAY',
+  format: '_text',
+  is_identity: false,
+  identity_generation: null,
+}
+
+const existingFk = { id: 99 } as ForeignKeyConstraint
+
+const removedForeignKey: ForeignKey = {
   id: 99,
   name: 'fk_users_org_id',
   schema: 'public',
@@ -111,9 +72,10 @@ const sampleForeignKey: ForeignKey = {
   columns: [{ source: 'org_id', target: 'id' }],
   deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
   updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  toRemove: true,
 }
 
-const makeColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => ({
+const idField: ColumnField = {
   id: '10.1',
   name: 'id',
   table: 'users',
@@ -129,60 +91,77 @@ const makeColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => (
   isPrimaryKey: true,
   isNewColumn: false,
   isEncrypted: false,
-  ...overrides,
-})
+}
+
+const newEmailField: ColumnField = {
+  ...idField,
+  id: 'new-col-uuid',
+  name: 'email',
+  format: 'text',
+  isPrimaryKey: false,
+  isIdentity: false,
+  isNullable: true,
+  isNewColumn: true,
+}
+
+/** Every util here runs its SQL through this endpoint; only the table retrieve needs a result. */
+const mockPgMeta = ({ failAddColumn = false } = {}) =>
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const { query } = (await request.json()) as { query: string }
+      if (failAddColumn && query.includes('ADD COLUMN')) {
+        return HttpResponse.json<APIErrorBody>(
+          { message: 'column already exists' },
+          { status: 400 }
+        )
+      }
+      if (query.includes('with tables as')) {
+        return HttpResponse.json<RetrieveTableResult[]>([baseTable])
+      }
+      return HttpResponse.json<unknown[]>([])
+    },
+  })
+
+const updateTableArgs = {
+  projectRef,
+  connectionString,
+  toastId: 'toast',
+  table: baseTable,
+  foreignKeyRelations: [],
+  existingForeignKeyRelations: [],
+  track: mockTrack,
+}
 
 describe('SidePanelEditor.utils telemetry', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    mockCreateDatabaseColumn.mockResolvedValue([])
-    mockUpdateDatabaseColumn.mockResolvedValue([])
-    mockDeleteDatabaseColumn.mockResolvedValue([])
-    mockUpdateTableMutation.mockResolvedValue(baseTable)
-    mockExecuteSql.mockResolvedValue({ result: [] })
-    mockGetTable.mockResolvedValue(baseTable)
-    mockPrefetchTableEditor.mockResolvedValue(baseTable)
-    mockInvalidateTableMetadata.mockResolvedValue(undefined)
-    mockInvalidateQueries.mockResolvedValue(undefined)
-    mockFetchQuery.mockImplementation(({ queryFn }) =>
-      queryFn ? queryFn({ signal: new AbortController().signal }) : Promise.resolve(baseTable)
-    )
+    mockTrack.mockClear()
   })
 
   describe('updateColumn', () => {
-    const arrayColumn = {
-      ...baseTable.columns![0],
-      id: '10.2',
-      name: 'tags',
-      data_type: 'ARRAY',
-      format: '_text',
-    } as unknown as SafePostgresColumn
+    it('falls back to originalColumn for isArray when payload omits type', async () => {
+      mockPgMeta()
 
-    it('preserves isArray from originalColumn when payload omits type', async () => {
       await updateColumn({
         projectRef,
         connectionString,
         originalColumn: arrayColumn,
         payload: { name: 'labels' },
         selectedTable: baseTable,
-        foreignKeyRelations: [],
-        existingForeignKeyRelations: [],
         track: mockTrack,
       })
 
       expect(mockTrack).toHaveBeenCalledTimes(1)
       expect(mockTrack).toHaveBeenCalledWith(
         'table_column_updated',
-        {
-          hasForeignKey: false,
-          isArray: true,
-        },
+        { hasForeignKey: false, isArray: true },
         { project: projectRef }
       )
     })
 
     it('treats FKs marked toRemove as absent and falls back to existingForeignKeyRelations when relations array is empty', async () => {
-      const existingFk = { id: 99 } as ForeignKeyConstraint
+      mockPgMeta()
 
       await updateColumn({
         projectRef,
@@ -190,24 +169,21 @@ describe('SidePanelEditor.utils telemetry', () => {
         originalColumn: arrayColumn,
         payload: { type: { name: 'text', isArray: false } },
         selectedTable: baseTable,
-        foreignKeyRelations: [{ ...sampleForeignKey, toRemove: true }],
+        foreignKeyRelations: [removedForeignKey],
         existingForeignKeyRelations: [existingFk],
         track: mockTrack,
       })
 
       expect(mockTrack).toHaveBeenLastCalledWith(
         'table_column_updated',
-        {
-          hasForeignKey: false,
-          isArray: false,
-        },
+        { hasForeignKey: false, isArray: false },
         { project: projectRef }
       )
 
       await updateColumn({
         projectRef,
         connectionString,
-        originalColumn: baseTable.columns![0] as unknown as SafePostgresColumn,
+        originalColumn: idColumn,
         payload: { comment: 'updated' },
         selectedTable: baseTable,
         foreignKeyRelations: [],
@@ -217,10 +193,7 @@ describe('SidePanelEditor.utils telemetry', () => {
 
       expect(mockTrack).toHaveBeenLastCalledWith(
         'table_column_updated',
-        {
-          hasForeignKey: true,
-          isArray: false,
-        },
+        { hasForeignKey: true, isArray: false },
         { project: projectRef }
       )
     })
@@ -228,86 +201,36 @@ describe('SidePanelEditor.utils telemetry', () => {
 
   describe('updateTable', () => {
     it('tracks table_updated with columnCountChanged without double-firing table_column_* events', async () => {
-      await updateTable({
-        projectRef,
-        connectionString,
-        toastId: 'toast-1',
-        table: baseTable,
-        payload: { name: 'accounts' },
-        columns: [makeColumnField()],
-        foreignKeyRelations: [],
-        existingForeignKeyRelations: [],
-        track: mockTrack,
-      })
+      mockPgMeta()
+
+      await updateTable({ ...updateTableArgs, payload: { name: 'accounts' }, columns: [idField] })
 
       expect(mockTrack).toHaveBeenCalledTimes(1)
       expect(mockTrack).toHaveBeenCalledWith(
         'table_updated',
-        {
-          columnCountChanged: false,
-        },
+        { columnCountChanged: false },
         { project: projectRef }
       )
 
       mockTrack.mockClear()
 
-      await updateTable({
-        projectRef,
-        connectionString,
-        toastId: 'toast-2',
-        table: baseTable,
-        payload: {},
-        columns: [
-          makeColumnField(),
-          makeColumnField({
-            id: 'new-col-uuid',
-            name: 'email',
-            format: 'text',
-            isPrimaryKey: false,
-            isIdentity: false,
-            isNullable: true,
-            isNewColumn: true,
-          }),
-        ],
-        foreignKeyRelations: [],
-        existingForeignKeyRelations: [],
-        track: mockTrack,
-      })
+      await updateTable({ ...updateTableArgs, payload: {}, columns: [idField, newEmailField] })
 
       expect(mockTrack).toHaveBeenCalledTimes(1)
       expect(mockTrack).toHaveBeenCalledWith(
         'table_updated',
-        {
-          columnCountChanged: true,
-        },
+        { columnCountChanged: true },
         { project: projectRef }
       )
     })
 
     it('does not track table_updated when adding a column fails', async () => {
-      mockCreateDatabaseColumn.mockRejectedValueOnce(new Error('column already exists'))
+      mockPgMeta({ failAddColumn: true })
 
       const { hasError } = await updateTable({
-        projectRef,
-        connectionString,
-        toastId: 'toast-3',
-        table: baseTable,
+        ...updateTableArgs,
         payload: {},
-        columns: [
-          makeColumnField(),
-          makeColumnField({
-            id: 'new-col-uuid',
-            name: 'email',
-            format: 'text',
-            isPrimaryKey: false,
-            isIdentity: false,
-            isNullable: true,
-            isNewColumn: true,
-          }),
-        ],
-        foreignKeyRelations: [],
-        existingForeignKeyRelations: [],
-        track: mockTrack,
+        columns: [idField, newEmailField],
       })
 
       expect(hasError).toBe(true)
