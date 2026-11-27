@@ -12,7 +12,7 @@ function textResponse(content: string) {
 }
 
 // Product overview slugs and pricing.txt are 301-redirected to /<slug>.md in
-// apps/www/lib/redirects.js, so this handler typically only sees per-SDK
+// apps/www/lib/redirects/, so this handler typically only sees per-SDK
 // reference files. The pricing branch stays as a fallback in case the redirect
 // is bypassed.
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
