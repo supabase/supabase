@@ -46,20 +46,24 @@ async function deletePhotos(
   }
 }
 
-/** Removes files from the photos bucket, in batches. */
-async function removeFiles(admin: SupabaseClient, paths: string[]) {
-  for (let start = 0; start < paths.length; start += BATCH_SIZE) {
-    const { error } = await admin.storage.from('photos').remove(paths.slice(start, start + BATCH_SIZE))
+/**
+ * Removes every file returned by one of the file-lookup SQL functions in the
+ * migration, a batch at a time (the API caps rows per request), until none
+ * are left.
+ */
+async function removeFiles(admin: SupabaseClient, fn: string, args: Record<string, string>) {
+  let removed = 0
+  while (true) {
+    const { data, error } = await admin.rpc(fn, args).limit(BATCH_SIZE)
     if (error) throw error
+    const paths = (data ?? []) as string[]
+    if (paths.length === 0) return removed
+    const { data: deleted, error: removeError } = await admin.storage.from('photos').remove(paths)
+    if (removeError) throw removeError
+    // Nothing removed means the next batch would be the same: stop rather than loop.
+    if (deleted.length === 0) throw new Error(`Could not remove ${paths.length} files`)
+    removed += deleted.length
   }
-  return paths.length
-}
-
-/** Paths returned by one of the file-lookup SQL functions in the migration. */
-async function filePaths(admin: SupabaseClient, fn: string, args: Record<string, string>) {
-  const { data, error } = await admin.rpc(fn, args)
-  if (error) throw error
-  return (data ?? []) as string[]
 }
 
 /** Reads a day count from an env var: the fallback when unset, else a positive number. */
@@ -99,7 +103,7 @@ async function purgeGuests(admin: SupabaseClient, guestDays: number) {
     if (wallIds.length > 0) await deletePhotos(admin, (query) => query.in('wall_id', wallIds))
     await deletePhotos(admin, (query) => query.eq('created_by', guestId))
     // Then any file they still own without a row, or Auth won't delete them.
-    await removeFiles(admin, await filePaths(admin, 'photo_files_owned_by', { owner: guestId }))
+    await removeFiles(admin, 'photo_files_owned_by', { owner: guestId })
     const { error: deleteError } = await admin.auth.admin.deleteUser(guestId)
     if (deleteError) throw deleteError
     purged += 1
@@ -118,12 +122,9 @@ export default {
       const deleted = await deletePhotos(ctx.supabaseAdmin, (query) =>
         query.lt('created_at', cutoff)
       )
-      const orphans = await removeFiles(
-        ctx.supabaseAdmin,
-        await filePaths(ctx.supabaseAdmin, 'orphaned_photo_files', {
-          older_than: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-        })
-      )
+      const orphans = await removeFiles(ctx.supabaseAdmin, 'orphaned_photo_files', {
+        older_than: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+      })
 
       const purgedGuests = guestDays > 0 ? await purgeGuests(ctx.supabaseAdmin, guestDays) : 0
 

@@ -196,7 +196,8 @@ export function imageUrl(path: string, width = 600) {
     .then(({ data }) => data?.signedUrl ?? null)
     .catch(() => null)
     .then((signed) => {
-      // Don't cache a failure: the next render tries again.
+      // Don't cache a failure: the next image that asks for this URL (a new
+      // mount, or a new path or width) signs it again.
       if (!signed && signedUrls.get(key)?.url === url) signedUrls.delete(key)
       return signed
     })

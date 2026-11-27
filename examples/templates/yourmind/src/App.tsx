@@ -132,7 +132,11 @@ function Mind({ userId }: { userId: string }) {
       onDrop={handleDrop}
     >
       <SearchBar search={search} onSearch={setSearch} />
-      {search.status === 'idle' && <Composer userId={userId} onFiles={handleFiles} />}
+      {/* Hidden rather than unmounted during a search, so a save that fails
+          meanwhile can still put its text back. */}
+      <div hidden={search.status !== 'idle'}>
+        <Composer userId={userId} onFiles={handleFiles} />
+      </div>
       {uploadError && (
         <p role="alert" className="text-center text-xs text-red-500">
           {uploadError}
