@@ -140,22 +140,31 @@ const channel = supabase.channel('room:123:messages', {
 const channelRef = useRef(null)
 
 useEffect(() => {
-  // Check if already subscribed to prevent multiple subscriptions
-  if (channelRef.current?.state === 'subscribed') return
-  const channel = supabase.channel('room:123:messages', {
-    config: { private: true }
-  })
-  channelRef.current = channel
+  let cancelled = false
 
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
+  const setup = async () => {
+    // Check if already subscribed to prevent multiple subscriptions
+    if (channelRef.current?.state === 'subscribed') return
 
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .on('broadcast', { event: 'user_joined' }, handleUserJoined)
-    .subscribe()
+    // Set auth before subscribing
+    await supabase.realtime.setAuth()
+    if (cancelled) return
+
+    const channel = supabase.channel('room:123:messages', {
+      config: { private: true }
+    })
+    channelRef.current = channel
+
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .on('broadcast', { event: 'user_joined' }, handleUserJoined)
+      .subscribe()
+  }
+
+  setup()
 
   return () => {
+    cancelled = true
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
@@ -172,7 +181,7 @@ This would be an example of catch all trigger function that would broadcast to t
 
 ```sql
 CREATE OR REPLACE FUNCTION notify_table_changes()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
@@ -195,7 +204,7 @@ But you can also create more specific trigger functions for specific tables and 
 
 ```sql
 CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
@@ -220,7 +229,7 @@ By default, `realtime.broadcast_changes` requires you to use private channels as
 
 ```sql
 CREATE OR REPLACE FUNCTION notify_custom_event()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
