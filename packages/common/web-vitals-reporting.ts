@@ -46,11 +46,15 @@ export function useWebVitalsReporting({ apiUrl, enabled }: { apiUrl: string; ena
 
     if (!enabled || hasRegisteredObservers) return
 
-    hasRegisteredObservers = true
     const pathname = landingPathname
+    let cancelled = false
 
     import('web-vitals')
       .then(({ onLCP, onCLS, onINP, onTTFB, onFCP }) => {
+        // Consent was withdrawn (or the effect re-ran) while the module was loading
+        if (cancelled || hasRegisteredObservers) return
+        hasRegisteredObservers = true
+
         const report = (metric: Metric) => reportWebVital(apiUrl, pathname, metric)
 
         onLCP(report)
@@ -60,9 +64,12 @@ export function useWebVitalsReporting({ apiUrl, enabled }: { apiUrl: string; ena
         onFCP(report)
       })
       .catch((error) => {
-        // e.g. a chunk load failure; allow the next enable to retry
-        hasRegisteredObservers = false
+        // e.g. a chunk load failure; nothing was registered, so the next enable retries
         console.error('Problem registering web vitals reporting:', error)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [apiUrl, enabled])
 }

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 /// <reference types="vitest/jsdom" />
 import { act, createElement } from 'react'
+import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -46,6 +47,12 @@ async function setup() {
 
   return {
     render: (props: HookProps) => act(async () => root.render(createElement(Harness, props))),
+    // Commits each set of props synchronously, back to back, so the dynamic import started by
+    // an earlier one is still pending when a later one is applied
+    renderBackToBack: (propsList: HookProps[]) =>
+      act(async () => {
+        propsList.forEach((props) => flushSync(() => root.render(createElement(Harness, props))))
+      }),
     // Unmounts the tree and mounts a fresh one, as when Telemetry remounts
     remount: (props: HookProps) =>
       act(async () => {
@@ -71,6 +78,24 @@ describe('useWebVitalsReporting', () => {
     await render({ apiUrl: API_URL, enabled: false })
 
     METRIC_NAMES.forEach((name) => expect(registrationCount(name)).toBe(0))
+  })
+
+  it('does not register observers if disabled again while web-vitals is still loading', async () => {
+    const { renderBackToBack, render } = await setup()
+
+    await renderBackToBack([
+      { apiUrl: API_URL, enabled: true },
+      { apiUrl: API_URL, enabled: false },
+    ])
+    await vi.dynamicImportSettled()
+
+    METRIC_NAMES.forEach((name) => expect(registrationCount(name)).toBe(0))
+
+    // The cancelled attempt must not block a later enable from registering
+    await render({ apiUrl: API_URL, enabled: true })
+    await vi.waitFor(() => {
+      METRIC_NAMES.forEach((name) => expect(registrationCount(name)).toBe(1))
+    })
   })
 
   it('registers all five metrics once enabled, e.g. after consent is granted', async () => {
