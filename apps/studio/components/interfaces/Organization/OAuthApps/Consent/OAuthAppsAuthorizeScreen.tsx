@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, Checkbox } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -66,6 +66,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const [allProjectsSelected, setAllProjectsSelected] = useState(false)
   const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeApproveData | null>(null)
   const [roleFailure, setRoleFailure] = useState<OAuthScopeValidationResult | null>(null)
+  const [hasApprovedPartialGrant, setHasApprovedPartialGrant] = useState(false)
 
   const {
     profile,
@@ -290,14 +291,16 @@ export const OAuthAppsAuthorizeScreen = ({
     selectedProjectRefs.includes(project.ref)
   )
 
-  const flaggedRefs = getFailedProjects(roleFailure)
-    .map((project) => project.ref)
-    .filter((ref) => selectedProjectRefs.includes(ref))
+  const unavailableRefs = getFailedProjects(roleFailure).map((project) => project.ref)
+  const flaggedRefs = unavailableRefs.filter((ref) => selectedProjectRefs.includes(ref))
+
   const hasRoleFailure = flaggedRefs.length > 0
-  const primaryActionLabel = hasRoleFailure
-    ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
-    : `Authorize ${request?.name}`
-  const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
+  const primaryActionLabel =
+    hasRoleFailure && !request?.allow_partial_grants
+      ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
+      : `Authorize ${request?.name}`
+  const primaryActionVariant =
+    (hasRoleFailure && !request?.allow_partial_grants) || isSubmitting ? 'default' : 'primary'
 
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
@@ -436,12 +439,27 @@ export const OAuthAppsAuthorizeScreen = ({
       : null
   const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
   const cannotSubmit =
-    hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure
+    hasNoSelection ||
+    isBlockedOnProjects ||
+    cannotGrantRequestedAccess ||
+    (hasRoleFailure && !request.allow_partial_grants) ||
+    (hasRoleFailure && request.allow_partial_grants && !hasApprovedPartialGrant)
 
   const handleApprove = () => {
-    if (hasNoSelection || isBlockedOnProjects || cannotGrantRequestedAccess || hasRoleFailure)
+    if (
+      hasNoSelection ||
+      isBlockedOnProjects ||
+      cannotGrantRequestedAccess ||
+      (hasRoleFailure && !request.allow_partial_grants) ||
+      (hasRoleFailure && request.allow_partial_grants && !hasApprovedPartialGrant)
+    )
       return
-    const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
+    const approveBody = usesSelectedProjects
+      ? {
+          project_refs: selectedProjectRefs,
+          partial: request.allow_partial_grants && hasApprovedPartialGrant ? true : undefined,
+        }
+      : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
 
@@ -479,22 +497,49 @@ export const OAuthAppsAuthorizeScreen = ({
       }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
-        {hasRoleFailure && (
-          <Admonition
-            type="warning"
-            title={
-              flaggedRefs.length === 1
-                ? "Couldn't authorize 1 project"
-                : `Couldn't authorize ${flaggedRefs.length} projects`
-            }
-            description={
-              <span>
-                {request.name} needs write access but your role is read-only on the projects
-                highlighted. Deselect them to continue.
-              </span>
-            }
-          />
-        )}
+        {hasRoleFailure ? (
+          request.allow_partial_grants ? (
+            <Admonition
+              type="warning"
+              title="Some features might not work"
+              description={
+                <div className="flex flex-col gap-2">
+                  <div>
+                    Your Read-only role can't grant everything {request.name} asked for. It will get
+                    the access you have; tools that need more will be unavailable.
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="allow_partial_grants"
+                      onCheckedChange={(value) => setHasApprovedPartialGrant(value === true)}
+                    />
+                    <label
+                      htmlFor="allow_partial_grants"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      I understand
+                    </label>
+                  </div>
+                </div>
+              }
+            />
+          ) : (
+            <Admonition
+              type="warning"
+              title={
+                flaggedRefs.length === 1
+                  ? "Couldn't authorize 1 project"
+                  : `Couldn't authorize ${flaggedRefs.length} projects`
+              }
+              description={
+                <span>
+                  {request.name} needs write access but your role is read-only on the projects
+                  highlighted. Deselect them to continue.
+                </span>
+              }
+            />
+          )
+        ) : null}
 
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
@@ -518,7 +563,7 @@ export const OAuthAppsAuthorizeScreen = ({
                   hasNoSelection ? 'Must select at least one project to authorize.' : undefined
                 }
                 flaggedRefs={flaggedRefs}
-                unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
+                unavailableRefs={unavailableRefs}
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={setAllProjectsSelected}
                 onSearchChange={setSearch}
@@ -574,7 +619,11 @@ export const OAuthAppsAuthorizeScreen = ({
             loading={isSubmitting || isPendingPreflight}
             disabled={cannotSubmit}
             aria-label={primaryActionLabel}
-            onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
+            onClick={
+              hasRoleFailure && !request.allow_partial_grants
+                ? handleDeselectFlagged
+                : handleApprove
+            }
           >
             {isSubmitting ? 'Authorizing...' : primaryActionLabel}
           </Button>

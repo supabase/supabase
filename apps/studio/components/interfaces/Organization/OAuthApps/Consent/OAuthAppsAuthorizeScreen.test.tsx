@@ -1066,7 +1066,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       )
     ).toBeInTheDocument()
     // Counted against the submitted selection
-    expect(screen.getByText(/2 of 3\s+projects unavailable/)).toBeInTheDocument()
+    expect(screen.getByText(/2 of 3\s+projects have issues/)).toBeInTheDocument()
     // The primary action turns into the deselect shortcut, replacing the inline link
     expect(screen.getByRole('button', { name: 'Deselect 2 projects' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Authorize Vercel/ })).not.toBeInTheDocument()
