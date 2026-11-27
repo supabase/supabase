@@ -49,6 +49,7 @@ interface ConnectConfigSectionProps {
   onFieldChange: (fieldId: string, value: string | boolean | string[]) => void
   getFieldOptions: (fieldId: string) => FieldOption[]
   insertAfter?: { fieldId: string; node: ReactNode }
+  children?: ReactNode
 }
 
 export function ConnectConfigSection({
@@ -57,6 +58,7 @@ export function ConnectConfigSection({
   onFieldChange,
   getFieldOptions,
   insertAfter,
+  children,
 }: ConnectConfigSectionProps) {
   const {
     meta: { isGrantMode },
@@ -279,6 +281,7 @@ export function ConnectConfigSection({
 
   return (
     <div className="flex flex-col gap-y-4">
+      {children}
       {activeFields.map((field) => (
         <Fragment key={field.id}>
           {renderField(field)}

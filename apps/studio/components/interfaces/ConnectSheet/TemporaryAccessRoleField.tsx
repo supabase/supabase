@@ -8,17 +8,17 @@ import { InlineLink } from '@/components/ui/InlineLink'
 
 export function TemporaryAccessPasswordNote() {
   const {
-    meta: { isGrantMode },
+    meta: { grantRole },
   } = useTemporaryAccessConnection()
 
-  if (!isGrantMode) return null
+  if (!grantRole) return null
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      This role uses a personal access token as its password.{' '}
+      Use a personal access token as the password for “{grantRole}”.{' '}
       <InlineLink href="/account/tokens">Create an access token</InlineLink> if you need one. If you
-      create a scoped token, choose this project and set “Database token access” to “
-      {PERMISSION_MODE_LABEL.read}”.
+      create a scoped token, choose this project and set “Database token access” to{' '}
+      {`“${PERMISSION_MODE_LABEL.read}”.`}
     </p>
   )
 }
@@ -34,17 +34,17 @@ export function TemporaryAccessRoleField() {
   return (
     <FormItemLayout isReactForm={false} layout="horizontal" label="Role">
       <Select value={selectedRole} onValueChange={setSelectedRole}>
-        <SelectTrigger size="small">
+        <SelectTrigger size="small" aria-label="Role">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value={DATABASE_PASSWORD_VALUE}>Database password</SelectItem>
+          <SelectSeparator />
           {activeRoles.map((role) => (
             <SelectItem key={role} value={role}>
               {role}
             </SelectItem>
           ))}
-          <SelectSeparator />
-          <SelectItem value={DATABASE_PASSWORD_VALUE}>Database password</SelectItem>
         </SelectContent>
       </Select>
     </FormItemLayout>
