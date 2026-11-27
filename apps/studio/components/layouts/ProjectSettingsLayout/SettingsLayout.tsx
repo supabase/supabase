@@ -6,6 +6,7 @@ import { useGenerateSettingsMenu } from './SettingsMenu.utils'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { useScrollToHash } from '@/hooks/ui/useScrollToHash'
 
 /**
  * Menu-only component for the settings section. Used by the desktop sidebar and by the
@@ -34,6 +35,8 @@ interface SettingsLayoutProps {
 }
 
 export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+  useScrollToHash()
+
   return (
     <ProjectLayout
       isBlocking={false}
