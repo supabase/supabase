@@ -146,7 +146,6 @@ const ExpiredAccess = () => {
   return (
     <Admonition
       type="default"
-
       className={cn('rounded-none', canManageJitDbAccess ? 'border-x-0 border-t-0' : 'border-none')}
       title="Your access to the project's database is expired"
       description="Contact your project's owner or administrator for renewed access if required."
