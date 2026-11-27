@@ -11,15 +11,17 @@ import {
   useWatch,
 } from 'ui'
 
-import {
-  PERMISSION_MODE_LABEL,
-  type PermissionCatalogEntry,
-  type PermissionMode,
-} from '../../AccessToken.permissions'
+import { type PermissionCatalogEntry, type PermissionMode } from '../../AccessToken.permissions'
 import type { EntryAccess } from '../../AccessToken.roles'
 import { ExceedsRoleBadge } from '../ExceedsRoleBadge'
 import { TokenFormValues } from './NewScopedTokenForm.utils'
 import { RiskMarker } from './RiskMarker'
+
+const permissionLabels: Record<PermissionMode, string> = {
+  none: 'No access',
+  read: 'Read only',
+  readwrite: 'Read and write',
+}
 
 interface PermissionRowProps {
   control: Control<TokenFormValues>
@@ -70,12 +72,15 @@ export const PermissionRow = ({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 py-4">
+    <div className="grid grid-cols-1 items-start gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
       <div className="min-w-0 flex flex-col gap-1">
         <span className="flex items-start md:items-center gap-2 flex-col-reverse md:flex-row">
           <Label htmlFor={`${entry.key}-permissions`}>
             <span
-              className={cn('text-sm text-foreground', isMissingDependencies && 'text-lighter')}
+              className={cn(
+                'text-sm font-medium text-foreground',
+                isMissingDependencies && 'text-lighter'
+              )}
             >
               {entry.name} <span className="sr-only">permissions</span>
             </span>
@@ -85,7 +90,7 @@ export const PermissionRow = ({
             <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
           )}
         </span>
-        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-lighter">
+        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-light">
           {entry.description}
           {entry.dependencies.length > 0 ? (
             <b>
@@ -116,7 +121,7 @@ export const PermissionRow = ({
       <div className="flex shrink-0 items-center gap-2">
         <Select disabled={isMissingDependencies} value={mode} onValueChange={handleChange}>
           <SelectTrigger
-            className="w-36 shrink-0"
+            className="w-full"
             id={`${entry.key}-permissions`}
             aria-describedby={`${entry.key}-permissions-description`}
           >
@@ -125,7 +130,7 @@ export const PermissionRow = ({
           <SelectContent>
             {modes.map((value) => (
               <SelectItem key={value} value={value}>
-                {PERMISSION_MODE_LABEL[value]}
+                {permissionLabels[value]}
               </SelectItem>
             ))}
           </SelectContent>

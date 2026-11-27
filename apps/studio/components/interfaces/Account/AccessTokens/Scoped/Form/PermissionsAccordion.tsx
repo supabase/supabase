@@ -47,8 +47,8 @@ export const PermissionsAccordion = ({
         layout="flex-row-reverse"
         label="Permissions"
         description={
-          <p className="text-foreground-lighter text-sm">
-            Grant the minimum access this token needs. Everything defaults to None. Permissions
+          <p className="text-foreground-light text-sm">
+            Grant the minimum access this token needs. Permissions default to No access. Permissions
             follow your role in the organizations and projects you're a member of.
           </p>
         }
@@ -77,7 +77,7 @@ export const PermissionsAccordion = ({
             <AccordionItem
               key={category.key}
               value={category.key}
-              className={cn('border', {
+              className={cn('border border-default', {
                 'border-b-0': index < categories.length - 1,
                 'rounded-t-md': index === 0,
                 'rounded-b-md': index === categories.length - 1,
@@ -87,7 +87,7 @@ export const PermissionsAccordion = ({
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium">{category.name}</span>
-                    <span className="text-xs text-foreground-lighter">{category.description}</span>
+                    <span className="text-xs text-foreground-light">{category.description}</span>
                   </div>
                   {configuredCount > 0 && (
                     <span className="text-xs text-primary font-medium">
@@ -97,7 +97,7 @@ export const PermissionsAccordion = ({
                 </div>
               </AccordionTrigger>
               <AccordionContent className="*:pb-0">
-                <div className="divide-y first:border-t">
+                <div className="divide-y divide-default border-t border-default">
                   {category.entries.map((entry) => (
                     <div className="px-4" key={entry.key}>
                       <PermissionRow

@@ -619,11 +619,11 @@ describe('NewScopedTokenSheet', () => {
     }
   })
 
-  test('offers only None and Read-write for Organization Settings on Project scope', async () => {
+  test('offers only No access and Read and write for Organization Settings on Project scope', async () => {
     await openSheet()
     await expandPermissionCategory('Account and organization')
 
-    expect(await modeOptionsFor('Organization Settings')).toEqual(['None', 'Read-write'])
+    expect(await modeOptionsFor('Organization Settings')).toEqual(['No access', 'Read and write'])
   })
 
   test('shows every row and every Organization Settings option on Organization scope', async () => {
@@ -637,7 +637,11 @@ describe('NewScopedTokenSheet', () => {
     for (const name of STILL_VISIBLE_ROWS) {
       expect(await screen.findByLabelText(rowLabel(name)), name).toBeInTheDocument()
     }
-    expect(await modeOptionsFor('Organization Settings')).toEqual(['None', 'Read', 'Read-write'])
+    expect(await modeOptionsFor('Organization Settings')).toEqual([
+      'No access',
+      'Read only',
+      'Read and write',
+    ])
   })
 
   test('resets hidden selections and Organization Settings Read when switching to Project scope', async () => {
@@ -646,32 +650,32 @@ describe('NewScopedTokenSheet', () => {
     await expandPermissionCategory('Account and organization')
 
     fireEvent.click(await screen.findByLabelText(rowLabel('Organization Members')))
-    fireEvent.click(await findOption('Read-write'))
+    fireEvent.click(await findOption('Read and write'))
     fireEvent.click(await screen.findByLabelText(rowLabel('Organization Settings')))
-    fireEvent.click(await findOption('Read'))
+    fireEvent.click(await findOption('Read only'))
     expect((await screen.findByLabelText(rowLabel('Organization Members'))).textContent).toBe(
-      'Read-write'
+      'Read and write'
     )
     expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-      'Read'
+      'Read only'
     )
 
     await user.click(await screen.findByRole('radio', { name: /Project/ }))
     expect(screen.queryByLabelText(rowLabel('Organization Members'))).toBeNull()
     await waitFor(async () =>
       expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-        'None'
+        'No access'
       )
     )
 
     await selectOrganizationScope()
     await waitFor(async () =>
       expect((await screen.findByLabelText(rowLabel('Organization Members'))).textContent).toBe(
-        'None'
+        'No access'
       )
     )
     expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-      'None'
+      'No access'
     )
   })
 
