@@ -1,6 +1,6 @@
 import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { CircleHelpIcon, FileIcon, InfoIcon, MoreVerticalIcon, RotateCcwIcon } from 'lucide-react'
+import { CircleHelpIcon, FileIcon, MoreVerticalIcon, RotateCcwIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Badge, Button, cn } from 'ui'

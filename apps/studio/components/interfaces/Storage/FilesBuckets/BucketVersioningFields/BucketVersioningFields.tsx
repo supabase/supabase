@@ -26,8 +26,6 @@ import { LifecyclePolicySection } from './LifecyclePolicySection'
 import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
 
 interface BucketVersioningFieldsProps {
   form: UseFormReturn<BucketFormValues>

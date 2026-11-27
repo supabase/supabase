@@ -1,8 +1,4 @@
-import { DollarSign } from 'lucide-react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
 
 interface EnableVersioningConfirmationModalProps {
   visible: boolean
