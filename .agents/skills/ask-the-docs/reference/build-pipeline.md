@@ -6,6 +6,8 @@ How `apps/docs` is built through the Turborepo task graph. There are no pnpm
 Verify against the current `apps/docs/turbo.jsonc` and
 `apps/docs/package.json` if behavior surprises you.
 
+Verified at: 3089aa3f67 (2026-11-25).
+
 ## Build flow
 
 ```mermaid
@@ -81,6 +83,10 @@ for example:
 ```json
 "build": "maybe-turbo next build --webpack"
 ```
+
+`pnpm dev` runs `next dev` (Turbopack). The production build runs
+`next build --webpack`. A loader or bundler change must work in both.
+`next.config.mjs` has a `webpack` block and a `turbopack` block.
 
 Outside Turbo, `pnpm build`, `pnpm dev`, `pnpm codegen:references`,
 `pnpm ingest:search_v2` and friends re-invoke themselves as

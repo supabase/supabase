@@ -204,8 +204,8 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `DB_NAMESPACE` | string |  | Database schema to use (bare alias). | Default: `auth` |
 | `GOTRUE_DB_DRIVER` | string | Both | Database driver name. | Required. Typically `postgres` |
 | `GOTRUE_DB_HEALTH_CHECK_PERIOD` | string (duration) |  | Interval between DB connection health checks. |  |
-| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | CLI | Maximum number of idle DB connections. |  |
-| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | CLI | Maximum total DB connections (0 = unlimited). |  |
+| `GOTRUE_DB_MAX_IDLE_POOL_SIZE` | integer (count) | Both | Maximum number of idle DB connections. | Default: `0` (keeps no idle connections, so every query opens a new one); `docker-compose.yml` sets `10` |
+| `GOTRUE_DB_MAX_POOL_SIZE` | integer (count) | Both | Maximum total DB connections (0 = unlimited). | Default: `0`; `docker-compose.yml` sets `10` |
 | `GOTRUE_DB_MIGRATIONS_PATH` | path | | Filesystem path containing migration SQL files. | Default: `./migrations` |
 
 ### JWT
@@ -1101,7 +1101,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `TUS_USE_FILE_VERSION_SEPARATOR` | boolean |  | Include the object version in TUS storage keys. | Default: `false` |
 | `UPLOAD_FILE_SIZE_LIMIT` | integer (bytes) | CLI | Max upload size in bytes. | Required |
 | `UPLOAD_FILE_SIZE_LIMIT_STANDARD` | integer (bytes) | CLI | Max size in bytes for non-resumable uploads. | Default: `0` (disabled) |
-| `UPLOAD_SIGNED_URL_EXPIRATION_TIME` | integer (seconds) |  | Default lifetime (seconds) of signed upload URLs. | Default: `60` |
+| `UPLOAD_SIGNED_URL_EXPIRATION_TIME` | integer (seconds) | Self-hosted | Default lifetime (seconds) of signed upload URLs. | Default: `60`; `docker-compose.yml` sets `7200` |
 
 ### Rate limiting
 

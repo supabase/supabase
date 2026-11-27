@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import {
   createMemoryHistory,
   createRootRoute,
@@ -10,13 +11,19 @@ import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { delay, HttpResponse } from 'msw'
 import { Toaster } from 'sonner'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 
-import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.constants'
+import {
+  ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS,
+  VERCEL_MARKETPLACE_SURVEY_START,
+} from './OnboardingSurvey.constants'
 import { markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveyFollowUpCard } from './OnboardingSurveyFollowUpCard'
 import { BannerStack } from '@/components/ui/BannerStack/BannerStack'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { organizationKeys } from '@/data/organizations/keys'
+import { castOrganizationSlugResponseToOrganization } from '@/data/organizations/organization-query'
+import { castOrganizationResponseToOrganization } from '@/data/organizations/organizations-query'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
@@ -24,6 +31,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type OrganizationDetailResponse = components['schemas']['OrganizationSlugResponse_Output']
 type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
 
 const PROFILE_ID = 'user-1'
@@ -64,14 +72,58 @@ const mockSurveyEndpoint = (status: 204 | 500) => {
   return requests
 }
 
-const renderCard = (initialUrl = `/org/${ORG_SLUG}`) => {
+const toOrganizationDetail = (
+  organization: OrganizationResponse,
+  createdAt: string
+): OrganizationDetailResponse => ({
+  ...organization,
+  created_at: createdAt,
+  has_oriole_project: false,
+})
+
+const mockOrganizationDetail = (organization: OrganizationResponse, createdAt: string) => {
+  const requests: string[] = []
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug',
+    response: ({ request }) => {
+      requests.push(request.url)
+      return HttpResponse.json<OrganizationDetailResponse>(
+        toOrganizationDetail(organization, createdAt)
+      )
+    },
+  })
+  return requests
+}
+
+// The app root keeps the org list and a free org's details cached on every page
+const cachedQueryClient = (organization: OrganizationResponse, createdAt: string) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  queryClient.setQueryData(organizationKeys.list(), [
+    castOrganizationResponseToOrganization(organization),
+  ])
+  queryClient.setQueryData(
+    organizationKeys.detail(organization.slug),
+    castOrganizationSlugResponseToOrganization(toOrganizationDetail(organization, createdAt))
+  )
+  return queryClient
+}
+
+const renderCard = ({
+  organization = createMockOrganizationResponse({ slug: ORG_SLUG }),
+  queryClient,
+  initialUrl = `/org/${ORG_SLUG}`,
+}: {
+  organization?: OrganizationResponse
+  queryClient?: QueryClient
+  initialUrl?: string
+} = {}) => {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
-    response: () =>
-      HttpResponse.json<OrganizationResponse[]>([
-        createMockOrganizationResponse({ slug: ORG_SLUG }),
-      ]),
+    response: () => HttpResponse.json<OrganizationResponse[]>([organization]),
   })
 
   const router = createRouter({
@@ -88,6 +140,7 @@ const renderCard = (initialUrl = `/org/${ORG_SLUG}`) => {
       <Toaster />
     </BannerStackProvider>,
     {
+      queryClient,
       router,
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
@@ -162,7 +215,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
     markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'PERSONAL' })
     const requests = mockSurveyEndpoint(204)
 
-    const { router } = renderCard(`/new/${ORG_SLUG}`)
+    const { router } = renderCard({ initialUrl: `/new/${ORG_SLUG}` })
     await advance(1000)
     expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
 
@@ -349,6 +402,78 @@ describe('OnboardingSurveyFollowUpCard', () => {
     expect(track).not.toHaveBeenCalledWith('onboarding_survey_dismissed', {
       surface: 'follow_up',
       reason: 'follow_up_expired',
+    })
+  })
+
+  describe('for a Vercel Marketplace org', () => {
+    const vercelOrg = createMockOrganizationResponse({
+      slug: ORG_SLUG,
+      billing_partner: 'vercel_marketplace',
+    })
+
+    it('does not ask about an org created before the start date', async () => {
+      const detailRequests = mockOrganizationDetail(vercelOrg, '2026-11-24T23:59:59Z')
+
+      renderCard({ organization: vercelOrg })
+      await waitFor(() => expect(detailRequests).toHaveLength(1))
+      await advance(1000)
+
+      expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
+    })
+
+    it.each([
+      ['a member who is not an owner', { ...vercelOrg, is_owner: false }],
+      ['the owner of an org Vercel does not manage', { ...vercelOrg, billing_partner: null }],
+    ])('does not ask %s', async (_, organization) => {
+      const queryClient = cachedQueryClient(organization, VERCEL_MARKETPLACE_SURVEY_START)
+
+      renderCard({ organization, queryClient })
+      await advance(1000)
+
+      expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
+    })
+
+    it('does not show the card before a stored skip has been read', async () => {
+      const state = { status: 'dismissed', orgCreatedAt: VERCEL_MARKETPLACE_SURVEY_START }
+      safeLocalStorage.setItem(storageKey, JSON.stringify(state))
+      const queryClient = cachedQueryClient(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
+
+      renderCard({ organization: vercelOrg, queryClient })
+      expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
+
+      await advance(1000)
+      expect(screen.queryByRole('button', { name: 'Answer' })).toBeNull()
+    })
+
+    it('asks about an org created on the start date and stores a skip without sending anything', async () => {
+      mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
+      const requests = mockSurveyEndpoint(204)
+
+      renderCard({ organization: vercelOrg })
+      fireEvent.click(await screen.findByRole('button', { name: 'Skip' }))
+
+      await waitFor(() =>
+        expect(readStoredState()).toEqual({
+          status: 'dismissed',
+          orgCreatedAt: VERCEL_MARKETPLACE_SURVEY_START,
+        })
+      )
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull())
+      await advance(1000)
+      expect(requests).toEqual([])
+    })
+
+    it('stays away after a skip that could not be stored', async () => {
+      mockOrganizationDetail(vercelOrg, VERCEL_MARKETPLACE_SURVEY_START)
+      const setItem = vi.spyOn(safeLocalStorage, 'setItem').mockImplementation(() => {})
+      onTestFinished(() => setItem.mockRestore())
+
+      renderCard({ organization: vercelOrg })
+      fireEvent.click(await screen.findByRole('button', { name: 'Skip' }))
+      await advance(1000)
+
+      expect(readStoredState()).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull()
     })
   })
 })

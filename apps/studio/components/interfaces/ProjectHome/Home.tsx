@@ -16,6 +16,8 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
@@ -27,7 +29,6 @@ import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
 import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -110,17 +111,16 @@ export const ProjectHome = () => {
   return (
     <ProjectNeedsSecuring>
       <div className="w-full h-full">
-        <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
-          <ScaffoldSection
-            isFullWidth
-            className={cn(isPaused ? 'h-full flex justify-center p-0!' : 'pb-0')}
+        <PageContainer size="large" className={cn(isPaused && 'h-full')}>
+          <PageSection
+            className={cn(isPaused ? 'h-full justify-center p-0 last:pb-0' : 'last:pb-0')}
           >
             <TopSection />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSection>
+        </PageContainer>
         {!isPaused && (
-          <ScaffoldContainer size="large">
-            <ScaffoldSection isFullWidth className="gap-12 pb-32">
+          <PageContainer size="large">
+            <PageSection className="gap-12 last:pb-32">
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                 <SortableContext items={renderOrder} strategy={verticalListSortingStrategy}>
                   {renderOrder.map((id) => {
@@ -171,8 +171,8 @@ export const ProjectHome = () => {
                   })}
                 </SortableContext>
               </DndContext>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+            </PageSection>
+          </PageContainer>
         )}
       </div>
     </ProjectNeedsSecuring>

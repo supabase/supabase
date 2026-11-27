@@ -135,19 +135,51 @@ describe('PostHogClient consent', () => {
 })
 
 describe('PostHogClient before_send', () => {
-  it('redacts the keywords url param from properties the SDK fills in itself', async () => {
+  it('redacts url params and the hash from properties the SDK fills in itself', async () => {
     vi.clearAllMocks()
     const client = await loadClient()
     client.init()
-    const usersPage = 'https://supabase.com/dashboard/project/abc/auth/users'
-    const leakingUrl = `${usersPage}?keywords=person%40example.com`
+    const projectPage = 'https://supabase.com/dashboard/project/abc'
+    const leakingUrl = `${projectPage}?token=secret1&utm_source=docs#access_token=secret2&refresh_token=secret3`
+    const redactedUrl = `${projectPage}?token=redacted&utm_source=docs`
 
     const sent = initConfig().before_send({
-      properties: { $current_url: leakingUrl, $session_entry_url: leakingUrl },
-      $set_once: { $initial_referrer: leakingUrl },
+      event: '$identify',
+      properties: {
+        $current_url: leakingUrl,
+        $referrer: leakingUrl,
+        $initial_referrer: leakingUrl,
+        $session_entry_url: leakingUrl,
+        $set: { $current_url: leakingUrl },
+        $set_once: { $initial_current_url: leakingUrl },
+      },
+      $set: { $current_url: leakingUrl },
+      $set_once: { $initial_current_url: leakingUrl },
     })
 
-    expect(JSON.stringify(sent)).not.toContain('person')
-    expect(sent.properties.$session_entry_url).toBe(`${usersPage}?keywords=redacted`)
+    expect(JSON.stringify(sent)).not.toMatch(/secret|#/)
+    expect(sent.properties.$session_entry_url).toBe(redactedUrl)
+    expect(sent.$set_once.$initial_current_url).toBe(redactedUrl)
+  })
+
+  it('replaces the title the SDK stamps on a pageview, and leaves other events alone', async () => {
+    vi.clearAllMocks()
+    const client = await loadClient()
+    client.init()
+    const { setTelemetryPageTitleResolver } = await import('./telemetry-utils')
+    setTelemetryPageTitleResolver(() => 'Tables | Supabase')
+    const fullTitle = 'users | Tables | Acme Project | Acme Org | Supabase'
+
+    const pageview = initConfig().before_send({
+      event: '$pageview',
+      properties: { title: fullTitle },
+    })
+    const custom = initConfig().before_send({
+      event: 'finding_viewed',
+      properties: { title: 'Custom' },
+    })
+
+    expect(pageview.properties.title).toBe('Tables | Supabase')
+    expect(custom.properties.title).toBe('Custom')
   })
 })

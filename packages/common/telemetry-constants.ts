@@ -633,6 +633,23 @@ export interface FreeTierGeneralRegionDocsLinkClickedEvent {
 }
 
 /**
+ * User clicked a "Docs" button rendered by the shared DocsButton component.
+ *
+ * @group Events
+ * @source studio
+ * @page any page that renders a DocsButton; the page is identified by the pathname sent with every event
+ */
+export interface DocsButtonClickedEvent {
+  action: 'docs_button_clicked'
+  properties: {
+    /** Fixed topic label passed to the button, e.g. the feature the docs link covers. Omitted when the button has no topic. */
+    topic?: string
+  }
+  // Rendered on project, organization, and account pages, so either group can be missing
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the "Need a specific region?" link to reveal the specific regions
  * list in the project creation region selector.
  *
@@ -5144,6 +5161,7 @@ export interface LegacyApiKeysUpdatedEvent {
  */
 export type TelemetryEvent =
   | AccountRecoveryReminderExposedEvent
+  | DocsButtonClickedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent

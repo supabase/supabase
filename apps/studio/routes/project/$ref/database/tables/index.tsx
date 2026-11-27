@@ -37,7 +37,7 @@ function DatabaseTables() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Tables</PageHeaderTitle>
@@ -49,7 +49,7 @@ function DatabaseTables() {
           )}
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
 
