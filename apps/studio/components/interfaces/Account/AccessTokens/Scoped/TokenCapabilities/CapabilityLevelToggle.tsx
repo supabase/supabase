@@ -1,5 +1,6 @@
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 
+import { PERMISSION_MODE_LABEL } from '../../AccessToken.permissions'
 import type { CapabilityLevelFilter } from './TokenCapabilities.utils'
 
 interface CapabilityLevelToggleProps {
@@ -9,8 +10,8 @@ interface CapabilityLevelToggleProps {
 
 const OPTIONS: { value: CapabilityLevelFilter; label: string }[] = [
   { value: 'all', label: 'All' },
-  { value: 'read', label: 'Read' },
-  { value: 'readwrite', label: 'Read-write' },
+  { value: 'read', label: PERMISSION_MODE_LABEL.read },
+  { value: 'readwrite', label: PERMISSION_MODE_LABEL.readwrite },
 ]
 
 export const CapabilityLevelToggle = ({ value, onChange }: CapabilityLevelToggleProps) => (
