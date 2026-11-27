@@ -57,6 +57,10 @@ While the "globstar" (`**`) is useful for local development and preview URLs, se
 | `http://localhost:3000/?`      | matches `http://localhost:3000/a` but not `http://localhost:3000/foo`                                                                                              |
 | `http://localhost:3000/[!a-z]` | matches `http://localhost:3000/1` but not `http://localhost:3000/a`                                                                                                |
 
+## Limits
+
+The redirect URL list can't exceed 2048 characters in total.
+
 ## Netlify preview URLs
 
 For deployments with Netlify, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
@@ -134,7 +138,3 @@ if (params.get('error_code').startsWith('4')) {
   window.alert(params.get('error_description'))
 }
 ```
-
-## Limits
-
-The redirect URL list can't exceed 2048 characters in total.
