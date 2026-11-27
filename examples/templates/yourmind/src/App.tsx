@@ -238,6 +238,9 @@ function Composer({
 }) {
   const [text, setText] = useState('')
   const [saveError, setSaveError] = useState<string | null>(null)
+  // The latest text, for after an await (the closure's `text` is stale by then).
+  const latestText = useRef(text)
+  latestText.current = text
   const fileInput = useRef<HTMLInputElement>(null)
 
   const save = async () => {
@@ -248,9 +251,15 @@ function Composer({
     try {
       await saveText(userId, submitted)
     } catch (error) {
-      // Give the text back unless something new has been typed since.
-      setText((current) => current || submitted)
-      setSaveError(error instanceof Error ? error.message : 'Could not save that')
+      // Give the text back. If something new has been typed since, keep that
+      // and name the failed text in the error instead, so neither is lost.
+      const reason = error instanceof Error ? error.message : 'Could not save that'
+      if (latestText.current.trim()) {
+        setSaveError(`Couldn't save "${preview(submitted)}": ${reason}`)
+      } else {
+        setText(submitted)
+        setSaveError(reason)
+      }
     }
   }
 
@@ -357,6 +366,12 @@ function LinkPreview({ item }: { item: Item }) {
       </div>
     </div>
   )
+}
+
+/** The start of a long piece of text, for error messages. */
+function preview(text: string) {
+  const line = text.trim().split('\n')[0]
+  return line.length > 60 ? `${line.slice(0, 60)}…` : line
 }
 
 function hostnameOf(url: string | null) {

@@ -1,5 +1,5 @@
 import { eq, useLiveQuery } from '@tanstack/react-db'
-import { useEffect, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
 
 import { ensureSession, openBoard, positionBetween } from './board'
 import { cards, type Card, type CardStatus } from './collections'
@@ -218,6 +218,9 @@ function Column({
   const [isOver, setIsOver] = useState(false)
   const [draft, setDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
+  // The latest draft, for after an await (the closure's `draft` is stale by then).
+  const latestDraft = useRef(draft)
+  latestDraft.current = draft
 
   const handleDrop = (event: DragEvent, beforeCardId: string | null) => {
     event.preventDefault()
@@ -236,9 +239,15 @@ function Column({
     try {
       await onAdd(title)
     } catch (addError) {
-      // The card rolled back: give the text back unless something new was typed.
-      setDraft((current) => current || title)
-      setError(addError instanceof Error ? addError.message : 'Could not add the card')
+      // The card rolled back: give the text back. If something new has been
+      // typed since, keep that and name the failed card in the error instead.
+      const reason = addError instanceof Error ? addError.message : 'Could not add the card'
+      if (latestDraft.current.trim()) {
+        setError(`Couldn't add "${title}": ${reason}`)
+      } else {
+        setDraft(title)
+        setError(reason)
+      }
     }
   }
 

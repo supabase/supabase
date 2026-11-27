@@ -85,7 +85,7 @@ export function isReservedAddress(address: string) {
 
 /**
  * Resolves a hostname's addresses. Fails closed: if the runtime can't resolve
- * names, or resolution returns nothing, the URL is refused.
+ * names, a lookup fails, or resolution returns nothing, the URL is refused.
  */
 async function resolve(hostname: string) {
   if (typeof Deno.resolveDns !== 'function') {
@@ -95,7 +95,16 @@ async function resolve(hostname: string) {
     Deno.resolveDns(hostname, 'A'),
     Deno.resolveDns(hostname, 'AAAA'),
   ])
-  const addresses = results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
+  const addresses: string[] = []
+  for (const result of results) {
+    if (result.status === 'fulfilled') addresses.push(...result.value)
+    // NotFound means there are no records of that type (many hosts have no
+    // IPv6), which is fine. Any other lookup error could hide an address, so
+    // refuse the URL.
+    else if (!(result.reason instanceof Deno.errors.NotFound)) {
+      throw new Error('Could not verify the address of this URL')
+    }
+  }
   if (addresses.length === 0) throw new Error('Could not verify the address of this URL')
   return addresses
 }

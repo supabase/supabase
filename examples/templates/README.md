@@ -34,4 +34,16 @@ The gallery embeds a live deployment of each template. Anyone can use them, so t
 - Photo Wall: `RETENTION_DAYS=1`, so every photo is deleted after a day even if its uploader is still around.
 - Uptime Monitor: `private.allowed_hosts` lists the only hosts visitors can monitor.
 
-**Removing something right away.** To take down one person's content (for example, something offensive on a shared board), find the row's `created_by` and delete that user in the dashboard under Authentication → Users; their boards, walls and items go with them. For Photo Wall and YourMind, delete their files in Storage first. To wipe every guest at once, run the delete above with `interval '0 seconds'` (Kanban, Uptime Monitor and Waitlisted), or set `PURGE_GUEST_DAYS=0.0001` and call the project's `cleanup` function (Photo Wall and YourMind).
+**Removing something right away.** To take down one person's content (for example, something offensive on a shared board), find the row's `created_by` (the user's id) and delete that user in the dashboard under Authentication → Users. Their boards, walls and items go with them, and Kanban, Uptime Monitor and Waitlisted need nothing else.
+
+For **Photo Wall**, remove the files first, or deleting the user leaves them at public URLs. That means every photo on walls the user created (including other members' uploads, since those walls are deleted too) and their own uploads on other walls:
+
+```sql
+select path from public.photos
+where wall_id in (select id from public.walls where created_by = '<user id>')
+   or created_by = '<user id>';
+```
+
+Delete those paths from the `photos` bucket (Storage in the dashboard, or `supabase.storage.from('photos').remove(paths)` with the secret key), then delete the user. For **YourMind**, delete the user's folder (`<user id>/`) in the `minds` bucket first.
+
+To wipe every guest at once, run the delete above with `interval '0 seconds'` (Kanban, Uptime Monitor and Waitlisted), or set `PURGE_GUEST_DAYS=0.0001` and call the project's `cleanup` function (Photo Wall and YourMind), which removes files in the right order.

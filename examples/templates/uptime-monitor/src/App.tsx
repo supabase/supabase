@@ -1,5 +1,5 @@
 import { gt, isNull, useLiveQuery } from '@tanstack/react-db'
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 
 import { checks, incidents, monitors, type Check, type Incident, type Monitor } from './collections'
 import { ensureSession, seedMonitors } from './session'
@@ -148,6 +148,9 @@ function Summary({ total, down, hasChecks }: { total: number; down: number; hasC
 
 function AddMonitorForm({ userId, isFull }: { userId: string; isFull: boolean }) {
   const [url, setUrl] = useState('')
+  // The latest URL, for after an await (the closure's `url` is stale by then).
+  const latestUrl = useRef(url)
+  latestUrl.current = url
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (event: FormEvent) => {
@@ -175,8 +178,15 @@ function AddMonitorForm({ userId, isFull }: { userId: string; isFull: boolean })
       })
       await transaction.isPersisted.promise
     } catch (insertError) {
-      setUrl((current) => current || submitted)
-      setError(insertError instanceof Error ? insertError.message : 'Could not add monitor')
+      // Give the URL back. If something new has been typed since, keep that
+      // and name the failed URL in the error instead.
+      const reason = insertError instanceof Error ? insertError.message : 'Could not add monitor'
+      if (latestUrl.current.trim()) {
+        setError(`Couldn't add ${submitted}: ${reason}`)
+      } else {
+        setUrl(submitted)
+        setError(reason)
+      }
     }
   }
 
