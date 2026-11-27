@@ -1,5 +1,4 @@
 import { useFlag } from 'common'
-import { PERMISSION_MODE_LABEL } from 'shared-data/scoped-access-token-permissions'
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -18,10 +17,10 @@ export function TemporaryAccessPasswordNote() {
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Use a personal access token as the database password.{' '}
-      <InlineLink href="/account/tokens">Create an access token</InlineLink> if you need one.
+      Use a <InlineLink href="/account/tokens">personal access token</InlineLink> as the database
+      password.
       {scopedTokensEnabled &&
-        ` Choose this project and set “Database token access” to “${PERMISSION_MODE_LABEL.read}”.`}
+        ' Choose this project and include the “Database token access” permission.'}
     </p>
   )
 }
