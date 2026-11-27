@@ -48,20 +48,8 @@
 
 /packages/shared-data/compute-disk-limits.ts @supabase/platform
 
-# Growth Eng reviews frontend telemetry so new or higher-volume event streams get a volume/cost check before merge.
-# Kept last so it adds to the owners above; *elemetry* matches both "telemetry" and "Telemetry" (CODEOWNERS has no [Tt]).
-/.agents/skills/telemetry-standards/  @supabase/growth-eng
-/packages/common/*elemetry*           @supabase/growth-eng
+# Growth Eng reviews telemetry senders for event volume/cost
 /packages/common/posthog-client*      @supabase/growth-eng
-/packages/common/feature-flags.tsx    @supabase/growth-eng
-/packages/common/consent-state*       @supabase/growth-eng
-/packages/ui-patterns/**/*elemetry*   @supabase/design @supabase/growth-eng
-/apps/studio/**/*elemetry*            @supabase/Dashboard @supabase/growth-eng
-/apps/studio/lib/posthog*             @supabase/Dashboard @supabase/growth-eng
+/packages/common/telemetry-event*     @supabase/growth-eng
 /apps/studio/lib/session-replay*      @supabase/Dashboard @supabase/growth-eng
-/apps/www/**/*elemetry*               @supabase/marketing @supabase/growth-eng
-/apps/docs/lib/*elemetry*             @supabase/docs @supabase/growth-eng
-/apps/docs/features/**/*elemetry*     @supabase/docs @supabase/growth-eng
-/apps/kb/**/*elemetry*                @supabase/knowledgebase @supabase/growth-eng
-/apps/learn/**/*elemetry*             @supabase/growth-eng
-/apps/ui-library/**/*elemetry*        @supabase/growth-eng
+/.agents/skills/telemetry-standards/  @supabase/growth-eng
