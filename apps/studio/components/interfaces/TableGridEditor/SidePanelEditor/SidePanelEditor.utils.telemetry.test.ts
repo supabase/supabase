@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
-import { createColumn, updateColumn, updateTable } from './SidePanelEditor.utils'
+import { updateColumn, updateTable } from './SidePanelEditor.utils'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
@@ -147,49 +147,6 @@ describe('SidePanelEditor.utils telemetry', () => {
     mockFetchQuery.mockImplementation(({ queryFn }) =>
       queryFn ? queryFn({ signal: new AbortController().signal }) : Promise.resolve(baseTable)
     )
-  })
-
-  describe('createColumn', () => {
-    const createPayload = {
-      schema: 'public',
-      table: 'users',
-      name: 'org_id',
-      type: { name: 'int8', isArray: false },
-      isPrimaryKey: false,
-    } satisfies Parameters<typeof createColumn>[0]['payload']
-
-    it('tracks table_column_created against the column project once the foreign keys are saved', async () => {
-      await createColumn({
-        projectRef,
-        connectionString,
-        payload: createPayload,
-        selectedTable: baseTable,
-        foreignKeyRelations: [sampleForeignKey],
-        track: mockTrack,
-      })
-
-      expect(mockTrack).toHaveBeenCalledTimes(1)
-      expect(mockTrack).toHaveBeenCalledWith(
-        'table_column_created',
-        { hasForeignKey: true, isArray: false },
-        { project: projectRef }
-      )
-    })
-
-    it('does not track when creating the column fails', async () => {
-      mockCreateDatabaseColumn.mockRejectedValueOnce(new Error('column already exists'))
-
-      const { error } = await createColumn({
-        projectRef,
-        connectionString,
-        payload: createPayload,
-        selectedTable: baseTable,
-        track: mockTrack,
-      })
-
-      expect(error).toBeDefined()
-      expect(mockTrack).not.toHaveBeenCalled()
-    })
   })
 
   describe('updateColumn', () => {

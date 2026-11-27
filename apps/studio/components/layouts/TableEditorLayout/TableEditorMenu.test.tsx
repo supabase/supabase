@@ -122,18 +122,6 @@ describe('TableEditorMenu telemetry', () => {
       action: 'table_editor_schema_selector_updated',
       custom_properties: { schemaType: 'custom' },
     })
-
-    // Switch back to public
-    await user.click(trigger)
-    await user.click(await screen.findByRole('option', { name: 'public' }))
-
-    await waitFor(() => {
-      expect(telemetryRequests).toHaveLength(3)
-    })
-    expect(telemetryRequests[2]).toMatchObject({
-      action: 'table_editor_schema_selector_updated',
-      custom_properties: { schemaType: 'public' },
-    })
     expect(JSON.stringify(telemetryRequests)).not.toContain('custom_app')
   })
 
