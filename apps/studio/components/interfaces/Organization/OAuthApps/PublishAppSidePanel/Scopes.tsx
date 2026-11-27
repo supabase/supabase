@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 import { AccessLevelDropdown, type AccessLevel } from './AccessLevelDropdown'
 
-const accessLevels: AccessLevel[] = ['No access', 'Read only', 'Write only', 'Read and write']
+const accessLevels: AccessLevel[] = ['No access', 'Read only', 'Write', 'Read and write']
 
 const Scope = ({
   title,
@@ -25,13 +25,13 @@ const Scope = ({
   const hasWrite = scopes.includes(writeScopeName)
   let accessLevel: AccessLevel = 'No access'
   if (hasRead) accessLevel = 'Read only'
-  if (hasWrite) accessLevel = hasRead ? 'Read and write' : 'Write only'
+  if (hasWrite) accessLevel = hasRead ? 'Read and write' : 'Write'
 
   const handleAccessChange = (level: AccessLevel) => {
     setScopes((current) => {
       const next = current.filter((scope) => scope !== readScopeName && scope !== writeScopeName)
       if (level === 'Read only' || level === 'Read and write') next.push(readScopeName)
-      if (level === 'Write only' || level === 'Read and write') next.push(writeScopeName)
+      if (level === 'Write' || level === 'Read and write') next.push(writeScopeName)
       return next
     })
   }

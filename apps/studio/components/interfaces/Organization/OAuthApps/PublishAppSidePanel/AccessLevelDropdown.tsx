@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-export type AccessLevel = 'No access' | 'Read only' | 'Write only' | 'Read and write'
+export type AccessLevel = 'No access' | 'Read only' | 'Write' | 'Read and write'
 
 export function AccessLevelDropdown({
   permission,
