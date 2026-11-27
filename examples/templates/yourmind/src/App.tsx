@@ -414,7 +414,13 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
       if (event.key === 'Escape') onCloseRef.current()
       if (event.key !== 'Tab' || !panel.current) return
       const focusable = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)]
-      if (focusable.length === 0) return
+      // Nothing to tab to (for example, Forget is disabled while deleting):
+      // keep focus on the panel rather than letting it leave the dialog.
+      if (focusable.length === 0) {
+        event.preventDefault()
+        panel.current.focus()
+        return
+      }
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
       // On open, focus is on the panel itself: treat it as the start of the cycle.
