@@ -8,14 +8,14 @@ Advisors are deterministic checks that ship with the platform. They flag health,
 
 <Admonition type="note">
 
-Advisors is planned for deprecation in a future release. You can continue to use Advisors alongside [Issues](/docs/guides/observability/issues).
+Advisors is being deprecated in favor of [Issue Inbox](/docs/guides/observability/issues). You can continue to use Advisors.
 
 </Admonition>
 
 You or an agent can run them from:
 
 - Studio: [Health Advisor](/dashboard/project/_/advisors/health), [Security Advisor](/dashboard/project/_/advisors/security), and [Performance Advisor](/dashboard/project/_/advisors/performance)
-- MCP: `get_advisors` with `type` set to `security` or `performance`, or `health` when your server advertises it
+- MCP: `get_advisors` with `type` set to `security` or `performance`
 - CLI: [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
 - Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) advisors
 

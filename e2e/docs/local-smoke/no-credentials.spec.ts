@@ -33,8 +33,11 @@ test.describe('docs dev runs locally without credentials', () => {
 
     await expect(page.getByRole('heading', { name: 'Advisors', exact: true })).toBeVisible()
     await expect(
-      page.getByText('Advisors is planned for deprecation in a future release.')
-    ).toBeVisible()
+      page.locator('article').getByRole('link', { name: 'Issue Inbox', exact: true })
+    ).toHaveAttribute('href', '/docs/guides/observability/issues')
+    await expect(
+      page.locator('article').getByRole('link', { name: 'Security Advisor', exact: true })
+    ).toHaveAttribute('href', /\/dashboard\/project\/_\/advisors\/security$/)
     await expect(page.getByRole('heading', { name: 'Available checks' })).toBeVisible()
     expect(new URL(page.url()).pathname).toBe('/docs/guides/observability/advisors')
     expect(new URL(page.url()).searchParams.get('lint')).toBe('0001_unindexed_foreign_keys')
@@ -47,7 +50,7 @@ test.describe('docs dev runs locally without credentials', () => {
     const response = await page.goto('/docs/guides/observability/issues')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
-    await expect(page.getByRole('heading', { name: 'Issues', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Issue Inbox', exact: true })).toBeVisible()
   })
 
   test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {

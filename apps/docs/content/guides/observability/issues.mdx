@@ -1,10 +1,10 @@
 ---
 id: 'issues'
-title: 'Issues'
+title: 'Issue Inbox'
 description: 'Health, security, and performance issues you or an agent can check for in a project.'
 ---
 
-Issues flag health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. You can use Issues alongside [Advisors](/docs/guides/observability/advisors), which is planned for deprecation in a future release.
+Issue Inbox flags health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. You can use Issue Inbox alongside [Advisors](/docs/guides/observability/advisors).
 
 You or an agent can check for issues from:
 
@@ -13,7 +13,7 @@ You or an agent can check for issues from:
 - CLI: [`supabase issues`](/docs/reference/cli/supabase-issues)
 - Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
 
-The Issues table lists findings from the latest checks. Use [Reports](/docs/guides/observability/reports) to monitor metrics over time.
+The **Issues** table lists findings from the latest checks. Use [Reports](/docs/guides/observability/reports) to monitor metrics over time.
 
 Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
 
@@ -50,7 +50,7 @@ Text output summarizes each issue and its affected-resource count, followed by c
 
 `--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`. API, network, or decoding failures preserve successful categories and mark the failed category unavailable. Authentication and permission failures stop the command.
 
-The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command is planned for deprecation in a future release. It retains its existing flags, defaults, output, and exit behavior.
+The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command remains available with its existing flags, defaults, output, and exit behavior.
 
 ## Check issues with MCP
 
@@ -75,7 +75,7 @@ On a project-scoped connection, these `get_issues` arguments request security is
 
 ChatGPT connections using published plugin metadata need an updated plugin submission to expose the new tool.
 
-The `get_advisors` tool is planned for deprecation in a future release. It remains available for existing callers.
+The `get_advisors` tool remains available for existing callers.
 
 ## Interpret results
 
@@ -89,7 +89,7 @@ Check IDs identify checks within a project, rather than persistent incidents. Th
 
 An empty `issues` list means no issues match your filter. Review `checks` before treating that result as clear: an unavailable check means the assessment is incomplete.
 
-The new interfaces normalize underlying lint levels: `INFO` becomes `info`, `WARN` becomes `warning`, and `ERROR` becomes `critical`. Existing Advisors API responses retain their lint-level names.
+`supabase issues` and `get_issues` normalize underlying lint levels: `INFO` becomes `info`, `WARN` becomes `warning`, and `ERROR` becomes `critical`. Existing Advisors API responses retain their lint-level names.
 
 ## Available checks
 

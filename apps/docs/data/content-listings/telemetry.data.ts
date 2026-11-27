@@ -38,16 +38,15 @@ export const telemetryAccessWhat: ContentListingGroup = {
       description: 'Inspect live Postgres stats from the CLI, Explorer, or MCP.',
     },
     {
-      title: 'Issues',
+      title: 'Issue Inbox',
       href: '/guides/observability/issues',
       description:
-        'Pull health, security, and performance issues from Studio, MCP, the CLI, or the API.',
+        'Check health, security, and performance issues from Studio, MCP, the CLI, or the API.',
     },
     {
       title: 'Advisors',
       href: '/guides/observability/advisors',
-      description:
-        'Run health, security, and performance checks from Studio, MCP, the CLI, or the API.',
+      description: 'Pull security and performance findings from Studio, MCP, the CLI, or the API.',
     },
     {
       title: 'Reports',
@@ -85,13 +84,13 @@ export const telemetryHireAgent: ContentListingGroup = {
       title: monitoringAgents.security.name,
       href: '/guides/observability/automate-with-agents/security',
       subtitle: getScheduleLabel(monitoringAgents.security),
-      description: 'Review security issues and authorization failures.',
+      description: 'Review advisor findings and authorization failures.',
     },
     {
       title: monitoringAgents.performance.name,
       href: '/guides/observability/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
-      description: 'Review sessions, query regressions, and performance issues.',
+      description: 'Review sessions, query regressions, and performance advisors.',
     },
     {
       title: monitoringAgents.usage.name,
