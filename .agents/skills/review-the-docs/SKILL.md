@@ -240,8 +240,9 @@ each change. Each of these problems is a blocker:
   opposite, or a nearby sentence is no longer true, such as "the steps above". The
   published docs can be wrong. Decide which sentence is true with the
   [Fact check](#fact-check), not by which one is published. Fix the wrong one in the
-  same change, so the docs agree when it merges. A troubleshooting article can't
-  change in this repo: report it as a follow-up, with a link to the article.
+  same change, so the docs agree when it merges. Some pages can't change in this repo,
+  such as a troubleshooting article or an SDK reference generated from another repo.
+  Report each one as a follow-up, with a link to the page.
 - **The reader can't act on it.** It describes internal mechanism. See
   [Document what the reader can use](../../../apps/docs/style-guide/01-voice-and-tone.md#document-what-the-reader-can-use).
 - **It explains one reporter's case.** Detail that fits only the issue's setup, or an
@@ -254,7 +255,7 @@ each change. Each of these problems is a blocker:
   and
   [Name what a command changes](../../../apps/docs/style-guide/02-elements.md#name-what-a-command-changes).
 - **It makes the change longer than the ask.** A shorter change, or a link to an
-  existing section, does the same job.
+  existing section, does the same job. Report this one as a note, not a blocker.
 
 Also report content tied to the same problem that the change left as it was, such as
 a screenshot of an old UI.
@@ -275,14 +276,15 @@ a screenshot of an old UI.
 covers style or terminology. CodeRabbit reviews style, terminology, and structure on
 `apps/docs/content/**/*.mdx`, but only once the PR is open.
 
-- Count the words of each sentence with a script, such as a one-line `node` or `awk`
-  command, and check each count against
+- Check each long sentence against
   [Prefer short, direct sentences](../../../apps/docs/style-guide/01-voice-and-tone.md#prefer-short-direct-sentences).
-- Read [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md),
+  Count its words with a script, such as a one-line `node` or `awk` command.
+- Read the rules in
+  [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md),
   [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md), and
-  [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md) from
-  start to end. Give each rule a verdict, also a rule that has no example on the
-  changed lines.
+  [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md) that
+  apply to the changed lines, such as the rules for each element that the change adds.
+  Give each of those rules a verdict.
 - Find the page's row in
   [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template).
   When it names a template, check the page against the template and its checklist. A
@@ -303,10 +305,9 @@ on the plan, with the reason.
 
 Done when each of these has a verdict, and each problem has a line in the report:
 
-- Each new and changed sentence, and the sentence after each change, from step 2,
-  with its word count
+- Each new and changed sentence, and the sentence after each change, from step 2
 - Each new section, example, and link
-- Each rule in the three style guide files
+- Each style guide rule that applies to the changed lines
 - The page's template
 - Each `WORD_LIST.md` entry that matches a word on the page
 - Each claim, from the Fact check
@@ -325,43 +326,33 @@ Compare PR preview URL (from Vercel/deployment comment) against production for v
 
 ### Fact check
 
-For content and tutorial changes. A claim is anything in the change that can be true
-or false: a fact, a default, a limit, a version, or an instruction. For an
-instruction, each path that a reader of the page can take is its own claim. The same
-SQL run through `psql` and through the Data API is two claims.
+For content and tutorial changes. A claim is anything on the new and changed lines
+that can be true or false: a fact, a default, a limit, a version, or an instruction.
+Each path that a reader can take, such as `psql` or the Data API, is its own claim. A
+claim on an untouched line is in scope only when the change disagrees with it.
 
-1. List each claim on the new and changed lines, with the file and line. Split a
-   sentence that makes two claims. A claim on a line that the change didn't touch is
-   out of scope, unless the change disagrees with it. Then give both claims a verdict,
-   on whichever page each one is.
-2. Give each claim one verdict:
+1. List each claim, with its file and line.
+2. Estimate the cost. When the list has more than 20 claims, or a claim needs a repo
+   that you can't read, report the count to the user and ask before you continue. If
+   the user declines, check only the claims that disagree with other docs, and mark
+   the others unverified.
+3. Give each claim one verdict:
    - **Ran:** it ran in [`test-the-docs`](../test-the-docs/SKILL.md), and the result
-     matches the claim. Cite the row in its verification report.
-   - **Traced:** you found it in the source, at the version that ships. Give
-     `repo@version:path:line`. Find the version first: for a self-hosted service, the
-     image tag in `docker/docker-compose.yml`. For a Postgres extension, the versions
-     in `supabase/postgres`. For an SDK, the version that the page or its example
-     pins, else the latest release. When the platform and self-hosting each implement
-     the behavior, trace each repo. Read each code path that the claim depends on,
-     such as a pool, a timer, or a limit.
-   - **Unverified:** you couldn't run it or trace it. Say what you tried.
+     matches. Cite the row in its report. Run code only through `test-the-docs`.
+   - **Traced:** the source matches at the version that ships. Give
+     `repo@version:path:line`. For a self-hosted service, use the image tag in
+     `docker/docker-compose.yml`. For an SDK, use the version that the page pins, else
+     the latest release. When the platform and self-hosting each implement the
+     behavior, trace each repo.
+   - **Unverified:** say what you tried, or say that the user declined the cost.
 
-   Prefer ran to traced for a claim about behavior, such as which rows a policy
-   returns. Source shows what code can do, and a run shows what it does.
+   Prefer ran to traced for a claim about behavior.
 
-3. A claim is wrong when the evidence says something else. A claim about a path is
-   wrong when a reader can't do it on that path, also when it's true on another path.
+4. A wrong claim is a blocker. First check whether the reader needs it, per step 2 of
+   the [Content review](#content-review). Often the fix is to cut it. An unverified
+   claim is a note to the author.
 
-Each wrong claim is a blocker. Before you make a wrong claim more exact, check whether
-the reader needs it at all, per step 2 of the [Content review](#content-review).
-Often the fix is to cut it. An unverified claim is a note to the author, not a
-blocker: name what would settle it.
-
-Run code only through `test-the-docs`. When it defers a snippet, such as one that
-targets a hosted project, trace the claim instead.
-
-Done when each claim has a verdict with its evidence, each wrong claim has a blocker
-in the report, and each unverified claim has a note.
+Done when each claim has a verdict, and each wrong claim has a blocker.
 
 ---
 
@@ -369,8 +360,9 @@ in the report, and each unverified claim has a note.
 
 Tutorial MDX plus matching example app. **Read [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md)** for full platform E2E — review is not complete without it when auth flows are involved.
 
-Build the example app with [`test-the-docs`](../test-the-docs/SKILL.md) as an
-`example-app` artifact, not in your checkout.
+Ask whether to build the example app with [`test-the-docs`](../test-the-docs/SKILL.md),
+as an `example-app` artifact, not in your checkout. If the user declines, record the
+build as `deferred`.
 
 Before the checklist, run the [Content review](#content-review) on the tutorial.
 
@@ -389,8 +381,9 @@ Checklist:
 
 Example-only PRs (or example portion of a tutorial PR).
 
-Build the example app with [`test-the-docs`](../test-the-docs/SKILL.md) as an
-`example-app` artifact, not in your checkout.
+Ask whether to build the example app with [`test-the-docs`](../test-the-docs/SKILL.md),
+as an `example-app` artifact, not in your checkout. If the user declines, record the
+build as `deferred`.
 
 Checklist:
 

@@ -256,8 +256,9 @@ Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Su
 #### Model an example on the page's other examples
 
 A new example, such as a code block or a table, uses the names, setup, and length of
-the page's other examples. When the page has none, follow the closest examples in the
-docs. Show the general rule that the text teaches, not one reader's case.
+the page's other examples, unless they break another rule in this guide. When the page
+has none, follow the closest examples in the docs. Show the general rule that the text
+teaches, not one reader's case.
 
 #### Keep code lines short so the reader doesn't scroll
 

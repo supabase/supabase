@@ -39,8 +39,8 @@ it. A reader who doesn't need a detail still has to work out that they don't.
 
 After each step or fact, think of the first question the reader asks next, and answer
 it on the page or link to the answer. After `Enable RLS on the table`, the reader asks
-what happens to existing queries. Say that requests with the publishable key return no
-rows until a policy allows them.
+what happens to existing queries. Say that, until a policy allows them, reads with the
+publishable key return no rows and inserts fail.
 
 ### Write for a massive global audience
 
@@ -104,10 +104,10 @@ that restates what an earlier section established, and for three phrasings of on
 `It's free`, `You won't be billed`, `No charge`.
 
 When another section of the page, or another page, already states a fact, link to it
-and leave the fact there. Before you add a fact, search `/docs` and `/kb` for it, by the
-terms of the behavior as well as the page title. Text that this guide asks for at each
-step, such as the [standard SQL snippet](./02-elements.md#for-every-run-the-following-sql-step),
-and shared partials aren't repeated points.
+and leave the fact there. Text that this guide asks for at each step, such as the
+[standard SQL snippet](./02-elements.md#for-every-run-the-following-sql-step), and
+shared partials aren't repeated points. Neither is a one-sentence explanation of a term,
+or a warning or prerequisite that the task needs.
 
 ### Use the positive form
 
