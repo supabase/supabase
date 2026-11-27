@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { AnimatePresence } from 'motion/react'
-import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Badge,
@@ -9,9 +8,9 @@ import {
   DialogSectionSeparator,
   FormControl,
   FormField,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -92,18 +91,8 @@ export const BucketVersioningFields = ({
               hideMessage
               name="enable_versioning"
               label="Object versioning"
-              description={
-                <>
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <StorageVersioningAlphaPopover />
-                    <span>Retains previous versions when an object is overwritten or deleted.</span>
-                  </div>
-                  Retained versions count toward Storage usage.{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
-                    Storage size and pricing
-                  </InlineLink>
-                </>
-              }
+              labelAddon={<StorageVersioningAlphaPopover />}
+              description="Retains previous versions when an object is overwritten or deleted"
               layout="flex"
             >
               <FormControl>
@@ -182,22 +171,20 @@ export const BucketVersioningFields = ({
 
 const StorageVersioningAlphaPopover = () => {
   const { selectFeaturePreview } = useFeaturePreviewModal()
-  const [open, setOpen] = useState(false)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+    <HoverCard openDelay={100}>
+      <HoverCardTrigger asChild>
         <button
           type="button"
           aria-label="Public Alpha feature details"
           tabIndex={0}
           className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onMouseEnter={() => setOpen(true)}
         >
           <Badge variant="warning">Public Alpha</Badge>
         </button>
-      </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" className="w-80 space-y-2">
+      </HoverCardTrigger>
+      <HoverCardContent side="bottom" align="start" className="w-80 space-y-2">
         <div className="space-y-1">
           <p className="text-sm font-medium text-foreground">
             Storage object versioning is in public alpha
@@ -219,7 +206,7 @@ const StorageVersioningAlphaPopover = () => {
         >
           Review feature
         </Button>
-      </PopoverContent>
-    </Popover>
+      </HoverCardContent>
+    </HoverCard>
   )
 }
