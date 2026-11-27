@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
   Tabs,
   TabsContent,
+  TabsFolderCorner,
   TabsFolderIndicator,
   TabsList,
   TabsTrigger,
@@ -134,15 +135,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
             className="flex-1"
           />
         </div>
-        <span aria-hidden className="relative z-1 block h-0">
-          <span
-            className={cn(
-              'absolute left-0 top-0 size-2 border-l border-default bg-200',
-              'transition-opacity ease-move motion-reduce:transition-none',
-              activeTopic ? 'opacity-0 duration-150' : 'opacity-100 duration-400'
-            )}
-          />
-        </span>
+        <TabsFolderCorner active={activeTopic === null} />
         <TabsContent
           value={toTabValue(activeTopic)}
           className={cn(

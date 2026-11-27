@@ -6,6 +6,10 @@ import { useRef, type ComponentPropsWithRef } from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { useTabIndicator } from './useTabIndicator'
 
+interface TabsFolderCornerProps extends ComponentPropsWithRef<'span'> {
+  active: boolean
+}
+
 const Tabs = TabsPrimitive.Root
 
 const trackClasses = cn(
@@ -77,6 +81,18 @@ const TabsFolderIndicator = ({ className, ...props }: ComponentPropsWithRef<'spa
   />
 )
 
+const TabsFolderCorner = ({ active, className, ...props }: TabsFolderCornerProps) => (
+  <span aria-hidden className={cn('relative z-1 block h-0', className)} {...props}>
+    <span
+      className={cn(
+        'absolute left-0 top-0 size-2 border-l border-default bg-200',
+        'transition-opacity ease-move motion-reduce:transition-none',
+        active ? 'opacity-100 duration-400' : 'opacity-0 duration-150'
+      )}
+    />
+  </span>
+)
+
 const TabsTrigger = ({
   className,
   ...props
@@ -101,4 +117,12 @@ const TabsContent = ({
   <TabsPrimitive.Content className={cn('mt-4 focus-ring', className)} {...props} />
 )
 
-export { Tabs, TabsContent, TabsFolderIndicator, TabsIndicator, TabsList, TabsTrigger }
+export {
+  Tabs,
+  TabsContent,
+  TabsFolderCorner,
+  TabsFolderIndicator,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+}

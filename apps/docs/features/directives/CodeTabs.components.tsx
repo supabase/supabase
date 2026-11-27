@@ -2,7 +2,14 @@
 
 import { useTabsWithQueryParams } from '~/features/ui/useTabsWithQueryParams'
 import { Children, isValidElement, useState, type PropsWithChildren, type ReactNode } from 'react'
-import { cn, TabsFolderIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
+import {
+  cn,
+  TabsFolderCorner,
+  TabsFolderIndicator,
+  TabsList,
+  Tabs as TabsRoot,
+  TabsTrigger,
+} from 'ui'
 
 interface CodeTabPanelProps {
   id: string
@@ -87,15 +94,7 @@ export function CodeTabs({
         ))}
         <TabsFolderIndicator />
       </TabsList>
-      <span aria-hidden className="relative z-1 block h-0">
-        <span
-          className={cn(
-            'absolute left-0 top-0 size-2 border-l border-default bg-200',
-            'transition-opacity ease-move motion-reduce:transition-none',
-            activeTab === tabs[0]?.props.id ? 'opacity-100 duration-400' : 'opacity-0 duration-150'
-          )}
-        />
-      </span>
+      <TabsFolderCorner active={activeTab === tabs[0]?.props.id} />
       {children}
     </TabsRoot>
   )
