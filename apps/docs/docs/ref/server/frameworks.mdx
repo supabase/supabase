@@ -100,16 +100,16 @@ The bridge files live in the server repository under [`examples/frameworks`](htt
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
-### H3 / Nuxt
+### H3
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
     Copy [`h3/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/h3/supabase-middleware.ts) into your project. `toH3` returns H3 middleware. H3 middleware return the response directly, so no workaround is needed.
 
-    This bridge does not build on Nuxt. Nuxt 3 and Nuxt 4 both ship h3 v1, and the bridge is h3 v2: it uses `defineMiddleware`, `toResponse`, and the `middleware` key on `defineHandler`, none of which exist in h3 v1. On Nuxt, call `createSupabaseContext` inside a plain `defineEventHandler`, as the [Nuxt tutorial](/docs/guides/getting-started/tutorials/with-nuxt-3) shows.
+    If you're using Nuxt, call `createSupabaseContext` in a server handler. The [Nuxt tutorial](/docs/guides/getting-started/tutorials/with-nuxt-3) has the setup.
 
-    `event.context` is not generic. Hoist the entry array to a `const` and read the keys through `Contributions<typeof entries>` from `@supabase/middleware`, or wrap that in a small typed accessor of your own.
+    `event.context` is not generic. Hoist the entry array to a `const` and read the keys through `Contributions<typeof entries>` from `@supabase/middleware`.
 
   </RefSubLayout.Details>
 
