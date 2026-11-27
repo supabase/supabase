@@ -1,8 +1,8 @@
 ---
-id: "redirect-urls"
-title: "Redirect URLs"
-description: "Set up redirect urls with Supabase Auth."
-subtitle: "Set up redirect urls with Supabase Auth."
+id: 'redirect-urls'
+title: 'Redirect URLs'
+description: 'Set up redirect urls with Supabase Auth.'
+subtitle: 'Set up redirect urls with Supabase Auth.'
 ---
 
 ## Overview
@@ -78,20 +78,20 @@ const getURL = () => {
   let url =
     process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
     process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-    "http://localhost:3000/";
+    'http://localhost:3000/'
   // Make sure to include `https://` when not localhost.
-  url = url.startsWith("http") ? url : `https://${url}`;
+  url = url.startsWith('http') ? url : `https://${url}`
   // Make sure to include a trailing `/`.
-  url = url.endsWith("/") ? url : `${url}/`;
-  return url;
-};
+  url = url.endsWith('/') ? url : `${url}/`
+  return url
+}
 
 const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: "github",
+  provider: 'github',
   options: {
     redirectTo: getURL(),
   },
-});
+})
 ```
 
 To point each preview deployment at its own Supabase preview branch, see [Preview branches on Vercel](/docs/guides/integrations/vercel-preview-branches).
@@ -125,11 +125,11 @@ Read more about deep linking and find code examples for different frameworks [he
 When authentication fails, the user will still be redirected to the redirect URL provided. However, the error details will be returned as query fragments in the URL. You can parse these query fragments and show a custom error message to the user. For example:
 
 ```js
-const params = new URLSearchParams(window.location.hash.slice());
+const params = new URLSearchParams(window.location.hash.slice())
 
-if (params.get("error_code").startsWith("4")) {
+if (params.get('error_code').startsWith('4')) {
   // show error message if error is a 4xx error
-  window.alert(params.get("error_description"));
+  window.alert(params.get('error_description'))
 }
 ```
 
