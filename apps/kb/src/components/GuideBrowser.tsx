@@ -146,7 +146,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
         <TabsContent
           value={toTabValue(activeTopic)}
           className={cn(
-            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 px-4 py-1',
+            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 pl-3.75 pr-4 py-1',
             'transition-[height] duration-250 ease-out motion-reduce:transition-none'
           )}
         >
@@ -303,7 +303,7 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               // community guides link off-site
               {...(externalHost && { target: '_blank', rel: 'noopener noreferrer' })}
               className={cn(
-                'group -mx-3 flex min-h-14 flex-col gap-1 rounded-md px-3 py-3',
+                'group -ml-2.75 -mr-3 flex min-h-14 flex-col gap-1 rounded-md pl-2.75 pr-3 py-3',
                 'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-hidden',
                 'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
               )}
