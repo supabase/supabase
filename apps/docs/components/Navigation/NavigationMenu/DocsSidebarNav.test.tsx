@@ -209,6 +209,24 @@ describe('DocsSidebarNav', () => {
     expect(screen.getByRole('button', { name: 'Reference, back to Home' })).toBeTruthy()
   })
 
+  it.each([
+    ['/reference/server/introduction', MenuId.RefServerV1, 'Server'],
+    ['/reference/cli/supabase-login', MenuId.RefCli, 'CLI Commands'],
+  ])(
+    'marks the library of %s as current in the option-1 reference list',
+    (pathname, menuId, label) => {
+      navigation.pathname = pathname
+      vi.mocked(useNavItems).mockReturnValue(option1NavItems)
+
+      renderSidebar(menuId)
+
+      const currentLinks = screen
+        .getAllByRole('link')
+        .filter((link) => link.hasAttribute('aria-current'))
+      expect(currentLinks.map((link) => link.textContent)).toEqual([label])
+    }
+  )
+
   it('puts the knowledge base first in the footer and leaves out the changelog', () => {
     render(<DocsSidebarResources />)
 

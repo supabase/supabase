@@ -22,6 +22,7 @@ import {
 import { isActiveHref, isReferencePath } from './DocsSidebarNav.utils'
 import { MenuItem, MenuItemLabel } from './GlobalNavigationMenu'
 import MenuIconPicker from './MenuIconPicker'
+import { isMenuLevel } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import { SidebarGroupLabel } from './SidebarGroupLabel'
 import { IA_NAV_PENDING_CLASS } from '~/features/IaNav/constants'
@@ -214,6 +215,8 @@ const useDocsSidebarNavState = (
       undefined
     ) ??
     treeItems[0] ??
+    // a reference page has a versioned menu id and no guide tree, so its row matches on the level
+    (menuId ? sectionItems.find((item) => isMenuLevel(menuId, item.level)) : undefined) ??
     // a tree that no section lists, like resources, is a level of its own on its pages
     (isMenu(pageTree) && isActiveHref(pageTree.url, pathname)
       ? { label: pageTree.title, href: pageTree.url, level: menuId }
