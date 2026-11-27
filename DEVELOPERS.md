@@ -149,6 +149,14 @@ First, make sure you have the Docker installed on your device. You can download 
    docker compose up
    ```
 
+4. If you're running the local Studio dev server (`pnpm dev:studio`) against the Docker
+   stack, make sure the `PG_META_CRYPTO_KEY` values match. Studio encrypts the Postgres
+   connection string with this key (read from `apps/studio/.env`, falling back to
+   `SAMPLE_KEY` if unset), and the `meta` container decrypts it with the key from
+   `docker/.env`. If the two values don't match, Studio can't query the database.
+   `apps/studio/.env` ships with the same default as `docker/.env.example`, so this only
+   matters if you've customized the key in `docker/.env`.
+
 This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
 Once the `docker compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access it at `http://localhost:8082`.
