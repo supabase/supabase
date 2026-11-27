@@ -6,6 +6,7 @@ import { HomeConnectExperiment } from './HomeConnectExperiment'
 const mocks = vi.hoisted(() => ({
   flagValue: undefined as string | false | undefined,
   hasFlagsForSignedInUser: false,
+  hasAcceptedAnalytics: true,
   track: vi.fn(),
 }))
 
@@ -21,6 +22,10 @@ vi.mock(import('common'), async (importOriginal) => {
       ...actual.useFeatureFlags(),
       hasFlagsForSignedInUser: mocks.hasFlagsForSignedInUser,
     }),
+    useConsentState: () => ({
+      ...actual.useConsentState(),
+      hasAccepted: mocks.hasAcceptedAnalytics,
+    }),
   }
 })
 
@@ -31,6 +36,7 @@ describe('HomeConnectExperiment', () => {
   beforeEach(() => {
     mocks.flagValue = undefined
     mocks.hasFlagsForSignedInUser = false
+    mocks.hasAcceptedAnalytics = true
     mocks.track.mockClear()
   })
 
@@ -95,5 +101,37 @@ describe('HomeConnectExperiment', () => {
 
     expect(mocks.track).toHaveBeenCalledTimes(1)
     expect(screen.getByText('agent prompt card')).toBeInTheDocument()
+  })
+
+  it('keeps the arm it first rendered and recorded when a later flag fetch returns another value', () => {
+    mocks.hasFlagsForSignedInUser = true
+
+    const { rerender } = render(<HomeConnectExperiment />)
+    mocks.flagValue = 'test'
+    rerender(<HomeConnectExperiment />)
+
+    expect(screen.getByText('connect tiles')).toBeInTheDocument()
+    expect(screen.queryByText('agent prompt card')).not.toBeInTheDocument()
+    expect(mocks.track).toHaveBeenCalledTimes(1)
+    expect(mocks.track).toHaveBeenCalledWith('home_connect_section_exposed', {})
+  })
+
+  it('tracks the exposure when analytics consent is given after the section rendered', () => {
+    mocks.flagValue = 'test'
+    mocks.hasFlagsForSignedInUser = true
+    mocks.hasAcceptedAnalytics = false
+
+    const { rerender } = render(<HomeConnectExperiment />)
+    expect(screen.getByText('agent prompt card')).toBeInTheDocument()
+    expect(mocks.track).not.toHaveBeenCalled()
+
+    mocks.hasAcceptedAnalytics = true
+    rerender(<HomeConnectExperiment />)
+
+    expect(mocks.track).toHaveBeenCalledTimes(1)
+    expect(mocks.track).toHaveBeenCalledWith('home_connect_section_exposed', {
+      experiment_id: 'homeAgentPrompt',
+      variant: 'test',
+    })
   })
 })
