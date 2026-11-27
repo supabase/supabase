@@ -324,9 +324,6 @@ const SecondStep = ({
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
       loading={isVerifying || isLoading || isUnenrolling || hasCompletedChallenge}
-      // Canceling unenrolls the new factor, so only an explicit Cancel, close, or Escape may do it.
-      // A stray click outside (for example on a cookie banner) must not delete the factor while
-      // the dialog stays open.
       dismissOnInteractOutside={false}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
