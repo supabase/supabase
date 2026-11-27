@@ -24,6 +24,8 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ## Unreleased
 
+- Updated Auth, Realtime, Storage, Supavisor, Analytics (Logflare) and imgproxy images with security and bug fixes. Full notes will follow with the next release.
+
 ### Edge Runtime
 - Added structured request and runtime logs for Edge Functions - PR [#53134](https://github.com/supabase/supabase/pull/53134) (via [@luizfelmach](https://github.com/luizfelmach))
 
