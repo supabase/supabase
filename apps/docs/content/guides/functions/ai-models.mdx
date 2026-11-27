@@ -363,7 +363,8 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
       export default {
         fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {
           const client = new OpenAI()
-          const { prompt } = await req.json()
+          const params = new URL(req.url).searchParams
+          const prompt = params.get('prompt') ?? ''
           const stream = true
 
           const chatCompletion = await client.chat.completions.create({
