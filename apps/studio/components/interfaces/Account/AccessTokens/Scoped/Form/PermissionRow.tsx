@@ -97,7 +97,9 @@ export const PermissionRow = ({
               {entry.dependencies.map((dependency, index) => (
                 <Fragment key={dependency.key}>
                   {dependency.label} set to {PERMISSION_MODE_LABEL.read}
-                  {dependency.permissions !== 'read' && ` or ${PERMISSION_MODE_LABEL.readwrite}`}
+                  {dependency.permissions !== 'read' && (
+                    <span>{` or ${PERMISSION_MODE_LABEL.readwrite}`}</span>
+                  )}
                   {index < entry.dependencies.length - 1 ? <span>{', '}</span> : null}
                 </Fragment>
               ))}
