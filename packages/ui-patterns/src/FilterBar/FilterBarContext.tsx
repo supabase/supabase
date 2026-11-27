@@ -55,7 +55,7 @@ export type FilterBarContextValue = {
   handleInputFocus: (path: number[]) => void
   handleOperatorFocus: (path: number[]) => void
   handleGroupFreeformFocus: (path: number[]) => void
-  handleInputBlur: () => void
+  handleInputBlur: (shouldCommitValue?: boolean) => void
   handleGroupFreeformChange: (path: number[], value: string) => void
   handleLabelClick: (path: number[]) => void
   handlePropertyChange: (path: number[], newPropertyName: string) => void
@@ -148,6 +148,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     onApplyRef.current = onApply
   }, [onApply])
 
+  const hasPendingValueRef = useRef(false)
   const filtersRef = useRef(filters)
   useEffect(() => {
     filtersRef.current = filters
@@ -155,6 +156,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const commitFilters = useCallback(
     (next: FilterGroup) => {
+      hasPendingValueRef.current = false
       onFilterChange(next)
       onApplyRef.current?.(next)
     },
@@ -178,6 +180,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
+      hasPendingValueRef.current = true
       const updatedFilters = updateNestedValue(filters, path, value)
       onFilterChange(updatedFilters)
 
@@ -282,23 +285,26 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     [setActiveInput, setIsCommandMenuVisible, hideTimeoutRef]
   )
 
-  const handleInputBlur = useCallback(() => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current)
-    }
-    hideTimeoutRef.current = setTimeout(() => {
-      const activeEl = document.activeElement as HTMLElement | null
-      if (activeEl && rootRef.current && rootRef.current.contains(activeEl)) {
-        return
+  const handleInputBlur = useCallback(
+    (shouldCommitValue = false) => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current)
       }
-      setIsCommandMenuVisible(false)
-      setActiveInput(null)
-      setHighlightedConditionPath(null)
-      // Focus has actually left the FilterBar — fire onApply with the latest filters so any
-      // value typed but never confirmed via Enter still gets pushed downstream.
-      onApplyRef.current?.(filtersRef.current)
-    }, 0)
-  }, [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath])
+      hideTimeoutRef.current = setTimeout(() => {
+        const activeEl = document.activeElement as HTMLElement | null
+        const hasFocusWithin = !!activeEl && !!rootRef.current?.contains(activeEl)
+        if (hasFocusWithin && (!shouldCommitValue || !hasPendingValueRef.current)) return
+        if (!hasFocusWithin) {
+          setIsCommandMenuVisible(false)
+          setActiveInput(null)
+          setHighlightedConditionPath(null)
+        }
+        hasPendingValueRef.current = false
+        onApplyRef.current?.(filtersRef.current)
+      }, 0)
+    },
+    [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath]
+  )
 
   const handleGroupFreeformChange = useCallback(
     (_path: number[], value: string) => {
