@@ -196,7 +196,7 @@ const RealtimeUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 grid md:grid-cols-2 gap-4">
+        <div className="mt-8 grid @4xl:grid-cols-2 gap-4">
           {selectedDateRange &&
             reportConfig
               .filter((report) => !report.hide)
