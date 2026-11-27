@@ -55,21 +55,21 @@ export const OnboardingSurveyFields = <TFieldValues extends FieldValues>({
           name={sizeField}
           render={({ field }) => (
             <FormItemLayout label="How many people?" layout="horizontal">
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
+                </FormControl>
 
-                  <SelectContent>
-                    {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>
-                        {v}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
+                <SelectContent>
+                  {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                    <SelectItem key={k} value={k}>
+                      {v}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           )}
         />

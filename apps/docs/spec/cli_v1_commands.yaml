@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 3.3.0
+  version: 3.4.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2314,13 +2314,15 @@ commands:
 
       Initialize configurations for Supabase local development.
 
-      A `supabase/config.toml` file is created in your current working directory. This configuration is specific to each local project.
+      A `supabase/config.jsonc` file is created in your current working directory. This configuration is specific to each local project.
 
       > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable or `--workdir` flag.
 
-      In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
+      Along with `config.jsonc`, the `supabase` directory can contain directories such as `migrations`, `functions`, and `tests`.
 
-      With `--use-orioledb`, the command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
+      With `--use-orioledb`, the command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.jsonc`; `--experimental` is not required.
+
+      With `--force`, the command replaces the project config with a fresh `supabase/config.jsonc` and removes any `supabase/config.json` or `supabase/config.toml`. Use `supabase config convert --to toml` to switch an initialized project back to TOML.
     examples:
       - id: example-1
         name: Initialize a project using OrioleDB as the Postgres storage engine
@@ -2332,7 +2334,7 @@ commands:
     flags:
       - id: force
         name: --force
-        description: Write a fresh supabase/config.toml, replacing an existing config.toml and removing any config.json or config.jsonc.
+        description: Write a fresh supabase/config.jsonc, replacing an existing config.jsonc and removing any config.json or config.toml.
         default_value: 'false'
       - id: interactive
         name: -i, --interactive
@@ -4476,7 +4478,7 @@ commands:
 
       Starts the Supabase local development stack.
 
-      Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
+      Requires a project config in your current working directory: the `supabase/config.jsonc` that `supabase init` creates, or an existing `supabase/config.json` or `supabase/config.toml`.
 
       All service containers are started by default. The `-x` flag accepts comma-separated service names or repeated occurrences.
 
@@ -4533,7 +4535,7 @@ commands:
 
       Stops the Supabase local development stack.
 
-      Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
+      Requires a project config in your current working directory: the `supabase/config.jsonc` that `supabase init` creates, or an existing `supabase/config.json` or `supabase/config.toml`.
 
       All Docker resources are maintained across restarts. Use `--no-backup` flag to reset your local development data between restarts.
 

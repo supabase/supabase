@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useIsLoggedIn, useUser } from 'common'
-import { useRouter } from 'next/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -39,7 +39,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
   const queryClient = useQueryClient()
   const isLoggedIn = useIsLoggedIn()
-  const router = useRouter()
+  const navigate = useNavigate()
   const signOut = useSignOut()
 
   const track = useTrack()
@@ -97,8 +97,8 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isUnauthorized = isError && error?.code === 401
   useEffect(() => {
     if (!isUnauthorized) return
-    signOut().then(() => router.push('/sign-in'))
-  }, [isUnauthorized, signOut, router])
+    signOut().then(() => void navigate({ to: '/sign-in' }))
+  }, [isUnauthorized, signOut, navigate])
 
   const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
   const { isInitialLoading: isLoadingPermissionsV2 } = usePermissionsQueryV2({

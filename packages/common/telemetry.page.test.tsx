@@ -74,6 +74,16 @@ describe('PageTelemetry route changes', () => {
     )
   })
 
+  it('does not send when only a redacted query value changes', () => {
+    renderTelemetry({ pathname: '/project/[ref]', asPath: '/project/abc' })
+    navigate('/project/abc?schema=auth')
+    sendPage.mockClear()
+
+    navigate('/project/abc?schema=public')
+
+    expect(sendPage).not.toHaveBeenCalled()
+  })
+
   it('does not send when only the hash changes', () => {
     renderTelemetry({ pathname: '/project/[ref]', asPath: '/project/abc' })
     sendPage.mockClear()

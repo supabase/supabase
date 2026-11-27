@@ -47,7 +47,7 @@ Two jobs:
   principles.
 
 **Not for:** general Supabase docs _content_ questions (use
-`work-linear-issue`, `audit-quickstarts`, etc.), or app-level work outside
+`write-the-docs`, `edit-the-docs`, or `review-the-docs`), or app-level work outside
 `apps/docs/`.
 
 ## Answering with diagrams
@@ -86,7 +86,7 @@ at hand — they cite each other where context matters.
 | [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing, `llms.txt`, content negotiation, bulk exports.                                                                                                         |
 | [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                                        |
 | [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.                               |
-| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `Docs Tests`, typecheck, prettier, Vercel preview gate. Where to add a check before creating a new one.                                     |
+| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `Docs Tests`, typecheck, oxfmt, Vercel preview gate. Where to add a check before creating a new one.                                       |
 | [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI → reference generation, including scoped PAT permission tables; why not to swap in Scalar/Redoc.                                                  |
 | [`reference/graphql-endpoint.md`](./reference/graphql-endpoint.md)                 | The `/api/graphql` endpoint under `apps/docs/resources/` — per-query folder layout, `rootSchema.ts`, connection/field utils, and the steps to add a new top-level query. |
 | [`reference/search-embeddings.md`](./reference/search-embeddings.md)               | The `scripts/search/` embeddings pipeline behind `searchDocs` — content sources, processing flow, change detection, and the `page` / `page_section` tables.              |
@@ -95,18 +95,22 @@ at hand — they cite each other where context matters.
 
 ## How to use during a chat
 
-1. **Start by reading** `adding-features.md` and `app-map.md` if the
+1. **Check for drift.** For each reference file you use, run
+   `git log --oneline <Verified at>..HEAD -- apps/docs ':!apps/docs/content'`
+   and read each commit that touches code the answer depends on. A file
+   with no `Verified at` line is unverified.
+2. **Start by reading** `adding-features.md` and `app-map.md` if the
    question touches design choices or unfamiliar code paths. They're
    small on purpose — read both, don't skim.
-2. **Verify before recommending.** Reference content may lag behind the
+3. **Verify before recommending.** Reference content may lag behind the
    live code. Confirm with the actual files (`apps/docs/...`) before
    acting on remembered claims about file paths, function names, or
    behavior.
-3. **Cite the principle**, not just the rule. "Per `adding-features.md`
+4. **Cite the principle**, not just the rule. "Per `adding-features.md`
    § 'Reuse pipelines, don't fork them', this routes through the
    existing markdown-schema handler rather than introducing a side
    path."
-4. **Reach for Mermaid** when explaining architecture, flows, or
+5. **Reach for Mermaid** when explaining architecture, flows, or
    relationships — see [Answering with diagrams](#answering-with-diagrams).
 
 ## Updating the librarian
@@ -117,6 +121,11 @@ file inaccurate, or a generally-applicable lesson emerges from a PR
 review, open a pull request against this repo to update the relevant
 file, same as any other in-repo change.
 
+List each stale fact under "Skill corrections" at the end of the answer.
+With the user's approval, fix it in their open PR if that PR changes
+`apps/docs`, else in a new PR. After you check a whole file, set its
+`Verified at` line to that commit.
+
 Keep each canonical file under ~250 lines; split before they bloat.
 Capture only what a future contributor would benefit from knowing — if
 a fact is already obvious from a quick read of the live code, don't
@@ -124,17 +133,11 @@ write it down.
 
 ## Related skills
 
-- [`pm-the-docs`](../pm-the-docs/SKILL.md) — audience, stage, and
-  cross-cutting scope calls (Frame stage of the "Write the docs" checklist,
+- [`pm-the-docs`](../pm-the-docs/SKILL.md) — audience, stage, content type,
+  and placement calls (Frame and Shape stages of the "Write the docs" checklist,
   mirrored in `pm-the-docs`'s reference file). Cross-repo **product** lookup
   (universe) lives there, not in this skill.
 - [`test-the-docs`](../test-the-docs/SKILL.md) — execute docs snippets against a
   Docker-isolated local stack; verification report.
-- [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) — implementing
-  assigned DOCS-\* tickets.
 - [`review-the-docs`](../review-the-docs/SKILL.md) — reviewing open docs
   PRs with type-specific verification.
-- [`audit-content-listings`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-content-listings/SKILL.md) — batch
-  conversion of overview pages to content listings.
-- [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) — opening or
-  updating a docs PR.

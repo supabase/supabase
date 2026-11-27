@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, Card, cn } from 'ui'
 
@@ -54,29 +53,27 @@ function getIntegrationImage(integration: IntegrationDefinition): ThemedImage | 
 const CoverImage = ({
   image,
   alt,
-  sizes,
   className,
 }: {
   image: ThemedImage
   alt: string
-  sizes?: string
   className?: string
 }) => (
   <>
-    <Image
-      fill
+    <img
       src={image.dark}
       alt={alt}
-      sizes={sizes}
-      className={cn('object-cover', image.light ? 'hidden dark:block' : '', className)}
+      className={cn(
+        'absolute inset-0 h-full w-full object-cover',
+        image.light ? 'hidden dark:block' : '',
+        className
+      )}
     />
     {image.light && (
-      <Image
-        fill
+      <img
         src={image.light}
         alt={alt}
-        sizes={sizes}
-        className={cn('object-cover dark:hidden', className)}
+        className={cn('absolute inset-0 h-full w-full object-cover dark:hidden', className)}
       />
     )}
   </>

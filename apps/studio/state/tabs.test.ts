@@ -1,11 +1,10 @@
 // @vitest-environment jsdom
-import type { NextRouter } from 'next/router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createTabId, createTabsState, type Tab } from './tabs'
+import { createTabId, createTabsState, type Tab, type TabRouter } from './tabs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
-const fakeRouter = () => ({ query: { ref: 'default' }, push: vi.fn() }) as unknown as NextRouter
+const fakeRouter = (): TabRouter => ({ query: { ref: 'default' }, push: vi.fn() })
 
 const sqlTab = (id: string): Tab => ({
   id: `sql-${id}`,

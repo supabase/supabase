@@ -21,12 +21,23 @@ export type GrantedQueryCallerOptions<
 > = Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey' | 'queryFn'>
 
 /**
+ * Fallback `queryFn` for grant-less observers. Avoids TanStack's dev `No queryFn` error (which
+ * fires on `undefined` even when `enabled: false`) while still delegating to a granted observer on
+ * invalidation (unlike `skipToken`, which fails if a grant-less observer rendered last).
+ */
+const fallbackQueryFn: QueryFunction<never, QueryKey> = (context) => {
+  const query = context.client.getQueryCache().find({ queryKey: context.queryKey, exact: true })
+  const queryFn = query?.observers.find(
+    (o) => typeof o.options.queryFn === 'function' && o.options.queryFn !== fallbackQueryFn
+  )?.options.queryFn
+  if (typeof queryFn === 'function') return queryFn(context)
+  return Promise.reject(new Error(`Missing queryFn: '${query?.queryHash}'`))
+}
+
+/**
  * Builds query options for a grant-gated query. Without a grant (or other required variables) the
- * factory passes `queryFn: undefined` and forces `enabled: false`.
- *
- * Not `skipToken`: TanStack keeps one options object per cache entry, overwritten by whichever
- * observer rendered last. With `undefined`, a refetch (e.g. after invalidation) borrows the queryFn
- * from a subscribed observer that has one, so a grant-less observer can't break it for the others.
+ * factory passes `queryFn: undefined` and this helper forces `enabled: false` with a delegating
+ * fallback `queryFn`.
  */
 export function grantedQueryOptions<
   TQueryFnData,
@@ -46,7 +57,7 @@ export function grantedQueryOptions<
   const result = queryOptions<TQueryFnData, TError, TData, TQueryKey>({
     ...options,
     queryKey,
-    queryFn,
+    queryFn: queryFn ?? fallbackQueryFn,
     enabled: queryFn ? enabled : false,
   })
   const branded: typeof result & GrantedQueryOptionsBrand = result

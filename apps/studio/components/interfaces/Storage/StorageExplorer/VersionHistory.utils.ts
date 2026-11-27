@@ -5,6 +5,7 @@ export type VersionFate =
   | { type: 'retained' }
   | { type: 'expires-in'; days: number }
   | { type: 'expires-on-next-upload'; daysRemaining: number }
+  | { type: 'cap-expiry-pending'; cap: number; daysRemaining: number }
   | { type: 'expiry-due' }
 
 export interface ComputeVersionFateOptions {
@@ -56,7 +57,11 @@ export const computeVersionFate = ({
   if (isCapExceeded) {
     return daysOld >= MIN_NONCURRENT_DAYS
       ? { type: 'expiry-due' }
-      : { type: 'expires-in', days: MIN_NONCURRENT_DAYS - daysOld }
+      : {
+          type: 'cap-expiry-pending',
+          cap: activeCap,
+          daysRemaining: MIN_NONCURRENT_DAYS - daysOld,
+        }
   }
   if (isAtCapBoundary && willRetainVersionOnWrite) {
     return { type: 'expires-on-next-upload', daysRemaining }

@@ -111,7 +111,10 @@ export function useOptionsCache() {
   }
 }
 
-export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur: () => void) {
+export function useDeferredBlur(
+  wrapperRef: React.RefObject<HTMLElement | null>,
+  onBlur: () => void
+) {
   return useCallback(
     (_e: React.FocusEvent<HTMLInputElement>) => {
       setTimeout(() => {

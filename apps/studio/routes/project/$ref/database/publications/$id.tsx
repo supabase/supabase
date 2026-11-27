@@ -54,7 +54,7 @@ function DatabasePublications() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </PageBreadcrumbs>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>
@@ -67,7 +67,7 @@ function DatabasePublications() {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <PublicationsTables />

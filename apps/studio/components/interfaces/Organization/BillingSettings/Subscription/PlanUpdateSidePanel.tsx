@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
@@ -10,7 +10,6 @@ import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
 import { PlanUpgradeSuccessView } from './PlanUpgradeSuccessView'
-import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import { SubscriptionPlanUpdateView } from './SubscriptionPlanUpdateView'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -236,9 +235,6 @@ export const PlanUpdateSidePanel = () => {
   // tier_free goes through the cancellation flow instead of the plan update view
   const isConfirmingPlanChange = selectedTier !== undefined && selectedTier !== 'tier_free'
 
-  // Rolls out the redesigned full screen plan change flow. Off falls back to the dialog.
-  const isPlanUpdateRedesignEnabled = useFlag('billingPlanUpdateRedesign')
-
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
@@ -283,12 +279,10 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       showAwsMarketplacePurchase={showAwsMarketplacePurchase}
-      isPlanUpdateRedesignEnabled={isPlanUpdateRedesignEnabled}
       onSelectTier={handleSelectTier}
     />
   )
 
-  // Both plan change surfaces take the same props, so the flag only picks the renderer.
   const planChangeProps = {
     selectedTier,
     onClose: () => setSelectedTier(undefined),
@@ -355,16 +349,13 @@ export const PlanUpdateSidePanel = () => {
         onDowngrade={() => setSelectedTier(undefined)}
       />
 
-      {isConfirmingPlanChange &&
-        (isPlanUpdateRedesignEnabled ? (
-          <SubscriptionPlanUpdateView
-            {...planChangeProps}
-            onSuccess={handlePlanChangeSuccess}
-            origin={source ?? undefined}
-          />
-        ) : (
-          <SubscriptionPlanUpdateDialog {...planChangeProps} onSuccess={onClose} />
-        ))}
+      {isConfirmingPlanChange && (
+        <SubscriptionPlanUpdateView
+          {...planChangeProps}
+          onSuccess={handlePlanChangeSuccess}
+          origin={source ?? undefined}
+        />
+      )}
 
       <UpgradeSurveyModal
         visible={showUpgradeSurvey}
