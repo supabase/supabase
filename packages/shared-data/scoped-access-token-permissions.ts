@@ -284,7 +284,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   'project:database_jit': {
     category: 'database',
     name: 'Database token access',
-    description: 'Connect to Postgres with an access token or manage token access settings.',
+    description: 'Connect to Postgres with an access token.',
     risk: 'medium',
     riskReason: 'Read-write can change database token access settings.',
     allowsRead: ['Connect using an existing database role grant', 'Read token access settings'],
