@@ -3133,7 +3133,7 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * Get started section (agent prompt) was shown to the user on the project homepage.
+ * Connect section (connect tiles or agent prompt card) was shown to the user on the project homepage.
  *
  * @group Events
  * @source studio
@@ -3141,6 +3141,34 @@ export interface HomeCustomReportBlockRemovedEvent {
  */
 export interface HomeConnectSectionExposedEvent {
   action: 'home_connect_section_exposed'
+  properties: {
+    /**
+     * Set together with `variant` when the homeAgentPrompt flag assigned the user a variant
+     */
+    experiment_id?: 'homeAgentPrompt'
+    /**
+     * The experiment variant the user is enrolled in: control shows the connect tiles, test shows the agent prompt card
+     */
+    variant?: 'control' | 'test'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
+  properties: {
+    /**
+     * The connect action/tile that was clicked
+     */
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
+  }
   groups: TelemetryGroups
 }
 
@@ -5371,6 +5399,7 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
   | HomeAgentPromptCopiedEvent
   | HomeConnectionValueCopiedEvent
   | ConnectSheetOpenedEvent
