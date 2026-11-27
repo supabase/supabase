@@ -12,6 +12,7 @@ import {
   ScrollTextIcon,
   WorkflowIcon,
 } from 'lucide-react'
+import { ReactElement } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -47,6 +48,7 @@ import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvail
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -94,6 +96,35 @@ const PanelActionButton = ({
   </ButtonTooltip>
 )
 
+const FREE_PLAN_REASON = 'Upgrade to Pro to configure add-ons'
+
+/** Link-style "Configure" button that renders as a disabled button when the add-on can't be configured */
+const ConfigureLinkButton = ({
+  isDisabled,
+  children,
+}: {
+  isDisabled: boolean
+  children: ReactElement
+}) => {
+  if (isDisabled) {
+    return (
+      <ButtonTooltip
+        size="tiny"
+        disabled
+        tooltip={{ content: { side: 'bottom', text: FREE_PLAN_REASON } }}
+      >
+        Configure
+      </ButtonTooltip>
+    )
+  }
+
+  return (
+    <Button asChild size="tiny">
+      {children}
+    </Button>
+  )
+}
+
 export const Addons = () => {
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
@@ -119,6 +150,7 @@ export const Addons = () => {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isBranch = selectedProject?.parent_project_ref
+  const isFreePlan = selectedOrg?.plan?.id === 'free'
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -245,6 +277,8 @@ export const Addons = () => {
     isOrioleDbInAws,
   })
 
+  const getDisabledReason = (reason?: string) => (isFreePlan ? FREE_PLAN_REASON : reason)
+
   const listTopSpacing = isBranch ? 'mt-6' : undefined
 
   let pitrAlert = null
@@ -281,7 +315,7 @@ export const Addons = () => {
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
-          <Button asChild size="tiny">
+          <Button asChild>
             <SupportLink
               queryParams={{
                 projectRef,
@@ -307,6 +341,20 @@ export const Addons = () => {
   return (
     <PageContainer size="default">
       <PageSection className="gap-0 pb-16">
+        {isFreePlan && (
+          <UpgradeToPro
+            className="mb-6"
+            primaryText="Upgrade to Pro to use add-ons"
+            secondaryText="Add-ons aren't available on the Free plan. Upgrade to configure compute, backups, networking and more."
+            source="addons"
+          />
+        )}
+        {!isFreePlan && (
+          <Admonition type="default" className="mb-6" title="Billed by the hour">
+            Add-ons are charged with your plan at the end of each billing cycle. Remove one and you
+            stop paying for it.
+          </Admonition>
+        )}
         <HighAvailabilityDisabledSectionNotice
           className="mb-4"
           title="Add-ons unavailable on High Availability projects"
@@ -364,7 +412,9 @@ export const Addons = () => {
                       action={
                         <PanelActionButton
                           label="Configure"
-                          disabledReason={canOpenIPv4 ? undefined : ipv4DisabledReason}
+                          disabledReason={getDisabledReason(
+                            canOpenIPv4 ? undefined : ipv4DisabledReason
+                          )}
                           onClick={() => setPanel('ipv4')}
                         />
                       }
@@ -384,9 +434,9 @@ export const Addons = () => {
                       action={
                         <PanelActionButton
                           label="Configure"
-                          disabledReason={
+                          disabledReason={getDisabledReason(
                             canOpenCustomDomain ? undefined : customDomainDisabledReason
-                          }
+                          )}
                           onClick={() => setPanel('customDomain')}
                         />
                       }
@@ -409,7 +459,7 @@ export const Addons = () => {
                   }
                   detail={computeDetail}
                   action={
-                    <Button asChild size="tiny">
+                    <ConfigureLinkButton isDisabled={isFreePlan}>
                       <Link
                         to="/project/$ref/settings/infrastructure"
                         params={{ ref: projectRef ?? '' }}
@@ -417,7 +467,7 @@ export const Addons = () => {
                       >
                         Configure
                       </Link>
-                    </Button>
+                    </ConfigureLinkButton>
                   }
                 />
                 {infrastructureReadReplicas && (
@@ -436,7 +486,7 @@ export const Addons = () => {
                     }
                     detail="Billed per replica"
                     action={
-                      <Button asChild size="tiny">
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
                         <Link
                           to="/project/$ref/settings/infrastructure"
                           params={{ ref: projectRef ?? '' }}
@@ -444,7 +494,7 @@ export const Addons = () => {
                         >
                           Configure
                         </Link>
-                      </Button>
+                      </ConfigureLinkButton>
                     }
                   />
                 )}
@@ -463,7 +513,9 @@ export const Addons = () => {
                   action={
                     <PanelActionButton
                       label="Configure"
-                      disabledReason={canOpenPITR ? undefined : pitrDisabledReason}
+                      disabledReason={getDisabledReason(
+                        canOpenPITR ? undefined : pitrDisabledReason
+                      )}
                       onClick={() => setPanel('pitr')}
                     />
                   }
@@ -481,7 +533,7 @@ export const Addons = () => {
                     }
                     detail={getAdvancedDiskDetail(diskData?.attributes)}
                     action={
-                      <Button asChild size="tiny">
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
                         <Link
                           to="/project/$ref/settings/infrastructure"
                           params={{ ref: projectRef ?? '' }}
@@ -489,7 +541,7 @@ export const Addons = () => {
                         >
                           Configure
                         </Link>
-                      </Button>
+                      </ConfigureLinkButton>
                     }
                   />
                 )}
@@ -509,14 +561,14 @@ export const Addons = () => {
                     }
                     detail="Usage based"
                     action={
-                      <Button asChild size="tiny">
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
                         <Link
                           to="/project/$ref/database/pipelines"
                           params={{ ref: projectRef ?? '' }}
                         >
                           Configure
                         </Link>
-                      </Button>
+                      </ConfigureLinkButton>
                     }
                   />
                 )}
@@ -541,14 +593,14 @@ export const Addons = () => {
                     }
                     detail={LOG_DRAIN_PRICE_LABEL}
                     action={
-                      <Button asChild size="tiny">
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
                         <Link
                           to="/project/$ref/settings/log-drains"
                           params={{ ref: projectRef ?? '' }}
                         >
                           Configure
                         </Link>
-                      </Button>
+                      </ConfigureLinkButton>
                     }
                   />
                 </ResourceList>
@@ -566,7 +618,7 @@ export const Addons = () => {
                   status={isLoadingAuthConfig ? undefined : smsMfaEnabled ? 'Enabled' : 'Disabled'}
                   detail={SMS_MFA_PRICE_LABEL}
                   action={
-                    <Button asChild size="tiny">
+                    <ConfigureLinkButton isDisabled={isFreePlan}>
                       <Link
                         to="/project/$ref/auth/mfa"
                         params={{ ref: projectRef ?? '' }}
@@ -574,7 +626,7 @@ export const Addons = () => {
                       >
                         Configure
                       </Link>
-                    </Button>
+                    </ConfigureLinkButton>
                   }
                 />
               </ResourceList>
