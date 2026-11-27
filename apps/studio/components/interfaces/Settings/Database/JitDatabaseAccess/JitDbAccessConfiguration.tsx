@@ -354,8 +354,8 @@ export const JitDbAccessConfiguration = () => {
               title="Managed in the main branch"
               description={
                 <>
-                  Member access rules are configured in the main branch and apply across all
-                  preview branches. Return to the{' '}
+                  Member access rules are configured in the main branch and apply across all preview
+                  branches. Return to the{' '}
                   <InlineLink href={`/project/${parentProjectRef}/settings/database`}>
                     main branch
                   </InlineLink>{' '}
@@ -502,6 +502,23 @@ export const JitDbAccessConfiguration = () => {
                 onEditRule={openEditRuleSheet}
                 onDeleteRule={openDeleteDialog}
               />
+
+              <Card>
+                <CardContent className="space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="settings-field-title">App access</h3>
+                    <p className="text-sm text-foreground-lighter">
+                      Apps that use access tokens to connect to this database.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground">No apps connected</p>
+                    <p className="text-sm text-foreground-lighter">
+                      Connect through a supported partner app and authorize access to Supabase.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </>
           )}
         </PageSectionContent>
