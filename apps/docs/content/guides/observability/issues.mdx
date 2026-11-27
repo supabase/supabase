@@ -17,7 +17,7 @@ Some issues may be intentional, so check them against your intended schema and a
 
 ## Check issues with the CLI
 
-`supabase issues` is available in CLI `v3.5.0-beta.1` and `v4.0.0-next.51`. Use one of these prereleases or a later release that includes the command; stable `v3.4.0` does not include it.
+`supabase issues` requires CLI `v3.5.0-beta.1` or later on the beta channel, or `v4.0.0-next.51` or later on the next channel. Stable `v3.4.0` does not include the command.
 
 Run checks against your local database, or use `--remote` for your linked project:
 
@@ -30,7 +30,7 @@ supabase issues --remote --output-format json
 
 `--type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `--severity` sets the minimum severity: `info`, `warning`, or `critical`. It defaults to `info`.
 
-Health checks require a remote project. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. Use `--remote=<project-ref>` or `--remote=<branch>` to select another hosted project, or `--remote=<postgresql-url>` for direct database checks. Supply the target with `=`, as in `--remote=your-project-ref`.
+Health checks cover elevated log error rates for the Data API, Auth, Storage, and Edge Functions and require a hosted project. They do not assess CPU, memory, disk, or connection saturation. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. Use `--remote=<project-ref>` or `--remote=<branch>` to select another hosted project, or `--remote=<postgresql-url>` for direct database checks. Supply the target with `=`, as in `--remote=your-project-ref`.
 
 Hosted CLI checks require **Advisors** read access (`advisors_read`). Selecting a project can also require `projects_read`; resolving a branch can require `branching_development_read` or `branching_production_read`. Use `supabase issues --help` to inspect conditional token permissions.
 
@@ -46,7 +46,7 @@ The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command i
 
 <Admonition type="note">
 
-`get_issues` requires an MCP server version that includes this tool. The published `v0.19.0` package predates it. Hosted MCP availability depends on its deployment; check your connection’s tool discovery before using it. Use `get_advisors` when `get_issues` is unavailable.
+`get_issues` is included in `@supabase/mcp-server-supabase` `v0.20.0` and later. Hosted MCP availability depends on its deployment; check your connection’s tool discovery before using it. Use `get_advisors` when `get_issues` is unavailable.
 
 </Admonition>
 
@@ -59,9 +59,9 @@ On a project-scoped connection, these `get_issues` arguments request security is
 }
 ```
 
-`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. A project-scoped MCP connection supplies `project_id` automatically and omits it from discovery. On an account-wide connection, add `"project_id": "your-project-ref"` to the arguments. Send `type` and `severity` explicitly when following the discovery schema. Platforms without health support omit `health` from the advertised type values; `all` still reports health as unavailable.
+`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. On a project-scoped connection, the server supplies `project_id` and omits it from the tool’s input schema. On an account-wide connection, add `"project_id": "your-project-ref"` to the arguments. Send `type` and `severity` explicitly when following the discovery schema. Platforms without health support omit `health` from the advertised type values; `all` still reports health as unavailable.
 
-`get_issues` belongs to the `debugging` feature group and supports read-only connections. Hosted checks require **Advisors** read access (`advisors_read`). Discovery can list the tool even when your token lacks this permission; a listed tool does not establish that you can call it.
+`get_issues` belongs to the `debugging` feature group and supports read-only connections. Hosted checks require **Advisors** read access (`advisors_read`). A tool listed in discovery can still reject calls when your token lacks this permission.
 
 ChatGPT connections using published plugin metadata need an updated plugin submission to expose the new tool.
 
