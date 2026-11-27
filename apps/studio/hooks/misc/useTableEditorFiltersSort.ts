@@ -50,6 +50,11 @@ export const useTableEditorFiltersSort = () => {
 
   const setParams = useCallback(
     (fn: (prevParams: SetParamsArgs) => SetParamsArgs) => {
+      // While a navigation is pending, the location already reports its destination. Writing then
+      // would put this table's filters on the next page, so drop the write.
+      const { location: routerLocation, resolvedLocation } = router.state
+      if (resolvedLocation && resolvedLocation.pathname !== routerLocation.pathname) return
+
       const currentLocation = latestLocation.current
       const pending = inFlightPush?.fromHref === currentLocation.href ? inFlightPush : null
       const baseSearch = pending?.search ?? parseSearch(currentLocation.searchStr)
@@ -69,8 +74,8 @@ export const useTableEditorFiltersSort = () => {
 
       const nextSearch: SearchRecord = {
         ...baseSearch,
-        ...(newParams.filter !== undefined && { filter: newParams.filter }),
-        ...(newParams.sort !== undefined && { sort: newParams.sort }),
+        ...(hasFilter && { filter: newParams.filter }),
+        ...(hasSort && { sort: newParams.sort }),
       }
 
       const push = { fromHref: currentLocation.href, search: nextSearch }

@@ -56,6 +56,7 @@ function TablePage() {
       <output data-testid="table">{id}</output>
       <Link href="/project/default/editor/17607?schema=public&extra=kept#selection">Table B</Link>
       <Link href="/project/default/editor/17489?schema=public&extra=kept#selection">Table A</Link>
+      <Link href="/project/default/storage">Storage</Link>
       <button
         tabIndex={0}
         onClick={() => state.setFilters([{ column: 'id', operator: '=', value: '1' }])}
@@ -164,3 +165,64 @@ for (const basepath of ['/', '/dashboard']) {
     )
   })
 }
+
+describe('table filter writes during a pending navigation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('does not write the filter onto the destination URL', async () => {
+    const tableUrl = '/project/default/editor/17489?schema=public'
+    window.history.replaceState(null, '', tableUrl)
+    const history = createBrowserHistory()
+    let finishStorageLoad = () => {}
+    const storageLoaded = new Promise<void>((resolve) => {
+      finishStorageLoad = resolve
+    })
+    const root = createRootRoute({ component: Outlet })
+    const table = createRoute({
+      getParentRoute: () => root,
+      path: '/project/$ref/editor/$id',
+      component: TablePage,
+    })
+    const storage = createRoute({
+      getParentRoute: () => root,
+      path: '/project/$ref/storage',
+      loader: () => storageLoaded,
+      component: () => <output data-testid="storage" />,
+    })
+    const router = createRouter({
+      routeTree: root.addChildren([table, storage]),
+      history,
+      parseSearch,
+      stringifySearch,
+      isServer: false,
+    })
+    await router.load()
+    const view = render(<RouterProvider router={router} />)
+
+    try {
+      await settleFilters()
+      fireEvent.click(screen.getByText('Filter rows'))
+      fireEvent.click(screen.getByText('Storage'))
+      await waitFor(() => expect(router.state.location.pathname).toBe('/project/default/storage'))
+      expect(screen.getByTestId('table')).toBeInTheDocument()
+
+      // The filter debounce fires while the table is still mounted and Storage is loading.
+      await settleFilters()
+      await act(async () => finishStorageLoad())
+      await waitFor(() => expect(screen.getByTestId('storage')).toBeInTheDocument())
+
+      expect(window.location.pathname + window.location.search).toBe('/project/default/storage')
+      act(() => window.history.back())
+      await waitFor(() => expect(screen.getByTestId('table')).toBeInTheDocument())
+      expect(window.location.pathname + window.location.search).toBe(tableUrl)
+    } finally {
+      view.unmount()
+      history.destroy()
+    }
+  })
+})
