@@ -262,9 +262,9 @@ a screenshot of an old UI.
 
 **3. Give each new section, example, and link a verdict.**
 
-- **Place:** the heading that each new paragraph or section sits under
-  names its topic, and the text fits with the sections beside it. Text under a
-  heading for another topic is a blocker. When you suggest a move, check the new place the same way.
+- **Place:** each new paragraph or section follows
+  [Put text under the heading for its topic](../../../apps/docs/style-guide/03-page-structure.md#put-text-under-the-heading-for-its-topic).
+  Text under a heading for another topic is a blocker. When you suggest a move, check the new place the same way.
 - **Example:** each new example, such as a code block or a table, follows
   [Model an example on the page's other examples](../../../apps/docs/style-guide/02-elements.md#model-an-example-on-the-pages-other-examples).
   An example built around the reported case, with its own tables, names, or scenario,
@@ -294,7 +294,7 @@ covers style or terminology. CodeRabbit reviews style, terminology, and structur
   two-pass protocol in
   [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent):
   [Phrase groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) for the
-  literal term lists, then `grep '^### ' WORD_LIST.md` and read only the entries that
+  literal term lists, then `grep '^### ' apps/docs/style-guide/WORD_LIST.md` and read only the entries that
   match words on the page. Include terms the author didn't introduce.
 
 **5. Check the claims** with the [Fact check](#fact-check).
@@ -387,7 +387,7 @@ build as `deferred`.
 
 Checklist:
 
-- [ ] Build passes with no type errors
+- [ ] Build passes with no type errors, or the build is `deferred` with a reason
 - [ ] `.env.example` documents required vars (no secrets committed)
 - [ ] If docs reference this example, `$CodeSample` paths still valid
 

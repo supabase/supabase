@@ -236,6 +236,12 @@ and keep the procedure group unbroken so context doesn't interrupt the action pa
 On a page about tables every section is about tables, so subject matter tells you
 nothing. A reader opens a section on schemas to understand something, so it's context.
 
+### Put text under the heading for its topic
+
+Each paragraph sits under a heading that names its topic, and fits with the sections
+beside it. When new text doesn't fit the heading above it, move it to the section it
+fits, or give it its own heading.
+
 ### Split a section that serves two types
 
 Filing it under the larger half buries the other one. Give the new half a heading, keep

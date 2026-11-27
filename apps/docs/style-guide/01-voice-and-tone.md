@@ -39,8 +39,8 @@ it. A reader who doesn't need a detail still has to work out that they don't.
 
 After each step or fact, think of the first question the reader asks next, and answer
 it on the page or link to the answer. After `Enable RLS on the table`, the reader asks
-what happens to existing queries. Say that, until a policy allows them, reads with the
-publishable key return no rows and inserts fail.
+what happens to existing queries. Say that, until a policy allows them, your app's reads
+return no rows and its inserts fail.
 
 ### Write for a massive global audience
 
