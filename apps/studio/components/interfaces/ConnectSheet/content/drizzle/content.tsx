@@ -107,9 +107,7 @@ const allUsers = await db.select().from(users);
   return (
     <div className="flex flex-col gap-3">
       <MultipleCodeBlock files={files} />
-      {envCode.includes(TOKEN_PASSWORD_PLACEHOLDER) && (
-        <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
-      )}
+      {envCode.includes(TOKEN_PASSWORD_PLACEHOLDER) && <TemporaryAccessPasswordNote />}
     </div>
   )
 }

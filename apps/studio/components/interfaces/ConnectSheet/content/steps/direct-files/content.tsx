@@ -274,7 +274,7 @@ except Exception as e:
         codeBlock
       )}
       {config.passwordInUrl && !isGrantMode && <PasswordEncodingNote />}
-      <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
+      <TemporaryAccessPasswordNote />
       {/* Persistent live region so screen readers announce the read-only state
           when the load balancer is selected */}
       <p

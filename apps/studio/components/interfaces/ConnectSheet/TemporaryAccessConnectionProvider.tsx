@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 
+import type { ConnectMode } from './Connect.types'
 import { PASSWORD_PLACEHOLDER, TOKEN_PASSWORD_PLACEHOLDER } from './ConnectionString.utils'
 import {
   DATABASE_PASSWORD_VALUE,
@@ -43,14 +44,17 @@ const TemporaryAccessConnectionContext =
 
 export function TemporaryAccessConnectionProvider({
   children,
+  mode,
   enabled = true,
 }: {
   children: ReactNode
+  mode: ConnectMode
   enabled?: boolean
 }) {
   const { ref: projectRef } = useParams()
   const { activeRoles } = useActiveTemporaryAccessRoles(projectRef, { enabled })
-  const [selectedRole, setSelectedRole] = useState<string | null>(null)
+  const [rolesByMode, setRolesByMode] = useState<Partial<Record<ConnectMode, string>>>({})
+  const selectedRole = rolesByMode[mode] ?? null
 
   const value = useMemo(() => {
     const resolvedRole = resolveSelectedTemporaryAccessRole({ selectedRole, activeRoles })
@@ -61,14 +65,16 @@ export function TemporaryAccessConnectionProvider({
         activeRoles,
         selectedRole: resolvedRole,
       },
-      actions: { setSelectedRole },
+      actions: {
+        setSelectedRole: (role) => setRolesByMode((roles) => ({ ...roles, [mode]: role })),
+      },
       meta: {
         isGrantMode,
         grantRole: isGrantMode ? resolvedRole : null,
         passwordPlaceholder: isGrantMode ? TOKEN_PASSWORD_PLACEHOLDER : PASSWORD_PLACEHOLDER,
       },
     } satisfies TemporaryAccessConnectionContextValue
-  }, [activeRoles, selectedRole])
+  }, [activeRoles, mode, selectedRole])
 
   return (
     <TemporaryAccessConnectionContext.Provider value={value}>

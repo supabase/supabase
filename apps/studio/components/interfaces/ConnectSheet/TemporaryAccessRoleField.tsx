@@ -5,26 +5,20 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DATABASE_PASSWORD_VALUE } from './TemporaryAccessConnection.utils'
 import { useTemporaryAccessConnection } from './TemporaryAccessConnectionProvider'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
 
-export function TemporaryAccessPasswordNote({ tokenHref }: { tokenHref?: string }) {
+export function TemporaryAccessPasswordNote() {
   const {
     meta: { isGrantMode },
   } = useTemporaryAccessConnection()
 
   if (!isGrantMode) return null
 
-  const tokenLabel = tokenHref ? (
-    <InlineLink href={tokenHref}>personal access token</InlineLink>
-  ) : (
-    'personal access token'
-  )
-
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Paste a {tokenLabel} when Postgres asks for a password. If you create a scoped token, choose
-      this project and set “Database token access” to “{PERMISSION_MODE_LABEL.read}”.{' '}
-      <InlineLink href={`${DOCS_URL}/guides/platform/temporary-access`}>Learn more</InlineLink>
+      This role uses a personal access token as its password.{' '}
+      <InlineLink href="/account/tokens">Create an access token</InlineLink> if you need one. If you
+      create a scoped token, choose this project and set “Database token access” to “
+      {PERMISSION_MODE_LABEL.read}”.
     </p>
   )
 }

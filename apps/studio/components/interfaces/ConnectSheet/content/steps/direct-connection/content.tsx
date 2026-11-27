@@ -1,7 +1,6 @@
-import { Link } from '@tanstack/react-router'
 import { CheckIcon, KeyRoundIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -148,8 +147,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
     !isGrantMode &&
     showPasswordPlaceholder &&
     !temporaryDatabasePassword
-  const showCreateTokenInTitle = deploymentMode.isPlatform && isGrantMode
-  const showStringTitleRow = showTitleBadge || showResetInTitle || showCreateTokenInTitle
+  const showStringTitleRow = showTitleBadge || showResetInTitle
 
   return (
     <div className="flex flex-col gap-3">
@@ -167,11 +165,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
                 triggerIcon={<KeyRoundIcon />}
                 onPasswordReset={setTemporaryDatabasePassword}
               />
-            )}
-            {showCreateTokenInTitle && (
-              <Button asChild variant="default" icon={<KeyRoundIcon />}>
-                <Link to="/account/tokens">Create access token</Link>
-              </Button>
             )}
           </div>
         )}

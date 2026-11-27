@@ -170,6 +170,12 @@ export const ConnectSheet = () => {
     }
   }
 
+  const roleFieldAnchors: Partial<Record<ConnectMode, string>> = {
+    direct: 'connectionSource',
+    orm: 'orm',
+  }
+  const roleFieldAnchor = roleFieldAnchors[state.mode]
+
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
       <SheetContent
@@ -181,7 +187,7 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <TemporaryAccessConnectionProvider enabled={showConnect}>
+        <TemporaryAccessConnectionProvider enabled={showConnect} mode={state.mode}>
           <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
             <ScrollViewport className="[&>div]:block!">
               <div className="flex min-w-0 flex-col divide-y">
@@ -215,8 +221,8 @@ export const ConnectSheet = () => {
                           onFieldChange={handleFieldChange}
                           getFieldOptions={getFieldOptions}
                           insertAfter={
-                            state.mode === 'direct'
-                              ? { fieldId: 'connectionSource', node: <TemporaryAccessRoleField /> }
+                            roleFieldAnchor
+                              ? { fieldId: roleFieldAnchor, node: <TemporaryAccessRoleField /> }
                               : undefined
                           }
                         />
