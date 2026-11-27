@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import * as option1 from './option1.constants'
+import { clientSdkIds, REFERENCES } from '@/content/navigation.references'
 import * as today from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 type NavNode = {
+  label?: string
   name?: string
   url?: string
   href?: string
@@ -52,5 +54,15 @@ describe('Option 1 navigation', () => {
     expect(navUrls(option1).filter((url) => !isKbPage(url) && !todayPages.has(page(url)))).toEqual(
       []
     )
+  })
+
+  it('lists every enabled client library in the reference section', () => {
+    const referenceSection = (option1.GLOBAL_MENU_ITEMS as NavNode[][])
+      .flat()
+      .find((section) => section.label === 'Reference')
+    const referenceLinks = new Set(walk(referenceSection ?? {}))
+    const libraryLinks = clientSdkIds.map((sdkId) => `/reference/${REFERENCES[sdkId].libPath}`)
+
+    expect(libraryLinks.filter((href) => !referenceLinks.has(href))).toEqual([])
   })
 })
