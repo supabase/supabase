@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { EditIcon, UploadIcon } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -41,6 +42,7 @@ import {
   hasAuthorizationChanges,
 } from './Authorization.utils'
 import { AuthorizationConfirmDialog } from './AuthorizationConfirmDialog'
+import { DirectDatabaseAccessPreview } from './DirectDatabaseAccessPreview'
 import {
   formSchema,
   FormSchema,
@@ -137,6 +139,12 @@ export const PublishAppSidePanel = ({
   onCreateSuccess,
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
+  const search = useLocation({ select: (location) => location.searchStr })
+  const databaseAccessPreview = import.meta.env.DEV
+    ? new URLSearchParams(search).get('preview_database_access')
+    : null
+  const isDatabaseAccessPreview =
+    databaseAccessPreview === 'approved' || databaseAccessPreview === 'member-bound'
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
   const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
 
@@ -554,7 +562,22 @@ export const PublishAppSidePanel = ({
               <DocsButton href={`${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`} />
             </div>
 
-            <ScopesPanel scopes={scopes} setScopes={setScopes} />
+            <ScopesPanel
+              scopes={scopes}
+              setScopes={setScopes}
+              databaseAccessPermission={
+                visible &&
+                isDatabaseAccessPreview && (
+                  <DirectDatabaseAccessPreview
+                    key={selectedApp?.id}
+                    isPreviewMemberBound={
+                      databaseAccessPreview === 'member-bound' ||
+                      selectedApp?.grant_kind === 'member_bound'
+                    }
+                  />
+                )
+              }
+            />
           </div>
 
           <AlertDialog open={showPreview} onOpenChange={(open) => setShowPreview(open)}>

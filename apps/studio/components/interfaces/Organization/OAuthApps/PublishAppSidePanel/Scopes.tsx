@@ -1,5 +1,5 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 import { AccessLevelDropdown, type AccessLevel } from './AccessLevelDropdown'
@@ -58,7 +58,9 @@ const Scope = ({
 export const ScopesPanel = ({
   scopes,
   setScopes,
+  databaseAccessPermission,
 }: {
+  databaseAccessPermission?: ReactNode
   scopes: OAuthScope[]
   setScopes: Dispatch<SetStateAction<OAuthScope[]>>
 }) => {
@@ -89,13 +91,14 @@ export const ScopesPanel = ({
         setScopes={setScopes}
       />
       <Scope
-        title="Database"
-        description={PERMISSIONS_DESCRIPTIONS.DATABASE}
+        title="Database management"
+        description="Access database settings. Write access also allows the app to run SQL and reset the database password."
         readScopeName={OAuthScope.DATABASE_READ}
         writeScopeName={OAuthScope.DATABASE_WRITE}
         scopes={scopes}
         setScopes={setScopes}
       />
+      {databaseAccessPermission}
       <Scope
         title="Domains"
         description={PERMISSIONS_DESCRIPTIONS.DOMAINS}
