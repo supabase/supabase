@@ -22,8 +22,8 @@ export function TemporaryAccessPasswordNote({ tokenHref }: { tokenHref?: string 
 
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Use a {tokenLabel} as the password. For a scoped token, set Database token access to{' '}
-      {PERMISSION_MODE_LABEL.read}.{' '}
+      Paste a {tokenLabel} when Postgres asks for a password. If you create a scoped token, choose
+      this project and set “Database token access” to “{PERMISSION_MODE_LABEL.read}”.{' '}
       <InlineLink href={`${DOCS_URL}/guides/platform/temporary-access`}>Learn more</InlineLink>
     </p>
   )
