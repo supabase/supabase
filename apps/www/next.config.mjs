@@ -6,7 +6,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-import redirects from './lib/redirects.js'
+import redirects from './lib/redirects/index.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
 import securityHeaders from './lib/security-headers.js'

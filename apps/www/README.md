@@ -177,7 +177,7 @@ for coverage and limits.
 
 ## Redirects
 
-Redirects for non-docs URLs live in [`lib/redirects.js`](lib/redirects.js). Redirects for `/docs` URLs moved to the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
+Redirects for non-docs URLs live in [`lib/redirects/`](lib/redirects/README.md), split into static one-to-one entries and dynamic entries, with tests that check for loops, chains, and missing destinations. Redirects for `/docs` URLs live in the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
 
 ## Go pages (`/go/*`)
 

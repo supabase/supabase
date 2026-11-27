@@ -11,7 +11,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import matter from 'gray-matter'
 
-import redirects from '../lib/redirects.js'
+import redirects from '../lib/redirects/index.js'
 import { mdxBodyToMarkdown } from './lib/mdxToMarkdown.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))

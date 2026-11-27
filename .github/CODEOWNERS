@@ -21,7 +21,7 @@
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/public/schemas/ @supabase/cli
-/apps/www/lib/redirects.js
+/apps/www/lib/redirects/
 /apps/www/data/legal/ @supabase/frontend
 /apps/www/pages/legal/ @supabase/frontend
 /apps/www/public/legal/ @supabase/frontend
