@@ -1,0 +1,82 @@
+---
+title: 'MCP with scoped OAuth access'
+subtitle: 'Connect MCP clients using project-scoped and member-bound OAuth grants'
+description: 'Learn how the hosted Supabase MCP server enforces scoped OAuth grants, project and branch access, read-only SQL fallback, and missing-scope error recovery.'
+---
+
+Understanding how the hosted Model Context Protocol (MCP) server enforces scoped OAuth grants helps you pick the right scopes, connection URL, and error recovery path. For how to configure a manual OAuth app for an MCP client, see [Manual OAuth app](/docs/guides/ai-tools/mcp#manual-oauth-app).
+
+## Supported OAuth apps
+
+The following table lists how each OAuth client type behaves with the hosted MCP server.
+
+| Client type                             | Behavior                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Static OAuth app with scoped access on  | Enforces member permissions, project selection, or both on every MCP connection and tool call.                     |
+| Static OAuth app with scoped access off | Unchanged. An Owner or Administrator authorizes the app for the whole organization and all projects.               |
+| Dynamically registered client           | Unchanged. Clients that connect through dynamic client registration, such as Claude Code, don't use scoped grants. |
+
+When a member connects through the Supabase Dashboard consent screen, approval is all-or-nothing: the member's role must cover every scope the app requests. Partial grants aren't available in the Dashboard, and MCP predicts re-consent as all-or-nothing against the app's registered scopes. Existing grants created before you turn on a setting keep their current access until the user authorizes the app again.
+
+<Admonition type="note">
+
+Scoped access is in private beta. You can't turn off a scoped access setting after you save it, so test on a staging app first. If the settings don't appear on your app, [open a support ticket](/dashboard/support/new) and include your app's client ID to request access.
+
+</Admonition>
+
+## Connection modes and project enforcement
+
+How the hosted MCP server enforces a project-scoped grant depends on whether the connection URL includes `project_ref`. The following table summarizes both modes.
+
+| Connection URL                      | Mode         | Behavior with a scoped grant                                                                                                                                   |
+| ----------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/mcp`                              | Account mode | Stays in account mode and enforces the grant on each tool call. Use `list_projects` to discover accessible projects.                                           |
+| `/mcp?project_ref=YOUR_PROJECT_REF` | Project mode | Connects when the grant covers the project, or covers the parent project of a preview branch ref. Rejects disallowed projects with `403 Forbidden` at connect. |
+
+### Account mode exceptions
+
+Without `project_ref` in the connection URL, account tools stay listed even when the grant restricts which resources they can reach:
+
+- **Project discovery**: Call `list_projects` to find projects the token can access. It requires `projects:read` and returns only projects covered by the grant and the member's current role.
+- **Organization tools**: With a specific-project grant, `list_organizations` returns an empty list even when the token has `organizations:read`, and organization-level tools such as `get_organization` are denied.
+- **Projects outside the grant**: Calling a tool on a project in the same organization that isn't in the grant's project list returns an error telling the AI agent to ask the user to re-authenticate and add that project. Calling a tool on an unknown project or a project in another organization returns a generic permission denial.
+- **Preview branches**: Branch tool calls check the grant of the branch's parent project. If the parent project isn't in the grant, the error denies the call without revealing the parent project ref.
+
+### Project mode and preview branches
+
+When the connection URL includes `project_ref`, the server checks the ref against the OAuth grant before opening the session:
+
+- **Parent projects and branches**: Users authorize the parent project on the consent screen; preview branch refs can't be granted directly. Once the parent project is in the grant, connecting with `?project_ref=YOUR_PROJECT_REF` or with a preview branch ref of that project succeeds in project mode and disables account tools.
+- **Disallowed or unknown refs**: If a well-formed `project_ref` is outside the grant, belongs to another organization, or doesn't exist, the connection fails at connect time with `403 Forbidden`. All three cases return the same error message so the server doesn't reveal which projects exist. The response omits an `insufficient_scope` challenge so the client doesn't loop back to the consent screen. Malformed `project_ref` values fail parameter validation before this check.
+
+## Read-only SQL fallback
+
+A project-scoped or member-bound grant that includes `database:read` without `database:write` runs `execute_sql` as a read-only Postgres user even when the connection URL doesn't set `read_only=true`.
+
+- If a query tries to write data or change the schema on this fallback path, Postgres rejects it and the server responds using the [missing-scope rules](#missing-scope-and-permission-errors) for `database:write`.
+- If the connection URL explicitly sets `read_only=true`, the server returns the Postgres read-only error directly instead of treating it as a missing scope.
+
+For a least-privilege read-only integration, registering `projects:read` and `database:read` lets an agent call `list_projects` to find granted projects and run read-only SQL queries with `execute_sql`, while blocking writes and other projects.
+
+## Missing-scope and permission errors
+
+Tools that call the Management API check the OAuth scope they need before running. Ungated tools such as `search_docs` don't require a Management API scope.
+
+For a static app using scoped access, the server checks whether re-authenticating can grant the missing scope before issuing an `insufficient_scope` challenge. The following table lists each denial path and how to recover.
+
+| Cause                                                                                                                  | Server response                                                           | How to recover                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Scope isn't registered on the OAuth app, for example `storage:write`.                                                  | Tool error in an HTTP `200` response, no `insufficient_scope` challenge.  | The app author adds the scope in app settings and the user re-authenticates, or the user reconnects with an app that requests it. |
+| User's role can't grant the app's scopes, for example a Read-only member after the app added a write scope.            | Tool error in an HTTP `200` response, no `insufficient_scope` challenge.  | An organization Owner or Administrator upgrades the member's role, then the user re-authenticates.                                |
+| Member-level OAuth authorization is temporarily unavailable.                                                           | Tool error in an HTTP `200` response, no `insufficient_scope` challenge.  | Retry later.                                                                                                                      |
+| Grant lacks a scope that the app registers and the user's role allows, for example after the app author added a scope. | `403 Forbidden` with a `WWW-Authenticate` `insufficient_scope` challenge. | The user re-authenticates in their MCP client to update the grant with the added scope.                                           |
+| Member's role was lowered or membership was removed, while the token still holds the scope.                            | Tool error in an HTTP `200` response from the live permission check.      | An organization Owner or Administrator restores the member's role or membership. Re-authenticating alone doesn't restore access.  |
+
+Returning a tool error in an HTTP `200` response when re-authenticating can't help prevents MCP clients from looping back to the consent screen. When an AI agent hits a grant or permission denial, ask the user to update their grant or role, retry only after the grant or connection changes, and never ask for the OAuth client secret in chat.
+
+## Related resources
+
+- [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access): learn how member permissions, project selection, and partial grants work.
+- [Update your app for scoped access](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access): see the lowest role required for each OAuth scope.
+- [Test scoped access on a staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access): verify member and project scenarios before changing a production app.
+- [Manage OAuth app access](/docs/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access): review and revoke OAuth grants in your organization.

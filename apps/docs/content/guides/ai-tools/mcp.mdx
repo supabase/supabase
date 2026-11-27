@@ -209,12 +209,12 @@ The [configuration panel](#configure-your-ai-tool) can set project scope, read-o
 
 | Parameter                   | Description                                                                                           | Example                                          |
 | --------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `read_only=true`            | Execute all queries as a read-only Postgres user                                                      | `?read_only=true`                                |
-| `project_ref=<id>`          | Scope to a specific project (disables account tools)                                                  | `?project_ref=abc123`                            |
+| `read_only=true`            | Execute database SQL queries as a read-only Postgres user                                             | `?read_only=true`                                |
+| `project_ref=<id>`          | Target a specific project and disable account tools                                                   | `?project_ref=YOUR_PROJECT_REF`                  |
 | `features=<groups>`         | Enable only specific tool groups (comma-separated)                                                    | `?features=database,docs`                        |
 | `skip_elicitations=<tools>` | Skip form confirmations for the named tools. See [Skip form confirmations](#skip-form-confirmations). | `?skip_elicitations=execute_sql,apply_migration` |
 
-Parameters can be combined: <code><CustomContent data="mcp:servers">remote</CustomContent>?project_ref=abc123&read_only=true</code>
+Parameters can be combined: <code><CustomContent data="mcp:servers">remote</CustomContent>?project_ref=YOUR_PROJECT_REF&read_only=true</code>
 
 <Admonition type="note">
 
@@ -273,7 +273,7 @@ If your MCP client requires an OAuth client ID and secret (e.g. Azure API Center
 
    Your client should provide you the website URL and callback URL that it expects for the OAuth app. Use these values when creating the OAuth app in Supabase.
 
-   Grant write access to all of the available scopes. In the future, the MCP server will support more fine-grained scopes, but for now all scopes are required.
+   Select the [OAuth scopes](/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes) your client needs. To limit the app to specific projects or each member's role, turn on scoped access in the app's settings after testing on a [staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access) because these settings can't be turned off after saving. For how the MCP server enforces scoped OAuth grants, see [MCP with scoped OAuth access](/docs/guides/integrations/build-a-supabase-oauth-integration/mcp-scoped-access).
 
 1. After creating the OAuth app, copy the client ID and client secret to your MCP client.
 
@@ -306,8 +306,8 @@ We recommend the following best practices to mitigate security risks when using 
 
 - **Protect production data**: Connect to a production project only when the task requires production evidence. Use project scoping, read-only mode, restricted feature groups, and the narrowest data query that can answer the question. Do not include secrets or unrelated personal data in prompts or reports.
 - **Don't give to your customers**: The MCP server operates under the context of your developer permissions, so you should not give it to your customers or end users. Instead, use it internally as a developer tool to help you build and test your applications.
-- **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which executes SQL queries as a read-only Postgres user.
-- **Project scoping**: Scope your MCP server to a [specific project](#configuration-options), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
+- **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which runs database SQL queries as a read-only Postgres user.
+- **Project scoping**: Target your MCP connection to a [specific project](#configuration-options) with `project_ref` to disable account tools in that session. To enforce project limits at the credential level, use a scoped PAT or [MCP with scoped OAuth access](/docs/guides/integrations/build-a-supabase-oauth-integration/mcp-scoped-access).
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
 - **Cost confirmation**: When your connection uses cost confirmation dialogs, the server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
