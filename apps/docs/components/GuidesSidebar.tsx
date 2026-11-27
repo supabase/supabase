@@ -2,6 +2,7 @@
 
 import { Feedback } from '~/components/Feedback'
 import { LegacyGuidesSidebar } from '~/components/GuidesSidebar.legacy'
+import { VideoPreview } from '~/components/VideoPreview'
 import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { HeadingSlotCrumb } from '~/layouts/HeadingSlot'
 import { RightRailPortal } from '~/layouts/RightRail'
@@ -70,7 +71,13 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
     <RightRailPortal>
       <div className="flex min-h-0 flex-1 flex-col gap-8 px-6 pt-6">
         {video ? (
-          <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
+          <ExpandableVideo
+            imgUrl={tocVideoPreview}
+            videoId={video}
+            videoTitle={videoTitle}
+            trigger={<VideoPreview imgUrl={tocVideoPreview} />}
+            triggerContainerClassName="rounded-lg focus-ring"
+          />
         ) : null}
         {hideToc || toc.length === 0 ? null : (
           <GuideToc toc={toc} activeUrl={toc[activeIndex]?.url} />

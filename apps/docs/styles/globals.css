@@ -68,6 +68,26 @@
   }
 }
 
+@utility crt-scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    oklch(0.12 0.05 20 / 0.06) 0px 1px,
+    transparent 1px 3px,
+    oklch(0.12 0.05 210 / 0.06) 3px 4px,
+    transparent 4px 6px,
+    oklch(0.12 0.05 95 / 0.06) 6px 7px,
+    transparent 7px 9px,
+    oklch(0.12 0.05 300 / 0.06) 9px 10px,
+    transparent 10px 12px,
+    oklch(0.12 0.05 150 / 0.06) 12px 13px,
+    transparent 13px 15px,
+    oklch(0.12 0.05 250 / 0.06) 15px 16px,
+    transparent 16px 18px,
+    oklch(0.12 0.05 45 / 0.06) 18px 19px,
+    transparent 19px 21px
+  );
+}
+
 @layer utilities {
   .prose--remove-p-margin p {
     margin: 0;

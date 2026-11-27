@@ -1,7 +1,7 @@
 import { FrameworkImage, useBreakpoint } from 'common'
 import { Play } from 'lucide-react'
 import React, { ReactNode } from 'react'
-import { Dialog, DialogContent, DialogTrigger } from 'ui'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from 'ui'
 
 interface ExpandableVideoProps {
   videoId: string
@@ -14,6 +14,8 @@ interface ExpandableVideoProps {
   onOpenCallback?: any
   priority?: boolean
 }
+
+export const EXPANDABLE_VIDEO_THUMBNAIL_SIZES = '320px'
 
 export function ExpandableVideo({
   imgUrl,
@@ -81,7 +83,21 @@ export function ExpandableVideo({
             {trigger ?? <CliccablePreview />}
           </button>
         </DialogTrigger>
-        <DialogContent size="xxlarge">
+        <DialogContent
+          size="xxlarge"
+          className="
+            ease-enter data-open:duration-200 data-closed:duration-150
+            motion-reduce:zoom-in-100! motion-reduce:zoom-out-100!
+          "
+          dialogOverlayProps={{
+            className: `
+              ease-enter data-open:animate-in data-open:fade-in data-open:duration-200
+              data-closed:animate-out! data-closed:fade-out data-closed:fill-mode-forwards
+              data-closed:duration-150
+            `,
+          }}
+        >
+          <DialogTitle className="sr-only">{videoTitle ?? 'Video player'}</DialogTitle>
           <div className="w-full! flex items-center justify-center">
             <div className="relative w-full">
               <button
@@ -91,11 +107,21 @@ export function ExpandableVideo({
                 <p className="text-xs">Close</p>
               </button>
               <div className="video-container rounded-lg! border-none! overflow-hidden!">
+                {imgUrl ? (
+                  <Image
+                    src={imgUrl}
+                    alt=""
+                    fill
+                    sizes={EXPANDABLE_VIDEO_THUMBNAIL_SIZES}
+                    className="object-cover"
+                  />
+                ) : null}
                 <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
                   title={videoTitle ?? 'Video player'}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  className="scheme-normal"
                 />
               </div>
             </div>
