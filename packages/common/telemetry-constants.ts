@@ -1729,8 +1729,8 @@ export interface WwwEventPageCtaClickedEvent {
  * @source www
  * @page /legal/customer-resources/subprocessor-list
  */
-export interface WwwSubprocessorUpdatesSubscribedEvent {
-  action: 'www_subprocessor_updates_subscribed'
+export interface WwwSubprocessorUpdatesFormSubmittedEvent {
+  action: 'www_subprocessor_updates_form_submitted'
 }
 
 /**
@@ -5268,7 +5268,7 @@ export type TelemetryEvent =
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwEventPageCtaClickedEvent
-  | WwwSubprocessorUpdatesSubscribedEvent
+  | WwwSubprocessorUpdatesFormSubmittedEvent
   | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
