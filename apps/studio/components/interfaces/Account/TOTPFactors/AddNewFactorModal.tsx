@@ -281,7 +281,9 @@ const SecondStep = ({
   const [verifiedFactorId, setVerifiedFactorId] = useState<string | null>(null)
   const hasCompletedChallenge = !!factor && verifiedFactorId === factor.id
 
-  const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
+  const { mutate: unenroll, isPending: isUnenrolling } = useMfaUnenrollMutation({
+    onSuccess: () => onClose(),
+  })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add MFA method: ${error?.message}`)
@@ -321,7 +323,11 @@ const SecondStep = ({
       title={`Verify authenticator app: ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
-      loading={isVerifying || isLoading || hasCompletedChallenge}
+      loading={isVerifying || isLoading || isUnenrolling || hasCompletedChallenge}
+      // Canceling unenrolls the new factor, so only an explicit Cancel, close, or Escape may do it.
+      // A stray click outside (for example on a cookie banner) must not delete the factor while
+      // the dialog stays open.
+      dismissOnInteractOutside={false}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while

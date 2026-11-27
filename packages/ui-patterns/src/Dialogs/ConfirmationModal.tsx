@@ -35,6 +35,11 @@ export interface ConfirmationModalProps {
   /** Overrides the first footer action while `onCancel` continues to handle dismissal. */
   onAdditionalAction?: () => void
   disabled?: boolean
+  /**
+   * When false, pointer or focus interactions outside the dialog do not dismiss it. Use this when
+   * `onCancel` has side effects that must only run from an explicit cancel. Defaults to true.
+   */
+  dismissOnInteractOutside?: boolean
   variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
     base?: React.ComponentProps<typeof Alert>
@@ -66,6 +71,7 @@ export const ConfirmationModal = forwardRef<
       children,
       variant = 'default',
       disabled,
+      dismissOnInteractOutside = true,
       className,
       ...props
     },
@@ -114,6 +120,9 @@ export const ConfirmationModal = forwardRef<
           size={size}
           onPointerDownOutside={preventDismissWhileLoading}
           onEscapeKeyDown={preventDismissWhileLoading}
+          onInteractOutside={(event) => {
+            if (!dismissOnInteractOutside) event.preventDefault()
+          }}
         >
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle>{title}</DialogTitle>

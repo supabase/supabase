@@ -56,6 +56,45 @@ describe('AddNewFactorModal completion', () => {
     expect(onComplete).not.toHaveBeenCalled()
   })
 
+  test('a click outside the verify step keeps the new factor enrolled', async () => {
+    const unenroll = vi.spyOn(auth.mfa, 'unenroll')
+    const challengeAndVerify = vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+      data: {
+        access_token: 'preview',
+        token_type: 'bearer',
+        expires_in: 3600,
+        refresh_token: 'preview',
+        user: {
+          id: 'user',
+          aud: 'authenticated',
+          app_metadata: {},
+          user_metadata: {},
+          created_at: '2026-01-01T00:00:00Z',
+        },
+      },
+      error: null,
+    })
+    const onComplete = vi.fn()
+    const onClose = vi.fn()
+    customRender(<AddNewFactorModal visible onClose={onClose} onComplete={onComplete} />)
+    await enrollFactor()
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    fireEvent.pointerDown(document.body)
+    fireEvent.focusIn(document.body)
+    expect(unenroll).not.toHaveBeenCalled()
+    expect(screen.getByText('Verify authenticator app: Backup')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Authentication code' }), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+    expect(challengeAndVerify).toHaveBeenCalledWith({ factorId: 'backup-factor', code: '123456' })
+    expect(unenroll).not.toHaveBeenCalled()
+  })
+
   test('completes only after successful authenticator verification', async () => {
     vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
       data: {
