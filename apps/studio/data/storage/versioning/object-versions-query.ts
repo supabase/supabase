@@ -20,6 +20,7 @@ export interface ObjectVersion {
   /** An overwrite can change the type, so each version carries its own. */
   mimeType?: string
   createdAt: string
+  archivedAt: string | null
   isCurrent: boolean
   action: ObjectVersionAction
 }
@@ -44,7 +45,7 @@ export type ObjectVersionsError = StudioError
 // The ceiling the list endpoint accepts.
 const MAX_VERSIONS = 1000
 
-/** Newest first. The oldest surviving row is labelled the initial upload; there is no flag for it. */
+/** Current first, then newest archived version. The oldest upload has no explicit flag. */
 export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
   const versions = objects
     .filter((object) => !!object.version)
@@ -55,23 +56,35 @@ export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
       mimeType:
         typeof object.metadata?.mimetype === 'string' ? object.metadata.mimetype : undefined,
       createdAt: object.created_at ?? object.updated_at ?? '',
+      archivedAt: object.archived_at ?? null,
       isCurrent: !object.archived_at,
       isDeleteMarker: !!object.is_delete_marker,
     }))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 
-  const oldestUploadIndex = versions.reduce(
-    (oldest, version, index) => (version.isDeleteMarker ? oldest : index),
-    -1
-  )
+  const oldestUpload = versions
+    .filter((version) => !version.isDeleteMarker)
+    .reduce<(typeof versions)[number] | undefined>(
+      (oldest, version) =>
+        oldest === undefined || version.createdAt < oldest.createdAt ? version : oldest,
+      undefined
+    )
 
-  return versions.map(({ isDeleteMarker, ...version }, index) => {
-    if (isDeleteMarker) return { ...version, action: 'delete marker' as const }
-    return {
-      ...version,
-      action: index === oldestUploadIndex ? ('initial upload' as const) : ('overwrite' as const),
-    }
-  })
+  return versions
+    .sort((a, b) => {
+      if (a.archivedAt === null) return b.archivedAt === null ? 0 : -1
+      if (b.archivedAt === null) return 1
+      return b.archivedAt.localeCompare(a.archivedAt)
+    })
+    .map(({ isDeleteMarker, ...version }) => {
+      if (isDeleteMarker) return { ...version, action: 'delete marker' as const }
+      return {
+        ...version,
+        action:
+          version.versionId === oldestUpload?.versionId
+            ? ('initial upload' as const)
+            : ('overwrite' as const),
+      }
+    })
 }
 
 async function getObjectVersions(
