@@ -18,9 +18,9 @@ A migration has four stages, from choosing a cutover approach to updating applic
 | Stage | What happens |
 | --- | --- |
 | Plan | Choose a one-time import or a gradual migration while Clerk remains available. |
-| Export | Export users from Clerk. Only the Dashboard export includes password digests and time-based one-time password (TOTP) secrets. CLI and Backend API exports include metadata. |
-| Map and import | Map verified emails, phone numbers, metadata, and supported password hashes to Supabase Auth users through the [Auth Admin API](/docs/reference/javascript/admin-api). |
-| Cut over | Update app records to reference Supabase Auth UUIDs, configure sign-in methods, and plan for users to create new Supabase Auth sessions. |
+| Export | Export users from Clerk. Only the Dashboard export includes password digests and time-based one-time password (TOTP) secrets. CLI and Backend API exports include metadata and ban status. |
+| Map and import | Map verified emails, phone numbers, metadata, and supported password hashes to Supabase Auth users through the [Auth Admin API](/docs/reference/javascript/admin-api). Before enabling sign-in, identify banned users and apply an equivalent restriction server-side with [`updateUserById()`](/docs/reference/javascript/auth-admin-updateuserbyid) and `ban_duration`. |
+| Cut over | Update app records to reference Supabase Auth UUIDs, configure sign-in methods, and plan for users to create Supabase Auth sessions. |
 
 If you need both password digests and metadata, combine a Dashboard export with a CLI or Backend API export by Clerk user ID. Check the exported fields for your chosen method. Clerk's [export guide](https://clerk.com/docs/guides/development/migrating/export-from-clerk) describes what each method includes.
 
@@ -40,11 +40,11 @@ Plan for these differences when you choose a migration date and communicate with
 | Data or behavior | Migration impact |
 | --- | --- |
 | User IDs | Supabase Auth user IDs are UUIDs. Preserve a Clerk ID if it is a supported UUID; otherwise map it to a new Supabase Auth ID and update foreign keys and app records. |
-| Passwords | Supabase Auth supports bcrypt and Argon2 password hashes through `password_hash`. Users whose hashes use an unsupported algorithm or format need a password reset or another recovery flow. |
+| Passwords | Supabase Auth supports bcrypt and Argon2 password hashes through `password_hash`. Users whose hashes use an unsupported algorithm or format, or whose import has no matching Dashboard password digest, need a password reset or another recovery flow. |
 | Email and phone verification | Set `email_confirm` or `phone_confirm` only when the corresponding Clerk address was verified. |
 | Metadata | Clerk's API exports include metadata. Map profile fields to `user_metadata` and trusted authorization data to `app_metadata`, following [Supabase Auth's user guidance](/docs/guides/auth/users). |
 | Sessions and social sign-ins | Clerk sessions are not Supabase Auth sessions, and user exports do not import social account credentials. Configure the required providers in Supabase Auth and plan for users to create Supabase Auth sessions. |
-| TOTP | Clerk Dashboard exports include TOTP secrets, but the documented Auth Admin API has no factor-import method. Plan for users to enroll a new TOTP factor in Supabase Auth. |
+| TOTP | Clerk Dashboard exports include TOTP secrets, but the documented Auth Admin API has no factor-import method. Users have no verified Supabase factor until they enroll a new one. If Clerk TOTP gated sensitive access, decide how your app will restrict that access or require trusted re-verification until enrollment. |
 
 ## When to keep Clerk
 
