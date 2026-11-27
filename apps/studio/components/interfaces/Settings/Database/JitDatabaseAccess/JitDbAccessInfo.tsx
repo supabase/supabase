@@ -5,6 +5,7 @@ import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { AlertError } from '@/components/ui/AlertError'
 import {
   JitDbAccessStatusData,
   useJitDbAccessStatusQuery,
@@ -15,7 +16,7 @@ const ACCESS_TITLE = "You have access to the project's database"
 
 export const JitDbAccessInfo = () => {
   const { ref: projectRef } = useParams()
-  const { data: jitDbAccess } = useJitDbAccessStatusQuery({ projectRef })
+  const { data: jitDbAccess, error, isError } = useJitDbAccessStatusQuery({ projectRef })
 
   const { can: canManageJitDbAccess } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
@@ -23,7 +24,15 @@ export const JitDbAccessInfo = () => {
 
   if (!jitDbAccess) return null
 
-  if (jitDbAccess.user_id === undefined) {
+  if (isError) {
+    return (
+      <AlertError
+        className="border-0 rounded-none"
+        subject="Failed to retrieve access status"
+        error={error}
+      />
+    )
+  } else if (jitDbAccess.user_id === undefined) {
     if (!canManageJitDbAccess) return <NoAccess />
     else return null
   } else if (jitDbAccess.user_roles.length === 1) {
@@ -99,27 +108,25 @@ const MultiRoleAccess = ({ roles }: { roles: JitDbAccessStatusData['user_roles']
   return (
     <Collapsible className={canManageJitDbAccess ? 'border-b' : ''}>
       <CollapsibleTrigger
-        asChild
-        className="py-4 px-4 [&[data-state=open]>svg]:-rotate-180! w-full"
+        type="button"
+        className="flex items-center justify-between gap-x-2 w-full py-4 px-4 text-left cursor-pointer [&[data-state=open]>svg]:-rotate-180!"
       >
-        <div className="flex items-center justify-between gap-x-2 w-full cursor-pointer">
-          <div className="text-sm">
-            <p className="mb-0.5">{ACCESS_TITLE}</p>
-            <div className="flex items-center gap-x-2 text-foreground-light">
-              <span>Assigned {roles.length} roles</span>
-              {nextExpiry !== undefined && (
-                <>
-                  <span>·</span>
-                  <span>
-                    <span>Next expiry on</span>{' '}
-                    <TimestampInfo className="text-sm" utcTimestamp={nextExpiry * 1000} />
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-          <ChevronDownIcon className="transition-transform" size={14} />
-        </div>
+        <span className="block text-sm">
+          <span className="block mb-0.5">{ACCESS_TITLE}</span>
+          <span className="flex items-center gap-x-2 text-foreground-light">
+            <span>Assigned {roles.length} roles</span>
+            {nextExpiry !== undefined && (
+              <>
+                <span>·</span>
+                <span>
+                  <span>Next expiry on</span>{' '}
+                  <TimestampInfo className="text-sm" utcTimestamp={nextExpiry * 1000} />
+                </span>
+              </>
+            )}
+          </span>
+        </span>
+        <ChevronDownIcon className="transition-transform" size={14} />
       </CollapsibleTrigger>
       <CollapsibleContent className="data-closed:animate-collapsible-up-clipped data-open:animate-collapsible-down-clipped motion-reduce:animate-none">
         {roles.map((role) => {
