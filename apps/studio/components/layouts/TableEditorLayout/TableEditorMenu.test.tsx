@@ -87,7 +87,7 @@ describe('TableEditorMenu telemetry', () => {
       { nuqs: { searchParams: { schema: 'public' }, hasMemory: true } }
     )
 
-  it('tracks schema switches once per change with system/public flags and no schema names', async () => {
+  it('tracks schema switches once per change with the schema type and no schema names', async () => {
     const user = userEvent.setup()
     renderMenu()
 
@@ -98,20 +98,20 @@ describe('TableEditorMenu telemetry', () => {
     await user.click(await screen.findByRole('option', { name: 'public' }))
     expect(telemetryRequests).toHaveLength(0)
 
-    // Switch to system schema (verifies cmdk option click fires once, not twice)
+    // Switch to a protected schema (verifies cmdk option click fires once, not twice)
     await user.click(trigger)
     await user.click(await screen.findByRole('option', { name: 'auth' }))
 
     await waitFor(() => {
       expect(telemetryRequests).toMatchObject([
         {
-          action: 'table_editor_schema_updated',
-          custom_properties: { isSystemSchema: true, isPublic: false },
+          action: 'table_editor_schema_selector_updated',
+          custom_properties: { schemaType: 'protected' },
         },
       ])
     })
 
-    // Switch to custom user schema
+    // Switch to a custom schema
     await user.click(trigger)
     await user.click(await screen.findByRole('option', { name: 'custom_app' }))
 
@@ -119,8 +119,8 @@ describe('TableEditorMenu telemetry', () => {
       expect(telemetryRequests).toHaveLength(2)
     })
     expect(telemetryRequests[1]).toMatchObject({
-      action: 'table_editor_schema_updated',
-      custom_properties: { isSystemSchema: false, isPublic: false },
+      action: 'table_editor_schema_selector_updated',
+      custom_properties: { schemaType: 'custom' },
     })
 
     // Switch back to public
@@ -131,8 +131,8 @@ describe('TableEditorMenu telemetry', () => {
       expect(telemetryRequests).toHaveLength(3)
     })
     expect(telemetryRequests[2]).toMatchObject({
-      action: 'table_editor_schema_updated',
-      custom_properties: { isSystemSchema: false, isPublic: true },
+      action: 'table_editor_schema_selector_updated',
+      custom_properties: { schemaType: 'public' },
     })
     expect(JSON.stringify(telemetryRequests)).not.toContain('custom_app')
   })
@@ -186,8 +186,8 @@ describe('TableEditorMenu telemetry', () => {
       expect(telemetryRequests).toHaveLength(2)
     })
     expect(telemetryRequests[1]).toMatchObject({
-      action: 'table_editor_schema_updated',
-      custom_properties: { isSystemSchema: true, isPublic: false },
+      action: 'table_editor_schema_selector_updated',
+      custom_properties: { schemaType: 'protected' },
     })
   })
 })

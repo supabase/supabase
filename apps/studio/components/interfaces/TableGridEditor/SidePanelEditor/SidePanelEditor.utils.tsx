@@ -266,10 +266,14 @@ export const createColumn = async ({
       })
     }
 
-    track?.('table_column_created', {
-      hasForeignKey: foreignKeyRelations.some((fk) => !fk.toRemove),
-      isArray: Boolean(payload.type.isArray),
-    })
+    track?.(
+      'table_column_created',
+      {
+        hasForeignKey: foreignKeyRelations.some((fk) => !fk.toRemove),
+        isArray: Boolean(payload.type.isArray),
+      },
+      { project: projectRef }
+    )
 
     if (!skipSuccessMessage) {
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
@@ -357,16 +361,20 @@ export const updateColumn = async ({
       })
     }
 
-    track?.('table_column_updated', {
-      hasForeignKey:
-        foreignKeyRelations.length > 0
-          ? foreignKeyRelations.some((fk) => !fk.toRemove)
-          : existingForeignKeyRelations.length > 0,
-      isArray:
-        payload.type !== undefined
-          ? Boolean(payload.type.isArray)
-          : originalColumn.data_type === 'ARRAY',
-    })
+    track?.(
+      'table_column_updated',
+      {
+        hasForeignKey:
+          foreignKeyRelations.length > 0
+            ? foreignKeyRelations.some((fk) => !fk.toRemove)
+            : existingForeignKeyRelations.length > 0,
+        isArray:
+          payload.type !== undefined
+            ? Boolean(payload.type.isArray)
+            : originalColumn.data_type === 'ARRAY',
+      },
+      { project: projectRef }
+    )
 
     if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
@@ -915,9 +923,11 @@ export const updateTable = async ({
   })
 
   if (!hasError) {
-    track('table_updated', {
-      columnCountChanged: columns.length !== originalColumns.length,
-    })
+    track(
+      'table_updated',
+      { columnCountChanged: columns.length !== originalColumns.length },
+      { project: projectRef }
+    )
   }
 
   return {

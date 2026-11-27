@@ -306,7 +306,11 @@ export const SidePanelEditor = ({
               onSuccess: () => {
                 toast.success('Successfully updated row')
                 if (isRowEditorSave) {
-                  track('table_editor_row_updated', { editMethod: 'side_panel' })
+                  track(
+                    'table_editor_row_updated',
+                    { editMethod: 'side_panel' },
+                    { project: project.ref }
+                  )
                 }
               },
             })

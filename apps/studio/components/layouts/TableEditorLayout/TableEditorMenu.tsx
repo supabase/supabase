@@ -42,7 +42,11 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import {
+  getDatabaseSchemaType,
+  useIsProtectedSchema,
+  useProtectedSchemas,
+} from '@/hooks/useProtectedSchemas'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -115,6 +119,7 @@ export const TableEditorMenu = () => {
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const { data: protectedSchemas } = useProtectedSchemas()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -160,9 +165,8 @@ export const TableEditorMenu = () => {
     setSelectedSchema(name)
     setIsSchemaDropdownOpen(false)
     if (name !== selectedSchema) {
-      track('table_editor_schema_updated', {
-        isSystemSchema: INTERNAL_SCHEMAS.includes(name) || name.startsWith('pg_'),
-        isPublic: name === 'public',
+      track('table_editor_schema_selector_updated', {
+        schemaType: getDatabaseSchemaType(name, protectedSchemas),
       })
     }
   }

@@ -1,4 +1,5 @@
 import { QUEUES_SCHEMA } from '@supabase/pg-meta'
+import type { DatabaseSchemaType } from 'common/telemetry-constants'
 import { uniq, uniqBy } from 'lodash'
 import { useMemo } from 'react'
 
@@ -40,6 +41,18 @@ export const INTERNAL_SCHEMAS = [
   'graphql_public',
   QUEUES_SCHEMA,
 ]
+
+/**
+ * Classifies a schema for telemetry without sending its name.
+ */
+export const getDatabaseSchemaType = (
+  name: string,
+  protectedSchemas: ReadonlyArray<{ name: string }>
+): DatabaseSchemaType => {
+  if (name === 'public') return 'public'
+  if (protectedSchemas.some((schema) => schema.name === name)) return 'protected'
+  return 'custom'
+}
 
 /**
  * Get the list of schemas used by FDWs like Iceberg, S3 Vectors, etc.
