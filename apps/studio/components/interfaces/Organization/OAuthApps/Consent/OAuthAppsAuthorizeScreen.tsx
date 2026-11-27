@@ -506,11 +506,12 @@ export const OAuthAppsAuthorizeScreen = ({
                 <div className="flex flex-col gap-2">
                   <div>
                     Your Read-only role can't grant everything {request.name} asked for. It will get
-                    the access you have; tools that need more will be unavailable.
+                    the access you have, tools that need more will be unavailable.
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="allow_partial_grants"
+                      checked={hasApprovedPartialGrant}
                       onCheckedChange={(value) => setHasApprovedPartialGrant(value === true)}
                     />
                     <label

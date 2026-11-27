@@ -146,11 +146,11 @@ export const ProjectMultiSelect = ({
       )}
 
       <div id="projects-description" aria-live="polite">
-        {hasFlagged && unavailableRefs.length > 0 && (
+        {hasFlagged && flaggedRefs.length > 0 && (
           <p className="text-xs text-destructive">
             {selectedProjectRefs.length > 1
-              ? `${unavailableRefs.length} of ${selectedProjectRefs.length} ${selectedProjectRefs.length === 1 ? 'project has' : 'projects have'} issues`
-              : `${unavailableRefs.length} project has issues`}
+              ? `${flaggedRefs.length} of ${selectedProjectRefs.length} ${selectedProjectRefs.length === 1 ? 'project has' : 'projects have'} issues`
+              : `${flaggedRefs.length} project has issues`}
           </p>
         )}
         {atCap && (
