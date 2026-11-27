@@ -14,7 +14,7 @@
    * A hairline ring in the border token gives the block an edge against the page, drawn as an
    * inset shadow so it never changes the skeleton's size. Variants add depth after it.
    */
-  --hs-ring: color-mix(in oklab, var(--border-default) 80%, transparent);
+  --hs-ring: color-mix(in oklab, var(--border-default) 90%, transparent);
   --hs-depth: 0 0 transparent;
 
   position: relative;
@@ -39,20 +39,22 @@
  * and below the sweep, so the light still crosses the recess.
  */
 .inset {
-  --hs-inset-shadow: color-mix(in oklab, currentColor 14%, transparent);
-  --hs-inset-light: color-mix(in oklab, var(--background-default) 90%, transparent);
+  --hs-inset-shadow: color-mix(in oklab, currentColor 22%, transparent);
+  --hs-inset-crease: color-mix(in oklab, currentColor 10%, transparent);
+  --hs-inset-light: var(--background-default);
 
   --hs-depth:
-    inset 0 1px 2px var(--hs-inset-shadow),
-    inset 0 1px 0 color-mix(in oklab, currentColor 6%, transparent),
+    inset 0 1.5px 3px var(--hs-inset-shadow), inset 0 1px 0 var(--hs-inset-crease),
     inset 0 -1px 0 var(--hs-inset-light);
 }
 
-/* In dark themes the page background is the darker tone, so it casts the shadow instead. */
+/* In dark themes a darker shade of the page background casts the shadow instead. */
 :global(.dark) .inset,
 :global([data-theme*='dark']) .inset {
-  --hs-inset-shadow: color-mix(in oklab, var(--background-default) 85%, transparent);
-  --hs-inset-light: color-mix(in oklab, currentColor 10%, transparent);
+  /* The page background is barely darker than the fill here, so the shade is derived from it. */
+  --hs-inset-shadow: oklch(from var(--background-default) calc(l * 0.55) c h);
+  --hs-inset-crease: oklch(from var(--background-default) calc(l * 0.7) c h / 0.8);
+  --hs-inset-light: color-mix(in oklab, currentColor 15%, transparent);
 }
 
 /* The sweep is a transform on a pseudo-element, so the compositor animates it without repaints. */
