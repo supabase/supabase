@@ -37,6 +37,7 @@ import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { AuthorizationSection } from './Authorization'
 import {
   AuthorizationValues,
+  AuthorizationValuesWithPartialGrants,
   getAuthorizationChanges,
   hasAuthorizationChanges,
 } from './Authorization.utils'
@@ -44,6 +45,8 @@ import { AuthorizationConfirmDialog } from './AuthorizationConfirmDialog'
 import {
   formSchema,
   FormSchema,
+  formSchemaWithOAuthAppPartialGrants,
+  FormSchemaWithOAuthAppPartialGrants,
   FormSchemaWithOAuthAppScopedGrants,
   formSchemaWithOAuthAppScopedGrants,
 } from './PublishAppSidePanel.utils'
@@ -71,16 +74,34 @@ export interface PublishAppSidePanelProps {
 
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: true
+  withOAuthAppScopedGrants: true,
+  withOAuthAppPartialGrants: true
+): FormSchemaWithOAuthAppPartialGrants
+function getFormDefaultValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants: true,
+  withOAuthAppPartialGrants: false
 ): FormSchemaWithOAuthAppScopedGrants
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: false
+  withOAuthAppScopedGrants: true,
+  withOAuthAppPartialGrants: boolean
+): FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants
+function getFormDefaultValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants: false,
+  withOAuthAppPartialGrants: false
 ): FormSchema
 function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants: boolean = false
-): FormSchema | FormSchemaWithOAuthAppScopedGrants {
+  withOAuthAppScopedGrants: boolean,
+  withOAuthAppPartialGrants: boolean
+): FormSchema | FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants
+function getFormDefaultValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants: boolean = false,
+  withOAuthAppPartialGrants: boolean = false
+): FormSchema | FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants {
   if (selectedApp) {
     if (!withOAuthAppScopedGrants) {
       return {
@@ -100,15 +121,7 @@ function getFormDefaultValues(
         selectedApp.redirect_uris?.map((url) => {
           return { id: uuidv4(), value: url }
         }) ?? [],
-      ...getSavedAuthorizationValues(selectedApp),
-    }
-  }
-
-  if (!withOAuthAppScopedGrants) {
-    return {
-      name: '',
-      website: '',
-      redirect_uris: [{ id: uuidv4(), value: '' }],
+      ...getSavedAuthorizationValues(selectedApp, withOAuthAppPartialGrants),
     }
   }
 
@@ -116,12 +129,43 @@ function getFormDefaultValues(
     name: '',
     website: '',
     redirect_uris: [{ id: uuidv4(), value: '' }],
-    member_bound_grant: false,
-    project_scoping: false,
+    ...(withOAuthAppScopedGrants
+      ? {
+          member_bound_grant: false,
+          project_scoping: false,
+          ...(withOAuthAppPartialGrants
+            ? {
+                allow_partial_grants: false,
+              }
+            : {}),
+        }
+      : {}),
   }
 }
 
-function getSavedAuthorizationValues(selectedApp: OAuthApp | undefined): AuthorizationValues {
+function getSavedAuthorizationValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppPartialGrants: true
+): AuthorizationValuesWithPartialGrants
+function getSavedAuthorizationValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppPartialGrants: false
+): AuthorizationValues
+function getSavedAuthorizationValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppPartialGrants: boolean
+): AuthorizationValues | AuthorizationValuesWithPartialGrants
+function getSavedAuthorizationValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppPartialGrants: boolean = false
+): AuthorizationValues | AuthorizationValuesWithPartialGrants {
+  if (withOAuthAppPartialGrants) {
+    return {
+      member_bound_grant: selectedApp?.grant_kind === 'member_bound',
+      project_scoping: selectedApp?.project_scoping_mode === true,
+      allow_partial_grants: selectedApp?.allow_partial_grants === true,
+    }
+  }
   return {
     member_bound_grant: selectedApp?.grant_kind === 'member_bound',
     project_scoping: selectedApp?.project_scoping_mode === true,
@@ -139,6 +183,7 @@ export const PublishAppSidePanel = ({
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
   const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
+  const areOAuthAppPartialGrantsEnabled = useFlag('enableScopedOAuthPartialGrants')
 
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -170,10 +215,14 @@ export const PublishAppSidePanel = ({
   const [valuesPendingConfirmation, setValuesPendingConfirmation] =
     useState<FormSchemaWithOAuthAppScopedGrants>()
 
-  const savedAuthorizationValues = getSavedAuthorizationValues(selectedApp)
+  const savedAuthorizationValues = getSavedAuthorizationValues(
+    selectedApp,
+    areOAuthAppPartialGrantsEnabled
+  )
   const pendingAuthorizationChanges = getAuthorizationChanges(
     savedAuthorizationValues,
-    valuesPendingConfirmation ?? savedAuthorizationValues
+    valuesPendingConfirmation ?? savedAuthorizationValues,
+    areOAuthAppPartialGrantsEnabled
   )
 
   useEffect(() => {
@@ -201,7 +250,9 @@ export const PublishAppSidePanel = ({
     event.target.value = ''
   }
 
-  const saveApp = async (values: FormSchema | FormSchemaWithOAuthAppScopedGrants) => {
+  const saveApp = async (
+    values: FormSchema | FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants
+  ) => {
     if (!slug) return console.error('Slug is required')
     if (isSaving) return
 
@@ -228,11 +279,6 @@ export const PublishAppSidePanel = ({
 
     try {
       const { name, website, redirect_uris } = values
-      let member_bound_grant, project_scoping
-      if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
-        member_bound_grant = values.member_bound_grant
-        project_scoping = values.project_scoping
-      }
 
       if (selectedApp === undefined) {
         // Create application
@@ -243,12 +289,18 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
-          ...(areOAuthAppScopedGrantsEnabled
+          ...(isFormValuesWithOAuthAppPartialGrants(values, areOAuthAppPartialGrantsEnabled)
             ? {
-                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
-                project_scoping_mode: project_scoping,
+                grant_kind: values.member_bound_grant ? 'member_bound' : 'organization_bound',
+                project_scoping_mode: values.project_scoping,
+                allow_partial_grants: values.allow_partial_grants,
               }
-            : {}),
+            : isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)
+              ? {
+                  grant_kind: values.member_bound_grant ? 'member_bound' : 'organization_bound',
+                  project_scoping_mode: values.project_scoping,
+                }
+              : {}),
         })
       } else {
         // Update application
@@ -260,12 +312,18 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
-          ...(areOAuthAppScopedGrantsEnabled
+          ...(isFormValuesWithOAuthAppPartialGrants(values, areOAuthAppPartialGrantsEnabled)
             ? {
-                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
-                project_scoping_mode: project_scoping,
+                grant_kind: values.member_bound_grant ? 'member_bound' : 'organization_bound',
+                project_scoping_mode: values.project_scoping,
+                allow_partial_grants: values.allow_partial_grants,
               }
-            : {}),
+            : isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)
+              ? {
+                  grant_kind: values.member_bound_grant ? 'member_bound' : 'organization_bound',
+                  project_scoping_mode: values.project_scoping,
+                }
+              : {}),
         })
       }
     } catch {
@@ -275,12 +333,19 @@ export const PublishAppSidePanel = ({
     }
   }
 
-  const onSubmit: SubmitHandler<FormSchema | FormSchemaWithOAuthAppScopedGrants> = async (
-    values
-  ) => {
-    if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
-      const changes = getAuthorizationChanges(savedAuthorizationValues, values)
-      if (hasAuthorizationChanges(changes)) {
+  const onSubmit: SubmitHandler<
+    FormSchema | FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants
+  > = async (values) => {
+    if (
+      isFormValuesWithOAuthAppPartialGrants(values, areOAuthAppPartialGrantsEnabled) ||
+      isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)
+    ) {
+      const changes = getAuthorizationChanges(
+        savedAuthorizationValues,
+        values,
+        areOAuthAppPartialGrantsEnabled
+      )
+      if (hasAuthorizationChanges(changes, areOAuthAppPartialGrantsEnabled)) {
         setValuesPendingConfirmation(values)
         return
       }
@@ -294,16 +359,24 @@ export const PublishAppSidePanel = ({
     await saveApp(valuesPendingConfirmation)
     setValuesPendingConfirmation(undefined)
   }
-
   const form = useForm<
-    typeof areOAuthAppScopedGrantsEnabled extends true
-      ? FormSchemaWithOAuthAppScopedGrants
-      : FormSchema
+    typeof areOAuthAppPartialGrantsEnabled extends true
+      ? FormSchemaWithOAuthAppPartialGrants
+      : typeof areOAuthAppScopedGrantsEnabled extends true
+        ? FormSchemaWithOAuthAppScopedGrants
+        : FormSchema
   >({
-    // @ts-expect-error known issue in TS https://github.com/microsoft/TypeScript/issues/50754
-    defaultValues: getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled),
+    defaultValues: getFormDefaultValues(
+      selectedApp,
+      areOAuthAppScopedGrantsEnabled,
+      areOAuthAppPartialGrantsEnabled
+    ),
     resolver: zodResolver(
-      areOAuthAppScopedGrantsEnabled ? formSchemaWithOAuthAppScopedGrants : formSchema
+      areOAuthAppScopedGrantsEnabled
+        ? formSchemaWithOAuthAppPartialGrants
+        : areOAuthAppScopedGrantsEnabled
+          ? formSchemaWithOAuthAppScopedGrants
+          : formSchema
     ),
   })
   const { reset } = form
@@ -529,7 +602,11 @@ export const PublishAppSidePanel = ({
             </>
           )}
 
-          {isFormSchemaWithOAuthAppScopedGrants(form.control, areOAuthAppScopedGrantsEnabled) && (
+          {isFormSchemaWithOAuthAppPartialGrants(
+            form.control,
+            areOAuthAppPartialGrantsEnabled ||
+              isFormSchemaWithOAuthAppScopedGrants(form.control, areOAuthAppScopedGrantsEnabled)
+          ) && (
             <>
               <SidePanel.Separator />
               <AuthorizationSection
@@ -537,6 +614,7 @@ export const PublishAppSidePanel = ({
                 savedValues={selectedApp === undefined ? undefined : savedAuthorizationValues}
                 organizationName={organization?.name}
                 scopes={scopes}
+                areOAuthAppPartialGrantsEnabled={areOAuthAppPartialGrantsEnabled}
               />
             </>
           )}
@@ -605,9 +683,26 @@ const isFormSchemaWithOAuthAppScopedGrants = (
   return withOAuthAppScopedGrants
 }
 
+const isFormSchemaWithOAuthAppPartialGrants = (
+  _schema:
+    | Control<FormSchema>
+    | Control<FormSchemaWithOAuthAppScopedGrants>
+    | Control<FormSchemaWithOAuthAppPartialGrants>,
+  withOAuthAppPartialGrants: boolean
+): _schema is Control<FormSchemaWithOAuthAppPartialGrants> => {
+  return withOAuthAppPartialGrants
+}
+
 const isFormValuesWithOAuthAppScopedGrants = (
   _values: FormSchema | FormSchemaWithOAuthAppScopedGrants,
   withOAuthAppScopedGrants: boolean
 ): _values is FormSchemaWithOAuthAppScopedGrants => {
   return withOAuthAppScopedGrants
+}
+
+const isFormValuesWithOAuthAppPartialGrants = (
+  _values: FormSchema | FormSchemaWithOAuthAppScopedGrants | FormSchemaWithOAuthAppPartialGrants,
+  withOAuthAppPartialGrants: boolean
+): _values is FormSchemaWithOAuthAppPartialGrants => {
+  return withOAuthAppPartialGrants
 }

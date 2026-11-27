@@ -6,10 +6,13 @@ import { describe, expect, test } from 'vitest'
 
 import { MEMBER_BOUND_GRANT_NOTICE } from '../Consent/AuthorizingAsCard'
 import { AuthorizationSection } from './Authorization'
-import { AuthorizationValues, DEFAULT_AUTHORIZATION_VALUES } from './Authorization.utils'
 import {
-  formSchemaWithOAuthAppScopedGrants,
-  FormSchemaWithOAuthAppScopedGrants,
+  AuthorizationValuesWithPartialGrants,
+  DEFAULT_AUTHORIZATION_VALUES_WITH_PARTIAL_GRANTS,
+} from './Authorization.utils'
+import {
+  FormSchemaWithOAuthAppPartialGrants,
+  formSchemaWithOAuthAppPartialGrants,
 } from './PublishAppSidePanel.utils'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -17,16 +20,17 @@ const OWNER_OPTION = /An owner, once for the whole organization/
 const MEMBER_OPTION = /Each member, for themselves/
 const ALL_PROJECTS_OPTION = /^All projects(?! in)/
 const LET_THEM_CHOOSE_OPTION = /Let them choose/
+const DISALLOW_PARTIAL_GRANTS = /Disallow partial grants/
 
-const TestForm = ({ savedValues }: { savedValues?: AuthorizationValues }) => {
-  const form = useForm<FormSchemaWithOAuthAppScopedGrants>({
+const TestForm = ({ savedValues }: { savedValues?: AuthorizationValuesWithPartialGrants }) => {
+  const form = useForm<FormSchemaWithOAuthAppPartialGrants>({
     defaultValues: {
       name: 'Acme Deploy',
       website: 'https://acme.test',
       redirect_uris: [{ id: 'one', value: 'https://acme.test/callback' }],
-      ...(savedValues ?? DEFAULT_AUTHORIZATION_VALUES),
+      ...(savedValues ?? DEFAULT_AUTHORIZATION_VALUES_WITH_PARTIAL_GRANTS),
     },
-    resolver: zodResolver(formSchemaWithOAuthAppScopedGrants),
+    resolver: zodResolver(formSchemaWithOAuthAppPartialGrants),
   })
 
   return (
@@ -35,6 +39,7 @@ const TestForm = ({ savedValues }: { savedValues?: AuthorizationValues }) => {
         control={form.control}
         savedValues={savedValues}
         organizationName="Acme"
+        areOAuthAppScopedGrantsEnabled
       />
     </Form>
   )
@@ -51,7 +56,7 @@ describe('AuthorizationSection', () => {
   })
 
   test('an app on the default setup marks owner and all projects as current, with nothing locked', async () => {
-    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES_WITH_PARTIAL_GRANTS} />)
 
     expect(await screen.findByRole('radio', { name: OWNER_OPTION })).toBeEnabled()
     expect(await screen.findByRole('radio', { name: ALL_PROJECTS_OPTION })).toBeEnabled()
@@ -60,16 +65,25 @@ describe('AuthorizationSection', () => {
   })
 
   test('a saved stricter value disables the looser option', async () => {
-    customRender(<TestForm savedValues={{ member_bound_grant: true, project_scoping: true }} />)
+    customRender(
+      <TestForm
+        savedValues={{
+          member_bound_grant: true,
+          project_scoping: true,
+          allow_partial_grants: true,
+        }}
+      />
+    )
 
     expect(await screen.findByRole('radio', { name: OWNER_OPTION })).toBeDisabled()
     expect(await screen.findByRole('radio', { name: ALL_PROJECTS_OPTION })).toBeDisabled()
-    expect(screen.getAllByText("Can't switch back")).toHaveLength(2)
-    expect(screen.getAllByText('Current')).toHaveLength(2)
+    expect(await screen.findByRole('radio', { name: DISALLOW_PARTIAL_GRANTS })).toBeDisabled()
+    expect(screen.getAllByText("Can't switch back")).toHaveLength(3)
+    expect(screen.getAllByText('Current')).toHaveLength(3)
   })
 
   test('the preview describes the resulting grant and what it is today', async () => {
-    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES_WITH_PARTIAL_GRANTS} />)
 
     expect(
       await screen.findByText('One grant for the organization, every project in it')
@@ -87,7 +101,7 @@ describe('AuthorizationSection', () => {
   })
 
   test('the preview only explains the grant acts as you for member-bound grants', async () => {
-    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES_WITH_PARTIAL_GRANTS} />)
 
     await screen.findByText('Authorize Acme Deploy')
     expect(screen.queryByText(MEMBER_BOUND_GRANT_NOTICE)).toBeNull()

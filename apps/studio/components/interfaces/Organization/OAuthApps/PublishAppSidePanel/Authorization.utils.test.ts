@@ -4,35 +4,8 @@ import {
   getAllProjectsRowLabel,
   getAuthorizationChangeDescriptions,
   getAuthorizationChanges,
-  getResultingGrantDescription,
   hasAuthorizationChanges,
 } from './Authorization.utils'
-
-describe('getResultingGrantDescription', () => {
-  test('describes a single organization-wide grant by default', () => {
-    expect(getResultingGrantDescription(false, false)).toEqual(
-      'One grant for the organization, every project in it'
-    )
-  })
-
-  test('describes per-member grants when only the approver is member-bound', () => {
-    expect(getResultingGrantDescription(true, false)).toEqual(
-      'One grant per member, every project that member can access'
-    )
-  })
-
-  test('describes chosen projects when only project scoping is on', () => {
-    expect(getResultingGrantDescription(false, true)).toEqual(
-      'One grant for the organization, projects chosen when connecting'
-    )
-  })
-
-  test('describes per-member scoped grants when both are strict', () => {
-    expect(getResultingGrantDescription(true, true)).toEqual(
-      'One grant per member, projects chosen when connecting'
-    )
-  })
-})
 
 describe('getAllProjectsRowLabel', () => {
   test('names the organization for an organization-bound grant', () => {
@@ -49,37 +22,84 @@ describe('getAllProjectsRowLabel', () => {
 })
 
 describe('getAuthorizationChanges', () => {
-  const defaults = { member_bound_grant: false, project_scoping: false }
+  const defaults = {
+    member_bound_grant: false,
+    project_scoping: false,
+    allow_partial_grants: false,
+  }
 
-  test('reports no changes when nothing moved', () => {
-    const changes = getAuthorizationChanges(defaults, defaults)
-    expect(changes).toEqual({ isApproverChanged: false, isProjectReachChanged: false })
-    expect(hasAuthorizationChanges(changes)).toBe(false)
+  test('reports no changes when nothing moved with partial grant disabled', () => {
+    const changes = getAuthorizationChanges(defaults, defaults, false)
+    expect(changes).toEqual({
+      isApproverChanged: false,
+      isProjectReachChanged: false,
+    })
+    expect(hasAuthorizationChanges(changes, false)).toBe(false)
   })
 
-  test('reports each field that became stricter', () => {
-    const changes = getAuthorizationChanges(defaults, {
-      member_bound_grant: true,
-      project_scoping: true,
+  test('reports no changes when nothing moved with partial grant enabled', () => {
+    const changes = getAuthorizationChanges(defaults, defaults, true)
+    expect(changes).toEqual({
+      isApproverChanged: false,
+      isProjectReachChanged: false,
+      isPartialGrantChanged: false,
     })
-    expect(changes).toEqual({ isApproverChanged: true, isProjectReachChanged: true })
-    expect(hasAuthorizationChanges(changes)).toBe(true)
+    expect(hasAuthorizationChanges(changes, true)).toBe(false)
+  })
+
+  test('reports each field that became stricter with partial grant disabled', () => {
+    const changes = getAuthorizationChanges(
+      defaults,
+      {
+        member_bound_grant: true,
+        project_scoping: true,
+      },
+      false
+    )
+    expect(changes).toEqual({
+      isApproverChanged: true,
+      isProjectReachChanged: true,
+    })
+    expect(hasAuthorizationChanges(changes, false)).toBe(true)
+  })
+
+  test('reports each field that became stricter with partial grant enabled', () => {
+    const changes = getAuthorizationChanges(
+      defaults,
+      {
+        member_bound_grant: true,
+        project_scoping: true,
+        allow_partial_grants: true,
+      },
+      true
+    )
+    expect(changes).toEqual({
+      isApproverChanged: true,
+      isProjectReachChanged: true,
+      isPartialGrantChanged: true,
+    })
+    expect(hasAuthorizationChanges(changes, true)).toBe(true)
   })
 
   test('ignores a field that is already saved as strict', () => {
     const changes = getAuthorizationChanges(
-      { member_bound_grant: true, project_scoping: false },
-      { member_bound_grant: true, project_scoping: true }
+      { member_bound_grant: true, project_scoping: false, allow_partial_grants: false },
+      { member_bound_grant: true, project_scoping: true, allow_partial_grants: true },
+      true
     )
-    expect(changes).toEqual({ isApproverChanged: false, isProjectReachChanged: true })
+    expect(changes).toEqual({
+      isApproverChanged: false,
+      isProjectReachChanged: true,
+      isPartialGrantChanged: true,
+    })
   })
 
   test('does not report a move back to a looser value as a change', () => {
     const changes = getAuthorizationChanges(
-      { member_bound_grant: true, project_scoping: true },
+      { member_bound_grant: true, project_scoping: true, allow_partial_grants: true },
       defaults
     )
-    expect(hasAuthorizationChanges(changes)).toBe(false)
+    expect(hasAuthorizationChanges(changes, false)).toBe(false)
   })
 })
 
@@ -89,6 +109,7 @@ describe('getAuthorizationChangeDescriptions', () => {
       getAuthorizationChangeDescriptions({
         isApproverChanged: false,
         isProjectReachChanged: false,
+        isPartialGrantChanged: false,
       })
     ).toEqual([])
   })
@@ -97,6 +118,7 @@ describe('getAuthorizationChangeDescriptions', () => {
     const descriptions = getAuthorizationChangeDescriptions({
       isApproverChanged: true,
       isProjectReachChanged: true,
+      isPartialGrantChanged: false,
     })
     expect(descriptions).toHaveLength(2)
     expect(descriptions[0]).toContain('their own access')

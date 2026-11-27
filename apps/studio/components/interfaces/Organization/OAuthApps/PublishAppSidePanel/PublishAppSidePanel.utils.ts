@@ -28,3 +28,11 @@ export const formSchemaWithOAuthAppScopedGrants = formSchema.extend({
 })
 
 export type FormSchemaWithOAuthAppScopedGrants = z.infer<typeof formSchemaWithOAuthAppScopedGrants>
+
+export const formSchemaWithOAuthAppPartialGrants = formSchemaWithOAuthAppScopedGrants.extend({
+  allow_partial_grants: z.coerce.boolean(),
+})
+
+export type FormSchemaWithOAuthAppPartialGrants = z.infer<
+  typeof formSchemaWithOAuthAppPartialGrants
+>

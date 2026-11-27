@@ -7,10 +7,11 @@ import { MEMBER_BOUND_GRANT_NOTICE } from '../Consent/AuthorizingAsCard'
 import { ScopeGroupCard } from '../Consent/ScopeGroupCard'
 import {
   AuthorizationValues,
+  AuthorizationValuesWithPartialGrants,
   getAllProjectsRowLabel,
   getResultingGrantDescription,
 } from './Authorization.utils'
-import { FormSchemaWithOAuthAppScopedGrants } from './PublishAppSidePanel.utils'
+import { FormSchemaWithOAuthAppPartialGrants } from './PublishAppSidePanel.utils'
 import { INTERSTITIAL_WIDTH_CLASS } from '@/components/layouts/InterstitialLayout'
 
 const APPROVER_OPTIONS = {
@@ -37,6 +38,19 @@ const PROJECT_REACH_OPTIONS = {
     label: 'Let them choose',
     description:
       "People connecting pick all projects or specific ones. Requests to projects they didn't pick return 403.",
+  },
+} as const
+
+const ALLOW_PARTIAL_GRANTS_OPTIONS = {
+  looser: {
+    value: 'forbid',
+    label: 'Disallow partial grants',
+    description: 'Users must have all the requested permissions.',
+  },
+  stricter: {
+    value: 'allow',
+    label: 'Allow partial grants',
+    description: 'Users may not have all the requested permissions.',
   },
 } as const
 
@@ -153,8 +167,9 @@ interface AuthorizationPreviewProps {
   scopes: string[]
   isMemberBoundGrant: boolean
   isProjectScopingEnabled: boolean
+  isPartialGrantEnabled: boolean
   organizationName?: string
-  savedValues?: AuthorizationValues
+  savedValues?: AuthorizationValues | AuthorizationValuesWithPartialGrants
 }
 
 const AuthorizationPreview = ({
@@ -162,13 +177,16 @@ const AuthorizationPreview = ({
   scopes,
   isMemberBoundGrant,
   isProjectScopingEnabled,
+  isPartialGrantEnabled,
   organizationName,
   savedValues,
 }: AuthorizationPreviewProps) => {
   const hasUnsavedChanges =
     savedValues !== undefined &&
     (savedValues.member_bound_grant !== isMemberBoundGrant ||
-      savedValues.project_scoping !== isProjectScopingEnabled)
+      savedValues.project_scoping !== isProjectScopingEnabled ||
+      (savedValues as AuthorizationValuesWithPartialGrants).allow_partial_grants !==
+        isPartialGrantEnabled)
 
   return (
     <section className="overflow-hidden rounded-lg border">
@@ -260,7 +278,11 @@ const AuthorizationPreview = ({
           <p className="text-sm">
             <span className="text-foreground-lighter">Resulting grant: </span>
             <span className="text-foreground-light">
-              {getResultingGrantDescription(isMemberBoundGrant, isProjectScopingEnabled)}
+              {getResultingGrantDescription(
+                isMemberBoundGrant,
+                isProjectScopingEnabled,
+                isPartialGrantEnabled
+              )}
             </span>
           </p>
           {hasUnsavedChanges && (
@@ -268,7 +290,8 @@ const AuthorizationPreview = ({
               Today:{' '}
               {getResultingGrantDescription(
                 savedValues.member_bound_grant,
-                savedValues.project_scoping
+                savedValues.project_scoping,
+                (savedValues as AuthorizationValuesWithPartialGrants).allow_partial_grants
               )}
             </p>
           )}
@@ -279,12 +302,13 @@ const AuthorizationPreview = ({
 }
 
 export interface AuthorizationSectionProps {
-  control: Control<FormSchemaWithOAuthAppScopedGrants>
+  control: Control<FormSchemaWithOAuthAppPartialGrants | FormSchemaWithOAuthAppPartialGrants>
   /** The values persisted on the app, or undefined while publishing a new app. */
   savedValues?: AuthorizationValues
   organizationName?: string
   /** The scopes the app is asking for, mirrored into the consent preview. */
   scopes?: string[]
+  areOAuthAppPartialGrantsEnabled?: boolean
 }
 
 export const AuthorizationSection = ({
@@ -292,10 +316,11 @@ export const AuthorizationSection = ({
   savedValues,
   organizationName,
   scopes = [],
+  areOAuthAppPartialGrantsEnabled = false,
 }: AuthorizationSectionProps) => {
-  const [appName, isMemberBoundGrant, isProjectScopingEnabled] = useWatch({
+  const [appName, isMemberBoundGrant, isProjectScopingEnabled, isPartialGrantEnabled] = useWatch({
     control,
-    name: ['name', 'member_bound_grant', 'project_scoping'],
+    name: ['name', 'member_bound_grant', 'project_scoping', 'allow_partial_grants'],
   })
 
   return (
@@ -341,11 +366,37 @@ export const AuthorizationSection = ({
         )}
       />
 
+      {areOAuthAppPartialGrantsEnabled && isMemberBoundGrant && (
+        <FormField
+          control={control}
+          name="allow_partial_grants"
+          render={({ field }) => (
+            <PermanentChoiceField
+              legend="Allow partial grants?"
+              looser={ALLOW_PARTIAL_GRANTS_OPTIONS.looser}
+              stricter={ALLOW_PARTIAL_GRANTS_OPTIONS.stricter}
+              value={toChoiceValue(ALLOW_PARTIAL_GRANTS_OPTIONS, field.value)}
+              savedValue={
+                savedValues &&
+                toChoiceValue(
+                  ALLOW_PARTIAL_GRANTS_OPTIONS,
+                  (savedValues as AuthorizationValuesWithPartialGrants).allow_partial_grants
+                )
+              }
+              onChange={(value) =>
+                field.onChange(value === ALLOW_PARTIAL_GRANTS_OPTIONS.stricter.value)
+              }
+            />
+          )}
+        />
+      )}
+
       <AuthorizationPreview
         appName={appName.length > 0 ? appName : 'your app'}
         scopes={scopes}
         isMemberBoundGrant={isMemberBoundGrant}
         isProjectScopingEnabled={isProjectScopingEnabled}
+        isPartialGrantEnabled={isPartialGrantEnabled}
         organizationName={organizationName}
         savedValues={savedValues}
       />
