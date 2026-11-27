@@ -21,7 +21,9 @@ function ProjectAddons() {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Add-ons</PageHeaderTitle>
-            <PageHeaderDescription>Level up your project with add-ons</PageHeaderDescription>
+            <PageHeaderDescription>
+              Level up your project with add-ons. Billed monthly alongside your plan.
+            </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>

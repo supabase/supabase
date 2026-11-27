@@ -79,11 +79,24 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
     if (replicasInTransition.length === 0) setStatusRefetchInterval(false)
   }, [isDatabasesSuccess, databases, projectRef])
 
+  // Deep link from the add-ons page (#read-replicas)
+  useEffect(() => {
+    if (!infrastructureReadReplicas || window.location.hash !== '#read-replicas') return
+
+    const timeoutId = setTimeout(() => {
+      document
+        .getElementById('read-replicas')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [infrastructureReadReplicas])
+
   if (!infrastructureReadReplicas) return null
 
   return (
     <>
-      <PageSection>
+      <PageSection id="read-replicas">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Read replicas</PageSectionTitle>
