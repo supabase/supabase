@@ -1,4 +1,5 @@
 import { useReducedMotion } from 'motion/react'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
@@ -6,11 +7,12 @@ import { useMainScrollContainer } from '@/components/layouts/MainScrollContainer
 const SCROLL_TIMEOUT_MS = 5000
 
 export const useScrollToHash = () => {
+  const router = useRouter()
   const mainScrollContainer = useMainScrollContainer()
   const shouldReduceMotion = useReducedMotion()
+  const hash = router.asPath.split('#')[1] ?? ''
 
   useEffect(() => {
-    const hash = window.location.hash.slice(1)
     if (!hash) return
 
     const behavior = shouldReduceMotion ? 'auto' : 'smooth'
@@ -50,5 +52,5 @@ export const useScrollToHash = () => {
       observer.disconnect()
       clearTimeout(timeout)
     }
-  }, [mainScrollContainer, shouldReduceMotion])
+  }, [hash, mainScrollContainer, shouldReduceMotion])
 }
