@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { TooltipProvider } from 'ui/src/components/shadcn/ui/tooltip'
 
 import { DatabaseAdvisorHeading } from './DatabaseAdvisorHeading'
 
@@ -18,7 +19,7 @@ function renderAdvisors(activeTab: string) {
   selectedTab.current = activeTab
 
   return renderToStaticMarkup(
-    <>
+    <TooltipProvider>
       {['health', 'security'].map((lintId) => (
         <section key={lintId} id={lintId}>
           <DatabaseAdvisorHeading lintId={lintId} tag="h3">
@@ -30,7 +31,7 @@ function renderAdvisors(activeTab: string) {
           </DatabaseAdvisorHeading>
         </section>
       ))}
-    </>
+    </TooltipProvider>
   )
 }
 
