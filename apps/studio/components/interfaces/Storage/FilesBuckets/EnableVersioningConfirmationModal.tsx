@@ -1,3 +1,4 @@
+import { DollarSign } from 'lucide-react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -27,17 +28,16 @@ export const EnableVersioningConfirmationModal = ({
     onConfirm={onConfirm}
     alert={{
       title: 'Storage object versioning is in public alpha',
-      description:
-        'The behavior of this feature may change during development and is not recommended production use.',
+      description: (
+        <p className="text-pretty">
+          The behavior of this feature may change during development and is not recommended
+          production use.
+        </p>
+      ),
     }}
   >
-    <div className="space-y-2">
-      <p className="text-sm text-foreground-light">
-        Any retained version counts toward Storage usage and may increase your bill.{' '}
-        <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
-          Read docs
-        </InlineLink>
-      </p>
-    </div>
+    <p className="text-sm text-foreground-light">
+      Retained versions count toward Storage usage and may increase your bill.
+    </p>
   </ConfirmationModal>
 )
