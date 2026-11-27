@@ -69,6 +69,7 @@ const SQLExamples = () => {
               title={x.title}
               description={x.description}
               bgColor="bg-alternative border"
+              data-attr="sql-editor-template-card"
               key={`action-card-${i}`}
               icon={<SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />}
               // sql={x.sql}

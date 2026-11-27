@@ -33,6 +33,7 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const SQLEditorMenu = () => {
@@ -41,6 +42,7 @@ export const SQLEditorMenu = () => {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const track = useTrack()
 
   const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
   const otelLegacyLogs = useFlag('otelLegacyLogs')
@@ -98,11 +100,16 @@ export const SQLEditorMenu = () => {
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
               name="search-queries"
+              data-attr="sql-editor-snippet-search"
               placeholder="Search queries..."
               aria-labelledby="Search queries"
               value={search}
               onChange={(e) => {
                 const value = e.target.value
+                // A search session starts on the first keystroke into an empty input
+                if (search.length === 0 && value.length > 0) {
+                  track('sql_editor_snippet_search_submitted')
+                }
                 setSearch(value)
                 if (value.length === 0) setShowSearch(false)
               }}
@@ -129,12 +136,24 @@ export const SQLEditorMenu = () => {
               ) : (
                 <InnerSideBarFilterSortDropdown
                   value={sort}
-                  onValueChange={(value) => setSort(value as 'name' | 'inserted_at')}
+                  onValueChange={(value) => {
+                    const sortBy = value as 'name' | 'inserted_at'
+                    if (sortBy !== sort) track('sql_editor_snippet_sort_updated', { sortBy })
+                    setSort(sortBy)
+                  }}
                 >
-                  <InnerSideBarFilterSortDropdownItem key="name" value="name">
+                  <InnerSideBarFilterSortDropdownItem
+                    key="name"
+                    value="name"
+                    data-attr="sql-editor-snippet-sort"
+                  >
                     Alphabetical
                   </InnerSideBarFilterSortDropdownItem>
-                  <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
+                  <InnerSideBarFilterSortDropdownItem
+                    key="inserted_at"
+                    value="inserted_at"
+                    data-attr="sql-editor-snippet-sort"
+                  >
                     Created At
                   </InnerSideBarFilterSortDropdownItem>
                 </InnerSideBarFilterSortDropdown>
@@ -156,17 +175,38 @@ export const SQLEditorMenu = () => {
               <TooltipContent side="bottom">Create a new query</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
-              <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
+              <DropdownMenuItem
+                className="gap-x-2"
+                data-attr="sql-editor-new-item"
+                onClick={() => {
+                  track('sql_editor_new_item_clicked', { itemType: 'snippet' })
+                  handleNewQuery()
+                }}
+              >
                 <FilePlusIcon size={14} />
                 Create a new snippet
               </DropdownMenuItem>
               {canCreateLogsSnippet && (
-                <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery('logs')}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  data-attr="sql-editor-new-item"
+                  onClick={() => {
+                    track('sql_editor_new_item_clicked', { itemType: 'logs_query' })
+                    handleNewQuery('logs')
+                  }}
+                >
                   <ScrollTextIcon size={14} />
                   Create a new logs query
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
+              <DropdownMenuItem
+                className="gap-x-2"
+                data-attr="sql-editor-new-item"
+                onClick={() => {
+                  track('sql_editor_new_item_clicked', { itemType: 'folder' })
+                  createNewFolder()
+                }}
+              >
                 <FolderPlusIcon size={14} />
                 Create a new folder
               </DropdownMenuItem>

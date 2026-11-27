@@ -7,10 +7,12 @@ export const ActionCard = (card: {
   description?: string
   bgColor: string
   onClick?: () => void
+  'data-attr'?: string
 }) => {
   return (
     <Card
       className="grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border hover:border-default cursor-pointer"
+      data-attr={card['data-attr']}
       onClick={card.onClick}
     >
       <div className={cn('relative flex gap-3', card.description ? 'items-start' : 'items-center')}>

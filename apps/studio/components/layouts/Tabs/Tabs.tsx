@@ -32,6 +32,7 @@ import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   editorEntityTypes,
   useTabsStateSnapshot,
@@ -60,6 +61,7 @@ export const EditorTabs = ({
     useDashboardHistory()
 
   const editor = useEditorType()
+  const track = useTrack()
   const tabs = useTabsStateSnapshot()
   const [pendingClose, setPendingClose] = useState<(() => void) | null>(null)
   const [pendingConfirmation, setPendingConfirmation] = useState<TabCloseConfirmation | null>(null)
@@ -128,8 +130,13 @@ export const EditorTabs = ({
     setIsOptOutChecked(false)
   }
 
+  const trackTabClosed = (closeType: 'single' | 'others' | 'right' | 'all') => {
+    if (editor) track('editor_tab_closed', { closeType, editor })
+  }
+
   const handleClose = (tabId: string) => {
     closeWithConfirmation([tabId], () => {
+      trackTabClosed('single')
       tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
     })
   }
@@ -139,6 +146,7 @@ export const EditorTabs = ({
       const tabsToClose = editorTabIds
 
       closeWithConfirmation(tabsToClose, () => {
+        trackTabClosed('all')
         tabs.closeTabs(tabsToClose)
         onClearDashboardHistory()
         const editorPath = editor === 'table' ? 'editor' : editor
@@ -152,6 +160,7 @@ export const EditorTabs = ({
       const tabsToClose = editorTabIds.filter((id) => id !== tabId)
 
       closeWithConfirmation(tabsToClose, () => {
+        trackTabClosed('others')
         tabs.closeTabs(tabsToClose)
         onClearDashboardHistory()
 
@@ -168,6 +177,7 @@ export const EditorTabs = ({
       const tabsToClose = openedTabs.slice(tabIdx + 1)
 
       closeWithConfirmation(tabsToClose, () => {
+        trackTabClosed('right')
         tabs.closeTabs(tabsToClose)
 
         const isActiveTabClosed = tabIdx < activeTabIdx
@@ -224,14 +234,27 @@ export const EditorTabs = ({
                       />
                     </ContextMenuTrigger>
                     <ContextMenuContent>
-                      <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
-                      <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
+                      <ContextMenuItem
+                        data-attr="editor-tab-close"
+                        onClick={() => handleClose(tab.id)}
+                      >
+                        Close
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        data-attr="editor-tab-close"
+                        onClick={() => handleCloseOthers(tab.id)}
+                      >
                         Close Others
                       </ContextMenuItem>
-                      <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
+                      <ContextMenuItem
+                        data-attr="editor-tab-close"
+                        onClick={() => handleCloseRight(tab.id)}
+                      >
                         Close to the Right
                       </ContextMenuItem>
-                      <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                      <ContextMenuItem data-attr="editor-tab-close" onClick={handleCloseAll}>
+                        Close All
+                      </ContextMenuItem>
                     </ContextMenuContent>
                   </ContextMenu>
                 ))}
