@@ -12,10 +12,7 @@ import type {
   JitUserRule,
   JitUserRuleDraft,
 } from './JitDbAccess.types'
-import {
-  hasSupabaseRolePrefix,
-  isTrustedPartnerRole,
-} from '@/components/interfaces/Database/Roles/Roles.utils'
+import { isSupabaseManagedRole } from '@/components/interfaces/Database/Roles/Roles.utils'
 import { type DatabaseRolesData, type PgRole } from '@/data/database-roles/database-roles-query'
 import type { JitDbAccessMembersData } from '@/data/jit-db-access/jit-db-access-members-query'
 import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
@@ -192,10 +189,7 @@ function isAssignableJitRole(role: PgRole) {
     role.canLogin &&
     !role.isSuperuser &&
     !role.name.startsWith('pg_') &&
-    (!role.name.startsWith('supabase_') || role.name === 'supabase_read_only_user') &&
-    !['pgbouncer', 'authenticator'].includes(role.name) &&
-    !hasSupabaseRolePrefix(role.name) &&
-    !isTrustedPartnerRole(role.comment)
+    (role.name === 'supabase_read_only_user' || !isSupabaseManagedRole(role))
   )
 }
 

@@ -189,4 +189,20 @@ describe('getAssignableJitRoleOptions', () => {
       'supabase_read_only_user',
     ])
   })
+
+  it('leaves out Supabase system roles, superusers, pg_ roles and roles that cannot log in', () => {
+    const options = getAssignableJitRoleOptions([
+      role('supabase_auth_admin'),
+      role('supabase_admin'),
+      role('pgbouncer'),
+      role('authenticator'),
+      role('anon'),
+      role('pg_monitor'),
+      role('root', { isSuperuser: true }),
+      role('no_login', { canLogin: false }),
+      role('reporting'),
+    ])
+
+    expect(options.map((option) => option.id)).toEqual(['reporting'])
+  })
 })
