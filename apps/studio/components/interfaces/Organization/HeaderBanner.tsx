@@ -29,8 +29,8 @@ export const OrganizationResourceBanner = () => {
 
 interface HeaderBannerProps {
   variant: 'danger' | 'warning' | 'note'
-  title: string
-  description: string | ReactNode
+  title: ReactNode
+  description: ReactNode
   onDismiss?: () => void
 }
 const variantStyles = {
