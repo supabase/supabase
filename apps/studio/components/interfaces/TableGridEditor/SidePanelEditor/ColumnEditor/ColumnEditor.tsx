@@ -40,6 +40,7 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
   getPlaceholderText,
+  isIntegerType,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -347,7 +348,7 @@ export const ColumnEditor = ({
               />
               {columnFields.foreignKey === undefined && (
                 <div className="space-y-4">
-                  {columnFields.format.includes('int') && (
+                  {isIntegerType(columnFields) && (
                     <FormItemLayout
                       isReactForm={false}
                       layout="flex"
