@@ -4,7 +4,7 @@ import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ProjectConnectionPopover } from './ProjectConnectionPopover'
+import { ProjectConnectionValues } from './ProjectConnectionValues'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -87,6 +87,33 @@ const mockSettings = () =>
 const mockEndpointDeps = () => {
   addAPIMock({
     method: 'get',
+    path: '/platform/organizations/:slug/entitlements',
+    response: { entitlements: [] },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/config/pgbouncer',
+    response: {
+      connection_string:
+        'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.default.supabase.co:6543/postgres',
+      db_dns_name: 'db.default.supabase.co',
+      db_host: 'db.default.supabase.co',
+      db_name: 'postgres',
+      db_port: 6543,
+      db_user: 'postgres',
+      inserted_at: '2026-01-01T00:00:00.000Z',
+      pgbouncer_enabled: false,
+      pool_mode: 'transaction',
+      ssl_enforced: false,
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/config/supavisor',
+    response: [],
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/profile/access-tokens',
     response: [],
   })
@@ -111,22 +138,22 @@ const mockEndpointDeps = () => {
   })
 }
 
-const renderPopover = async () => {
+const hoverPublishableKey = async () => {
   const user = userEvent.setup()
-  customRender(<ProjectConnectionPopover projectRef="default" />, { profileContext })
-  await user.click(await screen.findByRole('button', { name: /Copy/ }))
+  customRender(<ProjectConnectionValues projectRef="default" />, { profileContext })
+  await user.hover(await screen.findByRole('button', { name: /Publishable key/ }))
 }
 
-describe('ProjectConnectionPopover', () => {
-  it('shows the publishable key when api-keys are readable', async () => {
+describe('ProjectConnectionValues', () => {
+  it('shows the publishable key on hover so people can check it before copying', async () => {
     mockProjectGrantContext({ ref: 'default' })
     mockApiKeys()
     mockSettings()
     mockEndpointDeps()
 
-    await renderPopover()
+    await hoverPublishableKey()
 
-    expect(await screen.findByText('sb_publishable_abc')).toBeVisible()
+    expect((await screen.findAllByText('sb_publishable_abc'))[0]).toBeInTheDocument()
   })
 
   it('explains the missing permission and skips the request when denied', async () => {
@@ -135,9 +162,11 @@ describe('ProjectConnectionPopover', () => {
     mockSettings()
     mockEndpointDeps()
 
-    await renderPopover()
+    await hoverPublishableKey()
 
-    expect(await screen.findByText(/don't have permission to view API keys/)).toBeVisible()
+    expect(
+      (await screen.findAllByText(/don't have permission to view API keys/))[0]
+    ).toBeInTheDocument()
     expect(requests).not.toHaveBeenCalled()
   })
 
@@ -147,8 +176,10 @@ describe('ProjectConnectionPopover', () => {
     mockSettings()
     mockEndpointDeps()
 
-    await renderPopover()
+    await hoverPublishableKey()
 
-    expect(await screen.findByText(/Failed to check API key permissions/)).toBeVisible()
+    expect(
+      (await screen.findAllByText(/Failed to check API key permissions/))[0]
+    ).toBeInTheDocument()
   })
 })

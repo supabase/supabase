@@ -19,7 +19,7 @@ import { cn } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
-import { ConnectSection } from './ConnectSection'
+import { AgentPromptSection } from './AgentPromptSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
 import { IssuesSection } from './IssuesSection'
@@ -139,7 +139,7 @@ export const ProjectHome = () => {
                     if (id === 'connect' && showConnectSection) {
                       return (
                         <SortableSection gripClassName={SORT_GRIP_CLASS} key={id} id={id}>
-                          <ConnectSection />
+                          <AgentPromptSection />
                         </SortableSection>
                       )
                     }

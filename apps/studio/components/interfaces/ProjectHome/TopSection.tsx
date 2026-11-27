@@ -5,7 +5,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
-import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
+import { ProjectConnectionValues } from '@/components/interfaces/ProjectHome/ProjectConnectionValues'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from '@/components/ui/ProjectUpgradeFailedBanner'
@@ -85,7 +85,7 @@ export const TopSection = () => {
                   </Tooltip>
                 )}
               </div>
-              <ProjectConnectionPopover projectRef={project?.ref} />
+              <ProjectConnectionValues projectRef={project?.ref} />
             </div>
           </div>
           {IS_PLATFORM && (
