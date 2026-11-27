@@ -112,7 +112,11 @@ function Mind({ userId }: { userId: string }) {
       return
     }
     const text = event.dataTransfer.getData('text/uri-list') || event.dataTransfer.getData('text')
-    if (text.trim()) saveText(userId, text)
+    if (!text.trim()) return
+    setUploadError(null)
+    saveText(userId, text).catch((error: unknown) =>
+      setUploadError(error instanceof Error ? error.message : 'Could not save that')
+    )
   }
 
   return (
@@ -167,18 +171,29 @@ function Mind({ userId }: { userId: string }) {
 
 function SearchBar({ search, onSearch }: { search: Search; onSearch: (search: Search) => void }) {
   const [query, setQuery] = useState('')
+  // Bumped on every search and on Clear, so a slow response for an older
+  // query can't replace newer results or a cleared search.
+  const latestSearch = useRef(0)
+
+  const clear = () => {
+    latestSearch.current += 1
+    onSearch({ status: 'idle' })
+  }
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     const trimmed = query.trim()
     if (!trimmed) {
-      onSearch({ status: 'idle' })
+      clear()
       return
     }
+    const request = ++latestSearch.current
     onSearch({ status: 'searching', query: trimmed })
     try {
-      onSearch({ status: 'done', query: trimmed, ids: await searchMind(trimmed) })
+      const ids = await searchMind(trimmed)
+      if (request === latestSearch.current) onSearch({ status: 'done', query: trimmed, ids })
     } catch (error) {
+      if (request !== latestSearch.current) return
       onSearch({
         status: 'error',
         query: trimmed,
@@ -201,7 +216,7 @@ function SearchBar({ search, onSearch }: { search: Search; onSearch: (search: Se
           type="button"
           onClick={() => {
             setQuery('')
-            onSearch({ status: 'idle' })
+            clear()
           }}
           className="shrink-0 rounded-full border border-line-strong px-3 py-1 text-xs hover:bg-hover"
         >
@@ -222,12 +237,21 @@ function Composer({
   error: string | null
 }) {
   const [text, setText] = useState('')
+  const [saveError, setSaveError] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
-  const save = () => {
+  const save = async () => {
     if (!text.trim()) return
-    saveText(userId, text)
+    const submitted = text
+    setSaveError(null)
     setText('')
+    try {
+      await saveText(userId, submitted)
+    } catch (error) {
+      // Give the text back unless something new has been typed since.
+      setText((current) => current || submitted)
+      setSaveError(error instanceof Error ? error.message : 'Could not save that')
+    }
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -279,7 +303,11 @@ function Composer({
           onChange={handleFileChange}
         />
       </div>
-      {error && <p className="px-2 text-xs text-red-500">{error}</p>}
+      {(saveError ?? error) && (
+        <p role="alert" className="px-2 text-xs text-red-500">
+          {saveError ?? error}
+        </p>
+      )}
     </div>
   )
 }
@@ -348,13 +376,37 @@ function StoredImage({ path, width = 600 }: { path: string; width?: number }) {
   return <img src={src} alt="" className="w-full" />
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, [tabindex]:not([tabindex="-1"])'
+
 function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
+  const panel = useRef<HTMLDivElement>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  // Focus the dialog on open, keep Tab inside it, close on Escape, and return
+  // focus to whatever opened it.
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    panel.current?.focus()
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
+      if (event.key !== 'Tab' || !panel.current) return
+      const focusable = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)]
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      opener?.focus()
+    }
   }, [onClose])
 
   return (
@@ -366,8 +418,10 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
       className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
     >
       <div
+        ref={panel}
+        tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-full w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-3xl border border-line bg-card p-6 shadow-2xl"
+        className="flex max-h-full w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-3xl border border-line bg-card p-6 shadow-2xl outline-none"
       >
         {item.kind === 'image' && item.image_path && (
           <div className="overflow-hidden rounded-2xl">
@@ -393,6 +447,11 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
           <span>Saved {new Date(item.created_at).toLocaleString()}</span>
           {item.status === 'failed' && <span className="text-red-500">Couldn’t read this one</span>}
+          {deleteError && (
+            <span role="alert" className="text-red-500">
+              {deleteError}
+            </span>
+          )}
           <div className="ml-auto flex gap-2">
             {item.url && (
               <a
@@ -406,9 +465,14 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
             )}
             <button
               type="button"
-              onClick={() => {
-                deleteItem(item)
-                onClose()
+              onClick={async () => {
+                setDeleteError(null)
+                try {
+                  await deleteItem(item)
+                  onClose()
+                } catch (error) {
+                  setDeleteError(error instanceof Error ? error.message : 'Could not forget this')
+                }
               }}
               className="rounded-full border border-line-strong px-3 py-1 text-foreground hover:bg-hover"
             >

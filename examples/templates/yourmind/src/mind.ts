@@ -63,9 +63,10 @@ async function saveItem(item: Item) {
 /** Saves text as a link when it's a URL, otherwise as a note. */
 export function saveText(userId: string, text: string) {
   const trimmed = text.trim()
-  const isUrl = /^https?:\/\/\S+$/i.test(trimmed) || /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(trimmed)
+  const hasScheme = /^https?:\/\/\S+$/i.test(trimmed)
+  const isUrl = hasScheme || /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(trimmed)
   if (isUrl) {
-    const url = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`
+    const url = hasScheme ? trimmed : `https://${trimmed}`
     return saveItem(newItem(userId, { kind: 'link', url }))
   }
   return saveItem(newItem(userId, { kind: 'note', body: trimmed }))
@@ -83,12 +84,23 @@ export async function saveImage(userId: string, file: File) {
     .from('minds')
     .upload(path, file, { contentType: file.type, cacheControl: '3600' })
   if (error) throw error
-  await saveItem({ ...item, image_path: path })
+  try {
+    await saveItem({ ...item, image_path: path })
+  } catch (error) {
+    // The item was rejected: don't leave the uploaded image behind.
+    await supabase.storage.from('minds').remove([path])
+    throw error
+  }
 }
 
 export async function deleteItem(item: Item) {
-  if (item.image_path) await supabase.storage.from('minds').remove([item.image_path])
-  items.delete(item.id)
+  // Remove the image first and only delete the item once Storage confirms it.
+  if (item.image_path) {
+    const { data, error } = await supabase.storage.from('minds').remove([item.image_path])
+    if (error) throw error
+    if (data.length === 0) throw new Error('Could not delete the image. Try again.')
+  }
+  await items.delete(item.id).isPersisted.promise
 }
 
 /** Ranks your items by meaning. Returns item ids, best match first. */
@@ -140,19 +152,23 @@ export function seedMind(userId: string): Promise<void> {
   return seeding
 }
 
-const signedUrls = new Map<string, Promise<string | null>>()
+const SIGNED_URL_SECONDS = 3600
+// Reuse a signed URL for a while, then sign a fresh one before it expires.
+const SIGNED_URL_REUSE_MS = (SIGNED_URL_SECONDS - 600) * 1000
+const signedUrls = new Map<string, { url: Promise<string | null>; expiresAt: number }>()
 
-/** Signed, resized URL for an image in the private bucket (valid for an hour). */
+/** Signed, resized URL for an image in the private bucket. */
 export function imageUrl(path: string, width = 600) {
   const key = `${path}@${width}`
-  if (!signedUrls.has(key)) {
-    signedUrls.set(
-      key,
-      supabase.storage
-        .from('minds')
-        .createSignedUrl(path, 3600, { transform: { width, resize: 'contain', quality: 75 } })
-        .then(({ data }) => data?.signedUrl ?? null)
-    )
-  }
-  return signedUrls.get(key)!
+  const cached = signedUrls.get(key)
+  if (cached && cached.expiresAt > Date.now()) return cached.url
+
+  const url = supabase.storage
+    .from('minds')
+    .createSignedUrl(path, SIGNED_URL_SECONDS, {
+      transform: { width, resize: 'contain', quality: 75 },
+    })
+    .then(({ data }) => data?.signedUrl ?? null)
+  signedUrls.set(key, { url, expiresAt: Date.now() + SIGNED_URL_REUSE_MS })
+  return url
 }

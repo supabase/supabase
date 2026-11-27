@@ -18,14 +18,27 @@ interface Preview {
   siteName: string | null
 }
 
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }
+
+/** Decodes common HTML entities in a single pass, so nothing is decoded twice. */
 function decodeEntities(text: string) {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&#x27;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+  return text.replace(/&(#\d+|#x[\da-f]+|amp|lt|gt|quot|apos);/gi, (entity, name: string) => {
+    const lower = name.toLowerCase()
+    if (lower.startsWith('#x')) return String.fromCodePoint(parseInt(lower.slice(2), 16))
+    if (lower.startsWith('#')) return String.fromCodePoint(Number(lower.slice(1)))
+    return ENTITIES[lower] ?? entity
+  })
+}
+
+/** Plain text from an HTML fragment. Saved as text and rendered as text, never as HTML. */
+function toPlainText(html: string) {
+  let text = html
+  // Repeat until stable, so nested or broken tags can't leave a tag behind.
+  for (let previous = ''; previous !== text; ) {
+    previous = text
+    text = text.replace(/<[^<>]*>/g, '')
+  }
+  return decodeEntities(text).replace(/[<>]/g, '')
 }
 
 function metaContent(html: string, key: string) {
@@ -34,7 +47,7 @@ function metaContent(html: string, key: string) {
     const name = tag.match(/\b(?:property|name)\s*=\s*["']([^"']+)["']/i)?.[1]
     if (name?.toLowerCase() !== key) continue
     const content = tag.match(/\bcontent\s*=\s*["']([^"']*)["']/i)?.[1]
-    if (content) return decodeEntities(content.trim())
+    if (content) return toPlainText(content.trim())
   }
   return null
 }
@@ -43,12 +56,23 @@ function metaContent(html: string, key: string) {
 // paragraph worth embedding.
 function firstParagraph(html: string) {
   for (const match of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
-    const text = decodeEntities(match[1].replace(/<[^>]+>/g, '').replace(/\[\d+\]/g, ''))
+    const text = toPlainText(match[1])
+      .replace(/\[\d+\]/g, '')
       .replace(/\s+/g, ' ')
       .trim()
     if (text.length >= 80) return text.slice(0, 500)
   }
   return null
+}
+
+/** Resolves a preview image URL, keeping only http(s) images. */
+function httpUrl(value: string, base: string) {
+  try {
+    const url = new URL(value, base)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
+  } catch {
+    return null
+  }
 }
 
 async function readPreview(url: string): Promise<Preview> {
@@ -87,13 +111,13 @@ async function readPreview(url: string): Promise<Preview> {
   return {
     title:
       metaContent(html, 'og:title') ??
-      decodeEntities(html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() ?? '') ??
+      toPlainText(html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() ?? '') ??
       null,
     description:
       metaContent(html, 'og:description') ??
       metaContent(html, 'description') ??
       firstParagraph(html),
-    imageUrl: image ? new URL(image, response.url).toString() : null,
+    imageUrl: image ? httpUrl(image, response.url) : null,
     siteName: metaContent(html, 'og:site_name'),
   }
 }

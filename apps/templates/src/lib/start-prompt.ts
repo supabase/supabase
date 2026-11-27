@@ -43,7 +43,7 @@ export function buildStartPrompt(example: Example) {
 1. Fetch the template with plain git, which doesn't run any of its code:
    ${cloneCommands(parseGitHubSource(example.repoUrl))}
 
-2. Read the README, supabase/migrations and supabase/config.toml before running anything.
+2. Work in the new app folder (cd app). Read the README, supabase/migrations and supabase/config.toml before running anything.
 
 3. Create a Supabase project and set it up from the template. Use the Supabase MCP server if it's connected, otherwise the Supabase CLI:
    supabase projects create <name> --org-id <org> --region <region>

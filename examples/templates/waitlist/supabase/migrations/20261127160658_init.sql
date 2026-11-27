@@ -27,6 +27,19 @@ create index waitlist_entries_created_at_idx on public.waitlist_entries (created
 
 alter table public.waitlist_entries enable row level security;
 
+-- New tables aren't exposed to the Data API without explicit grants (the
+-- default for new projects), so grant exactly what the policies below allow.
+-- Column grants keep everything except the name fixed after joining
+-- (referral fields, email, created_at), while the referred_by foreign key
+-- can still clear itself when a referrer leaves.
+-- Start from nothing, in case the project still grants new tables by default.
+revoke all on public.waitlist_entries from anon, authenticated;
+grant select (id, user_id, name, email, referral_code, created_at)
+  on public.waitlist_entries to authenticated;
+grant insert (name, email, referral_code_used) on public.waitlist_entries to authenticated;
+grant update (name) on public.waitlist_entries to authenticated;
+grant delete on public.waitlist_entries to authenticated;
+
 create policy "People can view their entry"
 on public.waitlist_entries for select
 to authenticated
@@ -49,7 +62,7 @@ to authenticated
 using (user_id = (select auth.uid()));
 
 -- Resolve a referral code to the referrer's entry, ignoring unknown codes and
--- self-referrals, and keep the referral fields from being changed later.
+-- self-referrals. Clients can't set referred_by themselves.
 create function private.resolve_referral()
 returns trigger
 language plpgsql
@@ -57,14 +70,7 @@ security definer
 set search_path = ''
 as $$
 begin
-  if tg_op = 'UPDATE' then
-    new.referred_by := old.referred_by;
-    new.referral_code_used := old.referral_code_used;
-    new.referral_code := old.referral_code;
-    new.email := old.email;
-    return new;
-  end if;
-
+  new.referred_by := null;
   if new.referral_code_used is not null then
     select id into new.referred_by
     from public.waitlist_entries
@@ -78,7 +84,7 @@ $$;
 revoke all on function private.resolve_referral() from public;
 
 create trigger resolve_referral
-before insert or update on public.waitlist_entries
+before insert on public.waitlist_entries
 for each row execute function private.resolve_referral();
 
 -- Ranking: more referrals first, then earlier sign-ups.

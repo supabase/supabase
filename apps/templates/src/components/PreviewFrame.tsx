@@ -101,10 +101,16 @@ export function PreviewFrame({ title, embedUrl, demoUrl }: PreviewFrameProps) {
               className="size-full border-0"
             />
           )}
+          {/* Always mounted, so screen readers hear the status change. */}
+          <p role="status" className="sr-only">
+            {isLoaded ? 'Live preview loaded' : 'Loading live preview'}
+          </p>
           {!isLoaded && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-100">
-              <div className="size-6 animate-spin rounded-full border-2 border-foreground/15 border-t-brand-default" />
-              <p className="text-sm text-foreground-light">Loading live preview…</p>
+              <div className="size-6 rounded-full border-2 border-foreground/15 border-t-brand-default motion-safe:animate-spin" />
+              <p aria-hidden className="text-sm text-foreground-light">
+                Loading live preview…
+              </p>
               {isSlow && (
                 <a
                   href={demoUrl}

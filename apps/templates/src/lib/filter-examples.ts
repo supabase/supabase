@@ -13,11 +13,11 @@ export interface GalleryFilters {
 }
 
 export function isSupabaseFeature(value: string): value is SupabaseFeature {
-  return value in SUPABASE_FEATURES
+  return Object.hasOwn(SUPABASE_FEATURES, value)
 }
 
 export function isExampleCategory(value: string): value is ExampleCategory {
-  return value in EXAMPLE_CATEGORIES
+  return Object.hasOwn(EXAMPLE_CATEGORIES, value)
 }
 
 /** Search text for an example, lowercased once per call. */

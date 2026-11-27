@@ -22,7 +22,7 @@ export const example = defineExample({
     deployUrl:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftemplates%2Fuptime-monitor&env=VITE_SUPABASE_URL,VITE_SUPABASE_PUBLISHABLE_KEY',
     steps: [
-      'Create a Supabase project with `supabase projects create`, or run `supabase start` for a local one.',
+      'Create a Supabase project with `supabase projects create`. To run locally instead, `supabase start` applies the migrations and config, so skip the link, push and deploy steps.',
       'Run `supabase link` and `supabase db push` to create the tables, the `uptime_checks` queue and the Cron jobs.',
       'Run `supabase config push` to turn on anonymous sign-ins, then `supabase functions deploy run-checks`.',
       'Add your project URL and secret key to Vault with `vault.create_secret`, as shown in the README.',

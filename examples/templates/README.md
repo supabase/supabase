@@ -16,7 +16,7 @@ All of them use anonymous sign-ins and light and dark themes that follow the sys
 
 The gallery embeds a live deployment of each template. Anyone can use them, so the demo projects have a few extra settings that a normal project made from the template doesn't need.
 
-**Content stays private by default.** Every visitor signs in as their own guest (anonymous) user, and row level security limits each one to their own data. A visitor only sees someone else's content if they're sent that board's or wall's invite link. YourMind and Uptime Monitor have no sharing at all, and Waitlisted only shows other people as initials on its leaderboard.
+**Content stays private by default.** Every visitor signs in as their own guest (anonymous) user, and row level security limits each one to their own data. A visitor only sees someone else's content if they're sent that board's or wall's invite link. One exception: Photo Wall serves photos from a public bucket, so anyone who has a photo's URL can open that file, even without the wall's invite link. YourMind and Uptime Monitor have no sharing at all, and Waitlisted only shows other people as initials on its leaderboard.
 
 **Guest data is purged nightly.** Each demo project deletes guest users more than a day old, which removes everything they created:
 

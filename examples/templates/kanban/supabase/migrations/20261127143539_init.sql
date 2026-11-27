@@ -86,6 +86,12 @@ alter table public.boards enable row level security;
 alter table public.board_members enable row level security;
 alter table public.cards enable row level security;
 
+-- New tables aren't exposed to the Data API without explicit grants (the
+-- default for new projects), so grant exactly what the policies below allow.
+grant select, insert, update, delete on public.boards to authenticated;
+grant select, insert, delete on public.board_members to authenticated;
+grant select, insert, update, delete on public.cards to authenticated;
+
 -- Boards
 create policy "Members can view boards"
 on public.boards for select

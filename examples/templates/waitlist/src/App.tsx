@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 
 import { PRODUCT } from './config'
 import { ensureSession } from './session'
@@ -20,25 +20,37 @@ const referralCode = new URLSearchParams(window.location.search).get('ref')
 
 export function App() {
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  const latestRequest = useRef(0)
 
   const refresh = useCallback(async () => {
+    // Several refreshes can overlap; only the newest one updates the page.
+    const request = ++latestRequest.current
     try {
-      setState({ status: 'ready', waitlist: await fetchStatus() })
+      const waitlist = await fetchStatus()
+      if (request === latestRequest.current) setState({ status: 'ready', waitlist })
     } catch (error) {
+      if (request !== latestRequest.current) return
       setState({ status: 'error', message: error instanceof Error ? error.message : 'Failed' })
     }
   }, [])
 
   // Sign in, load the list, and refresh whenever the database broadcasts a change.
   useEffect(() => {
+    let isCancelled = false
     let unsubscribe = () => {}
     ensureSession()
       .then(() => {
+        if (isCancelled) return
         refresh()
         unsubscribe = subscribeToChanges(refresh)
       })
-      .catch((error: Error) => setState({ status: 'error', message: error.message }))
-    return () => unsubscribe()
+      .catch((error: Error) => {
+        if (!isCancelled) setState({ status: 'error', message: error.message })
+      })
+    return () => {
+      isCancelled = true
+      unsubscribe()
+    }
   }, [refresh])
 
   const total = state.status === 'ready' ? state.waitlist.total : null
@@ -190,16 +202,39 @@ function JoinedCard({ waitlist, onLeft }: { waitlist: WaitlistStatus; onLeft: ()
         </p>
       </div>
       <Leaderboard entries={waitlist.leaderboard} />
+      <LeaveButton onLeft={onLeft} />
+    </div>
+  )
+}
+
+function LeaveButton({ onLeft }: { onLeft: () => void }) {
+  const [error, setError] = useState<string | null>(null)
+  const [isLeaving, setIsLeaving] = useState(false)
+  return (
+    <div className="flex flex-col gap-1">
       <button
         type="button"
+        disabled={isLeaving}
         onClick={async () => {
-          await leaveWaitlist()
-          onLeft()
+          setError(null)
+          setIsLeaving(true)
+          try {
+            await leaveWaitlist()
+            onLeft()
+          } catch (leaveError) {
+            setError(leaveError instanceof Error ? leaveError.message : 'Could not leave the waitlist')
+            setIsLeaving(false)
+          }
         }}
-        className="self-start text-xs text-muted underline-offset-4 hover:text-foreground hover:underline"
+        className="self-start text-xs text-muted underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
       >
-        Leave the waitlist
+        {isLeaving ? 'Leaving…' : 'Leave the waitlist'}
       </button>
+      {error && (
+        <p role="alert" className="text-xs text-red-500">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

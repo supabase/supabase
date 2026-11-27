@@ -18,7 +18,13 @@ create extension if not exists pg_net with schema extensions;
 create table public.monitors (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 60),
-  url text not null check (url ~ '^https?://[^\s/$.?#].[^\s]*$' and char_length(url) <= 500),
+  -- No backslashes: URL parsers treat them as slashes, which would let a URL
+  -- pass the host allowlist below but request a different host.
+  url text not null check (
+    url ~ '^https?://[^\s/$.?#].[^\s]*$'
+    and position(chr(92) in url) = 0
+    and char_length(url) <= 500
+  ),
   is_paused boolean not null default false,
   created_by uuid not null default auth.uid() references auth.users (id) on delete cascade,
   created_at timestamptz not null default now()
@@ -72,6 +78,12 @@ grant execute on function private.owns_monitor(uuid) to authenticated;
 alter table public.monitors enable row level security;
 alter table public.checks enable row level security;
 alter table public.incidents enable row level security;
+
+-- New tables aren't exposed to the Data API without explicit grants (the
+-- default for new projects), so grant exactly what the policies below allow.
+grant select, insert, update, delete on public.monitors to authenticated;
+grant select on public.checks to authenticated;
+grant select on public.incidents to authenticated;
 
 create policy "Users can view their monitors"
 on public.monitors for select
@@ -182,6 +194,12 @@ as $$
 declare
   was_up boolean;
 begin
+  -- One writer per monitor at a time, so "was the previous check down?" is
+  -- read and acted on consistently.
+  if record_check.monitor_id is not null then
+    perform pg_advisory_xact_lock(hashtext(record_check.monitor_id::text));
+  end if;
+
   if record_check.monitor_id is not null and exists (select 1 from public.monitors where id = record_check.monitor_id) then
     select checks.is_up into was_up
     from public.checks
@@ -212,6 +230,20 @@ begin
   perform pgmq.delete('uptime_checks', record_check.msg_id);
 end;
 $$;
+
+-- The worker re-checks every redirect target against the allowlist.
+create function public.allowed_monitor_hosts()
+returns text[]
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(array_agg(host order by host), '{}') from private.allowed_hosts;
+$$;
+
+revoke all on function public.allowed_monitor_hosts() from public, anon, authenticated;
+grant execute on function public.allowed_monitor_hosts() to service_role;
 
 revoke all on function public.claim_checks(integer, integer) from public, anon, authenticated;
 revoke all on function public.record_check(bigint, uuid, boolean, integer, integer, text)

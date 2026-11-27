@@ -73,14 +73,33 @@ function Board({ board }: { board: BoardRow }) {
     })
   }
 
+  // Keyboard alternative to drag and drop: move to the neighbouring column
+  // (as its last card), or one place up or down within the column.
+  const nudgeCard = (card: Card, direction: MoveDirection) => {
+    if (direction === 'left' || direction === 'right') {
+      const index = COLUMNS.findIndex((column) => column.status === card.status)
+      const target = COLUMNS[index + (direction === 'left' ? -1 : 1)]
+      if (target) moveCard(card.id, target.status, null)
+      return
+    }
+    const column = cardsIn(card.status)
+    const index = column.findIndex((item) => item.id === card.id)
+    if (direction === 'up' && index > 0) moveCard(card.id, card.status, column[index - 1].id)
+    if (direction === 'down' && index < column.length - 1) {
+      moveCard(card.id, card.status, column[index + 2]?.id ?? null)
+    }
+  }
+
+  /** Resolves once the card is saved; rejects if Postgres or RLS refuses it. */
   const addCard = (status: CardStatus, title: string) => {
-    cards.insert({
+    const transaction = cards.insert({
       id: crypto.randomUUID(),
       board_id: board.id,
       title,
       status,
       position: positionBetween(cardsIn(status).at(-1)),
     })
+    return transaction.isPersisted.promise
   }
 
   const deleteCard = (cardId: string) => {
@@ -111,7 +130,10 @@ function Board({ board }: { board: BoardRow }) {
               cards={cardsIn(column.status)}
               onDrop={(cardId, beforeCardId) => moveCard(cardId, column.status, beforeCardId)}
               onAdd={(title) => addCard(column.status, title)}
+              onMove={nudgeCard}
               onDelete={deleteCard}
+              canMoveLeft={column.status !== 'todo'}
+              canMoveRight={column.status !== 'done'}
             />
           ))}
         </main>
@@ -143,23 +165,39 @@ function useOnlineCount(boardId: string) {
   return onlineCount
 }
 
+type MoveDirection = 'left' | 'right' | 'up' | 'down'
+
+const MOVES: { direction: MoveDirection; symbol: string; label: string }[] = [
+  { direction: 'left', symbol: '←', label: 'Move to previous column' },
+  { direction: 'up', symbol: '↑', label: 'Move up' },
+  { direction: 'down', symbol: '↓', label: 'Move down' },
+  { direction: 'right', symbol: '→', label: 'Move to next column' },
+]
+
 function Column({
   label,
   dot,
   cards,
   onDrop,
   onAdd,
+  onMove,
   onDelete,
+  canMoveLeft,
+  canMoveRight,
 }: {
   label: string
   dot: string
   cards: Card[]
   onDrop: (cardId: string, beforeCardId: string | null) => void
-  onAdd: (title: string) => void
+  onAdd: (title: string) => Promise<unknown>
+  onMove: (card: Card, direction: MoveDirection) => void
   onDelete: (cardId: string) => void
+  canMoveLeft: boolean
+  canMoveRight: boolean
 }) {
   const [isOver, setIsOver] = useState(false)
   const [draft, setDraft] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   const handleDrop = (event: DragEvent, beforeCardId: string | null) => {
     event.preventDefault()
@@ -169,12 +207,19 @@ function Column({
     if (cardId && cardId !== beforeCardId) onDrop(cardId, beforeCardId)
   }
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     const title = draft.trim()
     if (!title) return
-    onAdd(title)
+    setError(null)
     setDraft('')
+    try {
+      await onAdd(title)
+    } catch (addError) {
+      // The card rolled back: give the text back unless something new was typed.
+      setDraft((current) => current || title)
+      setError(addError instanceof Error ? addError.message : 'Could not add the card')
+    }
   }
 
   return (
@@ -194,7 +239,7 @@ function Column({
         {label}
         <span className="text-muted">{cards.length}</span>
       </h2>
-      {cards.map((card) => (
+      {cards.map((card, index) => (
         <article
           key={card.id}
           draggable
@@ -204,14 +249,37 @@ function Column({
           className="group flex cursor-grab items-start gap-2 rounded-lg border border-line bg-card px-3 py-2.5 text-sm shadow-sm active:cursor-grabbing"
         >
           <span className="flex-1">{card.title}</span>
-          <button
-            type="button"
-            aria-label={`Delete ${card.title}`}
-            onClick={() => onDelete(card.id)}
-            className="text-muted opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
-          >
-            ×
-          </button>
+          <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+            {MOVES.map(({ direction, symbol, label: moveLabel }) => {
+              const isDisabled =
+                (direction === 'left' && !canMoveLeft) ||
+                (direction === 'right' && !canMoveRight) ||
+                (direction === 'up' && index === 0) ||
+                (direction === 'down' && index === cards.length - 1)
+              if (isDisabled) return null
+              return (
+                <button
+                  key={direction}
+                  type="button"
+                  aria-label={`${moveLabel}: ${card.title}`}
+                  title={moveLabel}
+                  onClick={() => onMove(card, direction)}
+                  className="rounded px-1 text-xs text-muted hover:bg-hover hover:text-foreground"
+                >
+                  {symbol}
+                </button>
+              )
+            })}
+            <button
+              type="button"
+              aria-label={`Delete ${card.title}`}
+              title="Delete"
+              onClick={() => onDelete(card.id)}
+              className="rounded px-1 text-muted hover:bg-hover hover:text-foreground"
+            >
+              ×
+            </button>
+          </div>
         </article>
       ))}
       <form onSubmit={handleSubmit}>
@@ -220,9 +288,15 @@ function Column({
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Add a card"
           aria-label={`Add a card to ${label}`}
+          maxLength={200}
           className="w-full rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm placeholder:text-muted focus:border-line-strong focus:bg-card focus:outline-none"
         />
       </form>
+      {error && (
+        <p role="alert" className="px-3 text-xs text-red-500">
+          {error}
+        </p>
+      )}
     </section>
   )
 }

@@ -86,6 +86,15 @@ alter table public.walls enable row level security;
 alter table public.wall_members enable row level security;
 alter table public.photos enable row level security;
 
+-- New tables aren't exposed to the Data API without explicit grants (the
+-- default for new projects), so grant exactly what the policies below allow.
+grant select, insert, update, delete on public.walls to authenticated;
+grant select, insert, delete on public.wall_members to authenticated;
+grant select, insert, update, delete on public.photos to authenticated;
+-- The cleanup Edge Function reads walls and deletes photos with the secret key.
+grant select on public.walls to service_role;
+grant select, delete on public.photos to service_role;
+
 -- Walls
 create policy "Members can view walls"
 on public.walls for select
@@ -183,6 +192,12 @@ with check (
   and (select private.is_wall_member(((storage.foldername(name))[1])::uuid))
   and (select private.recent_upload_count()) < 30
 );
+
+-- Storage's remove() needs select as well as delete on the object.
+create policy "Uploaders can read their files"
+on storage.objects for select
+to authenticated
+using (bucket_id = 'photos' and owner_id = (select auth.uid())::text);
 
 create policy "Uploaders can delete their files"
 on storage.objects for delete

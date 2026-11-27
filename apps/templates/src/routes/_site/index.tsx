@@ -46,12 +46,12 @@ function HomePage() {
           <span className="rounded-md border bg-surface-75 px-2.5 py-1 font-mono text-xs uppercase tracking-wide text-foreground-light">
             {EXAMPLES.length} example apps
           </span>
-          <h1 className="max-w-3xl text-5xl leading-tight tracking-display md:text-6xl">
-            Start from a working app.
+          <h1 className="max-w-4xl text-balance text-5xl leading-tight tracking-display md:text-6xl">
+            If you can dream it, you can build it on Supabase.
           </h1>
           <p className="max-w-2xl text-xl text-foreground-light">
-            Real applications built on Supabase. Try each one live, read the source, then deploy it
-            or hand it to your coding agent and make it yours.
+            Start from a real app. Try each one live, read the source, then deploy it or hand it to
+            your coding agent and make it yours.
           </p>
           <div className="mt-2 flex gap-3">
             <Button asChild size="large" variant="primary" iconRight={<ArrowDown />}>

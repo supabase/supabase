@@ -18,9 +18,14 @@ const ConsentToast = lazy(() =>
 export function ConsentToaster() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
 
-  // data-theme is set on the client by the no-flash script
+  // Follow data-theme, which the no-flash script and the theme switch set.
   useEffect(() => {
-    setTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark')
+    const root = document.documentElement
+    const sync = () => setTheme(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark')
+    sync()
+    const observer = new MutationObserver(sync)
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
   }, [])
 
   return (

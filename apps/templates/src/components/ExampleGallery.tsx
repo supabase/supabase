@@ -58,12 +58,12 @@ export function ExampleGallery() {
                 }
                 placeholder="Search examples, frameworks, features…"
                 aria-label="Search examples"
-                className="h-10 w-full rounded-lg border bg-surface-100 pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-foreground-muted focus:border-foreground-muted"
+                className="h-10 w-full rounded-lg border bg-surface-100 pl-9 pr-3 text-sm transition-colors placeholder:text-foreground-muted focus:border-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted/40"
               />
             </div>
             <div
               className="flex gap-1 overflow-x-auto md:ml-auto"
-              role="tablist"
+              role="group"
               aria-label="Category"
             >
               <CategoryTab isActive={category === undefined} onClick={() => setCategory(undefined)}>
@@ -150,8 +150,7 @@ function CategoryTab({
     <button
       tabIndex={0}
       type="button"
-      role="tab"
-      aria-selected={isActive}
+      aria-pressed={isActive}
       onClick={onClick}
       className={cn(
         'shrink-0 rounded-md px-3 py-1.5 text-sm transition-colors',

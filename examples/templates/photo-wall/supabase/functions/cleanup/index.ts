@@ -44,37 +44,60 @@ async function deletePhotos(
   }
 }
 
-async function purgeGuests(admin: SupabaseClient, days: number) {
-  const cutoff = Date.now() - days * DAY_MS
-  let purged = 0
+/** Reads a day count from an env var: the fallback when unset, else a positive number. */
+function days(name: string, fallback: number) {
+  const value = Deno.env.get(name)
+  if (!value) return fallback
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`${name} must be a positive number`)
+  return parsed
+}
+
+async function purgeGuests(admin: SupabaseClient, guestDays: number) {
+  const cutoff = Date.now() - guestDays * DAY_MS
+
+  // Collect every eligible guest first, so deletions don't shift later pages.
+  const guests: string[] = []
   for (let page = 1; ; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
     if (error) throw error
-
-    for (const guest of data.users) {
-      if (!guest.is_anonymous || new Date(guest.created_at).getTime() >= cutoff) continue
-      const { data: walls } = await admin.from('walls').select('id').eq('created_by', guest.id)
-      const wallIds = (walls ?? []).map((wall) => wall.id)
-      if (wallIds.length > 0) await deletePhotos(admin, (query) => query.in('wall_id', wallIds))
-      await deletePhotos(admin, (query) => query.eq('created_by', guest.id))
-      const { error: deleteError } = await admin.auth.admin.deleteUser(guest.id)
-      if (!deleteError) purged += 1
+    for (const user of data.users) {
+      if (user.is_anonymous && new Date(user.created_at).getTime() < cutoff) guests.push(user.id)
     }
-    if (data.users.length < 1000) return purged
+    if (data.users.length < 1000) break
   }
+
+  let purged = 0
+  for (const guestId of guests) {
+    // Remove every file on the guest's walls (other members' too, since the
+    // walls go with the guest) and their own uploads elsewhere, before the
+    // cascade deletes the rows that point at those files.
+    const { data: walls, error: wallsError } = await admin
+      .from('walls')
+      .select('id')
+      .eq('created_by', guestId)
+    if (wallsError) throw wallsError
+    const wallIds = walls.map((wall) => wall.id)
+    if (wallIds.length > 0) await deletePhotos(admin, (query) => query.in('wall_id', wallIds))
+    await deletePhotos(admin, (query) => query.eq('created_by', guestId))
+    const { error: deleteError } = await admin.auth.admin.deleteUser(guestId)
+    if (deleteError) throw deleteError
+    purged += 1
+  }
+  return purged
 }
 
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
     try {
-      const retentionDays = Number(Deno.env.get('RETENTION_DAYS') ?? '7')
+      const retentionDays = days('RETENTION_DAYS', 7)
       const cutoff = new Date(Date.now() - retentionDays * DAY_MS).toISOString()
       const deleted = await deletePhotos(ctx.supabaseAdmin, (query) =>
         query.lt('created_at', cutoff)
       )
 
-      const guestDays = Number(Deno.env.get('PURGE_GUEST_DAYS') ?? '0')
-      const purgedGuests = guestDays ? await purgeGuests(ctx.supabaseAdmin, guestDays) : 0
+      const guestDays = days('PURGE_GUEST_DAYS', 0)
+      const purgedGuests = guestDays > 0 ? await purgeGuests(ctx.supabaseAdmin, guestDays) : 0
 
       return Response.json({ deleted, purgedGuests })
     } catch (error) {

@@ -46,6 +46,11 @@ create index item_embeddings_embedding_idx
 alter table public.items enable row level security;
 alter table public.item_embeddings enable row level security;
 
+-- New tables aren't exposed to the Data API without explicit grants (the
+-- default for new projects), so grant exactly what the policies below allow.
+grant select, insert, update, delete on public.items to authenticated;
+grant select, insert, update on public.item_embeddings to authenticated;
+
 create policy "Users can view their items"
 on public.items for select
 to authenticated
@@ -87,7 +92,13 @@ create policy "Users can update their embeddings"
 on public.item_embeddings for update
 to authenticated
 using (created_by = (select auth.uid()))
-with check (created_by = (select auth.uid()));
+with check (
+  created_by = (select auth.uid())
+  and exists (
+    select 1 from public.items
+    where items.id = item_id and items.created_by = (select auth.uid())
+  )
+);
 
 -- Up to 500 items per person.
 create function public.check_item_limit()

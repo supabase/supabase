@@ -139,7 +139,7 @@ function ResourceLink({
     >
       <Icon className="size-4 shrink-0" />
       <span className="flex-1">{children}</span>
-      <ArrowUpRight className="size-4 text-foreground-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+      <ArrowUpRight className="size-4 text-foreground-muted transition-transform motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5" />
     </a>
   )
 }

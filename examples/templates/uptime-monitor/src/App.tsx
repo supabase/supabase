@@ -49,7 +49,7 @@ export function App() {
 }
 
 function Dashboard({ userId }: { userId: string }) {
-  const [since] = useState(() => new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString())
+  const since = useWindowStart()
 
   // Live queries: as the worker records checks and opens or resolves
   // incidents, Realtime updates these and the dashboard re-renders.
@@ -69,8 +69,13 @@ function Dashboard({ userId }: { userId: string }) {
   )
 
   const checksByMonitor = Map.groupBy(recentChecks, (check) => check.monitor_id)
-  const downCount = monitorList.filter((monitor) =>
-    openIncidents.some((incident) => incident.monitor_id === monitor.id)
+  const downCount = monitorList.filter(
+    (monitor) =>
+      monitorStatus(
+        monitor,
+        checksByMonitor.get(monitor.id) ?? [],
+        openIncidents.find((incident) => incident.monitor_id === monitor.id)
+      ) === 'down'
   ).length
 
   return (
@@ -90,6 +95,31 @@ function Dashboard({ userId }: { userId: string }) {
       </ul>
     </main>
   )
+}
+
+/** Start of the one-hour window, moved forward every minute while the page is open. */
+function useWindowStart() {
+  const windowStart = () => {
+    const minute = Math.floor(Date.now() / 60_000) * 60_000
+    return new Date(minute - WINDOW_MINUTES * 60_000).toISOString()
+  }
+  const [since, setSince] = useState(windowStart)
+  useEffect(() => {
+    const timer = window.setInterval(() => setSince(windowStart()), 60_000)
+    return () => window.clearInterval(timer)
+  }, [])
+  return since
+}
+
+type Status = 'paused' | 'pending' | 'down' | 'up'
+
+/** One rule for a monitor's status, used by its row and by the summary. */
+function monitorStatus(monitor: Monitor, monitorChecks: Check[], incident?: Incident): Status {
+  const latest = monitorChecks.at(-1)
+  if (monitor.is_paused) return 'paused'
+  if (!latest) return 'pending'
+  if (incident || !latest.is_up) return 'down'
+  return 'up'
 }
 
 function Summary({ total, down, hasChecks }: { total: number; down: number; hasChecks: boolean }) {
@@ -130,19 +160,22 @@ function AddMonitorForm({ userId, isFull }: { userId: string; isFull: boolean })
       setError('Enter a full URL, like https://example.com')
       return
     }
-    const transaction = monitors.insert({
-      id: crypto.randomUUID(),
-      name: parsed.hostname.replace(/^www\./, ''),
-      url: parsed.toString(),
-      is_paused: false,
-      created_by: userId,
-      created_at: new Date().toISOString(),
-    })
+    const submitted = url
     setUrl('')
     try {
+      // insert() throws right away if the row fails the schema, and
+      // isPersisted rejects (rolling back) if Postgres refuses it.
+      const transaction = monitors.insert({
+        id: crypto.randomUUID(),
+        name: parsed.hostname.replace(/^www\./, '').slice(0, 60),
+        url: parsed.toString(),
+        is_paused: false,
+        created_by: userId,
+        created_at: new Date().toISOString(),
+      })
       await transaction.isPersisted.promise
     } catch (insertError) {
-      // The insert rolls back automatically; show Postgres's reason.
+      setUrl((current) => current || submitted)
       setError(insertError instanceof Error ? insertError.message : 'Could not add monitor')
     }
   }
@@ -181,7 +214,6 @@ function MonitorRow({
   checks: Check[]
   incident?: Incident
 }) {
-  const latest = monitorChecks.at(-1)
   const upCount = monitorChecks.filter((check) => check.is_up).length
   const uptime = monitorChecks.length > 0 ? (upCount / monitorChecks.length) * 100 : null
   const latencies = monitorChecks
@@ -192,10 +224,7 @@ function MonitorRow({
       ? Math.round(latencies.reduce((sum, latency) => sum + latency, 0) / latencies.length)
       : null
 
-  let status: 'paused' | 'pending' | 'down' | 'up' = 'up'
-  if (monitor.is_paused) status = 'paused'
-  else if (!latest) status = 'pending'
-  else if (incident || !latest.is_up) status = 'down'
+  const status = monitorStatus(monitor, monitorChecks, incident)
 
   return (
     <li className="group flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
@@ -276,7 +305,7 @@ function CheckBars({ checks: monitorChecks }: { checks: Check[] }) {
   )
 }
 
-function StatusDot({ status }: { status: 'paused' | 'pending' | 'down' | 'up' }) {
+function StatusDot({ status }: { status: Status }) {
   const color = {
     up: 'bg-emerald-500',
     down: 'animate-pulse bg-red-500',

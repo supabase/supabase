@@ -56,6 +56,7 @@ function PhotoWall({ wall, userId }: { wall: Wall; userId: string }) {
   const [uploads, setUploads] = useState<Upload[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [openPhoto, setOpenPhoto] = useState<Photo | null>(null)
+  const lightboxTrigger = useRef<HTMLElement | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
   // A live query: new photos from anyone on the wall appear without a refresh.
@@ -183,7 +184,10 @@ function PhotoWall({ wall, userId }: { wall: Wall; userId: string }) {
               key={photo.id}
               photo={photo}
               canDelete={photo.created_by === userId}
-              onOpen={() => setOpenPhoto(photo)}
+              onOpen={(trigger) => {
+                lightboxTrigger.current = trigger
+                setOpenPhoto(photo)
+              }}
             />
           ))}
         </div>
@@ -194,8 +198,34 @@ function PhotoWall({ wall, userId }: { wall: Wall; userId: string }) {
           Drop to add to the wall
         </div>
       )}
-      {openPhoto && <Lightbox photo={openPhoto} onClose={() => setOpenPhoto(null)} />}
+      {openPhoto && (
+        <Lightbox
+          photo={openPhoto}
+          onClose={() => {
+            setOpenPhoto(null)
+            // Return focus to the photo that opened the lightbox.
+            lightboxTrigger.current?.focus()
+          }}
+        />
+      )}
     </div>
+  )
+}
+
+/**
+ * A resized photo that falls back to the original file if resizing isn't
+ * available (image transformations need a paid plan).
+ */
+function PhotoImage({ path, width, alt, className }: { path: string; width: number; alt: string; className: string }) {
+  const [isResizeFailed, setIsResizeFailed] = useState(false)
+  return (
+    <img
+      src={photoUrl(path, isResizeFailed ? undefined : width)}
+      alt={alt}
+      loading="lazy"
+      onError={() => setIsResizeFailed(true)}
+      className={className}
+    />
   )
 }
 
@@ -206,39 +236,78 @@ function PhotoTile({
 }: {
   photo: Photo
   canDelete: boolean
-  onOpen: () => void
+  onOpen: (trigger: HTMLElement) => void
 }) {
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setDeleteError(null)
+    setIsDeleting(true)
+    try {
+      await deletePhoto(photo.id, photo.path)
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Could not delete the photo')
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <figure
       className="group relative mb-3 break-inside-avoid overflow-hidden rounded-xl bg-surface"
       style={{ aspectRatio: photo.width / photo.height }}
     >
-      <button type="button" onClick={onOpen} className="block size-full" aria-label="Open photo">
-        <img
-          src={photoUrl(photo.path, 600)}
+      <button
+        type="button"
+        onClick={(event) => onOpen(event.currentTarget)}
+        className="block size-full"
+        aria-label="Open photo"
+      >
+        <PhotoImage
+          path={photo.path}
+          width={600}
           alt={photo.caption ?? ''}
-          loading="lazy"
-          className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          className="size-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.03]"
         />
       </button>
       {canDelete && (
         <button
           type="button"
           aria-label="Delete photo"
-          onClick={() => deletePhoto(photo.id, photo.path)}
-          className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-background/80 text-sm opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+          disabled={isDeleting}
+          onClick={handleDelete}
+          className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-background/80 text-sm opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-50"
         >
           ×
         </button>
+      )}
+      {deleteError && (
+        <figcaption role="alert" className="absolute inset-x-0 bottom-0 bg-background/90 px-3 py-1.5 text-xs text-red-500">
+          {deleteError}
+        </figcaption>
       )}
     </figure>
   )
 }
 
-function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
+function Lightbox({
+  photo,
+  onClose,
+}: {
+  photo: Photo
+  onClose: () => void
+}) {
+  const dialog = useRef<HTMLDivElement>(null)
+
+  // Move focus into the dialog, keep Tab inside it, close on Escape.
   useEffect(() => {
+    dialog.current?.focus()
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
+      if (event.key === 'Tab') {
+        event.preventDefault()
+        dialog.current?.focus()
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -246,14 +315,17 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
 
   return (
     <div
+      ref={dialog}
       role="dialog"
       aria-modal="true"
-      aria-label="Photo"
+      aria-label="Photo. Press Escape to close."
+      tabIndex={-1}
       onClick={onClose}
-      className="fixed inset-0 z-30 flex items-center justify-center bg-black/85 p-6"
+      className="fixed inset-0 z-30 flex items-center justify-center bg-black/85 p-6 outline-none"
     >
-      <img
-        src={photoUrl(photo.path, 1600)}
+      <PhotoImage
+        path={photo.path}
+        width={1600}
         alt={photo.caption ?? ''}
         className="max-h-full max-w-full rounded-lg object-contain"
       />

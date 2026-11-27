@@ -18,8 +18,11 @@ select name, email, created_at from public.waitlist_entries order by created_at;
 
 ## Run it
 
-1. Create a Supabase project, or run `supabase start` for a local one.
-2. Link it and apply the migration and auth config:
+1. **Local:** run `supabase start`. It applies the migration and `supabase/config.toml` (including anonymous sign-ins) for you. Skip to step 3.
+
+   **Hosted:** create a project in the dashboard or with `supabase projects create`.
+
+2. For a hosted project, link it and apply the migration and auth config:
 
    ```bash
    supabase link --project-ref <your-project-ref>

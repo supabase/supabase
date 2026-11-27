@@ -109,14 +109,23 @@ export async function uploadPhoto(wallId: string, userId: string, file: Blob) {
     created_by: userId,
     created_at: new Date().toISOString(),
   })
-  await transaction.isPersisted.promise
+  try {
+    await transaction.isPersisted.promise
+  } catch (insertError) {
+    // The row was rejected: don't leave the uploaded file behind.
+    await supabase.storage.from('photos').remove([path])
+    throw insertError
+  }
 }
 
 /** Deletes a photo's file and row (both are limited to the uploader by RLS). */
 export async function deletePhoto(id: string, path: string) {
-  const { error } = await supabase.storage.from('photos').remove([path])
+  // Delete the file first, and only remove the row once Storage confirms the
+  // file is gone, so a photo never outlives its row at a public URL.
+  const { data, error } = await supabase.storage.from('photos').remove([path])
   if (error) throw error
-  photos.delete(id)
+  if (data.length === 0) throw new Error('Could not delete the photo file. Try again.')
+  await photos.delete(id).isPersisted.promise
 }
 
 /**

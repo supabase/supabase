@@ -17,7 +17,7 @@ function DemoScreenshot({ example }: { example: Example }) {
     <>
       <img
         src={withBasePath(`/screenshots/${example.slug}-light.jpg`)}
-        alt={`${example.title} demo`}
+        alt=""
         width={800}
         height={500}
         loading="lazy"
@@ -49,7 +49,7 @@ export function ExampleCard({ example }: { example: Example }) {
     >
       {/* The demo peeks up from the bottom of the frame, like a window. */}
       <div className="aspect-[16/10] overflow-hidden border-b bg-surface-75 px-6 pt-6">
-        <div className="h-full overflow-hidden rounded-t-md border border-b-0 shadow-sm transition-transform duration-500 ease-out group-hover:-translate-y-1">
+        <div className="h-full overflow-hidden rounded-t-md border border-b-0 shadow-sm transition-transform duration-500 ease-out motion-safe:group-hover:-translate-y-1">
           <DemoScreenshot example={example} />
         </div>
       </div>
