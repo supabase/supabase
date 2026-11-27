@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RouterContextProvider } from '@tanstack/react-router'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import type React from 'react'
@@ -6,7 +7,9 @@ import { useState } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import { createTestRouter } from '@/tests/lib/custom-render'
 import type { Organization } from '@/types'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
@@ -129,11 +132,44 @@ export const createMockProject = (details: Partial<ProjectInfoInfinite>): Projec
   return Object.assign(base, details)
 }
 
+type OrgProjectComputeSize = OrgProject['databases'][number]['infra_compute_size']
+
+/** An org project with a single primary database, as returned by the org projects endpoint. */
+export const createMockOrgProject = ({
+  computeSize = 'micro',
+  ...details
+}: Partial<OrgProject> & { computeSize?: OrgProjectComputeSize }): OrgProject => {
+  const ref = details.ref ?? 'abcdefghijklmnopqrst'
+  const base: OrgProject = {
+    ref,
+    name: 'Project 1',
+    status: 'ACTIVE_HEALTHY',
+    cloud_provider: 'AWS',
+    region: 'us-east-1',
+    inserted_at: '2026-01-01T00:00:00Z',
+    is_branch: false,
+    integration_source: null,
+    databases: [
+      {
+        identifier: ref,
+        infra_compute_size: computeSize,
+        region: 'us-east-1',
+        status: 'ACTIVE_HEALTHY',
+        type: 'PRIMARY',
+        cloud_provider: 'AWS',
+      },
+    ],
+  }
+
+  return Object.assign(base, details)
+}
+
 /**
  * A custom render function for react testing library
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
 const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [router] = useState(() => createTestRouter())
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -146,11 +182,13 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
   )
 
   return (
-    <TooltipProvider>
-      <QueryClientProvider client={queryClient}>
-        <CommandProvider openKey="">{children}</CommandProvider>
-      </QueryClientProvider>
-    </TooltipProvider>
+    <RouterContextProvider router={router}>
+      <TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <CommandProvider openKey="">{children}</CommandProvider>
+        </QueryClientProvider>
+      </TooltipProvider>
+    </RouterContextProvider>
   )
 }
 type renderParams = Parameters<typeof originalRender>

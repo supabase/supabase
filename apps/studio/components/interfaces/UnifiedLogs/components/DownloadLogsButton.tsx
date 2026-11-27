@@ -1,8 +1,7 @@
+import { Link, useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
 import { DownloadIcon, SettingsIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -41,8 +40,8 @@ interface DownloadLogsButtonProps {
 
 export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
-  const pathname = usePathname()
-  const isLogs = pathname?.includes?.('/logs') ?? false
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const isLogs = pathname.includes('/logs')
   const [numRows, setNumRows] = useState(DEFAULT_NUM_ROWS)
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
@@ -113,7 +112,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
-              <Link href={`/project/${ref}/settings/log-drains`}>
+              <Link to="/project/$ref/settings/log-drains" params={{ ref: ref ?? '_' }}>
                 <SettingsIcon size={14} />
                 <p>Add a Log Drain</p>
               </Link>

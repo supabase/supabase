@@ -1,9 +1,6 @@
 'use client'
 
 import { components } from 'api-types'
-import { useRouter } from 'next/compat/router'
-import { usePathname } from 'next/navigation'
-import Script from 'next/script'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLatest } from 'react-use'
 
@@ -14,6 +11,7 @@ import { IS_PLATFORM } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { parseFirstReferrerCookie, parseMwDiagCookie } from './first-referrer-cookie'
+import { useFramework, useHasFrameworkProvider } from './framework'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
 import { handlePageLeaveTelemetry, handlePageTelemetry } from './page-telemetry'
@@ -27,7 +25,7 @@ import {
 import { TelemetryEvent } from './telemetry-constants'
 import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
-import { setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
+import { redactUrlKeywords, setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -38,6 +36,9 @@ export {
   type ClientTelemetryEvent,
   type SessionRecordingOptions,
 }
+
+const GTM_SCRIPT_ID = 'consent'
+const GTM_INLINE_SCRIPT = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`
 
 export const TelemetryTagManager = () => {
   const { hasAccepted } = useConsentState()
@@ -53,17 +54,16 @@ export const TelemetryTagManager = () => {
     syncCookie(hasAccepted)
   }, [hasAccepted, syncCookie])
 
-  if (!isGTMEnabled) return null
+  useEffect(() => {
+    if (!isGTMEnabled || document.getElementById(GTM_SCRIPT_ID)) return
 
-  return (
-    <Script
-      id="consent"
-      strategy="afterInteractive"
-      dangerouslySetInnerHTML={{
-        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`,
-      }}
-    />
-  )
+    const script = document.createElement('script')
+    script.id = GTM_SCRIPT_ID
+    script.textContent = GTM_INLINE_SCRIPT
+    document.body.appendChild(script)
+  }, [isGTMEnabled])
+
+  return null
 }
 
 export const PageTelemetry = ({
@@ -86,10 +86,13 @@ export const PageTelemetry = ({
 }) => {
   setTelemetryPlatform(platform)
 
-  const router = useRouter()
-
-  const pagesPathname = router?.pathname
-  const appPathname = usePathname()
+  const { pathname: frameworkPathname, asPath, isReady = true } = useFramework()
+  // Without a provider nothing re-renders this on client-side navigation, so only the landing
+  // pageview would be sent.
+  const hasFrameworkProvider = useHasFrameworkProvider()
+  if (process.env.NODE_ENV !== 'production' && !hasFrameworkProvider) {
+    throw new Error('PageTelemetry must be rendered inside a FrameworkProvider')
+  }
 
   const params = useParams()
   const slug = organizationSlug || params.slug
@@ -99,8 +102,8 @@ export const PageTelemetry = ({
 
   useFirstTouchStore({ enabled: enabled && IS_PLATFORM })
 
-  const pathname =
-    pagesPathname ?? appPathname ?? (isBrowser ? window.location.pathname : undefined)
+  const pathname = frameworkPathname ?? (isBrowser ? window.location.pathname : undefined)
+  const routeKey = asPath ?? pathname
   const pathnameRef = useLatest(pathname)
   const featureFlagsRef = useLatest(featureFlags.posthog)
 
@@ -135,8 +138,8 @@ export const PageTelemetry = ({
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
-  const lastSentPagesUrlRef = useRef<string | null>(null)
-  const previousAppPathnameRef = useRef<string | null>(null)
+  const lastSentUrlRef = useRef<string | null>(null)
+  const previousRouteKeyRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
@@ -144,14 +147,9 @@ export const PageTelemetry = ({
     }
   }, [hasAcceptedConsent, IS_PLATFORM, sessionReplay])
 
-  // Waiting for router.isReady before sending to avoid dynamic route placeholders
+  // Waiting for isReady before sending to avoid dynamic route placeholders
   useEffect(() => {
-    if (
-      (router?.isReady ?? true) &&
-      enabled &&
-      hasAcceptedConsent &&
-      !hasSentInitialPageTelemetryRef.current
-    ) {
+    if (isReady && enabled && hasAcceptedConsent && !hasSentInitialPageTelemetryRef.current) {
       const cookieHeader = document.cookie
       const firstReferrerData = parseFirstReferrerCookie(cookieHeader)
       const mwDiagData = parseMwDiagCookie(cookieHeader)
@@ -171,44 +169,28 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
-        lastSentPagesUrlRef.current = window.location.pathname + window.location.search
+        lastSentUrlRef.current = redactUrlKeywords(
+          window.location.pathname + window.location.search
+        )
       }
     }
-  }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
+  }, [isReady, enabled, hasAcceptedConsent, slug, ref])
 
   useEffect(() => {
-    if (router === null) return
+    const currentRouteKey = routeKey ?? null
+    const previousRouteKey = previousRouteKeyRef.current
+    previousRouteKeyRef.current = currentRouteKey
 
-    function handleRouteChange() {
-      if (!hasSentInitialPageTelemetryRef.current) return
-      // routeChangeComplete can fire when only the hash changes, and `$current_url` drops the hash,
-      // so that pageview would be an exact repeat.
-      const url = window.location.pathname + window.location.search
-      if (url === lastSentPagesUrlRef.current) return
-      lastSentPagesUrlRef.current = url
-      sendPageTelemetry()
-    }
+    if (!hasSentInitialPageTelemetryRef.current) return
+    if (previousRouteKey === null || previousRouteKey === currentRouteKey) return
 
-    router.events.on('routeChangeComplete', handleRouteChange)
-
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router])
-
-  useEffect(() => {
-    if (router !== null) return
-
-    if (
-      appPathname &&
-      previousAppPathnameRef.current !== null &&
-      previousAppPathnameRef.current !== appPathname
-    ) {
-      sendPageTelemetry()
-    }
-
-    previousAppPathnameRef.current = appPathname
-  }, [appPathname, router, sendPageTelemetry])
+    // Skip changes that leave the sent URL the same: `$current_url` drops the hash and carries
+    // redacted query values.
+    const url = redactUrlKeywords(window.location.pathname + window.location.search)
+    if (url === lastSentUrlRef.current) return
+    lastSentUrlRef.current = url
+    sendPageTelemetry()
+  }, [routeKey, sendPageTelemetry])
 
   useEffect(() => {
     if (!enabled) return

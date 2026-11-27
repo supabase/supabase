@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
+import InlineSVG from 'react-inlinesvg'
 import { Card, CardContent } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -19,12 +20,12 @@ import {
 import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import type { ForeignProject } from '@/components/interfaces/Integrations/VercelGithub/VercelGithub.types'
 import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
-import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { BASE_PATH } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { getFrameworkIconUrl } from '@/lib/integration-utils'
 import { hasVercelDeployButtonSignals } from '@/lib/integrations/vercel-install.utils'
@@ -94,7 +95,13 @@ function VercelChooseProjectPage() {
       const frameworkIconUrl = getFrameworkIconUrl(project?.framework)
 
       return !frameworkIconUrl ? (
-        vercelIcon
+        <div className="flex items-center justify-center rounded-sm bg-black p-1 text-white">
+          <InlineSVG
+            src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+            title="Vercel Icon"
+            className="w-3"
+          />
+        </div>
       ) : (
         <img src={frameworkIconUrl} width={21} height={21} alt="Framework icon" />
       )

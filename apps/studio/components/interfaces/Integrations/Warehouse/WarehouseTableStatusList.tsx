@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   Card,
@@ -23,8 +24,16 @@ import {
 } from 'ui-patterns/PageSection'
 
 import type { WarehouseSetupTable } from './Warehouse.utils'
+import {
+  WarehouseSchemaTablePicker,
+  type WarehouseSchemaTablePickerProps,
+} from './WarehouseSchemaTablePicker'
+import { AlertError } from '@/components/ui/AlertError'
 import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import type { WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-status-query'
+import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 
 const TABLE_STATE: Record<
   WarehouseSetupTable['state'],
@@ -130,11 +139,36 @@ export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatu
   </PageSection>
 )
 
-interface WarehouseEnablingProgressProps {
+interface WarehouseEnablingProgressProps extends Pick<
+  WarehouseSchemaTablePickerProps,
+  'onSubmit' | 'isSubmitting' | 'error'
+> {
   status: WarehouseSetupStatusResponse
 }
 
-export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressProps) => {
+export const WarehouseEnablingProgress = ({
+  status,
+  onSubmit,
+  isSubmitting,
+  error,
+}: WarehouseEnablingProgressProps) => {
+  const { ref: projectRef } = useParams()
+  // An empty status table list can also mean the first replication observation is pending.
+  // Only offer selection recovery once an existing pipeline's publication is confirmed empty.
+  const shouldCheckPublication = status.pipeline_id !== undefined && status.tables.length === 0
+  const { data: sources, error: sourcesError } = useReplicationSourcesQuery(
+    { projectRef },
+    { enabled: shouldCheckPublication }
+  )
+  const sourceId = sources?.sources.find((source) => source.name === projectRef)?.id
+  const { data: publication, error: publicationError } = useReplicationPublicationQuery(
+    { projectRef, sourceId, publicationName: WAREHOUSE_PUBLICATION_NAME },
+    { enabled: shouldCheckPublication }
+  )
+  const selectionError = shouldCheckPublication ? (sourcesError ?? publicationError) : null
+  const hasEmptyPublication =
+    shouldCheckPublication && !selectionError && publication?.tables.length === 0
+
   const syncedTableCount = status.tables.filter((table) => table.state === 'live').length
   const progressDescription =
     status.setup_status === 'setting_up'
@@ -142,21 +176,42 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
       : `Backfilling selected tables. ${syncedTableCount} of ${status.tables.length} tables synced.`
 
   return (
-    <PageSection className="pt-5!">
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Status</PageSectionTitle>
-          <PageSectionDescription>Warehouse setup progress.</PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent className="space-y-4">
-        <Admonition
-          type="default"
-          title="Warehouse is being set up"
-          description={progressDescription}
+    <>
+      <PageSection className="pt-5!">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Status</PageSectionTitle>
+            <PageSectionDescription>Warehouse setup progress.</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="space-y-4">
+          <Admonition
+            type="default"
+            title={hasEmptyPublication ? 'No tables selected' : 'Warehouse is being set up'}
+            description={
+              hasEmptyPublication
+                ? 'Select tables below to start replicating data to Warehouse.'
+                : progressDescription
+            }
+          />
+          {!!selectionError && (
+            <AlertError
+              subject="Failed to load replicated tables"
+              error={selectionError}
+              projectRef={projectRef}
+            />
+          )}
+          {status.tables.length > 0 && <WarehouseTableStatusList tables={status.tables} />}
+        </PageSectionContent>
+      </PageSection>
+      {hasEmptyPublication && (
+        <WarehouseSchemaTablePicker
+          isEditing
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          error={error}
         />
-        {status.tables.length > 0 && <WarehouseTableStatusList tables={status.tables} />}
-      </PageSectionContent>
-    </PageSection>
+      )}
+    </>
   )
 }

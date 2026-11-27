@@ -81,7 +81,11 @@ resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: realtime-dev.supabase-realtime
+                    # Use the Compose service name, not the container name, so the
+                    # lookup is a single label and covered by `dns_opt` on api-gw.
+                    # Realtime reads its tenant from the Host header, which the
+                    # routes set with `host_rewrite_literal`.
+                    address: realtime
                     port_value: 4000
     ignore_health_on_host_removal: true
     health_checks:

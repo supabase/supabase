@@ -35,13 +35,14 @@ failure modes. Implication: **don't add new federated sources** without
 strong justification; **don't extend federated patterns** to new content
 types.
 
-## Troubleshooting guides currently live in an external repo
+## Troubleshooting articles come from a private repo
 
 **Severity:** ongoing sync issues.
 
-This causes synchronization problems between the docs site and the source
-of truth. Proposed direction: bring them in-house and require support
-teams to contribute directly to `supabase/supabase` to ensure accuracy.
+Troubleshooting articles moved from `apps/docs` to `/kb`. The build fetches
+them into `apps/kb/src/content/troubleshooting/` from a private repo, so
+they don't take direct contributions in `supabase/supabase`, and the site
+can drift from the source repo. See `apps/kb/README.md`.
 
 ## Reference pages can't go through standard MDX
 

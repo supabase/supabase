@@ -1098,4 +1098,14 @@ module.exports = [
     source: '/changelog/rss.xml',
     destination: '/changelog-rss.xml',
   },
+  {
+    permanent: true,
+    source: '/builder-day',
+    destination: '/builderday',
+  },
+  {
+    permanent: true,
+    source: '/builder-day/:path*',
+    destination: '/builderday/:path*',
+  },
 ]

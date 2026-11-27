@@ -256,7 +256,7 @@ function DatabasePoliciesPage() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Policies</PageHeaderTitle>
@@ -271,7 +271,7 @@ function DatabasePoliciesPage() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
 

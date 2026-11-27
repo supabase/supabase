@@ -102,10 +102,7 @@ export function FilterCondition({
     setLocalOperator(conditionOperator)
     handleInputBlur()
   })
-  const handleValueBlur = useDeferredBlur(
-    wrapperRef as React.RefObject<HTMLElement>,
-    handleInputBlur
-  )
+  const handleValueBlur = useDeferredBlur(valueRef, () => handleInputBlur(true))
 
   useEffect(() => {
     if (!isPropertyActive) setPropertySearchText('')

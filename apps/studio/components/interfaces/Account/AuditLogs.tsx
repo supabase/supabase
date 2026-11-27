@@ -11,6 +11,8 @@ import { RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { parseTimeRange, serializeTimeRange } from '../Settings/Logs/Logs.timeRange'
@@ -30,7 +32,6 @@ import {
 import { createAuditLogsProjectOption } from '@/components/interfaces/AuditLogs/AuditLogsProjectOption'
 import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
 import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { type AuditLog } from '@/data/organizations/organization-audit-logs-query'
@@ -174,8 +175,8 @@ export const AuditLogs = () => {
   }, [dateRange.from, dateRange.to])
 
   return (
-    <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
-      <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
+    <PageContainer size="full" className="px-0 xl:px-0 h-full flex flex-col">
+      <PageSection className="pt-6 last:pb-0 flex-1 min-h-0">
         <div className="flex flex-col h-full min-h-0">
           {isLoading && (
             <div className={cn(CONTENT_PADDING, 'space-y-2')}>
@@ -262,7 +263,7 @@ export const AuditLogs = () => {
             </>
           )}
         </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </PageSection>
+    </PageContainer>
   )
 }

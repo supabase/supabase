@@ -1,7 +1,7 @@
-import { usePathname } from 'next/navigation'
+import { useLocation } from '@tanstack/react-router'
 
 export function useHideSidebar() {
-  const pathname = usePathname() ?? ''
+  const pathname = useLocation({ select: (location) => location.pathname })
 
   const shouldHide =
     pathname.startsWith('/account') ||

@@ -118,7 +118,7 @@ function EdgeFunctionsPage() {
   const hasFunctions = (functions ?? []).length > 0
 
   return (
-    <PageContainer size="large">
+    <PageContainer size="default">
       <PageSection>
         <PageSectionContent>
           <div className="flex flex-col gap-6">
@@ -243,7 +243,7 @@ function EdgeFunctionsPage() {
 const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) => (
   <>
     <div className="w-full min-h-full flex flex-col items-stretch">
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Edge Functions</PageHeaderTitle>

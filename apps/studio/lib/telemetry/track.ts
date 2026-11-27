@@ -1,6 +1,5 @@
-import { sendTelemetryEvent } from 'common'
+import { sendTelemetryEvent, useFramework } from 'common'
 import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -25,18 +24,18 @@ type HasProperties<A extends keyof EventMap> = EventMap[A] extends { properties:
  *
  * @example
  * const track = useTrack()
- * track('table_created', { method: 'sql_editor', schema_name: 'public' })
+ * track('table_created', { method: 'sql_editor' })
  * track('help_button_clicked')
  */
 export const useTrack = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const router = useRouter()
+  const { pathname } = useFramework()
 
   const latest = useLatest({
     projectRef: project?.ref,
     orgSlug: org?.slug,
-    pathname: router.pathname,
+    pathname,
   })
 
   const track = useCallback(

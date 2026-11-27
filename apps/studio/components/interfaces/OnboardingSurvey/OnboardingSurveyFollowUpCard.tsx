@@ -1,4 +1,4 @@
-import { usePathname } from 'next/navigation'
+import { useLocation } from '@tanstack/react-router'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -70,7 +70,7 @@ export function OnboardingSurveyFollowUpCard() {
     if (hasExpired && !isDialogOpen) onExpire()
   }, [hasExpired, isDialogOpen])
 
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const shouldShowCard =
     isEligible && !hasFailedSkip && !isDialogOpen && !isProjectCreationPath(pathname)
 

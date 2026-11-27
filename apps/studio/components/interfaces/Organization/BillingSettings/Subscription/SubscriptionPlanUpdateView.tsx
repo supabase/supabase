@@ -25,6 +25,7 @@ import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Pa
 import {
   billingPartnerLabel,
   getPlanChangeType,
+  type PlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
@@ -45,7 +46,7 @@ interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
   /** Called after the subscription update succeeds, in addition to onClose. */
-  onSuccess?: () => void
+  onSuccess?: (result: { changeType: PlanChangeType }) => void
   planMeta?: OrgPlan | null
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
@@ -153,11 +154,12 @@ export const SubscriptionPlanUpdateView = ({
   const onSuccessfulPlanChange = () => {
     track('studio_pricing_plan_change_completed', planChangeProperties)
     setPaymentConfirmationLoading(false)
-    toast.success(
-      `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
-    )
+    // Upgrades land on the post-upgrade screen, which confirms the change itself.
+    if (changeType !== 'upgrade') {
+      toast.success(`Successfully downgraded subscription to ${subscriptionPlanMeta?.name}!`)
+    }
     onClose()
-    onSuccess?.()
+    onSuccess?.({ changeType })
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 

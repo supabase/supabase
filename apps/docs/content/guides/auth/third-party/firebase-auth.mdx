@@ -159,6 +159,22 @@ enabled = true
 project_id = "<id>"
 ```
 
+## Write RLS policies for Firebase users
+
+The `sub` claim of a Firebase ID token is the Firebase user's `uid`. To limit rows to the signed-in user, compare a column with `auth.jwt()->>'sub'` in your [RLS policies](/docs/guides/database/postgres/row-level-security):
+
+```sql
+create policy "Users can read their own rows"
+  on table_name
+  for select
+  to authenticated
+  using (user_id = (select auth.jwt()->>'sub'));
+```
+
+Firebase UIDs aren't UUIDs, so `user_id` must be a `text` column. Use `auth.jwt()->>'sub'` in place of `auth.uid()`, which casts `sub` to `uuid` and fails with `invalid input syntax for type uuid`.
+
+The `to authenticated` clause needs the [`role` claim](#assign-the-role-custom-claim) on your Firebase users. When self-hosting, also add the [restrictive issuer policy](#adding-an-extra-layer-of-security-to-your-projects-rls-policies-self-hosting-only) to accept only tokens from your Firebase project.
+
 ## Adding an extra layer of security to your project's RLS policies (self-hosting only)
 
 <Admonition type="caution">

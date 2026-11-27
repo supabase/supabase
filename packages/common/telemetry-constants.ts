@@ -633,6 +633,23 @@ export interface FreeTierGeneralRegionDocsLinkClickedEvent {
 }
 
 /**
+ * User clicked a "Docs" button rendered by the shared DocsButton component.
+ *
+ * @group Events
+ * @source studio
+ * @page any page that renders a DocsButton; the page is identified by the pathname sent with every event
+ */
+export interface DocsButtonClickedEvent {
+  action: 'docs_button_clicked'
+  properties: {
+    /** Fixed topic label passed to the button, e.g. the feature the docs link covers. Omitted when the button has no topic. */
+    topic?: string
+  }
+  // Rendered on project, organization, and account pages, so either group can be missing
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the "Need a specific region?" link to reveal the specific regions
  * list in the project creation region selector.
  *
@@ -724,8 +741,8 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/realtime/inspector
  */
-export interface RealtimeInspectorBroadcastSentEvent {
-  action: 'realtime_inspector_broadcast_sent'
+export interface RealtimeInspectorBroadcastSubmittedEvent {
+  action: 'realtime_inspector_broadcast_submitted'
   groups: TelemetryGroups
 }
 
@@ -1712,8 +1729,8 @@ export interface WwwEventPageCtaClickedEvent {
  * @source www
  * @page /legal/customer-resources/subprocessor-list
  */
-export interface WwwSubprocessorUpdatesSubscribedEvent {
-  action: 'www_subprocessor_updates_subscribed'
+export interface WwwSubprocessorUpdatesFormCompletedEvent {
+  action: 'www_subprocessor_updates_form_completed'
 }
 
 /**
@@ -2041,10 +2058,6 @@ export interface StudioPricingPlanCtaClickedEvent {
      * The plan type the org is currently on.
      */
     currentPlan?: string
-    /**
-     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
-     */
-    planUpdateRedesignEnabled: boolean
     /**
      * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
      */
@@ -3176,8 +3189,8 @@ export interface ConnectSheetOpenedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeSectionRowsMovedEvent {
-  action: 'home_section_rows_moved'
+export interface HomeSectionRowsUpdatedEvent {
+  action: 'home_section_rows_updated'
   properties: {
     /**
      * The section that was moved
@@ -4312,6 +4325,25 @@ export interface FreeMicroUpgradeBannerCtaClickedEvent {
 }
 
 /**
+ * User confirmed moving a Nano project to Micro on the screen shown after upgrading the
+ * organization to a paid plan. Starts the compute change, which restarts the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /org/{slug}/billing?panel=planUpgraded
+ */
+export interface PlanUpgradedMicroComputeUpgradeSubmittedEvent {
+  action: 'plan_upgraded_micro_compute_upgrade_submitted'
+  properties: {
+    /** The paid plan the organization just upgraded to. */
+    planId: 'pro' | 'team'
+    /** Projects on the screen that can still move to Micro, including the confirmed one. */
+    nanoProjectCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -4474,7 +4506,8 @@ export interface AccessTokenDoneButtonClickedEvent {
 
 /**
  * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
- * `placement` identifying which one (the user dropdown or the org project-list usage card).
+ * `placement` identifying which one (the user dropdown, the org project-list usage card, or the
+ * Free plan badge next to the organization name in the header).
  *
  * @group Events
  * @source studio
@@ -4482,7 +4515,7 @@ export interface AccessTokenDoneButtonClickedEvent {
 export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
-    placement: 'user_dropdown' | 'org_projects_list'
+    placement: 'user_dropdown' | 'org_projects_list' | 'org_plan_badge'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -4932,15 +4965,214 @@ export interface RecoveryCodesDownloadClickedEvent {
 }
 
 /**
+ * Kind of database schema, without the schema name.
+ * `public` is the public schema, `protected` is a schema managed by Supabase
+ * (internal or used by a foreign data wrapper), `custom` is any other schema.
+ */
+export type DatabaseSchemaType = 'public' | 'protected' | 'custom'
+
+/**
+ * User selected a schema in a database schema selector.
+ *
+ * @group Events
+ * @source Studio schema selector (SchemaSelector), when the user picks a schema
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaSelectorUpdatedEvent {
+  action: 'database_schema_selector_updated'
+  properties: {
+    /** Kind of the selected schema */
+    schemaType: DatabaseSchemaType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table in the Find table selector of the schema visualizer.
+ * Fires for selections opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar, Find table result
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerFindTableClickedEvent {
+  action: 'database_schema_visualizer_find_table_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied something from the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar (Copy as SQL, Copy as Markdown, or their keyboard shortcuts), or a table or column menu on the graph (Copy name, Copy as SQL, Copy as Markdown)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerCopiedEvent {
+  action: 'database_schema_visualizer_copied'
+  properties: {
+    /** What was copied: the whole schema, one table, or a name */
+    content:
+      | 'schema_sql'
+      | 'schema_markdown'
+      | 'table_name'
+      | 'table_sql'
+      | 'table_markdown'
+      | 'column_name'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started a download of the schema visualizer graph as an image.
+ *
+ * @group Events
+ * @source Schema visualizer toolbar export menu (Download as PNG or SVG), or their keyboard shortcuts
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerImageDownloadClickedEvent {
+  action: 'database_schema_visualizer_image_download_clicked'
+  properties: {
+    /** Image format of the download */
+    format: 'png' | 'svg'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed Auto layout in the schema visualizer.
+ * Fires for dialogs opened by click and by keyboard shortcut.
+ *
+ * @group Events
+ * @source Schema visualizer Auto layout dialog, Apply button
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerAutoLayoutAppliedEvent {
+  action: 'database_schema_visualizer_auto_layout_applied'
+  groups: TelemetryGroups
+}
+
+/**
+ * User chose an edit action in a table or column menu of the schema visualizer.
+ *
+ * @group Events
+ * @source Schema visualizer table menu (Edit table) or column menu (Edit column)
+ * @page /project/{ref}/database/schemas
+ */
+export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
+  action: 'database_schema_visualizer_node_menu_clicked'
+  properties: {
+    /** Which edit action the user chose */
+    action: 'edit_table' | 'edit_column'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied an API key with its Copy button on the API keys pages: a publishable or secret key,
+ * or a legacy anon or service_role key. Keyboard copies from the key input are not counted. Not
+ * fired when the copy is blocked by missing permissions or the clipboard write fails.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyCopiedEvent {
+  action: 'api_key_copied'
+  properties: {
+    /** Which key was copied */
+    keyType: 'publishable' | 'secret' | 'legacy_anon' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to reveal a secret key (the new secret key or the legacy service_role key).
+ * Publishable and legacy anon keys are always visible and don't fire this event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface ApiKeyRevealClickedEvent {
+  action: 'api_key_reveal_clicked'
+  properties: {
+    /** Which key the user revealed */
+    keyType: 'secret' | 'legacy_service_role'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully created, either from the create dialog or the first-time setup.
+ * The first-time setup creates a default publishable and secret key and fires once per key, so a
+ * failed secret key doesn't lose the publishable key's event.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyCreatedEvent {
+  action: 'api_key_created'
+  properties: {
+    /** Which key was created */
+    keyType: 'publishable' | 'secret'
+    /** Where the user created the key */
+    source: 'create_dialog' | 'initial_setup'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * An API key was successfully deleted after the user confirmed in the delete modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys
+ */
+export interface ApiKeyRemovedEvent {
+  action: 'api_key_removed'
+  properties: {
+    /** Which key was deleted */
+    keyType: 'publishable' | 'secret'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Legacy JWT-based API keys (anon and service_role) were successfully disabled or re-enabled.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/settings/api-keys/legacy
+ */
+export interface LegacyApiKeysUpdatedEvent {
+  action: 'legacy_api_keys_updated'
+  properties: {
+    /** Whether the legacy keys are enabled after the update */
+    enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | AccountRecoveryReminderExposedEvent
+  | DocsButtonClickedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
   | RecoveryCodesCopiedEvent
   | RecoveryCodesDownloadClickedEvent
+  | DatabaseSchemaSelectorUpdatedEvent
+  | DatabaseSchemaVisualizerFindTableClickedEvent
+  | DatabaseSchemaVisualizerCopiedEvent
+  | DatabaseSchemaVisualizerImageDownloadClickedEvent
+  | DatabaseSchemaVisualizerAutoLayoutAppliedEvent
+  | DatabaseSchemaVisualizerNodeMenuClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4982,7 +5214,7 @@ export type TelemetryEvent =
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
-  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorBroadcastSubmittedEvent
   | RealtimeInspectorMessageClickedEvent
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
@@ -5036,7 +5268,7 @@ export type TelemetryEvent =
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwEventPageCtaClickedEvent
-  | WwwSubprocessorUpdatesSubscribedEvent
+  | WwwSubprocessorUpdatesFormCompletedEvent
   | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
@@ -5123,7 +5355,7 @@ export type TelemetryEvent =
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
-  | HomeSectionRowsMovedEvent
+  | HomeSectionRowsUpdatedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
@@ -5174,6 +5406,7 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | PlanUpgradedMicroComputeUpgradeSubmittedEvent
   | UpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
@@ -5206,5 +5439,10 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | ApiKeyCopiedEvent
+  | ApiKeyRevealClickedEvent
+  | ApiKeyCreatedEvent
+  | ApiKeyRemovedEvent
+  | LegacyApiKeysUpdatedEvent
   | WarehouseEnabledEvent
   | WarehouseDisabledEvent

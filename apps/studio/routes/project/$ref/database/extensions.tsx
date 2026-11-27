@@ -34,7 +34,7 @@ function DatabaseExtensions() {
 
   return (
     <>
-      <PageHeader size="large">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Extensions</PageHeaderTitle>
@@ -47,7 +47,7 @@ function DatabaseExtensions() {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <Extensions />

@@ -65,7 +65,7 @@ export const getAddressElementAppearanceOptions = (
     theme: (isDark ? 'night' : 'flat') as 'night' | 'flat',
     variables: {
       fontSizeBase: '14px',
-      spacingUnit: '7px',
+      spacingUnit: '4px',
       colorPrimary: isDark ? 'hsl(0deg 0% 32%)' : 'hsl(0deg 0% 55%)',
       colorBackground: isDark ? 'hsl(0deg 0% 14.1%)' : 'hsl(0deg 0% 95.3%)',
       borderRadius: '4px',
@@ -74,7 +74,6 @@ export const getAddressElementAppearanceOptions = (
     rules: {
       '.Input': {
         boxShadow: isDark ? 'none' : 'inset 0 0 0 1px hsl(0deg 0% 80%)',
-        height: '34px',
         lineHeight: '16px',
         padding: '8px 12px',
         borderWidth: '1px',
