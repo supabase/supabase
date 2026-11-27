@@ -169,8 +169,8 @@ describe('ViewTokenSheet', () => {
 
     expect(await screen.findByText('Advisors')).toBeInTheDocument()
     expect(screen.getByText('Database')).toBeInTheDocument()
-    expect(screen.getByText('Read-write')).toBeInTheDocument()
-    expect(screen.getByText('Read')).toBeInTheDocument()
+    expect(screen.getByText('Read and write')).toBeInTheDocument()
+    expect(screen.getByText('Read only')).toBeInTheDocument()
 
     // Enabled tools are token-wide summary rows, visible without expanding any capability card.
     expect(screen.getByText('get_advisors')).toBeInTheDocument()

@@ -36,9 +36,9 @@ export type RiskLevel = 'low' | 'medium' | 'high'
  * Studio's form and the docs guide's tables must label modes identically.
  */
 export const PERMISSION_MODE_LABEL = {
-  none: 'None',
-  read: 'Read',
-  readwrite: 'Read-write',
+  none: 'No access',
+  read: 'Read only',
+  readwrite: 'Read and write',
 } as const
 
 /** Selection modes for a catalog entry. The label map's keys are the single source of truth. */
