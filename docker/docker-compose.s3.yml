@@ -2,6 +2,7 @@ services:
 
   minio:
     image: cgr.dev/chainguard/minio
+    restart: unless-stopped
     #ports:
     #  - '9000:9000'
     #  - '9001:9001'
