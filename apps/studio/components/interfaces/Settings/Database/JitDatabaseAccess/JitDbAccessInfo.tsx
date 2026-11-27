@@ -41,31 +41,32 @@ const SingleRoleAccess = ({ role }: { role: JitRole }) => {
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
   )
 
+  if (isExpired) {
+    if (!canManageJitDbAccess) return <ExpiredAccess />
+    else return null
+  }
+
   return (
     <Admonition
       type="default"
       showIcon={false}
       className={cn('rounded-none', canManageJitDbAccess ? 'border-x-0 border-t-0' : 'border-none')}
-      title={isExpired ? EXPIRED_TITLE : ACCESS_TITLE}
+      title={ACCESS_TITLE}
       description={
-        isExpired ? (
-          <p>Contact your project's owner or administrator for renewed access if required.</p>
-        ) : (
-          <div className="flex items-center gap-x-2">
-            <span>
-              <span>As</span> <code>{role.role}</code>
-            </span>
-            {role.expires_at && (
-              <>
-                <span>·</span>
-                <span>
-                  Expires on{' '}
-                  <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
-                </span>
-              </>
-            )}
-          </div>
-        )
+        <div className="flex items-center gap-x-2">
+          <span>
+            <span>As</span> <code>{role.role}</code>
+          </span>
+          {role.expires_at && (
+            <>
+              <span>·</span>
+              <span>
+                Expires on{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
+              </span>
+            </>
+          )}
+        </div>
       }
     />
   )
@@ -85,6 +86,11 @@ const MultiRoleAccess = ({ roles }: { roles: JitDbAccessStatusData['user_roles']
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
   )
 
+  if (isExpired) {
+    if (!canManageJitDbAccess) return <ExpiredAccess />
+    else return null
+  }
+
   return (
     <Collapsible className={canManageJitDbAccess ? 'border-b' : ''}>
       <CollapsibleTrigger
@@ -93,7 +99,7 @@ const MultiRoleAccess = ({ roles }: { roles: JitDbAccessStatusData['user_roles']
       >
         <div className="flex items-center justify-between gap-x-2 w-full cursor-pointer">
           <div className="text-sm">
-            <p className="mb-0.5">{isExpired ? EXPIRED_TITLE : ACCESS_TITLE}</p>
+            <p className="mb-0.5">{ACCESS_TITLE}</p>
             <div className="flex items-center gap-x-2 text-foreground-light">
               <span>Assigned {roles.length} roles</span>
               {nextExpiry !== undefined && (
@@ -129,5 +135,21 @@ const MultiRoleAccess = ({ roles }: { roles: JitDbAccessStatusData['user_roles']
         })}
       </CollapsibleContent>
     </Collapsible>
+  )
+}
+
+const ExpiredAccess = () => {
+  const { can: canManageJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
+  return (
+    <Admonition
+      type="default"
+
+      className={cn('rounded-none', canManageJitDbAccess ? 'border-x-0 border-t-0' : 'border-none')}
+      title="Your access to the project's database is expired"
+      description="Contact your project's owner or administrator for renewed access if required."
+    />
   )
 }

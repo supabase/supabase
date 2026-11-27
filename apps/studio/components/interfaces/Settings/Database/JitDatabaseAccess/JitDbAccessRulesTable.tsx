@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
   DropdownMenu,
@@ -226,6 +227,14 @@ export function JitDbAccessRulesTable({
           </Table>
         )}
       </CardContent>
+
+      {!canManageJitDbAccess && (
+        <CardFooter>
+          <p className="text-foreground-lighter text-sm">
+            You need additional permissions to manage temporary database access
+          </p>
+        </CardFooter>
+      )}
     </Card>
   )
 }
