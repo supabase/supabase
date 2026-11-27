@@ -60,13 +60,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 The sections below are experimental loading placeholders that could replace `Skeleton` and `ShimmeringLoader`. They're for evaluation only. On this branch, `Skeleton` and `ShimmeringLoader` (including `GenericSkeletonLoader` and `GenericTableLoader`) render `DitheredSkeletonGif` with its shine, so the experiment can be seen across Studio and the other apps. The dithered variants share the same API (`className` plus `pixelSize`), use page coordinates so neighboring skeletons read as one surface, and respect reduced motion.
 
-| Variant                             | Texture                                   | Shine                                | Per-frame cost                            |
-| ----------------------------------- | ----------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| `DitheredSkeleton`                  | Procedural, drawn per cell on a canvas    | Procedural, rippled edge             | Main-thread JavaScript, scales with area  |
-| `DitheredSkeletonLite`              | Static, baked once into mask tiles        | Stepped `transform`, 3 dither levels | 3 compositor layers per instance          |
-| `DitheredSkeletonGif`               | Drifting and pulsing, two GIF masks       | Soft `transform` sweep               | 1 compositor layer per instance           |
-| `DitheredSkeletonGif shine={false}` | Drifting and pulsing, one GIF mask        | None                                 | None, the browser animates the GIF itself |
-| `GradientSkeleton`                  | Smooth drifting pools of light, no dither | CSS `background-position` sweep      | Repaints every instance, even offscreen   |
+| Variant                             | Texture                                           | Shine                                | Per-frame cost                            |
+| ----------------------------------- | ------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| `DitheredSkeleton`                  | Procedural, drawn per cell on a canvas            | Procedural, rippled edge             | Main-thread JavaScript, scales with area  |
+| `DitheredSkeletonLite`              | Static, baked once into mask tiles                | Stepped `transform`, 3 dither levels | 3 compositor layers per instance          |
+| `DitheredSkeletonGif`               | Drifting and pulsing, two GIF masks               | Soft `transform` sweep               | 1 compositor layer per instance           |
+| `DitheredSkeletonGif shine={false}` | Drifting and pulsing, one GIF mask                | None                                 | None, the browser animates the GIF itself |
+| `GradientSkeleton`                  | Smooth drifting pools of light, no dither         | CSS `background-position` sweep      | Repaints every instance, even offscreen   |
+| `HatchedSkeleton`                   | Classic muted block with faint diagonal hairlines | Quick `transform` sweep with a pause | 1 compositor layer per instance           |
 
 Compositor layers don't run JavaScript, but every extra animated layer makes each main-thread frame on the page more expensive (Chrome's layerization step), and costs more on devices that composite in software. That's why the GIF variant without shine is the cheapest option.
 
@@ -171,6 +172,26 @@ import { GradientSkeleton } from 'ui'
 Use `speed` to change how fast the sweep moves. The default is `1`. The drifting light underneath keeps its pace.
 
 <ComponentPreview name="gradient-skeleton-speed" peekCode />
+
+## Experimental: Hatched
+
+`HatchedSkeleton` stays close to the original skeleton: a plain muted block, with barely-visible 1px diagonal hairlines in the foreground color for a hint of material. A soft band of light crosses it quickly, then rests before the next pass, like the original shimmer.
+
+It's pure CSS, with no JavaScript, canvas, or GIF. The hairlines are a static `repeating-linear-gradient`, and the sweep is a `transform` animation on a pseudo-element, so the browser runs it on the compositor without repainting. Like the other sweeps, each instance adds one animated layer. With reduced motion, the light stays still.
+
+<ComponentPreview name="hatched-skeleton-demo" peekCode wide />
+
+```tsx
+import { HatchedSkeleton } from 'ui'
+
+;<HatchedSkeleton className="h-4 w-[200px]" />
+```
+
+Use `speed` to change how fast the light sweeps. The default is `1`.
+
+### List
+
+<ComponentPreview name="hatched-skeleton-list" peekCode />
 
 ## Experimental: Comparison
 

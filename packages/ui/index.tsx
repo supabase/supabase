@@ -36,6 +36,7 @@ export * from './src/components/ExpandingTextArea'
 export * from './src/components/LoadingLine'
 export * from './src/components/DitheredSkeleton'
 export * from './src/components/GradientSkeleton'
+export * from './src/components/HatchedSkeleton'
 
 // ai icon
 export * from './src/layout/ai-icon-animation'

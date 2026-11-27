@@ -973,6 +973,16 @@ export const examples: Registry = [
     files: ['example/dithered-skeleton-gif-list.tsx'],
   },
   {
+    name: 'hatched-skeleton-demo',
+    type: 'components:example',
+    files: ['example/hatched-skeleton-demo.tsx'],
+  },
+  {
+    name: 'hatched-skeleton-list',
+    type: 'components:example',
+    files: ['example/hatched-skeleton-list.tsx'],
+  },
+  {
     name: 'dithered-skeleton-gif-no-shine',
     type: 'components:example',
     files: ['example/dithered-skeleton-gif-no-shine.tsx'],

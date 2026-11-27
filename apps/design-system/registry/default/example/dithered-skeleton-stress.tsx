@@ -7,6 +7,7 @@ import {
   DitheredSkeletonGif,
   DitheredSkeletonLite,
   GradientSkeleton,
+  HatchedSkeleton,
 } from 'ui'
 
 const DitheredSkeletonGifWithoutShine = (props: HTMLAttributes<HTMLDivElement>) => (
@@ -19,6 +20,7 @@ const VARIANTS = {
   GIF: DitheredSkeletonGif,
   'GIF, no shine': DitheredSkeletonGifWithoutShine,
   Gradient: GradientSkeleton,
+  Hatched: HatchedSkeleton,
 }
 
 type Variant = keyof typeof VARIANTS

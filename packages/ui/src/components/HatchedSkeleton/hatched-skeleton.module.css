@@ -1,0 +1,61 @@
+/*
+ * A classic muted skeleton with a hint of material: 1px diagonal hairlines in the foreground color
+ * at a few percent, then a soft band of light that crosses quickly and rests before the next pass.
+ */
+
+.root {
+  --hs-sweep-duration: 1.8s;
+  --hs-line: color-mix(in oklab, currentColor 5%, transparent);
+  /* Light themes brighten towards the page background; dark themes lift towards the foreground. */
+  --hs-light-color: var(--background-default);
+  --hs-light: color-mix(in oklab, var(--hs-light-color) 55%, transparent);
+  --hs-crest: color-mix(in oklab, var(--hs-light-color) 75%, transparent);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(-45deg, var(--hs-line) 0 1px, transparent 1px 5px);
+}
+
+:global(.dark) .root,
+:global([data-theme*='dark']) .root {
+  --hs-light-color: currentColor;
+  --hs-light: color-mix(in oklab, currentColor 9%, transparent);
+  --hs-crest: color-mix(in oklab, currentColor 12%, transparent);
+}
+
+/* The sweep is a transform on a pseudo-element, so the compositor animates it without repaints. */
+.root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 15%,
+    var(--hs-light) 45%,
+    var(--hs-crest) 50%,
+    var(--hs-light) 55%,
+    transparent 85%
+  );
+  transform: translateX(-100%);
+  animation: hs-sweep var(--hs-sweep-duration) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Cross in the first 60% of the cycle, then rest off to the side until the next pass. */
+@keyframes hs-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root::after {
+    animation: none;
+    transform: translateX(-100%);
+  }
+}
