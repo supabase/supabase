@@ -43,7 +43,7 @@ const Scope = ({
     >
       <div className="flex min-w-0 flex-col gap-1">
         <span className="text-sm font-medium text-foreground">{title}</span>
-        <span className="text-foreground-light text-xs capitalize-sentence">{description}</span>
+        <span className="text-sm text-foreground-lighter capitalize-sentence">{description}</span>
       </div>
       <AccessLevelDropdown
         permission={title}
