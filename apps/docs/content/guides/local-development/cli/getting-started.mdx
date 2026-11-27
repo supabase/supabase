@@ -445,7 +445,35 @@ If you have any Supabase containers running locally, stop them and delete their 
 
 ## Telemetry
 
-The Supabase CLI collects telemetry data about general usage. Participating in this program is optional, and you can opt out at any time.
+The Supabase CLI sends usage data to Supabase to help improve the CLI. Telemetry is optional, and you can opt out at any time.
+
+The first time you run the CLI in a terminal, it prints a telemetry notice and sends nothing during that run. Sending starts with the next command. Non-interactive runs, such as CI jobs, don't print the notice and send from the first run. To opt out there, set one of the opt-out environment variables before the first run.
+
+### What the CLI collects
+
+The CLI sends these events:
+
+| Event                   | Sent when                                                        |
+| ----------------------- | ---------------------------------------------------------------- |
+| `cli_command_executed`  | A command finishes. Shell completion requests also send it.      |
+| `cli_login_completed`   | You sign in with `supabase login`.                               |
+| `cli_project_linked`    | You link a project.                                              |
+| `cli_stack_started`     | The local stack starts and passes its health check.              |
+| `cli_upgrade_suggested` | A command fails because the organization's plan lacks a feature. |
+
+A command event includes the command name, the flags you set, the exit code, the duration, and the output format. Flag values are redacted unless the flag is a boolean, a fixed choice, or on the CLI's list of safe values, such as a project ref. A failed command adds an error classification from a fixed list.
+
+Every event also includes:
+
+- A random device ID, stored in `telemetry.json` in your Supabase home directory. The directory is `~/.supabase` unless you set `SUPABASE_HOME`.
+- A session ID that changes after 30 minutes of inactivity.
+- Your Supabase account ID, after you sign in.
+- The organization ID, organization slug, and project ref of the linked project.
+- The CLI version, operating system, and CPU architecture.
+- Whether the run is interactive, runs in CI, or was started by an AI agent, and the name of that agent.
+- Whether certain environment variables are set, such as `CI`, `GITHUB_ACTIONS`, and `SUPABASE_ACCESS_TOKEN`. The CLI records that they are set and omits their values. For a few terminal and agent variables, such as `TERM` and `TERM_PROGRAM`, it records the value.
+
+For every property, see the [analytics reference in the CLI repository](https://github.com/supabase/cli/blob/develop/apps/cli/docs/analytics.md).
 
 ### How to opt out
 
@@ -463,7 +491,13 @@ The Supabase CLI collects telemetry data about general usage. Participating in t
 
 To enable telemetry again, run `supabase telemetry enable`.
 
-You can also opt out using the `SUPABASE_TELEMETRY_DISABLED=1` environment variable. The broader `DO_NOT_TRACK=1` convention is also respected.
+You can also opt out with an environment variable. Set `SUPABASE_TELEMETRY_DISABLED=1` or `DO_NOT_TRACK=1`. The value must be exactly `1`. Other values, such as `true` or `yes`, leave telemetry on. While either variable is `1`, `supabase telemetry status` reports telemetry as disabled.
+
+An opt-out applies to commands that start after it. A command that is already running when you opt out can still send its events.
+
+### Update check
+
+After a command succeeds, the CLI periodically asks the GitHub API for the latest CLI release so it can tell you when a newer version exists. This request is separate from telemetry, and a telemetry opt-out leaves it on. To turn it off, set `SUPABASE_NO_UPDATE_NOTIFIER=1`.
 
 ## Learn more
 
