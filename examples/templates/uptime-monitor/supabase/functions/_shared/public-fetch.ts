@@ -2,6 +2,11 @@
 // Every request, including each redirect, is checked: http(s) only, no
 // credentials in the URL, and no loopback, private, link-local or other
 // reserved addresses (as IP literals or after resolving the hostname).
+//
+// Limitation: fetch() resolves the hostname again when it connects, and the
+// Edge Runtime has no way to pin that connection to the address checked here.
+// A host that changes its DNS answer between the two lookups (DNS rebinding)
+// could still reach a private address, if the runtime's network allows it.
 
 const MAX_REDIRECTS = 5
 
@@ -28,12 +33,47 @@ function isReservedIpv4(octets: number[]) {
   )
 }
 
+/** The eight 16-bit groups of an IPv6 address, or null if it isn't one. */
+function ipv6Groups(address: string) {
+  let value = address.toLowerCase()
+  // A trailing dotted IPv4 part (::ffff:1.2.3.4) becomes two hex groups.
+  const dotted = value.match(/^(.*:)(\d+\.\d+\.\d+\.\d+)$/)
+  if (dotted) {
+    const octets = ipv4Octets(dotted[2])
+    if (!octets) return null
+    value = `${dotted[1]}${((octets[0] << 8) | octets[1]).toString(16)}:${((octets[2] << 8) | octets[3]).toString(16)}`
+  }
+  const halves = value.split('::')
+  if (halves.length > 2) return null
+  const head = halves[0] ? halves[0].split(':') : []
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(':') : []
+  const missing = 8 - head.length - tail.length
+  if (halves.length === 1 ? missing !== 0 : missing < 0) return null
+  const groups = [...head, ...Array(halves.length === 2 ? missing : 0).fill('0'), ...tail]
+  if (!groups.every((group) => /^[0-9a-f]{1,4}$/.test(group))) return null
+  return groups.map((group) => parseInt(group, 16))
+}
+
 function isReservedIpv6(address: string) {
-  const value = address.toLowerCase()
-  if (value === '::' || value === '::1') return true
-  const mapped = value.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/)
-  if (mapped) return isReservedAddress(mapped[1])
-  return /^f[cd]/.test(value) || /^fe[89ab]/.test(value) || value.startsWith('ff')
+  const groups = ipv6Groups(address)
+  if (!groups) return true // Unparseable: refuse rather than guess.
+  const [first] = groups
+  const embeddedIpv4 = [groups[6] >> 8, groups[6] & 255, groups[7] >> 8, groups[7] & 255]
+  const isZero = (from: number, to: number) => groups.slice(from, to).every((group) => group === 0)
+
+  // IPv4-mapped (::ffff:a.b.c.d), IPv4-compatible (::a.b.c.d) and NAT64
+  // (64:ff9b::a.b.c.d) addresses reach the embedded IPv4 address.
+  if (isZero(0, 5) && (groups[5] === 0xffff || groups[5] === 0)) {
+    return isZero(0, 8) || (groups[5] === 0 && isZero(0, 7)) || isReservedIpv4(embeddedIpv4)
+  }
+  if (first === 0x64 && groups[1] === 0xff9b && isZero(2, 6)) return isReservedIpv4(embeddedIpv4)
+
+  return (
+    (first & 0xfe00) === 0xfc00 || // unique local fc00::/7
+    (first & 0xffc0) === 0xfe80 || // link-local fe80::/10
+    (first & 0xff00) === 0xff00 || // multicast ff00::/8
+    first === 0x2001 && groups[1] === 0x0db8 // documentation 2001:db8::/32
+  )
 }
 
 /** True for addresses that aren't on the public internet. */
@@ -43,14 +83,21 @@ export function isReservedAddress(address: string) {
   return address.includes(':') ? isReservedIpv6(address) : false
 }
 
+/**
+ * Resolves a hostname's addresses. Fails closed: if the runtime can't resolve
+ * names, or resolution returns nothing, the URL is refused.
+ */
 async function resolve(hostname: string) {
-  // resolveDns may be unavailable in some runtimes; IP literals are still checked.
-  if (typeof Deno.resolveDns !== 'function') return []
+  if (typeof Deno.resolveDns !== 'function') {
+    throw new Error('Could not verify the address of this URL')
+  }
   const results = await Promise.allSettled([
     Deno.resolveDns(hostname, 'A'),
     Deno.resolveDns(hostname, 'AAAA'),
   ])
-  return results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
+  const addresses = results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
+  if (addresses.length === 0) throw new Error('Could not verify the address of this URL')
+  return addresses
 }
 
 /** Throws if the URL isn't a public http(s) URL. */

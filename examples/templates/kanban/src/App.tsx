@@ -76,6 +76,9 @@ function Board({ board }: { board: BoardRow }) {
   // Keyboard alternative to drag and drop: move to the neighbouring column
   // (as its last card), or one place up or down within the column.
   const nudgeCard = (card: Card, direction: MoveDirection) => {
+    // The pressed button re-renders in the card's new spot (or disappears, at
+    // the end of a column), so put focus back on the moved card afterwards.
+    keepFocusOnCard(card.id, direction)
     if (direction === 'left' || direction === 'right') {
       const index = COLUMNS.findIndex((column) => column.status === card.status)
       const target = COLUMNS[index + (direction === 'left' ? -1 : 1)]
@@ -167,6 +170,23 @@ function useOnlineCount(boardId: string) {
 
 type MoveDirection = 'left' | 'right' | 'up' | 'down'
 
+/**
+ * After a keyboard move, focuses the same control on the moved card, or the
+ * card's next available control if that one no longer applies.
+ */
+function keepFocusOnCard(cardId: string, direction: MoveDirection) {
+  // Two frames: one for the optimistic update to render, one for layout.
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const card = document.querySelector<HTMLElement>(`[data-card-id="${cardId}"]`)
+      const control =
+        card?.querySelector<HTMLElement>(`[data-move="${direction}"]`) ??
+        card?.querySelector<HTMLElement>('button')
+      control?.focus()
+    })
+  )
+}
+
 const MOVES: { direction: MoveDirection; symbol: string; label: string }[] = [
   { direction: 'left', symbol: '←', label: 'Move to previous column' },
   { direction: 'up', symbol: '↑', label: 'Move up' },
@@ -242,6 +262,7 @@ function Column({
       {cards.map((card, index) => (
         <article
           key={card.id}
+          data-card-id={card.id}
           draggable
           onDragStart={(event) => event.dataTransfer.setData('text/plain', card.id)}
           onDragOver={(event) => event.preventDefault()}
@@ -261,6 +282,7 @@ function Column({
                 <button
                   key={direction}
                   type="button"
+                  data-move={direction}
                   aria-label={`${moveLabel}: ${card.title}`}
                   title={moveLabel}
                   onClick={() => onMove(card, direction)}

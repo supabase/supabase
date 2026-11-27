@@ -27,11 +27,11 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Supabase Templates' },
+      { title: 'Supabase Templates | If you can dream it up, you can build it' },
       {
         name: 'description',
         content:
-          'Example applications built on Supabase. Try them live, read the source, and start your own from any of them.',
+          'If you can dream it up, you can build it on Supabase. Try each template live, read the source, and start your own from any of them.',
       },
     ],
     links: [
