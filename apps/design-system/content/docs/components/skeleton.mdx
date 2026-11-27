@@ -68,6 +68,7 @@ The sections below are experimental loading placeholders that could replace `Ske
 | `DitheredSkeletonGif shine={false}` | Drifting and pulsing, one GIF mask                | None                                 | None, the browser animates the GIF itself |
 | `GradientSkeleton`                  | Smooth drifting pools of light, no dither         | CSS `background-position` sweep      | Repaints every instance, even offscreen   |
 | `HatchedSkeleton`                   | Classic muted block with faint diagonal hairlines | Quick `transform` sweep with a pause | 1 compositor layer per instance           |
+| `HatchedSkeleton inset`             | Same, recessed with inner shadow and light edges  | Quick `transform` sweep with a pause | 1 compositor layer per instance           |
 
 Compositor layers don't run JavaScript, but every extra animated layer makes each main-thread frame on the page more expensive (Chrome's layerization step), and costs more on devices that composite in software. That's why the GIF variant without shine is the cheapest option.
 
@@ -188,6 +189,12 @@ import { HatchedSkeleton } from 'ui'
 ```
 
 Use `speed` to change how fast the light sweeps. The default is `1`.
+
+### Inset
+
+Set `inset` to press the block slightly into the surface. A soft inner shadow falls from the top edge and a 1px inner light catches the bottom edge. In light themes the shadow is a faint foreground tint and the light is the page background; in dark themes the page background casts the shadow and the foreground gives the light. The shadows are static, so they add no animation cost.
+
+<ComponentPreview name="hatched-skeleton-inset" peekCode wide />
 
 ### List
 

@@ -24,6 +24,28 @@
   --hs-crest: color-mix(in oklab, currentColor 12%, transparent);
 }
 
+/*
+ * Inset: the block reads as pressed slightly into the surface. A soft inner shadow falls from the
+ * top edge and a 1px inner light catches the bottom edge. Inset shadows paint above the hairlines
+ * and below the sweep, so the light still crosses the recess.
+ */
+.inset {
+  --hs-inset-shadow: color-mix(in oklab, currentColor 14%, transparent);
+  --hs-inset-light: color-mix(in oklab, var(--background-default) 90%, transparent);
+
+  box-shadow:
+    inset 0 1px 2px var(--hs-inset-shadow),
+    inset 0 1px 0 color-mix(in oklab, currentColor 6%, transparent),
+    inset 0 -1px 0 var(--hs-inset-light);
+}
+
+/* In dark themes the page background is the darker tone, so it casts the shadow instead. */
+:global(.dark) .inset,
+:global([data-theme*='dark']) .inset {
+  --hs-inset-shadow: color-mix(in oklab, var(--background-default) 85%, transparent);
+  --hs-inset-light: color-mix(in oklab, currentColor 10%, transparent);
+}
+
 /* The sweep is a transform on a pseudo-element, so the compositor animates it without repaints. */
 .root::after {
   content: '';

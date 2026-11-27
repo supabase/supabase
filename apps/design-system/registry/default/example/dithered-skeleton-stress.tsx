@@ -14,6 +14,10 @@ const DitheredSkeletonGifWithoutShine = (props: HTMLAttributes<HTMLDivElement>) 
   <DitheredSkeletonGif shine={false} {...props} />
 )
 
+const HatchedSkeletonInset = (props: HTMLAttributes<HTMLDivElement>) => (
+  <HatchedSkeleton inset {...props} />
+)
+
 const VARIANTS = {
   Canvas: DitheredSkeleton,
   Lite: DitheredSkeletonLite,
@@ -21,6 +25,7 @@ const VARIANTS = {
   'GIF, no shine': DitheredSkeletonGifWithoutShine,
   Gradient: GradientSkeleton,
   Hatched: HatchedSkeleton,
+  'Hatched, inset': HatchedSkeletonInset,
 }
 
 type Variant = keyof typeof VARIANTS
