@@ -2,6 +2,8 @@
 // project's secret key.
 //
 // 1. Deletes photos older than RETENTION_DAYS (default 7): files, then rows.
+//    Also removes files with no photos row (an upload whose row was never
+//    saved) once they're an hour old.
 // 2. Optional, for public demos: when PURGE_GUEST_DAYS is set, deletes
 //    anonymous (guest) users older than that many days, along with their
 //    walls and every photo on them (files first, so none are left behind).
@@ -44,6 +46,22 @@ async function deletePhotos(
   }
 }
 
+/** Removes files from the photos bucket, in batches. */
+async function removeFiles(admin: SupabaseClient, paths: string[]) {
+  for (let start = 0; start < paths.length; start += BATCH_SIZE) {
+    const { error } = await admin.storage.from('photos').remove(paths.slice(start, start + BATCH_SIZE))
+    if (error) throw error
+  }
+  return paths.length
+}
+
+/** Paths returned by one of the file-lookup SQL functions in the migration. */
+async function filePaths(admin: SupabaseClient, fn: string, args: Record<string, string>) {
+  const { data, error } = await admin.rpc(fn, args)
+  if (error) throw error
+  return (data ?? []) as string[]
+}
+
 /** Reads a day count from an env var: the fallback when unset, else a positive number. */
 function days(name: string, fallback: number) {
   const value = Deno.env.get(name)
@@ -80,6 +98,8 @@ async function purgeGuests(admin: SupabaseClient, guestDays: number) {
     const wallIds = walls.map((wall) => wall.id)
     if (wallIds.length > 0) await deletePhotos(admin, (query) => query.in('wall_id', wallIds))
     await deletePhotos(admin, (query) => query.eq('created_by', guestId))
+    // Then any file they still own without a row, or Auth won't delete them.
+    await removeFiles(admin, await filePaths(admin, 'photo_files_owned_by', { owner: guestId }))
     const { error: deleteError } = await admin.auth.admin.deleteUser(guestId)
     if (deleteError) throw deleteError
     purged += 1
@@ -90,16 +110,24 @@ async function purgeGuests(admin: SupabaseClient, guestDays: number) {
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
     try {
+      // Validate both settings before deleting anything.
       const retentionDays = days('RETENTION_DAYS', 7)
+      const guestDays = days('PURGE_GUEST_DAYS', 0)
+
       const cutoff = new Date(Date.now() - retentionDays * DAY_MS).toISOString()
       const deleted = await deletePhotos(ctx.supabaseAdmin, (query) =>
         query.lt('created_at', cutoff)
       )
+      const orphans = await removeFiles(
+        ctx.supabaseAdmin,
+        await filePaths(ctx.supabaseAdmin, 'orphaned_photo_files', {
+          older_than: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+        })
+      )
 
-      const guestDays = days('PURGE_GUEST_DAYS', 0)
       const purgedGuests = guestDays > 0 ? await purgeGuests(ctx.supabaseAdmin, guestDays) : 0
 
-      return Response.json({ deleted, purgedGuests })
+      return Response.json({ deleted, orphans, purgedGuests })
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       return Response.json({ error: message }, { status: 500 })

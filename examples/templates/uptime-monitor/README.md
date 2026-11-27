@@ -33,11 +33,20 @@ The whole schema, queue and Cron jobs are in [`supabase/migrations`](./supabase/
 
    `config push` turns on anonymous sign-ins (`enable_anonymous_sign_ins` in `supabase/config.toml`).
 
-3. Give the Cron job your project URL and secret key, in the SQL editor. Use the full secret key (`supabase projects api-keys --reveal`):
+3. Give the Cron job the URL it calls the worker at and your secret key, in the SQL editor.
+
+   **Hosted:** use your project URL and the full secret key (`supabase projects api-keys --reveal`):
 
    ```sql
    select vault.create_secret('https://<your-project-ref>.supabase.co', 'project_url');
    select vault.create_secret('<your secret key>', 'secret_key');
+   ```
+
+   **Local:** the Cron job runs inside the database container, so `127.0.0.1` is the container itself. Use `host.docker.internal` (or your machine's local IP address if that doesn't resolve), and the secret key from `supabase status`. Keep `supabase functions serve` running.
+
+   ```sql
+   select vault.create_secret('http://host.docker.internal:54321', 'project_url');
+   select vault.create_secret('<secret key from supabase status>', 'secret_key');
    ```
 
 4. Copy `.env.example` to `.env.local` and add your project URL and publishable key.

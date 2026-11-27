@@ -80,7 +80,7 @@ function Dashboard({ userId }: { userId: string }) {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-5">
-      <Summary total={monitorList.length} down={downCount} hasChecks={recentChecks.length > 0} />
+      <Summary total={monitorList.length} down={downCount} hasChecks={recentChecks.length > 0 || downCount > 0} />
       <AddMonitorForm userId={userId} isFull={monitorList.length >= 5} />
       {isLoading && <Centered>Loading monitors…</Centered>}
       <ul className="flex flex-col gap-3">
@@ -117,9 +117,11 @@ type Status = 'paused' | 'pending' | 'down' | 'up'
 function monitorStatus(monitor: Monitor, monitorChecks: Check[], incident?: Incident): Status {
   const latest = monitorChecks.at(-1)
   if (monitor.is_paused) return 'paused'
+  // An open incident means down, even if its checks have left the window
+  // (for example after being paused for over an hour).
+  if (incident) return 'down'
   if (!latest) return 'pending'
-  if (incident || !latest.is_up) return 'down'
-  return 'up'
+  return latest.is_up ? 'up' : 'down'
 }
 
 function Summary({ total, down, hasChecks }: { total: number; down: number; hasChecks: boolean }) {
@@ -147,10 +149,13 @@ function Summary({ total, down, hasChecks }: { total: number; down: number; hasC
 }
 
 function AddMonitorForm({ userId, isFull }: { userId: string; isFull: boolean }) {
-  const [url, setUrl] = useState('')
+  const [url, setUrlState] = useState('')
   // The latest URL, for after an await (the closure's `url` is stale by then).
-  const latestUrl = useRef(url)
-  latestUrl.current = url
+  const latestUrl = useRef('')
+  const setUrl = (value: string) => {
+    latestUrl.current = value
+    setUrlState(value)
+  }
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (event: FormEvent) => {

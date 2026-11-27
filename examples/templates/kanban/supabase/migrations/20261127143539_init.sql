@@ -88,7 +88,9 @@ alter table public.cards enable row level security;
 
 -- New tables aren't exposed to the Data API without explicit grants (the
 -- default for new projects), so grant exactly what the policies below allow.
-grant select, insert, update, delete on public.boards to authenticated;
+-- Members can rename a board, but not change who owns it.
+grant select, insert, delete on public.boards to authenticated;
+grant update (name) on public.boards to authenticated;
 grant select, insert, delete on public.board_members to authenticated;
 grant select, insert, update, delete on public.cards to authenticated;
 

@@ -31,7 +31,9 @@ The whole schema, bucket and Cron job are in [`supabase/migrations`](./supabase/
 
    `config push` turns on anonymous sign-ins (`enable_anonymous_sign_ins` in `supabase/config.toml`).
 
-3. Give the nightly Cron job your project URL and secret key, in the SQL editor. Use the full secret key (`supabase projects api-keys --reveal`):
+3. Give the nightly Cron job the URL it calls the cleanup function at and your secret key, in the SQL editor.
+
+   **Hosted:** use your project URL and the full secret key (`supabase projects api-keys --reveal`):
 
    ```sql
    select vault.create_secret('https://<your-project-ref>.supabase.co', 'project_url');
@@ -39,6 +41,15 @@ The whole schema, bucket and Cron job are in [`supabase/migrations`](./supabase/
    ```
 
    Optionally change how long photos are kept: `supabase secrets set RETENTION_DAYS=30`.
+
+   **Local:** the Cron job runs inside the database container, so `127.0.0.1` is the container itself. Use `host.docker.internal` (or your machine's local IP address if that doesn't resolve), and the secret key from `supabase status`:
+
+   ```sql
+   select vault.create_secret('http://host.docker.internal:54321', 'project_url');
+   select vault.create_secret('<secret key from supabase status>', 'secret_key');
+   ```
+
+   To change how long photos are kept locally, add `RETENTION_DAYS=30` to `supabase/functions/.env` and restart `supabase functions serve`. You can skip this step entirely if you don't need the cleanup while developing.
 
 4. Copy `.env.example` to `.env.local` and add your project URL and publishable key.
 5. Start the app:

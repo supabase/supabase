@@ -115,9 +115,15 @@ export async function saveImage(userId: string, file: File) {
 export async function deleteItem(item: Item) {
   // Remove the image first and only delete the item once Storage confirms it.
   if (item.image_path) {
-    const { data, error } = await supabase.storage.from('minds').remove([item.image_path])
+    const bucket = supabase.storage.from('minds')
+    const { data, error } = await bucket.remove([item.image_path])
     if (error) throw error
-    if (data.length === 0) throw new Error('Could not delete the image. Try again.')
+    // An empty result means nothing was removed: either the file is already
+    // gone (a retry after the item delete failed), or a policy refused. Only
+    // carry on if the file really is gone.
+    if (data.length === 0 && (await bucket.exists(item.image_path)).data) {
+      throw new Error('Could not delete the image. Try again.')
+    }
   }
   await items.delete(item.id).isPersisted.promise
 }
@@ -188,6 +194,12 @@ export function imageUrl(path: string, width = 600) {
       transform: { width, resize: 'contain', quality: 75 },
     })
     .then(({ data }) => data?.signedUrl ?? null)
+    .catch(() => null)
+    .then((signed) => {
+      // Don't cache a failure: the next render tries again.
+      if (!signed && signedUrls.get(key)?.url === url) signedUrls.delete(key)
+      return signed
+    })
   signedUrls.set(key, { url, expiresAt: Date.now() + SIGNED_URL_REUSE_MS })
   return url
 }

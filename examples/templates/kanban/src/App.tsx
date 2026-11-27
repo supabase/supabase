@@ -216,11 +216,14 @@ function Column({
   canMoveRight: boolean
 }) {
   const [isOver, setIsOver] = useState(false)
-  const [draft, setDraft] = useState('')
+  const [draft, setDraftState] = useState('')
   const [error, setError] = useState<string | null>(null)
   // The latest draft, for after an await (the closure's `draft` is stale by then).
-  const latestDraft = useRef(draft)
-  latestDraft.current = draft
+  const latestDraft = useRef('')
+  const setDraft = (value: string) => {
+    latestDraft.current = value
+    setDraftState(value)
+  }
 
   const handleDrop = (event: DragEvent, beforeCardId: string | null) => {
     event.preventDefault()

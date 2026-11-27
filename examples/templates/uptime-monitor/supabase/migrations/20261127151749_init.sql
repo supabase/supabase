@@ -82,6 +82,31 @@ alter table public.incidents enable row level security;
 -- New tables aren't exposed to the Data API without explicit grants (the
 -- default for new projects), so grant exactly what the policies below allow.
 grant select, insert, update, delete on public.monitors to authenticated;
+
+-- created_at decides when a guest's monitors are pruned, so the server sets
+-- it and nobody can change it (or created_by) afterwards. A trigger rather
+-- than column grants, because the client sends whole rows.
+create function private.protect_monitor_fields()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if tg_op = 'INSERT' then
+    new.created_at := now();
+  else
+    new.created_at := old.created_at;
+    new.created_by := old.created_by;
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.protect_monitor_fields() from public;
+
+create trigger protect_monitor_fields
+before insert or update on public.monitors
+for each row execute function private.protect_monitor_fields();
 grant select on public.checks to authenticated;
 grant select on public.incidents to authenticated;
 

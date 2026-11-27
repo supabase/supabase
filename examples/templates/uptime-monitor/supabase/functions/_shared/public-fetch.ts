@@ -18,18 +18,20 @@ function ipv4Octets(address: string) {
 }
 
 function isReservedIpv4(octets: number[]) {
-  const [a, b] = octets
+  const [a, b, c] = octets
   return (
-    a === 0 ||
-    a === 10 ||
-    a === 127 ||
-    (a === 100 && b >= 64 && b <= 127) ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 0) ||
-    (a === 192 && b === 168) ||
-    (a === 198 && (b === 18 || b === 19)) ||
-    a >= 224
+    a === 0 || // "this network" 0.0.0.0/8
+    a === 10 || // private 10.0.0.0/8
+    a === 127 || // loopback 127.0.0.0/8
+    (a === 100 && b >= 64 && b <= 127) || // shared address space 100.64.0.0/10
+    (a === 169 && b === 254) || // link-local 169.254.0.0/16
+    (a === 172 && b >= 16 && b <= 31) || // private 172.16.0.0/12
+    (a === 192 && b === 0 && (c === 0 || c === 2)) || // protocol 192.0.0.0/24, docs 192.0.2.0/24
+    (a === 192 && b === 168) || // private 192.168.0.0/16
+    (a === 198 && (b === 18 || b === 19)) || // benchmarking 198.18.0.0/15
+    (a === 198 && b === 51 && c === 100) || // docs 198.51.100.0/24
+    (a === 203 && b === 0 && c === 113) || // docs 203.0.113.0/24
+    a >= 224 // multicast and reserved 224.0.0.0 and up
   )
 }
 
@@ -87,14 +89,17 @@ export function isReservedAddress(address: string) {
  * Resolves a hostname's addresses. Fails closed: if the runtime can't resolve
  * names, a lookup fails, or resolution returns nothing, the URL is refused.
  */
-async function resolve(hostname: string) {
+async function resolve(hostname: string, signal?: AbortSignal | null) {
   if (typeof Deno.resolveDns !== 'function') {
     throw new Error('Could not verify the address of this URL')
   }
+  const options = signal ? { signal } : undefined
   const results = await Promise.allSettled([
-    Deno.resolveDns(hostname, 'A'),
-    Deno.resolveDns(hostname, 'AAAA'),
+    Deno.resolveDns(hostname, 'A', options),
+    Deno.resolveDns(hostname, 'AAAA', options),
   ])
+  // If the caller's deadline passed, report that (a TimeoutError) instead.
+  signal?.throwIfAborted()
   const addresses: string[] = []
   for (const result of results) {
     if (result.status === 'fulfilled') addresses.push(...result.value)
@@ -109,8 +114,11 @@ async function resolve(hostname: string) {
   return addresses
 }
 
-/** Throws if the URL isn't a public http(s) URL. */
-export async function assertPublicUrl(url: URL) {
+/**
+ * Throws if the URL isn't a public http(s) URL. `signal` cancels the DNS
+ * lookups, so they count toward the caller's timeout.
+ */
+export async function assertPublicUrl(url: URL, signal?: AbortSignal | null) {
   if (url.protocol !== 'https:' && url.protocol !== 'http:') {
     throw new Error('Only http and https URLs are allowed')
   }
@@ -120,7 +128,7 @@ export async function assertPublicUrl(url: URL) {
   if (hostname === 'localhost' || /\.(localhost|local|internal)$/.test(hostname)) {
     throw new Error('Private hosts are not allowed')
   }
-  const addresses = ipv4Octets(hostname) || hostname.includes(':') ? [hostname] : await resolve(hostname)
+  const addresses = ipv4Octets(hostname) || hostname.includes(':') ? [hostname] : await resolve(hostname, signal)
   if (addresses.some(isReservedAddress)) throw new Error('Private addresses are not allowed')
 }
 
@@ -135,7 +143,7 @@ export async function fetchPublic(
 ) {
   let url = new URL(input)
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    await assertPublicUrl(url)
+    await assertPublicUrl(url, init.signal)
     if (!isAllowed(url)) {
       throw new Error(hop === 0 ? 'Host is not allowed' : 'Redirected to a host that is not allowed')
     }

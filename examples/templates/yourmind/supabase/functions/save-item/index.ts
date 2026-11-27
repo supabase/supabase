@@ -21,12 +21,21 @@ interface Preview {
 
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }
 
+/**
+ * A numeric entity's character, or '' for code points Postgres text can't
+ * hold (NUL, lone surrogates) or that don't exist (fromCodePoint would throw).
+ */
+function fromCodePoint(code: number) {
+  const valid = Number.isInteger(code) && code >= 1 && code <= 0x10ffff
+  return valid && (code < 0xd800 || code > 0xdfff) ? String.fromCodePoint(code) : ''
+}
+
 /** Decodes common HTML entities in a single pass, so nothing is decoded twice. */
 function decodeEntities(text: string) {
   return text.replace(/&(#\d+|#x[\da-f]+|amp|lt|gt|quot|apos);/gi, (entity, name: string) => {
     const lower = name.toLowerCase()
-    if (lower.startsWith('#x')) return String.fromCodePoint(parseInt(lower.slice(2), 16))
-    if (lower.startsWith('#')) return String.fromCodePoint(Number(lower.slice(1)))
+    if (lower.startsWith('#x')) return fromCodePoint(parseInt(lower.slice(2), 16))
+    if (lower.startsWith('#')) return fromCodePoint(Number(lower.slice(1)))
     return ENTITIES[lower] ?? entity
   })
 }
@@ -39,7 +48,8 @@ function toPlainText(html: string) {
     previous = text
     text = text.replace(/<[^<>]*>/g, '')
   }
-  return decodeEntities(text).replace(/[<>]/g, '')
+  // Postgres text can't hold NUL characters, so drop any the page contains.
+  return decodeEntities(text).replace(/[<>\u0000]/g, '')
 }
 
 function metaContent(html: string, key: string) {

@@ -204,6 +204,36 @@ on storage.objects for delete
 to authenticated
 using (bucket_id = 'photos' and owner_id = (select auth.uid())::text);
 
+-- For the cleanup Edge Function (secret key only): files in the bucket that
+-- have no photos row, such as an upload whose row was never saved, and every
+-- file a user owns. Storage won't delete a user who still owns files.
+create function public.orphaned_photo_files(older_than timestamptz)
+returns setof text
+language sql
+stable
+set search_path = ''
+as $$
+  select o.name
+  from storage.objects o
+  where o.bucket_id = 'photos'
+    and o.created_at < older_than
+    and not exists (select 1 from public.photos p where p.path = o.name);
+$$;
+
+create function public.photo_files_owned_by(owner uuid)
+returns setof text
+language sql
+stable
+set search_path = ''
+as $$
+  select name from storage.objects where bucket_id = 'photos' and owner_id = owner::text;
+$$;
+
+revoke all on function public.orphaned_photo_files(timestamptz) from public, anon, authenticated;
+revoke all on function public.photo_files_owned_by(uuid) from public, anon, authenticated;
+grant execute on function public.orphaned_photo_files(timestamptz) to service_role;
+grant execute on function public.photo_files_owned_by(uuid) to service_role;
+
 -- Stream new and deleted photos to wall members over Realtime.
 alter publication supabase_realtime add table public.photos;
 

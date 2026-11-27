@@ -132,8 +132,11 @@ function Mind({ userId }: { userId: string }) {
       onDrop={handleDrop}
     >
       <SearchBar search={search} onSearch={setSearch} />
-      {search.status === 'idle' && (
-        <Composer userId={userId} onFiles={handleFiles} error={uploadError} />
+      {search.status === 'idle' && <Composer userId={userId} onFiles={handleFiles} />}
+      {uploadError && (
+        <p role="alert" className="text-center text-xs text-red-500">
+          {uploadError}
+        </p>
       )}
       {search.status === 'searching' && (
         <p className="text-center text-sm text-muted">Searching your mind…</p>
@@ -227,20 +230,15 @@ function SearchBar({ search, onSearch }: { search: Search; onSearch: (search: Se
   )
 }
 
-function Composer({
-  userId,
-  onFiles,
-  error,
-}: {
-  userId: string
-  onFiles: (files: File[]) => void
-  error: string | null
-}) {
-  const [text, setText] = useState('')
+function Composer({ userId, onFiles }: { userId: string; onFiles: (files: File[]) => void }) {
+  const [text, setTextState] = useState('')
   const [saveError, setSaveError] = useState<string | null>(null)
   // The latest text, for after an await (the closure's `text` is stale by then).
-  const latestText = useRef(text)
-  latestText.current = text
+  const latestText = useRef('')
+  const setText = (value: string) => {
+    latestText.current = value
+    setTextState(value)
+  }
   const fileInput = useRef<HTMLInputElement>(null)
 
   const save = async () => {
@@ -251,15 +249,11 @@ function Composer({
     try {
       await saveText(userId, submitted)
     } catch (error) {
-      // Give the text back. If something new has been typed since, keep that
-      // and name the failed text in the error instead, so neither is lost.
-      const reason = error instanceof Error ? error.message : 'Could not save that'
-      if (latestText.current.trim()) {
-        setSaveError(`Couldn't save "${preview(submitted)}": ${reason}`)
-      } else {
-        setText(submitted)
-        setSaveError(reason)
-      }
+      // Give the text back. If something new has been typed since, put the
+      // failed text back above it, so neither is lost.
+      const current = latestText.current
+      setText(current.trim() ? `${submitted}\n\n${current}` : submitted)
+      setSaveError(error instanceof Error ? error.message : 'Could not save that')
     }
   }
 
@@ -312,9 +306,9 @@ function Composer({
           onChange={handleFileChange}
         />
       </div>
-      {(saveError ?? error) && (
+      {saveError && (
         <p role="alert" className="px-2 text-xs text-red-500">
-          {saveError ?? error}
+          {saveError}
         </p>
       )}
     </div>
@@ -368,12 +362,6 @@ function LinkPreview({ item }: { item: Item }) {
   )
 }
 
-/** The start of a long piece of text, for error messages. */
-function preview(text: string) {
-  const line = text.trim().split('\n')[0]
-  return line.length > 60 ? `${line.slice(0, 60)}…` : line
-}
-
 function hostnameOf(url: string | null) {
   if (!url) return ''
   try {
@@ -405,6 +393,13 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, [tabindex]:
 function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
   const panel = useRef<HTMLDivElement>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  // The parent passes a new onClose on every render; keep the latest in a ref
+  // so live updates don't rerun the focus effect and move focus around.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
 
   // Focus the dialog on open, keep Tab inside it, close on Escape, and return
   // focus to whatever opened it.
@@ -412,13 +407,15 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
     const opener = document.activeElement as HTMLElement | null
     panel.current?.focus()
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') onCloseRef.current()
       if (event.key !== 'Tab' || !panel.current) return
       const focusable = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)]
       if (focusable.length === 0) return
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
+      // On open, focus is on the panel itself: treat it as the start of the cycle.
+      const atStart = document.activeElement === first || document.activeElement === panel.current
+      if (event.shiftKey && atStart) {
         event.preventDefault()
         last.focus()
       } else if (!event.shiftKey && document.activeElement === last) {
@@ -431,7 +428,7 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
       window.removeEventListener('keydown', handleKeyDown)
       opener?.focus()
     }
-  }, [onClose])
+  }, [])
 
   return (
     <div
@@ -489,16 +486,19 @@ function ItemDialog({ item, onClose }: { item: Item; onClose: () => void }) {
             )}
             <button
               type="button"
+              disabled={isDeleting}
               onClick={async () => {
                 setDeleteError(null)
+                setIsDeleting(true)
                 try {
                   await deleteItem(item)
                   onClose()
                 } catch (error) {
                   setDeleteError(error instanceof Error ? error.message : 'Could not forget this')
+                  setIsDeleting(false)
                 }
               }}
-              className="rounded-full border border-line-strong px-3 py-1 text-foreground hover:bg-hover"
+              className="rounded-full border border-line-strong px-3 py-1 text-foreground hover:bg-hover disabled:opacity-50"
             >
               Forget
             </button>

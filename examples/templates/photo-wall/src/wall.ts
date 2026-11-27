@@ -112,8 +112,13 @@ export async function uploadPhoto(wallId: string, userId: string, file: Blob) {
   try {
     await transaction.isPersisted.promise
   } catch (insertError) {
-    // The row was rejected: don't leave the uploaded file behind.
-    await supabase.storage.from('photos').remove([path])
+    // The row was rejected: don't leave the uploaded file behind. If that
+    // fails too, say so; the nightly cleanup removes files without a row.
+    const { error: removeError } = await supabase.storage.from('photos').remove([path])
+    if (removeError) {
+      const reason = insertError instanceof Error ? insertError.message : 'unknown error'
+      throw new Error(`Couldn't save the photo (${reason}). The uploaded file is removed overnight.`)
+    }
     throw insertError
   }
 }
@@ -122,9 +127,15 @@ export async function uploadPhoto(wallId: string, userId: string, file: Blob) {
 export async function deletePhoto(id: string, path: string) {
   // Delete the file first, and only remove the row once Storage confirms the
   // file is gone, so a photo never outlives its row at a public URL.
-  const { data, error } = await supabase.storage.from('photos').remove([path])
+  const bucket = supabase.storage.from('photos')
+  const { data, error } = await bucket.remove([path])
   if (error) throw error
-  if (data.length === 0) throw new Error('Could not delete the photo file. Try again.')
+  // An empty result means nothing was removed: either the file is already
+  // gone (a retry after the row delete failed), or a policy refused. Only
+  // carry on if the file really is gone.
+  if (data.length === 0 && (await bucket.exists(path)).data) {
+    throw new Error('Could not delete the photo file. Try again.')
+  }
   await photos.delete(id).isPersisted.promise
 }
 
