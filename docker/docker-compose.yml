@@ -94,9 +94,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    depends_on:
-      studio:
-        condition: service_healthy
     ports:
       - ${API_GW_HTTP_PORT:-${KONG_HTTP_PORT:-8000}}:8000/tcp
     volumes:
