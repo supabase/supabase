@@ -305,7 +305,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectCreate !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-folder-action"
                   onSelect={() => {
                     trackAction('folder_create_snippet')
                     onSelectCreate()
@@ -319,7 +318,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-folder-action"
                   onSelect={() => {
                     trackAction('folder_rename')
                     onSelectRename()
@@ -335,7 +333,6 @@ export const SQLEditorTreeViewItem = ({
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     className="gap-x-2"
-                    data-attr="sql-editor-folder-action"
                     onSelect={() => {
                       trackAction('folder_delete')
                       onSelectDelete()
@@ -353,7 +350,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectMove !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('move', true)
                     onSelectMove()
@@ -368,7 +364,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectDelete !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('delete', true)
                     onSelectDelete()
@@ -385,7 +380,6 @@ export const SQLEditorTreeViewItem = ({
               <ContextMenuItem
                 asChild
                 className="gap-x-2"
-                data-attr="sql-editor-snippet-action"
                 onSelect={() => trackAction('open_new_tab')}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
@@ -402,7 +396,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('rename')
                     onSelectRename()
@@ -416,7 +409,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectMove !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('move')
                     onSelectMove()
@@ -433,7 +425,6 @@ export const SQLEditorTreeViewItem = ({
                 IS_PLATFORM && (
                   <ContextMenuItem
                     className="gap-x-2"
-                    data-attr="sql-editor-snippet-action"
                     onSelect={() => {
                       trackAction('share')
                       onSelectShare()
@@ -447,7 +438,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('unshare')
                     onSelectUnshare()
@@ -461,7 +451,6 @@ export const SQLEditorTreeViewItem = ({
               {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction('duplicate')
                     onSelectDuplicate()
@@ -475,7 +464,6 @@ export const SQLEditorTreeViewItem = ({
               {IS_PLATFORM && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-snippet-action"
                   onSelect={() => {
                     trackAction(isFavorite ? 'unfavorite' : 'favorite')
                     onToggleFavorite()
@@ -499,7 +487,6 @@ export const SQLEditorTreeViewItem = ({
                 getSnippetSource(element.metadata) !== 'logs' && (
                   <ContextMenuItem
                     className="gap-x-2"
-                    data-attr="sql-editor-snippet-action"
                     onSelect={() => {
                       trackAction('export')
                       onSelectDownload()
@@ -515,7 +502,6 @@ export const SQLEditorTreeViewItem = ({
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     className="gap-x-2"
-                    data-attr="sql-editor-snippet-action"
                     onSelect={() => {
                       trackAction('delete')
                       onSelectDelete()

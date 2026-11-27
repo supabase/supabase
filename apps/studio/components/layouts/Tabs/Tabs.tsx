@@ -234,27 +234,14 @@ export const EditorTabs = ({
                       />
                     </ContextMenuTrigger>
                     <ContextMenuContent>
-                      <ContextMenuItem
-                        data-attr="editor-tab-close"
-                        onClick={() => handleClose(tab.id)}
-                      >
-                        Close
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        data-attr="editor-tab-close"
-                        onClick={() => handleCloseOthers(tab.id)}
-                      >
+                      <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                      <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
                         Close Others
                       </ContextMenuItem>
-                      <ContextMenuItem
-                        data-attr="editor-tab-close"
-                        onClick={() => handleCloseRight(tab.id)}
-                      >
+                      <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
                         Close to the Right
                       </ContextMenuItem>
-                      <ContextMenuItem data-attr="editor-tab-close" onClick={handleCloseAll}>
-                        Close All
-                      </ContextMenuItem>
+                      <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
                     </ContextMenuContent>
                   </ContextMenu>
                 ))}

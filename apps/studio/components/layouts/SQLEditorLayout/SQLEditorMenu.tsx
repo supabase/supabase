@@ -100,7 +100,6 @@ export const SQLEditorMenu = () => {
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
               name="search-queries"
-              data-attr="sql-editor-snippet-search"
               placeholder="Search queries..."
               aria-labelledby="Search queries"
               value={search}
@@ -142,18 +141,10 @@ export const SQLEditorMenu = () => {
                     setSort(sortBy)
                   }}
                 >
-                  <InnerSideBarFilterSortDropdownItem
-                    key="name"
-                    value="name"
-                    data-attr="sql-editor-snippet-sort"
-                  >
+                  <InnerSideBarFilterSortDropdownItem key="name" value="name">
                     Alphabetical
                   </InnerSideBarFilterSortDropdownItem>
-                  <InnerSideBarFilterSortDropdownItem
-                    key="inserted_at"
-                    value="inserted_at"
-                    data-attr="sql-editor-snippet-sort"
-                  >
+                  <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
                     Created At
                   </InnerSideBarFilterSortDropdownItem>
                 </InnerSideBarFilterSortDropdown>
@@ -177,7 +168,6 @@ export const SQLEditorMenu = () => {
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem
                 className="gap-x-2"
-                data-attr="sql-editor-new-item"
                 onClick={() => {
                   track('sql_editor_new_item_clicked', { itemType: 'snippet' })
                   handleNewQuery()
@@ -189,7 +179,6 @@ export const SQLEditorMenu = () => {
               {canCreateLogsSnippet && (
                 <DropdownMenuItem
                   className="gap-x-2"
-                  data-attr="sql-editor-new-item"
                   onClick={() => {
                     track('sql_editor_new_item_clicked', { itemType: 'logs_query' })
                     handleNewQuery('logs')
@@ -201,7 +190,6 @@ export const SQLEditorMenu = () => {
               )}
               <DropdownMenuItem
                 className="gap-x-2"
-                data-attr="sql-editor-new-item"
                 onClick={() => {
                   track('sql_editor_new_item_clicked', { itemType: 'folder' })
                   createNewFolder()

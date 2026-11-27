@@ -368,7 +368,6 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               <Button
                 variant="primary"
                 type="submit"
-                data-attr="sql-editor-move-confirm"
                 disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >
