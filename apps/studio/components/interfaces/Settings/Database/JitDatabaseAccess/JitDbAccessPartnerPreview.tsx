@@ -103,7 +103,7 @@ export function JitDbAccessPartnerPreview({ showLargeList = false }: { showLarge
         <div className="space-y-1">
           <h3 className="settings-field-title">App access</h3>
           <p className="text-sm text-foreground-lighter">
-            Apps that rely on temporary access to connect to this database.
+            Apps that use access tokens to connect to this database.
           </p>
         </div>
         {organization && (
@@ -182,7 +182,7 @@ export function JitDbAccessPartnerPreview({ showLargeList = false }: { showLarge
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Temporary access</PageSectionTitle>
+          <PageSectionTitle>Token access</PageSectionTitle>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent className="space-y-4">
@@ -190,13 +190,13 @@ export function JitDbAccessPartnerPreview({ showLargeList = false }: { showLarge
           <CardContent>
             <FormLayout
               layout="flex-row-reverse"
-              label="Allow temporary access"
+              label="Allow token access"
               labelClassName="settings-field-title"
-              description="Allow database sign-ins with a temporary grant."
+              description="Allow members and approved apps to connect to this database using access tokens."
             >
               <Switch
                 ref={switchRef}
-                aria-label="Allow temporary access"
+                aria-label="Allow token access"
                 size="large"
                 checked={isEnabled}
                 onCheckedChange={setPendingEnabled}
@@ -230,12 +230,12 @@ export function JitDbAccessPartnerPreview({ showLargeList = false }: { showLarge
         >
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isEnabling ? 'Enable temporary access' : 'Disable temporary access'}
+              {isEnabling ? 'Enable token access' : 'Disable token access'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isEnabling
                 ? `This lets ${affectedAccess} open new database connections using their existing grants.`
-                : `This blocks new database connections through temporary access for ${affectedAccess}. Existing connections stay open.`}
+                : `This blocks new database connections through token access for ${affectedAccess}. Existing connections stay open.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {isEnabling && (

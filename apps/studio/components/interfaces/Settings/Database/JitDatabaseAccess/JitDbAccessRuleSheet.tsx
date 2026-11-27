@@ -64,7 +64,7 @@ const grantSchema = z.object({
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
   return z
     .object({
-      memberId: z.string().min(1, 'Select a member for this temporary access rule.'),
+      memberId: z.string().min(1, 'Select a member for this member access rule.'),
       grants: z.array(grantSchema),
     })
     .superRefine((data, ctx) => {
@@ -73,7 +73,7 @@ function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
           code: z.ZodIssueCode.custom,
           path: ['memberId'],
           message:
-            'This member already has a temporary access rule. Edit their existing rule from the list.',
+            'This member already has a member access rule. Edit their existing rule from the list.',
         })
       }
 
@@ -228,10 +228,10 @@ export function JitDbAccessRuleSheet({
         >
           <SheetHeader>
             <SheetTitle>
-              {mode === 'edit' ? 'Edit temporary access rule' : 'New temporary access rule'}
+              {mode === 'edit' ? 'Edit member access rule' : 'New member access rule'}
             </SheetTitle>
             <SheetDescription className="sr-only">
-              Configure which database roles a user can request with temporary access.
+              Configure which database roles a user can request with token access.
             </SheetDescription>
           </SheetHeader>
 
@@ -275,7 +275,7 @@ export function JitDbAccessRuleSheet({
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (
                         <p className="mt-2 text-foreground-lighter">
-                          All project members already have temporary access rules. Edit an existing
+                          All project members already have member access rules. Edit an existing
                           rule from the table above.
                         </p>
                       )}
