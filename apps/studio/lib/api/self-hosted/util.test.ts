@@ -21,10 +21,6 @@ vi.mock('crypto-js', () => {
 })
 
 describe('api/self-hosted/util', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('assertSelfHosted', () => {
     it('should not throw when IS_PLATFORM is false', async () => {
       const constants = await import('@/lib/constants')

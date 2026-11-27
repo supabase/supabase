@@ -1,7 +1,7 @@
 import days, { endOfLW7, WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'

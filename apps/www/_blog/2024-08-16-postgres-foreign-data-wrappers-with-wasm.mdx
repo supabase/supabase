@@ -17,7 +17,7 @@ date: '2024-08-16'
 toc_depth: 3
 ---
 
-Foreign Data Wrappers (FDWs) allow Postgres to interact with externally hosted data. To operate a FDW, the user creates a foreign table. When queried, the foreign table reaches out to the 3rd party service, collects the requested data, and returns it to the query in the shape defined by the foreign table. This allows seamless querying and data manipulation across different tools as if they were local tables from within Postgres.
+[Foreign Data Wrappers](https://supabase.com/docs/guides/database/extensions/wrappers/overview) (FDWs) allow Postgres to interact with externally hosted data. To operate a FDW, the user creates a foreign table. When queried, the foreign table reaches out to the 3rd party service, collects the requested data, and returns it to the query in the shape defined by the foreign table. This allows seamless querying and data manipulation across different tools as if they were local tables from within Postgres.
 
 [Wrappers](https://github.com/supabase/wrappers) is a Rust framework for creating Postgres Foreign Data Wrappers. Today we're releasing support for [Wasm (WebAssembly)](https://webassembly.org/) wrappers.
 
@@ -66,7 +66,7 @@ This feature is available today in public alpha for all new projects.
   />
 </div>
 
-[Wrappers](https://github.com/supabase/wrappers) is an open source project that simplifies the creation of Postgres Foreign Data Wrappers using [Rust](https://www.rust-lang.org/).
+[Wrappers](https://github.com/supabase/wrappers) is an open source project that simplifies the creation of Postgres Foreign Data Wrappers using [Rust](https://rust-lang.org/).
 
 ## Why WebAssembly?
 
@@ -75,7 +75,7 @@ This feature is available today in public alpha for all new projects.
 Here's how the Wasm FDW benefits us:
 
 - **Improved Security:** Wasm's sandboxed execution runtime with minimum interfaces enhances the security of FDW.
-- **Simplified Development:** Developers can use [Rust](https://www.rust-lang.org/) to create complex FDWs without diving deep into Postgres internal API.
+- **Simplified Development:** Developers can use [Rust](https://rust-lang.org/) to create complex FDWs without diving deep into Postgres internal API.
 - **Simplified Distribution:** Easily distribute your Wasm FDW through any URL-accessible storage (such as GitHub or S3).
 - **Enhanced Performance:** Wasm's near-native speed ensures FDWs operate with minimal overhead.
 - **Increased Modularity:** Each Wasm FDW is an isolated package which is dynamically loaded and executed by Wrappers individually.
@@ -137,7 +137,7 @@ The Wasm FDW feature is available today on the Supabase platform. We have 2 new 
 To get started, follow below steps:
 
 1. Create a new Supabase project: [database.new](http://database.new)
-2. Navigate to the [Database -> Wrappers](https://supabase.com/dashboard/project/_/database/wrappers) section and enable Wrappers.
+2. Navigate to the [Database -> Wrappers](https://supabase.com/dashboard/project/_/integrations?category=wrapper) section and enable Wrappers.
 3. Add `Snowflake` or `Paddle` wrapper, follow the instructions and create foreign tables.
 
 <div>

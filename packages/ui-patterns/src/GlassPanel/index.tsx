@@ -1,7 +1,7 @@
 'use client'
 
+import { FrameworkImage } from 'common'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import * as React from 'react'
 import { cn } from 'ui'
 
@@ -52,7 +52,7 @@ const LogoComponent = ({
 }) => (
   <div className={cn('relative box-content p-4 pb-0 md:p-6 md:pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
-      <Image
+      <FrameworkImage
         src={logoImage}
         alt={alt}
         fill
@@ -148,7 +148,7 @@ export const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-foreground-light grow">{children}</span>}
-        {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-primary justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

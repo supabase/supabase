@@ -1,9 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { jitDbAccessKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type JitDbAccessSelfVariables = { projectRef?: string }
 
@@ -13,6 +12,7 @@ async function getJitDbAccessSelf({ projectRef }: JitDbAccessSelfVariables, sign
   const { data, error } = await get(`/v1/projects/{ref}/database/jit`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -20,7 +20,6 @@ async function getJitDbAccessSelf({ projectRef }: JitDbAccessSelfVariables, sign
 }
 
 export type JitDbAccessSelfData = Awaited<ReturnType<typeof getJitDbAccessSelf>>
-export type JitDbAccessSelfError = ResponseError
 
 export const jitDbAccessSelfQueryOptions = ({ projectRef }: JitDbAccessSelfVariables) =>
   queryOptions({
@@ -31,15 +30,11 @@ export const jitDbAccessSelfQueryOptions = ({ projectRef }: JitDbAccessSelfVaria
     refetchOnWindowFocus: false,
   })
 
-export const useJitDbAccessSelfQuery = <TData = JitDbAccessSelfData>(
+export const useJitDbAccessSelfQuery = (
   { projectRef }: JitDbAccessSelfVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<JitDbAccessSelfData, JitDbAccessSelfError, TData> = {}
+  { enabled = true }: { enabled?: boolean } = {}
 ) =>
-  useQuery<JitDbAccessSelfData, JitDbAccessSelfError, TData>({
+  useQuery({
     ...jitDbAccessSelfQueryOptions({ projectRef }),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-    ...options,
+    enabled: enabled && IS_PLATFORM && !!projectRef,
   })

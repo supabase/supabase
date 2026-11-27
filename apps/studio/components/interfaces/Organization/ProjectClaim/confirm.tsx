@@ -1,7 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
-import Image from 'next/image'
+import { CheckCircle2Icon, ChevronRightIcon, ChevronsLeftRightIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -68,8 +67,8 @@ export const ProjectClaimConfirm = ({
     <ProjectClaimLayout
       title={
         <>
-          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-          <span className="text-brand">{requester?.name}</span>
+          Claim a project <span className="text-primary">{projectClaim?.project?.name}</span> from{' '}
+          <span className="text-primary">{requester?.name}</span>
         </>
       }
     >
@@ -85,20 +84,20 @@ export const ProjectClaimConfirm = ({
               }}
             >
               {!requester.icon && (
-                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+                <p className="text-foreground-light text-lg">{requester.name?.[0] ?? '?'}</p>
               )}
             </div>
 
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
               <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
-                <ChevronsLeftRight className="text-muted-foreground" size={24} />
+                <ChevronsLeftRightIcon className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
             </div>
 
             <div className="w-8 h-8">
-              <Image
+              <img
                 src={`${BASE_PATH}/img/supabase-logo.svg`}
                 alt="Supabase Logo"
                 className="w-full h-full"
@@ -117,7 +116,7 @@ export const ProjectClaimConfirm = ({
           <ul className="space-y-3">
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 The project will be transferred to your Supabase organization{' '}
@@ -133,7 +132,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 <span className="text-foreground">{requester?.name}</span> will receive API access
@@ -143,7 +142,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 You'll be responsible for maintaining the project, which may include additional
@@ -175,7 +174,7 @@ export const ProjectClaimConfirm = ({
                   </span>
                 </p>
 
-                <ChevronRight
+                <ChevronRightIcon
                   size={16}
                   className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
@@ -255,7 +254,13 @@ export const ProjectClaimConfirm = ({
         </div>
       </div>
       <div className="flex justify-center sticky bottom-0">
-        <Button size="medium" loading={isLoading} disabled={isLoading} onClick={onClaimProject}>
+        <Button
+          variant="primary"
+          size="medium"
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={onClaimProject}
+        >
           Claim project {projectClaim?.project?.name}
         </Button>
       </div>

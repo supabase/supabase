@@ -63,6 +63,19 @@ const MainProducts: ProductType = {
     label: '',
     url: '/edge-functions',
   },
+  [PRODUCT_SHORTNAMES.COMPUTE]: {
+    name: PRODUCT_NAMES.COMPUTE,
+    icon: products.compute.icon[24],
+    description: (
+      <>
+        Run <strong>AI-agent sandboxes and backend services</strong> on one runtime, next to your
+        database.
+      </>
+    ),
+    description_short: 'Sandboxes and backend services',
+    label: 'Private Alpha',
+    url: '/compute',
+  },
   [PRODUCT_SHORTNAMES.REALTIME]: {
     name: PRODUCT_NAMES.REALTIME,
     icon: products.realtime.icon[24],

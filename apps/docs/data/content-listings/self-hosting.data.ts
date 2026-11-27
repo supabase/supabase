@@ -20,26 +20,46 @@ export const selfHostingGetStarted: ContentListingGroup = {
 
 export const selfHostingCommunity: ContentListingGroup = {
   id: 'self-hosting-community',
-  heading: 'Community-driven projects',
+  heading: 'Community projects',
   headingLevel: 'h2',
   type: 'grid',
   columns: 2,
   description:
-    "There are several other options to deploy Supabase. If you're interested in helping these projects, visit our [Community page](https://supabase.com/contribute).",
+    'These projects are maintained by the Supabase community, not by Supabase. To get involved, see the [Community page](https://supabase.com/contribute).',
   items: [
     {
       title: 'Kubernetes',
       href: 'https://github.com/supabase-community/supabase-kubernetes',
       icon: '/docs/img/icons/kubernetes-icon',
       hasLightIcon: false,
-      description: 'Helm charts to deploy a Supabase on Kubernetes.',
+      description: 'Run Supabase on Kubernetes with the Supabase Operator or a Helm chart.',
     },
     {
-      title: 'Traefik',
-      href: 'https://github.com/supabase-community/supabase-traefik',
-      icon: '/docs/img/icons/traefik-icon',
-      hasLightIcon: false,
-      description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
+      title: 'Observability',
+      href: 'https://github.com/supabase-community/supabase-observability',
+      icon: { kind: 'grafana', color: '#F05A28', bg: 'rgba(240,90,40,0.1)' },
+      description:
+        'Collect logs, metrics, and traces from self-hosted Supabase with open-source tools.',
+    },
+  ],
+}
+
+export const selfHostingThirdPartyGuides: ContentListingGroup = {
+  id: 'self-hosting-third-party-guides',
+  heading: 'Third-party guides',
+  headingLevel: 'h2',
+  type: 'grid',
+  columns: 2,
+  description:
+    "Guides written by other projects and companies. Supabase doesn't maintain them, so check that they match your version of self-hosted Supabase.",
+  items: [
+    {
+      title: 'Secure self-hosted Supabase with NetBird',
+      href: 'https://netbird.io/knowledge-hub/supabase-self-hosted-netbird',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      subtitle: 'By NetBird',
+      description:
+        'Keep Studio and Postgres off the public internet with NetBird network access controls.',
     },
   ],
 }

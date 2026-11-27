@@ -16,9 +16,8 @@
 //
 // Known gap: Next's `routeChangeStart` lets handlers throw to cancel the
 // navigation. TanStack's `subscribe` is fire-and-forget; cancellation
-// requires `useBlocker` instead. `usePreventNavigationOnUnsavedChanges`
-// relies on the throw-to-cancel pattern and will need migrating to
-// `useBlocker` separately.
+// requires `useBlocker` instead. Vite selects a native implementation of
+// `usePreventNavigationOnUnsavedChanges` so that guard bypasses this adapter.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRouter = any

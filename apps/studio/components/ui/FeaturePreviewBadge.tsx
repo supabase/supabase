@@ -1,4 +1,4 @@
-import { FlaskConical } from 'lucide-react'
+import { FlaskConicalIcon } from 'lucide-react'
 import { Badge, cn } from 'ui'
 
 import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -26,7 +26,7 @@ export const FeaturePreviewBadge = ({ featureKey, className }: FeaturePreviewBad
           className
         )}
       >
-        <FlaskConical size={8} strokeWidth={1.5} />
+        <FlaskConicalIcon size={8} strokeWidth={1.5} />
         Preview
       </Badge>
     </button>

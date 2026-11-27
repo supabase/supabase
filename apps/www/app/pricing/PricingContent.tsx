@@ -1,4 +1,5 @@
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import { AiTools } from '~/components/AiTools'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingAddons from '~/components/Pricing/PricingAddons'
@@ -27,6 +28,13 @@ export default function PricingContent() {
             <p className="p text-lg leading-5">
               Start building for free, collaborate with your team, then scale to millions of users
             </p>
+            <AiTools
+              orientation="horizontal"
+              titleClassName="sr-only"
+              className="flex justify-center pt-4"
+              pagePath="/pricing"
+              pageType="pricing"
+            />
           </div>
         </div>
       </div>
@@ -40,12 +48,7 @@ export default function PricingContent() {
               Compare Plans
             </Button>
           </a>
-          <Button
-            size="tiny"
-            variant="default"
-            asChild
-            iconRight={<ArrowUpRight className="w-4" />}
-          >
+          <Button size="tiny" asChild iconRight={<ArrowUpRight className="w-4" />}>
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"
@@ -70,7 +73,7 @@ export default function PricingContent() {
           <div className="flex items-center justify-center gap-1">
             <span className="py-1 px-3 bg-surface-100 flex items-center gap-1 border rounded-full text-xs text-foreground-lighter">
               What is &ldquo;compute&rdquo;?
-              <InfoTooltip side="bottom" className="max-w-[280px]">
+              <InfoTooltip side="bottom" className="max-w-[280px]" label="About compute">
                 Think of compute as the computer your database runs on. As your app grows, you scale
                 CPU and memory to handle more traffic and data.
               </InfoTooltip>

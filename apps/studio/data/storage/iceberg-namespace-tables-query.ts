@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type GetNamespaceTablesVariables = {
   warehouse?: string
@@ -32,7 +33,7 @@ async function getNamespaceTables(
 
 type IcebergNamespaceTablesData = Awaited<ReturnType<typeof getNamespaceTables>>
 
-export type IcebergNamespaceTablesError = ResponseError
+export type IcebergNamespaceTablesError = StudioError
 
 export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesData>(
   params: GetNamespaceTablesVariables,

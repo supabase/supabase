@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { KeyboardShortcut } from './KeyboardShortcut'
@@ -44,5 +45,19 @@ describe('KeyboardShortcut', () => {
     render(<KeyboardShortcut keys={['Meta', 'ArrowUp']} />)
 
     expect(screen.getByText('Ctrl ↑')).toBeInTheDocument()
+  })
+
+  it('renders each key as its own keycap', () => {
+    setNavigator('MacIntel', 'Mozilla/5.0 (Macintosh; Intel Mac OS X)')
+
+    render(<KeyboardShortcut keys={['Meta', 'k']} variant="keycaps" />)
+
+    expect(screen.getByText('⌘')).toBeInTheDocument()
+    expect(screen.getByText('K')).toBeInTheDocument()
+  })
+
+  it('hides platform keys in server html so hydration cannot mismatch', () => {
+    expect(renderToString(<KeyboardShortcut keys={['Meta', 'k']} />)).toContain('invisible')
+    expect(renderToString(<KeyboardShortcut keys={['Enter']} />)).not.toContain('invisible')
   })
 })

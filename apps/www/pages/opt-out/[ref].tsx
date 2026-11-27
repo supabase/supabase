@@ -117,7 +117,11 @@ export default function OptOutPage() {
   function OptOutLayout({ children }: { children: React.ReactNode }) {
     return (
       <>
-        <NextSeo title="Supabase | Opt Out" description="Opt out of receiving emails." />
+        <NextSeo
+          title="Supabase | Opt Out"
+          description="Opt out of receiving emails."
+          noindex={true}
+        />
         <Layout className="overflow-visible mx-auto max-w-xl mt-24 flex flex-col gap-8">
           {children}
         </Layout>
@@ -227,7 +231,12 @@ export default function OptOutPage() {
               )}
             </div>
 
-            <Button type="submit" size="small" disabled={submissionType === 'success'}>
+            <Button
+              variant="primary"
+              type="submit"
+              size="small"
+              disabled={submissionType === 'success'}
+            >
               Report spam
             </Button>
             <FormMessage

@@ -1,4 +1,4 @@
-import { MinusCircle, PauseCircle } from 'lucide-react'
+import { CircleDollarSignIcon, MinusCircleIcon, PauseCircleIcon, ZapIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import {
@@ -13,8 +13,10 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { OrgSubscription, ProjectAddon } from '@/data/subscriptions/types'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface DowngradeModalProps {
   visible: boolean
@@ -29,9 +31,9 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
   const needsRestart = projectAddon.addons.find((addon) => addon.type === 'compute_instance')
 
   /**
-   * We do not include Log Drains, Advanced MFA Phone, and ETL Pipeline for the following reasons:
+   * We do not include Log Drains, Advanced MFA Phone, and Pipelines for the following reasons:
    * 1. These addons are not removed automatically. Instead, users have to remove the respective configuration themselves
-   * 2. It's not obvious to users that Log Drains, MFA Phone, and ETL Pipeline are addons
+   * 2. It's not obvious to users that Log Drains, MFA Phone, and Pipelines are addons
    */
   const relevantAddonsToList = projectAddon.addons.filter(
     (addon) => !['log_drain', 'auth_mfa_phone', 'etl_pipeline'].includes(addon.type)
@@ -43,7 +45,7 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
   })
 
   return (
-    <li className="list-disc ml-6">
+    <li>
       {projectAddon.name}: {addonNames.join(', ')} will be removed.
       {needsRestart ? (
         <>
@@ -96,23 +98,16 @@ export const DowngradeModal = ({
 
   return (
     <Dialog open={visible} onOpenChange={onClose}>
-      <DialogContent size="large">
+      <DialogContent size="xlarge">
         <DialogHeader>
           <DialogTitle>Confirm to downgrade to {selectedPlan?.name} plan</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <div className="px-5 py-4 text-foreground-light">
-          <div className="flex flex-col space-y-2">
-            <Admonition
-              type="warning"
-              title="Downgrading to the Free Plan will lead to reductions in your organization's quota"
-              description="If you're already past the limits of the Free Plan, your projects could become
-                  unresponsive or enter read only mode."
-            />
-
-            {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
+          {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
+            <div className="flex flex-col space-y-2">
               <Admonition type="warning" title="Projects affected by the downgrade">
-                <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                <ul className="!my-0 space-y-1 max-h-[100px] overflow-y-auto">
                   {previousProjectAddons.map((project) => (
                     <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
                   ))}
@@ -123,38 +118,51 @@ export const DowngradeModal = ({
                       return computeSize === 'micro'
                     })
                     .map((project) => (
-                      <li className="list-disc ml-6" key={project.ref}>
+                      <li key={project.ref}>
                         {project.name}: Compute will be downgraded. Project will also{' '}
                         <span className="font-bold">need to be restarted</span>.
                       </li>
                     ))}
                 </ul>
               </Admonition>
-            )}
-          </div>
+            </div>
+          )}
 
           {hasPostCutoffProjects && (
             <Admonition
               type="warning"
-              className="mt-2"
+              className="mt-2 mb-4"
               title="Any custom email templates will be reset"
               description="Downgrading will reset your custom email templates to their defaults. You won’t be able to edit them unless you set up custom SMTP after downgrading."
             />
           )}
 
-          <ul className="mt-4 space-y-5 text-sm">
+          <ul className="flex flex-col gap-y-2 text-sm">
             <li className="flex items-center gap-3">
-              <PauseCircle size={18} />
+              <PauseCircleIcon size={18} />
               <span>Projects will be paused after a week of inactivity</span>
             </li>
 
-            <li className="flex items-center gap-3 mb-2">
-              <MinusCircle size={18} />
+            <li className="flex items-center gap-3">
+              <MinusCircleIcon size={18} />
               <span>Add ons from all projects under this organization will be removed.</span>
             </li>
 
+            <li className="flex items-center gap-3">
+              <CircleDollarSignIcon size={18} />
+              <span>Any unbilled usage will be charged for in one final invoice.</span>
+            </li>
+
+            <li className="flex items-center gap-3 mb-2">
+              <ZapIcon size={18} />
+              <span>
+                Downgrades are immediate and you will receive prorated credits for unused time on
+                the Pro Plan.
+              </span>
+            </li>
+
             <li className="flex gap-3">
-              <div>
+              <div className="mt-2">
                 <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
                 <ul className="space-y-2 mt-2">
                   <li className="list-disc ml-6 text-foreground-light">
@@ -164,7 +172,11 @@ export const DowngradeModal = ({
                     Your resource consumption are well within the {selectedPlan?.name} plan's quota.
                   </li>
                   <li className="list-disc ml-6 text-foreground-light">
-                    Alternatively, you may also transfer projects across organizations.
+                    Alternatively, you may also{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/platform/project-transfer`}>
+                      transfer projects
+                    </InlineLink>{' '}
+                    across organizations.
                   </li>
                 </ul>
               </div>
@@ -183,7 +195,7 @@ export const DowngradeModal = ({
               onConfirm()
             }}
           >
-            Confirm
+            Downgrade Now
           </Button>
         </DialogFooter>
       </DialogContent>

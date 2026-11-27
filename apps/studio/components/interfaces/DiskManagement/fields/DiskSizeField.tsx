@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcwIcon } from 'lucide-react'
 import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -15,15 +15,17 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { canRightSizeDisk } from '../DiskManagement.utils'
 import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
 import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { GB } from '@/lib/constants'
+import { DOCS_URL, GB } from '@/lib/constants'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -74,6 +76,9 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
 
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
+  const canShowRightSizingNote =
+    !isProjectNew && !isError && canRightSizeDisk(defaultValues?.totalSize)
+
   return (
     <FormField
       name="totalSize"
@@ -91,11 +96,19 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                 </p>
               )}
 
+              {canShowRightSizingNote && (
+                <p>
+                  Disk size doesn't shrink automatically. Upgrade Postgres to reduce disk size.{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/database-size#reducing-disk-size`}>
+                    Learn more
+                  </InlineLink>
+                </p>
+              )}
+
               <DiskTypeRecommendationSection
                 form={form}
                 actions={
                   <Button
-                    variant="default"
                     onClick={() => {
                       setValue('storageType', 'io2', { shouldDirty: true })
                       trigger('provisionedIOPS')
@@ -171,7 +184,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                     }}
                     title="Reset"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    <RotateCcwIcon className="h-4 w-4" aria-hidden="true" />
                   </InputGroupButton>
                 ) : null}
               </InputGroupAddon>

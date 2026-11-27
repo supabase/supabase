@@ -25,9 +25,17 @@ By creating RLS policies on the `realtime.messages` table you can control the ac
 
 <Admonition type="caution">
 
-Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed.
+Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed: [`supautils`](https://github.com/supabase/supautils) lets the `postgres` role run policy statements on that table without owning it.
 
-Row level security (RLS) is enabled by default on table `realtime.messages`, you don't need to execute `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY`.
+Row Level Security is already enabled on `realtime.messages`, so don't add `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY` to a migration. Postgres checks table ownership before it checks whether the setting would change, so the statement fails with `42501 must be owner of table messages`. That aborts the transaction, and every statement after it is skipped, including any `create policy` statements that follow.
+
+Remove the `ALTER TABLE` line and the rest of the migration passes. If a migration needs to check that RLS is on, read the catalog:
+
+```sql
+select relrowsecurity from pg_class where oid = 'realtime.messages'::regclass;
+```
+
+If you hit that error, see [must be owner of table messages](/kb/troubleshooting/realtime-must-be-owner-of-table-messages).
 
 </Admonition>
 
@@ -133,7 +141,7 @@ The `extension` field on the `realtime.messages` table records the message type.
 
 To join a Broadcast Channel, a user must have at least one read or write permission on the Channel topic.
 
-Here, we allow reads (`select`s) for users who are linked to the requested topic within the relationship table `public.room_users`:
+Here, we allow reads (`select`s) for users who are linked to the requested topic within the relationship table `public.rooms_users`:
 
 ```sql
 create policy "authenticated can receive broadcast"
@@ -145,7 +153,7 @@ exists (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -266,7 +274,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
 
 To authorize sending Broadcast messages, create a policy for `insert` where the value of `realtime.messages.extension` is `broadcast`.
 
-Here, we allow writes (sends) for users who are linked to the requested topic within the relationship table `public.room_users`:
+Here, we allow writes (sends) for users who are linked to the requested topic within the relationship table `public.rooms_users`:
 
 ```sql
 create policy "authenticated can send broadcast on topic"
@@ -278,7 +286,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -305,7 +313,7 @@ using (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -328,7 +336,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -355,7 +363,7 @@ using (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -378,7 +386,7 @@ with check (
     select
       user_id
     from
-      rooms_users
+      public.rooms_users
     where
       user_id = (select auth.uid())
       and room_topic = (select realtime.topic())
@@ -401,6 +409,8 @@ Realtime updates the access policy cache for a client based on your RLS policies
 
 - A client connects to Realtime and subscribes to a Channel
 - A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
+
+This means that if you revoke a user's access (for example, by removing a row an RLS policy uses to grant it) while they're still connected, they'll keep receiving messages until their JWT expires or a new one is sent.
 
 If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 

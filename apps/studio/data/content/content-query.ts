@@ -3,6 +3,7 @@ import { components } from 'api-types'
 
 import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { getLogSqlSnippetPage } from './logs-view-content'
 import { get, handleError } from '@/data/fetchers'
 import type {
   Dashboards,
@@ -12,12 +13,7 @@ import type {
   UseCustomQueryOptions,
 } from '@/types'
 
-// TODO — Charis 2026-08-06
-// Temporary widening until we have API support for notebooks
-export type ContentBase = Omit<
-  components['schemas']['GetUserContentResponse']['data'][number],
-  'type'
-> & { type: components['schemas']['GetUserContentResponse']['data'][number]['type'] | 'notebook' }
+export type ContentBase = components['schemas']['GetUserContentResponse_Output']['data'][number]
 
 export type Content = Omit<ContentBase, 'content' | 'type'> &
   (
@@ -62,12 +58,19 @@ export async function getContent(
     throw new Error('projectRef is required for getContent')
   }
 
+  if (type === 'log_sql') {
+    const { rows, cursor: nextCursor } = await getLogSqlSnippetPage(
+      { projectRef, name, limit },
+      signal,
+      headers
+    )
+    return { cursor: nextCursor, content: rows }
+  }
+
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: {
       path: { ref: projectRef },
-      // TODO — Charis 2026-08-06
-      // Cast until the generated query param type picks up 'notebook' (see ContentBase above)
-      query: { type: type as 'sql' | 'report' | 'log_sql', name, limit: limit.toString() },
+      query: { type, name, limit: limit.toString() },
     },
     headers,
     signal,

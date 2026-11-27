@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
-import { ScaffoldSection } from '@/components/layouts/Scaffold'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
@@ -30,12 +31,13 @@ export const ExtensionNotInstalled = ({
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Missing required extension">
           <p>
             The Wrappers extension is required in order to query analytics tables.{' '}
-            {databaseNeedsUpgrading &&
-              'Please first upgrade your database and then install the extension.'}{' '}
+            {databaseNeedsUpgrading && (
+              <span>Please first upgrade your database and then install the extension.</span>
+            )}{' '}
             <InlineLink
               href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
               target="_blank"
@@ -45,7 +47,7 @@ export const ExtensionNotInstalled = ({
               Learn more
             </InlineLink>
           </p>
-          <Button variant="default" asChild className="mt-2" onClick={() => {}}>
+          <Button asChild className="mt-2" onClick={() => {}}>
             <Link
               href={
                 databaseNeedsUpgrading
@@ -57,7 +59,7 @@ export const ExtensionNotInstalled = ({
             </Link>
           </Button>
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )
@@ -81,20 +83,20 @@ export const ExtensionNeedsUpgrade = ({
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Outdated extension version">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
             {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-            by disabling and enabling the Wrappers extension.
+            {databaseNeedsUpgrading && <span>{'first upgrade your database, and then '}</span>}
+            <span>update the extension by disabling and enabling the Wrappers extension.</span>
           </p>
           <p>
             Before reinstalling the wrapper extension, you must first remove all existing wrappers.
             Afterward, you can recreate the wrappers.
           </p>
-          <Button asChild variant="default">
+          <Button asChild>
             <Link
               href={
                 databaseNeedsUpgrading
@@ -106,31 +108,50 @@ export const ExtensionNeedsUpgrade = ({
             </Link>
           </Button>
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )
 }
 
 export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
+  const {
+    mutateAsync: createIcebergWrapper,
+    isPending: isCreatingIcebergWrapper,
+    apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
+  } = useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')
+    if (!isApiKeyReady) return
     await createIcebergWrapper({ bucketName })
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button variant="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          <Button
+            loading={
+              isCreatingIcebergWrapper ||
+              (apiKeysGrant.status === 'granted' && apiKeyState === 'loading')
+            }
+            disabled={!isApiKeyReady}
+            onClick={onSetupWrapper}
+          >
             Install wrapper
           </Button>
+          <ApiKeysAccessNote
+            className="mt-2"
+            grant={apiKeysGrant}
+            keyState={apiKeyState}
+            fallback="They're needed to set up the Iceberg Wrapper."
+          />
         </Admonition>
-      </ScaffoldSection>
+      </PageSection>
       <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )

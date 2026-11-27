@@ -79,6 +79,15 @@ function getIdentifierWhereClause(identifier: RoleIdentifier): SafeSqlFragment {
   throw new Error('Must provide either id or name')
 }
 
+function getRoleNotFoundSql(identifier: RoleIdentifier): SafeSqlFragment {
+  if ('id' in identifier && identifier.id) {
+    return safeSql`raise exception 'Cannot find role with id %', ${literal(identifier.id)};`
+  } else if ('name' in identifier && identifier.name) {
+    return safeSql`raise exception 'Cannot find role with name %', ${literal(identifier.name)};`
+  }
+  throw new Error('Must provide either id or name')
+}
+
 function retrieve(identifier: RoleIdentifier): {
   sql: SafeSqlFragment
   zod: typeof pgRoleOptionalZod
@@ -185,10 +194,10 @@ begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    ${getRoleNotFoundSql(identifier)}
   end if;
 
-  execute(format('alter role %I
+  execute format('alter role %I
     ${isSuperuser === undefined ? safeSql`` : isSuperuser ? safeSql`superuser` : safeSql`nosuperuser`}
     ${canCreateDb === undefined ? safeSql`` : canCreateDb ? safeSql`createdb` : safeSql`nocreatedb`}
     ${canCreateRole === undefined ? safeSql`` : canCreateRole ? safeSql`createrole` : safeSql`nocreaterole`}
@@ -197,9 +206,9 @@ begin
     ${isReplicationRole === undefined ? safeSql`` : isReplicationRole ? safeSql`replication` : safeSql`noreplication`}
     ${canBypassRls === undefined ? safeSql`` : canBypassRls ? safeSql`bypassrls` : safeSql`nobypassrls`}
     ${connectionLimit === undefined ? safeSql`` : safeSql`connection limit ${literal(connectionLimit)}`}
-    ${password === undefined ? safeSql`` : safeSql`password ${literal(password)}`}
+    ${password === undefined ? safeSql`` : safeSql`password %L`}
     ${validUntil === undefined ? safeSql`` : safeSql`valid until %L`}
-  ', old.name${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`}));
+  ', old.name${password === undefined ? safeSql`` : safeSql`, ${literal(password)}`}${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`});
 
   ${
     newName === undefined
@@ -207,7 +216,7 @@ begin
       : safeSql`
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if ${literal(newName)} != old.name then
-    execute(format('alter role %I rename to %I;', old.name, ${literal(newName)}));
+    execute format('alter role %I rename to %I;', old.name, ${literal(newName)});
   end if;
   `
   }
@@ -232,10 +241,10 @@ begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    ${getRoleNotFoundSql(identifier)}
   end if;
 
-  execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
+  execute format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name);
 end
 $$;
 `

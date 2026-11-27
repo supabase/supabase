@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Check, Lock } from 'lucide-react'
+import { CheckIcon, LockIcon } from 'lucide-react'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -10,7 +10,7 @@ import {
 
 import { datePickerValueToLogTimeRange, logTimeRangesEqual } from './LogTimeRange.utils'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
@@ -55,7 +55,7 @@ export const LogsTimeRangeSubMenu = ({
       <DropdownMenuSubContent className="w-52">
         {presets.map(({ helper, range: presetRange }) => {
           const isSelected = !isCustomRange && logTimeRangesEqual(range, presetRange)
-          const isLocked = maybeShowUpgradePromptIfNotEntitled(helper.calcFrom(), entitledToLogDays)
+          const isLocked = isStartOutsideRetention(helper.calcFrom(), entitledToLogDays)
 
           return (
             <DropdownMenuItem
@@ -68,9 +68,9 @@ export const LogsTimeRangeSubMenu = ({
             >
               <span>{helper.text}</span>
               {isLocked ? (
-                <Lock size={14} className="text-foreground-lighter" />
+                <LockIcon size={14} className="text-foreground-lighter" />
               ) : (
-                isSelected && <Check size={14} />
+                isSelected && <CheckIcon size={14} />
               )}
             </DropdownMenuItem>
           )
@@ -78,7 +78,7 @@ export const LogsTimeRangeSubMenu = ({
         <DropdownMenuSeparator />
         <DropdownMenuItem className="justify-between" onClick={onOpenCustomRange}>
           <span>Custom range…</span>
-          {isCustomRange && <Check size={14} />}
+          {isCustomRange && <CheckIcon size={14} />}
         </DropdownMenuItem>
       </DropdownMenuSubContent>
     </DropdownMenuSub>

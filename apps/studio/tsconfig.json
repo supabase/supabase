@@ -7,10 +7,8 @@
     "noUnusedParameters": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@/*": ["./*"]
     },
-    "plugins": [{ "name": "next" }],
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "module": "ESNext",
@@ -18,6 +16,6 @@
     "skipLibCheck": true,
     "strictNullChecks": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "public/deno/*.ts", "dist"]
 }

@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useSearchParamsShallow } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -26,10 +26,14 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_CLIENTS,
+  MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { AGENT_CLIENT_PARAM } from './AgentPluginsPanel.data'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -105,7 +109,7 @@ function ProjectSelector({
         </span>
 
         {!isUserLoading && !isLoggedIn ? (
-          <Button size="small" variant="default" className="gap-0 rounded-l-none" asChild>
+          <Button size="small" className="gap-0 rounded-l-none" asChild>
             <Link href="https://supabase.com/dashboard" rel="noreferrer noopener" target="_blank">
               <div className="flex items-center gap-2">Log in to choose a project</div>
             </Link>
@@ -114,7 +118,6 @@ function ProjectSelector({
           <PopoverTrigger asChild disabled={isUserLoading || isLoading || isError}>
             <Button
               size="small"
-              variant="default"
               className="gap-0 rounded-l-none"
               iconRight={
                 <ChevronDown
@@ -215,7 +218,6 @@ function PlatformSelector({
         <PopoverTrigger asChild>
           <Button
             size="small"
-            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={
               <ChevronDown
@@ -266,10 +268,13 @@ function PlatformSelector({
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
-  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mcpServers } = getCustomContent(['mcp:servers'])
+  const searchParams = useSearchParamsShallow()
+  const selectedClient =
+    MCP_CLIENTS.find((client) => client.key === searchParams.get(AGENT_CLIENT_PARAM)) ??
+    MCP_CLIENTS[0]
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
@@ -306,6 +311,8 @@ export function McpConfigPanel() {
     }
   }
 
+  const handleClientSelect = (client: McpClient) => searchParams.set(AGENT_CLIENT_PARAM, client.key)
+
   return (
     <>
       <div className="not-prose">
@@ -324,6 +331,7 @@ export function McpConfigPanel() {
             : 'Project selection is only available for the hosted platform.'}
         </p>
         <McpConfigPanelBase
+          selectedClient={selectedClient}
           className="mt-6"
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}
@@ -332,21 +340,12 @@ export function McpConfigPanel() {
           nonPlatformUrl={mcpServers?.local}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}
-          onClientSelect={setSelectedClient}
+          onClientSelect={handleClientSelect}
         />
       </div>
       {isPlatform && (
-        <Admonition type="note" title="Authentication" className="mt-3">
-          <p>
-            {
-              "Some MCP clients will automatically prompt you to login during setup, while others may require manual authentication steps. Either authentication method will open a browser window where you can login to your Supabase account and grant organization access to the MCP client. In the future, we'll offer more fine grain control over these permissions."
-            }
-          </p>
-          <p>
-            {
-              'Previously Supabase MCP required you to generate a personal access token (PAT), but this is no longer required.'
-            }
-          </p>
+        <Admonition type="note" title={MCP_HOSTED_AUTH_NOTE.title} className="mt-3">
+          <p>{MCP_HOSTED_AUTH_NOTE.body}</p>
         </Admonition>
       )}
     </>

@@ -25,16 +25,23 @@ import {
 
 import type { ResourceAccessMode } from '../../AccessToken.permissions'
 import { getIsProjectScopedOnly } from '../../AccessToken.roles'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
+import {
+  OrgProject,
+  OrgProjectsResponse,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
 import { Organization } from '@/types'
 
 interface ResourceAccessStepProps {
   control: Control<TokenFormValues>
   setValue: UseFormSetValue<TokenFormValues>
+
+  /** Switches the form between the Project and Organization resource scopes. */
+  onResourceAccessChange: (mode: Exclude<ResourceAccessMode, 'account'>) => void
 
   /** Switches the form into legacy (account-wide) token mode. */
   onSelectLegacyToken: () => void
@@ -62,9 +69,25 @@ const CARD_OPTIONS: {
 export const ResourceAccessStep = ({
   control,
   setValue,
+  onResourceAccessChange,
   onSelectLegacyToken,
 }: ResourceAccessStepProps) => {
-  const { organizations, projects } = useOrgAndProjectData()
+  const { data: organizations = [] } = useOrganizationsQuery()
+
+  const resourceAccess = useWatch({ control, name: 'resourceAccess' })
+  const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
+  const selectedOrgSlug = organizationSlugs[0]
+
+  const {
+    data: projectsData,
+    hasNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery({ slug: selectedOrgSlug })
+
+  const projectsForOrg = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData]
+  )
   const organizationsBySlug = useMemo(
     () =>
       organizations.reduce(
@@ -78,24 +101,21 @@ export const ResourceAccessStep = ({
   )
   const projectsByRef = useMemo(
     () =>
-      projects.reduce(
+      projectsForOrg.reduce(
         (acc, project) => {
           acc[project.ref] = project
           return acc
         },
-        {} as Record<string, ProjectInfoInfinite>
+        {} as Record<string, OrgProject>
       ),
-    [projects]
+    [projectsForOrg]
   )
-
-  const resourceAccess = useWatch({ control, name: 'resourceAccess' })
-  const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
 
   // Users invited to specific projects (rather than the whole org) can't select that org for an
   // org-wide token. Skipped while permissions are still loading so nothing gets disabled by
-  // mistake. The project list itself needs no permission filter — /platform/projects is already
-  // scoped server-side to what the user can access.
-  const { data: permissions } = usePermissionsQuery()
+  // mistake. The project list itself needs no permission filter — the org projects endpoint is
+  // already scoped server-side to what the user can access.
+  const { data: permissions } = usePermissionsQueryV2()
   const projectScopedOrgSlugs = useMemo(() => {
     if (permissions === undefined) return new Set<string>()
     return new Set(
@@ -104,11 +124,6 @@ export const ResourceAccessStep = ({
         .filter((slug) => getIsProjectScopedOnly(permissions, slug))
     )
   }, [permissions, organizations])
-
-  const projectsForOrg = useMemo(
-    () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
-    [projects, organizationSlugs]
-  )
 
   return (
     <section className="space-y-4 px-5 sm:px-6 py-6">
@@ -139,8 +154,7 @@ export const ResourceAccessStep = ({
                 value={resourceAccess}
                 onValueChange={(value) => {
                   field.onChange(value)
-                  // Reset dependent selections when switching modes.
-                  setValue('projectRefs', [])
+                  onResourceAccessChange(value as Exclude<ResourceAccessMode, 'account'>)
                 }}
               >
                 {CARD_OPTIONS.map((option) => (
@@ -234,13 +248,11 @@ export const ResourceAccessStep = ({
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search projects" showResetIcon />
-                    <MultiSelectorList>
-                      {projectsForOrg.map((project) => (
-                        <MultiSelectorItem key={project.ref} value={project.ref}>
-                          {project.name}
-                        </MultiSelectorItem>
-                      ))}
-                    </MultiSelectorList>
+                    <ProjectMultiSelectList
+                      projects={projectsForOrg}
+                      hasNextPage={hasNextPage}
+                      fetchNextPage={fetchNextPage}
+                    />
                   </MultiSelectorContent>
                 </MultiSelector>
               </FormItemLayout>
@@ -301,5 +313,34 @@ export const ResourceAccessStep = ({
         />
       )}
     </section>
+  )
+}
+
+const ProjectMultiSelectList = ({
+  projects,
+  hasNextPage,
+  fetchNextPage,
+}: {
+  projects: OrgProjectsResponse['projects']
+  hasNextPage: boolean
+  fetchNextPage: () => void
+}) => {
+  const handleScroll = (event: React.UIEvent) => {
+    const element = event.currentTarget as HTMLElement
+    const offset = 50 // Offset by approximately 1 item to start fetching next page before hitting the bottom
+    const isAtBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - offset
+    if (hasNextPage && isAtBottom) {
+      fetchNextPage()
+    }
+  }
+
+  return (
+    <MultiSelectorList onScroll={handleScroll}>
+      {projects.map((project) => (
+        <MultiSelectorItem key={project.ref} value={project.ref} keywords={[project.name]}>
+          {project.name}
+        </MultiSelectorItem>
+      ))}
+    </MultiSelectorList>
   )
 }

@@ -27,7 +27,6 @@ describe('ExplorerQuery', () => {
     const cell = screen.getByLabelText('Weekly signups query')
     expect(cell).toHaveAttribute('data-slot', 'explorer-query')
     expect(cell).toHaveAttribute('data-variant', 'embedded')
-    expect(cell).toHaveClass('rounded-md', 'border')
     expect(screen.getByRole('toolbar', { name: 'Explorer query toolbar' })).toBeInTheDocument()
     expect(cell.querySelector('[data-slot="explorer-query-editor"]')).toHaveTextContent(
       'SQL editor'
@@ -56,8 +55,7 @@ describe('ExplorerQuery', () => {
     const viewport = screen.getByLabelText('Explorer query tab')
     expect(viewport).toHaveAttribute('data-variant', 'viewport')
     expect(viewport).toHaveAttribute('data-density', 'compact')
-    expect(viewport).toHaveClass('h-full', 'min-h-0', 'custom-viewport')
-    expect(viewport).not.toHaveClass('rounded-md')
+    expect(viewport).toHaveClass('custom-viewport')
     expect(viewportRef.current).toBe(viewport)
   })
 

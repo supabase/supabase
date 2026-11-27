@@ -6,13 +6,21 @@ import { z } from 'zod'
 
 import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import type { Transcript } from './transcript'
-import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { contract as loadKnowledgeContract } from '@/lib/ai/tools/load-knowledge'
 import { extractUrls } from '@/lib/helpers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
+/** How the simulated user answers an `update_opt_in_level` card. Needs `aiOptInLevel`. */
+export type OptInDecision = 'accept' | 'skip' | { chooses: AiOptInLevel }
+
 export type AssistantEvalInput = {
   prompt: string
+  /** Opt-in level the mock tools are filtered by. Omitted means no filtering, same as the highest level. */
+  aiOptInLevel?: AiOptInLevel
+  /** Resumes the chat after the Assistant asks for a level. Omit to stop at the request. */
+  optInDecision?: OptInDecision
   mockTables?: Record<
     string,
     Array<{
@@ -27,6 +35,8 @@ export type AssistantEvalInput = {
 export type AssistantEvalOutput = {
   finishReason: FinishReason
   transcript: Transcript
+  /** Calls the user denied. They never execute, so they leave no tool span for Tool Usage. */
+  deniedToolCalls?: Array<{ toolName: string; input: unknown }>
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -35,6 +45,7 @@ type RequiredTool = string | { name: string; input?: Record<string, ToolInputFie
 
 export type Expected = {
   requiredTools?: RequiredTool[]
+  forbiddenTools?: RequiredTool[]
   requiredKnowledge?: string[]
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
@@ -112,29 +123,42 @@ const matchesExpectedToolInput = (
   })
 }
 
-export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {
-  if (!expected.requiredTools || !trace) return null
+type CalledTool = { name: string | undefined; input: unknown }
+
+const matchesRequiredTool = (calledTools: CalledTool[], requiredTool: RequiredTool) => {
+  if (typeof requiredTool === 'string') {
+    return calledTools.some((call) => call.name === requiredTool)
+  }
+
+  return calledTools.some((call) => {
+    if (call.name !== requiredTool.name) return false
+    if (!requiredTool.input) return true
+    return matchesExpectedToolInput(call.input, requiredTool.input)
+  })
+}
+
+export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace, output }) => {
+  const requiredTools = expected.requiredTools ?? []
+  const forbiddenTools = expected.forbiddenTools ?? []
+  if ((requiredTools.length === 0 && forbiddenTools.length === 0) || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
+  const calledTools: CalledTool[] = [
+    ...toolSpans.map((span) => ({ name: span.span.span_attributes?.name, input: span.input })),
+    ...(output?.deniedToolCalls ?? []).map((call) => ({ name: call.toolName, input: call.input })),
+  ]
 
-  const presentCount = expected.requiredTools.filter((requiredTool) => {
-    if (typeof requiredTool === 'string') {
-      return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
-    }
+  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(calledTools, tool)).length
+  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(calledTools, tool))
 
-    return toolSpans.some((span) => {
-      if (span.span.span_attributes?.name !== requiredTool.name) return false
-      if (!requiredTool.input) return true
-      return matchesExpectedToolInput(span.input, requiredTool.input)
-    })
-  }).length
-
-  const totalCount = expected.requiredTools.length
-  const ratio = totalCount === 0 ? 1 : presentCount / totalCount
+  const totalCount = requiredTools.length + forbiddenTools.length
+  const passedCount = presentCount + (forbiddenTools.length - violatedTools.length)
+  const ratio = totalCount === 0 ? 1 : passedCount / totalCount
 
   return {
     name: 'Tool Usage',
     score: ratio,
+    metadata: violatedTools.length > 0 ? { violatedForbiddenTools: violatedTools } : undefined,
   }
 }
 
@@ -142,7 +166,7 @@ export const knowledgeUsageScorer: AssistantEvalScorer = async ({ expected, trac
   if (!expected.requiredKnowledge || !trace) return null
 
   const knowledgeSpans = await getParsedToolSpans(trace, 'load_knowledge', {
-    inputSchema: loadKnowledgeInputSchema,
+    inputSchema: loadKnowledgeContract.inputSchema,
   })
   const loadedKnowledge: string[] = knowledgeSpans.map((s) => s.input.name)
 
@@ -316,6 +340,7 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
     {{output}}
 
     The assistant response may include tool call markers like [called execute_sql] followed by the inputs passed to those tools. Treat those tool inputs as part of what the assistant did.
+    A call to update_opt_in_level asks the user through an approval card, even without a prose question.
 
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
     - Include the expected answer or perform equivalent actions through tool calls

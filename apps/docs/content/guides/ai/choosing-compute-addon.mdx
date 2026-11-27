@@ -83,7 +83,7 @@ QPS can also be improved by increasing [`m` and `ef_construction`](/docs/guides/
 
 ### 1536 dimensions [#hnsw-1536-dimensions]
 
-This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
+This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://developers.openai.com/api/docs/guides/embeddings).
 
 <Tabs
   scrollable
@@ -210,7 +210,7 @@ This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, whic
 
 ### 1536 dimensions [#ivfflat-1536-dimensions]
 
-This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
+This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://developers.openai.com/api/docs/guides/embeddings).
 
 <Tabs
   scrollable
@@ -343,7 +343,7 @@ We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikber
   height={1194}
 />
 
-_The diagram above shows the vecs benchmark setup: a Python test runner uploads data, builds the index, and runs queries against pgvector._
+_The diagram above shows the vecs benchmark setup: a Python test runner uploads data, builds the index, and runs queries against [pgvector](/docs/guides/database/extensions/pgvector)._
 
 Each test is run for a minimum of 30-40 minutes. They include a series of experiments executed at different concurrency levels to measure the engine's performance under different load types. The results are then averaged.
 

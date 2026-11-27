@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import {
-  Badge,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -16,13 +15,11 @@ interface MarketplaceDetailBreadrumbsProps {
   isLoading?: boolean
   title?: string
   actions?: ReactNode
-  isInstalled?: boolean
 }
 
 export const MarketplaceDetailBreadrumbs = ({
   isLoading,
   title,
-  isInstalled,
   actions,
 }: MarketplaceDetailBreadrumbsProps) => {
   const { ref } = useParams()
@@ -48,7 +45,6 @@ export const MarketplaceDetailBreadrumbs = ({
           <BreadcrumbPage className="block min-w-0 truncate">
             {isLoading ? <ShimmeringLoader className="w-24" /> : title}
           </BreadcrumbPage>
-          {isInstalled && <Badge variant="success">Installed</Badge>}
         </BreadcrumbItem>
       </BreadcrumbList>
     </PageBreadcrumbs>

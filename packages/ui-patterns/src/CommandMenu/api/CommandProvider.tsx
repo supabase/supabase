@@ -1,8 +1,7 @@
 'use client'
 
-import { useConstant } from 'common'
-import { useRouter as useLegacyRouter } from 'next/compat/router'
-import { useCallback, useEffect, useMemo, type PropsWithChildren } from 'react'
+import { useConstant, useFramework } from 'common'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
@@ -14,7 +13,6 @@ import {
   type CommandMenuTelemetryCallback,
 } from './hooks/useCommandMenuTelemetry'
 import { CommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
-import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
 import {
   useCommandMenuOpen,
   useResetCommandMenu,
@@ -71,35 +69,24 @@ const CommandShortcut = ({
   return null
 }
 
+// Renders `children` as its only output so they keep a stable position in the tree. As a sibling
+// of other elements, a child that switches between one element and a fragment would remount.
 function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
 
-  const legacyRouter = useLegacyRouter()
-  const isUsingLegacyRouting = !!legacyRouter
-
-  const completeNavigation = useCallback(() => {
-    setIsOpen(false)
-    resetCommandMenu()
-  }, [resetCommandMenu, setIsOpen])
-
-  const ctx = useMemo(
-    () => ({
-      onPendingEnd: new Set([completeNavigation]),
-    }),
-    [completeNavigation]
-  )
+  // Hash-only changes (e.g. Back from `/careers#positions`) aren't navigations, so ignore the fragment.
+  const path = useFramework().asPath?.split('#')[0]
+  const previousPathRef = useRef(path)
 
   useEffect(() => {
-    if (!isUsingLegacyRouting) return
+    if (previousPathRef.current === path) return
+    previousPathRef.current = path
+    setIsOpen(false)
+    resetCommandMenu()
+  }, [path, resetCommandMenu, setIsOpen])
 
-    legacyRouter.events.on('routeChangeComplete', completeNavigation)
-    return () => legacyRouter.events.off('routeChangeComplete', completeNavigation)
-  }, [isUsingLegacyRouting, legacyRouter])
-
-  return (
-    <CrossCompatRouterContext.Provider value={ctx}>{children}</CrossCompatRouterContext.Provider>
-  )
+  return children
 }
 
 interface CommandProviderProps extends PropsWithChildren {

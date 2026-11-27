@@ -1,5 +1,4 @@
-import { ChevronDown, RefreshCw, Unlink } from 'lucide-react'
-import Image from 'next/image'
+import { ChevronDownIcon, RefreshCwIcon, UnlinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -90,12 +89,13 @@ export const AccountConnections = () => {
           {isSuccess && (
             <CardContent className="flex justify-between items-center">
               <div className="flex gap-x-4 items-center">
-                <Image
+                <img
                   className={cn('dark:invert')}
                   src={`${BASE_PATH}/img/icons/github-icon.svg`}
                   width={30}
                   height={30}
-                  alt={`GitHub icon`}
+                  alt=""
+                  aria-hidden="true"
                 />
                 <div>
                   <div className="flex items-center gap-x-2">
@@ -111,7 +111,7 @@ export const AccountConnections = () => {
                 {isConnected ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button iconRight={<ChevronDown size={14} />} variant="default">
+                      <Button iconRight={<ChevronDownIcon size={14} />}>
                         <span>Manage</span>
                       </Button>
                     </DropdownMenuTrigger>
@@ -123,7 +123,7 @@ export const AccountConnections = () => {
                           handleReauthenticate()
                         }}
                       >
-                        <RefreshCw size={14} />
+                        <RefreshCwIcon size={14} />
                         <p>Re-authenticate</p>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -131,7 +131,7 @@ export const AccountConnections = () => {
                         className="space-x-2"
                         onSelect={() => setIsRemoveModalOpen(true)}
                       >
-                        <Unlink size={14} />
+                        <UnlinkIcon size={14} />
                         <p>Remove connection</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

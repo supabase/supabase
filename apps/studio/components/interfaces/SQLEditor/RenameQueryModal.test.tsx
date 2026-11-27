@@ -34,6 +34,8 @@ const createSnippet = (id: string, name: string): SnippetWithContent => ({
 
 const SNIPPET_A = createSnippet('snippet-a', 'First query')
 const SNIPPET_B = createSnippet('snippet-b', 'Second query')
+const UNTITLED_A = createSnippet('untitled-a', 'Untitled query')
+const UNTITLED_B = createSnippet('untitled-b', 'Untitled query')
 
 /** The modal renders the AI title generator, which checks for an OpenAI key when self-hosted. */
 const mockOpenAIKeyCheck = () =>
@@ -58,6 +60,11 @@ const mockUpsert = () => {
 
 const getNameInput = () => screen.getByLabelText('Name')
 
+const enterName = async (name: string) => {
+  await userEvent.clear(getNameInput())
+  await userEvent.paste(name)
+}
+
 describe('RenameQueryModal', () => {
   test('submits the new name for the selected snippet', async () => {
     mockOpenAIKeyCheck()
@@ -68,8 +75,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={vi.fn()} onComplete={onComplete} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Renamed query')
+    await enterName('Renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
 
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
@@ -85,8 +91,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={vi.fn()} onComplete={onComplete} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Renamed query')
+    await enterName('Renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
 
@@ -108,6 +113,45 @@ describe('RenameQueryModal', () => {
     expect(screen.getByRole('button', { name: 'Rename query' })).toBeDisabled()
   })
 
+  test('resets for the next snippet when both snippets share a name', async () => {
+    mockOpenAIKeyCheck()
+    const requests = mockUpsert()
+    const onComplete = vi.fn()
+
+    const { rerender } = customRender(
+      <RenameQueryModal snippet={UNTITLED_A} visible onCancel={vi.fn()} onComplete={onComplete} />
+    )
+
+    await enterName('Renamed query')
+    fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+
+    // The parent keeps the renamed snippet selected while closing the modal, then reopens it for
+    // a second snippet that still carries the same original name
+    rerender(
+      <RenameQueryModal
+        snippet={UNTITLED_A}
+        visible={false}
+        onCancel={vi.fn()}
+        onComplete={onComplete}
+      />
+    )
+    rerender(
+      <RenameQueryModal snippet={UNTITLED_B} visible onCancel={vi.fn()} onComplete={onComplete} />
+    )
+
+    await waitFor(() => expect(getNameInput()).toHaveValue('Untitled query'))
+
+    await enterName('Second renamed query')
+    fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
+
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(2))
+    expect(requests).toEqual([
+      { id: 'untitled-a', name: 'Renamed query' },
+      { id: 'untitled-b', name: 'Second renamed query' },
+    ])
+  })
+
   test('discards an abandoned edit when cancelled', async () => {
     mockOpenAIKeyCheck()
     const onCancel = vi.fn()
@@ -116,8 +160,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={onCancel} onComplete={vi.fn()} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Half-typed name')
+    await enterName('Half-typed name')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onCancel).toHaveBeenCalledOnce()
 

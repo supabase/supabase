@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteReplicationTenantParams = {
   projectRef: string
@@ -31,16 +32,12 @@ export const useDeleteReplicationTenantMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DeleteReplicationTenantData,
-    ResponseError,
-    DeleteReplicationTenantParams
-  >,
+  UseCustomMutationOptions<DeleteReplicationTenantData, StudioError, DeleteReplicationTenantParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteReplicationTenantData, ResponseError, DeleteReplicationTenantParams>({
+  return useMutation<DeleteReplicationTenantData, StudioError, DeleteReplicationTenantParams>({
     mutationFn: (vars) => deleteReplicationTenant(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -1,14 +1,14 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { uniqBy } from 'lodash'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -22,11 +22,14 @@ import {
   ScrollArea,
 } from 'ui'
 
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import {
   DatabaseFunctionsData,
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
 } from '@/data/database-functions/database-functions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -38,7 +41,6 @@ interface FunctionSelectorProps {
   value: string
   onChange: (value: string) => void
   disabled?: boolean
-  stopScrollPropagation?: boolean
   // used to filter the functions by a criteria
   filterFunction?: (func: DatabaseFunction) => boolean
   noResultsLabel?: React.ReactNode
@@ -52,26 +54,39 @@ const FunctionSelector = ({
   schema,
   value,
   onChange,
-  stopScrollPropagation = false,
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
-  const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { refetch: refetchPermissions } = usePermissionsQueryV2({ enabled: false })
   const {
     data,
-    error,
-    isPending: isLoading,
-    isError,
+    error: queryError,
+    isPending: isLoadingFunctions,
+    isError: isQueryError,
     isSuccess,
     refetch,
-  } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
+  const isLoading =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingFunctions)
+  const isDenied = readGrant.status === 'denied'
+  const isPermissionsError = readGrant.status === 'error'
+  const isError = isQueryError || isPermissionsError
+  const errorMessage = isPermissionsError ? readGrant.error.message : queryError?.message
 
   const filteredFunctions = (data ?? [])
     .filter((func) => schema && func.schema === schema)
@@ -86,13 +101,26 @@ const FunctionSelector = ({
         </Button>
       )}
 
+      {showError && isDenied && (
+        <Alert variant="warning" className="px-3! py-3!">
+          <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
+          <AlertDescription className="text-xs">
+            You need additional permissions to view database functions
+          </AlertDescription>
+        </Alert>
+      )}
+
       {showError && isError && (
         <Alert variant="warning" className="px-3! py-3!">
           <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
 
-          <AlertDescription className="text-xs mb-2">Error: {error.message}</AlertDescription>
+          <AlertDescription className="text-xs mb-2">Error: {errorMessage}</AlertDescription>
 
-          <Button variant="default" size="tiny" onClick={() => refetch()}>
+          <Button
+            variant="default"
+            size="tiny"
+            onClick={() => (isPermissionsError ? refetchPermissions() : refetch())}
+          >
             Reload functions
           </Button>
         </Alert>
@@ -101,33 +129,27 @@ const FunctionSelector = ({
       {isSuccess && (
         <Popover open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger asChild>
-            <Button
+            <ComboboxTrigger
               size={size}
               disabled={!!disabled}
-              variant="default"
-              className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-              iconRight={
-                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-              }
+              aria-expanded={open}
+              data-state={open ? 'open' : 'closed'}
+              className={size === 'small' ? 'py-1.5' : undefined}
             >
               {value ? (
-                <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">function:</p>
-                  <p className="text-foreground">{value}</p>
-                </div>
+                <span className="flex w-full gap-1">
+                  <span className="text-foreground-lighter">function:</span>
+                  <span className="text-foreground">{value}</span>
+                </span>
               ) : (
-                <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Select a function</p>
-                </div>
+                <span className="flex w-full gap-1 text-foreground-lighter">Select a function</span>
               )}
-            </Button>
+            </ComboboxTrigger>
           </PopoverTrigger>
           <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command>
               <CommandInput placeholder="Search functions..." />
-              <CommandList
-                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
-              >
+              <CommandList>
                 <CommandEmpty>No functions found</CommandEmpty>
                 <CommandGroup>
                   <ScrollArea className={(functions || []).length > 7 ? 'h-[210px]' : ''}>
@@ -156,7 +178,7 @@ const FunctionSelector = ({
                       >
                         <span>{func.name}</span>
                         {value === func.name && (
-                          <Check className="text-brand" size={14} strokeWidth={2} />
+                          <CheckIcon className="text-primary" size={14} strokeWidth={2} />
                         )}
                       </CommandItem>
                     ))}
@@ -164,25 +186,14 @@ const FunctionSelector = ({
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push(`/project/${ref}/database/functions`)
-                    }}
-                    onClick={() => setOpen(false)}
+                  <CommandItemLink
+                    href={`/project/${ref}/database/functions`}
+                    className="cursor-pointer w-full gap-2"
+                    onSelect={() => setOpen(false)}
                   >
-                    <Link
-                      href={`/project/${ref}/database/functions`}
-                      onClick={() => {
-                        setOpen(false)
-                      }}
-                      className="w-full flex items-center gap-2"
-                    >
-                      <Plus size={14} strokeWidth={1.5} />
-                      <p>New function</p>
-                    </Link>
-                  </CommandItem>
+                    <PlusIcon size={14} strokeWidth={1.5} />
+                    <p>New function</p>
+                  </CommandItemLink>
                 </CommandGroup>
               </CommandList>
             </Command>

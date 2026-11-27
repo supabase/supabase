@@ -1,4 +1,9 @@
 import {
+  createFeedbackOperations,
+  type FeedbackOperationsOptions,
+  type SupabasePlatform,
+} from '@supabase/mcp-server-supabase'
+import {
   ApiKey,
   ApiKeyType,
   ApplyMigrationOptions,
@@ -6,6 +11,7 @@ import {
   DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
+  FeedbackOperations,
   QueryLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 import { isFeatureEnabled, type Feature } from 'common/enabled-features'
@@ -18,7 +24,7 @@ import { retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { ResponseError } from '@/types'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -106,7 +112,7 @@ export function getDevelopmentOperations({
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })
 
-      if (response instanceof ResponseError) {
+      if (isStudioError(response)) {
         throw response
       }
 
@@ -186,5 +192,36 @@ export function getDebuggingOperations({
 
       return data.filter((lint) => lint.categories.includes('PERFORMANCE'))
     },
+  }
+}
+
+export type GetFeedbackOperationsOptions = Pick<FeedbackOperationsOptions, 'fetch'>
+
+export function getFeedbackOperations({
+  fetch,
+}: GetFeedbackOperationsOptions = {}): FeedbackOperations {
+  const feedback = createFeedbackOperations({ fetch })
+
+  // Self-hosted project refs aren't Supabase projects, so feedback is sent without one.
+  return {
+    submit: ({ projectId: _projectId, ...input }) => feedback.submit(input),
+    delete: ({ projectId: _projectId, ...input }) => feedback.delete(input),
+  }
+}
+
+export type GetSelfHostedPlatformOptions = {
+  headers?: HeadersInit
+}
+
+// Self-hosted Studio has no notebooks. Without `notebooks` the MCP server registers no notebook tools.
+// https://github.com/supabase/mcp/blob/8af504280d5689537c481924f8a11222ae0ceaeb/packages/mcp-server-supabase/src/server.ts#L374
+export function getSelfHostedPlatform({
+  headers,
+}: GetSelfHostedPlatformOptions): Omit<SupabasePlatform, 'notebooks'> {
+  return {
+    database: getDatabaseOperations({ headers }),
+    development: getDevelopmentOperations({ headers }),
+    debugging: getDebuggingOperations({ headers }),
+    feedback: getFeedbackOperations(),
   }
 }

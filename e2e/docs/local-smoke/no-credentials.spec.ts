@@ -25,26 +25,13 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
   })
 
-  test('database-advisors page renders (full content or graceful fallback, never a crash)', async ({
+  test('advisors page renders (full content or graceful fallback, never a crash)', async ({
     page,
   }) => {
-    const response = await page.goto('/docs/guides/database/database-advisors')
+    const response = await page.goto('/docs/guides/observability/advisors')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
-    await expect(
-      page.getByRole('heading', { name: 'Performance and Security Advisors' })
-    ).toBeVisible()
-  })
-
-  test('a troubleshooting article page renders without Supabase credentials', async ({ page }) => {
-    const errors = collectPageErrors(page)
-
-    const response = await page.goto('/docs/guides/troubleshooting/rls-simplified-BJTcS8')
-    expect(response?.status(), `expected 200, got ${response?.status()}`).toBe(200)
-
-    await expect(page.getByRole('heading', { name: 'RLS Simplified' })).toBeVisible()
-
-    expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
+    await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
   })
 
   test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {

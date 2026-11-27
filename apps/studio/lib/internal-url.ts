@@ -23,6 +23,14 @@
 // URLs are normalised to a relative path. Cross-origin URLs are left
 // alone so TanStack's external-link path handles them.
 //
+// Same-origin is not enough on its own, though. Next only treats an
+// *absolute* URL as local when it is same-origin AND under the basePath
+// (`isLocalURL` + `hasBasePath`). With `basePath: '/dashboard'` on
+// supabase.com, `https://supabase.com/docs/...` is a different app on the
+// same origin. Normalising it to `/docs/...` would make TanStack prefix its
+// basepath (`/dashboard/docs/...`), so it is returned untouched like a
+// cross-origin URL. Relative inputs are always local, as in Next.
+//
 // basePath quirk: TanStack's `to` is **basepath-relative** — given
 // `basepath: '/dashboard'` and `to: '/foo'`, TanStack builds the href
 // `/dashboard/foo`. Next's contract treats `href` as the **full path
@@ -36,6 +44,7 @@
 // the router shim's pre-stripped targets — pass through unchanged, since
 // no studio route pathname itself starts with the basePath segment.)
 
+import { BASE_PATH } from './constants'
 import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 
 // Inlined at build time via Vite's `define`. Must agree with Vite `base`
@@ -47,6 +56,17 @@ export interface SplitInternalUrlResult {
   to: string
   search?: SearchRecord
   hash?: string
+}
+
+function hasBasePath(pathname: string): boolean {
+  return pathname === NEXT_PUBLIC_BASE_PATH || pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`)
+}
+
+// True for inputs that carry their own origin: a scheme (`https:`,
+// `mailto:`) or protocol-relative (`//host`). This is how callers tell an
+// external `to` returned by `splitInternalUrl` apart from an internal path.
+export function isAbsoluteUrl(url: string): boolean {
+  return url.startsWith('//') || /^[a-z][a-z\d+.-]*:/i.test(url)
 }
 
 export function splitInternalUrl(url: string): SplitInternalUrlResult {
@@ -79,13 +99,15 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
   }
 
   let pathname = parsed.pathname
+  // Same-origin absolute URL outside the basePath → another app on this
+  // origin (e.g. `/docs`), so leave it external.
+  if (NEXT_PUBLIC_BASE_PATH && isAbsoluteUrl(url) && !hasBasePath(pathname)) {
+    return { to: url }
+  }
   // Strip a leading basePath segment so we hand TanStack a basepath-
   // relative path. Match `/dashboard` exactly OR `/dashboard/...`; don't
   // strip a coincidental prefix like `/dashboard-other`.
-  if (
-    NEXT_PUBLIC_BASE_PATH &&
-    (pathname === NEXT_PUBLIC_BASE_PATH || pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
-  ) {
+  if (NEXT_PUBLIC_BASE_PATH && hasBasePath(pathname)) {
     pathname = pathname.slice(NEXT_PUBLIC_BASE_PATH.length) || '/'
   }
 
@@ -101,4 +123,45 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
     search: Object.keys(search).length > 0 ? search : undefined,
     hash,
   }
+}
+
+// Next's pages-router exposes `router.pathname` as the route *pattern*
+// (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
+// route id uses `$param` — convert so legacy code that does
+// `router.pathname.endsWith('/sql/[id]')` keeps working.
+//
+// Also strip the trailing slash TanStack appends to index-route ids
+// (`/project/$ref/`). Next's pages-router never includes a trailing
+// slash, so consumers like `router.pathname.split('/')[3]` (used in
+// the project sidebar's active-route check) silently see an empty
+// string for index pages instead of `undefined`, and the home icon
+// stops highlighting. The root path stays `/` either way.
+export function toRoutePattern(routeId: string): string {
+  // Strip TanStack's layout-route segments — they're prefixed with `_`
+  // (`_app`, `_auth`, etc.) and don't appear in the URL or in Next's
+  // `router.pathname`. Without this, downstream code that derives a path
+  // segment from `pathname.split('/')[N]` indexes into the wrong slot —
+  // e.g. Sidebar uses index 3 to pick the active route, expecting
+  // `/org/[slug]/general` but receiving `/_app/org/[slug]/general` and
+  // ending up with `[slug]` instead of `general`.
+  const withoutLayoutSegments = routeId.replace(/\/_[a-zA-Z0-9_]+(?=\/|$)/g, '')
+  const withBracketParams = withoutLayoutSegments.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+  if (withBracketParams === '' || withBracketParams === '/') return '/'
+  return withBracketParams.replace(/\/$/, '')
+}
+
+// Prefix an app-served asset path with the basePath, as Next's image
+// optimizer URL does. Full URLs, already-prefixed and relative paths are
+// returned unchanged.
+export function applyBasePath(src: string): string {
+  if (!BASE_PATH) return src
+  // Schemes (http:, https:, data:, blob:) and protocol-relative URLs.
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
+  // Already prefixed — happens when callers manually prepend BASE_PATH
+  // (several studio components do this today).
+  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
+  // Absolute app path — prepend.
+  if (src.startsWith('/')) return `${BASE_PATH}${src}`
+  // Relative path — leave alone.
+  return src
 }

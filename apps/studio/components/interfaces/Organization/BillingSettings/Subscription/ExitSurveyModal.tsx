@@ -191,9 +191,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" onClick={() => onClose()}>
-            Cancel
-          </Button>
+          <Button onClick={() => onClose()}>Cancel</Button>
           <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
             <Button
               variant="danger"

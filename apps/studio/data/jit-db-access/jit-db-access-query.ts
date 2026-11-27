@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { jitDbAccessKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type JitDbAccessVariables = { projectRef?: string }
 
@@ -15,6 +16,7 @@ async function getJitDbAccessConfiguration(
   const { data, error } = await get(`/v1/projects/{ref}/jit-access`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -25,9 +27,9 @@ type JitDbAccessData = Awaited<ReturnType<typeof getJitDbAccessConfiguration>>
 
 export const useJitDbAccessQuery = <TData = JitDbAccessData>(
   { projectRef }: JitDbAccessVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<JitDbAccessData, ResponseError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<JitDbAccessData, StudioError, TData> = {}
 ) =>
-  useQuery<JitDbAccessData, ResponseError, TData>({
+  useQuery<JitDbAccessData, StudioError, TData>({
     queryKey: jitDbAccessKeys.list(projectRef),
     queryFn: ({ signal }) => getJitDbAccessConfiguration({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

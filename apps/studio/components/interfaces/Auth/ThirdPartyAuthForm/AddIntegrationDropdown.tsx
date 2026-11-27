@@ -1,5 +1,4 @@
-import { ChevronDown } from 'lucide-react'
-import Image from 'next/image'
+import { ChevronDownIcon } from 'lucide-react'
 import {
   Button,
   cn,
@@ -42,7 +41,7 @@ const ProviderDropdownItem = ({
       className={cn('flex items-center gap-x-2 p-2', disabled && 'cursor-not-allowed')}
       disabled={disabled}
     >
-      <Image src={getIntegrationTypeIcon(type)} width={16} height={16} alt={`${type} icon`} />
+      <img src={getIntegrationTypeIcon(type)} width={16} height={16} alt="" aria-hidden="true" />
       <span>{getIntegrationTypeLabel(type)}</span>
     </DropdownMenuItem>
   )
@@ -58,7 +57,7 @@ export const AddIntegrationDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDownIcon />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
@@ -70,6 +69,7 @@ export const AddIntegrationDropdown = ({
         <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="custom" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

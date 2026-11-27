@@ -21,9 +21,7 @@ export default function PageSectionDemo() {
             </PageSectionDescription>
           </PageSectionSummary>
           <PageSectionAside>
-            <Button variant="default" size="small">
-              Action
-            </Button>
+            <Button size="small">Action</Button>
           </PageSectionAside>
         </PageSectionMeta>
         <PageSectionContent>

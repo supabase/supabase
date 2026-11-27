@@ -1,4 +1,4 @@
-import { Activity, BookOpen, ChevronRight, Mail, Wrench } from 'lucide-react'
+import { ActivityIcon, BookOpenIcon, ChevronRightIcon, MailIcon, WrenchIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
@@ -79,13 +79,13 @@ export const HelpOptionsList = ({
       onClick: onAssistantClick,
     },
     docs: {
-      media: <BookOpen strokeWidth={1.5} size={14} />,
+      media: <BookOpenIcon strokeWidth={1.5} size={14} />,
       title: 'Docs',
       description: 'Browse guides, references, and product documentation.',
       href: `${DOCS_URL}/`,
     },
     troubleshooting: {
-      media: <Wrench strokeWidth={1.5} size={14} />,
+      media: <WrenchIcon strokeWidth={1.5} size={14} />,
       title: 'Troubleshooting',
       description: 'Find fixes for common platform issues and errors.',
       href: `${DOCS_URL}/guides/troubleshooting?products=platform`,
@@ -97,13 +97,13 @@ export const HelpOptionsList = ({
       href: DISCORD_URL,
     },
     status: {
-      media: <Activity strokeWidth={1.5} size={14} />,
+      media: <ActivityIcon strokeWidth={1.5} size={14} />,
       title: 'Supabase status',
       description: 'Check incidents, maintenance, and uptime updates.',
       href: STATUS_URL,
     },
     support: {
-      media: <Mail strokeWidth={1.5} size={14} />,
+      media: <MailIcon strokeWidth={1.5} size={14} />,
       title: 'Contact support',
       description: 'Reach support for account and platform issues.',
       onClick: handleSupportClick,
@@ -121,7 +121,7 @@ export const HelpOptionsList = ({
               key={id}
               className="!border-b"
               media={option.media}
-              meta={<ChevronRight strokeWidth={1.5} size={16} />}
+              meta={<ChevronRightIcon strokeWidth={1.5} size={16} />}
               href={option.href}
               target="_blank"
               rel="noreferrer noopener"

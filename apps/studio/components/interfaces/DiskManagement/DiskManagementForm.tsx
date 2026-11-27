@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -35,7 +34,8 @@ import {
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
-import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
+import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
+import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
   useDiskAttributesQuery,
@@ -52,17 +52,33 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
   useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
-export function DiskManagementForm({ chartsClassName }: { chartsClassName?: string } = {}) {
+export function DiskManagementForm({
+  chartsClassName,
+  overviewExtra,
+  beforeScaling,
+  recommendedCompute,
+  onRecommendedComputeApplied,
+}: {
+  chartsClassName?: string
+  /** Rendered above usage charts in the overview block (for example topology). */
+  overviewExtra?: ReactNode
+  /** Rendered between overview and the Scaling section (for example read replicas). */
+  beforeScaling?: ReactNode
+  recommendedCompute?: RecommendedComputeForReadReplicas | null
+  onRecommendedComputeApplied?: () => void
+} = {}) {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -72,6 +88,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
   const storageSettingsRef = useRef<HTMLDivElement>(null)
   const computeSettingsRef = useRef<HTMLDivElement>(null)
   const diskSizeSettingsRef = useRef<HTMLDivElement>(null)
+  const mainScrollContainer = useMainScrollContainer()
 
   const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
 
@@ -84,13 +101,10 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const isHighAvailability = useIsHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-      resource: {
-        project_id: project?.id,
-      },
-    })
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE)
 
   const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
     'instances.compute_update_available_sizes'
@@ -129,6 +143,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
     : undefined
+  const { limits: projectDiskLimits, isPerInstance } = useProjectDiskLimits()
 
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
@@ -150,6 +165,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
         isSpendCapEnabled,
+        currentComputeSize: computeSize,
+        currentInstanceLimits: isPerInstance ? projectDiskLimits : undefined,
       })
     ),
     defaultValues,
@@ -190,9 +207,10 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    modifiedComputeSize &&
-    !isSpendCapEnabled &&
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    isHighAvailability ||
+    (modifiedComputeSize &&
+      !isSpendCapEnabled &&
+      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize))
 
   const watchedTotalSize = useWatch({ control: form.control, name: 'totalSize' }) ?? 0
   const watchedStorageType = useWatch({ control: form.control, name: 'storageType' })
@@ -201,7 +219,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
     DISK_LIMITS[DiskType.GP3].minIops
   )
   // Suggested target when prompting a resize, sits above the floor so users
-  // aren't pinned at the minimum between disk-config modifications.
+  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
   const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
   const isDiskTooSmallForCustomIops =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
@@ -212,12 +230,14 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
+    isHighAvailability ||
     !canUpdateDiskConfiguration ||
     !isAws
 
-  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled || isHighAvailability
 
-  const disableComputeInputs = isPlanUpgradeRequired
+  // Compute resizing is not supported for High Availability projects during Alpha
+  const disableComputeInputs = isPlanUpgradeRequired || isHighAvailability
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
@@ -289,7 +309,10 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
         })
       }
 
-      if (payload.computeSize !== form.formState.defaultValues?.computeSize) {
+      if (
+        !isHighAvailability &&
+        payload.computeSize !== form.formState.defaultValues?.computeSize
+      ) {
         await updateSubscriptionAddon({
           projectRef: projectRef,
           // cast variant to AddonVariantId to satisfy type
@@ -349,12 +372,70 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
   }, [modifiedComputeSize, form, isDialogOpen, project])
 
   useEffect(() => {
-    // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isDiskAttributesSuccess || isSuccess) {
+    // Initialize field values properly when data has been loaded, preserving any user changes.
+    // Disk attribute queries never run for High Availability projects (non-AWS cloud provider),
+    // so the project loading is the initialization signal there.
+    if (isDiskAttributesSuccess || isSuccess || isHighAvailability) {
       form.reset(defaultValues, {})
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isDiskAttributesSuccess])
+  }, [isSuccess, isDiskAttributesSuccess, isHighAvailability])
+
+  // Apply the recommendation only after the sheet's close lifecycle has completed.
+  useEffect(() => {
+    // The compute add-on supplies the option. Keep the recommendation pending
+    // until disk attributes have initialised the form, so a later reset cannot
+    // overwrite it. Other infrastructure requests are unrelated to this handoff.
+    if (!recommendedCompute || !isAddonsSuccess || isHighAvailability) return
+
+    form.setValue('computeSize', recommendedCompute, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    void form.trigger(['provisionedIOPS', 'throughput'])
+    if (isDiskAttributesSuccess) onRecommendedComputeApplied?.()
+
+    const element = computeSettingsRef.current
+    if (!element) return
+
+    element
+      .querySelector<HTMLElement>(`[id="${recommendedCompute}"]`)
+      ?.focus({ preventScroll: true })
+
+    if (!mainScrollContainer) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
+    const scrollMarginTop = Number.parseFloat(getComputedStyle(element).scrollMarginTop) || 0
+    const top =
+      mainScrollContainer.scrollTop +
+      element.getBoundingClientRect().top -
+      mainScrollContainer.getBoundingClientRect().top -
+      scrollMarginTop
+
+    mainScrollContainer.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }, [
+    form,
+    isAddonsSuccess,
+    isDiskAttributesSuccess,
+    isHighAvailability,
+    mainScrollContainer,
+    onRecommendedComputeApplied,
+    recommendedCompute,
+  ])
+
+  // Deep links from billing / UpgradePlanButton (e.g. #compute).
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.location.hash !== '#compute') return
+
+    const timeoutId = setTimeout(() => {
+      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [])
 
   useEffect(() => {
     const fieldErrors = Object.keys(errors)
@@ -392,7 +473,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
         <PageContainer size="default" className="pb-16">
           <PageSection>
             <PageSectionContent>
-              <ComputeAndDiskUsageCharts className={chartsClassName} />
+              {overviewExtra}
+              <ComputeAndDiskUsageCharts className={cn(overviewExtra && 'mt-6', chartsClassName)} />
             </PageSectionContent>
           </PageSection>
 
@@ -419,6 +501,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
               />
             </div>
           )}
+
+          {beforeScaling}
 
           <PageSection>
             <PageSectionMeta>
@@ -489,24 +573,13 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
               transition={{ duration: 0.1, delay: 0.2 }}
               className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
             >
-              <div
-                className={cn(
-                  'mx-auto w-full max-w-[1200px]',
-                  PADDING_CLASSES,
-                  'flex items-center justify-end gap-3'
-                )}
-              >
+              <PageContainer className="flex items-center justify-end gap-3">
                 <BillingChangeBadge
                   show={isDirty}
                   beforePrice={totalBeforePrice}
                   afterPrice={totalAfterPrice}
                 />
-                <Button
-                  variant="default"
-                  onClick={() => form.reset()}
-                  disabled={!isDirty}
-                  size="medium"
-                >
+                <Button onClick={() => form.reset()} disabled={!isDirty} size="medium">
                   Cancel
                 </Button>
                 <DiskManagementReviewAndSubmitDialog
@@ -519,7 +592,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
                   setIsDialogOpen={setIsDialogOpen}
                   message={message}
                 />
-              </div>
+              </PageContainer>
             </motion.div>
           ) : null}
         </AnimatePresence>

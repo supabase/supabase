@@ -9,7 +9,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       language: 'bash',
       code: `
 REACT_APP_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile or desktop apps>'}
+REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? 'your-publishable-key'}
         `,
     },
     {
@@ -19,9 +19,9 @@ REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key 
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_KEY
+const supabaseKey = process.env.REACT_APP_SUPABASE_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseKey)
 `,
     },
     {

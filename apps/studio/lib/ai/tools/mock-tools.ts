@@ -1,9 +1,19 @@
 import assert from 'node:assert'
-import { tool, type ToolExecutionOptions, type ToolSet } from 'ai'
+import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
-import { getStudioTools } from '../tools/studio-tools'
-import { getNotebookTools } from './notebook-tools'
+import { createTool as createCreateNotebookTool } from './create-notebook.server'
+import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
+import { createTool as createDeployEdgeFunctionTool } from './deploy-edge-function.server'
+import { createTool as createExecuteSqlTool } from './execute-sql.server'
+import { createTool as createGetNotebookTool } from './get-notebook.server'
+import { createTool as createListDatabasesTool } from './list-databases.server'
+import { createTool as createListNotebooksTool } from './list-notebooks.server'
+import { createTool as createLoadKnowledgeTool } from './load-knowledge.server'
+import { createTool as createRenameChatTool } from './rename-chat.server'
+import { createTool as createRunNotebookTool } from './run-notebook.server'
+import { createTool as createUpdateNotebookTool } from './update-notebook.server'
+import { createTool as createUpdateOptInLevelTool } from './update-opt-in-level.server'
 import {
   applyNotebookOperations,
   describeNotebookOperationError,
@@ -15,7 +25,8 @@ import type {
   CellWire,
   NotebookWire,
 } from '@/data/content/notebooks/notebook-schema'
-import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -92,7 +103,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Materialized views in API schema can bypass RLS. Move them to private schema.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
   },
   {
     id: '0031_functions_no_rls_guard',
@@ -100,7 +111,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Function api.health_check should verify auth context before querying tables.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
   },
   {
     id: '1012_slow_query',
@@ -178,18 +189,18 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
       cells: [
         {
           _tag: 'markdown_cell',
-          id: 'c1a0b8e2-3f47-4a52-9d18-6b0c4e2f7a91',
+          _id: 'c1a0b8e2-3f47-4a52-9d18-6b0c4e2f7a91',
           text: '# Auth health\n\nRun this daily: signup volume, then anything the auth service logged as an error.',
         },
         {
           _tag: 'database_cell',
-          id: 'd2b1c9f3-4a58-4b63-8e29-7c1d5f3a8b02',
+          _id: 'd2b1c9f3-4a58-4b63-8e29-7c1d5f3a8b02',
           title: 'Signups per day',
           sql: "select date_trunc('day', created_at) as day, count(*) as signups\nfrom auth.users\ngroup by day\norder by day desc",
           row_limit: 30,
           chart: {
             x_column: 'day',
-            y_columns: ['signups'],
+            y_series: ['signups'],
             cumulative: false,
             type: 'line',
             scale: 'log',
@@ -198,7 +209,7 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
         },
         {
           _tag: 'log_cell',
-          id: 'e3c2d0a4-5b69-4c74-9f3a-8d2e6a4b9c13',
+          _id: 'e3c2d0a4-5b69-4c74-9f3a-8d2e6a4b9c13',
           title: 'Auth errors',
           sql: "select timestamp, event_message\nfrom auth_logs\nwhere event_message like '%error%'\norder by timestamp desc",
           time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
@@ -216,12 +227,12 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
       cells: [
         {
           _tag: 'markdown_cell',
-          id: 'f4d3e1b5-7c80-4d85-8a4b-9e3f7b5c0d24',
+          _id: 'f4d3e1b5-7c80-4d85-8a4b-9e3f7b5c0d24',
           text: '# Edge function errors\n\nFailures from the last day, newest first.',
         },
         {
           _tag: 'log_cell',
-          id: '0a5e4f2c-8d91-4e96-9b5c-af408c6d1e35',
+          _id: '0a5e4f2c-8d91-4e96-9b5c-af408c6d1e35',
           title: 'hello-world failures',
           sql: "select timestamp, event_message\nfrom function_edge_logs\nwhere event_message like '%TypeError%'\norder by timestamp desc",
           time_range: { _tag: 'relative_time_range', unit: 'day', amount: 1 },
@@ -232,13 +243,31 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
 ]
 
 function createMockedStudioTools() {
-  const studioTools = getStudioTools()
+  // Pinned to `schema` so the model sees the same execute_sql output it always has in evals,
+  // whatever level the eval runs at. Evals don't yet use one level for every tool and for replay.
+  const ctx = { aiOptInLevel: 'schema' } as const
+  const studioTools = {
+    execute_sql: createExecuteSqlTool(ctx),
+    deploy_edge_function: createDeployEdgeFunctionTool(ctx),
+    rename_chat: createRenameChatTool(ctx),
+    load_knowledge: createLoadKnowledgeTool(ctx),
+  }
 
   return Object.fromEntries(
     Object.entries(studioTools).map(([name, baseTool]) => {
       // Always mock execute_sql and deploy_edge_function with needsApproval disabled
       if (name === 'execute_sql') {
-        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+        return [
+          name,
+          {
+            ...baseTool,
+            needsApproval: false,
+            execute: async () => ({
+              rows: [] as unknown[],
+              optInLevel: 'schema_and_log_and_data' as const,
+            }),
+          },
+        ]
       }
       if (name === 'deploy_edge_function') {
         return [
@@ -363,21 +392,22 @@ function createMockNotebookStore() {
 
   const assignCellIds = (cells: OperationResultCell[]): CellWire[] =>
     cells.map((cell): CellWire => {
-      if ('id' in cell) return cell
-      const id = `mock-cell-${++cellCount}`
+      if ('_id' in cell) return cell
+      const _id = `mock-cell-${++cellCount}`
       switch (cell._tag) {
         case 'markdown_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
         case 'database_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
         case 'log_cell':
-          return { ...cell, id }
+          return { ...cell, _id }
       }
     })
 
   return {
     list: () => [...notebooks.values()],
     get: (id: string) => notebooks.get(id),
+    delete: (id: string) => notebooks.delete(id),
     create: ({
       name,
       description,
@@ -411,14 +441,52 @@ function createMockNotebookStore() {
 
 type MockNotebookStore = ReturnType<typeof createMockNotebookStore>
 
-// All four notebook tools are real, locally-defined ai-SDK tools, so wrap them and
+const MOCK_DATABASES_DATA = [
+  {
+    identifier: 'mock-project-ref',
+    is_primary: true,
+    region: 'us-east-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+  {
+    identifier: 'mock-project-ref-replica-1',
+    is_primary: false,
+    region: 'us-west-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+]
+
+// All notebook tools are real, locally-defined ai-SDK tools, so wrap them and
 // override only execute/needsApproval — evals must validate the model's arguments
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_notebooks, get_notebook, create_notebook, update_notebook } = getNotebookTools()
+  const ctx = { aiOptInLevel: 'schema_and_log_and_data' } as const
+  const {
+    list_databases,
+    list_notebooks,
+    get_notebook,
+    run_notebook,
+    create_notebook,
+    update_notebook,
+    delete_notebook,
+  } = {
+    list_databases: createListDatabasesTool(ctx),
+    list_notebooks: createListNotebooksTool(ctx),
+    get_notebook: createGetNotebookTool(ctx),
+    run_notebook: createRunNotebookTool(ctx),
+    create_notebook: createCreateNotebookTool(ctx),
+    update_notebook: createUpdateNotebookTool(ctx),
+    delete_notebook: createDeleteNotebookTool(ctx),
+  }
 
   return {
+    list_databases: {
+      ...list_databases,
+      execute: async (_args: object, _options: ToolExecutionOptions<unknown>) => ({
+        databases: MOCK_DATABASES_DATA,
+      }),
+    },
     list_notebooks: {
       ...list_notebooks,
       execute: async (
@@ -453,6 +521,39 @@ function createMockNotebookTools(store: MockNotebookStore) {
           visibility: notebook.visibility,
           updated_at: notebook.updated_at,
           cells: notebook.content.cells,
+        }
+      },
+    },
+    run_notebook: {
+      ...run_notebook,
+      // The eval harness cannot answer approval gates. Nothing executes here; return a
+      // deterministic empty result for each query cell in notebook order.
+      needsApproval: false,
+      execute: async (
+        { id }: { id: string; expected_updated_at: string },
+        _options: ToolExecutionOptions<unknown>
+      ) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        return {
+          id,
+          name: notebook.name,
+          updated_at: notebook.updated_at,
+          optInLevel: 'schema_and_log_and_data' as const,
+          cells: notebook.content.cells.flatMap((cell) =>
+            cell._tag === 'markdown_cell'
+              ? []
+              : [
+                  {
+                    cell_id: cell._id,
+                    title: cell.title?.trim() || 'Untitled query',
+                    source: cell._tag === 'log_cell' ? ('logs' as const) : ('database' as const),
+                    status: 'success' as const,
+                    rows: [],
+                  },
+                ]
+          ),
         }
       },
     },
@@ -505,6 +606,18 @@ function createMockNotebookTools(store: MockNotebookStore) {
         return { id, name: notebook.name }
       },
     },
+    delete_notebook: {
+      ...delete_notebook,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async ({ id }: { id: string }, _options: ToolExecutionOptions<unknown>) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        store.delete(id)
+        return { id, name: notebook.name }
+      },
+    },
   }
 }
 
@@ -517,33 +630,20 @@ export type MockToolOverrides = {
  * These mirror tool names used in prompts so the model can call them,
  * but return stable, static data for repeatable tests.
  *
- * Note: search_docs uses the real implementation
+ * Note: search_docs uses the real implementation.
  */
-export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
+export async function getMockTools(
+  overrides: MockToolOverrides | undefined,
+  aiOptInLevel: AiOptInLevel = 'schema_and_log_and_data'
+) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
-  // Every tool here is a deterministic mock except `search_docs`, which uses the
-  // real implementation. We source it from an in-process MCP server directly
-  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
-  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
-  // needs no live remote endpoint or real access token. See AI-897 for how to
-  // point evals at the remote MCP server instead.
-  const mcpClient = await createInProcessSupabaseMCPClient({
-    accessToken: 'mock-access-token',
-    projectRef: 'mock-project-ref',
-  })
-  // The caller owns this signal and aborts it once generation is done, which
-  // closes the client opened here (search_docs executes during generation, so
-  // the connection must stay open until then).
-  signal.addEventListener('abort', () => void mcpClient.close().catch(() => {}), { once: true })
+  const search_docs = await createSearchDocsTool()
 
-  const { search_docs } = (await mcpClient.tools()) as ToolSet
-
-  assert(search_docs, 'search_docs tool not available from MCP server')
-
-  return {
+  const tools = {
     ...mockedStudioTools,
+    update_opt_in_level: createUpdateOptInLevelTool({ aiOptInLevel }),
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),
@@ -553,4 +653,8 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
     list_policies: createMockListPoliciesTool(),
     ...createMockNotebookTools(notebookStore),
   }
+
+  assert(tools.search_docs, 'search_docs tool is missing from the eval harness')
+
+  return tools
 }

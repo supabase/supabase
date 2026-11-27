@@ -22,7 +22,7 @@ npx @tanstack/cli@latest create my-app
 
 ## 5. Install the Supabase client libraries
 
-Navigate to the TanStack Start app and install `supabase-js` and `@supabase/ssr`, the helper package that manages cookie-based sessions for server-side rendering.
+Navigate to the TanStack Start app and install `supabase-js` and `@supabase/ssr`, the helper package that manages cookie-based sessions for [server-side rendering](/docs/guides/auth/server-side).
 
 ```bash
 cd my-app && npm install @supabase/supabase-js @supabase/ssr
@@ -38,7 +38,7 @@ Create a `.env.local` file in the root of your project and populate it with your
   </a>
 </Button>
 
-```text name=.env.local
+```dotenv name=.env.local
 VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
@@ -154,7 +154,7 @@ npm run dev
 
 ## Next steps
 
-- Learn how to [protect routes and check sessions](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=tanstack) with the server client, or drop in a complete [login and sign-up flow](/library/docs/tanstack/password-based-auth) from Supabase Library
+- Learn how to [protect routes and check sessions](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=tanstack) with the server client, or drop in a complete [sign-in and sign-up flow](/library/docs/tanstack/password-based-auth) from Supabase Library
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
 - Explore [drop-in UI components](/ui) for your Supabase app

@@ -8,47 +8,48 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { ExceedFreeProjectLimitMembers } from '@/components/ui/ExceedFreeProjectLimitMembers'
+import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { pluralize } from '@/lib/helpers'
 
 export interface MembersExceedLimitModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalProps) => {
+export const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const slug = selectedOrganization?.slug
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: visible }
   )
+  const { data: orgMembers } = useOrganizationMembersQuery({ slug }, { enabled: visible })
+  const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
 
   return (
     <AlertDialog open={visible} onOpenChange={onClose}>
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Your organization has members who have exceeded their free project limits
-          </AlertDialogTitle>
+          <AlertDialogTitle>Unable to downgrade organization</AlertDialogTitle>
           <AlertDialogDescription>
             <div className="flex flex-col space-y-2">
               <p className="text-sm text-foreground-light">
-                The following members have reached their maximum limits for the number of active
-                free plan projects within organizations where they are an administrator or owner:
+                Downgrading this organization would cause {membersExceededLimit?.length}{' '}
+                {pluralize(membersExceededLimit?.length ?? 0, 'member')} to exceed the limit of{' '}
+                <span className="text-foreground">2 active Free Plan projects</span> per member
+                across all organizations.
               </p>
-              <ul className="pl-5 text-sm list-disc text-foreground-light">
-                {(membersExceededLimit || []).map((member, idx: number) => (
-                  <li key={`member-${idx}`}>
-                    {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
-                    free projects)
-                  </li>
-                ))}
-              </ul>
-              <p className="text-sm text-foreground-light">
-                These members will need to either delete, pause, or upgrade one or more of these
-                projects before you're able to downgrade this project.
-              </p>
+
+              <ExceedFreeProjectLimitMembers membersExceededLimit={membersExceededLimit ?? []} />
+
+              <FreeProjectLimitActions
+                goal="downgrade to the Free Plan"
+                hasMultipleMembers={hasMultipleMembers}
+              />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -61,5 +62,3 @@ const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalPr
     </AlertDialog>
   )
 }
-
-export default MembersExceedLimitModal

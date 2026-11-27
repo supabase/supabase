@@ -17,6 +17,18 @@ export const appendHighAvailabilitySslParams = (uri: string) =>
     ? uri
     : appendConnectionStringParams(uri, HIGH_AVAILABILITY_SSL_PARAMS)
 
+/**
+ * The Multigres read-only load balancer listens on this port on the same host
+ * as the primary database.
+ */
+export const HIGH_AVAILABILITY_LOAD_BALANCER_PORT = 5433
+
+export const getHighAvailabilityLoadBalancerConnectionInfo = <
+  T extends { db_port: number | string },
+>(
+  connectionInfo: T
+): T => ({ ...connectionInfo, db_port: HIGH_AVAILABILITY_LOAD_BALANCER_PORT })
+
 type ConnectionStrings = {
   psql: string
   uri: string
@@ -40,7 +52,7 @@ export const getSelfHostedPoolerStrings = (
   dbName: string = 'postgres'
 ): ConnectionStrings => {
   const user = 'postgres.[POOLER_TENANT_ID]'
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
   const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
@@ -76,7 +88,7 @@ export const getSelfHostedDirectStrings = (
   dbName: string = 'postgres'
 ): ConnectionStrings => {
   const user = 'postgres'
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
   const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
@@ -137,7 +149,7 @@ export const getConnectionStrings = ({
 } => {
   const isMd5 = poolingInfo?.connectionString.includes('options=reference')
   const { projectRef } = metadata
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   // Direct connection variables
   const directUser = connectionInfo.db_user

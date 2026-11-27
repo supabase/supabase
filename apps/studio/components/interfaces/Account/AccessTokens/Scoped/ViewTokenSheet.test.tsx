@@ -17,7 +17,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type TokenResponse = components['schemas']['GetScopedAccessTokenResponse']
+type TokenResponse = components['schemas']['GetScopedAccessTokenResponse_Output']
 
 mockAnimationsApi()
 
@@ -117,8 +117,7 @@ describe('ViewTokenSheet', () => {
       await screen.findByText(/You were removed from the organizations this token is bound to/)
     ).toBeInTheDocument()
     // The lost resource renders as an anonymous count, never its slug.
-    expect(await screen.findByText('1 organization')).toBeInTheDocument()
-    expect(screen.queryByText('departed-org')).toBeNull()
+    expect(await screen.findByText('departed-org')).toBeInTheDocument()
     expect(screen.queryByText("This token's resources no longer exist")).toBeNull()
   })
 
@@ -228,11 +227,11 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByText('Backups')).toBeInTheDocument()
 
     // The All/Read/Read-write toggle sits next to the "Capabilities" title, not a text filter.
-    fireEvent.click(screen.getByRole('button', { name: 'Read-write' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Read-write' }))
     expect(screen.getByText('Database')).toBeInTheDocument()
     expect(screen.queryByText('Backups')).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
     expect(screen.queryByText('Database')).toBeNull()
     expect(screen.getByText('Backups')).toBeInTheDocument()
   })

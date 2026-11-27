@@ -1,3 +1,6 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { z } from 'zod'
+
 import type { SubmittedSupportRequest } from './SupportForm.state'
 
 const SUPPORT_ASSISTANT_FIELD_LABELS = {
@@ -52,6 +55,67 @@ export function buildSupportAssistantPrompt(request: SubmittedSupportRequest) {
     supportField('dashboard_logs', request.dashboardLogs ? 'Attached' : 'Not attached'),
     '</support>',
   ].join('\n')
+}
+
+export const ASSISTANT_HANDOFF_QUERY_PARAM = 'assistantHandoff'
+
+// Not typed as z.ZodType<SubmittedSupportRequest>: zod always models "may be undefined"
+// as an optional key, while SubmittedSupportRequest declares organizationSlug/projectRef
+// as required keys whose value may be undefined — a distinction JSON can't carry anyway,
+// since JSON.stringify drops undefined-valued keys entirely.
+const AssistantHandoffSchema = z.object({
+  organizationSlug: z.string().optional(),
+  projectRef: z.string().optional(),
+  category: z.union([
+    z.nativeEnum(SupportCategories),
+    z.literal('Plan_upgrade'),
+    z.literal('Others'),
+  ]),
+  severity: z.string(),
+  subject: z.string(),
+  message: z.string(),
+  affectedServices: z.string(),
+  allowSupportAccess: z.boolean(),
+  library: z.string().optional(),
+  dashboardLogs: z.string().optional(),
+  threadRef: z.string().optional(),
+  frontConversationId: z.string().optional(),
+})
+
+const ASSISTANT_HANDOFF_STORAGE_PREFIX = 'assistant-handoff:'
+
+// The handoff URL only ever carries an opaque token — the actual ticket content (subject,
+// message, any attached log links) is kept out of the URL entirely (browser history,
+// referrer headers, server logs, a copy-pasted link) by round-tripping it through
+// sessionStorage instead, scoped to this one tab and gone once it's been read or the tab closes.
+export function storeAssistantHandoff(token: string, request: SubmittedSupportRequest): void {
+  try {
+    sessionStorage.setItem(ASSISTANT_HANDOFF_STORAGE_PREFIX + token, JSON.stringify(request))
+  } catch {
+    // Handoff will just fail closed (no context) on the receiving end — not worth
+    // surfacing an error for a private-browsing/storage-full edge case.
+  }
+}
+
+export function consumeAssistantHandoff(token: string): SubmittedSupportRequest | null {
+  const key = ASSISTANT_HANDOFF_STORAGE_PREFIX + token
+
+  try {
+    const raw = sessionStorage.getItem(key)
+    if (!raw) return null
+
+    const parsed = AssistantHandoffSchema.safeParse(JSON.parse(raw))
+    return parsed.success ? (parsed.data as SubmittedSupportRequest) : null
+  } catch {
+    return null
+  } finally {
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      // Best-effort cleanup — a failure here shouldn't override the value (or null)
+      // already produced above.
+    }
+  }
 }
 
 export function parseSupportAssistantPrompt(text: string): ParsedSupportAssistantPrompt | null {

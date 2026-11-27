@@ -2,10 +2,10 @@ import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
-import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { type Dashboards } from '@/types'
@@ -49,7 +49,7 @@ export const useGenerateObservabilityMenu = () => {
   const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
-  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
+  const isWarehouseEnabled = useIsWarehouseEnabled()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const baseUrl = `/project/${ref}/observability`
@@ -92,16 +92,12 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    ...(isDatabaseConnectionsEnabled
-      ? [
-          {
-            name: 'Database Connections',
-            key: 'connections',
-            url: `${baseUrl}/connections`,
-            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_API_GATEWAY,
-          },
-        ]
-      : []),
+    {
+      name: 'Database Connections',
+      key: 'connections',
+      url: `${baseUrl}/connections`,
+      shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_CONNECTIONS,
+    },
   ]
 
   const productItems: ObservabilityMenuItem[] = [
@@ -145,6 +141,9 @@ export const useGenerateObservabilityMenu = () => {
       url: `${baseUrl}/realtime${preservedQueryParams}`,
       shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     },
+    ...(isWarehouseEnabled
+      ? [{ name: 'Warehouse', key: 'warehouse', url: `${baseUrl}/warehouse` }]
+      : []),
   ]
 
   const sections: ObservabilityMenuSection[] = [

@@ -36,8 +36,6 @@ const InnovationTeams: NextPage = () => {
           description: data.metadata.metaDescription,
           url: `https://supabase.com/solutions/innovation-teams`,
         }}
-        noindex={true}
-        nofollow={true}
       />
       <Layout className="overflow-visible">
         <SolutionsStickyNav activeItem={Solutions.innovationTeams} type="use-case" />
@@ -83,7 +81,7 @@ const InnovationTeams: NextPage = () => {
                   {data.aiBuilderEcosystem.builders.map(
                     (builder: { name: string; description: string }) => (
                       <li key={builder.name} className="flex gap-3">
-                        <Check className="w-5 h-5 text-brand mt-0.5 shrink-0" />
+                        <Check className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                         <div>
                           <span className="text-foreground font-medium">{builder.name}</span>
                           <span className="text-foreground-lighter">: {builder.description}</span>

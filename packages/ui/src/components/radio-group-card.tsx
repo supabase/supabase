@@ -10,7 +10,13 @@ const RadioGroupCard = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  return <RadioGroupPrimitive.Root className={cn('grid gap-2', className)} {...props} ref={ref} />
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn('relative grid gap-2', className)}
+      {...props}
+      ref={ref}
+    />
+  )
 })
 RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
@@ -23,10 +29,14 @@ interface RadioGroupCardItemProps {
 const RadioGroupCardItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupCardItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, ...props }, ref) => {
+>(({ id: idProp, children, className, image, label, showIndicator = true, ...props }, ref) => {
+  const generatedId = React.useId()
+  const id = idProp || generatedId
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
+      id={id}
+      aria-labelledby={`${id}-label`}
       {...props}
       className={cn(
         'flex flex-col gap-2',
@@ -42,11 +52,11 @@ const RadioGroupCardItem = React.forwardRef<
         'transition-colors',
         'group',
         'data-[state=checked]:border-control-hover',
-        props.className
+        className
       )}
     >
-      {props.children}
-      <label className="flex gap-2 w-full" id={props.id} htmlFor={props.value}>
+      {children}
+      <div className="flex gap-2 w-full" id={`${id}-label`}>
         {showIndicator && (
           <div
             className="
@@ -79,7 +89,7 @@ const RadioGroupCardItem = React.forwardRef<
         >
           {label}
         </div>
-      </label>
+      </div>
     </RadioGroupPrimitive.Item>
   )
 })

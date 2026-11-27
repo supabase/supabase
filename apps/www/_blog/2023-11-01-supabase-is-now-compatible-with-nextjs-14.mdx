@@ -28,7 +28,7 @@ As part of [Next.js Conf 2023](https://nextjs.org/conf), the team at Vercel rele
 
 That's right, the headline feature is no new features!
 
-This may sound underwhelming at first, but is incredibly good news for the stability of Next.js. This release comes with a huge number of performance and stability improvements—such as [Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions) being marked as stable. This means we can finally start promoting this fantastically simple way of authenticating users—entirely server-side!
+This may sound underwhelming at first, but is incredibly good news for the stability of Next.js. This release comes with a huge number of performance and stability improvements—such as [Server Actions](https://nextjs.org/docs/app/guides/server-actions) being marked as stable. This means we can finally start promoting this fantastically simple way of authenticating users—entirely server-side!
 
 ```tsx
 export default async function Page() {
@@ -45,7 +45,7 @@ export default async function Page() {
 }
 ```
 
-With [Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components), fetching data in Next.js became as simple as:
+With [Server Components](https://nextjs.org/docs/app/getting-started/server-and-client-components), fetching data in Next.js became as simple as:
 
 ```tsx
 export default async function Page() {
@@ -90,10 +90,10 @@ Since the release of the [App Router](https://nextjs.org/docs/app)—launched as
 
 So for the [App Router](https://nextjs.org/docs/app), that's:
 
-- [Client Components](https://nextjs.org/docs/app/building-your-application/rendering/client-components)
-- [Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
-- [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
-- [Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions)
+- [Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
+- [Server Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
+- [Route Handlers](https://nextjs.org/docs/app/api-reference/file-conventions/route)
+- [Server Actions](https://nextjs.org/docs/app/guides/server-actions)
 - [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
 
 And for the [Pages Router](https://nextjs.org/docs/pages):
@@ -159,7 +159,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 ```
 
-That is a lot of very confusing code! So we decided to [create a package called `@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/overview) that does all of this for you. Then we took it one step further and created a [Next.js and Supabase Starter Template](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs), so you can just focus on building your awesome app! 🚀
+That is a lot of very confusing code! So we decided to [create a package called `@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side) that does all of this for you. Then we took it one step further and created a [Next.js and Supabase Starter Template](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs), so you can just focus on building your awesome app! 🚀
 
 > Check out my [Next.js Conf talk](https://www.youtube.com/watch?t=3880&v=FdiX5rHS_0Y) to see this starter template in action!
 
@@ -194,6 +194,6 @@ As you probably know, we love memes, so we are signing off with one about the le
 
 - [Next.js Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)
 - [Build a User Management App with Next.js](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
-- [Server-Side Auth Overview](https://supabase.com/docs/guides/auth/server-side/overview)
+- [Server-Side Auth Overview](https://supabase.com/docs/guides/auth/server-side)
 - [Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components)
 - [Infinite scroll with Next.js, Framer Motion, and Supabase](https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion)

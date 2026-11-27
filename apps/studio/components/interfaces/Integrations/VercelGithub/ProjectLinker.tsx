@@ -137,7 +137,7 @@ export const ProjectLinker = ({
           <div className="text-sm text-foreground-lighter text-balance">
             No {missingEntity} projects found. Create a {missingEntity} project to link to a{' '}
             {oppositeMissingEntity} project
-            {onSkip !== undefined ? ', or skip and connect later.' : '.'}
+            {onSkip !== undefined ? <span>, or skip and connect later.</span> : <span>.</span>}
           </div>
         ) : (
           <>

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type GitHubAuthorizationCreateVariables = {
   code: string
@@ -40,7 +41,7 @@ export const useGitHubAuthorizationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     GitHubAuthorizationCreateData,
-    ResponseError,
+    StudioError,
     GitHubAuthorizationCreateVariables
   >,
   'mutationFn'
@@ -48,7 +49,7 @@ export const useGitHubAuthorizationCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     GitHubAuthorizationCreateData,
-    ResponseError,
+    StudioError,
     GitHubAuthorizationCreateVariables
   >({
     mutationFn: (vars) => createGitHubAuthorization(vars),

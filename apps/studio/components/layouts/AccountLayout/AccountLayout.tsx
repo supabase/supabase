@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import { useFlag } from 'common'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
@@ -8,7 +8,6 @@ import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -26,8 +25,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
-  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-
+  const showOAuthApps = useFlag('enableScopedOAuthManage')
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
@@ -75,19 +73,25 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                   isActive: currentPath === '/account/me',
                 },
                 {
+                  key: 'security',
+                  label: 'Security',
+                  href: '/account/security',
+                  isActive: currentPath === '/account/security',
+                },
+                {
                   key: 'access-tokens',
                   label: 'Access Tokens',
                   href: '/account/tokens',
                   isActive:
                     currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
                 },
-                ...(showSecuritySettings
+                ...(showOAuthApps
                   ? [
                       {
-                        key: 'security',
-                        label: 'Security',
-                        href: '/account/security',
-                        isActive: currentPath === '/account/security',
+                        key: 'oauth-apps',
+                        label: 'OAuth Apps',
+                        href: '/account/apps',
+                        isActive: currentPath === '/account/apps',
                       },
                     ]
                   : []),
@@ -106,7 +110,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
               ],
             },
           ],
-    [currentPath, showSecuritySettings]
+    [currentPath, showOAuthApps]
   )
 
   useLayoutEffect(() => {
@@ -126,10 +130,8 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
 
   return (
     <>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content="Supabase Studio" />
-      </Head>
+      <title>{pageTitle}</title>
+      <meta name="description" content="Supabase Studio" />
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
         <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
           {children}

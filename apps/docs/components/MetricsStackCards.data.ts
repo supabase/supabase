@@ -13,7 +13,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
     title: 'Grafana Cloud (SaaS)',
     description:
       'Use Grafana Cloud’s managed Prometheus (works on Free + Pro tiers) and import the Supabase dashboard without running any infrastructure.',
-    href: '/guides/monitoring-and-debugging/metrics/grafana-cloud',
+    href: '/guides/observability/metrics/grafana-cloud',
     iconKind: 'grafana',
     iconColor: '#F05A28',
     iconBg: 'rgba(240,90,40,0.1)',
@@ -23,7 +23,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
     title: 'Grafana + self-hosted Prometheus',
     description:
       'Run Prometheus yourself following the official installation guidance and pair it with Grafana plus our dashboard JSON and alert pack.',
-    href: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted',
+    href: '/guides/observability/metrics/grafana-self-hosted',
     iconKind: 'grafana',
     iconColor: '#F05A28',
     iconBg: 'rgba(240,90,40,0.1)',
@@ -53,7 +53,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
     title: 'Vendor-agnostic / BYO Prometheus',
     description:
       'Connect AWS AMP, Grafana Mimir, VictoriaMetrics, or any Prometheus-compatible SaaS with the same scrape job pattern.',
-    href: '/guides/monitoring-and-debugging/metrics/vendor-agnostic',
+    href: '/guides/observability/metrics/vendor-agnostic',
     iconKind: 'flame',
     iconColor: '#0BA678',
     iconBg: 'rgba(11,166,120,0.1)',

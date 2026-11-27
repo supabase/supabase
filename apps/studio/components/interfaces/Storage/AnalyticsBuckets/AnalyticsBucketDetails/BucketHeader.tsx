@@ -1,9 +1,12 @@
-import { CreateTableInstructionsDialog } from './CreateTable/CreateTableInstructionsDialog'
 import {
-  ScaffoldHeader,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from '@/components/layouts/Scaffold'
+  PageSectionAside,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+
+import { CreateTableInstructionsDialog } from './CreateTable/CreateTableInstructionsDialog'
 
 interface BucketHeaderProps {
   showActions?: boolean
@@ -11,18 +14,16 @@ interface BucketHeaderProps {
 
 export const BucketHeader = ({ showActions = true }: BucketHeaderProps) => {
   return (
-    <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
-      <div>
-        <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
-        <ScaffoldSectionDescription>
-          Analytics tables stored in this bucket
-        </ScaffoldSectionDescription>
-      </div>
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Tables</PageSectionTitle>
+        <PageSectionDescription>Analytics tables stored in this bucket</PageSectionDescription>
+      </PageSectionSummary>
       {showActions && (
-        <div className="flex items-center gap-x-2">
+        <PageSectionAside>
           <CreateTableInstructionsDialog />
-        </div>
+        </PageSectionAside>
       )}
-    </ScaffoldHeader>
+    </PageSectionMeta>
   )
 }

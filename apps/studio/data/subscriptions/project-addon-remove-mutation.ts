@@ -3,8 +3,10 @@ import { toast } from 'sonner'
 
 import { subscriptionKeys } from './keys'
 import type { AddonVariantId } from './types'
+import { configKeys } from '@/data/config/keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectAddonRemoveVariables = {
   projectRef: string
@@ -38,18 +40,21 @@ export const useProjectAddonRemoveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>,
+  UseCustomMutationOptions<ProjectAddonRemoveData, StudioError, ProjectAddonRemoveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>({
+  return useMutation<ProjectAddonRemoveData, StudioError, ProjectAddonRemoveVariables>({
     mutationFn: (vars) => removeSubscriptionAddon(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
       // subscription page is using AddOn react query
-      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

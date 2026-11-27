@@ -1,13 +1,11 @@
 'use client'
 
-import { useCopyMarkdownFromUrl } from 'common'
-import { Chatgpt, Claude } from 'icons'
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { cn } from 'ui'
 
+import { AiTools } from '@/components/AiTools'
 import { ChangeTypeBadge, ProductBadges } from '@/components/Changelog/ChangelogTimelineList'
 import type { ChangelogEntryFrontmatter } from '@/lib/changelog-repo'
-import { SITE_ORIGIN } from '@/lib/constants'
 
 type Props = {
   slug: string
@@ -16,10 +14,6 @@ type Props = {
 }
 
 export function ChangelogDetailSidebar({ slug, frontmatter, className }: Props) {
-  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const mdPath = `/changelog/${slug}.md`
-  const mdAbs = `${SITE_ORIGIN}${mdPath}`
-  const aiPrompt = `Read from ${mdAbs} so I can ask questions about its contents`
   const affectedProducts = frontmatter.affected_products ?? []
 
   return (
@@ -98,58 +92,36 @@ export function ChangelogDetailSidebar({ slug, frontmatter, className }: Props) 
         </>
       )}
 
-      <section aria-labelledby="changelog-detail-links">
-        <h2
-          id="changelog-detail-links"
-          className="text-foreground-light mb-2 font-mono text-xs uppercase tracking-wide"
-        >
-          Links
-        </h2>
-        <nav className="flex flex-col gap-2">
-          {frontmatter.legacy_gh_discussion && (
-            <a
-              href={`https://github.com/supabase/supabase/discussions/${frontmatter.legacy_gh_discussion}`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-xs transition-colors"
+      {frontmatter.legacy_gh_discussion && (
+        <>
+          <section aria-labelledby="changelog-detail-links">
+            <h2
+              id="changelog-detail-links"
+              className="text-foreground-light mb-2 font-mono text-xs uppercase tracking-wide"
             >
-              <ExternalLink size={14} strokeWidth={1.5} />
-              View discussion on GitHub
-            </a>
-          )}
-          <button
-            tabIndex={0}
-            type="button"
-            onClick={() => void copyMarkdown(mdPath)}
-            className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-left text-xs transition-colors"
-          >
-            {copied ? (
-              <Check size={14} strokeWidth={1.5} className="text-brand" />
-            ) : (
-              <Copy size={14} strokeWidth={1.5} />
-            )}
-            {copied ? 'Copied as markdown' : 'Copy page as markdown'}
-          </button>
-          <a
-            href={`https://chatgpt.com/?hint=search&q=${encodeURIComponent(`Read from ${mdAbs} so I can ask questions about its contents`)}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-xs transition-colors"
-          >
-            <Chatgpt size={14} />
-            Ask ChatGPT
-          </a>
-          <a
-            href={`https://claude.ai/new?q=${encodeURIComponent(aiPrompt)}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-xs transition-colors"
-          >
-            <Claude size={14} />
-            Ask Claude
-          </a>
-        </nav>
-      </section>
+              Links
+            </h2>
+            <nav className="flex flex-col gap-2">
+              <a
+                href={`https://github.com/supabase/supabase/discussions/${frontmatter.legacy_gh_discussion}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-xs transition-colors"
+              >
+                <ExternalLink size={14} strokeWidth={1.5} />
+                View discussion on GitHub
+              </a>
+            </nav>
+          </section>
+          <div className="border-default border-t" role="presentation" />
+        </>
+      )}
+
+      <AiTools
+        pagePath={`/changelog/${slug}`}
+        pageType="changelog"
+        titleClassName="mb-2 tracking-wide"
+      />
     </div>
   )
 }

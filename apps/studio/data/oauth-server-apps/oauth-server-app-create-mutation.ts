@@ -4,8 +4,9 @@ import { toast } from 'sonner'
 
 import { oauthServerAppKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthServerAppCreateVariables = CreateOAuthClientParams & {
   projectRef: string | undefined
@@ -34,12 +35,12 @@ export const useOAuthServerAppCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>,
+  UseCustomMutationOptions<OAuthAppCreateData, StudioError, OAuthServerAppCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>({
+  return useMutation<OAuthAppCreateData, StudioError, OAuthServerAppCreateVariables>({
     mutationFn: (vars) => createOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
       const { projectRef, clientEndpoint } = variables

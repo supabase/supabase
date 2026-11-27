@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import {
   Check,
   ClipboardCheck,
@@ -91,7 +92,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -271,7 +272,7 @@ const data: () => {
       ),
       subheading:
         'Copy these prompts into your AI editor to scaffold agent infrastructure on Supabase:',
-      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts',
       leftFooter: (
         <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
           {frameworks.map((framework) => (

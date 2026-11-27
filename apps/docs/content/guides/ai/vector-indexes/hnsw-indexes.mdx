@@ -37,15 +37,7 @@ create index on items using hnsw (column_name vector_ip_ops);
 create index on items using hnsw (column_name vector_cosine_ops);
 ```
 
-For pgvector versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
-
-- vector: up to 2,000 dimensions
-- halfvec: up to 4,000 dimensions
-- bit: up to 64,000 dimensions
-
-You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
-
-If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/general).
+For the maximum dimensions you can index and how to check your pgvector version, see [Vector index limits](/docs/guides/ai/vector-indexes#limits).
 
 ## Example with high-dimensional vectors
 
@@ -115,13 +107,13 @@ Like skip lists, search starts at the top layer and works its way down until it 
 
 HNSW should be your default choice when creating a vector index. Add the index when you don't need 100% accuracy and are willing to trade a small amount of accuracy for a lot of throughput.
 
-Unlike IVFFlat indexes, you are safe to build an HNSW index immediately after the table is created. HNSW indexes are based on graphs which inherently are not affected by the same limitations as IVFFlat. As new data is added to the table, the index will be filled automatically and the index structure will remain optimal.
+HNSW indexes are based on graphs, so they aren't affected by the same limitations as IVFFlat. For when you can build each index type, see [When to use each index type](/docs/guides/ai/vector-indexes#when-to-use-each-index-type).
 
 ## Filtering with HNSW indexes
 
 Adding a `where` clause to a vector query does not bypass the HNSW index. The Postgres planner picks between using the index and a sequential scan based on the selectivity of the filter and the size of the table. When the index is used, the filter is applied as the index returns candidates.
 
-The trade-off shows up when the filter is selective: an HNSW scan returns the top `k` rows by distance, and if most of those are filtered out you can end up with fewer rows than your `LIMIT`. From `pgvector` 0.8.0, the planner supports **iterative index scans** that automatically scan more of the index until enough results are found, controlled by the `hnsw.iterative_scan` GUC. The default is `off`. The two enabled modes are:
+The trade-off shows up when the filter is selective. An HNSW scan returns at most the nearest [`hnsw.ef_search`](/docs/guides/ai/going-to-prod#hnsw-understanding-efconstruction--efsearch--and-m) rows (40 by default). If the filter removes most of them, you get fewer rows than your `LIMIT`. From `pgvector` 0.8.0, the planner supports **iterative index scans** that automatically scan more of the index until enough results are found, controlled by the `hnsw.iterative_scan` GUC. The default is `off`. The two enabled modes are:
 
 - `strict_order` preserves exact distance ordering across iterations.
 - `relaxed_order` allows slight reordering across iterations for better recall.

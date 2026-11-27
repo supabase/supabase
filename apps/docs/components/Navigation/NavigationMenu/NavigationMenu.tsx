@@ -1,7 +1,6 @@
 import { memo } from 'react'
 
 import type { NavMenuSection } from '../Navigation.types'
-import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
@@ -28,15 +27,19 @@ enum MenuId {
   LocalDevelopment = 'local_development',
   Contributing = 'contributing',
   RefServerV1 = 'reference_server_v1',
+  RefMiddlewareV1 = 'reference_middleware_v1',
+  RefTanstackDbV1 = 'reference_tanstack_db_v1',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
   RefDartV2 = 'reference_dart_v2',
   RefCSharpV0 = 'reference_csharp_v0',
   RefCSharpV1 = 'reference_csharp_v1',
+  RefCSharpV8 = 'reference_csharp_v8',
   RefPythonV2 = 'reference_python_v2',
   RefSwiftV1 = 'reference_swift_v1',
   RefSwiftV2 = 'reference_swift_v2',
+  RefSwiftV3 = 'reference_swift_v3',
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
   RefKotlinV3 = 'reference_kotlin_v3',
@@ -154,6 +157,11 @@ const menus: Menu[] = [
     path: '/reference/server',
   },
   {
+    id: MenuId.RefMiddlewareV1,
+    type: 'reference',
+    path: '/reference/middleware',
+  },
+  {
     id: MenuId.RefJavaScriptV1,
     type: 'reference',
     path: '/reference/javascript/v1',
@@ -181,6 +189,11 @@ const menus: Menu[] = [
   {
     id: MenuId.RefCSharpV1,
     type: 'reference',
+    path: '/reference/csharp/v1',
+  },
+  {
+    id: MenuId.RefCSharpV8,
+    type: 'reference',
     path: '/reference/csharp',
   },
   {
@@ -197,6 +210,11 @@ const menus: Menu[] = [
     id: MenuId.RefSwiftV2,
     type: 'reference',
     path: '/reference/swift',
+  },
+  {
+    id: MenuId.RefSwiftV3,
+    type: 'reference',
+    path: '/reference/swift/v3',
   },
   {
     id: MenuId.RefKotlinV1,
@@ -290,8 +308,6 @@ const NavigationMenu = ({
 }) => {
   const level = menuId
   const menu = getMenuById(level)
-
-  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu, { additionalNavItems })
 }

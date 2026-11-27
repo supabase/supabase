@@ -1,5 +1,6 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -9,7 +10,7 @@ import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
-import { useAPIKeysQuery, type APIKey } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, type APIKey } from '@/data/api-keys/api-keys-query'
 import { ProjectAuthConfigData, useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { type Schema } from '@/data/database/schemas-query'
@@ -22,7 +23,9 @@ import {
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
+import { useGrant } from '@/lib/grants'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   const stripeSchema = findStripeSchema(schemas)
@@ -38,8 +41,8 @@ export type ProjectOAuthIntegrationData = {
   oauthApps: AuthorizedApp[]
 }
 
-const isPermissionError = (error: unknown): error is ResponseError =>
-  error instanceof ResponseError && error.code === 403
+const isPermissionError = (error: unknown): error is StudioError =>
+  isStudioError(error) && error.code === 403
 
 /**
  * Reinterprets a 403 from an existing query as a fallback value, for graceful degradation of the
@@ -47,11 +50,42 @@ const isPermissionError = (error: unknown): error is ResponseError =>
  */
 function permissionSafeData<TData, TDefault>(
   data: TData | undefined,
-  error: ResponseError | null,
+  error: StudioError | null,
   defaultVal: TDefault
 ): TData | TDefault {
   if (isPermissionError(error)) return defaultVal
   return data ?? defaultVal
+}
+
+type QueryState<TData> = {
+  data: TData | undefined
+  error: StudioError | null
+  isLoading: boolean
+  isPending: boolean
+  isSuccess: boolean
+}
+
+/** Folds a grant into the state of the query it gates. Denied settles with no data. */
+const getGatedQueryState = <TData>(
+  grant: { status: 'loading' | 'granted' | 'denied' | 'error'; error?: StudioError },
+  query: QueryState<TData>
+): QueryState<TData> => {
+  if (grant.status === 'loading') {
+    return { data: undefined, error: null, isLoading: true, isPending: true, isSuccess: false }
+  }
+  if (grant.status === 'error') {
+    return {
+      data: undefined,
+      error: grant.error ?? null,
+      isLoading: false,
+      isPending: false,
+      isSuccess: false,
+    }
+  }
+  if (grant.status === 'denied') {
+    return { data: undefined, error: null, isLoading: false, isPending: false, isSuccess: true }
+  }
+  return query
 }
 
 /**
@@ -62,7 +96,7 @@ export const useProjectOAuthIntegrationData = (
   { enabled = true } = {}
 ): {
   data: ProjectOAuthIntegrationData
-  error: ResponseError | null
+  error: StudioError | null
   isError: boolean
   isLoading: boolean
   isPending: boolean
@@ -86,8 +120,17 @@ export const useProjectOAuthIntegrationData = (
   )
 
   const sharedOptions = { enabled, retryOnMount: false }
+
+  // The grant gates the request. A denied grant sends no request, and a failed permission check
+  // surfaces as an error, so both settle instead of staying pending.
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const apiKeysQuery = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, sharedOptions)
+  )
+  const apiKeysState = enabled ? getGatedQueryState(apiKeysGrant, apiKeysQuery) : apiKeysQuery
+
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    apiKeys: apiKeysState,
     edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
     authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),

@@ -1,14 +1,15 @@
-import { ClassValue, clsx } from 'clsx'
-import { extendTailwindMerge } from 'tailwind-merge'
+import type { ClassValue } from 'cn'
+import { createCn } from 'cn/config'
 
-const twMerge = extendTailwindMerge({
+export type { ClassValue } from 'cn'
+
+export const cn: (...inputs: ClassValue[]) => string = createCn({
   extend: {
     theme: {
       spacing: ['card', 'content'],
     },
+    classGroups: {
+      shadow: [{ 'floating-surface-shadow': ['sm', 'md'] }],
+    },
   },
 })
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}

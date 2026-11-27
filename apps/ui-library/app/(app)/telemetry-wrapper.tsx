@@ -10,6 +10,7 @@ export const TelemetryWrapper = () => {
   return (
     <PageTelemetry
       API_URL={API_URL}
+      platform="ui-library"
       hasAcceptedConsent={hasAcceptedConsent}
       enabled={IS_PLATFORM}
     />

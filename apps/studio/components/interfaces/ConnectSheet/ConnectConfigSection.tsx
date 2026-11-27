@@ -1,8 +1,22 @@
-import { Fragment, type ReactNode } from 'react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
+import { Fragment, type ReactNode, useState } from 'react'
 import {
+  Button,
   cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
   Select,
   SelectContent,
   SelectItem,
@@ -20,25 +34,21 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
+import { getOptionMatchScore } from './ConnectConfigSection.utils'
 import { ConnectionIcon } from './ConnectionIcon'
 import {
   ConnectModeButton,
   getConnectModeButtonCornerVariants,
   getConnectModeEmptySlotClasses,
 } from './ConnectModeButton'
+import { useTemporaryAccessConnection } from './TemporaryAccessConnectionProvider'
 
 interface ConnectConfigSectionProps {
   activeFields: ResolvedField[]
   state: Record<string, string | boolean | string[]>
   onFieldChange: (fieldId: string, value: string | boolean | string[]) => void
   getFieldOptions: (fieldId: string) => FieldOption[]
-  /** Rendered after this field when it is visible, otherwise at the top of the stack. */
   insertAfter?: { fieldId: string; node: ReactNode }
-}
-
-function shouldShowConnectField(field: ResolvedField, options: FieldOption[]) {
-  if (field.type === 'switch' || field.type === 'multi-select') return true
-  return options.length > 1
 }
 
 export function ConnectConfigSection({
@@ -48,202 +58,342 @@ export function ConnectConfigSection({
   getFieldOptions,
   insertAfter,
 }: ConnectConfigSectionProps) {
+  const {
+    meta: { isGrantMode },
+  } = useTemporaryAccessConnection()
+
   if (activeFields.length === 0) return null
 
-  const visibleFields = activeFields.filter((field) =>
-    shouldShowConnectField(field, getFieldOptions(field.id))
-  )
-  const insertAfterVisible = Boolean(
-    insertAfter?.node && visibleFields.some((field) => field.id === insertAfter.fieldId)
-  )
+  const renderField = (field: ResolvedField) => {
+    if (isGrantMode && field.id === 'useSharedPooler') return null
+
+    const options = getFieldOptions(field.id)
+    const value = state[field.id]
+
+    // Skip fields with no options (or single option that's auto-selected)
+    // Exception: switch and multi-select fields don't require options
+    if (field.type !== 'switch' && field.type !== 'multi-select') {
+      if (options.length === 0) return null
+      if (options.length === 1) return null
+    }
+
+    switch (field.type) {
+      case 'combobox':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+            description={field.description}
+            name={`connect-${field.id}`}
+          >
+            <ConnectCombobox
+              id={`connect-${field.id}`}
+              options={options}
+              value={String(value ?? '')}
+              onValueChange={(v) => onFieldChange(field.id, v)}
+              placeholder={field.combobox?.placeholder ?? 'Select option'}
+              searchPlaceholder={field.combobox?.searchPlaceholder ?? 'Search...'}
+              emptyMessage={field.combobox?.emptyMessage ?? 'No results found'}
+              /*
+                [Joshen] Omitting MCP icons for now as the images are not optimized (large)
+                and is causing noticeably latency issues on the browser (even with the existing Connect UI)
+               */
+              showIcons={field.id === 'framework'}
+            />
+          </FormItemLayout>
+        )
+
+      case 'radio-grid':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+          >
+            <RadioGroupStacked
+              value={String(value ?? '')}
+              onValueChange={(v) => onFieldChange(field.id, v)}
+              className="flex-row gap-3 space-y-0"
+            >
+              {options.map((option) => (
+                <RadioGroupStackedItem
+                  key={option.value}
+                  id={`connect-${field.id}-${option.value}`}
+                  value={option.value}
+                  label=""
+                  className="flex-1 rounded-lg text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
+                    <span className="text-sm">{option.label}</span>
+                  </div>
+                </RadioGroupStackedItem>
+              ))}
+            </RadioGroupStacked>
+          </FormItemLayout>
+        )
+
+      case 'radio-list':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+          >
+            <RadioGroupStacked
+              value={String(value ?? '')}
+              onValueChange={(v) => onFieldChange(field.id, v)}
+              className="min-w-0 w-full"
+            >
+              {options.map((option) => (
+                <RadioGroupStackedItem
+                  key={option.value}
+                  id={`connect-${field.id}-${option.value}`}
+                  value={option.value}
+                  className="min-w-0 w-full text-left"
+                  label={
+                    <span className="flex min-w-0 items-center gap-2">
+                      {option.icon && <ConnectionIcon icon={option.icon} />}
+                      <span className="truncate">{option.label}</span>
+                    </span>
+                  }
+                  description={option.description}
+                />
+              ))}
+            </RadioGroupStacked>
+          </FormItemLayout>
+        )
+
+      case 'select':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+            description={field.description}
+            name={`connect-${field.id}`}
+          >
+            <Select value={String(value ?? '')} onValueChange={(v) => onFieldChange(field.id, v)}>
+              <SelectTrigger
+                id={`connect-${field.id}`}
+                size="small"
+                className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
+                  >
+                    {/*
+                      [Joshen] Omitting MCP icons for now as the images are not optimized (large)
+                      and is causing noticeably latency issues on the browser (even with the existing Connect UI)
+                     */}
+                    {field.id === 'framework' && option.icon && (
+                      <ConnectionIcon icon={option.icon} />
+                    )}
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormItemLayout>
+        )
+
+      case 'switch':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+            description={field.description}
+            name={field.id}
+            className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
+          >
+            <Switch
+              id={field.id}
+              checked={Boolean(value)}
+              onCheckedChange={(v) => onFieldChange(field.id, v)}
+            />
+          </FormItemLayout>
+        )
+
+      case 'multi-select':
+        return (
+          <FormItemLayout
+            key={field.id}
+            isReactForm={false}
+            layout="horizontal"
+            label={field.label}
+            description={field.description}
+            name={`connect-${field.id}`}
+          >
+            <MultiSelector
+              values={Array.isArray(value) ? value : []}
+              onValuesChange={(v) => onFieldChange(field.id, v)}
+            >
+              <MultiSelectorTrigger
+                id={`connect-${field.id}`}
+                className="w-full"
+                label="Select features"
+                badgeLimit="wrap"
+                showIcon={true}
+              />
+              <MultiSelectorContent>
+                <MultiSelectorList>
+                  {options.map((option) => (
+                    <MultiSelectorItem
+                      key={option.value}
+                      value={option.value}
+                      className="items-start"
+                    >
+                      <div className="flex flex-col ml-2 gap-y-0.5">
+                        <span className="font-medium">{option.label}</span>
+                        {option.description && (
+                          <span className="text-xs text-foreground-light">
+                            {option.description}
+                          </span>
+                        )}
+                      </div>
+                    </MultiSelectorItem>
+                  ))}
+                </MultiSelectorList>
+              </MultiSelectorContent>
+            </MultiSelector>
+          </FormItemLayout>
+        )
+
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="flex flex-col gap-y-4">
-      {!insertAfterVisible && insertAfter?.node}
-      {visibleFields.map((field) => {
-        const options = getFieldOptions(field.id)
-        const value = state[field.id]
-
-        const control = (() => {
-          switch (field.type) {
-            case 'radio-grid':
-              return (
-                <FormItemLayout
-                  key={field.id}
-                  isReactForm={false}
-                  layout="horizontal"
-                  label={field.label}
-                >
-                  <RadioGroupStacked
-                    value={String(value ?? '')}
-                    onValueChange={(v) => onFieldChange(field.id, v)}
-                    className="flex-row gap-3 space-y-0"
-                  >
-                    {options.map((option) => (
-                      <RadioGroupStackedItem
-                        key={option.value}
-                        id={`connect-${field.id}-${option.value}`}
-                        value={option.value}
-                        label=""
-                        className="flex-1 rounded-lg text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
-                          <span className="text-sm">{option.label}</span>
-                        </div>
-                      </RadioGroupStackedItem>
-                    ))}
-                  </RadioGroupStacked>
-                </FormItemLayout>
-              )
-
-            case 'radio-list':
-              return (
-                <FormItemLayout
-                  key={field.id}
-                  isReactForm={false}
-                  layout="horizontal"
-                  label={field.label}
-                >
-                  <RadioGroupStacked
-                    value={String(value ?? '')}
-                    onValueChange={(v) => onFieldChange(field.id, v)}
-                    className="min-w-0 w-full"
-                  >
-                    {options.map((option) => (
-                      <RadioGroupStackedItem
-                        key={option.value}
-                        id={`connect-${field.id}-${option.value}`}
-                        value={option.value}
-                        className="min-w-0 w-full text-left"
-                        label={
-                          <span className="flex min-w-0 items-center gap-2">
-                            {option.icon && <ConnectionIcon icon={option.icon} />}
-                            <span className="truncate">{option.label}</span>
-                          </span>
-                        }
-                        description={option.description}
-                      />
-                    ))}
-                  </RadioGroupStacked>
-                </FormItemLayout>
-              )
-
-            case 'select':
-              return (
-                <FormItemLayout
-                  key={field.id}
-                  isReactForm={false}
-                  layout="horizontal"
-                  label={field.label}
-                  description={field.description}
-                >
-                  <Select
-                    value={String(value ?? '')}
-                    onValueChange={(v) => onFieldChange(field.id, v)}
-                  >
-                    <SelectTrigger
-                      size="small"
-                      className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem
-                          key={option.value}
-                          value={option.value}
-                          className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
-                        >
-                          {/*
-                          [Joshen] Omitting MCP icons for now as the images are not optimized (large)
-                          and is causing noticeably latency issues on the browser (even with the existing Connect UI)
-                         */}
-                          {field.id === 'framework' && option.icon && (
-                            <ConnectionIcon icon={option.icon} />
-                          )}
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItemLayout>
-              )
-
-            case 'switch':
-              return (
-                <FormItemLayout
-                  key={field.id}
-                  isReactForm={false}
-                  layout="horizontal"
-                  label={field.label}
-                  description={field.description}
-                  className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
-                >
-                  <Switch
-                    id={field.id}
-                    checked={Boolean(value)}
-                    onCheckedChange={(v) => onFieldChange(field.id, v)}
-                  />
-                </FormItemLayout>
-              )
-
-            case 'multi-select':
-              return (
-                <FormItemLayout
-                  key={field.id}
-                  isReactForm={false}
-                  layout="horizontal"
-                  label={field.label}
-                  description={field.description}
-                >
-                  <MultiSelector
-                    values={Array.isArray(value) ? value : []}
-                    onValuesChange={(v) => onFieldChange(field.id, v)}
-                  >
-                    <MultiSelectorTrigger
-                      className="w-full"
-                      label="Select features"
-                      badgeLimit="wrap"
-                      showIcon={true}
-                    />
-                    <MultiSelectorContent>
-                      <MultiSelectorList>
-                        {options.map((option) => (
-                          <MultiSelectorItem
-                            key={option.value}
-                            value={option.value}
-                            className="items-start"
-                          >
-                            <div className="flex flex-col ml-2 gap-y-0.5">
-                              <span className="font-medium">{option.label}</span>
-                              {option.description && (
-                                <span className="text-xs text-foreground-light">
-                                  {option.description}
-                                </span>
-                              )}
-                            </div>
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    </MultiSelectorContent>
-                  </MultiSelector>
-                </FormItemLayout>
-              )
-
-            default:
-              return null
-          }
-        })()
-
-        return (
-          <Fragment key={field.id}>
-            {control}
-            {insertAfterVisible && insertAfter?.fieldId === field.id ? insertAfter.node : null}
-          </Fragment>
-        )
-      })}
+      {activeFields.map((field) => (
+        <Fragment key={field.id}>
+          {renderField(field)}
+          {field.id === insertAfter?.fieldId && insertAfter.node}
+        </Fragment>
+      ))}
     </div>
+  )
+}
+
+interface ConnectComboboxProps {
+  id: string
+  options: FieldOption[]
+  value: string
+  onValueChange: (value: string) => void
+  placeholder: string
+  searchPlaceholder: string
+  emptyMessage: string
+  showIcons: boolean
+}
+
+function ConnectCombobox({
+  id,
+  options,
+  value,
+  onValueChange,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+  showIcons,
+}: ConnectComboboxProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [listboxElementId, setListboxElementId] = useState<string>()
+  const selectedOption = options.find((option) => option.value === value)
+  const showEmptyStatus =
+    search.trim().length > 0 &&
+    !options.some((option) => getOptionMatchScore(option.label, search, [option.value]) > 0)
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) setSearch('')
+  }
+
+  return (
+    <Popover open={isOpen} onOpenChange={handleOpenChange} modal={false}>
+      <PopoverTrigger asChild>
+        <Button
+          id={id}
+          variant="default"
+          size="small"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-controls={listboxElementId}
+          className={cn('w-full justify-between', !selectedOption && 'text-foreground-muted')}
+          iconRight={<ChevronsUpDownIcon className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
+        >
+          <span className="flex min-w-0 items-center gap-x-2">
+            {showIcons && selectedOption?.icon && (
+              <span aria-hidden="true" className="flex shrink-0">
+                <ConnectionIcon icon={selectedOption.icon} />
+              </span>
+            )}
+            <span className="truncate">{selectedOption?.label ?? placeholder}</span>
+          </span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="p-0" sameWidthAsTrigger>
+        <Command filter={getOptionMatchScore}>
+          <CommandInput placeholder={searchPlaceholder} value={search} onValueChange={setSearch} />
+          <p className="sr-only" role="status" aria-live="polite">
+            {showEmptyStatus ? emptyMessage : ''}
+          </p>
+          <ScrollRoot className="flex flex-col">
+            <ScrollViewport className="max-h-72 overscroll-contain">
+              <CommandList
+                className="max-h-none overflow-visible"
+                ref={(node) => {
+                  if (node?.id) setListboxElementId(node.id)
+                }}
+              >
+                <CommandEmpty>{emptyMessage}</CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.label}
+                      keywords={[option.value]}
+                      onSelect={() => {
+                        onValueChange(option.value)
+                        handleOpenChange(false)
+                      }}
+                      className="gap-x-2"
+                    >
+                      <CheckIcon
+                        className={cn(
+                          'h-4 w-4 shrink-0',
+                          option.value === value ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                      {showIcons && option.icon && (
+                        <span aria-hidden="true" className="flex shrink-0">
+                          <ConnectionIcon icon={option.icon} />
+                        </span>
+                      )}
+                      <span className="truncate">{option.label}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </ScrollViewport>
+            <ScrollBar />
+          </ScrollRoot>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

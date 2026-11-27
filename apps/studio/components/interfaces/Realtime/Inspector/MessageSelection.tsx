@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, copyToClipboard } from 'ui'
@@ -104,7 +104,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <X size={14} strokeWidth={2} className="text-scale-900" />
+              <XIcon size={14} strokeWidth={2} className="text-scale-900" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded-sm" />

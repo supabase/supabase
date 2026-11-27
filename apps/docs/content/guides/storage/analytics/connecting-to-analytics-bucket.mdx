@@ -8,20 +8,11 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-Analytics buckets require authentication with two distinct services:
+[Analytics buckets](/docs/guides/storage/analytics/introduction) require authentication with two distinct services:
 
 ## Architecture overview
 
-**Iceberg REST Catalog** serves as the metadata management system for your Iceberg tables. It enables Iceberg clients such as PyIceberg and Apache Spark to perform critical operations:
-
-- Creating and managing tables and namespaces
-- Tracking schemas and handling schema evolution
-- Managing partitions and table snapshots
-- Ensuring transactional consistency and isolation
-
-The REST Catalog only stores metadata describing your data's structure, schema, and partitioning strategy—not the actual data itself.
-
-**S3-Compatible Storage Endpoint** handles the actual data storage and retrieval. It's optimized for reading and writing large analytical datasets stored in Parquet format, separate from the metadata management layer.
+The **Iceberg REST Catalog** manages your tables' metadata, and the **S3-compatible storage endpoint** stores the data. For what each service does, see [Analytics buckets](/docs/guides/storage/analytics/introduction#services).
 
 ## Authentication setup
 

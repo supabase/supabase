@@ -2,7 +2,7 @@ import type { ConnectionStringMethod } from './Connect.constants'
 import type { ConnectionStringPooler } from './Connect.types'
 
 export const DEFAULT_PORT = '5432'
-export const PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
+export const PASSWORD_PLACEHOLDER = '[YOUR-DATABASE-PASSWORD]'
 export const TOKEN_PASSWORD_PLACEHOLDER = '[YOUR-ACCESS-TOKEN]'
 export const TEMPORARY_ACCESS_POOLER_OPTIONS = 'options=-c%20jit%3dtrue'
 
@@ -23,12 +23,26 @@ export const resolveConnectionString = ({
   connectionMethod,
   useSharedPooler,
   connectionStringPooler,
+  grantRole,
 }: {
   connectionMethod: ConnectionStringMethod
   useSharedPooler: boolean
   connectionStringPooler: ConnectionStringPooler | undefined
-}) => {
+  grantRole?: string | null
+}): string => {
   if (!connectionStringPooler) return ''
+
+  if (grantRole) {
+    const uri = resolveConnectionString({
+      connectionMethod,
+      useSharedPooler: true,
+      connectionStringPooler,
+    })
+    return applyTemporaryAccessToConnectionString(uri, {
+      role: grantRole,
+      addPoolerJitOption: connectionMethod !== 'direct',
+    })
+  }
 
   if (connectionMethod === 'direct') {
     return connectionStringPooler.direct ?? ''
@@ -114,6 +128,35 @@ export const buildJdbcString = (
   return `jdbc:postgresql://${params.host}:${params.port}/${params.database}?user=${params.user}&password=${passwordPlaceholder}${extraParams}`
 }
 
+/**
+ * Ensures a connection string's query params carry `sslmode=require` without
+ * dropping params the URI already has (e.g. `options=reference%3D...` or
+ * `sslnegotiation=direct`).
+ */
+export const withRequiredSslmode = (search: string) => {
+  if (!search) return '?sslmode=require'
+  if (search.includes('sslmode=')) return search
+  return `${search}&sslmode=require`
+}
+
+export const buildDotnetConnectionString = (
+  params: ConnectionParams,
+  passwordPlaceholder = PASSWORD_PLACEHOLDER
+) => {
+  // Multigres only accepts direct SSL negotiation; Npgsql (9+) spells it
+  // `SSL Negotiation=Direct` and throws on the parameter in older versions,
+  // so only emit it when the resolved URI carries the param.
+  const poolerOptions = new URLSearchParams(params.search).get('options')
+  const options =
+    passwordPlaceholder === TOKEN_PASSWORD_PLACEHOLDER && poolerOptions
+      ? `;Options=${poolerOptions}`
+      : ''
+  const sslNegotiation = params.search.includes('sslnegotiation=direct')
+    ? ';SSL Negotiation=Direct'
+    : ''
+  return `Host=${params.host};Port=${params.port};Database=${params.database};Username=${params.user};Password=${passwordPlaceholder};SSL Mode=Require;Trust Server Certificate=true${sslNegotiation}${options}`
+}
+
 export const buildConnectionStringWithPassword = (
   connectionString: string,
   password: string
@@ -131,11 +174,17 @@ export const buildConnectionStringWithPassword = (
   return connectionString.split(PASSWORD_PLACEHOLDER).join(encodedPassword)
 }
 
-export const buildConnectionParameters = (params: ConnectionParams) => [
+export const buildConnectionParameters = (params: ConnectionParams, tokenPassword?: string) => [
   { key: 'host', value: params.host },
   { key: 'port', value: params.port },
   { key: 'database', value: params.database },
   { key: 'user', value: params.user },
+  ...(tokenPassword
+    ? [
+        { key: 'password', value: tokenPassword },
+        ...Array.from(new URLSearchParams(params.search), ([key, value]) => ({ key, value })),
+      ]
+    : []),
 ]
 
 /**
@@ -199,23 +248,15 @@ export const applyTemporaryAccessToPooler = (
   return {
     ...pooler,
     direct: rewrite(pooler.direct, false),
-    transactionShared: rewrite(pooler.transactionShared, true),
-    sessionShared: rewrite(pooler.sessionShared, true),
-    transactionDedicated: rewrite(pooler.transactionDedicated, false),
-    sessionDedicated: rewrite(pooler.sessionDedicated, false),
+    transactionShared: applyTemporaryAccessToConnectionString(pooler.transactionShared, {
+      role,
+      addPoolerJitOption: true,
+    }),
+    sessionShared: applyTemporaryAccessToConnectionString(pooler.sessionShared, {
+      role,
+      addPoolerJitOption: true,
+    }),
+    transactionDedicated: undefined,
+    sessionDedicated: undefined,
   }
-}
-
-export const shouldAddTemporaryAccessPoolerOption = ({
-  connectionMethod,
-  useSharedPooler,
-  hasDedicatedPooler,
-}: {
-  connectionMethod: ConnectionStringMethod
-  useSharedPooler: boolean
-  hasDedicatedPooler: boolean
-}) => {
-  if (connectionMethod === 'direct') return false
-  if (connectionMethod === 'session') return true
-  return useSharedPooler || !hasDedicatedPooler
 }

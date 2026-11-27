@@ -52,7 +52,7 @@ Select the **JDBC** tab to copy the connection string in the right format for Sp
 The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
 
 ```bash
-export SUPABASE_DB_URL='jdbc:postgresql://[POOLER-HOST]:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
+export SUPABASE_DB_URL='jdbc:postgresql://[POOLER-HOST]:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-DATABASE-PASSWORD]&sslmode=require'
 ```
 
 Then reference the variable, along with the driver, in `src/main/resources/application.properties`.
@@ -69,7 +69,7 @@ If the app fails to start with `Unable to determine Dialect without JDBC metadat
 
 By default Hibernate creates tables in the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
-Create the `app` schema before you start the app. Hibernate creates tables in that schema on startup, but it does not create the schema itself. Run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+Create the `app` schema before you start the app. Hibernate creates tables in that schema on startup, but it does not create the schema itself. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql SQL_EDITOR
 create schema if not exists app;
@@ -83,7 +83,7 @@ spring.jpa.properties.hibernate.default_schema=app
 
 ## 6. Create an entity and repository
 
-Spring Data JPA maps Java classes to database tables. Create an `Instrument` entity in `src/main/java/com/example/instruments/Instrument.java`. With `spring.jpa.hibernate.ddl-auto=update` set, Hibernate creates the `instruments` table for you when the app starts.
+Spring Data JPA maps Java classes to [database tables](/docs/guides/database/tables). Create an `Instrument` entity in `src/main/java/com/example/instruments/Instrument.java`. With `spring.jpa.hibernate.ddl-auto=update` set, Hibernate creates the `instruments` table for you when the app starts.
 
 ```java name=src/main/java/com/example/instruments/Instrument.java
 package com.example.instruments;

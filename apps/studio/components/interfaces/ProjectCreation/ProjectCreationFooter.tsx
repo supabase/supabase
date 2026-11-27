@@ -1,4 +1,5 @@
 import { useFlag } from 'common'
+import { ClockIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -13,8 +14,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
@@ -31,9 +34,11 @@ interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
   canCreateProject: boolean
   instanceSize?: string
+  highAvailability?: boolean
   organizationProjects: OrgProject[]
   isCreatingNewProject: boolean
   isSuccessNewProject: boolean
+  isLoadingAvailableRegions?: boolean
   cancelAction?: ProjectCreationCancelAction
 }
 
@@ -41,9 +46,11 @@ export const ProjectCreationFooter = ({
   form,
   canCreateProject,
   instanceSize,
+  highAvailability = false,
   organizationProjects,
   isCreatingNewProject,
   isSuccessNewProject,
+  isLoadingAvailableRegions = false,
   cancelAction = 'studio',
 }: ProjectCreationFooterProps) => {
   const router = useRouter()
@@ -62,18 +69,26 @@ export const ProjectCreationFooter = ({
   const showAdditionalCosts =
     !isFreePlan && !projectCreationDisabled && canCreateProject && additionalMonthlySpend > 0
 
+  // High availability is free during Alpha, so the new project costs $0 and is excluded from
+  // the totals below — the tooltip table still shows the usual compute price struck through.
+  const displayedAdditionalMonthlySpend = highAvailability ? 0 : additionalMonthlySpend
+  const newProjectComputeCosts = highAvailability ? 0 : monthlyInstancePrice(instanceSize)
+
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
-  const monthlyComputeCosts =
+  // Clamped since a free HA project can leave the compute credits larger than the costs
+  const monthlyComputeCosts = Math.max(
+    0,
     // current project costs
     organizationProjects.reduce((prev, acc) => {
       const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
       const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
       return prev + cost
     }, 0) +
-    // selected compute size
-    monthlyInstancePrice(instanceSize) -
-    // compute credits
-    10
+      // selected compute size
+      newProjectComputeCosts -
+      // compute credits
+      10
+  )
 
   const onCancel = () => {
     if (cancelAction === 'close') {
@@ -92,14 +107,26 @@ export const ProjectCreationFooter = ({
   }, [cancelAction])
 
   return (
-    <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
+    <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center py-3">
       {showAdditionalCosts && (
-        <div className="col-span-4">
-          <div className="flex justify-between text-sm">
-            <span>Additional costs</span>
-            <div className="text-brand flex gap-1 items-center font-mono font-medium">
-              <span>${additionalMonthlySpend}/m</span>
-              <InfoTooltip side="top" className="max-w-[450px] p-0">
+        <div className="col-span-7">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base text-foreground">Compute cost</span>
+            <span
+              role="status"
+              className="text-base font-mono font-medium text-warning"
+              translate="no"
+            >
+              +${displayedAdditionalMonthlySpend}/mo
+            </span>
+          </div>
+          <div className="mt-1 flex items-center gap-1.5 text-sm text-foreground-light">
+            <ClockIcon size={14} className="shrink-0" aria-hidden="true" />
+            <Tooltip>
+              <TooltipTrigger className="text-left underline decoration-dotted underline-offset-4">
+                Billed hourly, busy or idle
+              </TooltipTrigger>
+              <TooltipContent side="top" align="start" className="max-w-[450px] p-0">
                 <div className="p-4 text-sm text-foreground-light space-y-1">
                   <p>
                     Each project includes a dedicated Postgres instance running on its own server.
@@ -109,6 +136,9 @@ export const ProjectCreationFooter = ({
                     </InlineLink>{' '}
                     of that server, independent of your database usage.
                   </p>
+                  {highAvailability && (
+                    <p>High availability projects are free during Alpha for up to 2 projects.</p>
+                  )}
                   {monthlyComputeCosts > 0 && (
                     <p>Compute costs are applied on top of your subscription plan costs.</p>
                   )}
@@ -149,7 +179,12 @@ export const ProjectCreationFooter = ({
                       </TableCell>
                       <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
                       <TableCell className="text-right">
-                        ${monthlyInstancePrice(instanceSize)}
+                        <span className={cn(highAvailability && 'line-through')}>
+                          ${monthlyInstancePrice(instanceSize)}
+                        </span>
+                        {highAvailability && (
+                          <p className="text-xs text-foreground-lighter">Free during Alpha</p>
+                        )}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -182,15 +217,15 @@ export const ProjectCreationFooter = ({
                     </TableRow>
                   </TableBody>
                 </Table>
-              </InfoTooltip>
-            </div>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       )}
 
       <div
         className={cn(
-          showAdditionalCosts ? 'col-span-8' : 'col-span-12',
+          showAdditionalCosts ? 'col-span-5' : 'col-span-12',
           'flex items-center gap-x-2 ml-auto'
         )}
       >
@@ -201,7 +236,6 @@ export const ProjectCreationFooter = ({
         ) : (
           <Button
             type="button"
-            variant="default"
             disabled={isCreatingNewProject || isSuccessNewProject}
             onClick={onCancel}
           >
@@ -210,9 +244,10 @@ export const ProjectCreationFooter = ({
         )}
 
         <Button
+          variant="primary"
           type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
-          disabled={!canCreateProject}
+          disabled={!canCreateProject || isLoadingAvailableRegions}
         >
           Create new project
         </Button>

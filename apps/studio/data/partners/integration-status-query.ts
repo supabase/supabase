@@ -3,14 +3,15 @@ import { useQuery } from '@tanstack/react-query'
 import { partnersKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type IntegrationVariables = {
   projectRef?: string
 }
 
 export type IntegrationStatus =
-  components['schemas']['PartnerIntegrationListResponse']['integrations'][0]
+  components['schemas']['PartnerIntegrationListResponse_Output']['integrations'][0]
 
 async function getIntegrations({ projectRef }: IntegrationVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -25,7 +26,7 @@ async function getIntegrations({ projectRef }: IntegrationVariables, signal?: Ab
 }
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
-export type IntegrationsError = ResponseError
+export type IntegrationsError = StudioError
 
 export const usePartnerIntegrationsQuery = <TData = IntegrationsData>(
   { projectRef }: IntegrationVariables,

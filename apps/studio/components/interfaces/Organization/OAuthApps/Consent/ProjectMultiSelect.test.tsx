@@ -1,0 +1,339 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
+import { describe, expect, test, vi } from 'vitest'
+
+import { ProjectMultiSelect } from './ProjectMultiSelect'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { customRender } from '@/tests/lib/custom-render'
+
+const createMockOrganizationProject = (project?: Partial<OrgProject>): OrgProject => ({
+  cloud_provider: '',
+  databases: [],
+  inserted_at: '',
+  integration_source: null,
+  is_branch: false,
+  name: '',
+  ref: '',
+  region: '',
+  status: 'ACTIVE_HEALTHY',
+  ...project,
+})
+
+const PROJECTS = [
+  createMockOrganizationProject({ ref: 'project-1', name: 'production' }),
+  createMockOrganizationProject({ ref: 'project-2', name: 'staging' }),
+]
+
+const MANY_PROJECTS = Array.from({ length: 12 }, (_, index) =>
+  createMockOrganizationProject({
+    ref: `project-${index + 1}`,
+    name: `project ${index + 1}`,
+  })
+)
+
+const projectsUpTo = (count: number) => MANY_PROJECTS.slice(0, count)
+
+const CAP_HELPER_TEXT = 'Maximum reached. Deselect a project to choose a different one.'
+
+mockIntersectionObserver()
+
+describe('ProjectMultiSelect', () => {
+  test('shows a placeholder when nothing is selected', () => {
+    customRender(
+      <ProjectMultiSelect
+        selectedProjectRefs={[]}
+        projects={PROJECTS}
+        selectedProjects={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    expect(screen.getByRole('combobox')).toHaveTextContent('Select projects...')
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('0/10')).not.toBeInTheDocument()
+  })
+
+  test('renders a single selected project by name in the trigger', () => {
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjectRefs={[PROJECTS[0].ref]}
+        selectedProjects={[PROJECTS[0]]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('production')
+    expect(trigger).not.toHaveTextContent('project-1')
+  })
+
+  test('shows two selected projects as two badges', () => {
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={PROJECTS}
+        selectedProjectRefs={PROJECTS.map((p) => p.ref)}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('production')
+    expect(trigger).toHaveTextContent('staging')
+    expect(trigger).not.toHaveTextContent('+')
+    expect(trigger).not.toHaveTextContent('project-1')
+  })
+
+  test('collapses the projects past the badge limit into a counter', () => {
+    const selectedProjects = projectsUpTo(3)
+    customRender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('project 1')
+    expect(trigger).toHaveTextContent('project 2')
+    expect(trigger).toHaveTextContent('+1')
+    expect(trigger).not.toHaveTextContent('project 3')
+    expect(trigger).not.toHaveTextContent('project-1')
+  })
+
+  test('fires onChange with the toggled id added', () => {
+    const onChange = vi.fn()
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        selectedProjectRefs={[]}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByText('production'))
+
+    expect(onChange).toHaveBeenCalledWith(['project-1'])
+  })
+
+  test('fires onChange with the toggled id removed', () => {
+    const onChange = vi.fn()
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[PROJECTS[0]]}
+        selectedProjectRefs={[PROJECTS[0].ref]}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByRole('option', { name: 'production' }))
+
+    expect(onChange).toHaveBeenCalledWith([])
+  })
+
+  test('renders the error message when the error prop is set', () => {
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        selectedProjectRefs={[]}
+        onChange={vi.fn()}
+        error="Must select at least one project to authorize."
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
+    expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
+  })
+
+  test('search filters the visible project rows', () => {
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        selectedProjectRefs={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+    expect(screen.getByText('production')).toBeInTheDocument()
+    expect(screen.getByText('staging')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText('Search projects'), {
+      target: { value: 'prod' },
+    })
+
+    expect(screen.getByText('production')).toBeInTheDocument()
+    expect(screen.queryByText('staging')).not.toBeInTheDocument()
+  })
+
+  test('has no select-all control', () => {
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        selectedProjectRefs={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    expect(screen.queryByText(/select all/i)).not.toBeInTheDocument()
+  })
+
+  test.each([
+    { count: 7, isCounterShown: false },
+    { count: 8, isCounterShown: true },
+  ])(
+    'shows the counter from eight selected onward ($count selected)',
+    ({ count, isCounterShown }) => {
+      const selectedProjects = projectsUpTo(count)
+      customRender(
+        <ProjectMultiSelect
+          projects={MANY_PROJECTS}
+          selectedProjects={selectedProjects}
+          selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+          onChange={vi.fn()}
+          onSearchChange={vi.fn()}
+          onLoadMore={vi.fn()}
+        />
+      )
+
+      expect(screen.queryByText(`${count}/10`) !== null).toBe(isCounterShown)
+    }
+  )
+
+  test('at nine selected the cap is not yet reached and a tenth can be added', () => {
+    const onChange = vi.fn()
+    const selectedProjects = projectsUpTo(9)
+    customRender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('9/10')).toBeInTheDocument()
+    expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByText('project 10'))
+
+    expect(onChange).toHaveBeenCalledWith(projectsUpTo(10).map((p) => p.ref))
+  })
+
+  test('at the cap it shows 10/10 and the helper text', () => {
+    const selectedProjects = projectsUpTo(10)
+    customRender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('10/10')).toBeInTheDocument()
+    expect(screen.getByText(CAP_HELPER_TEXT)).toBeInTheDocument()
+  })
+
+  test('at the cap unselected options are disabled and cannot be selected', () => {
+    const onChange = vi.fn()
+    const selectedProjects = projectsUpTo(10)
+    customRender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+
+    const unselected = screen.getByText('project 11').closest('[role="option"]')
+    expect(unselected).toHaveAttribute('aria-disabled', 'true')
+
+    fireEvent.click(screen.getByText('project 11'))
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  test('the cap never blocks deselection, which re-enables the other options', () => {
+    const onChange = vi.fn()
+    let selectedProjects = projectsUpTo(10)
+    const { rerender } = customRender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByRole('option', { name: 'project 1' }))
+
+    expect(onChange).toHaveBeenCalledWith(
+      projectsUpTo(10)
+        .slice(1)
+        .map((p) => p.ref)
+    )
+
+    selectedProjects = projectsUpTo(0)
+    rerender(
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
+    expect(screen.getByText('project 11').closest('[role="option"]')).not.toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+  })
+})

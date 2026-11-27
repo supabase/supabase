@@ -9,6 +9,8 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { getGuideLastUpdated } from '~/lib/last-changed'
+import { mdAlternate } from '~/lib/md-alternates'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
@@ -20,6 +22,8 @@ import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
+
+type OpenGraphArticleMetadata = Extract<NonNullable<Metadata['openGraph']>, { type: 'article' }>
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -33,7 +37,7 @@ const PUBLISHED_SECTIONS = [
   'graphql',
   'integrations',
   'local-development',
-  'monitoring-and-debugging',
+  'observability',
   'platform',
   'queues',
   'realtime',
@@ -82,14 +86,22 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
+    const lastUpdated = await getGuideLastUpdated(slug)
+
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
       meta: restMeta,
       content,
       editLink,
+      lastUpdated,
     }
   } catch (error: unknown) {
-    if (error instanceof Error && error.cause instanceof FileNotFoundError) {
+    // `fromFs` rethrows FileNotFoundError directly, so check the error itself
+    // as well as its cause.
+    if (
+      error instanceof FileNotFoundError ||
+      (error instanceof Error && error.cause instanceof FileNotFoundError)
+    ) {
       // Not using console.error because this includes pages that are genuine
       // 404s and clutters up the logs
       console.log('Could not read Markdown at path: %s', fullPath)
@@ -160,11 +172,15 @@ const genGuidesStaticParams = (directory?: string) => async () => {
 
 const genGuideMeta =
   <Params,>(
-    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
+    generate: (params: Params) => OrPromise<{
+      meta: GuideFrontmatter
+      pathname: `/${string}`
+      lastUpdated?: string
+    }>
   ) =>
   async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
     const params = await props.params
-    const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
+    const [parentAlternates, parentOg, { meta, pathname, lastUpdated }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),
       generate(params),
@@ -182,18 +198,20 @@ const genGuideMeta =
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
         types: {
           ...(parentAlternates?.types ?? {}),
-          'text/markdown': `${BASE_PATH}${pathname}.md`,
+          ...mdAlternate(pathname.replace(/^\/guides\//, '')),
         },
       },
       openGraph: {
         ...parentOg,
+        type: 'article',
+        modifiedTime: lastUpdated,
         url: `${BASE_PATH}${pathname}`,
         images: generateOpenGraphImageMeta({
           type: ogType,
           title: meta.title,
           description: meta.description,
         }),
-      },
+      } satisfies OpenGraphArticleMetadata,
     }
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { POST } from './route'
 
@@ -19,10 +19,6 @@ function makeRequest(body: unknown) {
 }
 
 describe('/api/search/embeddings', () => {
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('returns 400 when query is missing', async () => {
     const response = await POST(makeRequest({}))
     expect(response.status).toBe(400)

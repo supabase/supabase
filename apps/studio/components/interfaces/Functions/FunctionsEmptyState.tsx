@@ -1,14 +1,14 @@
 import { useParams } from 'common'
-import { Code, Server, Terminal } from 'lucide-react'
+import { CodeIcon, ServerIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { PageSectionTitle } from 'ui-patterns/PageSection'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
@@ -44,25 +44,24 @@ export const FunctionsEmptyState = () => {
     : 'Add your first edge function'
 
   return (
-    <>
+    <div>
       <Card>
         <CardHeader>
           <CardTitle>{emptyStateTitle}</CardTitle>
         </CardHeader>
-        <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+        <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x items-stretch">
           {/* Editor Option */}
           {IS_PLATFORM && (
             <>
               <div className="p-8">
                 <div className="flex items-center gap-2">
-                  <Code strokeWidth={1.5} size={20} />
+                  <CodeIcon strokeWidth={1.5} size={20} />
                   <h4 className="text-base text-foreground">Via Editor</h4>
                 </div>
                 <p className="text-sm text-foreground-light mb-4 mt-1">
                   Create and edit functions directly in the browser. Download to local at any time.
                 </p>
                 <Button
-                  variant="default"
                   onClick={() => {
                     router.push(`/project/${ref}/functions/new`)
                     track('edge_function_via_editor_button_clicked', {
@@ -85,7 +84,6 @@ export const FunctionsEmptyState = () => {
                   function.
                 </p>
                 <Button
-                  variant="default"
                   onClick={() => {
                     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                     aiSnap.newChat({
@@ -127,7 +125,7 @@ export const FunctionsEmptyState = () => {
           {(IS_PLATFORM || isCli) && (
             <div className="p-8">
               <div className="flex items-center gap-2">
-                <Terminal strokeWidth={1.5} size={20} />
+                <TerminalIcon strokeWidth={1.5} size={20} />
                 <h4 className="text-base text-foreground">Via CLI</h4>
               </div>
               <p className="text-sm text-foreground-light mb-4 mt-1">
@@ -136,7 +134,6 @@ export const FunctionsEmptyState = () => {
               </p>
 
               <Button
-                variant="default"
                 onClick={() => {
                   setCreateMethod('cli')
                   track('edge_function_via_cli_button_clicked', { origin: 'no_functions_block' })
@@ -152,14 +149,12 @@ export const FunctionsEmptyState = () => {
       </Card>
       {IS_PLATFORM && (
         <>
-          <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
-            Start with a template
-          </ScaffoldSectionTitle>
+          <PageSectionTitle className="mb-4 mt-12">Start with a template</PageSectionTitle>
           <ResourceList>
             {templates.map((template) => (
               <ResourceItem
                 key={template.name}
-                media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
+                media={<CodeIcon strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
                 onClick={() => {
                   track('edge_function_template_clicked', {
                     templateName: template.name,
@@ -176,20 +171,19 @@ export const FunctionsEmptyState = () => {
           </ResourceList>
         </>
       )}
-    </>
+    </div>
   )
 }
 
 const SelfHostedManualFunctionContent = () => (
   <div className="p-8">
     <div className="flex items-center gap-2">
-      <Server strokeWidth={1.5} size={20} />
+      <ServerIcon strokeWidth={1.5} size={20} />
       <h4 className="text-base text-foreground">Self-Hosted</h4>
     </div>
     <p className="text-sm text-foreground-light mb-4 mt-1">
-      Place each function at{' '}
-      <code className="text-code-inline">volumes/functions/&lt;function-name&gt;/index.ts</code> and
-      restart the <code className="text-code-inline">functions</code> service to pick up changes.
+      Place each function at <code>volumes/functions/&lt;function-name&gt;/index.ts</code> and
+      restart the <code>functions</code> service to pick up changes.
     </p>
     <DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions`} />
   </div>

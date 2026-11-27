@@ -4,7 +4,9 @@ import {
   CartesianGrid,
   Cell,
   Legend,
+  Line,
   BarChart as RechartBarChart,
+  ComposedChart as RechartComposedChart,
   Tooltip,
   XAxis,
   YAxis,
@@ -14,7 +16,7 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import NoDataPlaceholder from './NoDataPlaceholder'
+import { NoDataPlaceholder } from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
 import { CHART_COLORS, DateTimeFormats } from '@/components/ui/Charts/Charts.constants'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
@@ -31,6 +33,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
+  chartStyle?: 'bar' | 'line'
   syncId?: string
 }
 
@@ -56,7 +59,9 @@ function BarChart<D extends Datum = Datum>({
   YAxisProps,
   showGrid = false,
   syncId,
+  chartStyle = 'bar',
 }: BarChartProps<D>) {
+  const Chart = chartStyle === 'line' ? RechartComposedChart : RechartBarChart
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
     useChartHoverState('default')
   const { Container } = useChartSize(size)
@@ -143,7 +148,7 @@ function BarChart<D extends Datum = Datum>({
         attributes={[]}
       />
       <Container>
-        <RechartBarChart
+        <Chart
           data={transformedData}
           className="overflow-visible"
           onMouseMove={(e: any) => {
@@ -192,26 +197,36 @@ function BarChart<D extends Datum = Datum>({
               ) : null
             }
           />
-          <Bar
-            dataKey={yAxisKey}
-            fill={CHART_COLORS.GREEN_1}
-            animationDuration={300}
-            maxBarSize={48}
-          >
-            {data?.map((_entry: D, index: number) => (
-              <Cell
-                key={`cell-${index}`}
-                className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
-                fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
-                }
-                enableBackground={12}
-              />
-            ))}
-          </Bar>
-        </RechartBarChart>
+          {chartStyle === 'line' ? (
+            <Line
+              dataKey={yAxisKey}
+              type="linear"
+              stroke={CHART_COLORS.GREEN_1}
+              dot={false}
+              animationDuration={300}
+            />
+          ) : (
+            <Bar
+              dataKey={yAxisKey}
+              fill={CHART_COLORS.GREEN_1}
+              animationDuration={300}
+              maxBarSize={48}
+            >
+              {data?.map((_entry: D, index: number) => (
+                <Cell
+                  key={`cell-${index}`}
+                  className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
+                  fill={
+                    focusDataIndex === index || focusDataIndex === null
+                      ? CHART_COLORS.GREEN_1
+                      : CHART_COLORS.GREEN_2
+                  }
+                  enableBackground={12}
+                />
+              ))}
+            </Bar>
+          )}
+        </Chart>
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">

@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Loader2, Search, X } from 'lucide-react'
+import { Loader2Icon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { AccordionContent, AccordionItem, AccordionTrigger, Button, Checkbox, cn, Label } from 'ui'
@@ -40,9 +40,6 @@ export const UserLogFilterControl = () => {
     [data?.pages]
   )
 
-  // Only one user can be filtered on at a time — keep the current selection visible (and
-  // checked) even if it falls outside the current search results, e.g. right after loading
-  // from a deep link.
   const options: UserOption[] =
     user && !results.some((u) => u.id === user) ? [{ id: user, email: null }, ...results] : results
 
@@ -50,8 +47,8 @@ export const UserLogFilterControl = () => {
 
   return (
     <AccordionItem value="user" className="border-none">
-      <div className="flex items-center gap-2 pr-2">
-        <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+      <div className="flex items-center gap-2 px-2">
+        <AccordionTrigger className="flex-1 px-0 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
           <div className="flex items-center gap-2 truncate py-2">
             <p className="text-sm">User</p>
           </div>
@@ -60,7 +57,7 @@ export const UserLogFilterControl = () => {
           <Button
             type="button"
             variant="outline"
-            icon={<X />}
+            icon={<XIcon />}
             className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
             aria-label="Clear user filter"
             onClick={(e) => {
@@ -73,13 +70,13 @@ export const UserLogFilterControl = () => {
         ) : null}
       </div>
       <AccordionContent>
-        <div className="p-1 grid gap-2">
+        <div className="py-1 px-2 grid gap-2">
           <InputWithAddons
             placeholder="Search by email or id"
-            leading={<Search size={14} className="text-foreground-lighter" />}
+            leading={<SearchIcon size={14} className="text-foreground-lighter" />}
             containerClassName="h-8 rounded-sm"
             value={search}
-            trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
+            trailing={isFetching ? <Loader2Icon size={12} className="animate-spin" /> : undefined}
             onChange={(e) => setSearch(e.target.value)}
           />
 

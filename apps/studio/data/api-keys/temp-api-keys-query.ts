@@ -24,6 +24,7 @@ export async function getTemporaryAPIKey(
     signal,
   })
 
-  if (error) handleError(error)
+  // Called directly (see temp-api-keys-utils), not through a query
+  if (error) handleError(error, { reportImmediately: true })
   return data
 }

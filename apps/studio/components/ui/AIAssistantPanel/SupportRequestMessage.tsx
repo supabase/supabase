@@ -1,4 +1,4 @@
-import { Mail } from 'lucide-react'
+import { MailIcon } from 'lucide-react'
 
 import {
   parseSupportAssistantPrompt,
@@ -14,7 +14,7 @@ export function SupportRequestMessage({ request }: { request: ParsedSupportAssis
     <div className="not-prose rounded-lg border bg-surface-75 p-4 text-sm text-foreground-light">
       <div className="min-w-0 space-y-4">
         <div className="space-y-4">
-          <Mail size={16} strokeWidth={1.5} className="text-foreground-muted" />
+          <MailIcon size={16} strokeWidth={1.5} className="text-foreground-muted" />
           <div className="space-y-1">
             <p className="heading-default text-foreground">Support request submitted</p>
             <p>

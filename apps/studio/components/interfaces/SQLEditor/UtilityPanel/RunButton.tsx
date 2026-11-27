@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { KeyboardShortcut } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -35,7 +35,7 @@ export const SqlRunButton = ({
       data-testid="sql-run-button"
       iconRight={
         isExecuting ? (
-          <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={10} strokeWidth={1.5} />
         ) : (
           <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
         )

@@ -3,7 +3,8 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT, withSavedStatus } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SQLSnippetFolderContentsVariables = {
   projectRef?: string
@@ -45,7 +46,7 @@ export async function getSQLSnippetFolderContents(
 }
 
 export type SQLSnippetFolderContentsData = Awaited<ReturnType<typeof getSQLSnippetFolderContents>>
-export type SQLSnippetFolderContentsError = ResponseError
+export type SQLSnippetFolderContentsError = StudioError
 
 export const useSQLSnippetFolderContentsQuery = <TData = SQLSnippetFolderContentsData>(
   { projectRef, folderId, name, sort }: Omit<SQLSnippetFolderContentsVariables, 'cursor'>,

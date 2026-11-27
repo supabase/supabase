@@ -9,7 +9,7 @@ description: >-
   for the docs app?", or before writing non-trivial changes under
   apps/docs/ — especially anything touching the MDX pipeline, markdown
   generation, content components, federated docs, or contributor-facing
-  authoring patterns. Can answer architecture questions with Mermaid
+  authoring patterns, or feature flags and experiments. Can answer architecture questions with Mermaid
   diagrams when helpful.
 ---
 
@@ -47,7 +47,7 @@ Two jobs:
   principles.
 
 **Not for:** general Supabase docs _content_ questions (use
-`work-linear-issue`, `audit-quickstarts`, etc.), or app-level work outside
+`write-the-docs`, `edit-the-docs`, or `review-the-docs`), or app-level work outside
 `apps/docs/`.
 
 ## Answering with diagrams
@@ -57,15 +57,15 @@ than with prose. Default to including a **Mermaid diagram** in answers
 about:
 
 - The MDX runtime vs markdown-export pipeline split.
-- Build flow (Turbo → pnpm `prebuild` / `build` / `postbuild` → Vercel).
+- Build flow (Turbo task graph → `build` → Vercel).
 - LLM/agent consumption surface (`llms.txt`, negotiation, bulk exports).
 - Federated docs fetch flow.
 - CI / PR flow.
 - Component / data-registry relationships.
 - Management API OpenAPI → codegen → reference page flow.
 
-Mermaid fences (`` ```mermaid `````) render natively on GitHub, Cursor,
-and most Markdown previewers. Several reference files already embed
+Mermaid fences (`` ```mermaid `````) render natively on GitHub and
+most Markdown previewers. Several reference files already embed
 Mermaid; reuse or adapt them rather than re-deriving.
 
 Keep diagrams **small and one-topic**. If a diagram needs more than a
@@ -76,34 +76,41 @@ dozen nodes, split it.
 Short, focused docs under `reference/`. Read whichever apply to the task
 at hand — they cite each other where context matters.
 
-| File                                                                               | What's inside                                                                                                                                         |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`reference/adding-features.md`](./reference/adding-features.md)                   | Best-practices guidance for adding features to `apps/docs`. Inventory existing code first, pick the smallest viable shape, reuse pipelines.           |
-| [`reference/docs-app-direction.md`](./reference/docs-app-direction.md)             | Refactoring vision and working norms — what new work should align with.                                                                               |
-| [`reference/known-issues.md`](./reference/known-issues.md)                         | Living list of broken, fragile, or in-flux systems. Check before depending on anything (federated docs, search, Sentry, reference-page architecture). |
-| [`reference/app-map.md`](./reference/app-map.md)                                   | Architecture cheat sheet — directories, the two-pipeline (MDX runtime + markdown export) model, heading/typography contract, telemetry, lint entries. |
-| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo + pnpm lifecycle steps for building `apps/docs` — codegen, prebuild, postbuild, Vercel deploy. Mermaid diagram included.                    |
-| [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing, `llms.txt`, content negotiation, bulk exports.                                                                                      |
-| [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                     |
-| [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.            |
-| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `docs_lint`, `Docs Tests`, typecheck, prettier, Vercel preview gate. Where to add a check before creating a new one.     |
-| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI download → Redocly bundle → codegen → `ApiEndpointSection`; why not to swap in Scalar/Redoc.                                   |
-| [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                      |
+| File                                                                               | What's inside                                                                                                                                                            |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`reference/adding-features.md`](./reference/adding-features.md)                   | Best-practices guidance for adding features to `apps/docs`. Inventory existing code first, pick the smallest viable shape, reuse pipelines.                              |
+| [`reference/docs-app-direction.md`](./reference/docs-app-direction.md)             | Refactoring vision and working norms — what new work should align with.                                                                                                  |
+| [`reference/known-issues.md`](./reference/known-issues.md)                         | Living list of broken, fragile, or in-flux systems. Check before depending on anything (federated docs, search, Sentry, reference-page architecture).                    |
+| [`reference/app-map.md`](./reference/app-map.md)                                   | Architecture cheat sheet — directories, the two-pipeline (MDX runtime + markdown export) model, heading/typography contract, telemetry, lint entries.                    |
+| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo task graph for building `apps/docs` — codegen, markdown generation, sitemap, Vercel deploy. Mermaid diagram included.                                          |
+| [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing, `llms.txt`, content negotiation, bulk exports.                                                                                                         |
+| [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                                        |
+| [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.                               |
+| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `Docs Tests`, typecheck, oxfmt, Vercel preview gate. Where to add a check before creating a new one.                                       |
+| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI → reference generation, including scoped PAT permission tables; why not to swap in Scalar/Redoc.                                                  |
+| [`reference/graphql-endpoint.md`](./reference/graphql-endpoint.md)                 | The `/api/graphql` endpoint under `apps/docs/resources/` — per-query folder layout, `rootSchema.ts`, connection/field utils, and the steps to add a new top-level query. |
+| [`reference/search-embeddings.md`](./reference/search-embeddings.md)               | The `scripts/search/` embeddings pipeline behind `searchDocs` — content sources, processing flow, change detection, and the `page` / `page_section` tables.              |
+| [`reference/feature-flags.md`](./reference/feature-flags.md)                       | Static `enabled-features` flags and PostHog experiment flags in `apps/docs`: where each resolves, the variant hook pattern, and gotchas.                                 |
+| [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                                         |
 
 ## How to use during a chat
 
-1. **Start by reading** `adding-features.md` and `app-map.md` if the
+1. **Check for drift.** For each reference file you use, run
+   `git log --oneline <Verified at>..HEAD -- apps/docs ':!apps/docs/content'`
+   and read each commit that touches code the answer depends on. A file
+   with no `Verified at` line is unverified.
+2. **Start by reading** `adding-features.md` and `app-map.md` if the
    question touches design choices or unfamiliar code paths. They're
    small on purpose — read both, don't skim.
-2. **Verify before recommending.** Reference content may lag behind the
+3. **Verify before recommending.** Reference content may lag behind the
    live code. Confirm with the actual files (`apps/docs/...`) before
    acting on remembered claims about file paths, function names, or
    behavior.
-3. **Cite the principle**, not just the rule. "Per `adding-features.md`
+4. **Cite the principle**, not just the rule. "Per `adding-features.md`
    § 'Reuse pipelines, don't fork them', this routes through the
    existing markdown-schema handler rather than introducing a side
    path."
-4. **Reach for Mermaid** when explaining architecture, flows, or
+5. **Reach for Mermaid** when explaining architecture, flows, or
    relationships — see [Answering with diagrams](#answering-with-diagrams).
 
 ## Updating the librarian
@@ -114,6 +121,11 @@ file inaccurate, or a generally-applicable lesson emerges from a PR
 review, open a pull request against this repo to update the relevant
 file, same as any other in-repo change.
 
+List each stale fact under "Skill corrections" at the end of the answer.
+With the user's approval, fix it in their open PR if that PR changes
+`apps/docs`, else in a new PR. After you check a whole file, set its
+`Verified at` line to that commit.
+
 Keep each canonical file under ~250 lines; split before they bloat.
 Capture only what a future contributor would benefit from knowing — if
 a fact is already obvious from a quick read of the live code, don't
@@ -121,14 +133,11 @@ write it down.
 
 ## Related skills
 
-- [`pm-the-docs`](../pm-the-docs/SKILL.md) — audience, stage, and
-  cross-cutting scope calls (Frame stage of the "Write the docs" checklist,
-  mirrored in `pm-the-docs`'s reference file).
-- [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) — implementing
-  assigned DOCS-\* tickets.
+- [`pm-the-docs`](../pm-the-docs/SKILL.md) — audience, stage, content type,
+  and placement calls (Frame and Shape stages of the "Write the docs" checklist,
+  mirrored in `pm-the-docs`'s reference file). Cross-repo **product** lookup
+  (universe) lives there, not in this skill.
+- [`test-the-docs`](../test-the-docs/SKILL.md) — execute docs snippets against a
+  Docker-isolated local stack; verification report.
 - [`review-the-docs`](../review-the-docs/SKILL.md) — reviewing open docs
   PRs with type-specific verification.
-- [`audit-content-listings`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-content-listings/SKILL.md) — batch
-  conversion of overview pages to content listings.
-- [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) — opening or
-  updating a docs PR.

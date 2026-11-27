@@ -1,60 +1,86 @@
 import { useState } from 'react'
+import { Control } from 'react-hook-form'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import {
   countConfiguredInCategory,
-  PERMISSION_CATALOG_BY_CATEGORY,
+  getEntryModes,
+  getVisibleCategories,
   type PermissionMode,
   type PermissionSelection,
+  type ResourceAccessMode,
 } from '../../AccessToken.permissions'
+import { getActivePreset, type PermissionPreset } from '../../AccessToken.presets'
 import type { TokenAccessEvaluation } from '../../AccessToken.roles'
+import { TokenFormValues } from './NewScopedTokenForm.utils'
+import { PermissionPresetSelect } from './PermissionPresetSelect'
 import { PermissionRow } from './PermissionRow'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
 
 interface PermissionsAccordionProps {
+  control: Control<TokenFormValues>
   selection: PermissionSelection
+  resourceAccess: ResourceAccessMode
   onChange: (key: string, mode: PermissionMode) => void
+  onApplyPreset: (preset: PermissionPreset) => void
   access?: TokenAccessEvaluation
 }
 
 export const PermissionsAccordion = ({
+  control,
   selection,
+  resourceAccess,
   onChange,
+  onApplyPreset,
   access,
 }: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([])
+  const categories = getVisibleCategories(resourceAccess)
+  const activePreset = getActivePreset(selection, resourceAccess)
+  // Derived, so editing any row back off the preset clears the warning with it.
+  const riskyPreset = activePreset?.isRisky === true ? activePreset : undefined
 
   return (
-    <div className="space-y-3 px-5 sm:px-6 py-6">
-      <div>
-        <h3 className="text-sm text-foreground">Permissions</h3>
-        <p className="text-foreground-lighter text-sm">
-          Grant the minimum access this token needs. Everything defaults to None. Permissions follow
-          your role in the organizations and projects you're a member of — see{' '}
-          <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-            access control
-          </InlineLink>{' '}
-          for how roles work.
-        </p>
-      </div>
-
-      <Accordion
-        type="multiple"
-        value={openCategories}
-        onValueChange={setOpenCategories}
-        className="mt-2"
+    <section className="space-y-4 px-5 sm:px-6 py-6">
+      <FormLayout
+        layout="flex-row-reverse"
+        label="Permissions"
+        description={
+          <p className="text-foreground-lighter text-sm">
+            Grant the minimum access this token needs. Everything defaults to None. Permissions
+            follow your role in the organizations and projects you're a member of.
+          </p>
+        }
       >
-        {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
-          const configuredCount = countConfiguredInCategory(selection, category.key)
+        <PermissionPresetSelect
+          selection={selection}
+          resourceAccess={resourceAccess}
+          onApplyPreset={onApplyPreset}
+        />
+      </FormLayout>
+
+      {riskyPreset !== undefined && (
+        <Admonition
+          type="warning"
+          // Groups the warning with the header above it, rather than the list it sits on top of.
+          className="mb-4"
+          title={riskyPreset.label}
+          description={riskyPreset.description}
+        />
+      )}
+
+      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
+        {categories.map((category, index) => {
+          const configuredCount = countConfiguredInCategory(selection, category.key, resourceAccess)
           return (
             <AccordionItem
               key={category.key}
               value={category.key}
               className={cn('border', {
-                'border-b-0': index < PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+                'border-b-0': index < categories.length - 1,
                 'rounded-t-md': index === 0,
-                'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+                'rounded-b-md': index === categories.length - 1,
               })}
             >
               <AccordionTrigger className="bg-surface-300 first:rounded-t last:rounded-b px-4 py-3 hover:no-underline transition">
@@ -75,8 +101,10 @@ export const PermissionsAccordion = ({
                   {category.entries.map((entry) => (
                     <div className="px-4" key={entry.key}>
                       <PermissionRow
+                        control={control}
                         entry={entry}
                         mode={selection[entry.key] ?? 'none'}
+                        modes={getEntryModes(entry, resourceAccess)}
                         onChange={(mode) => onChange(entry.key, mode)}
                         entryAccess={access?.entries[entry.key]}
                       />
@@ -88,6 +116,6 @@ export const PermissionsAccordion = ({
           )
         })}
       </Accordion>
-    </div>
+    </section>
   )
 }

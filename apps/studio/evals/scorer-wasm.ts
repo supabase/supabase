@@ -3,15 +3,28 @@ import { parse } from 'libpg-query'
 
 import { AssistantEvalScorer } from './scorer'
 import { getParsedToolSpans } from './trace-utils'
-import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
+import { contract as createNotebookContract } from '@/lib/ai/tools/create-notebook'
+import { contract as executeSqlContract } from '@/lib/ai/tools/execute-sql'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
-/** Extracts SQL strings from all `execute_sql` tool spans in the trace. */
+/**
+ * Extracts SQL strings from `execute_sql` tool spans and from every database cell inside
+ * `create_notebook` tool spans. Log cells are excluded — their SQL targets ClickHouse, and
+ * libpg-query only understands Postgres syntax.
+ */
 async function getSqlQueries(trace: Trace): Promise<string[]> {
-  const spans = await getParsedToolSpans(trace, 'execute_sql', {
-    inputSchema: executeSqlInputSchema,
+  const executeSqlSpans = await getParsedToolSpans(trace, 'execute_sql', {
+    inputSchema: executeSqlContract.inputSchema,
   })
-  return spans.map((s) => s.input.sql)
+  const createNotebookSpans = await getParsedToolSpans(trace, 'create_notebook', {
+    inputSchema: createNotebookContract.inputSchema,
+  })
+
+  const notebookCellSql = createNotebookSpans.flatMap((s) =>
+    s.input.content.cells.filter((cell) => cell._tag === 'database_cell').map((cell) => cell.sql)
+  )
+
+  return [...executeSqlSpans.map((s) => s.input.sql), ...notebookCellSql]
 }
 
 export const sqlSyntaxScorer: AssistantEvalScorer = async ({ trace }) => {

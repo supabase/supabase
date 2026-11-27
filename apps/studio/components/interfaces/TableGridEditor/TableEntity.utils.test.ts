@@ -1,8 +1,52 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatTableRowsToSQL, getTablePoliciesUrl } from './TableEntity.utils'
+import {
+  formatTableRowsToJSON,
+  formatTableRowsToSQL,
+  getTablePoliciesUrl,
+  wrapGridJsonText,
+} from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+describe('TableEntity.utils: formatTableRowsToJSON', () => {
+  const table: SupaTable = {
+    id: 1,
+    type: ENTITY_TYPE.TABLE,
+    columns: [
+      { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+      { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+      { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb', position: 3 },
+    ],
+    name: 'yearly_totals',
+    schema: 'public',
+    comment: undefined,
+    estimateRowCount: 1,
+  }
+
+  it('should follow column order, including integer-like column names', () => {
+    const rows = [{ idx: 0, '2023': 42, '2024': 99, id: 7, meta: { a: 1 } }]
+    expect(formatTableRowsToJSON(table, rows)).toBe(`[{"id":7,"2024":99,"2023":42,"meta":{"a":1}}]`)
+  })
+
+  it('should omit the grid idx key unless the table has an idx column', () => {
+    expect(formatTableRowsToJSON(table, [{ idx: 3, id: 1 }])).not.toContain('idx')
+
+    const withIdx: SupaTable = {
+      ...table,
+      columns: [{ name: 'idx', dataType: 'bigint', format: 'int8', position: 0 }],
+    }
+    expect(formatTableRowsToJSON(withIdx, [{ idx: 3 }])).toBe(`[{"idx":3}]`)
+  })
+
+  it('should emit null for missing columns and [] for no rows', () => {
+    expect(formatTableRowsToJSON(table, [{ id: 1 }])).toBe(
+      `[{"id":1,"2024":null,"2023":null,"meta":null}]`
+    )
+    expect(formatTableRowsToJSON(table, [])).toBe('[]')
+  })
+})
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {
@@ -25,7 +69,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -49,7 +93,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -74,19 +118,62 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
         id: 2,
         name: 'Person 1',
         tags: ['tag-a', 'tag-c'],
-        metadata: '{"version": 1}',
+        metadata: { version: 1 },
       },
       {
         idx: 2,
         id: 3,
         name: 'ONeil',
         tags: ['tag-a'],
-        metadata: `{"version": 1, "name": "O'Neil"}`,
+        metadata: { version: 1, name: "O'Neil" },
       },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version": 1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version": 1, "name": "O''Neil"}');`
+    const expected = `INSERT INTO public.demo (id, name, tags, metadata) VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version":1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version":1,"name":"O''Neil"}');`
     expect(result).toBe(expected)
+  })
+
+  it('should emit an untyped literal for empty arrays', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'tags', dataType: 'ARRAY', format: '_text', position: 0 }],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    expect(formatTableRowsToSQL(table, [{ tags: [] }, { tags: ['a'] }])).toBe(
+      `INSERT INTO public.demo (tags) VALUES ('{}'), (ARRAY['a']);`
+    )
+  })
+
+  it('should escape quotes and backslashes in json and jsonb values', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'a', dataType: 'jsonb', format: 'jsonb', position: 0 },
+        { name: 'b', dataType: 'json', format: 'json', position: 1 },
+      ],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [
+      { a: { text: 'say "hi"', path: 'C:\\dir', note: "it's" }, b: 'plain "string"' },
+      { a: 'hello', b: [1, 'two'] },
+      { a: 42, b: true },
+      { a: null },
+    ]
+    expect(formatTableRowsToSQL(table, rows)).toBe(
+      `INSERT INTO public.demo (a, b) VALUES ` +
+        `('{"text":"say \\"hi\\"","path":"C:\\\\dir","note":"it''s"}', '"plain \\"string\\""'), ` +
+        `('"hello"', '[1,"two"]'), ` +
+        `('42', 'true'), ` +
+        `(null, null);`
+    )
   })
 
   it('should emit valid Postgres literals for booleans, numbers and text arrays', () => {
@@ -116,7 +203,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "storage"."buckets" ("id", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types") VALUES ('emails', true, false, 10485760, ARRAY['image/*','image/o''neil']);`
+    const expected = `INSERT INTO storage.buckets (id, public, avif_autodetection, file_size_limit, allowed_mime_types) VALUES ('emails', true, false, 10485760, ARRAY['image/*','image/o''neil']);`
     expect(result).toBe(expected)
   })
 
@@ -133,8 +220,48 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     const rows = [{ email: "o'neil@example.com" }]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."users" ("email") VALUES ('o''neil@example.com');`
+    const expected = `INSERT INTO public.users (email) VALUES ('o''neil@example.com');`
     expect(result).toBe(expected)
+  })
+
+  it('should keep values aligned with columns when column names are integer-like', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+        { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      ],
+      name: 'yearly_totals',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    // JS hoists integer-like keys to the front of Object.entries, regardless of insertion order
+    const rows = [{ idx: 0, id: 7, '2024': 99, '2023': 42 }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO public.yearly_totals (id, "2024", "2023") VALUES (7, 99, 42);`
+    expect(result).toBe(expected)
+  })
+
+  it('should emit null for columns missing from a row', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'name', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'people',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+
+    const result = formatTableRowsToSQL(table, [{ id: 1 }])
+    expect(result).toBe(`INSERT INTO public.people (id, name) VALUES (1, null);`)
   })
 
   it('should return an empty string for empty rows', () => {
@@ -152,6 +279,26 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     }
     const result = formatTableRowsToSQL(table, [])
     expect(result).toBe('')
+  })
+
+  it('should escape double quotes in schema, table and column identifiers', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'we"ird', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'pe"ople',
+      schema: 'pub"lic',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ id: 1, 'we"ird': 'value' }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "pub""lic"."pe""ople" (id, "we""ird") VALUES (1, 'value');`
+    expect(result).toBe(expected)
   })
 
   it('should remove the idx property', () => {
@@ -173,7 +320,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, 'Person 2');`
     expect(result).toBe(expected)
   })
 })
@@ -185,24 +332,69 @@ describe('TableEntity.utils: getTablePoliciesUrl', () => {
     )
   })
 
-  it('preserves special characters in the table name', () => {
-    const url = getTablePoliciesUrl('abc', 'public', 'user_data&secret=1')
-    const parsed = new URL(url, 'http://example.com')
-    expect(parsed.searchParams.get('search')).toBe('user_data&secret=1')
-    expect(parsed.searchParams.get('schema')).toBe('public')
-  })
-
-  it('preserves special characters in the schema', () => {
-    const url = getTablePoliciesUrl('abc', 'my schema+x', 'users')
-    const parsed = new URL(url, 'http://example.com')
-    expect(parsed.searchParams.get('schema')).toBe('my schema+x')
-    expect(parsed.searchParams.get('search')).toBe('users')
-  })
-
-  it('encodes both the table name and schema together', () => {
+  it('preserves special characters in the table name and schema', () => {
     const url = getTablePoliciesUrl('abc', 'a&b=c', 'd e+f')
     const parsed = new URL(url, 'http://example.com')
     expect(parsed.searchParams.get('search')).toBe('d e+f')
     expect(parsed.searchParams.get('schema')).toBe('a&b=c')
+  })
+})
+
+describe('TableEntity.utils: wrapGridJsonText', () => {
+  const table: SupaTable = {
+    id: 1,
+    type: ENTITY_TYPE.TABLE,
+    columns: [
+      { name: 'note', dataType: 'text', format: 'text', position: 0 },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb', position: 1 },
+      { name: 'tags', dataType: 'ARRAY', format: '_jsonb', position: 2 },
+    ],
+    name: 'demo',
+    schema: 'public',
+    comment: undefined,
+    estimateRowCount: 1,
+  }
+
+  it('emits json text verbatim so the SQL formatter does not double-encode it', () => {
+    const rows = [
+      { note: '{"a":1}', meta: '{"text":"say \\"hi\\""}', tags: ['{"x":1}'] },
+      { note: 'n', meta: '"hello"', tags: [] },
+    ]
+    const wrapped = wrapGridJsonText(table, rows)
+    expect(wrapped[0].note).toBe('{"a":1}')
+    expect(wrapped[0].tags).toEqual(['{"x":1}'])
+    expect(formatTableRowsToSQL(table, wrapped)).toBe(
+      `INSERT INTO public.demo (note, meta, tags) VALUES ` +
+        `('{"a":1}', '{"text":"say \\"hi\\""}', ARRAY['{"x":1}']), ('n', '"hello"', '{}');`
+    )
+  })
+
+  it('keeps numbers outside the safe integer range exact', () => {
+    const wrapped = wrapGridJsonText(table, [
+      { note: 'n', meta: '{"n":9007199254740993,"d":1.10}', tags: [] },
+    ])
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'{"n":9007199254740993,"d":1.10}'`)
+  })
+
+  it('keeps a JSON null distinct from a SQL NULL', () => {
+    const wrapped = wrapGridJsonText(table, [
+      { note: 'n', meta: 'null', tags: [] },
+      { note: 'n', meta: null, tags: [] },
+    ])
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(
+      `VALUES ('n', 'null', '{}'), ('n', null, '{}');`
+    )
+  })
+
+  it('does not change the rows it is given, so primary key lookups keep the original values', () => {
+    const rows = [{ note: 'n', meta: '1', tags: [] }]
+    const wrapped = wrapGridJsonText(table, rows)
+    expect(rows[0].meta).toBe('1')
+    expect(wrapped[0].meta).not.toBe('1')
+  })
+
+  it('escapes single quotes in the json text', () => {
+    const wrapped = wrapGridJsonText(table, [{ note: 'n', meta: '"it\'s"', tags: [] }])
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'"it''s"'`)
   })
 })

@@ -81,11 +81,11 @@ jobs:
 
           pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
           if [ -z "$pr_url" ]; then
-            gh pr create \
+            pr_url=$(gh pr create \
               --title "[bot] Decrease ESLint ratchet baselines" \
               --body "Automated weekly decrease of ESLint ratchet baselines." \
               --base "$DEFAULT_BRANCH" \
-              --head "$BRANCH"
+              --head "$BRANCH")
           else
             gh pr comment "$pr_url" --body "Updated ESLint ratchet baselines with the latest weekly decreases."
           fi

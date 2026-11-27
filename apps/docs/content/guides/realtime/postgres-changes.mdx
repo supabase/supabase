@@ -2,6 +2,7 @@
 title: 'Postgres Changes'
 subtitle: 'Listen to Postgres changes using Supabase Realtime.'
 description: 'Listen to Postgres changes using Supabase Realtime.'
+tocVideo: _-y_Lnujq64
 ---
 
 Use Realtime's Postgres Changes to listen to database events.
@@ -17,7 +18,7 @@ In this example we'll set up a database table, secure it with Row Level Security
 
     [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
 
-    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](https://app.supabase.com/project/_/sql).
+    After your project is ready, create a table in your [Supabase database](/docs/guides/database/overview). You can do this with either the Table interface or the [SQL Editor](https://app.supabase.com/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -92,7 +93,7 @@ In this example we'll set up a database table, secure it with Row Level Security
 
     <StepHikeCompact.Details title="Enable Postgres replication">
 
-      Go to your project's [Publications settings](/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to.
+      Go to your project's [Publications settings](/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to. If changes still don't arrive, see [Postgres Changes troubleshooting](/kb/troubleshooting/realtime-postgres-changes-troubleshooting).
 
       Alternatively, add tables to the `supabase_realtime` publication by running the given SQL:
 
@@ -1487,7 +1488,7 @@ for await change in changes {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "messages"
@@ -1500,8 +1501,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -3002,7 +3002,7 @@ await channel.Subscribe();
 </$Show>
 </Tabs>
 
-### Negating a filter (`not`)
+### Negating a filter (`not`) [#negating-a-filter-not]
 
 Prefix any operator with `not.` to invert it — for example `not.in`, `not.is`, or `not.like`.
 

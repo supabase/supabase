@@ -20,6 +20,10 @@ export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> 
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
+  /** Called only after the Copy button writes to the clipboard, not on native copy events */
+  onCopied?: () => void
+  /** Called when the user clicks the Reveal button (only when `reveal` is set) */
+  onReveal?: () => void
   icon?: any
   reveal?: boolean
   actions?: React.ReactNode
@@ -39,6 +43,8 @@ const Input = forwardRef<
       reveal = false,
       actions,
       onCopy,
+      onCopied,
+      onReveal,
       iconContainerClassName,
       containerClassName,
       size = 'small',
@@ -57,11 +63,13 @@ const Input = forwardRef<
           setCopyLabel('Copy')
         }, 3000)
         onCopy?.()
+        onCopied?.()
       })
     }
 
-    function onReveal() {
+    function handleReveal() {
       setHidden(false)
+      onReveal?.()
     }
 
     return (
@@ -91,7 +99,10 @@ const Input = forwardRef<
               <InputGroupButton
                 size="tiny"
                 variant="default"
-                className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
+                className={cn(
+                  showCopyOnHover &&
+                    'opacity-0 group-hover/input-group:opacity-100 group-focus-within/input-group:opacity-100 transition'
+                )}
                 icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
               >
@@ -99,7 +110,7 @@ const Input = forwardRef<
               </InputGroupButton>
             ) : null}
             {reveal && hidden ? (
-              <InputGroupButton size="tiny" variant="default" onClick={onReveal}>
+              <InputGroupButton size="tiny" variant="default" onClick={handleReveal}>
                 Reveal
               </InputGroupButton>
             ) : null}

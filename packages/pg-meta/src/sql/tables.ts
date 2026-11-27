@@ -14,11 +14,7 @@ import { safeSql, type SafeSqlFragment } from '../pg-format'
  * relationships filter keeps BOTH directions (conrelid OR confrelid), matching
  * the outgoing/incoming FK rows the unscoped query would have matched by name.
  *
- * When `targetOid` is omitted the injected fragments are empty and the rendered
- * SQL is the legacy full-catalog query -- `TABLES_SQL` below is exactly that
- * rendering, so every existing consumer is unaffected. Behavioral equivalence
- * between the scoped and unscoped forms is enforced by execution-based tests in
- * test/tables.test.ts, not by a byte-for-byte SQL snapshot.
+ * Omit `targetOid` for the full-catalog listing used by `tables.list`.
  */
 export const getTablesSql = (targetOid?: SafeSqlFragment) => {
   const mainScope = targetOid
@@ -33,10 +29,9 @@ export const getTablesSql = (targetOid?: SafeSqlFragment) => {
     ? safeSql`
       and (c.conrelid = ${targetOid} or c.confrelid = ${targetOid})`
     : safeSql``
-  // Scoped path only: deterministic relationships order (plan-order dependent
-  // otherwise). A composite FK expands to one entry per source×target column
-  // pair sharing constraint_name, so tie-break on the column names. Empty for
-  // legacy, keeping TABLES_SQL byte-for-byte unchanged.
+  // retrieve only: deterministic relationships order (plan-order dependent
+  // otherwise). A composite FK expands to one entry per ordinal column pair
+  // sharing constraint_name, so tie-break on the column names.
   const relOrder = targetOid
     ? safeSql` order by relationships.constraint_name, relationships.source_column_name, relationships.target_column_name`
     : safeSql``
@@ -103,16 +98,17 @@ FROM
       ta.attname as target_column_name
     from
       pg_constraint c
+    cross join lateral unnest(c.conkey, c.confkey) with ordinality as cols(source_attnum, target_attnum, ord)
     join (
       pg_attribute sa
       join pg_class csa on sa.attrelid = csa.oid
       join pg_namespace nsa on csa.relnamespace = nsa.oid
-    ) on sa.attrelid = c.conrelid and sa.attnum = any (c.conkey)
+    ) on sa.attrelid = c.conrelid and sa.attnum = cols.source_attnum
     join (
       pg_attribute ta
       join pg_class cta on ta.attrelid = cta.oid
       join pg_namespace nta on cta.relnamespace = nta.oid
-    ) on ta.attrelid = c.confrelid and ta.attnum = any (c.confkey)
+    ) on ta.attrelid = c.confrelid and ta.attnum = cols.target_attnum
     where
       c.contype = 'f'${relScope}
   ) as relationships
@@ -140,8 +136,4 @@ group by
 `
 }
 
-// FROZEN legacy path: the unscoped rendering served while the
-// pgMetaScopedIntrospection flag is off. Do not edit its shape -- it must keep
-// matching production behavior until the flag cleanup deletes it. The scoped
-// form is getTablesSql(targetOid) (used by tables.retrieve).
 export const TABLES_SQL = getTablesSql()

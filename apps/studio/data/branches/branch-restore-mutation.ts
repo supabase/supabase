@@ -3,18 +3,23 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
+
+export type BranchRestoreGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/restore'>
 
 export type BranchRestoreVariables = {
+  grant: BranchRestoreGrant
   branchRef: string
   projectRef: string
 }
 
-export async function restoreBranch({ branchRef }: BranchRestoreVariables) {
+export async function restoreBranch({ branchRef, grant }: BranchRestoreVariables) {
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/restore', {
     params: {
       path: { branch_id_or_ref: branchRef },
     },
+    grant,
   })
 
   if (error) handleError(error)
@@ -28,22 +33,22 @@ export const useBranchRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchRestoreData, ResponseError, BranchRestoreVariables>,
+  UseMutationOptions<BranchRestoreData, StudioError, BranchRestoreVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchRestoreData, ResponseError, BranchRestoreVariables>({
+  return useMutation<BranchRestoreData, StudioError, BranchRestoreVariables>({
     mutationFn: (vars) => restoreBranch(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to restore branch: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationUpdateVariables = {
   slug: string
@@ -44,12 +45,12 @@ export const useOrganizationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>,
+  UseCustomMutationOptions<OrganizationUpdateData, StudioError, OrganizationUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>({
+  return useMutation<OrganizationUpdateData, StudioError, OrganizationUpdateVariables>({
     mutationFn: (vars) => updateOrganization(vars),
     async onSuccess(data, variables, context) {
       queryClient.setQueriesData(
@@ -57,7 +58,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.list(),
           exact: true,
         },
-        (prev: components['schemas']['OrganizationResponse'][] | undefined) => {
+        (prev: components['schemas']['OrganizationResponse_Output'][] | undefined) => {
           if (!prev) return prev
 
           return prev.map((org) => {
@@ -78,7 +79,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.customerProfile(data.slug),
           exact: true,
         },
-        (prev: components['schemas']['CustomerResponse'] | undefined) => {
+        (prev: components['schemas']['CustomerResponse_Output'] | undefined) => {
           if (!prev) return prev
           return {
             ...prev,
@@ -92,7 +93,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.detail(data.slug),
           exact: true,
         },
-        (prev: components['schemas']['OrganizationSlugResponse'] | undefined) => {
+        (prev: components['schemas']['OrganizationSlugResponse_Output'] | undefined) => {
           if (!prev) return prev
           return {
             ...prev,

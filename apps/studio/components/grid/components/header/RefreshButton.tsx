@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
@@ -34,7 +34,7 @@ export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => 
       <Button
         variant="outline"
         loading={isRefetching}
-        icon={<RefreshCw />}
+        icon={<RefreshCwIcon />}
         onClick={() => onClick()}
         className="w-7 p-0"
         aria-label="Refresh table data"

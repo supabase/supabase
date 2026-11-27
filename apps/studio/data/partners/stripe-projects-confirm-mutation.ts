@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ConfirmAccountRequestVariables = {
   arId: string
@@ -25,11 +26,7 @@ export const useConfirmAccountRequestMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    ConfirmAccountRequestData,
-    ResponseError,
-    ConfirmAccountRequestVariables
-  >,
+  UseCustomMutationOptions<ConfirmAccountRequestData, StudioError, ConfirmAccountRequestVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation({

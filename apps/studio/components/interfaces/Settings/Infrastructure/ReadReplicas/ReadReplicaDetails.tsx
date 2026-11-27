@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -15,18 +15,22 @@ import {
 } from 'ui-patterns/Chart'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { BASE_PATH } from '@/lib/constants'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 
 const attribute = 'physical_replication_lag_physical_replication_lag_seconds'
 
@@ -35,8 +39,14 @@ export const ReadReplicaDetails = () => {
 
   const { data = [], isPending: isLoadingDatabases } = useReadReplicasQuery({ projectRef })
   const replica = data.find((x) => x.identifier === replicaId)
-  const { identifier, connectionString, status: baseStatus, restUrl, region, size } = replica ?? {}
+  const { identifier, connectionString, status: baseStatus, restUrl, region } = replica ?? {}
   const regionLabel = Object.values(AWS_REGIONS).find((x) => x.code === region)?.displayName
+
+  const { data: project } = useSelectedProjectQuery()
+  const computeSize = getComputeSizeLabel(project?.infra_compute_size)
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   const { data: statuses = [] } = useReadReplicasStatusesQuery({ projectRef })
   const replicaStatus = statuses.find((x) => x.identifier === identifier)
@@ -94,7 +104,7 @@ export const ReadReplicaDetails = () => {
             isEmpty={chartData.length === 0}
             emptyState={
               <ChartEmptyState
-                icon={<BarChart2 size={16} />}
+                icon={<BarChart2Icon size={16} />}
                 title="No data to show"
                 description="It may take up to 24 hours for data to refresh"
               />
@@ -120,8 +130,8 @@ export const ReadReplicaDetails = () => {
           </ChartContent>
         </ChartCard>
       </Chart>
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth>
+      <PageContainer>
+        <PageSection>
           <Card>
             <CardHeader>
               <CardTitle>Replica Information</CardTitle>
@@ -151,29 +161,25 @@ export const ReadReplicaDetails = () => {
                       readOnly
                       className="input-mono"
                       value={regionLabel}
-                      icon={
-                        <img
-                          alt="region icon"
-                          className="w-5 rounded-xs"
-                          src={`${BASE_PATH}/img/regions/${region ?? ''}.svg`}
-                        />
-                      }
+                      icon={<RegionFlag className="w-5" region={region ?? ''} />}
                     />
                   </FormItemLayout>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="horizontal"
-                    label="Compute Size"
-                    description="Size of replica will be identical to the primary database."
-                  >
-                    <Input readOnly className="input-mono" value={size} />
-                  </FormItemLayout>
+                  {projectHomepageShowInstanceSize && (
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="horizontal"
+                      label="Compute Size"
+                      description="Size of replica will be identical to the primary database."
+                    >
+                      <Input readOnly className="input-mono" value={computeSize} />
+                    </FormItemLayout>
+                  )}
                 </CardContent>
               </>
             )}
           </Card>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection>
+      </PageContainer>
     </>
   )
 }

@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AwsRedirectVariables = {
   organizationSlug?: string
@@ -23,7 +24,7 @@ export async function getAwsRedirect(
 }
 
 export type AwsRedirectData = Awaited<ReturnType<typeof getAwsRedirect>>
-export type AwsRedirectError = ResponseError
+export type AwsRedirectError = StudioError
 
 export const useAwsRedirectQuery = <TData = AwsRedirectData>(
   { organizationSlug }: AwsRedirectVariables,

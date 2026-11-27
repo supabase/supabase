@@ -1,4 +1,8 @@
+import { useRef } from 'react'
+import { SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -7,16 +11,18 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-} from '@ui/components/shadcn/ui/dialog'
-import { SubmitHandler } from 'react-hook-form'
-import { toast } from 'sonner'
-import { Button } from 'ui'
+} from 'ui'
 
 import {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
   NewAwsMarketplaceOrgForm,
   type NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
+import { ORG_KIND_DEFAULT } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
+import {
+  useOnboardingSurveyMutation,
+  type OnboardingSurveyVariables,
+} from '@/data/organizations/onboarding-survey-mutation'
 import { useAwsManagedOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
 
 interface Props {
@@ -27,10 +33,16 @@ interface Props {
 }
 
 export const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Props) => {
+  const surveyAnswers = useRef<Omit<OnboardingSurveyVariables, 'slug'> | null>(null)
+  // This flow has no follow-up card, so retrying is the answers' only second chance
+  const { mutate: submitOnboardingSurvey } = useOnboardingSurveyMutation({ retry: 2 })
   const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (org) => {
         //TODO(thomas): send tracking event?
+        if (surveyAnswers.current) {
+          submitOnboardingSurvey({ slug: org.slug, ...surveyAnswers.current })
+        }
         onSuccess(org.slug)
       },
       onError: (res) => {
@@ -41,12 +53,15 @@ export const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose
     })
 
   const onSubmit: SubmitHandler<NewMarketplaceOrgForm> = async (values) => {
-    createOrganization({
-      name: values.name,
-      kind: values.kind,
-      buyerId,
-      ...(values.kind === 'COMPANY' ? { size: values.size } : {}),
-    })
+    const { kind, building, can_code } = values
+    const size = kind === 'COMPANY' ? values.size : undefined
+    // Kind always holds a value, so it only counts as answered when changed
+    const hasSurveyAnswer = kind !== ORG_KIND_DEFAULT || building !== '' || can_code !== ''
+    surveyAnswers.current = hasSurveyAnswer ? { kind, size, building, can_code } : null
+
+    // Kind and size go to the survey endpoint only. It keeps the first response per user
+    // and org, so sending them at creation too would drop the other answers.
+    createOrganization({ name: values.name, buyerId })
   }
 
   return (
@@ -103,6 +118,7 @@ const AwsMarketplaceOrgCreationDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
+            variant="primary"
             form={CREATE_AWS_MANAGED_ORG_FORM_ID}
             type="submit"
             loading={isCreatingOrganization}

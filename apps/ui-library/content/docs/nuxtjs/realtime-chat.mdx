@@ -1,22 +1,25 @@
 ---
 title: Realtime Chat
 description: Real-time chat component for collaborative applications
+preview: |-
+  <BlockOverview name="realtime-chat-nuxtjs" showFiles>
+    <DualRealtimeChat />
+  </BlockOverview>
 ---
-
-<DualRealtimeChat />
 
 ## Installation
 
-<BlockItem
-  name="realtime-chat-nuxtjs"
-  description="Renders a real-time chat interface for users in a shared room."
-/>
+### Set up the Supabase client
 
-## Folder structure
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
 
-This block assumes that you have already installed a Supabase client for Vue from the previous step.
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
 
-<RegistryBlock itemName="realtime-chat-nuxtjs" />
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="realtime-chat-nuxtjs" framework="vue" />
 
 ## Introduction
 
@@ -126,3 +129,10 @@ interface ChatMessage {
 
 - [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
 - [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)
+- [Getting started with Realtime](https://supabase.com/docs/guides/realtime/getting_started)
+- [Broadcast from the database](https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-the-database)
+- [Broadcast replay](https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay)
+- [Realtime limits](https://supabase.com/docs/guides/realtime/limits)
+- [Realtime message usage and billing](https://supabase.com/docs/guides/platform/manage-your-usage/realtime-messages)
+- [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
+- [multiplayer.dev, a live Realtime demo](https://multiplayer.dev)

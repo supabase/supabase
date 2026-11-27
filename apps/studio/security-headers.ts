@@ -1,12 +1,9 @@
 import { getCSP } from './csp'
 
-// Security response headers for the app. On the Next build these are applied via
-// `next.config.ts` `headers()`; the TanStack build has no such hook and (on
-// Vercel) serves a static shell with no server to attach them, so they're
-// applied through `vercel.ts` (deploy) and `scripts/serve.js` (self-hosted)
-// instead. Keep this in sync with the `/(.*?)` header block in next.config.ts.
+// Security response headers, applied through `vercel.ts` (Vercel) and Nitro
+// `routeRules` in `vite.config.ts` (self-hosted).
 //
-// Env-gated exactly like next.config:
+// Env-gated:
 //   - CSP: full `getCSP()` on platform, else just `frame-ancestors 'none'`.
 //   - HSTS: only on platform + Vercel (never for self-hosted / previews on a
 //     bare IP), so it's omitted rather than sent empty.

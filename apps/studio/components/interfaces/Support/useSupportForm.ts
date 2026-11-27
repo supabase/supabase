@@ -61,7 +61,7 @@ export function useSupportForm(
         ? loadSupportFormInitialParamsFromObject(providedInitialParamsRef.current)
         : loadSupportFormInitialParams(window.location.search)
     urlParamsRef.current = params
-    setInitialError(params.error ?? null)
+    setInitialError(params.errorMessage ?? null)
 
     if (params.category && !form.getFieldState('category').isDirty) {
       form.setValue('category', params.category, { shouldDirty: false })

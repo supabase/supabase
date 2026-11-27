@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "supabase-client-tanstack",
-  "type": "registry:lib",
   "title": "Supabase Client for TanStack Start",
   "description": "",
   "dependencies": [
@@ -25,5 +24,6 @@
     "VITE_SUPABASE_URL": "",
     "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:lib"
 }

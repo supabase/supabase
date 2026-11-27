@@ -1,3 +1,7 @@
+'use client'
+
+import { useSyncExternalStore } from 'react'
+
 import { cn } from '../../lib/utils'
 
 const getIsMac = () => {
@@ -29,7 +33,7 @@ const KEY_SYMBOLS: Record<string, string | ((isMac: boolean) => string)> = {
 
 type KeyboardShortcutProps = {
   keys: string[]
-  variant?: 'pill' | 'inline'
+  variant?: 'pill' | 'inline' | 'keycaps'
   className?: string
 }
 
@@ -46,18 +50,45 @@ const formatShortcutLabel = (keys: string[]) => {
   return keys.every((key) => key.length === 1) ? keys.join('') : keys.join(' ')
 }
 
+const subscribeToNothing = () => () => {}
+
 export const KeyboardShortcut = ({ keys, variant = 'pill', className }: KeyboardShortcutProps) => {
-  const isMac = getIsMac()
-  const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac))
+  // the server cannot know the platform, so a mismatch would make react rebuild the page root
+  const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, () => null)
+  const isPlatformPending =
+    isMac === null && keys.some((key) => typeof KEY_SYMBOLS[key] === 'function')
+  const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac ?? false))
   const shortcutLabel = formatShortcutLabel(resolvedKeys)
+
+  if (variant === 'keycaps') {
+    return (
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center gap-0.5',
+          isPlatformPending && 'invisible',
+          className
+        )}
+      >
+        {resolvedKeys.map((key) => (
+          <kbd
+            key={key}
+            className="inline-flex h-4 min-w-4 items-center justify-center rounded border border-border-muted bg-surface-300 px-0.5 font-sans text-[11px] leading-none text-foreground-light"
+          >
+            {key}
+          </kbd>
+        ))}
+      </span>
+    )
+  }
 
   return (
     <span
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
+        isPlatformPending && 'invisible',
         variant === 'pill'
           ? 'items-center text-[11px] leading-none tracking-[-0.025em] text-foreground-light bg-surface-200/50 dark:bg-surface-100/50 rounded px-[5px] py-[3px] border border-border-muted'
-          : 'items-baseline text-[11px] leading-[inherit] text-foreground/40',
+          : 'items-baseline text-[11px] leading-[inherit]',
         className
       )}
     >

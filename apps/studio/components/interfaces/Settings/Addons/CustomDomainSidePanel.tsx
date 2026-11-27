@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -22,7 +21,7 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 import { useAddonsPagePanel } from '@/state/addons-page'
@@ -33,9 +32,8 @@ const CustomDomainSidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const { can: canUpdateCustomDomain } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateCustomDomain } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
   const { panel, closePanel } = useAddonsPagePanel()
@@ -131,7 +129,7 @@ const CustomDomainSidePanel = () => {
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
               <Alert variant="default" className="mb-2">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircleIcon className="h-4 w-4" />
                 <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
                 <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new

@@ -17,7 +17,7 @@ toc_depth: 3
 video: https://www.youtube.com/v/zHvatf2wySI
 ---
 
-Realtime is a server that listens to changes in your PostgreSQL database and broadcasts the changes to clients through a websocket connection.
+[Realtime](/realtime) is a server that listens to changes in your PostgreSQL database and broadcasts the changes to clients through a websocket connection.
 
 Today, we're announcing security improvements to Realtime, where database changes will be broadcast to authenticated users, respecting the same PostgreSQL policies that you use for Row Level Security.
 
@@ -44,7 +44,7 @@ The unsafe nature of this behavior is the reason why Realtime has been an opt-in
 As more developers rely on Realtime to receive and send database changes in their apps and services,
 security has become a primary concern for us and others in the community who wish to build secure systems with Realtime.
 
-Supabase projects have supported Row Level Security (RLS) for API authorization since our [Auth launch](https://supabase.io/blog/supabase-auth).
+Supabase projects have supported Row Level Security (RLS) for API authorization since our [Auth launch](https://supabase.com/blog/supabase-auth).
 In that time, it has quickly become the recommended way to implement authorization.
 
 As we were evaluating possible solutions to improve Realtime security, we looked to our Auth implementation as inspiration for a cohesive security system.
@@ -77,7 +77,7 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 
 to queries.
 
-Check out the [Row Level Security guide](https://supabase.com/docs/guides/auth/row-level-security) for more info on how to use RLS with your project.
+Check out the [Row Level Security guide](https://supabase.com/docs/guides/database/postgres/row-level-security) for more info on how to use RLS with your project.
 
 ## Realtime Design
 
@@ -177,7 +177,7 @@ Use single column primary keys with a fixed field size (integer, uuid, etc.) ove
 
 ## Next Steps
 
-Realtime RLS is available today on all existing and new Supabase projects. To get started, upgrade your Supabase JavaScript client to version v1.23.0
+Realtime RLS is available today on all existing and new Supabase projects. To get started, upgrade your [Supabase JavaScript client](/docs/reference/javascript/introduction) to version v1.23.0
 and launch your new PostgreSQL database today: [database.new](https://database.new)
 
 ## More Postgres resources
@@ -185,7 +185,7 @@ and launch your new PostgreSQL database today: [database.new](https://database.n
 - [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
 - [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
 - [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
 - [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
 - [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
 

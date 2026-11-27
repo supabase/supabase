@@ -1,4 +1,4 @@
-import { Megaphone } from 'lucide-react'
+import { MegaphoneIcon } from 'lucide-react'
 import { forwardRef, type PropsWithChildren, type ReactNode } from 'react'
 import { Badge, Button, cn, Loading } from 'ui'
 
@@ -59,7 +59,7 @@ function Content({ children, className }: { children: ReactNode; className?: str
 function Footer({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('bg-surface-100 border-t border-default', className)}>
-      <div className="flex h-12 items-center px-card">{children}</div>
+      <div className="flex min-h-12 items-center px-card">{children}</div>
     </div>
   )
 }
@@ -117,7 +117,7 @@ const PanelNotice = forwardRef<
               variant={'default'}
               className="rounded-r-none pr-2 shrink-0 gap-1.5 border-dashed bg-surface-400/0 text-foreground-lighter"
             >
-              <Megaphone size={16} strokeWidth={1.2} />
+              <MegaphoneIcon size={16} strokeWidth={1.2} />
               <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
             </Badge>
             <Badge
@@ -134,7 +134,7 @@ const PanelNotice = forwardRef<
           )}
         </div>
         {href && (
-          <Button size="tiny" variant="default" className="text-xs" asChild>
+          <Button size="tiny" className="text-xs" asChild>
             <a href={href} target="_blank" rel="noreferrer noopener">
               {buttonText ?? 'Read the accouncement'}
             </a>

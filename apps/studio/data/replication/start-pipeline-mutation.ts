@@ -3,11 +3,12 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type StartPipelineParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
 }
 
 export async function startPipeline(
@@ -34,36 +35,33 @@ export const useStartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
+  UseCustomMutationOptions<StartPipelineData, StudioError, StartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>({
+  return useMutation<StartPipelineData, StudioError, StartPipelineParams>({
     mutationFn: (vars) => startPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
 
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-      })
-
-      // [Joshen] We're manually updating the query client here as the pipeline status is async
-      // So setting it so starting while letting long poll update the actual status thereafter
-      queryClient.setQueriesData(
+      await queryClient.invalidateQueries(
         {
           queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-          exact: true,
         },
-        (prev) => {
-          if (!prev) return prev
-          return { ...prev, status: { name: 'starting' } }
-        }
+        { cancelRefetch: false }
       )
 
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+        },
+        { cancelRefetch: false }
+      )
+
       if (onError === undefined) {
         toast.error(`Failed to start pipeline: ${data.message}`)
       } else {

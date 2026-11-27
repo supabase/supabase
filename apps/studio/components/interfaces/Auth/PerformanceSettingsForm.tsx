@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -22,11 +21,16 @@ import {
   SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { convertPoolSize, isAllocationUnit } from './PerformanceSettingsForm.utils'
-import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -34,7 +38,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -68,13 +72,11 @@ export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
   const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.performance_settings')
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const [isUpdatingRequestDurationForm, setIsUpdatingRequestDurationForm] = useState(false)
@@ -182,43 +184,47 @@ export const PerformanceSettingsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   if (isLoadingAuthConfig || isLoadingEntitlement) {
     return (
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         <GenericSkeletonLoader />
-      </ScaffoldSection>
+      </PageSection>
     )
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        {promptUpgrade && (
+      {promptUpgrade && (
+        <PageSection>
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
             primaryText="Only available on the Pro Plan and above"
             secondaryText="Upgrade to the Pro Plan to configure Auth server performance settings."
           />
-        )}
-      </ScaffoldSection>
+        </PageSection>
+      )}
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Request duration</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
 
         <Form {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
@@ -267,9 +273,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => requestDurationForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}
@@ -288,10 +292,14 @@ export const PerformanceSettingsForm = () => {
             </Card>
           </form>
         </Form>
-      </ScaffoldSection>
+      </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Connection management</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
 
         <Form {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
@@ -411,9 +419,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => databaseForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => databaseForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}
@@ -429,7 +435,7 @@ export const PerformanceSettingsForm = () => {
             </Card>
           </form>
         </Form>
-      </ScaffoldSection>
+      </PageSection>
     </>
   )
 }

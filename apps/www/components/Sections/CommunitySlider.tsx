@@ -131,7 +131,7 @@ const CommunitySlider = () => {
       <p className="text-foreground-muted my-3 text-base">{card.abstract}</p>
 
       {card.url && (
-        <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>
+        <div className="text-primary block cursor-pointer text-sm">Read Customer Story</div>
       )}
     </div>
   )

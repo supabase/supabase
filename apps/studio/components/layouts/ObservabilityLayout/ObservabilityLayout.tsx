@@ -1,12 +1,10 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ObservabilityMenu } from './ObservabilityMenu'
-import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { BannerDatabaseConnections } from '@/components/ui/BannerStack/Banners/BannerDatabaseConnections'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -23,7 +21,7 @@ const ObservabilityLayoutContent = ({
   children,
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
@@ -32,39 +30,10 @@ const ObservabilityLayoutContent = ({
     false
   )
 
-  const { isInitialized, previouslyToggled } = useIsDatabaseConnectionsEnabled()
-
-  const [isDatabaseConnectionsBannerDismissed, , { isSuccess: isLocalStorageReady }] =
-    useLocalStorageQuery(LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''), false)
-
   const prevPathnameRef = useRef(pathname)
 
   useEffect(() => {
-    if (
-      !isInitialized ||
-      !isLocalStorageReady ||
-      isDatabaseConnectionsBannerDismissed ||
-      previouslyToggled
-    )
-      return
-
-    addBanner({
-      id: 'database-connections-banner',
-      priority: 2,
-      isDismissed: false,
-      content: <BannerDatabaseConnections />,
-    })
-  }, [
-    addBanner,
-    dismissBanner,
-    isInitialized,
-    isDatabaseConnectionsBannerDismissed,
-    previouslyToggled,
-    isLocalStorageReady,
-  ])
-
-  useEffect(() => {
-    const isQueryPerformancePage = pathname?.includes('/query-performance')
+    const isQueryPerformancePage = pathname.includes('/query-performance')
 
     if (
       isQueryPerformancePage &&

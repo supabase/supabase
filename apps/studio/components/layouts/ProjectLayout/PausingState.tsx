@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Circle, Loader } from 'lucide-react'
+import { CircleIcon, LoaderIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge, Button } from 'ui'
 
@@ -83,7 +83,7 @@ export const PausingState = ({ project }: PausingStateProps) => {
           <div>
             <Badge>
               <div className="flex items-center gap-2">
-                <Loader className="animate-spin" size={12} />
+                <LoaderIcon className="animate-spin" size={12} />
                 <span>Pausing project</span>
               </div>
             </Badge>
@@ -94,9 +94,9 @@ export const PausingState = ({ project }: PausingStateProps) => {
             <div className="grid w-[380px] gap-4">
               <div className="relative mx-auto max-w-[300px]">
                 <div className="absolute flex h-full w-full items-center justify-center">
-                  <Loader className="animate-spin" size={20} strokeWidth={2} />
+                  <LoaderIcon className="animate-spin" size={20} strokeWidth={2} />
                 </div>
-                <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
+                <CircleIcon className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
               <p className="text-center text-sm text-foreground-light">
@@ -106,7 +106,7 @@ export const PausingState = ({ project }: PausingStateProps) => {
               </p>
               {isTakingLongerThanExpected && (
                 <div className="flex justify-center">
-                  <Button asChild variant="default">
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,

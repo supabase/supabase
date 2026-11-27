@@ -1,6 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { Card } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './AnalyticsBucketDetails.constants'
 import { CopyEnvButton } from './CopyEnvButton'
@@ -10,22 +18,22 @@ import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperIn
 import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import {
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from '@/components/layouts/Scaffold'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: project?.ref },
+    { variant: 'reveal' }
+  )
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
 
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
   const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
@@ -44,9 +52,11 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
       { enabled: canReadAPIKeys }
     )
 
-  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useAPIKeys(
-    { projectRef: project?.ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
   )
 
   const isTokenValid = apiKeysData?.allSecretKeys.some((x) => x.api_key === decryptedToken)
@@ -54,29 +64,35 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
   if (!wrapperInstance) return null
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8 pt-0">
-        <div>
-          <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
-          <ScaffoldSectionDescription>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Connection details</PageSectionTitle>
+          <PageSectionDescription>
             Connect to this bucket from an Iceberg client.{' '}
             <InlineLink
               href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
             >
               Learn more
             </InlineLink>
-          </ScaffoldSectionDescription>
-        </div>
-        <CopyEnvButton
-          serverOptions={wrapperMeta.server.options.filter(
-            (option) => !option.hidden && wrapperValues[option.name]
-          )}
-          values={wrapperValues}
-        />
-      </ScaffoldHeader>
+          </PageSectionDescription>
+        </PageSectionSummary>
+        <PageSectionAside>
+          <CopyEnvButton
+            serverOptions={wrapperMeta.server.options.filter(
+              (option) => !option.hidden && wrapperValues[option.name]
+            )}
+            values={wrapperValues}
+          />
+        </PageSectionAside>
+      </PageSectionMeta>
 
+      <ApiKeysAccessNote
+        grant={apiKeysGrant}
+        fallback="We can't check whether the catalog token is still valid."
+      />
       {isSuccessApiKeys && isSuccessVaultDecrypt && !isTokenValid && (
-        <Admonition type="warning" title="Catalog token is no longer valid" className="mb-4">
+        <Admonition type="warning" title="Catalog token is no longer valid">
           <p>
             The Iceberg wrapper's catalog token doesn't match with any of your project's API keys,
             and hence authorization will fail when connecting to your bucket. Update the catalog
@@ -102,6 +118,6 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
             )
           })}
       </Card>
-    </ScaffoldSection>
+    </PageSection>
   )
 }

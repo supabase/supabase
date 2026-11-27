@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Plus, X } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -178,7 +178,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                             {namespaces.length > 0 && <SelectSeparator />}
                             <SelectItem value={NEW_NAMESPACE_MARKER}>
                               <div className="flex items-center gap-x-2">
-                                <Plus size={14} />
+                                <PlusIcon size={14} />
                                 <p>Create a new namespace</p>
                               </div>
                             </SelectItem>
@@ -193,7 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="newNamespace"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="newNamespace" label="Name of new namespace">
+                      <FormItemLayout label="Name of new namespace">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
@@ -211,7 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name of table">
+                      <FormItemLayout label="Name of table">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
@@ -223,8 +223,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        variant="default"
-                        icon={<Plus />}
+                        icon={<PlusIcon />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
                         Add column
@@ -259,7 +258,6 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)
@@ -267,7 +265,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} type="submit" loading={isCreating}>
+              <Button variant="primary" form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>
@@ -332,7 +330,7 @@ const ColumnRow = ({ control, idx, isCreating, onRemove }: ColumnRowProps) => {
           aria-label="Remove"
           variant="text"
           size="tiny"
-          icon={<X strokeWidth={1.5} size={14} />}
+          icon={<XIcon strokeWidth={1.5} size={14} />}
           className="w-6 h-6"
           onClick={onRemove}
         />

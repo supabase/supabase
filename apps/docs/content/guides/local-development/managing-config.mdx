@@ -1,30 +1,30 @@
 ---
 id: 'managing-config'
 title: 'Managing config and secrets'
-description: 'Managing local configuration using config.toml.'
+description: 'Managing local configuration using your config file.'
 ---
 
-The Supabase CLI uses a `config.toml` file to manage local configuration. This file is located in the `supabase` directory of your project.
+The [Supabase CLI](/docs/guides/local-development/cli/getting-started) uses a config file to manage local configuration. The file is `supabase/config.toml` or `supabase/config.jsonc`.
+
+Since CLI 3.4.0, `supabase init` creates `config.jsonc`. A project with a `config.toml` keeps working without changes. To switch formats, see [Config file formats](/docs/guides/local-development/cli/config-formats).
 
 ## Config reference
 
-The `config.toml` file is automatically created when you run `supabase init`.
-
 There are a wide variety of options available, which can be found in the [CLI Config Reference](/docs/guides/local-development/cli/config).
 
-For example, to enable the "Apple" OAuth provider for local development, you can append the following information to `config.toml`:
+For example, to enable the "Apple" OAuth provider for local development, add the following to your config file. Merge its keys into the entries your file already has instead of adding a second copy. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
 
-```toml
+```toml supabase/config.toml
 [auth.external.apple]
-enabled = false
+enabled = true
 client_id = ""
-secret = ""
+secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
 redirect_uri = "" # Overrides the default auth redirectUrl.
 ```
 
-## Using secrets inside config.toml
+## Using secrets inside your config file [#using-secrets-inside-configtoml]
 
-You can reference environment variables within the `config.toml` file using the `env()` function. This will detect any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
+You can reference environment variables within your config file using the `env()` function. The CLI reads any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
 
 ```
 .
@@ -47,9 +47,9 @@ GITHUB_CLIENT_ID=""
 GITHUB_SECRET=""
 ```
 
-Then you would reference them inside of our `config.toml` like this:
+Then you would reference them in your config file like this:
 
-```toml
+```toml supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(GITHUB_CLIENT_ID)"
@@ -63,6 +63,6 @@ For more advanced secrets management workflows, including:
 
 - **Using dotenvx for encrypted secrets**: Learn how to securely manage environment variables across different branches and environments
 - **Branch-specific secrets**: Understand how to manage secrets for different deployment environments
-- **Encrypted configuration values**: Use encrypted values directly in your `config.toml`
+- **Encrypted configuration values**: Use encrypted values directly in your config file
 
-See the [Managing secrets for branches](/docs/guides/deployment/branching#managing-secrets-for-branches) section in our branching documentation, or check out the [dotenvx example repository](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone-dotenvx/README.md) for a complete implementation.
+See the [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches) section in our branching documentation, or check out the [dotenvx example repository](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone-dotenvx/README.md) for a complete implementation.

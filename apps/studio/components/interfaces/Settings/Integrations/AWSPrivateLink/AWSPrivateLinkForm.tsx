@@ -126,9 +126,13 @@ export const AWSPrivateLinkForm = ({
         <SheetHeader>
           <SheetTitle>{isNew ? 'Add connection' : 'Connection details'}</SheetTitle>
           <SheetDescription>
-            {isNew
-              ? 'Enter an AWS account to connect. You’ll need to accept the share in AWS. '
-              : 'These values identify the resource share in AWS. '}
+            {isNew ? (
+              <span>
+                {'Enter an AWS account to connect. You’ll need to accept the share in AWS. '}
+              </span>
+            ) : (
+              <span>{'These values identify the resource share in AWS. '}</span>
+            )}
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
           </SheetDescription>
         </SheetHeader>
@@ -255,7 +259,7 @@ export const AWSPrivateLinkForm = ({
                   <Button type="button" variant="danger" onClick={onDelete}>
                     Delete
                   </Button>
-                  <Button type="button" variant="default" onClick={() => handleOpenChange(false)}>
+                  <Button type="button" onClick={() => handleOpenChange(false)}>
                     Close
                   </Button>
                 </>
@@ -263,13 +267,12 @@ export const AWSPrivateLinkForm = ({
                 <>
                   <Button
                     type="button"
-                    variant="default"
                     disabled={isPending}
                     onClick={() => handleOpenChange(false)}
                   >
                     Cancel
                   </Button>
-                  <Button form={FORM_ID} type="submit" loading={isPending}>
+                  <Button variant="primary" form={FORM_ID} type="submit" loading={isPending}>
                     Add connection
                   </Button>
                 </>

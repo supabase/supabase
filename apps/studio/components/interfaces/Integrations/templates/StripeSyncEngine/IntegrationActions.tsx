@@ -1,10 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, cn } from 'ui'
 
 import { hasInstallError, hasUninstallError } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const IntegrationInstalledActions = ({
   className,
@@ -24,9 +23,8 @@ export const IntegrationInstalledActions = ({
   setShowUninstallModal: (value: boolean) => void
   setShouldShowInstallSheet: (value: boolean) => void
 }) => {
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )
 
   const {
@@ -55,7 +53,6 @@ export const IntegrationInstalledActions = ({
           </ButtonTooltip>
         )}
         <ButtonTooltip
-          variant="default"
           onClick={() => setShowUninstallModal(true)}
           disabled={disabled}
           loading={uninstalling}
@@ -76,26 +73,13 @@ export const IntegrationInstalledActions = ({
 
 export const IntegrationNotInstalledActions = ({
   className,
-  installing,
-  canInstall,
   isUninstallRequested,
-  hideInstallCTA = false,
   handleUninstall,
-  setShouldShowInstallSheet,
 }: {
   className?: string
-  installing: boolean
-  canInstall: boolean
   isUninstallRequested: boolean
-  hideInstallCTA?: boolean
   handleUninstall: () => void
-  setShouldShowInstallSheet: (value: boolean) => void
 }) => {
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
-  )
-
   const {
     schemaComment: { status: installationStatus },
   } = useStripeSyncStatus()
@@ -103,27 +87,8 @@ export const IntegrationNotInstalledActions = ({
 
   return (
     <div className={cn('flex gap-x-2 justify-end', className)}>
-      {!hideInstallCTA && (
-        <ButtonTooltip
-          variant="primary"
-          onClick={() => setShouldShowInstallSheet(true)}
-          disabled={!canInstall || !canManageSecrets}
-          loading={installing}
-          tooltip={{
-            content: {
-              text: !canInstall
-                ? 'Your database already uses a schema named "stripe"'
-                : !canManageSecrets
-                  ? 'You need additional permissions to install the Stripe Sync Engine.'
-                  : undefined,
-            },
-          }}
-        >
-          {installError ? 'Retry installation' : 'Install integration'}
-        </ButtonTooltip>
-      )}
       {installError && (
-        <Button variant="default" loading={isUninstallRequested} onClick={handleUninstall}>
+        <Button loading={isUninstallRequested} onClick={handleUninstall}>
           Uninstall
         </Button>
       )}

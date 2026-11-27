@@ -1,7 +1,6 @@
 import { useFlag, useParams } from 'common'
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -11,6 +10,7 @@ import {
 
 import { RowLimitSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
 import { RunAsSubMenu } from '../../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -26,6 +26,7 @@ import {
 import { type RoleImpersonationController } from '@/state/role-impersonation-state'
 
 export type QuerySourceMenuProps = {
+  disabled?: boolean
   rowLimit?: number
   onRowLimitChange?: (val: number) => void
   roleImpersonationState?: RoleImpersonationController
@@ -43,6 +44,7 @@ export type QuerySourceMenuProps = {
  * has SQL to preserve or discard and a fresh draft does not.
  */
 export const QuerySourceMenu = ({
+  disabled = false,
   rowLimit = 100,
   onRowLimitChange,
   roleImpersonationState,
@@ -73,15 +75,14 @@ export const QuerySourceMenu = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="text"
-            size="tiny"
+          <ExplorerToolbarAction
+            disabled={disabled}
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[source._tag]}`}
-            icon={<QuerySourceIcon source={source._tag} className="text-foreground-light" />}
-            iconRight={<ChevronDown className="text-foreground-light" />}
+            icon={<QuerySourceIcon source={source._tag} />}
+            iconRight={<ChevronDownIcon size={16} strokeWidth={2} />}
           >
             {QUERY_SOURCE_LABELS[source._tag]}
-          </Button>
+          </ExplorerToolbarAction>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           {availableSources.map((candidate) => (
@@ -99,7 +100,7 @@ export const QuerySourceMenu = ({
                 <QuerySourceIcon source={candidate._tag} className="text-foreground-light" />
                 {QUERY_SOURCE_LABELS[candidate._tag]}
               </span>
-              {source._tag === candidate._tag && <Check size={14} />}
+              {source._tag === candidate._tag && <CheckIcon size={14} />}
             </DropdownMenuItem>
           ))}
 

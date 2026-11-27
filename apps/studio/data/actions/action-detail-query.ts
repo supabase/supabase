@@ -2,15 +2,16 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { actionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ActionRunVariables = {
   projectRef?: string
   runId?: string
 }
 
-export type ActionRun = components['schemas']['ActionRunResponse'] & {
+export type ActionRun = components['schemas']['ActionRunResponse_Output'] & {
   status?: 'SUCCESS' | 'FAILED' | 'RUNNING'
 }
 
@@ -24,6 +25,7 @@ export async function getActionRun(
   const { data, error } = await get('/v1/projects/{ref}/actions/{run_id}', {
     params: { path: { ref: projectRef, run_id: runId } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -39,7 +41,7 @@ export async function getActionRun(
 }
 
 export type ActionRunData = Awaited<ReturnType<typeof getActionRun>>
-export type ActionRunError = ResponseError
+export type ActionRunError = StudioError
 
 export const useActionRunQuery = <TData = ActionRunData>(
   { projectRef, runId }: ActionRunVariables,

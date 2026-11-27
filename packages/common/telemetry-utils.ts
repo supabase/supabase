@@ -1,6 +1,18 @@
 import { IS_PROD } from './constants'
 import { isBrowser } from './helpers'
 
+export type TelemetryPlatform = 'studio' | 'www' | 'docs' | 'kb' | 'learn' | 'ui-library'
+
+let telemetryPlatform: TelemetryPlatform | undefined
+
+export function setTelemetryPlatform(platform: TelemetryPlatform) {
+  telemetryPlatform = platform
+}
+
+export function getTelemetryPlatform() {
+  return telemetryPlatform
+}
+
 export function getTelemetryCookieOptions() {
   if (typeof window === 'undefined') return 'path=/; SameSite=Lax'
   if (!IS_PROD) return 'path=/; SameSite=Lax'
@@ -33,19 +45,57 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
+const KEYWORDS_PARAM_PATTERN = /([?&](?:keywords|schema)=)[^&#]*/g
+
+// URL params whose values are customer data:
+// - `keywords`: Studio's Auth users page keeps its search term, often an end user's email, here.
+// - `schema`: Studio's database pages keep the selected schema name here, which a customer names.
+export function redactUrlKeywords(url: string) {
+  return url.replace(KEYWORDS_PARAM_PATTERN, '$1redacted')
+}
+
+type EventProperties = Record<string, unknown>
+
+// posthog-js fills its own URL properties (session entry URL, initial URL, referrers) from the
+// browser, so the outgoing event is cleaned by value instead of by a list of property names.
+export function redactEventUrlKeywords(event: {
+  properties: EventProperties
+  $set?: EventProperties
+  $set_once?: EventProperties
+}) {
+  const { properties } = event
+  const propertyBags = [
+    properties,
+    properties.$set,
+    properties.$set_once,
+    event.$set,
+    event.$set_once,
+  ]
+
+  for (const bag of propertyBags) {
+    if (!bag || typeof bag !== 'object') continue
+
+    for (const [key, value] of Object.entries(bag)) {
+      if (typeof value === 'string') (bag as EventProperties)[key] = redactUrlKeywords(value)
+    }
+  }
+}
+
+function getPageLocation() {
+  if (!isBrowser) return { pageUrl: '', search: '' }
+
+  try {
+    const url = new URL(window.location.href)
+    url.hash = ''
+    return { pageUrl: redactUrlKeywords(url.href), search: redactUrlKeywords(url.search) }
+  } catch {
+    return { pageUrl: window.location.href.split('#')[0], search: window.location.search }
+  }
+}
+
 export function getSharedTelemetryData(pathname?: string) {
   const sessionId = getPostHogSessionId()
-  const pageUrl = (() => {
-    if (!isBrowser) return ''
-
-    try {
-      const url = new URL(window.location.href)
-      url.hash = ''
-      return url.href
-    } catch {
-      return window.location.href.split('#')[0]
-    }
-  })()
+  const { pageUrl, search } = getPageLocation()
 
   return {
     page_url: pageUrl,
@@ -53,10 +103,10 @@ export function getSharedTelemetryData(pathname?: string) {
     pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
     session_id: sessionId,
     ph: {
-      referrer: isBrowser ? document?.referrer : '',
+      referrer: isBrowser ? redactUrlKeywords(document?.referrer ?? '') : '',
       language: navigator.language ?? 'en-US',
       user_agent: navigator.userAgent,
-      search: isBrowser ? window.location.search : '',
+      search,
       viewport_height: isBrowser ? window.innerHeight : 0,
       viewport_width: isBrowser ? window.innerWidth : 0,
     },

@@ -1,9 +1,17 @@
-import dynamic from 'next/dynamic'
+import { lazy, Suspense } from 'react'
 import { useCommandMenuInitiated } from 'ui-patterns/CommandMenu'
 
-const LazyCommandMenu = dynamic(() => import('./CommandMenu'), { ssr: false })
+const LazyCommandMenu = lazy(() =>
+  import('./CommandMenu').then((mod) => ({ default: mod.StudioCommandMenu }))
+)
 
 export const StudioCommandMenu = () => {
   const isInitiated = useCommandMenuInitiated()
-  return isInitiated && <LazyCommandMenu />
+  if (!isInitiated) return null
+
+  return (
+    <Suspense fallback={null}>
+      <LazyCommandMenu />
+    </Suspense>
+  )
 }

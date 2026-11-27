@@ -83,14 +83,14 @@ function CICard() {
         <h4 className="text-foreground text-base font-medium">Continuous Integration</h4>
         <p className="text-foreground-lighter text-sm">
           Use the{' '}
-          <Link
-            href="https://supabase.com/docs/guides/functions/cicd-workflow"
+          <a
+            href="https://supabase.com/docs/guides/functions/deploy#cicd-deployment"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
             rel="noopener noreferrer"
           >
             Supabase CLI with GitHub actions
-          </Link>{' '}
+          </a>{' '}
           to preview and deploy your functions along with the rest of your application
         </p>
       </div>

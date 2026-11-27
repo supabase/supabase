@@ -251,13 +251,13 @@ export const SupportFormV3 = ({
             orgSlug={selectedOrgSlug}
             projectRef={currentProjectRef}
             subscriptionPlanId={subscriptionPlanId}
-            category={category}
           />
           <CategoryAndSeverityInfo
             form={form}
             category={category}
             severity={severity}
             projectRef={projectRef}
+            subscriptionPlanId={subscriptionPlanId}
           />
         </div>
 

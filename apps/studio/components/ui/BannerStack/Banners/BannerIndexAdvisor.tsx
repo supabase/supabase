@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { Lightbulb } from 'lucide-react'
+import { LightbulbIcon } from 'lucide-react'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
@@ -28,7 +28,7 @@ export const BannerIndexAdvisor = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <div className="p-2 rounded-lg bg-warning-300 text-warning">
-            <Lightbulb size={16} />
+            <LightbulbIcon size={16} />
           </div>
         </div>
         <div className="flex flex-col gap-y-1 mb-2">

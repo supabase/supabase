@@ -1,11 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
+import type { ConnectionStringMethod } from '../Connect.constants'
+import type { ConnectionStringPooler } from '../Connect.types'
 import {
   appendConnectionStringParams,
   applyTemporaryAccessToConnectionString,
   applyTemporaryAccessToPooler,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildDotnetConnectionString,
   buildJdbcString,
   buildPsqlCommand,
   buildSafeConnectionString,
@@ -13,23 +16,13 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
-  shouldAddTemporaryAccessPoolerOption,
   TOKEN_PASSWORD_PLACEHOLDER,
+  withRequiredSslmode,
 } from '../ConnectionString.utils'
 
 describe('parseConnectionParams', () => {
-  test('returns hidden defaults for an empty string', () => {
-    expect(parseConnectionParams('')).toEqual({
-      host: 'hidden',
-      port: DEFAULT_PORT,
-      user: 'hidden',
-      database: 'hidden',
-      search: '',
-    })
-  })
-
-  test('returns hidden defaults for an unparseable URL', () => {
-    expect(parseConnectionParams('not a url')).toEqual({
+  test.each(['', 'not a url'])('returns hidden defaults for %j', (uri) => {
+    expect(parseConnectionParams(uri)).toEqual({
       host: 'hidden',
       port: DEFAULT_PORT,
       user: 'hidden',
@@ -40,7 +33,7 @@ describe('parseConnectionParams', () => {
 
   test('parses a platform-shaped connection string', () => {
     const uri =
-      'postgresql://postgres.projref:[YOUR-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres'
+      'postgresql://postgres.projref:[YOUR-DATABASE-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres'
     expect(parseConnectionParams(uri)).toEqual({
       host: 'aws-0-eu-west-1.pooler.supabase.com',
       port: '6543',
@@ -52,7 +45,7 @@ describe('parseConnectionParams', () => {
 
   test('keeps the query string in search', () => {
     const uri =
-      'postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct'
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct'
     expect(parseConnectionParams(uri).search).toBe('?sslmode=require&sslnegotiation=direct')
   })
 
@@ -60,7 +53,7 @@ describe('parseConnectionParams', () => {
     // The URL parser percent-encodes the `[`/`]` in self-hosted's POOLER_TENANT_ID placeholder.
     // parseConnectionParams must decode so the displayed user matches what we wrote.
     const uri =
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:6543/postgres'
     expect(parseConnectionParams(uri).user).toBe('postgres.[POOLER_TENANT_ID]')
   })
 })
@@ -72,7 +65,7 @@ describe('buildSafeConnectionString', () => {
 
   test('rebuilds the URL with PASSWORD_PLACEHOLDER and the parsed params (round-trips brackets)', () => {
     const uri =
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:6543/postgres'
     const params = parseConnectionParams(uri)
     const safe = buildSafeConnectionString(uri, params)
     expect(safe).toBe(
@@ -81,7 +74,8 @@ describe('buildSafeConnectionString', () => {
   })
 
   test('preserves search params from the original URL', () => {
-    const uri = 'postgresql://postgres.proj:[YOUR-PASSWORD]@host:5432/postgres?sslmode=require'
+    const uri =
+      'postgresql://postgres.proj:[YOUR-DATABASE-PASSWORD]@host:5432/postgres?sslmode=require'
     const params = parseConnectionParams(uri)
     expect(buildSafeConnectionString(uri, params)).toContain('?sslmode=require')
   })
@@ -105,7 +99,7 @@ describe('buildConnectionStringWithPassword', () => {
 })
 
 describe('resolveConnectionString', () => {
-  const pooler = {
+  const pooler: ConnectionStringPooler = {
     transactionShared: 'tx-shared',
     sessionShared: 'session-shared',
     transactionDedicated: 'tx-dedicated',
@@ -124,55 +118,21 @@ describe('resolveConnectionString', () => {
     ).toBe('')
   })
 
-  test('direct method returns the direct URI', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'direct',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('direct-uri')
-  })
-
-  test('session method returns sessionShared', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'session',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('session-shared')
-  })
-
-  test('transaction prefers dedicated when available and useSharedPooler is false', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('tx-dedicated')
-  })
-
-  test('transaction falls back to shared when useSharedPooler is true', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: true,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('tx-shared')
-  })
-
-  test('transaction falls back to shared when no dedicated pooler exists', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        connectionStringPooler: { ...pooler, transactionDedicated: undefined },
-      })
-    ).toBe('tx-shared')
-  })
+  test.each<[ConnectionStringMethod, boolean, ConnectionStringPooler, string]>([
+    ['direct', false, pooler, 'direct-uri'],
+    ['session', false, pooler, 'session-shared'],
+    // transaction prefers the dedicated pooler when available
+    ['transaction', false, pooler, 'tx-dedicated'],
+    ['transaction', true, pooler, 'tx-shared'],
+    ['transaction', false, { ...pooler, transactionDedicated: undefined }, 'tx-shared'],
+  ])(
+    '%s method (useSharedPooler: %s) resolves the expected URI',
+    (connectionMethod, useSharedPooler, connectionStringPooler, expected) => {
+      expect(
+        resolveConnectionString({ connectionMethod, useSharedPooler, connectionStringPooler })
+      ).toBe(expected)
+    }
+  )
 })
 
 describe('appendConnectionStringParams', () => {
@@ -240,6 +200,52 @@ describe('buildJdbcString', () => {
   })
 })
 
+describe('withRequiredSslmode', () => {
+  test('returns ?sslmode=require for an empty search', () => {
+    expect(withRequiredSslmode('')).toBe('?sslmode=require')
+  })
+
+  test('leaves a search that already sets sslmode unchanged', () => {
+    expect(withRequiredSslmode('?sslmode=require&sslnegotiation=direct')).toBe(
+      '?sslmode=require&sslnegotiation=direct'
+    )
+  })
+
+  test('appends sslmode=require to existing params without it', () => {
+    expect(withRequiredSslmode('?options=reference%3Dproj')).toBe(
+      '?options=reference%3Dproj&sslmode=require'
+    )
+  })
+})
+
+describe('buildDotnetConnectionString', () => {
+  const params = {
+    host: 'db.proj.supabase.co',
+    port: '5432',
+    user: 'postgres',
+    database: 'postgres',
+    search: '',
+  }
+
+  test('builds the base Npgsql string without SSL negotiation', () => {
+    expect(buildDotnetConnectionString(params)).toBe(
+      `Host=db.proj.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true`
+    )
+  })
+
+  test('appends SSL Negotiation=Direct when the URI requires direct negotiation', () => {
+    expect(
+      buildDotnetConnectionString({
+        ...params,
+        port: '5433',
+        search: '?sslmode=require&sslnegotiation=direct',
+      })
+    ).toBe(
+      `Host=db.proj.supabase.co;Port=5433;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true;SSL Negotiation=Direct`
+    )
+  })
+})
+
 describe('buildConnectionParameters', () => {
   test('produces host/port/database/user rows in display order', () => {
     expect(
@@ -290,7 +296,7 @@ describe('applyTemporaryAccessToConnectionString', () => {
 })
 
 describe('applyTemporaryAccessToPooler', () => {
-  test('rewrites every URI slot and only adds jit on shared pooler strings', () => {
+  test('uses only direct and shared pooler strings for a granted role', () => {
     const rewritten = applyTemporaryAccessToPooler(
       {
         transactionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@pooler:6543/postgres`,
@@ -308,47 +314,25 @@ describe('applyTemporaryAccessToPooler', () => {
     )
     expect(rewritten.transactionShared).toContain('options=-c%20jit%3dtrue')
     expect(rewritten.sessionShared).toContain('options=-c%20jit%3dtrue')
-    expect(rewritten.transactionDedicated).not.toContain('jit')
-    expect(rewritten.sessionDedicated).not.toContain('jit')
+    expect(rewritten.transactionDedicated).toBeUndefined()
+    expect(rewritten.sessionDedicated).toBeUndefined()
   })
 })
 
-describe('shouldAddTemporaryAccessPoolerOption', () => {
-  test('is true only for shared pooler connections', () => {
-    expect(
-      shouldAddTemporaryAccessPoolerOption({
-        connectionMethod: 'direct',
-        useSharedPooler: false,
-        hasDedicatedPooler: true,
-      })
-    ).toBe(false)
-    expect(
-      shouldAddTemporaryAccessPoolerOption({
-        connectionMethod: 'session',
-        useSharedPooler: false,
-        hasDedicatedPooler: true,
-      })
-    ).toBe(true)
-    expect(
-      shouldAddTemporaryAccessPoolerOption({
-        connectionMethod: 'transaction',
-        useSharedPooler: true,
-        hasDedicatedPooler: true,
-      })
-    ).toBe(true)
-    expect(
-      shouldAddTemporaryAccessPoolerOption({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        hasDedicatedPooler: true,
-      })
-    ).toBe(false)
-    expect(
-      shouldAddTemporaryAccessPoolerOption({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        hasDedicatedPooler: false,
-      })
-    ).toBe(true)
-  })
+test('uses shared transaction pooling with a granted role when a dedicated pooler exists', () => {
+  expect(
+    resolveConnectionString({
+      connectionMethod: 'transaction',
+      useSharedPooler: false,
+      grantRole: 'analytics',
+      connectionStringPooler: {
+        transactionShared: `postgresql://postgres.proj:${PASSWORD_PLACEHOLDER}@shared:6543/postgres`,
+        transactionDedicated: `postgresql://postgres:${PASSWORD_PLACEHOLDER}@dedicated:6543/postgres`,
+        sessionShared: '',
+        ipv4SupportedForDedicatedPooler: true,
+      },
+    })
+  ).toBe(
+    `postgresql://analytics.proj:${TOKEN_PASSWORD_PLACEHOLDER}@shared:6543/postgres?options=-c%20jit%3dtrue`
+  )
 })

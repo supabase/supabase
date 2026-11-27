@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { cn } from 'ui'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  CONNECTION_SOURCE_LOAD_BALANCER,
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
@@ -10,13 +12,17 @@ import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Conn
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
   buildConnectionParameters,
+  buildDotnetConnectionString,
   buildSafeConnectionString,
   parseConnectionParams,
   resolveConnectionString,
+  withRequiredSslmode,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { useTemporaryAccessConnection } from '@/components/interfaces/ConnectSheet/TemporaryAccessConnectionProvider'
 import { TemporaryAccessPasswordNote } from '@/components/interfaces/ConnectSheet/TemporaryAccessRoleField'
+import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 type DirectFilesConfig = {
   files: {
@@ -29,23 +35,29 @@ type DirectFilesConfig = {
   passwordInUrl?: boolean
 }
 
-function DirectFilesContent({ state, connectionStringPooler }: StepContentProps) {
+function DirectFilesContent({ state, deploymentMode }: StepContentProps) {
+  const isHighAvailability = useIsHighAvailability()
+
+  const connectionSource = state.connectionSource
+  const isLoadBalancerSelected =
+    isHighAvailability && connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
   const {
-    meta: { isGrantMode, passwordPlaceholder },
+    meta: { grantRole, isGrantMode, passwordPlaceholder },
   } = useTemporaryAccessConnection()
 
-  const resolvedConnectionString = useMemo(
-    () =>
-      resolveConnectionString({
-        connectionMethod,
-        useSharedPooler,
-        connectionStringPooler,
-      }),
-    [connectionMethod, useSharedPooler, connectionStringPooler]
-  )
+  const connectionStrings = useConnectionStringDatabases(deploymentMode)
+  const connectionStringPooler =
+    connectionStrings[connectionSource as keyof typeof connectionStrings]
+
+  const resolvedConnectionString = resolveConnectionString({
+    connectionMethod,
+    useSharedPooler,
+    connectionStringPooler,
+    grantRole,
+  })
 
   const connectionParams = useMemo(
     () => parseConnectionParams(resolvedConnectionString),
@@ -130,7 +142,7 @@ func main() {
               language: 'json',
               code: `{
   "ConnectionStrings": {
-                "DefaultConnection": "Host=${connectionParams.host};Database=${connectionParams.database};Username=${connectionParams.user};Password=${passwordPlaceholder};SSL Mode=Require;Trust Server Certificate=true"
+    "DefaultConnection": "${buildDotnetConnectionString(connectionParams, passwordPlaceholder)}"
   }
 }`,
             },
@@ -185,7 +197,7 @@ PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 
 # Construct the SQLAlchemy connection string
-DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}${withRequiredSslmode(connectionParams.search)}"
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
@@ -240,12 +252,44 @@ except Exception as e:
     return null
   }
 
+  const codeBlock = (
+    <MultipleCodeBlock
+      files={config.files}
+      value={activeFile}
+      onValueChange={setActiveFile}
+      className={isLoadBalancerSelected ? 'rounded-none border-0' : undefined}
+    />
+  )
+
   return (
     <div className="flex flex-col gap-3">
-      <MultipleCodeBlock files={config.files} value={activeFile} onValueChange={setActiveFile} />
+      {isLoadBalancerSelected ? (
+        <div className="overflow-hidden rounded-lg border">
+          <div className="flex items-center border-b bg-surface-100 py-2 pl-4 pr-2">
+            <span className="text-xs text-foreground-light">Read-only</span>
+          </div>
+          {codeBlock}
+        </div>
+      ) : (
+        codeBlock
+      )}
       {config.passwordInUrl && !isGrantMode && <PasswordEncodingNote />}
       <TemporaryAccessPasswordNote tokenHref="/account/tokens" />
-      <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
+      {/* Persistent live region so screen readers announce the read-only state
+          when the load balancer is selected */}
+      <p
+        role="status"
+        className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
+      >
+        {isLoadBalancerSelected &&
+          'Replica connections are read-only. Connect to the primary database for writes.'}
+      </p>
+      <ConnectionParameters
+        parameters={buildConnectionParameters(
+          connectionParams,
+          isGrantMode ? passwordPlaceholder : undefined
+        )}
+      />
     </div>
   )
 }

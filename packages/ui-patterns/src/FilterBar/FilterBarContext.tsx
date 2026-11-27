@@ -18,13 +18,14 @@ import {
   FilterOptionObject,
   FilterProperty,
   MenuItem,
+  NewGroupPosition,
 } from './types'
 import { useCommandHandling } from './useCommandHandling'
 import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
   findConditionByPath,
   isAsyncOptionsFunction,
-  removeFromGroup,
+  removeConditionAndEmptiedGroups,
   resolvePropertyChange,
   updateNestedLogicalOperator,
   updateNestedOperator,
@@ -40,6 +41,7 @@ export type FilterBarContextValue = {
   isLoading: boolean
   error: string | null
   highlightedConditionPath: number[] | null
+  setHighlightedConditionPath: (path: number[] | null) => void
 
   onFilterChange: (filters: FilterGroup) => void
   commitFilters: (filters: FilterGroup) => void
@@ -68,6 +70,8 @@ export type FilterBarContextValue = {
   optionsError: string | null
 
   supportsOperators: boolean
+  newGroupPosition: NewGroupPosition
+  isRootOperatorLocked: boolean
   variant: FilterBarVariant
   actions?: FilterBarAction[]
   icon?: React.ReactNode
@@ -97,6 +101,12 @@ export type FilterBarRootProps = {
   actions?: FilterBarAction[]
   isLoading?: boolean
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New filter group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroup['logicalOperator']
+  /** Where "New filter group" sits in the property menu. Defaults to 'bottom'. */
+  newGroupPosition?: NewGroupPosition
+  /** Prevents toggling the root group's logical operator. Defaults to false. */
+  isRootOperatorLocked?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
   freeformDefaultProperty?: string
@@ -120,6 +130,9 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     actions,
     isLoading: externalLoading,
     supportsOperators = false,
+    defaultGroupOperator,
+    newGroupPosition = 'bottom',
+    isRootOperatorLocked = false,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -204,6 +217,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     handleOperatorChange,
     newPathRef,
     setIsCommandMenuVisible,
+    defaultGroupOperator,
   })
 
   const { handleKeyDown } = useKeyboardNavigation({
@@ -336,15 +350,16 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleLogicalOperatorChange = useCallback(
     (path: number[]) => {
+      if (isRootOperatorLocked && path.length === 0) return
       const updatedFilters = updateNestedLogicalOperator(filters, path)
       commitFilters(updatedFilters)
     },
-    [filters, commitFilters]
+    [filters, commitFilters, isRootOperatorLocked]
   )
 
   const handleRemoveCondition = useCallback(
     (path: number[]) => {
-      const updatedFilters = removeFromGroup(filters, path)
+      const updatedFilters = removeConditionAndEmptiedGroups(filters, path)
       commitFilters(updatedFilters)
       setActiveInput(null)
     },
@@ -370,6 +385,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     isLoading: loading,
     error,
     highlightedConditionPath,
+    setHighlightedConditionPath,
 
     onFilterChange,
     commitFilters,
@@ -395,6 +411,8 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     optionsError,
 
     supportsOperators,
+    newGroupPosition,
+    isRootOperatorLocked,
     variant,
     actions,
     icon,
@@ -409,7 +427,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>

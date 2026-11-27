@@ -1,6 +1,6 @@
 'use client'
 
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
@@ -65,7 +65,7 @@ export function RestartDatabaseTroubleshootingSection({
             <p className="text-sm text-foreground-light mb-3">
               Restarting your project can help resolve timeout errors or stale connections.
             </p>
-            <Button variant="default" size="tiny" onClick={handleClick}>
+            <Button size="tiny" onClick={handleClick}>
               Restart project
             </Button>
           </div>
@@ -109,7 +109,6 @@ export function TroubleshootingGuideSection({
           {description && <p className="text-sm text-foreground-light mb-3">{description}</p>}
           <Button
             asChild
-            variant="default"
             size="tiny"
             onClick={() =>
               track('inline_error_troubleshooter_action_clicked', {
@@ -117,7 +116,7 @@ export function TroubleshootingGuideSection({
                 ctaType: 'troubleshooting_guide',
               })
             }
-            iconRight={<ExternalLink />}
+            iconRight={<ExternalLinkIcon />}
           >
             <a href={href} target="_blank" rel="noopener noreferrer">
               View troubleshooting guide

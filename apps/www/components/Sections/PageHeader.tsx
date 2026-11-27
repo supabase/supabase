@@ -16,7 +16,7 @@ const PageHeader = ({ breadcrumb, title, h1, subheader, className }: Props) => (
     <SectionContainerWithCn height="narrow">
       {breadcrumb && <div className="mb-6">{breadcrumb}</div>}
       {title && (
-        <p className="mb-3 font-mono text-sm uppercase tracking-widest text-brand">{title}</p>
+        <p className="mb-3 font-mono text-sm uppercase tracking-widest text-primary">{title}</p>
       )}
       <h1 className="h1 font-normal tracking-tight text-foreground md:text-3xl lg:text-4xl">
         {h1}

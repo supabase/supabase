@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpIcon, TrashIcon } from 'lucide-react'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
@@ -12,7 +12,7 @@ export const MoveCellDropdownContent = ({ cellId }: MoveCellDropdownContentProps
   const currentNotebook = useCurrentNotebook()
 
   const cells = currentNotebook?.notebook.content?.cells ?? []
-  const currentIndex = cells.findIndex((c) => c.id === cellId)
+  const currentIndex = cells.findIndex((c) => c._id === cellId)
   const isFirstCell = currentIndex <= 0
   const isLastCell = currentIndex === -1 || currentIndex === cells.length - 1
 
@@ -36,7 +36,7 @@ export const MoveCellDropdownContent = ({ cellId }: MoveCellDropdownContentProps
         disabled={isFirstCell}
         onClick={() => onSelectMoveCell('up')}
       >
-        <ArrowUp size={14} />
+        <ArrowUpIcon size={14} />
         <p>Move up</p>
       </DropdownMenuItem>
       <DropdownMenuItem
@@ -44,12 +44,12 @@ export const MoveCellDropdownContent = ({ cellId }: MoveCellDropdownContentProps
         disabled={isLastCell}
         onClick={() => onSelectMoveCell('down')}
       >
-        <ArrowDown size={14} />
+        <ArrowDownIcon size={14} />
         <p>Move down</p>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRemoveCell()}>
-        <Trash size={14} />
+        <TrashIcon size={14} />
         <p>Remove cell</p>
       </DropdownMenuItem>
     </DropdownMenuContent>

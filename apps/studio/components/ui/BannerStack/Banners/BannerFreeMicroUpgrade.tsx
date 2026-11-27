@@ -15,15 +15,15 @@ export const BannerFreeMicroUpgrade = () => {
   const { ref } = useParams()
   const track = useTrack()
   const { dismissBanner } = useBannerStack()
-  const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(ref ?? ''),
-    false
+  const [, setDismissedAt] = useLocalStorageQuery<string | null>(
+    LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT(ref ?? ''),
+    null
   )
 
   return (
     <BannerCard
       onDismiss={() => {
-        setIsDismissed(true)
+        setDismissedAt(new Date().toISOString())
         dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
         track('free_micro_upgrade_banner_dismissed')
       }}
@@ -35,17 +35,16 @@ export const BannerFreeMicroUpgrade = () => {
               <ComputeBadge
                 infraComputeSize="nano"
                 icon={<ChevronsUpAnimated />}
-                className="text-brand-600 border-brand-500 bg-brand/10 gap-1"
+                className="text-brand-600 border-brand-500 bg-brand-default/10 gap-1"
               />
-              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand/20 to-transparent blur-md" />
+              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand-default/20 to-transparent blur-md" />
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium">Project low on resources</p>
+          <p className="text-sm font-medium">Compute Upgrade available</p>
           <p className="text-xs text-foreground-lighter text-balance">
-            Your Nano compute is approaching its limits. Your Pro plan includes a free upgrade to
-            Micro — double the memory at no extra cost.
+            Your Pro plan includes a free upgrade to Micro — double the memory at no extra cost.
           </p>
         </div>
         <div className="flex gap-2">
@@ -54,7 +53,7 @@ export const BannerFreeMicroUpgrade = () => {
             size="tiny"
             asChild
             onClick={() => {
-              setIsDismissed(true)
+              setDismissedAt(new Date().toISOString())
               dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
               track('free_micro_upgrade_banner_cta_clicked')
             }}

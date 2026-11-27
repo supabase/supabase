@@ -1,27 +1,28 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useInView } from 'react-intersection-observer'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 import { CreditCodeRedemption } from './CreditCodeRedemption'
 import { CreditTopUp } from './CreditTopUp'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { ref, inView } = useInView({ triggerOnce: true })
 
@@ -41,22 +42,20 @@ const CreditBalance = () => {
   const balance = Math.abs(combinedCreditBalance).toFixed(2)
 
   return (
-    <ScaffoldSection ref={ref}>
-      <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
-          <div className="flex items-center space-x-2">
-            <p className="text-foreground text-base m-0">Credit Balance</p>
-          </div>
-          <p className="text-sm text-foreground-light m-0">
-            Credits will be applied to future invoices, before charging your payment method. This
-            balance includes purchased credits and any prorated credits from plan changes.
-          </p>
-          <p className="text-sm text-foreground-light m-0">
-            If your credits run out, your default payment method will be charged.
-          </p>
-        </div>
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
+    <PageSection ref={ref} orientation="horizontal">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Credit Balance</PageSectionTitle>
+          <PageSectionDescription className="space-y-2">
+            <p>
+              Credits will be applied to future invoices, before charging your payment method. This
+              balance includes purchased credits and any prorated credits from plan changes.
+            </p>
+            <p>If your credits run out, your default payment method will be charged.</p>
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
@@ -94,8 +93,8 @@ const CreditBalance = () => {
             </FormSection>
           </FormPanel>
         )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 

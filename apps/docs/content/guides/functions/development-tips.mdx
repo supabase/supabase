@@ -45,9 +45,9 @@ We recommend this folder structure:
     └── config.toml
 ```
 
-## Using config.toml
+## Using the config file [#using-configtoml]
 
-Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set in your config file (`supabase/config.toml` or `supabase/config.jsonc`).
 
 ```toml supabase/config.toml
 [functions.hello-world]
@@ -59,7 +59,7 @@ import_map = './import_map.json'
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
 
-Save your Function as a JavaScript file (e.g. `index.js`) and then update the `supabase/config.toml` as follows:
+Save your Function as a JavaScript file (e.g. `index.js`) and then update your config file as follows:
 
 <Admonition type="note">
 
@@ -96,6 +96,42 @@ if (error instanceof FunctionsHttpError) {
   console.log('Fetch error:', error.message)
 }
 ```
+
+## Sending Realtime messages
+
+To send a [Broadcast](/docs/guides/realtime/broadcast) message from an Edge Function, call `httpSend()` without subscribing to the channel. `httpSend()` sends the message in a single HTTP request, so no connection stays open:
+
+```ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEYS['default'])
+
+Deno.serve(async (req) => {
+  const { roomId, message } = await req.json()
+
+  // Verify the caller is allowed to post to this room before sending
+  const channel = supabase.channel(`room:${roomId}`)
+  try {
+    await channel.httpSend('new-message', { message })
+  } finally {
+    await supabase.removeChannel(channel)
+  }
+
+  return new Response(null, { status: 204 })
+})
+```
+
+`httpSend()` requires `supabase-js` 2.76.0 or later. For other languages, call the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) directly.
+
+### Why not subscribe to the channel
+
+Subscribing from an Edge Function opens more connections than you might expect, and you're billed for each one:
+
+- Each worker that subscribes opens its own WebSocket connection and keeps it until the worker shuts down.
+- Under load, a function can run many workers at once.
+- Every connection counts toward [Realtime Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections).
+- Every subscribed worker counts as a recipient of each message on the channel, which adds to [Realtime Messages](/docs/guides/platform/manage-your-usage/realtime-messages).
 
 ## Database Functions vs Edge Functions
 

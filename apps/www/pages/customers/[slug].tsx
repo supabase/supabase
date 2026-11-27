@@ -15,10 +15,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { AiTools } from '@/components/AiTools'
 import SectionContainer from '@/components/Layouts/SectionContainer'
-
-// table of contents extractor
-const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_customers')
@@ -59,7 +57,6 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
   }
@@ -149,7 +146,7 @@ function CaseStudyPage(props: any) {
                   <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
                     <Link
                       href="/customers"
-                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                      className="text-primary hover:text-brand-600 sm:mb-2 mt-0"
                     >
                       Customer Stories
                     </Link>
@@ -209,12 +206,19 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
+                        <AiTools
+                          pagePath={`/customers/${slug}`}
+                          pageType="customers"
+                          titleClassName="sr-only"
+                          className="not-prose"
+                        />
+
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild variant="default" iconRight={<ChevronRight />}>
+                            <Button asChild iconRight={<ChevronRight />}>
                               <Link
-                                href="https://supabase.com/contact/enterprise"
+                                href="https://forms.supabase.com/enterprise"
                                 className="no-underline"
                               >
                                 Contact sales

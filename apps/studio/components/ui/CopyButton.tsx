@@ -1,4 +1,4 @@
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { ComponentProps, forwardRef, useEffect, useState } from 'react'
 import { Button, cn, copyToClipboard } from 'ui'
 
@@ -6,6 +6,8 @@ type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
+  /** Called once the clipboard write has succeeded, with the text that was copied */
+  onCopied?: (copiedText: string) => void
 }
 
 type CopyButtonWithText = CopyButtonBaseProps & {
@@ -31,6 +33,7 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       onClick,
       copyLabel = 'Copy',
       copiedLabel = 'Copied',
+      onCopied,
       variant = 'primary',
       icon,
       className,
@@ -51,8 +54,11 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         ref={ref}
         onClick={(e) => {
           const textToCopy = asyncText ? asyncText() : text
-          setShowCopied(true)
-          copyToClipboard(textToCopy)
+          copyToClipboard(textToCopy, () => {
+            setShowCopied(true)
+            // The write only succeeds after the text resolves, so this adds no wait
+            Promise.resolve(textToCopy).then((copiedText) => onCopied?.(copiedText))
+          })
           onClick?.(e)
         }}
         {...props}
@@ -60,12 +66,12 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         className={cn({ 'px-1.5': iconOnly }, className)}
         icon={
           showCopied ? (
-            <Check
+            <CheckIcon
               strokeWidth={2}
-              className={cn(variant === 'primary' ? 'text-inherit' : 'text-brand')}
+              className={cn(variant === 'primary' ? 'text-inherit' : 'text-primary')}
             />
           ) : (
-            (icon ?? <Copy />)
+            (icon ?? <CopyIcon />)
           )
         }
       >

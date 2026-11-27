@@ -1,16 +1,21 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { networkRestrictionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { UseCustomQueryOptions } from '@/types'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
+type NetworkRestrictionsConfig = { dbAllowedCidrs: string[]; dbAllowedCidrsV6?: string[] }
+
 export type NetworkRestrictionsResponse = {
   entitlement: 'disallowed' | 'allowed'
   status: '' | 'stored' | 'applied'
-  config: { dbAllowedCidrs: string[] }
-  old_config?: { dbAllowedCidrs: string[] }
+  config: NetworkRestrictionsConfig
+  old_config?: NetworkRestrictionsConfig
+  pending_config?: Partial<NetworkRestrictionsConfig>
+  pending_requested_at?: string
+  updated_at?: string
   error?: any
 }
 
@@ -23,6 +28,7 @@ export async function getNetworkRestrictions(
   const { data, error } = await get('/v1/projects/{ref}/network-restrictions', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   // Not allowed error is a valid response to denote if a project

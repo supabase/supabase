@@ -1,10 +1,11 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 import { formatUsage } from '../helpers'
 import { Metric } from './BillingBreakdown.constants'
+import { UsageProjectName } from '@/components/interfaces/Organization/Usage/UsageProjectName'
 import { ComputeUsageMetric, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { DOCS_URL } from '@/lib/constants'
@@ -16,6 +17,7 @@ export interface ComputeMetricProps {
   usage: OrgUsageResponse
   relativeToSubscription: boolean
   className?: string
+  projectRef?: string | null
 }
 
 export const ComputeMetric = ({
@@ -24,6 +26,7 @@ export const ComputeMetric = ({
   usage,
   relativeToSubscription,
   className,
+  projectRef,
 }: ComputeMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
@@ -52,7 +55,7 @@ export const ComputeMetric = ({
               <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                 {metric.name}
               </p>
-              <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+              <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
             </div>
           </Link>
           <span className="text-sm">{usageLabel}</span>&nbsp;
@@ -77,7 +80,7 @@ export const ComputeMetric = ({
                 <Link
                   href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
                   target="_blank"
-                  className="transition text-brand hover:text-brand-600 underline"
+                  className="transition text-primary hover:text-primary-hover underline"
                 >
                   Read more
                 </Link>
@@ -90,7 +93,7 @@ export const ComputeMetric = ({
                 <Link
                   href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                   target="_blank"
-                  className="transition text-brand hover:text-brand-600 underline"
+                  className="transition text-primary hover:text-primary-hover underline"
                 >
                   Read more
                 </Link>
@@ -109,7 +112,13 @@ export const ComputeMetric = ({
               <tbody>
                 {sortedProjectAllocations.map((allocation) => (
                   <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                    <td>{allocation.name}</td>
+                    <td>
+                      <UsageProjectName
+                        name={allocation.name}
+                        projectRef={allocation.ref}
+                        selectedProjectRef={projectRef}
+                      />
+                    </td>
                     <td className="text-right">
                       {formatUsage(usageMeta.metric as PricingMetric, allocation)}
                     </td>

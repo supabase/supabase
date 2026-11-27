@@ -9,6 +9,7 @@ export interface EmbeddedProjectListProps {
   selectedRef: string | undefined
   onSelect?: (project: OrgProject) => void
   onClose: () => void
+  getItemHref?: (project: OrgProject) => string
   renderRow?: (project: OrgProject) => ReactNode
   checkPosition?: 'right' | 'left'
   isOptionDisabled?: (project: OrgProject) => boolean
@@ -21,6 +22,7 @@ export function EmbeddedProjectList({
   selectedRef,
   onSelect,
   onClose,
+  getItemHref,
   renderRow,
   checkPosition,
   isOptionDisabled,
@@ -36,6 +38,7 @@ export function EmbeddedProjectList({
           selectedRef={selectedRef}
           onSelect={onSelect}
           onClose={onClose}
+          href={getItemHref?.(project)}
           renderRow={renderRow}
           checkPosition={checkPosition}
           isOptionDisabled={isOptionDisabled}
