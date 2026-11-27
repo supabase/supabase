@@ -1,0 +1,132 @@
+import { cn } from '@graphiql/react'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { ChevronDownIcon } from 'lucide-react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import {
+  JitDbAccessStatusData,
+  useJitDbAccessStatusQuery,
+} from '@/data/jit-db-access/jit-db-access-status-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+
+const ACCESS_TITLE = "You have access to the project's database"
+const EXPIRED_TITLE = "Your access to the project's database is expired"
+
+export const JitDbAccessInfo = () => {
+  const { ref: projectRef } = useParams()
+
+  const { data: jitDbAccess } = useJitDbAccessStatusQuery({ projectRef })
+
+  if (!jitDbAccess || jitDbAccess.user_id === undefined) return null
+
+  if (jitDbAccess.user_roles.length === 1) {
+    return <SingleRoleAccess role={jitDbAccess.user_roles[0]} />
+  } else {
+    return <MultiRoleAccess roles={jitDbAccess.user_roles} />
+  }
+}
+
+type JitRole = JitDbAccessStatusData['user_roles'][number]
+
+// A role without `expires_at` never expires, so it keeps access alive. Units in unix seconds.
+const isRoleExpired = (role: JitRole) =>
+  role.expires_at !== undefined && dayjs.unix(role.expires_at).isBefore(dayjs())
+
+const SingleRoleAccess = ({ role }: { role: JitRole }) => {
+  const isExpired = isRoleExpired(role)
+
+  const { can: canManageJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
+  return (
+    <Admonition
+      type="default"
+      showIcon={false}
+      className={cn('rounded-none', canManageJitDbAccess ? 'border-x-0 border-t-0' : 'border-none')}
+      title={isExpired ? EXPIRED_TITLE : ACCESS_TITLE}
+      description={
+        isExpired ? (
+          <p>Contact your project's owner or administrator for renewed access if required.</p>
+        ) : (
+          <div className="flex items-center gap-x-2">
+            <span>
+              <span>As</span> <code>{role.role}</code>
+            </span>
+            <span>·</span>
+            {role.expires_at && (
+              <span>
+                Expires on{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
+              </span>
+            )}
+          </div>
+        )
+      }
+    />
+  )
+}
+
+const MultiRoleAccess = ({ roles }: { roles: JitDbAccessStatusData['user_roles'] }) => {
+  // A role without `expires_at` never expires, so it keeps access alive
+  const isExpired = roles.length > 0 && roles.every(isRoleExpired)
+
+  // Earliest expiry among roles that are still active (unix seconds)
+  const upcomingExpiries = roles.flatMap((role) =>
+    role.expires_at !== undefined && !isRoleExpired(role) ? [role.expires_at] : []
+  )
+  const nextExpiry = upcomingExpiries.length > 0 ? Math.min(...upcomingExpiries) : undefined
+
+  const { can: canManageJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
+  return (
+    <Collapsible className={canManageJitDbAccess ? 'border-b' : ''}>
+      <CollapsibleTrigger
+        asChild
+        className="py-4 px-4 [&[data-state=open]>div>svg]:-rotate-180! w-full "
+      >
+        <div className="flex items-center justify-between gap-x-2 w-full cursor-pointer">
+          <div className="text-sm">
+            <p className="mb-0.5">{isExpired ? EXPIRED_TITLE : ACCESS_TITLE}</p>
+            <div className="flex items-center gap-x-2 text-foreground-light">
+              <span>Assigned {roles.length} roles</span>
+              {nextExpiry !== undefined && (
+                <>
+                  <span>·</span>
+                  <span>
+                    <span>Next expiry on</span>{' '}
+                    <TimestampInfo className="text-sm" utcTimestamp={nextExpiry * 1000} />
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <ChevronDownIcon className="transition-transform" size={14} />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="data-closed:animate-collapsible-up-clipped data-open:animate-collapsible-down-clipped motion-reduce:animate-none">
+        {roles.map((role) => {
+          return (
+            <div key={role.role} className="py-2 px-4 first:pt-0 text-foreground-light">
+              <p className="text-sm flex items-center gap-x-2">
+                <code>{role.role}</code>
+                <span>·</span>
+                {role.expires_at && (
+                  <span>
+                    Expires on{' '}
+                    <TimestampInfo className="text-sm" utcTimestamp={role.expires_at * 1000} />
+                  </span>
+                )}
+              </p>
+            </div>
+          )
+        })}
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
