@@ -654,39 +654,16 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     			}
     			is NativeSignInResult.NetworkError -> {
     				// Network error occurred
-    				println("Network error during Apple sign in: ${result.error}")
+    				println("Network error during Apple sign in: ${result.message}")
     				// Show network error to user
     			}
     			is NativeSignInResult.Success -> {
     				// User successfully signed in
     				println("Apple sign in successful!")
 
-    				// Apple only provides the user's full name on the first sign-in (iOS only)
-    				// Save it to user metadata if available
-    				result.data?.let { appleData ->
-    					appleData.fullName?.let { fullName ->
-    						val nameParts = mutableListOf<String>()
-    						fullName.givenName?.let { nameParts.add(it) }
-    						fullName.middleName?.let { nameParts.add(it) }
-    						fullName.familyName?.let { nameParts.add(it) }
-
-    						val fullNameString = nameParts.joinToString(" ")
-
-    						scope.launch {
-    							try {
-    								supabaseClient.auth.updateUser {
-    									data = buildJsonObject {
-    										put("full_name", fullNameString)
-    										fullName.givenName?.let { put("given_name", it) }
-    										fullName.familyName?.let { put("family_name", it) }
-    									}
-    								}
-    							} catch (e: Exception) {
-    								println("Failed to update user metadata: ${e.message}")
-    							}
-    						}
-    					}
-    				}
+    				// Apple only returns the user's name on the first sign-in, and only on iOS.
+    				// That data lives in the Apple source set (iosMain), at
+    				// result.data.apple.credential.fullName.
 
     				// Navigate to home screen or update UI
     			}
