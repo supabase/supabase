@@ -1,8 +1,9 @@
 import { source } from 'common-tags'
+import z from 'zod/v4'
 
 import { executeQuery } from './query'
 import { PgMetaDatabaseError, WrappedResult } from './types'
-import { assertSelfHosted } from './util'
+import { assertSelfHosted, isSparkProject } from './util'
 import { makeRandomString } from '@/lib/helpers'
 
 export type ListMigrationsResult = {
@@ -42,6 +43,60 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
 
     commit;
   `
+}
+
+const sparkMigrationReceiptSchema = z.object({ version: z.string() })
+
+const sparkMigrationErrorSchema = z.object({
+  message: z.string(),
+  code: z.string().optional(),
+  formattedError: z.string().optional(),
+})
+
+/**
+ * TEMPORARY, Spark only. Applies a migration through Spark's own migration route, which runs the
+ * SQL and records it in Spark's history in one transaction.
+ *
+ * Spark refuses the SQL the Postgres path below sends: `alter table ... add column if not exists`
+ * on the history table, and `to_char(current_timestamp, ...)` for the version reads as null.
+ * Delete once Spark runs `initializeHistoryTableQuery` and `applyAndTrackMigrationsQuery`.
+ */
+async function applySparkMigration<T>({
+  query,
+  name,
+}: ApplyAndTrackMigrationsOptions): Promise<WrappedResult<T[]>> {
+  try {
+    const response = await fetch(`${process.env.SUPABASE_URL}/system/v1/migrations`, {
+      method: 'POST',
+      // Only the service key: the caller's own headers (cookies, its bearer) are not Spark's to see.
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: `${process.env.SUPABASE_SERVICE_KEY}`,
+      },
+      body: JSON.stringify({ sql: query, name }),
+      // fetch would carry the service key to wherever a redirect points.
+      redirect: 'error',
+    })
+    const result = await response.json()
+
+    if (response.ok) {
+      // A 2xx without Spark's receipt (a gateway's page, another service) applied nothing.
+      sparkMigrationReceiptSchema.parse(result)
+      return { data: [], error: undefined }
+    }
+
+    const { message, code, formattedError } = sparkMigrationErrorSchema.parse(result)
+    const error = new PgMetaDatabaseError(
+      message,
+      code ?? '',
+      response.status,
+      formattedError ?? message
+    )
+    return { data: undefined, error }
+  } catch (cause) {
+    const error = new Error("Spark's migration route did not answer as expected", { cause })
+    return { data: undefined, error }
+  }
 }
 
 export type ListMigrationVersionsOptions = {
@@ -92,6 +147,10 @@ export async function applyAndTrackMigrations<T = unknown>({
   headers,
 }: ApplyAndTrackMigrationsOptions): Promise<WrappedResult<T[]>> {
   assertSelfHosted()
+
+  if (isSparkProject()) {
+    return applySparkMigration<T>({ query, name })
+  }
 
   const initializeResponse = await executeQuery<void>({
     query: initializeHistoryTableQuery(),

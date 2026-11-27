@@ -1,9 +1,9 @@
-import { getKeywordsSql } from '@supabase/pg-meta'
+import { getKeywordsFallback, getKeywordsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -18,7 +18,7 @@ export async function getKeywords(
 ) {
   const sql = getKeywordsSql()
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -28,6 +28,7 @@ export async function getKeywords(
       queryKey: ['keywords'],
       grant: unguarded.migrating,
     },
+    () => getKeywordsFallback(),
     signal
   )
 

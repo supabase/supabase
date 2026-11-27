@@ -1,8 +1,9 @@
-import { getMigrationsSql } from '@supabase/pg-meta'
+import { getMigrationsFallback, getMigrationsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -25,19 +26,19 @@ export async function getMigrations(
   signal?: AbortSignal
 ) {
   const sql = getMigrationsSql()
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'migrations',
+    queryKey: ['migrations'],
+    grant: unguarded.migrating,
+  }
 
   try {
-    const { result } = await executeSql(
-      {
-        projectRef,
-        connectionString,
-        sql,
-        sqlOrigin: 'studio',
-        queryName: 'migrations',
-        queryKey: ['migrations'],
-        grant: unguarded.migrating,
-      },
-      signal
+    const result = await withSparkFallback(
+      projectRef,
+      async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+      () => getMigrationsFallback(catalogFallbackQuery(variables, signal))
     )
 
     return result as DatabaseMigration[]

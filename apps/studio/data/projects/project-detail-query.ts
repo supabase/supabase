@@ -12,7 +12,11 @@ import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
-export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output']
+// TEMPORARY: `postgres_engine` is not in the generated API types yet. A Spark project's detail
+// carries `postgres_engine: 'spark'`. Delete the intersection once the generated type has the field.
+export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output'] & {
+  postgres_engine?: string
+}
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.

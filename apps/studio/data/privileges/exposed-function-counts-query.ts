@@ -1,9 +1,9 @@
-import { getExposedFunctionCountsSql } from '@supabase/pg-meta'
+import { getExposedFunctionCountsFallback, getExposedFunctionCountsSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
@@ -29,7 +29,7 @@ export async function getExposedFunctionCounts(
 
   const sql = getExposedFunctionCountsSql({ selectedSchemas, ignoredSchemas: IGNORED_SCHEMAS })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -39,6 +39,8 @@ export async function getExposedFunctionCounts(
       queryKey: ['exposed-function-counts', selectedSchemas],
       grant: unguarded.migrating,
     },
+    (query) =>
+      getExposedFunctionCountsFallback(query, { selectedSchemas, ignoredSchemas: IGNORED_SCHEMAS }),
     signal
   )
 

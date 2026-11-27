@@ -1,9 +1,9 @@
-import { getTableConstraintsSql } from '@supabase/pg-meta'
+import { getTableConstraintsFallback, getTableConstraintsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -41,7 +41,7 @@ export async function getTableConstraints(
   if (!id) throw new Error('Table ID is required')
 
   const sql = getTableConstraintsSql({ id })
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -51,6 +51,7 @@ export async function getTableConstraints(
       queryKey: ['table-constraints', id],
       grant: unguarded.migrating,
     },
+    (query) => getTableConstraintsFallback(query, { id }),
     signal
   )
 

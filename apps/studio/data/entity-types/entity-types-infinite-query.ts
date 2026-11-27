@@ -1,9 +1,10 @@
-import { getEntityTypesSQL } from '@supabase/pg-meta'
+import { getEntityTypesFallback, getEntityTypesSQL } from '@supabase/pg-meta'
 import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomInfiniteQueryOptions } from '@/types'
@@ -53,28 +54,20 @@ export async function getEntityTypes(
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getEntityTypesSQL({
-    schemas,
-    sort,
-    filterTypes,
-    excludePartitions,
-    parentId,
-    search,
-    limit,
-    page,
-  })
+  const args = { schemas, sort, filterTypes, excludePartitions, parentId, search, limit, page }
+  const sql = getEntityTypesSQL(args)
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'entity-types',
+    queryKey: ['entity-types', ...schemas, page],
+    grant: unguarded.migrating,
+  }
 
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sqlOrigin: 'studio',
-      queryName: 'entity-types',
-      sql,
-      queryKey: ['entity-types', ...schemas, page],
-      grant: unguarded.migrating,
-    },
-    signal
+  const result = await withSparkFallback(
+    projectRef,
+    async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+    () => getEntityTypesFallback(catalogFallbackQuery(variables, signal), args)
   )
 
   return result[0] as EntityTypesResponse

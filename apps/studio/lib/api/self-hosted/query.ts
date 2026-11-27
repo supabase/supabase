@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react'
 
 import { constructHeaders } from '../apiHelpers'
 import { databaseErrorSchema, PgMetaDatabaseError, WrappedResult } from './types'
-import { assertSelfHosted, encryptString, getConnectionString } from './util'
+import { assertSelfHosted, encryptString, getConnectionString, isSparkProject } from './util'
 import { PG_META_URL } from '@/lib/constants/index'
 
 export type QueryOptions = {
@@ -28,9 +28,15 @@ export async function executeQuery<T = unknown>({
   const connectionString = getConnectionString({ readOnly })
   const connectionStringEncrypted = encryptString(connectionString)
 
-  const requestBody: { query: string; parameters?: unknown[] } = { query }
+  const requestBody: { query: string; parameters?: unknown[]; read_only?: boolean } = { query }
   if (parameters !== undefined) {
     requestBody.parameters = parameters
+  }
+  // TEMPORARY, Spark only. Spark has no read-only role to connect as, so the connection string
+  // above does not make the query read-only there: Spark's query route reads `read_only` from the
+  // body. Delete the engine check once pg-meta's `/query` takes `read_only` from the body too.
+  if (readOnly && isSparkProject()) {
+    requestBody.read_only = true
   }
 
   return await Sentry.startSpan({ name: 'pg-meta.query', op: 'db.query' }, async (span) => {

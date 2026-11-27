@@ -1,10 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { listSchemasFallback } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
 import { UseCustomQueryOptions } from '@/types'
@@ -25,7 +25,7 @@ export async function getSchemas(
   { projectRef, connectionString }: SchemasVariables,
   signal?: AbortSignal
 ) {
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -35,6 +35,7 @@ export async function getSchemas(
       queryKey: ['schemas'],
       grant: unguarded.migrating,
     },
+    (query) => listSchemasFallback(query),
     signal
   )
 

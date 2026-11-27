@@ -296,6 +296,7 @@ overrides:
   '@nuxt/devtools>simple-git': ^4.0.0
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
+  '@supabase/mcp-server-supabase': github:supabase/mcp#36857d7198e1899c964e1633bdf3fda2cc5de6db&path:/packages/mcp-server-supabase/packed
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
@@ -1318,8 +1319,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
-        specifier: ^0.17.0
-        version: 0.17.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+        specifier: github:supabase/mcp#36857d7198e1899c964e1633bdf3fda2cc5de6db&path:/packages/mcp-server-supabase/packed
+        version: https://codeload.github.com/supabase/mcp/tar.gz/36857d7198e1899c964e1633bdf3fda2cc5de6db#path:/packages/mcp-server-supabase/packed(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -1332,6 +1333,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.117.3(@opentelemetry/api@1.9.1)
+      '@supabase/typegen':
+        specifier: github:supabase/sdk#5a5db05b23a12f1cdea0406e082d465eacc1d6a7&path:/packages/typegen
+        version: https://codeload.github.com/supabase/sdk/tar.gz/5a5db05b23a12f1cdea0406e082d465eacc1d6a7#path:/packages/typegen
       '@tanstack/react-devtools':
         specifier: ^0.10.3
         version: 0.10.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(solid-js@1.9.17)
@@ -3415,6 +3419,12 @@ packages:
     resolution: {integrity: sha512-VFpv9UP820SiwDUPYtq7PmD3jifzZlevkQ26bhbSzFeruSTys0eHzQCZyKg+IhgmZzwPI9AFjPe26ABNjGeIKg==}
     peerDependencies:
       graphql: '*'
+
+  '@ark/schema@0.56.8':
+    resolution: {integrity: sha512-R05TOe85oQBGFFw2zKMuZpqkXibLKuC/aJt6VwFn5Cjc4x3NkWfhvGRpRDycNkj3ddcHnOPtIsmjVowJO9Yxdw==}
+
+  '@ark/util@0.56.8':
+    resolution: {integrity: sha512-XLiQyGfpJcws1zCtp2Cva8s1oheCdFn1Rt6JSyC4NnkDrpwCJnlaiawuuOc1Z97vMH+jEzW5vyyf0xOju5wUQA==}
 
   '@asamuzakjp/css-color@5.0.1':
     resolution: {integrity: sha512-2SZFvqMyvboVV1d15lMf7XiI3m7SDqXUuKaTymJYLN6dSGadqp+fVojqJlVoMlbZnlTmu3S0TLwLTJpvBMO1Aw==}
@@ -9406,8 +9416,9 @@ packages:
     resolution: {integrity: sha512-6GuizbP4N5xWaxEVUsI+UQpJdmMmn0t3sYNpObo9gCAldvM22gFjnYzRVmkHxp5ylU21azEYmiWVwk9iDgCMkQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.17.0':
-    resolution: {integrity: sha512-uGZM3GQx1vcpurkmRD4sW9WOW8aTTOKbn5/d5/Y5NUiXJXGmepe4Sz7AcCMvlXd4zKbf2zzBd7WiWWL4gR1R/g==}
+  '@supabase/mcp-server-supabase@https://codeload.github.com/supabase/mcp/tar.gz/36857d7198e1899c964e1633bdf3fda2cc5de6db#path:/packages/mcp-server-supabase/packed':
+    resolution: {gitHosted: true, integrity: sha512-XV3h9WYiB+jT0jiNZT6GcmJobbHwch8Z1dybWlDeICuVeKQhbObnCgzeviSSkd0TbvDW3g8ju4scQWGa5I5oaw==, path: /packages/mcp-server-supabase/packed, tarball: https://codeload.github.com/supabase/mcp/tar.gz/36857d7198e1899c964e1633bdf3fda2cc5de6db}
+    version: 0.17.0
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
@@ -9425,6 +9436,15 @@ packages:
   '@supabase/postgrest-js@2.117.3':
     resolution: {integrity: sha512-NpyTgullu6tw11ojYKTdZg9HannZ4mu4FUlhc9V5zDXOVllUJzEmuyLM+WWoYF0BurfrRvarimpm3SR8P0Gzfw==}
     engines: {node: '>=22.0.0'}
+
+  '@supabase/postgrest-typegen@0.7.0':
+    resolution: {integrity: sha512-B1Wh2arVChXsX9ACdOv6CuX7m1+5S7jYFjB0b+yhNWJq63RFkOTgRlz4Q1uGI/M9nSPXtM3XC03KxpvKzTknCg==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      oxfmt: 0.66.0
+    peerDependenciesMeta:
+      oxfmt:
+        optional: true
 
   '@supabase/realtime-js@2.117.3':
     resolution: {integrity: sha512-4W4ISbreRygNXbhwqxeqyuRul8RPx+SF+Hp2IT8wctebQEHSVCULfKatiRiEhmasfoXvYm2AHV4XFsOxhoousA==}
@@ -9452,6 +9472,16 @@ packages:
       '@opentelemetry/api': '>=1.0.0'
     peerDependenciesMeta:
       '@opentelemetry/api':
+        optional: true
+
+  '@supabase/typegen@https://codeload.github.com/supabase/sdk/tar.gz/5a5db05b23a12f1cdea0406e082d465eacc1d6a7#path:/packages/typegen':
+    resolution: {gitHosted: true, integrity: sha512-c4XphNBhHXkNxc1hf7z2NFg7tFprPdnF3oEZbe4OVcwZFVSndOND7P89s3hy7pA0OnRJ0E9Qd8ZyZkAWn9YVEg==, path: /packages/typegen, tarball: https://codeload.github.com/supabase/sdk/tar.gz/5a5db05b23a12f1cdea0406e082d465eacc1d6a7}
+    version: 0.3.2
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      oxfmt: 0.66.0
+    peerDependenciesMeta:
+      oxfmt:
         optional: true
 
   '@swc/helpers@0.5.23':
@@ -11114,6 +11144,12 @@ packages:
   aria-query@5.3.2:
     resolution: {integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==}
     engines: {node: '>= 0.4'}
+
+  arkregex@0.0.14:
+    resolution: {integrity: sha512-G3I/uCtWE0IKQiPh0qqmmAFDdtjZKZQ5mNPR6gJBeAMZ7VqYCpoaDeXnLju2Zo6ywExtmxZJELeVFb0MPDjPyA==}
+
+  arktype@2.2.9:
+    resolution: {integrity: sha512-Cja0IMEn19rB35on9da1i1z6QMasuS7ULffXbetCry09jvCGYT8Bi1KgYiqri5FymF4nQAXkM90yksYkgSK2EA==}
 
   array-buffer-byte-length@1.0.2:
     resolution: {integrity: sha512-LHE+8BuR7RYGDKvnrmcuSq3tDcKv9OFEXQt/HpbZhY7V6h0zlUXutnAD82GiFx9rdieCMjkvtcsPqBwgUl1Iiw==}
@@ -19667,6 +19703,12 @@ snapshots:
       immutable: 5.1.9
       invariant: 2.2.4
 
+  '@ark/schema@0.56.8':
+    dependencies:
+      '@ark/util': 0.56.8
+
+  '@ark/util@0.56.8': {}
+
   '@asamuzakjp/css-color@5.0.1':
     dependencies:
       '@csstools/css-calc': 3.1.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.2))(@csstools/css-tokenizer@4.0.2)
@@ -26359,7 +26401,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.17.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@https://codeload.github.com/supabase/mcp/tar.gz/36857d7198e1899c964e1633bdf3fda2cc5de6db#path:/packages/mcp-server-supabase/packed(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
       '@modelcontextprotocol/node': 2.1.2(@modelcontextprotocol/server@2.4.0)
@@ -26381,6 +26423,10 @@ snapshots:
   '@supabase/postgrest-js@2.117.3':
     dependencies:
       tslib: 2.8.1
+
+  '@supabase/postgrest-typegen@0.7.0':
+    dependencies:
+      arktype: 2.2.9
 
   '@supabase/realtime-js@2.117.3':
     dependencies:
@@ -26417,6 +26463,10 @@ snapshots:
       '@supabase/storage-js': 2.117.3
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
+
+  '@supabase/typegen@https://codeload.github.com/supabase/sdk/tar.gz/5a5db05b23a12f1cdea0406e082d465eacc1d6a7#path:/packages/typegen':
+    dependencies:
+      '@supabase/postgrest-typegen': 0.7.0
 
   '@swc/helpers@0.5.23':
     dependencies:
@@ -28521,6 +28571,16 @@ snapshots:
       dequal: 2.0.3
 
   aria-query@5.3.2: {}
+
+  arkregex@0.0.14:
+    dependencies:
+      '@ark/util': 0.56.8
+
+  arktype@2.2.9:
+    dependencies:
+      '@ark/schema': 0.56.8
+      '@ark/util': 0.56.8
+      arkregex: 0.0.14
 
   array-buffer-byte-length@1.0.2:
     dependencies:

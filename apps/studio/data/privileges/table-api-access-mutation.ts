@@ -1,4 +1,7 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, {
+  getTablePrivilegesStatementsSql,
+  type TablePrivilegesGrant,
+} from '@supabase/pg-meta'
 import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -7,6 +10,7 @@ import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
 import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
+import { withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
@@ -18,6 +22,9 @@ import type { UseCustomMutationOptions } from '@/types'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
+  /** The table's schema and name, for databases that cannot run the `DO` block (Spark). */
+  schema: string
+  name: string
   privileges: DeepReadonly<ApiPrivilegesByRole>
 }
 
@@ -25,9 +32,13 @@ export async function updateTableApiAccessPrivileges({
   projectRef,
   connectionString,
   relationId,
+  schema,
+  name,
   privileges,
 }: TableApiAccessPrivilegesVariables) {
   const sqlStatements: Array<SafeSqlFragment> = []
+  const grants: TablePrivilegesGrant[] = []
+  const revokes: TablePrivilegesGrant[] = []
 
   for (const role of API_ACCESS_ROLES) {
     const rolePrivileges = privileges[role]
@@ -43,6 +54,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
+      revokes.push(...revokeGrants)
       const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql
       if (revokeSql) sqlStatements.push(revokeSql)
     }
@@ -54,6 +66,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
+      grants.push(...grantGrants)
       const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql
       if (grantSql) sqlStatements.push(grantSql)
     }
@@ -63,17 +76,21 @@ export async function updateTableApiAccessPrivileges({
     return null
   }
 
-  const { result } = await executeSql<[]>({
+  const variables = {
     projectRef,
     connectionString,
-    sqlOrigin: 'studio',
     queryName: 'table-api-access-update-privileges',
-    sql: joinSqlFragments(sqlStatements, '\n'),
     queryKey: ['table-api-access', 'update-privileges'],
     grant: unguarded.migrating,
-  })
+  }
+  const run = async (sql: SafeSqlFragment) =>
+    (await executeSql<[]>({ ...variables, sqlOrigin: 'studio', sql })).result
 
-  return result
+  return withSparkFallback(
+    projectRef,
+    () => run(joinSqlFragments(sqlStatements, '\n')),
+    () => run(getTablePrivilegesStatementsSql({ schema, name, grants, revokes }))
+  )
 }
 
 type UpdateTableApiAccessPrivilegesData = Awaited<ReturnType<typeof updateTableApiAccessPrivileges>>

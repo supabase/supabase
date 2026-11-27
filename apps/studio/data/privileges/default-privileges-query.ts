@@ -1,9 +1,9 @@
-import { getDefaultPrivilegesStateSql } from '@supabase/pg-meta'
+import { getDefaultPrivilegesStateFallback, getDefaultPrivilegesStateSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type DefaultPrivilegesVariables = {
@@ -20,7 +20,7 @@ export async function getDefaultPrivilegesState(
 
   const sql = getDefaultPrivilegesStateSql({ schema })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -30,6 +30,7 @@ export async function getDefaultPrivilegesState(
       queryKey: ['default-privileges-state'],
       grant: unguarded.migrating,
     },
+    (query) => getDefaultPrivilegesStateFallback(query, { schema }),
     signal
   )
 

@@ -1,9 +1,9 @@
-import { getIndexesSQL } from '@supabase/pg-meta'
+import { getIndexesFallback, getIndexesSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseIndexesKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -34,7 +34,7 @@ export async function getIndexes(
 
   const sql = getIndexesSQL({ schema })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -44,6 +44,7 @@ export async function getIndexes(
       queryKey: ['indexes', schema],
       grant: unguarded.migrating,
     },
+    (query) => getIndexesFallback(query, { schema }),
     signal
   )
 

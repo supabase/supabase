@@ -1,7 +1,7 @@
-import pgMeta, { type PGMaterializedView } from '@supabase/pg-meta'
+import pgMeta, { listMaterializedViewsFallback, type PGMaterializedView } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from '../sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '../sql/catalog-fallback-query'
 import { materializedViewKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -21,7 +21,7 @@ export async function getMaterializedViews(
 
   const { sql } = pgMeta.materializedViews.list({ includedSchemas: schemas })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -31,6 +31,7 @@ export async function getMaterializedViews(
       queryKey: ['materialized-views', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },
+    (query) => listMaterializedViewsFallback(query, { includedSchemas: schemas }),
     signal
   )
 

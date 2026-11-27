@@ -1,4 +1,4 @@
-import pgMeta, { type PGPolicy } from '@supabase/pg-meta'
+import pgMeta, { withParsedPolicyRoles, type PGPolicy } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
@@ -38,7 +38,7 @@ export async function getDatabasePolicies(
     headersInit
   )
 
-  return result as PGPolicy[]
+  return withParsedPolicyRoles(result as PGPolicy[])
 }
 
 export type DatabasePoliciesData = Awaited<ReturnType<typeof getDatabasePolicies>>

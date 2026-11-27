@@ -4,6 +4,7 @@ import {
   type SupabasePlatform,
 } from '@supabase/mcp-server-supabase'
 import {
+  AccountOperations,
   ApiKey,
   ApiKeyType,
   ApplyMigrationOptions,
@@ -24,6 +25,8 @@ import { retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
+import { isSparkProject } from './util'
+import { DEFAULT_PROJECT } from '@/lib/constants/api'
 import { isStudioError } from '@/lib/errors/studio-errors'
 
 export type GetDatabaseOperationsOptions = {
@@ -209,6 +212,42 @@ export function getFeedbackOperations({
   }
 }
 
+/**
+ * TEMPORARY, Spark only. The MCP server learns a project's engine from its project detail
+ * (`database.postgres_engine`) and, for Spark, runs its own Spark catalog queries for `list_tables`
+ * and `list_extensions`. Self-hosted has no account API, so this answers that one read. The account
+ * tools are never registered: the server is always scoped to the default project.
+ * Delete once Spark runs the pg-meta queries those two tools send.
+ */
+export function getSparkAccountOperations(): AccountOperations {
+  const notOnSelfHosted = async (): Promise<never> => {
+    throw new Error('Account operations are not available on self-hosted')
+  }
+
+  return {
+    async getProject(_projectRef) {
+      const project = {
+        id: DEFAULT_PROJECT.ref,
+        ref: DEFAULT_PROJECT.ref,
+        organization_id: String(DEFAULT_PROJECT.organization_id),
+        organization_slug: 'default-org-slug',
+        name: DEFAULT_PROJECT.name,
+        status: DEFAULT_PROJECT.status,
+        created_at: DEFAULT_PROJECT.inserted_at,
+        region: DEFAULT_PROJECT.region,
+        database: { postgres_engine: 'spark' },
+      }
+      return project
+    },
+    listOrganizations: notOnSelfHosted,
+    getOrganization: notOnSelfHosted,
+    listProjects: notOnSelfHosted,
+    createProject: notOnSelfHosted,
+    pauseProject: notOnSelfHosted,
+    restoreProject: notOnSelfHosted,
+  }
+}
+
 export type GetSelfHostedPlatformOptions = {
   headers?: HeadersInit
 }
@@ -219,6 +258,7 @@ export function getSelfHostedPlatform({
   headers,
 }: GetSelfHostedPlatformOptions): Omit<SupabasePlatform, 'notebooks'> {
   return {
+    ...(isSparkProject() && { account: getSparkAccountOperations() }),
     database: getDatabaseOperations({ headers }),
     development: getDevelopmentOperations({ headers }),
     debugging: getDebuggingOperations({ headers }),

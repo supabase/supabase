@@ -61,7 +61,9 @@ export async function createTestDatabase() {
           return rows as T
         } catch (error) {
           if (error instanceof Error) {
-            throw new Error(`Failed to execute query: ${error.message}`)
+            // Keep the SQLSTATE, which callers classify errors by.
+            const code = 'code' in error ? error.code : undefined
+            throw Object.assign(new Error(`Failed to execute query: ${error.message}`), { code })
           }
           throw error
         }

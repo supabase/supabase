@@ -118,7 +118,7 @@ from table_privileges
   }
 }
 
-type TablePrivilegesGrant = {
+export type TablePrivilegesGrant = {
   relationId: number
   grantee: string
   privilegeType:
@@ -148,7 +148,7 @@ function relationIdentArgs(relationId: number): SafeSqlFragment {
   return safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = ${id}), (select relname from pg_class where oid = ${id})`
 }
 
-function granteeSql(grantee: string): SafeSqlFragment {
+export function granteeSql(grantee: string): SafeSqlFragment {
   return grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
 }
 
@@ -172,7 +172,7 @@ end $$;
   return { sql }
 }
 
-type TablePrivilegesRevoke = {
+export type TablePrivilegesRevoke = {
   relationId: number
   grantee: string
   privilegeType:

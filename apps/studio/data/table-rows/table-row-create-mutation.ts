@@ -1,3 +1,4 @@
+import { readColumnFormats, type ColumnFormat } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -5,6 +6,7 @@ import { toast } from 'sonner'
 import { tableRowKeys } from './keys'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -27,10 +29,14 @@ export function getTableRowCreateSql({
   payload,
   returning = false,
   enumArrayColumns,
-}: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns' | 'returning'>) {
+  columnFormats,
+}: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns' | 'returning'> & {
+  /** TEMPORARY: writes literal values where `jsonb_populate_recordset` is missing (Spark). */
+  columnFormats?: ColumnFormat[]
+}) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .insert([payload], { returning, enumArrayColumns })
+    .insert([payload], { returning, enumArrayColumns, columnFormats })
     .toSql()
 }
 
@@ -43,23 +49,41 @@ export async function createTableRow({
   returning,
   roleImpersonationState,
 }: TableRowCreateVariables) {
-  const sql = wrapWithRoleImpersonation(
-    getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
-    roleImpersonationState
-  )
+  const grant = unguarded.migrating
+  const write = async (columnFormats?: ColumnFormat[]) => {
+    const sql = wrapWithRoleImpersonation(
+      getTableRowCreateSql({ table, payload, enumArrayColumns, returning, columnFormats }),
+      roleImpersonationState
+    )
+    const { result } = await executeSql({
+      projectRef,
+      connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-row-create',
+      isUserFaultSqlState: isUserFaultForValues,
+      sql,
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant,
+    })
+    return result
+  }
 
-  const { result } = await executeSql({
+  return withSparkFallback(
     projectRef,
-    connectionString,
-    sqlOrigin: 'studio',
-    queryName: 'table-row-create',
-    isUserFaultSqlState: isUserFaultForValues,
-    sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    grant: unguarded.migrating,
-  })
-
-  return result
+    () => write(),
+    async () =>
+      write(
+        await readColumnFormats(
+          catalogFallbackQuery({
+            projectRef,
+            connectionString,
+            queryName: 'table-row-create',
+            grant,
+          }),
+          table.id
+        )
+      )
+  )
 }
 
 type TableRowCreateData = Awaited<ReturnType<typeof createTableRow>>

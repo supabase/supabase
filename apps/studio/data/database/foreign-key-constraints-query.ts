@@ -1,11 +1,15 @@
-import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
+import {
+  getForeignKeyConstraintsFallback,
+  getForeignKeyConstraintsSql,
+  parseTextArray,
+} from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -48,6 +52,10 @@ export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables &
   connectionString?: string | null
 }
 
+// A quoted column name may hold commas or quotes: `{"a, b",c}`.
+const columnNames = (text: string) =>
+  parseTextArray(text).flatMap((name) => (name === null ? [] : [name]))
+
 export async function getForeignKeyConstraints(
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
   signal?: AbortSignal
@@ -56,7 +64,7 @@ export async function getForeignKeyConstraints(
 
   const sql = getForeignKeyConstraintsSql({ schema })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -66,14 +74,15 @@ export async function getForeignKeyConstraints(
       queryKey: ['foreign-key-constraints', schema],
       grant: unguarded.migrating,
     },
+    (query) => getForeignKeyConstraintsFallback(query, { schema }),
     signal
   )
 
   return (result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
     return {
       ...foreignKey,
-      source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-      target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+      source_columns: columnNames(foreignKey.source_columns),
+      target_columns: columnNames(foreignKey.target_columns),
     }
   }) as ForeignKeyConstraint[]
 }

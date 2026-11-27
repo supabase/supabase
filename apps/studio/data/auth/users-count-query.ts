@@ -1,11 +1,11 @@
+import { getUsersCountFallback, getUsersCountSQL } from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
-import { getUsersCountSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -35,7 +35,7 @@ export async function getUsersCount(
 ) {
   const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount, column })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -45,6 +45,8 @@ export async function getUsersCount(
       queryKey: ['users-count'],
       grant: unguarded.migrating,
     },
+    (query) =>
+      getUsersCountFallback(query, { filter, keywords, providers, forceExactCount, column }),
     signal
   )
 

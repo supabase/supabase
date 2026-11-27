@@ -77,6 +77,7 @@
         "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
         "POSTGRES_PORT",
+        "POSTGRES_ENGINE",
         "READ_ONLY_URL",
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",

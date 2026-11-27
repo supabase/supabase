@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { SparkSchemaDescription } from '@supabase/typegen'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { generateTypescriptTypes } from './generate-types'
 
@@ -10,7 +11,8 @@ vi.mock('@/lib/constants', () => ({
   PG_META_URL: 'http://localhost:8080',
 }))
 
-vi.mock('./util', () => ({
+vi.mock('./util', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./util')>()),
   assertSelfHosted: vi.fn(),
 }))
 
@@ -93,6 +95,102 @@ describe('api/self-hosted/generate-types', () => {
       await generateTypescriptTypes({})
 
       expect(mockFetchGet).toHaveBeenCalledWith(expect.any(String), { headers: undefined })
+    })
+  })
+
+  describe('generateTypescriptTypes on a Spark project', () => {
+    const description: SparkSchemaDescription = {
+      managed_schemas: ['auth'],
+      schemas: [{ name: 'public', comment: null }],
+      enums: [],
+      views: [],
+      tables: [
+        {
+          schema: 'public',
+          name: 'todos',
+          rls_enabled: true,
+          rls_forced: false,
+          comment: null,
+          columns: [
+            {
+              name: 'id',
+              position: 1,
+              type: 'bigint',
+              not_null: true,
+              default: null,
+              identity: 'd',
+              generated: null,
+              comment: null,
+            },
+            {
+              name: 'title',
+              position: 2,
+              type: 'text',
+              not_null: true,
+              default: null,
+              identity: null,
+              generated: null,
+              comment: null,
+            },
+          ],
+          constraints: [
+            {
+              name: 'todos_pkey',
+              type: 'p',
+              def: 'PRIMARY KEY (id)',
+              columns: ['id'],
+              references: null,
+            },
+          ],
+        },
+      ],
+    }
+
+    const stubSpark = (respond: () => Response) => {
+      vi.stubEnv('POSTGRES_ENGINE', 'spark')
+      vi.stubEnv('SUPABASE_URL', 'http://localhost:54321')
+      vi.stubEnv('SUPABASE_SERVICE_KEY', 'service-key')
+      const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => respond())
+      vi.stubGlobal('fetch', fetchMock)
+      return fetchMock
+    }
+
+    beforeEach(() => {
+      mockFetchGet.mockReset()
+    })
+
+    afterEach(() => {
+      vi.unstubAllEnvs()
+      vi.unstubAllGlobals()
+    })
+
+    it("renders the types from Spark's schema description, without pg-meta", async () => {
+      const fetchMock = stubSpark(() => Response.json(description))
+
+      const result = await generateTypescriptTypes({
+        headers: { cookie: 'session=browser', Authorization: 'Bearer browser' },
+      })
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, init] = fetchMock.mock.calls[0]
+      expect(url).toBe('http://localhost:54321/_spark/v1/schema')
+      expect(init.headers).toEqual({ apikey: 'service-key' })
+      expect(init.redirect).toBe('error')
+      expect(mockFetchGet).not.toHaveBeenCalled()
+      expect(result).toEqual({ types: expect.stringContaining('export type Database = {') })
+      expect(result).toEqual({
+        types: expect.stringMatching(/"todos": \{\s+Row: \{\s+"id": number/),
+      })
+    })
+
+    it('throws when Spark does not give its schema description', async () => {
+      stubSpark(() =>
+        Response.json({ message: 'the service_role key is required' }, { status: 401 })
+      )
+
+      await expect(generateTypescriptTypes({})).rejects.toThrow(
+        "Spark's schema description answered HTTP 401"
+      )
     })
   })
 })

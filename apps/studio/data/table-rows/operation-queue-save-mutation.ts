@@ -1,4 +1,10 @@
-import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import {
+  joinSqlFragments,
+  readColumnFormats,
+  safeSql,
+  type ColumnFormat,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -10,6 +16,7 @@ import { getTableRowUpdateSql } from './table-row-update-mutation'
 import type { PendingAddRow } from '@/components/grid/types'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -41,7 +48,10 @@ export type OperationQueueSaveVariables = {
  * Generates SQL for a single queued operation.
  * Extend this function as new operation types are added.
  */
-function getOperationSql(operation: QueuedOperation): SafeSqlFragment {
+function getOperationSql(
+  operation: QueuedOperation,
+  columnFormatsByTableId?: Map<number, ColumnFormat[]>
+): SafeSqlFragment {
   switch (operation.type) {
     case QueuedOperationType.EDIT_CELL_CONTENT: {
       const { payload } = operation
@@ -55,6 +65,7 @@ function getOperationSql(operation: QueuedOperation): SafeSqlFragment {
         payload: { [payload.columnName]: payload.newValue },
         enumArrayColumns: payload.enumArrayColumns ?? [],
         returning: false,
+        columnFormats: columnFormatsByTableId?.get(payload.table.id),
       })
     }
     case QueuedOperationType.ADD_ROW: {
@@ -66,6 +77,7 @@ function getOperationSql(operation: QueuedOperation): SafeSqlFragment {
         payload: cleanRowData,
         enumArrayColumns: payload.enumArrayColumns ?? [],
         returning: false,
+        columnFormats: columnFormatsByTableId?.get(payload.table.id),
       })
     }
     case QueuedOperationType.DELETE_ROW: {
@@ -102,14 +114,16 @@ function stripTrailingSemicolon(sql: SafeSqlFragment): SafeSqlFragment {
 }
 
 export function getOperationSqlStatements(
-  operations: readonly QueuedOperation[]
+  operations: readonly QueuedOperation[],
+  /** TEMPORARY: writes literal values where `json(b)_populate_record(set)` is missing (Spark). */
+  columnFormatsByTableId?: Map<number, ColumnFormat[]>
 ): Array<SafeSqlFragment> {
   const statements: Array<SafeSqlFragment> = []
   const editCellOperationsByRow = new Map<string, EditCellContentOperation[]>()
 
   for (const operation of sortOperations(operations)) {
     if (!isEditCellContentOperation(operation)) {
-      statements.push(stripTrailingSemicolon(getOperationSql(operation)))
+      statements.push(stripTrailingSemicolon(getOperationSql(operation, columnFormatsByTableId)))
       continue
     }
 
@@ -138,6 +152,7 @@ export function getOperationSqlStatements(
             ...new Set(editCellOperations.flatMap(({ payload }) => payload.enumArrayColumns ?? [])),
           ],
           returning: false,
+          columnFormats: columnFormatsByTableId?.get(table.id),
         })
       )
     )
@@ -160,23 +175,41 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
-  const statements = getOperationSqlStatements(operations)
+  const grant = unguarded.migrating
+  const save = async (columnFormatsByTableId?: Map<number, ColumnFormat[]>) => {
+    const statements = getOperationSqlStatements(operations, columnFormatsByTableId)
+    const transactionSql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
+    const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
 
-  const transactionSql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
+    const { result } = await executeSql({
+      projectRef,
+      connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'operation-queue-save',
+      isUserFaultSqlState: isUserFaultForValues,
+      sql,
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      queryKey: ['operation-queue-save'],
+      grant,
+    })
+    return result
+  }
 
-  const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
-
-  const { result } = await executeSql({
+  const result = await withSparkFallback(
     projectRef,
-    connectionString,
-    sqlOrigin: 'studio',
-    queryName: 'operation-queue-save',
-    isUserFaultSqlState: isUserFaultForValues,
-    sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    queryKey: ['operation-queue-save'],
-    grant: unguarded.migrating,
-  })
+    () => save(),
+    async () => {
+      const query = catalogFallbackQuery({
+        projectRef,
+        connectionString,
+        queryName: 'operation-queue-save',
+        grant,
+      })
+      const tableIds = [...new Set(operations.map((operation) => operation.tableId))]
+      const formats = await Promise.all(tableIds.map((id) => readColumnFormats(query, id)))
+      return save(new Map(tableIds.map((id, index) => [id, formats[index]])))
+    }
+  )
 
   return { result }
 }

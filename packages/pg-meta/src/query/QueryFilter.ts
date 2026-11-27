@@ -1,5 +1,6 @@
 import { IQueryModifier, QueryModifier } from './QueryModifier'
 import type { ActionConfig, Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
+import type { ColumnFormat } from './write-values.fallback'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
@@ -14,7 +15,11 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
   constructor(
     protected table: QueryTable,
     protected actionConfig: ActionConfig,
-    protected actionOptions?: { returning: boolean; enumArrayColumns?: Array<string> }
+    protected actionOptions?: {
+      returning: boolean
+      enumArrayColumns?: Array<string>
+      columnFormats?: Array<ColumnFormat>
+    }
   ) {}
 
   filter(column: string | string[], operator: FilterOperator, value: any) {

@@ -1,9 +1,9 @@
-import { getFDWsSql } from '@supabase/pg-meta'
+import { getFDWsFallback, getFDWsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { fdwKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
 import { UseCustomQueryOptions } from '@/types'
@@ -41,7 +41,7 @@ export async function getFDWs(
 ) {
   const sql = getFDWsSql()
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -51,6 +51,7 @@ export async function getFDWs(
       queryKey: ['fdws'],
       grant: unguarded.migrating,
     },
+    (query) => getFDWsFallback(query),
     signal
   )
 

@@ -20,6 +20,15 @@ export function assertSelfHosted() {
   }
 }
 
+/**
+ * Whether the self-hosted project's database is Spark instead of Postgres.
+ *
+ * Read per call: the same built image runs with or without `POSTGRES_ENGINE`.
+ */
+export function isSparkProject() {
+  return process.env.POSTGRES_ENGINE === 'spark'
+}
+
 export function encryptString(stringToEncrypt: string): string {
   return crypto.AES.encrypt(stringToEncrypt, ENCRYPTION_KEY).toString()
 }
