@@ -297,7 +297,7 @@ const AuthUsage = () => {
                 showSearch={true}
               />
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid @4xl:grid-cols-2 gap-4">
               {usageReportConfig.map((metric) => (
                 <ReportChartV2
                   key={`${metric.id}`}
@@ -332,7 +332,7 @@ const AuthUsage = () => {
                 isLoading={isRefreshing}
               />
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid @4xl:grid-cols-2 gap-4">
               {errorsReportConfig.map((metric) => (
                 <ReportChartV2
                   key={`${metric.id}`}
@@ -357,7 +357,7 @@ const AuthUsage = () => {
               title="Performance"
               description="Monitor sign-in and sign-up performance metrics including average, percentiles, and request counts to ensure optimal authentication speed."
             />
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid @4xl:grid-cols-2 gap-4">
               {latencyReportConfig.map((metric) => (
                 <ReportChartV2
                   key={`${metric.id}`}

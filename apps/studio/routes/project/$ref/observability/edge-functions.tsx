@@ -258,7 +258,7 @@ const EdgeFunctionsUsage = () => {
           </div>
         }
       >
-        <div className="mt-8 flex flex-col gap-4 pb-8">
+        <div className="mt-8 grid @4xl:grid-cols-2 gap-4 pb-8">
           {selectedDateRange &&
             reportConfig
               .filter((report) => !report.hide)
