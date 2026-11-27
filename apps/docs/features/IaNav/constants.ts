@@ -14,8 +14,8 @@ export const isIaNavVariant = (value: unknown): value is IaNavVariant =>
 export const IA_NAV_OVERRIDE_KEY = 'docs-ia-mvp-v1-override'
 
 // runs before paint, so a visitor on option-1 never sees the control nav the server renders.
-// the url override wins over the session override, which wins over the value from the last visit
-export const IA_NAV_CACHE_SCRIPT = `try{var V=${JSON.stringify(VARIANTS)};var o=new URLSearchParams(location.search).get('${IA_NAV_FLAG}');var s=V.indexOf(o)>-1?o:sessionStorage.getItem('${IA_NAV_OVERRIDE_KEY}');var v=V.indexOf(s)>-1?s:localStorage.getItem('${LOCAL_STORAGE_KEYS.IA_NAV_FLAG}');if(v==='option-1')document.documentElement.dataset.iaNav='option-1'}catch(e){}`
+// the url override wins over the session override, then the layout the user picked, then the value from the last visit
+export const IA_NAV_CACHE_SCRIPT = `try{var V=${JSON.stringify(VARIANTS)};var o=new URLSearchParams(location.search).get('${IA_NAV_FLAG}');var s=V.indexOf(o)>-1?o:sessionStorage.getItem('${IA_NAV_OVERRIDE_KEY}');if(V.indexOf(s)<0)s=localStorage.getItem('${LOCAL_STORAGE_KEYS.DOCS_LAYOUT_CHOICE}');var v=V.indexOf(s)>-1?s:localStorage.getItem('${LOCAL_STORAGE_KEYS.IA_NAV_FLAG}');if(v==='option-1')document.documentElement.dataset.iaNav='option-1'}catch(e){}`
 
 export const IA_NAV_PENDING_CLASS = 'in-data-[ia-nav=option-1]:invisible'
 

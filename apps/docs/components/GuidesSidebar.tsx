@@ -2,6 +2,7 @@
 
 import { Feedback } from '~/components/Feedback'
 import { LegacyGuidesSidebar } from '~/components/GuidesSidebar.legacy'
+import { LayoutSwitchButton } from '~/features/DocsLayout/LayoutSwitchButton'
 import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { HeadingSlotCrumb } from '~/layouts/HeadingSlot'
 import { RightRailPortal } from '~/layouts/RightRail'
@@ -76,6 +77,7 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
           <GuideToc toc={toc} activeUrl={toc[activeIndex]?.url} />
         )}
       </div>
+      <LayoutSwitchButton className="mx-4 mb-3 shrink-0" />
       <footer className="shrink-0 border-t py-2 pl-6 pr-4">
         <ul className="flex flex-col">
           {showFeedback ? (
