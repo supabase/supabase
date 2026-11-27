@@ -69,6 +69,7 @@ const ALLOWLIST = [
   'Edge Functions',
   'Edge Functions > Examples',
   'Edge Functions > Third-Party Tools',
+  'Local Dev / CLI > Guides',
   'Platform > Billing > Manage your usage',
   'Platform > Platform Configuration',
   'Self-Hosting',

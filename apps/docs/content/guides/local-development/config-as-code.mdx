@@ -27,10 +27,10 @@ Install the CLI, log in, and link a project:
 
 ```bash
 supabase login
-supabase link <project-ref>
+supabase link YOUR_PROJECT_REF
 ```
 
-Your project ref is in the Dashboard URL: `https://supabase.com/dashboard/project/<project-ref>`. With no flag, the `config` commands use `SUPABASE_PROJECT_ID` if it is set, and the linked project if it is not. To target another project or a branch, refer to [Targeting a branch](#targeting-a-branch).
+Replace `YOUR_PROJECT_REF` with your project ref, from the Dashboard URL: `https://supabase.com/dashboard/project/YOUR_PROJECT_REF`. With no flag, the `config` commands use `SUPABASE_PROJECT_ID` if it is set, and the linked project if it is not. To target another project or a branch, refer to [Targeting a branch](#targeting-a-branch).
 
 <Admonition type="note" label="`supabase` vs. `npx supabase`">
 
@@ -52,14 +52,16 @@ Environment variables can override values in your file. `config diff` labels eac
 
 ## Key commands at a glance
 
-| Command                              | What it does                                                         |
-| ------------------------------------ | -------------------------------------------------------------------- |
-| `supabase config diff`               | Shows differences between your config file and a project (read-only) |
-| `supabase config diff --exit-code`   | Same, but exits `2` when it finds a difference (for CI)              |
-| `supabase config pull`               | Writes a project's settings into your config file                    |
-| `supabase config pull --dry-run`     | Shows what a pull writes, without writing                            |
-| `supabase config push`               | Applies the settings your file declares to a project                 |
-| `--remote=<project-ref or branch>`   | Targets another project or a branch (all three commands)             |
+Use these commands to compare, pull, and push project settings:
+
+| Command                                               | What it does                                                         |
+| ----------------------------------------------------- | -------------------------------------------------------------------- |
+| `supabase config diff`                                | Shows differences between your config file and a project (read-only) |
+| `supabase config diff --exit-code`                    | Same, but exits `2` when it finds a difference (for CI)              |
+| `supabase config pull`                                | Writes a project's settings into your config file                    |
+| `supabase config pull --dry-run`                      | Shows what a pull writes, without writing                            |
+| `supabase config push`                                | Applies the settings your file declares to a project                 |
+| `--remote=YOUR_PROJECT_REF` or `--remote=YOUR_BRANCH` | Targets another project or a branch (all three commands)             |
 
 ## See what differs
 
@@ -83,7 +85,7 @@ Local-stack sections, such as `[studio]`, `[analytics]`, `[realtime]`, and ports
 With `--exit-code`, `config diff` exits with status `2` when it finds a difference, and `1` on an error. A CI job can then fail when a project drifts from your repo:
 
 ```bash
-supabase config diff --remote=<project-ref> --exit-code
+supabase config diff --remote=YOUR_PROJECT_REF --exit-code
 ```
 
 For machine-readable output, add `--output-format json` or `--output-format stream-json`.
@@ -99,9 +101,9 @@ supabase config pull --remote=staging
 ```
 
 - **Preview.** `--dry-run` lists each difference and whether pull writes or skips it. It writes nothing and asks nothing.
-- **Confirmation.** In a terminal, pull asks first, and the default answer is Yes. Without a terminal, pull uses the default and writes.
+- **Confirmation.** In a terminal, pull asks first, and the default answer is Yes. With JSON output, pull takes the default without asking. Otherwise, pull reads one line from stdin: `y` or `yes` writes, empty input takes the default, and any other answer declines.
 - **Small edits.** Pull changes only the values that differ, and keeps your comments, ordering, and other keys. Small edits work in `config.toml`, `config.json`, and `config.jsonc`.
-- **Uncommitted changes.** If your config file has uncommitted git changes, pull does not write. Pass `--force` to write anyway. `--yes` does not skip this check.
+- **Uncommitted changes.** If your config file has uncommitted git changes, pull warns you, and the default answer changes to No. With `--yes`, JSON output, or no terminal, pull fails instead. `--force` skips the check.
 - **Secrets.** Pull never writes secret values.
 
 <Admonition type="note" label="Where pulled values go">
@@ -110,8 +112,10 @@ Pull writes to the first match in this list:
 
 1. `[remotes.<name>]`, when you pass `--remote-label <name>`.
 2. A `[remotes.<name>]` block whose `project_id` matches the target.
-3. A new `[remotes.<branch-name>]` block at the end of the file, for a branch target.
+3. A new `[remotes.<branch-name>]` block at the end of the file, when you target a branch by name or UUID (not by project ref). A UUID target names the block after the branch's project ref.
 4. The top level of the file.
+
+A top-level write also changes `supabase start` settings, such as `auth.site_url` and `db.major_version`, and pull warns when it does. To write to a `[remotes]` block instead, pass `--remote-label`.
 
 Refer to [Branch configuration](/docs/guides/deployment/branching/configuration) for how `[remotes]` blocks work.
 
@@ -143,7 +147,7 @@ The file that `supabase init` creates holds local development values, such as `s
 Push asks only in a terminal with text output, and never when an AI coding agent runs it. In any other run, push fails before it changes anything, unless you pass `--yes`:
 
 ```bash
-supabase config push --remote=<project-ref> --yes
+supabase config push --remote=YOUR_PROJECT_REF --yes
 ```
 
 You can also export `SUPABASE_YES=1` in your shell. `SUPABASE_YES` in a `.env` file does not count, and piped input such as `echo y |` does not confirm anything. Refer to [When the CLI can't ask](/docs/guides/local-development/local-and-hosted-projects#cannot-ask).
@@ -169,13 +173,12 @@ When a push enables a paid add-on, such as phone MFA, it prints the cost before 
 <Admonition type="note" label="The Dashboard stays editable">
 
 You can still change settings in the Dashboard. A Dashboard change shows in the next `config diff`, and `config pull` adds it to your file. A `config push` replaces the hosted value with the value in your file, so pull Dashboard changes before you push.
-{/* NEEDS REVIEW: the CLI code confirms drift-then-pull and that push replaces declared hosted values. "No lock on the Dashboard" is product intent (Config Driven Development PRFAQ, MARKET-1590), not checked in platform code. Confirm with the PM. */}
 
 </Admonition>
 
 ## Targeting a branch
 
-All three commands accept `--remote=<value>`. The value is a project ref, or the name or UUID of a branch of the linked project. A value of exactly 20 lowercase letters is always a project ref.
+All three commands accept `--remote=YOUR_TARGET`. `YOUR_TARGET` is a project ref, or the name or UUID of a branch of the linked project. A value of exactly 20 lowercase letters is always a project ref.
 
 ```bash
 supabase config diff --remote=my-preview-branch
@@ -189,6 +192,6 @@ To link the CLI to a branch instead, run `supabase link my-preview-branch`.
 
 ## Deploying config on merge
 
-If you use [Branching](/docs/guides/deployment/branching) with the GitHub integration, you do not need `config push` for branches. When you push a config change to git, the integration applies it to the matching Supabase branch. Refer to [Branch configuration](/docs/guides/deployment/branching/configuration) and the [GitHub integration](/docs/guides/deployment/branching/github-integration).
+If you use [Branching](/docs/guides/deployment/branching) with the GitHub integration, you do not need `config push` for branches. When you push a config change to git, the integration applies it to the matching Supabase branch. To give a persistent branch its own settings, add a `[remotes.<name>]` block with that branch's project ref as `project_id`. Refer to [Branch configuration](/docs/guides/deployment/branching/configuration) and the [GitHub integration](/docs/guides/deployment/branching/github-integration).
 
 For every command and flag, refer to the [CLI reference](/docs/reference/cli).
