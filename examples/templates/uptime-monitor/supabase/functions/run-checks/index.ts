@@ -5,8 +5,9 @@
 import '@supabase/functions-js/edge-runtime.d.ts'
 import { withSupabase } from '@supabase/server'
 
+import { fetchPublic } from '../_shared/public-fetch.ts'
+
 const TIMEOUT_MS = 10_000
-const MAX_REDIRECTS = 5
 const BATCH_SIZE = 50
 // Cron calls this every 30 seconds; stop claiming new batches after this long.
 const TIME_BUDGET_MS = 20_000
@@ -36,47 +37,35 @@ function failure(error: string): CheckResult {
 }
 
 /**
- * Requests the URL, following redirects by hand so every URL requested,
- * including each redirect target, passes the host allowlist.
+ * Requests the URL. Every URL requested, including each redirect target, must
+ * be a public address on the host allowlist.
  */
 async function checkUrl(url: string, allowedHosts: string[]): Promise<CheckResult> {
   const startedAt = performance.now()
-  const signal = AbortSignal.timeout(TIMEOUT_MS)
-  let current = url
   try {
-    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-      const target = new URL(current)
-      if (target.protocol !== 'https:' && target.protocol !== 'http:') {
-        return failure('Only http and https URLs can be monitored')
-      }
-      if (!isAllowedHost(target.hostname, allowedHosts)) {
-        return failure(hop === 0 ? 'Host is not allowed' : 'Redirected to a host that is not allowed')
-      }
-
-      const response = await fetch(target, {
+    const response = await fetchPublic(
+      url,
+      {
         method: 'GET',
-        redirect: 'manual',
-        signal,
+        signal: AbortSignal.timeout(TIMEOUT_MS),
         headers: { 'user-agent': 'supabase-uptime-monitor/1.0' },
-      })
-      await response.body?.cancel()
-
-      const location = response.headers.get('location')
-      if (response.status >= 300 && response.status < 400 && location) {
-        current = new URL(location, target).toString()
-        continue
-      }
-      return {
-        is_up: response.status < 400,
-        status_code: response.status,
-        latency_ms: Math.round(performance.now() - startedAt),
-        error: null,
-      }
+      },
+      (target) => isAllowedHost(target.hostname, allowedHosts)
+    )
+    await response.body?.cancel()
+    return {
+      is_up: response.status < 400,
+      status_code: response.status,
+      latency_ms: Math.round(performance.now() - startedAt),
+      error: null,
     }
-    return failure(`More than ${MAX_REDIRECTS} redirects`)
   } catch (error) {
-    const isTimeout = error instanceof DOMException && error.name === 'TimeoutError'
-    return failure(isTimeout ? `Timed out after ${TIMEOUT_MS / 1000}s` : 'Could not connect')
+    if (error instanceof DOMException && error.name === 'TimeoutError') {
+      return failure(`Timed out after ${TIMEOUT_MS / 1000}s`)
+    }
+    // fetchPublic's own errors explain themselves; network errors don't.
+    const message = error instanceof Error ? error.message : ''
+    return failure(/allowed|redirects/.test(message) ? message : 'Could not connect')
   }
 }
 

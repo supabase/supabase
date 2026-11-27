@@ -27,6 +27,9 @@ function newItem(userId: string, fields: Partial<Item> & Pick<Item, 'kind'>): It
 }
 
 const requested = new Set<string>()
+// Items whose insert is still on its way to the database. processPending
+// skips these: saveItem processes them itself once the insert commits.
+const saving = new Set<string>()
 
 /**
  * Asks the save-item function to add a preview and embedding, then writes the
@@ -50,14 +53,29 @@ async function processItem(id: string) {
 /** Finishes any items still marked as processing, such as seeds or interrupted saves. */
 export function processPending(list: Item[]) {
   for (const item of list) {
-    if (item.status === 'processing') void processItem(item.id)
+    if (item.status === 'processing' && !saving.has(item.id)) void processItem(item.id)
   }
 }
 
 async function saveItem(item: Item) {
-  const transaction = items.insert(item)
-  await transaction.isPersisted.promise
+  saving.add(item.id)
+  try {
+    const transaction = items.insert(item)
+    await transaction.isPersisted.promise
+  } finally {
+    saving.delete(item.id)
+  }
   await processItem(item.id)
+}
+
+/** A normalized http(s) URL, or null if the text isn't one. */
+function parseHttpUrl(text: string) {
+  try {
+    const url = new URL(text)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
+  } catch {
+    return null
+  }
 }
 
 /** Saves text as a link when it's a URL, otherwise as a note. */
@@ -66,7 +84,8 @@ export function saveText(userId: string, text: string) {
   const hasScheme = /^https?:\/\/\S+$/i.test(trimmed)
   const isUrl = hasScheme || /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(trimmed)
   if (isUrl) {
-    const url = hasScheme ? trimmed : `https://${trimmed}`
+    const url = parseHttpUrl(hasScheme ? trimmed : `https://${trimmed}`)
+    if (!url) return Promise.reject(new Error('That link doesn’t look right. Check it and try again.'))
     return saveItem(newItem(userId, { kind: 'link', url }))
   }
   return saveItem(newItem(userId, { kind: 'note', body: trimmed }))

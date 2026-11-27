@@ -338,7 +338,7 @@ function ItemCard({ item, onOpen }: { item: Item; onOpen: () => void }) {
 
 function LinkPreview({ item }: { item: Item }) {
   const [hasImageError, setHasImageError] = useState(false)
-  const host = item.site_name ?? (item.url ? new URL(item.url).hostname : '')
+  const host = item.site_name ?? hostnameOf(item.url)
   return (
     <div>
       {item.image_url && !hasImageError && (
@@ -357,6 +357,15 @@ function LinkPreview({ item }: { item: Item }) {
       </div>
     </div>
   )
+}
+
+function hostnameOf(url: string | null) {
+  if (!url) return ''
+  try {
+    return new URL(url).hostname
+  } catch {
+    return url
+  }
 }
 
 function StoredImage({ path, width = 600 }: { path: string; width?: number }) {

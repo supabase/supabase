@@ -7,6 +7,7 @@ import '@supabase/functions-js/edge-runtime.d.ts'
 import { withSupabase } from '@supabase/server'
 
 import { embed } from '../_shared/embed.ts'
+import { fetchPublic } from '../_shared/public-fetch.ts'
 
 const FETCH_TIMEOUT_MS = 8000
 const MAX_HTML_BYTES = 512 * 1024
@@ -76,8 +77,9 @@ function httpUrl(value: string, base: string) {
 }
 
 async function readPreview(url: string): Promise<Preview> {
-  const response = await fetch(url, {
-    redirect: 'follow',
+  // Only public hosts, checked on every redirect, so a saved link can't make
+  // this function read internal addresses.
+  const response = await fetchPublic(url, {
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { 'user-agent': 'Mozilla/5.0 (compatible; YourMind/1.0)', accept: 'text/html' },
   })
