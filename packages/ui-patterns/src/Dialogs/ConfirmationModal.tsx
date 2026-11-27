@@ -35,10 +35,6 @@ export interface ConfirmationModalProps {
   /** Overrides the first footer action while `onCancel` continues to handle dismissal. */
   onAdditionalAction?: () => void
   disabled?: boolean
-  /**
-   * When false, pointer or focus interactions outside the dialog do not dismiss it. Use this when
-   * `onCancel` has side effects that must only run from an explicit cancel. Defaults to true.
-   */
   dismissOnInteractOutside?: boolean
   variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
