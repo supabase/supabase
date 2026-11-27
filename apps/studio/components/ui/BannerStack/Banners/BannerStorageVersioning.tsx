@@ -1,9 +1,9 @@
 import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { CircleHelpIcon, FileIcon, MoreVerticalIcon } from 'lucide-react'
+import { CircleHelpIcon, FileIcon, InfoIcon, MoreVerticalIcon, RotateCcwIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useCallback, useEffect, useState } from 'react'
-import { Badge, Button } from 'ui'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Badge, Button, cn } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
@@ -123,45 +123,48 @@ const BannerStorageVersioning = ({ onDismiss }: { onDismiss: () => void }) => {
 }
 
 const INITIAL_VERSIONS = [
-  { id: 'v4', date: 'Today, 10:16 AM', size: '1.2 MB' },
-  { id: 'v2', date: 'Yesterday, 3:48 PM', size: '980 KB' },
+  { id: 'v4', versionId: '7f3a9c21b8046d5e', size: '1.2 MB', isCurrent: true },
+  { id: 'v2', versionId: '2b8e1d64a9703cf2', size: '980 KB', isCurrent: false },
 ]
 
-const DEMO_TIMESTAMPS = ['10:23 AM', '2:47 PM', '9:16 AM', '4:38 PM', '11:52 AM', '6:04 PM']
+const shortDemoVersionId = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
 
 const VersionHistoryPreview = () => {
   const [versions, setVersions] = useState(INITIAL_VERSIONS)
   const [isAtRetentionLimit, setIsAtRetentionLimit] = useState(false)
+  const [isRemovingVersion, setIsRemovingVersion] = useState(false)
+  const nextVersionNumber = useRef(5)
   const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>
-    let nextVersionNumber = 5
+    let timeout: ReturnType<typeof setTimeout> | undefined
     let phase: 'upload' | 'expire' = 'upload'
     let isPageActive = document.visibilityState === 'visible' && document.hasFocus()
 
     const schedulePhase = () => {
-      if (!isPageActive) return
+      if (!isPageActive || timeout) return
 
       timeout = setTimeout(
         () => {
+          timeout = undefined
+
           if (phase === 'upload') {
+            const versionNumber = nextVersionNumber.current
+            nextVersionNumber.current += 1
             setVersions((currentVersions) => [
               {
-                id: `v${nextVersionNumber}`,
-                date: 'Just now',
+                id: `v${versionNumber}`,
+                versionId: `a7c3d812e4f9b2${versionNumber.toString(16).padStart(2, '0')}`,
                 size: '1.3 MB',
+                isCurrent: true,
               },
-              ...currentVersions.map((version, index) => ({
-                ...version,
-                date: `${index === 0 ? 'Today' : 'Yesterday'}, ${DEMO_TIMESTAMPS[(nextVersionNumber + index) % DEMO_TIMESTAMPS.length]}`,
-              })),
+              ...currentVersions.map((version) => ({ ...version, isCurrent: false })),
             ])
-            nextVersionNumber += 1
             setIsAtRetentionLimit(true)
             phase = 'expire'
           } else {
             setVersions((currentVersions) => currentVersions.slice(0, -1))
+            setIsRemovingVersion(true)
             setIsAtRetentionLimit(false)
             phase = 'upload'
           }
@@ -178,6 +181,7 @@ const VersionHistoryPreview = () => {
 
       isPageActive = isActive
       clearTimeout(timeout)
+      timeout = undefined
       if (isPageActive) schedulePhase()
     }
 
@@ -199,22 +203,29 @@ const VersionHistoryPreview = () => {
       <div className="rounded-md rounded-b-none border border-b-0 bg-surface-100 p-3 shadow-sm">
         <div className="mb-1 flex items-center gap-1 text-[9px] font-medium text-foreground-light">
           <span>Versions</span>
-          <span className="text-[8px] text-foreground-lighter">{versions.length}</span>
+          <span className="text-[8px] text-foreground-lighter">
+            {versions.length + (isRemovingVersion ? 1 : 0)}
+          </span>
         </div>
         <div className="mb-2 flex items-center gap-1 text-[8px] font-mono text-foreground-lighter">
-          <span aria-hidden="true">
-            <BroomSparklesIcon size={14} className="shrink-0 text-foreground-lighter" />
+          <BroomSparklesIcon
+            size={14}
+            className="mr-0.5 shrink-0 text-foreground-lighter"
+            aria-hidden="true"
+          />
+          <span className="rounded-sm border border-strong bg-surface-300 px-1.5 py-0.5">2d</span>
+          <span className="rounded-sm border border-strong border-dashed px-1.5 py-0.5 uppercase tracking-wide">
+            Either
           </span>
-          <span className="rounded-sm border bg-surface-200 px-1.5 py-0.5">2d</span>
-          <span className="rounded-sm border border-dashed px-1.5 py-0.5 uppercase">Either</span>
-          <span className="rounded-sm border bg-surface-200 px-1.5 py-0.5">
-            2 noncurrent versions retained
+          <span className="rounded-sm border border-strong bg-surface-300 px-1.5 py-0.5">
+            2 noncurrent v. retained
           </span>
+          <InfoIcon size={11} className="shrink-0 text-foreground-lighter" aria-hidden="true" />
         </div>
-        <ol className="flex min-h-[5.5rem] flex-col gap-y-0.5">
-          <AnimatePresence initial={false}>
+        <ol className="flex min-h-[6.25rem] flex-col gap-y-0.5">
+          <AnimatePresence initial={false} onExitComplete={() => setIsRemovingVersion(false)}>
             {versions.map((version, index) => {
-              const isCurrent = index === 0
+              const isCurrent = version.isCurrent
               const isExpiring = isAtRetentionLimit && index === versions.length - 1
 
               return (
@@ -224,40 +235,54 @@ const VersionHistoryPreview = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
                   transition={{ duration: 0.25, ease: 'easeOut' }}
-                  className="flex min-h-7 items-center gap-1.5 rounded-sm text-[9px]"
+                  className="group flex min-h-7 items-center gap-1 rounded-md border border-transparent text-[9px] hover:bg-surface-200"
                 >
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border bg-surface-200 text-foreground-lighter">
-                    <FileIcon size={11} />
+                  <span
+                    className={cn(
+                      'flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md border',
+                      isCurrent
+                        ? 'border-brand-400 bg-surface-200 text-brand'
+                        : 'border-overlay bg-surface-100 text-foreground-lighter'
+                    )}
+                    aria-hidden="true"
+                  >
+                    {isCurrent ? <RotateCcwIcon size={12} /> : <FileIcon size={12} />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-foreground leading-tight">
-                      {version.date}
+                      {shortDemoVersionId(version.versionId)}
                     </span>
-                    <span className="block text-[8px] text-foreground-lighter leading-tight">
+                    <span className="block font-mono text-[8px] text-foreground-lighter leading-tight">
                       {version.size}
                     </span>
                   </span>
                   {isCurrent && (
-                    <span className="shrink-0 rounded-sm border border-brand-500/40 bg-brand-200 px-1 py-0.5 text-[8px] text-brand">
+                    <Badge variant="success" className="h-4 shrink-0 px-1 text-[8px] leading-none">
                       Current
-                    </span>
+                    </Badge>
                   )}
-                  {isExpiring && (
+                  {!isCurrent && (
                     <motion.span
                       initial={shouldReduceMotion ? false : { opacity: 0, x: 4 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.2, duration: 0.2 }}
-                      className="max-w-24 shrink-0 text-right text-[8px] leading-tight text-warning-600"
+                      transition={{ delay: isExpiring ? 0.2 : 0, duration: 0.2 }}
+                      className={cn(
+                        'flex shrink-0 items-center gap-0.5 text-[10px]',
+                        isExpiring ? 'text-warning-600' : 'text-foreground-lighter'
+                      )}
                     >
-                      Expires on next upload or in 2d
+                      <BroomSparklesIcon size={12} aria-hidden="true" />
+                      <span>2d</span>
                     </motion.span>
                   )}
-                  <span
-                    aria-hidden="true"
-                    className="flex h-5 w-4 shrink-0 items-center justify-center text-foreground-lighter"
-                  >
-                    <MoreVerticalIcon size={12} />
-                  </span>
+                  {!isCurrent && (
+                    <span
+                      aria-hidden="true"
+                      className="flex h-6 w-4 shrink-0 items-center justify-center text-foreground-lighter"
+                    >
+                      <MoreVerticalIcon size={14} />
+                    </span>
+                  )}
                 </motion.li>
               )
             })}
