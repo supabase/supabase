@@ -107,6 +107,7 @@ export const useOrgSubscriptionUpdateMutation = ({
         toast.error(data.message, {
           dismissible: true,
           duration: 10_000,
+          position: 'bottom-center',
         })
       } else {
         onError(data, variables, context)

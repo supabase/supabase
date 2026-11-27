@@ -176,7 +176,11 @@ export const SubscriptionPlanUpdateView = ({
       onError: (error) => {
         setSubmittedState(undefined)
         setPaymentConfirmationLoading(false)
-        toast.error(`Unable to update subscription: ${error.message}`)
+        toast.error(error.message, {
+          dismissible: true,
+          duration: 10_000,
+          position: 'bottom-center',
+        })
       },
     }
   )
@@ -188,7 +192,11 @@ export const SubscriptionPlanUpdateView = ({
       },
       onError: (error) => {
         setSubmittedState(undefined)
-        toast.error(`Unable to update subscription: ${error.message}`)
+        toast.error(error.message, {
+          dismissible: true,
+          duration: 10_000,
+          position: 'bottom-center',
+        })
       },
     })
 

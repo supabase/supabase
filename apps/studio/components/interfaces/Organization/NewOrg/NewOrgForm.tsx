@@ -274,7 +274,11 @@ export const NewOrgForm = ({
       }
     },
     onError: (data) => {
-      const toastId = toast.error(data.message, { duration: 10_000 })
+      const toastId = toast.error(data.message, {
+        duration: 10_000,
+        dismissible: true,
+        position: 'bottom-center',
+      })
       trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast', toastId)
       setNewOrgLoading(false)
     },
