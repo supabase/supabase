@@ -1672,7 +1672,7 @@ export function createStorageExplorerState({
             })
           } catch (error: any) {
             numberOfFilesMovedFail += 1
-            toast.error(error.message)
+            toast.error(`Failed to move "${fromPath}": ${error.message}`)
           }
         })
       )
