@@ -227,10 +227,12 @@ for select
 to authenticated
 using (
   bucket_id = 'avatars'
-  and owner_id = (select auth.uid()::text)
+  and owner_id = (select auth.jwt()->>'sub')
   and archived_at is null
 );
 ```
+
+This owner check has the same multi-issuer caveat as the [ownership policy](/docs/guides/storage/security/ownership#access-control).
 
 With this policy, users can't restore a version with `copy` or `move`, because those calls read the source version. For the other permissions those calls need, see [Copy and move permissions](/docs/guides/storage/management/copy-move-objects#permissions).
 

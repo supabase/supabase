@@ -28,9 +28,15 @@ on storage.objects
 for delete
 to authenticated
 using (
-    owner_id = (select auth.uid()::text)
+    owner_id = (select auth.jwt()->>'sub')
 );
 ```
+
+<Admonition type="caution">
+
+This check compares the object owner with the JWT `sub` claim. Storage stores the `sub` value as the owner and does not record the issuer. If more than one issuer can assign the same `sub` value to different users, one user could match another user's objects. Only use this comparison when subject values are unique across every issuer you currently accept and every issuer that has created owned objects, including issuers you no longer trust.
+
+</Admonition>
 
 Row Level Security (RLS) policies are one way to enforce access control. You can also implement access control in your server code by following the same pattern.
 
