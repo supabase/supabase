@@ -546,7 +546,7 @@ export const FileExplorerRow = ({
                       event.stopPropagation()
                       onCheckItem(event.nativeEvent.shiftKey)
                     }}
-                    aria-label="Check to select this item"
+                    aria-label={`Select ${getStoragePathForItem(openedFolders, itemWithColumnIndex)}`}
                   />
                 ) : (
                   // Reserve the same slot as the file checkbox without a focusable control
