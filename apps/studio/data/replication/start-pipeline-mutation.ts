@@ -9,16 +9,20 @@ import type { UseCustomMutationOptions } from '@/types'
 export type StartPipelineParams = {
   projectRef: string
   pipelineId: string
+  clusterId?: string
 }
 
 export async function startPipeline(
-  { projectRef, pipelineId }: StartPipelineParams,
+  { projectRef, pipelineId, clusterId }: StartPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/start', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    params: {
+      path: { ref: projectRef, pipeline_id: pipelineId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
   if (error) {
@@ -47,7 +51,7 @@ export const useStartPipelineMutation = ({
 
       await queryClient.invalidateQueries(
         {
-          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId, variables.clusterId),
         },
         { cancelRefetch: false }
       )
@@ -57,7 +61,11 @@ export const useStartPipelineMutation = ({
     async onError(data, variables, context) {
       await queryClient.invalidateQueries(
         {
-          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+          queryKey: replicationKeys.pipelinesStatus(
+            variables.projectRef,
+            variables.pipelineId,
+            variables.clusterId
+          ),
         },
         { cancelRefetch: false }
       )

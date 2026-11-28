@@ -8,13 +8,17 @@ import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateTenantSourceParams = {
   projectRef: string
+  clusterId?: string
 }
 
-async function createTenantSource({ projectRef }: CreateTenantSourceParams, signal?: AbortSignal) {
+async function createTenantSource(
+  { projectRef, clusterId }: CreateTenantSourceParams,
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/tenants-sources', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     signal,
   })
   if (error) {
@@ -40,7 +44,9 @@ export const useCreateTenantSourceMutation = ({
     mutationFn: (vars) => createTenantSource(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: replicationKeys.sources(projectRef) })
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.sources(projectRef, variables.clusterId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

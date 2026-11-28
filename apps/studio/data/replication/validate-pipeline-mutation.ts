@@ -16,6 +16,7 @@ type ValidatePipelineParams = {
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
   tableSyncCopy: TableSyncCopyConfig
+  clusterId?: string
 }
 type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse_Output']
 
@@ -29,6 +30,7 @@ async function validatePipeline(
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
     tableSyncCopy,
+    clusterId,
   }: ValidatePipelineParams,
   signal?: AbortSignal
 ): Promise<ValidatePipelineResponse> {
@@ -36,7 +38,7 @@ async function validatePipeline(
   if (!sourceId) throw new Error('sourceId is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     body: {
       source_id: sourceId,
       config: buildPipelineApiConfig({

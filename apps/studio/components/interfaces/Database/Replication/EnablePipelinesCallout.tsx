@@ -21,6 +21,7 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type EnablePipelinesModalProps =
   | { open: boolean; onOpenChange: (open: boolean) => void; onSuccess?: () => void }
@@ -32,6 +33,7 @@ export const EnablePipelinesModal = ({
   onSuccess,
 }: EnablePipelinesModalProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const [_open, _setOpen] = useState(false)
 
   const open = extOpen ?? _open
@@ -55,7 +57,7 @@ export const EnablePipelinesModal = ({
   const onEnablePipelines = async () => {
     if (isLoading || !hasAccess) return
     if (!projectRef) return console.error('Project ref is required')
-    createTenantSource({ projectRef })
+    createTenantSource({ projectRef, clusterId })
   }
 
   return (
