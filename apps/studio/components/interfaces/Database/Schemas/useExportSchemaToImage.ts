@@ -38,7 +38,6 @@ export const useExportSchemaToImage = () => {
           height: height.toString(),
           transform: `translate(${x}px, ${y}px) scale(${zoom})`,
         },
-        skipFonts: true,
       }
       try {
         if (format === 'svg') {
