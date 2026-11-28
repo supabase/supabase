@@ -210,19 +210,27 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 ### Generate keys and secrets
 
-To generate secure passwords and secrets, run:
+To generate secure passwords and secrets and write them to `.env`, run:
 
 ```sh
-sh utils/generate-keys.sh
+sh utils/generate-keys.sh --update-env
 ```
 
-As the **next step**, use the following script to add the new API keys and asymmetric key pair:
+As the **next step**, use the following script to add the new API keys and asymmetric key pair. The script also enables the matching entries in `docker-compose.yml`:
 
 ```sh
-sh utils/add-new-auth-keys.sh
+sh utils/add-new-auth-keys.sh --update-env
 ```
+
+To review the values and confirm before each script writes them, omit `--update-env`. If standard input is not a terminal, a script run without the flag prints the values and writes nothing.
 
 Review the output of both scripts and check the `.env` file **before proceeding** to configure [Supabase URLs](#configure-supabase-urls).
+
+<Admonition type="caution">
+
+After both scripts run, the `.env.old` backup contains your new secrets and Git doesn't ignore it. Delete `.env.old` after you check `.env`.
+
+</Admonition>
 
 For a description of all secrets refer to the [related section](#configuring-secrets) in the "Advanced topics" below. If you'd like to learn more about how the new API keys and asymmetric JWT signing work in a self-hosted Supabase setup, make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-auth-keys).
 
