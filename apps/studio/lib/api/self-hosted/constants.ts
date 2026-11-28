@@ -1,10 +1,20 @@
 // Constants specific to self-hosted environments
 
+import { IS_PLATFORM } from '@/lib/constants'
+
 // Schemas exposed via PostgREST Data API, read from the PGRST_DB_SCHEMAS env var
 // that is passed to the Studio container via docker-compose / CLI.
 export const DEFAULT_EXPOSED_SCHEMAS = process.env.PGRST_DB_SCHEMAS ?? 'public,graphql_public'
 
-export const ENCRYPTION_KEY = process.env.PG_META_CRYPTO_KEY || 'SAMPLE_KEY'
+export const DEFAULT_ENCRYPTION_KEY = 'SAMPLE_KEY'
+const configuredEncryptionKey = process.env.PG_META_CRYPTO_KEY
+export const ENCRYPTION_KEY = configuredEncryptionKey || DEFAULT_ENCRYPTION_KEY
+
+if (!IS_PLATFORM && !configuredEncryptionKey) {
+  console.warn(
+    "[Studio] PG_META_CRYPTO_KEY is not set. Studio is using SAMPLE_KEY to encrypt the postgres-meta connection string. Set PG_META_CRYPTO_KEY to the same value as postgres-meta's CRYPTO_KEY to avoid database connection failures."
+  )
+}
 export const POSTGRES_PORT = parseInt(process.env.POSTGRES_PORT || '5432', 10)
 export const POSTGRES_HOST = process.env.POSTGRES_HOST || 'db'
 export const POSTGRES_DATABASE = process.env.POSTGRES_DB || 'postgres'
