@@ -7,6 +7,7 @@
     "build": "maybe-turbo astro build",
     "fetch:federated-content": "tsx ./scripts/federated-content/fetch-federated-content.ts",
     "generate:markdown": "maybe-turbo tsx ./scripts/generate-markdown.ts",
+    "redirects:generate": "node ./scripts/generate-static-redirects-md-variants.mjs",
     "search:ingest": "maybe-turbo tsx ./scripts/search/ingest.ts",
     "sync:troubleshooting-entries": "tsx ./scripts/federated-content/sync-troubleshooting-entries.ts",
     "sync:troubleshooting-updates": "tsx ./scripts/federated-content/sync-troubleshooting-updates.ts",

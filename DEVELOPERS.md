@@ -178,6 +178,7 @@ We review PRs in the order of their submission. We try to accept the earliest on
 Where the redirect goes depends on the URL:
 
 - **`/docs` URLs:** add the entry to [`apps/docs/lib/redirects/`](https://github.com/supabase/supabase/blob/master/apps/docs/lib/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, and entries with params, splats, or conditions go in `dynamic-redirects.js`.
+- **`/kb` URLs:** add the entry to [`apps/kb/redirects/`](https://github.com/supabase/supabase/blob/master/apps/kb/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, and entries with params, splats, or conditions go in the `redirects` in `apps/kb/vercel.json`.
 - **All other URLs:** add the entry to [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) in the main site.
 
 ---
