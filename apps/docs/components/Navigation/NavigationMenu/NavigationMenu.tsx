@@ -4,6 +4,7 @@ import type { NavMenuSection } from '../Navigation.types'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
+
 enum MenuId {
   GettingStarted = 'gettingstarted',
   Database = 'database',
@@ -43,6 +44,7 @@ enum MenuId {
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
   RefKotlinV3 = 'reference_kotlin_v3',
+  RefKotlinV4 = 'reference_kotlin_v4',
   RefCli = 'reference_cli',
   RefApi = 'reference_api',
   SelfHostingAuth = 'reference_self_hosting_auth',
@@ -228,6 +230,11 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.RefKotlinV3,
+    type: 'reference',
+    path: '/reference/kotlin/v3',
+  },
+  {
+    id: MenuId.RefKotlinV4,
     type: 'reference',
     path: '/reference/kotlin',
   },
