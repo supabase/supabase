@@ -4,11 +4,17 @@ import type { Dictionary, QueryTable } from './types'
 
 export interface IQueryAction {
   count: () => IQueryFilter
-  delete: (options?: { returning: boolean }) => IQueryFilter
-  insert: (values: Array<Dictionary<any>>, options?: { returning: boolean }) => IQueryFilter
+  delete: (options?: { returning: boolean; enumArrayColumns?: Array<string> }) => IQueryFilter
+  insert: (
+    values: Array<Dictionary<any>>,
+    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+  ) => IQueryFilter
   select: (columns?: SafeSqlFragment) => IQueryFilter
-  update: (value: Dictionary<any>, options?: { returning: boolean }) => IQueryFilter
-  truncate: (options?: { returning: boolean }) => IQueryFilter
+  update: (
+    value: Dictionary<any>,
+    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+  ) => IQueryFilter
+  truncate: (options?: { returning: boolean; enumArrayColumns?: Array<string> }) => IQueryFilter
 }
 
 export class QueryAction implements IQueryAction {
