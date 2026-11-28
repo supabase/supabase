@@ -24,6 +24,9 @@ export type ProjectPostgrestConfigVariables = {
 
 type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse_Output'] & {
   db_pool: number | null
+  db_pool_acquisition_timeout?: number | null
+  db_pool_max_lifetime?: number | null
+  db_pool_max_idletime?: number | null
 }
 
 export async function getProjectPostgrestConfig(
