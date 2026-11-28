@@ -171,7 +171,11 @@ export const ResetDbPasswordDialog = ({
               type="password"
               placeholder="Type in a strong password"
               value={password}
-              autoComplete="off"
+              autoComplete="new-password"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              data-bwignore
               onChange={onDbPassChange}
             />
           </FormItemLayout>
