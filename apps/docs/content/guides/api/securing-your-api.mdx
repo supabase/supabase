@@ -303,12 +303,18 @@ Before adding the check logic, review [Request information](#request-information
      returns void
      language plpgsql
      security definer
+     set search_path = ''
      as $$
    begin
      -- your logic here
    end;
    $$;
    ```
+
+   Because the search path is empty, schema-qualify every custom table, view, and function referenced in your pre-request function (for example, `public.my_table`).
+   Postgres built-in functions, types, and operators continue to resolve through `pg_catalog`.
+
+   For more information, see [Security definer vs. invoker](/docs/guides/database/functions#security-definer-vs-invoker).
 
 2. Register the function to run on every Data API request:
 
@@ -366,6 +372,7 @@ create function public.check_request()
   returns void
   language plpgsql
   security definer
+  set search_path = ''
   as $$
 declare
   req_method text := current_setting('request.method', true);
@@ -443,6 +450,7 @@ create function public.check_request()
   returns void
   language plpgsql
   security definer
+  set search_path = ''
   as $$
 declare
   req_app_api_key text := current_setting('request.headers', true)::json->>'x-app-api-key';
