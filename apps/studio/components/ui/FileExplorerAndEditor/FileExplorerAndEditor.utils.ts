@@ -22,7 +22,6 @@ export const isBinaryFile = (fileName: string): boolean => {
     'gif',
     'bmp',
     'ico',
-    'svg',
     'mp3',
     'mp4',
     'avi',
