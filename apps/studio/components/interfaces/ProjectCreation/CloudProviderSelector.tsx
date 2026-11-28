@@ -43,7 +43,11 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
           }
         >
           <Select
-            onValueChange={(value) => field.onChange(value)}
+            onValueChange={(value) => {
+              field.onChange(value)
+              // Whether OrioleDB is allowed depends on the cloud provider, so re-validate it
+              if (form.getFieldState('useOrioleDb').error) form.trigger('useOrioleDb')
+            }}
             defaultValue={field.value}
             value={field.value}
           >

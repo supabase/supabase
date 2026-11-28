@@ -26,7 +26,7 @@ import {
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
 } from './ProjectCreation.constants'
-import { FormSchema } from './ProjectCreation.schema'
+import { FormSchema, ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE } from './ProjectCreation.schema'
 import {
   AUTO_REGION_VALUE,
   getAvailableRegions,
@@ -763,13 +763,18 @@ export const ProjectCreationForm = ({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+        onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) => {
+          // The OrioleDB field can sit in a collapsed section, where its inline error is not
+          // rendered, so surface this error as a toast as well.
+          if (errors.useOrioleDb?.message === ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE) {
+            toast.error(ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE)
+          }
           trackFunnelError(
             'project_creation',
             classifyValidationError('project_creation', errors),
             'form'
           )
-        )}
+        })}
       >
         <Panel
           loading={!isOrganizationsSuccess}
