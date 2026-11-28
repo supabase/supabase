@@ -34,6 +34,12 @@ const ContactSales = () => {
             __html: `!function(e,t){var _=0;e.__default__=e.__default__||{},e.__default__.form_id=879120,e.__default__.team_id=715,e.__default__.listenToIds=["support-form"],function e(){var o=t.createElement("script");o.async=!0,o.src="https://import-cdn.default.com",o.onload=function(){!0,console.info("[Default.com] Powered by Default.com")},o.onerror=function(){++_<=3&&setTimeout(e,1e3*_)},t.head.appendChild(o)}()}(window,document);`,
           }}
         />
+        {/* Default.com pixel — new routing platform. Only listens to form submissions; HubSpot still receives them as normal. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(e,t){if(e.__dft_ran)return;e.__dft_ran=!0;e.__defaultPixel__=e.__defaultPixel__||{},e.__defaultPixel__.key="8dcc90bb-b2d8-47e4-b0d0-477af9639cc3",e.__defaultPixel__.q=e.__defaultPixel__.q||[],e.__defaultPixel__.setConsent=e.__defaultPixel__.setConsent||function(c){e.__defaultPixel__.q.push(["setConsent",c])};["https://handshake.default.com/index.js"].forEach(function(s){var f={}[s]||s;!function e(o){o=o||1;var n=t.createElement("script");n.async=!0,n.src=s,n.onload=function(){console.log("[Pixel] Script loaded successfully"+(o>1?" after "+o+" attempts":"")+": "+s)},n.onerror=function(){console.warn("[Pixel] Failed to load script (attempt "+o+"/3): "+s),o<3?setTimeout((function(){e(o+1)}),2e3*o):s!==f?(s=f,e(1)):console.error("[Pixel] Script failed to load after 3 attempts: "+s)},t.head.appendChild(n)}()})}(window,document);`,
+          }}
+        />
       </Head>
       <DefaultLayout className="min-h-fit!">
         <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
