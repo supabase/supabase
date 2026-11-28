@@ -6,7 +6,13 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import {
+  AUTH_LEVEL_SQL,
+  AUTH_LOGS_FROM_SQL,
+  AUTH_METHOD_SQL,
+  AUTH_PATH_SQL,
+  AUTH_STATUS_SQL,
+} from './Queries/AuthLogs.sql'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -40,11 +46,6 @@ const ALL_LOG_TYPES = [
   'pipelines',
 ]
 
-/**
- * Computes the log_type set that the CTE should union. With no filter, defaults
- * to the cheap two-source set. With `=` filters, narrows to those values. With
- * `<>` filters, excludes them from the full set.
- */
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   if (search.scope) throw new Error('Scoped unified logs queries are only supported on ClickHouse')
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
@@ -52,12 +53,17 @@ export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] =>
     const hasPipelineFilter = parseLogsFilterUrlParams(search.filter).some(
       (filter) => filter.column === 'pipeline_id'
     )
-    return hasPipelineFilter ? ['pipelines'] : [...DEFAULT_LOG_TYPES]
+    return (hasPipelineFilter ? ['pipelines'] : [...ALL_LOG_TYPES]).filter(
+      (type) => type !== 'pipelines' || search.logTypeVisibility?.pipelines !== false
+    )
   }
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
   const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
   const base = included.length > 0 ? included : ALL_LOG_TYPES
-  return base.filter((t) => !excluded.has(t))
+  return base.filter(
+    (type) =>
+      !excluded.has(type) && (type !== 'pipelines' || search.logTypeVisibility?.pipelines !== false)
+  )
 }
 
 /**
@@ -312,14 +318,14 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
     cross join unnest(fel_metadata.request) as fel_request
     left join (
     SELECT
-        fl_metadata.request_id,
+        json_value(to_json_string(fl_metadata), '$.request_id') as request_id,
         COUNT(fl.id) as function_log_count,
         ANY_VALUE(fl.event_message) as last_event_message
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.request_id IS NOT NULL
-    GROUP BY fl_metadata.request_id
-    ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
+    WHERE json_value(to_json_string(fl_metadata), '$.request_id') IS NOT NULL
+    GROUP BY json_value(to_json_string(fl_metadata), '$.request_id')
+    ) as function_logs_agg on json_value(to_json_string(fel_metadata), '$.request_id') = function_logs_agg.request_id
   `
 
 /**
@@ -327,35 +333,20 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
  */
 const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
-      el_in_al.id as id,
-      al.id as source_id,
-      el_in_al.timestamp as timestamp,
+      al.id as id,
+      el.id as source_id,
+      al.timestamp as timestamp,
       'auth' as log_type,
-      CAST(el_in_al_response.status_code AS STRING) as status,
-      CASE
-          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN el_in_al_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      el_in_al_request.path as pathname,
-      null as event_message,
-      el_in_al_request.method as method,
+      CAST(${AUTH_STATUS_SQL} AS STRING) as status,
+      ${AUTH_LEVEL_SQL} as level,
+      ${AUTH_PATH_SQL} as pathname,
+      al.event_message as event_message,
+      ${AUTH_METHOD_SQL} as method,
       null as log_count,
       null as logs,
       cast(null as string) as pipeline_id,
       cast(null as string) as pipeline_metadata
-    from auth_logs as al
-    cross join unnest(metadata) as al_metadata
-    left join (
-    edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
-    )
-    on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    WHERE al_metadata.request_id is not null
+    ${AUTH_LOGS_FROM_SQL}
   `
 
 /**
@@ -425,19 +416,33 @@ const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   pipelines: getPipelinesLogsQuery,
 }
 
-/**
- * Combine the requested log sources to create the unified logs CTE.
- * Defaults to postgres + postgrest on first load to reduce query cost.
- */
-export const getUnifiedLogsCTE = (
-  logTypes: string[] = [...DEFAULT_LOG_TYPES]
-): SafeLogSqlFragment => {
+export const getUnifiedLogsCTE = (logTypes: string[] = [...ALL_LOG_TYPES]): SafeLogSqlFragment => {
   const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
     .map((type) => LOG_TYPE_QUERIES[type]())
 
   const effective =
-    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
+    queries.length > 0
+      ? queries
+      : [
+          safeSql`
+    SELECT
+      CAST(NULL AS STRING) AS id,
+      CAST(NULL AS STRING) AS source_id,
+      CAST(NULL AS TIMESTAMP) AS timestamp,
+      CAST(NULL AS STRING) AS log_type,
+      CAST(NULL AS STRING) AS status,
+      CAST(NULL AS STRING) AS level,
+      CAST(NULL AS STRING) AS pathname,
+      CAST(NULL AS STRING) AS event_message,
+      CAST(NULL AS STRING) AS method,
+      CAST(NULL AS INT64) AS log_count,
+      NULL AS logs,
+      CAST(NULL AS STRING) AS pipeline_id,
+      CAST(NULL AS STRING) AS pipeline_metadata
+    WHERE FALSE
+  `,
+        ]
 
   return safeSql`
 WITH unified_logs AS (

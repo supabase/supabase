@@ -286,6 +286,15 @@ describe('attribute discovery scope', () => {
   })
 })
 
+describe('available attribute sources', () => {
+  it('includes Auth and Edge Functions after clearing the log type filter', () => {
+    const sources = getLogAttributeSources(createUnifiedLogsSearch({}))
+    expect(sources).toContain('auth_logs')
+    expect(sources).toContain('function_edge_logs')
+    expect(sources).not.toContain('function_logs')
+  })
+})
+
 describe('filter groups', () => {
   const orGroup = {
     logicalOperator: 'OR' as const,

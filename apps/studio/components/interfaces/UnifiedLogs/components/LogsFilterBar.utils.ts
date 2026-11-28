@@ -8,7 +8,7 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
+import { LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -24,6 +24,7 @@ import {
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
 import type { QuerySearchParamsType } from '../UnifiedLogs.types'
+import { getAvailableLogTypes } from '../UnifiedLogs.utils'
 import { REPORTS_DATEPICKER_HELPERS } from '@/components/interfaces/Reports/Reports.constants'
 import {
   findMatchingDateHelper,
@@ -290,9 +291,7 @@ export const formatTimeRangeValue = (value: FilterCondition['value']): string =>
 export const getLogAttributeSources = (search: QuerySearchParamsType): string[] => {
   const filter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
   const hasUser = !!search.user?.trim()
-  const hasDefaultSources = !filter && !search.scope && !hasUser
-  let types = Object.keys(LOG_TYPE_TO_SOURCE)
-  if (hasDefaultSources) types = [...DEFAULT_LOG_TYPES]
+  let types = getAvailableLogTypes(search)
   if (filter?.operator === '=') types = types.filter((type) => filter.values.includes(type))
   if (filter?.operator === '<>') {
     types = types.filter(
@@ -308,9 +307,7 @@ export const getLogAttributeSources = (search: QuerySearchParamsType): string[] 
   }
   types = types.filter((type) => !excludedScopeTypes.some(({ value }) => value === type))
   if (hasUser) types = types.filter((type) => type === 'edge' || type === 'auth')
-  return Object.entries(LOG_TYPE_TO_SOURCE)
-    .filter(([type]) => types.includes(type))
-    .map(([, source]) => source)
+  return types.map((type) => LOG_TYPE_TO_SOURCE[type])
 }
 
 const conditionKey = ({ propertyName, operator, value }: FilterCondition) =>

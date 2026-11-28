@@ -34,8 +34,8 @@ const row = columnSchema.parse({
   level: 'success',
 })
 
-function Harness({ tab }: { tab: 'overview' | 'raw-json' }) {
-  const table = useReactTable({ data: [row], columns: [], getCoreRowModel: getCoreRowModel() })
+function Harness({ tab, log = row }: { tab: 'overview' | 'raw-json'; log?: typeof row }) {
+  const table = useReactTable({ data: [log], columns: [], getCoreRowModel: getCoreRowModel() })
   return (
     <DataTableProvider
       table={table}
@@ -48,17 +48,20 @@ function Harness({ tab }: { tab: 'overview' | 'raw-json' }) {
       isLoadingCounts={false}
     >
       <LogDetail
-        row={row}
+        row={log}
         tab={tab}
         searchParameters={querySearchParamsSchema.parse({
-          scope: { filters: [{ column: 'function_id', operator: '=', value: 'fn-1' }] },
+          scope:
+            log.log_type === 'realtime'
+              ? { filters: [{ column: 'function_id', operator: '=', value: 'fn-1' }] }
+              : undefined,
         })}
       />
     </DataTableProvider>
   )
 }
 
-const renderDetail = (tab: 'overview' | 'raw-json') => {
+const renderDetail = (tab: 'overview' | 'raw-json', log = row) => {
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
@@ -102,7 +105,7 @@ const renderDetail = (tab: 'overview' | 'raw-json') => {
       }}
     >
       <FeaturePreviewContextProvider>
-        <Harness tab={tab} />
+        <Harness tab={tab} log={log} />
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>,
     { queryClient }
@@ -111,6 +114,39 @@ const renderDetail = (tab: 'overview' | 'raw-json') => {
 
 describe('log detail attributes', () => {
   beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
+
+  it.each([false, true])(
+    'shows the native Auth payload with gateway enrichment %s',
+    async (hasGateway) => {
+      const auth = {
+        id: 'native-auth-id',
+        timestamp: '2026-01-01T10:00:00Z',
+        event_message: 'Native Auth error payload',
+      }
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+        response: () =>
+          HttpResponse.json<AnalyticsResponse>({
+            result: [
+              {
+                ...auth,
+                log_type: 'auth',
+                raw_log_data: auth,
+                request_host: hasGateway ? 'gateway-enrichment.example' : null,
+              },
+            ],
+          }),
+      })
+      renderDetail('raw-json', columnSchema.parse({ ...row, ...auth, log_type: 'auth' }))
+      expect(await screen.findByText(/request_host/)).toBeVisible()
+      for (const element of await screen.findAllByText(/Native Auth error payload/))
+        expect(element).toBeVisible()
+      for (const element of await screen.findAllByText(/native-auth-id/))
+        expect(element).toBeVisible()
+      expect(screen.queryByText(/gateway-log-id/)).not.toBeInTheDocument()
+    }
+  )
 
   it.each(['overview', 'raw-json'] as const)(
     'shows retrieval failures in the %s tab',

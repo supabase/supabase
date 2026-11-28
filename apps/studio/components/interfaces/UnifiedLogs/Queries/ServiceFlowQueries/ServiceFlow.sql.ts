@@ -5,6 +5,13 @@
  * showing how requests flow through different layers of the infrastructure.
  */
 
+import {
+  AUTH_LEVEL_SQL,
+  AUTH_LOGS_FROM_SQL,
+  AUTH_METHOD_SQL,
+  AUTH_PATH_SQL,
+  AUTH_STATUS_SQL,
+} from '../AuthLogs.sql'
 import { analyticsLiteral, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 // Service configuration for different log types
@@ -41,23 +48,29 @@ const getBaseEdgeServiceFlowQuery = (
   logId: string,
   serviceType: EdgeServiceType
 ): SafeLogSqlFragment => {
+  const isAuth = serviceType === 'auth'
   return safeSql`
   select
-      id,
-      el.timestamp as timestamp,
+      ${isAuth ? safeSql`al.id` : safeSql`el.id`} AS id,
+      ${isAuth ? safeSql`al.timestamp` : safeSql`el.timestamp`} as timestamp,
       ${SAFE_SERVICE_LITERAL[serviceType]} as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
+      CAST(${isAuth ? AUTH_STATUS_SQL : safeSql`edge_logs_response.status_code`} AS STRING) as status,
+      ${
+        isAuth
+          ? AUTH_LEVEL_SQL
+          : safeSql`CASE
         WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
         WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
         WHEN edge_logs_response.status_code >= 500 THEN 'error'
         ELSE 'success'
-      END as level,
+      END`
+      } as level,
+      ${isAuth ? safeSql`al.event_message,` : safeSql``}
 
       -- Request data
-      edge_logs_request.path as request_path,
+      ${isAuth ? AUTH_PATH_SQL : safeSql`edge_logs_request.path`} as request_path,
       edge_logs_request.host as request_host,
-      edge_logs_request.method as request_method,
+      ${isAuth ? AUTH_METHOD_SQL : safeSql`edge_logs_request.method`} as request_method,
       edge_logs_request.url as request_url,
       edge_logs_request.search as request_search,
 
@@ -151,13 +164,17 @@ const getBaseEdgeServiceFlowQuery = (
       edge_logs_response_headers.cf_ray as correlation_cf_ray,
 
       -- Raw data
-      el as raw_log_data
+      ${isAuth ? safeSql`al` : safeSql`el`} as raw_log_data
 
-    from edge_logs as el
+    ${
+      isAuth
+        ? AUTH_LOGS_FROM_SQL
+        : safeSql`from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_response.headers) as edge_logs_response_headers
+    left join unnest(edge_logs_response.headers) as edge_logs_response_headers`
+    }
     left join unnest(edge_logs_request.headers) as edge_logs_request_headers
     left join unnest(edge_logs_request.cf) as edge_logs_cf
     left join unnest(edge_logs_request.sb) as sb
@@ -170,7 +187,11 @@ const getBaseEdgeServiceFlowQuery = (
     left join unnest(COALESCE(sb_apikey_outer.apikey, [])) as sb_apikey_inner
 
 WHERE
-  el.id = ${analyticsLiteral(logId)}
+  ${
+    isAuth
+      ? safeSql`(al.id = ${analyticsLiteral(logId)} OR el.id = ${analyticsLiteral(logId)})`
+      : safeSql`el.id = ${analyticsLiteral(logId)}`
+  }
 `
 }
 

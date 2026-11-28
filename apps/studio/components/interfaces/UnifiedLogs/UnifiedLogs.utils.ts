@@ -22,6 +22,14 @@ import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
+export const getAvailableLogTypes = (search: QuerySearchParamsType) =>
+  LOG_TYPES.filter((type) => type !== 'compute').filter((type) => {
+    if (type === 'edge function runtime') return Boolean(search.scope)
+    if (type === 'multigres') return search.logTypeVisibility?.multigres !== false
+    if (type === 'pipelines') return search.logTypeVisibility?.pipelines !== false
+    return true
+  })
+
 export function getComputeLogsAvailability({
   isPlatform,
   flagsLoaded,

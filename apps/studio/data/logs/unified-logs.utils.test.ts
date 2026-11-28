@@ -60,6 +60,21 @@ describe('extractLogMetadata', () => {
   })
 
   describe('auth logs', () => {
+    it.each([null, 'unstructured Auth failure', '{}'])(
+      'preserves projected request metadata when event_message is %s',
+      (event_message) => {
+        expect(
+          extractLogMetadata({
+            log_type: 'auth',
+            status: '500',
+            method: 'POST',
+            pathname: '/auth/v1/token',
+            event_message,
+          })
+        ).toEqual({ status: '500', method: 'POST', pathname: '/auth/v1/token' })
+      }
+    )
+
     it('extracts status, method, and pathname from event_message JSON', () => {
       const row = {
         log_type: 'auth',
@@ -142,7 +157,7 @@ describe('extractLogMetadata', () => {
       expect(extractLogMetadata(row).status).toBeUndefined()
     })
 
-    it('returns undefined metadata when event_message is not valid JSON', () => {
+    it('keeps projected metadata when event_message is not valid JSON', () => {
       const row = {
         log_type: 'auth',
         status: 200,
@@ -151,8 +166,8 @@ describe('extractLogMetadata', () => {
       }
 
       expect(extractLogMetadata(row)).toEqual({
-        status: undefined,
-        method: undefined,
+        status: 200,
+        method: 'GET',
         pathname: undefined,
       })
     })

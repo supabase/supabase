@@ -9,6 +9,7 @@ import {
 
 export const columnSchema = z.object({
   id: z.string(),
+  source_id: z.string().nullish(),
   log_type: z.string(),
   method: z.string().nullable(),
   pathname: z.string().nullable(),
@@ -95,6 +96,13 @@ export const unifiedLogsScopeSchema = z.object({
 
 export const querySearchParamsSchema = z.object({
   scope: unifiedLogsScopeSchema.optional(),
+  logTypeVisibility: z
+    .object({
+      compute: z.boolean().optional(),
+      multigres: z.boolean().optional(),
+      pipelines: z.boolean().optional(),
+    })
+    .optional(),
   filter: z.array(z.string()).optional(),
   latency: z.array(z.number()).optional(),
   'timing.dns': z.array(z.number()).optional(),

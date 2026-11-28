@@ -980,6 +980,54 @@ describe('UnifiedLogs', () => {
     )
   })
 
+  it('opens a legacy Auth bookmark alongside other selected log types', async () => {
+    const log: UnifiedLogsQueryRow = {
+      id: 'auth-native-id',
+      source_id: 'gateway-id',
+      log_type: 'auth',
+      timestamp: Date.now() * 1000,
+      event_message: 'Auth request failed',
+      level: 'error',
+      method: 'POST',
+      pathname: '/auth/v1/token',
+      status: '500',
+      log_count: null,
+      logs: null,
+    }
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        return HttpResponse.json<AnalyticsResponse>({
+          result:
+            sql.includes('FROM unified_logs') &&
+            !sql.includes('COUNT') &&
+            !sql.includes('TIMESTAMP_TRUNC')
+              ? [log]
+              : [],
+        })
+      },
+    })
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs hasFilterSideBar={false} />
+      </FeatureFlagContext.Provider>,
+      {
+        nuqs: {
+          hasMemory: true,
+          searchParams: '?filter=log_type:eq:auth,log_type:eq:postgres&id=gateway-id',
+        },
+      }
+    )
+    expect(
+      await screen.findByRole('status', { name: 'Auth request failed', hidden: true })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Raw JSON', hidden: true })).toBeInTheDocument()
+  })
+
   it('remembers the function dock independently from the project dock when reopening logs', async () => {
     const user = userEvent.setup({ delay: null })
     mswServer.use(

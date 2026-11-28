@@ -106,7 +106,10 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { unifiedLogQueryOptions } from '@/data/logs/unified-log-query'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsBackend,
+  useUnifiedLogsInfiniteQuery,
+} from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -274,6 +277,7 @@ export const UnifiedLogs = ({
     if (parameters.filter) {
       parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
+    parameters.logTypeVisibility = queryLogTypeVisibility
     return parameters
   }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([projectRef, search.filter, search.date, scope])
@@ -293,7 +297,7 @@ export const UnifiedLogs = ({
   useEffect(() => syncUrlFilters(), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
-    scope: JSON.stringify([projectRef, searchParameters]),
+    scope: JSON.stringify([projectRef, { ...searchParameters, logTypeVisibility: undefined }]),
     initialId: search.id ?? undefined,
   })
   const previousUrlId = useRef(search.id)
@@ -357,6 +361,19 @@ export const UnifiedLogs = ({
     () => getUniqueLogRows(unifiedLogsData?.pages),
     [unifiedLogsData?.pages]
   )
+  const usesOtel = useUnifiedLogsBackend(searchParameters)
+  const legacyAuthRow =
+    !usesOtel && search.id && !flatData.some((row) => row.id === search.id)
+      ? flatData.find((row) => row.log_type === 'auth' && row.source_id === search.id)
+      : undefined
+  useEffect(() => {
+    if (!legacyAuthRow) return
+    selectRow(
+      flatData.map((row) => row.id),
+      legacyAuthRow.id
+    )
+    setSearch({ id: legacyAuthRow.id })
+  }, [legacyAuthRow, flatData, selectRow, setSearch])
   const missingSelectedId =
     scope && selection.activeId && !flatData.some((row) => row.id === selection.activeId)
       ? selection.activeId
@@ -667,7 +684,7 @@ export const UnifiedLogs = ({
   }, [sorting])
 
   useEffect(() => {
-    if (isLoading || isFetching || hasUrlSelectionChanged) return
+    if (isLoading || isFetching || hasUrlSelectionChanged || legacyAuthRow) return
     if (missingSelectedId && (!selectedLogQuery.isSuccess || isPlaceholderData)) return
 
     if (openRowId && !selectedRow) {

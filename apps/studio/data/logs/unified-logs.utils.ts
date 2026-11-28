@@ -14,6 +14,7 @@ type UnifiedLogMetadataRow = {
 
 export const unifiedLogsQueryRowSchema = z.object({
   id: z.string(),
+  source_id: z.string().nullish(),
   timestamp: z.union([z.string(), z.number()]),
   log_type: z.string(),
   status: z.union([z.string(), z.number()]).nullable(),
@@ -62,10 +63,13 @@ export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
     row.log_type === 'auth'
       ? (eventMessage?.status ??
         extractLeadingStatus(eventMessage?.msg) ??
-        extractLeadingStatus(eventMessage?.error))
+        extractLeadingStatus(eventMessage?.error) ??
+        row.status ??
+        undefined)
       : (row.status ?? 200)
-  const method = row.log_type === 'auth' ? eventMessage?.method : row.method
-  const pathname = row.log_type === 'auth' ? eventMessage?.path : row.pathname || ''
+  const method = row.log_type === 'auth' ? (eventMessage?.method ?? row.method) : row.method
+  const pathname =
+    row.log_type === 'auth' ? (eventMessage?.path ?? row.pathname ?? undefined) : row.pathname || ''
 
   return { status, method, pathname }
 }
@@ -76,6 +80,7 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
 
   const mappedRow = {
     id: row.id,
+    source_id: row.source_id,
     date: parseOtelTimestamp(row.timestamp),
     method,
     pathname,
