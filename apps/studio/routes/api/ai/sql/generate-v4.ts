@@ -1,12 +1,14 @@
 import pgMeta from '@supabase/pg-meta'
-import type { JwtPayload } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
+import {
+  createUIMessageStreamResponse,
+  safeValidateUIMessages,
+  toUIMessageStream,
+  type UIMessageChunk,
+} from 'ai'
 import { IS_PLATFORM } from 'common'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -31,28 +33,11 @@ import {
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getBasePathURL } from '@/lib/helpers'
 import { trustedUserEmail } from '@/lib/server/configcat'
-
-async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res, claims)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({
-        data: null,
-        error: { message: `Method ${method} Not Allowed` },
-      })
-  }
-}
-
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
 
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
@@ -67,22 +52,25 @@ const requestBodySchema = z.object({
   model: z.string().optional(),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
+async function handlePost({ request, claims }: ApiHandlerContext) {
   const requestStartedAt = Date.now()
-  const authorization = req.headers.authorization
+  const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
-    return res.status(401).json({ error: 'Authorization token is required' })
+    return Response.json({ error: 'Authorization token is required' }, { status: 401 })
   }
 
   const userId = claims?.sub
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const body = await parseJsonBody(request)
   const { data, error: parseError } = requestBodySchema.safeParse(body)
 
   if (parseError) {
-    return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
+    return Response.json(
+      { error: 'Invalid request body', issues: parseError.issues },
+      { status: 400 }
+    )
   }
 
   const {
@@ -104,10 +92,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     metadataSchema: assistantMessageMetadataSchema,
   })
   if (!messagesValidation.success) {
-    return res.status(400).json({
-      error: 'Invalid request body',
-      message: messagesValidation.error.message,
-    })
+    return Response.json(
+      {
+        error: 'Invalid request body',
+        message: messagesValidation.error.message,
+      },
+      { status: 400 }
+    )
   }
   const messages = messagesValidation.data
 
@@ -137,10 +128,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId = aiDetails.planId
       projectRegion = aiDetails.projectRegion
       isHighComplianceProject = aiDetails.isHighComplianceProject
-    } catch (error) {
-      return res.status(400).json({
-        error: 'There was an error fetching your organization details',
-      })
+    } catch {
+      return Response.json(
+        { error: 'There was an error fetching your organization details' },
+        { status: 400 }
+      )
     }
   }
 
@@ -163,17 +155,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   })
 
   if (modelError) {
-    return res.status(500).json({ error: modelError.message })
+    return Response.json({ error: modelError.message }, { status: 500 })
   }
 
-  try {
-    const abortController = new AbortController()
-    req.on('close', () => abortController.abort())
-    req.on('aborted', () => abortController.abort())
-    // Fires when the connection drops. Aborting tears down the remote MCP connection opened
-    // in getTools. The TanStack adapter doesn't emit it, so settling the pipe below also aborts.
-    res.on('close', () => abortController.abort())
+  // request.signal only aborts on client disconnect; `done` also releases the request once the
+  // response stream ends or setup fails.
+  const done = new AbortController()
+  const signal = AbortSignal.any([request.signal, done.signal])
+  const release = () => done.abort()
 
+  try {
     const tools = await getTools({
       projectRef,
       connectionString,
@@ -183,7 +174,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
-      signal: abortController.signal,
+      signal,
     })
 
     // Get a list of all schemas to add to context
@@ -213,6 +204,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         : NO_SCHEMA_ACCESS_MESSAGE
     }
 
+    let braintrustSpanId: string | undefined
+
     const result = await generateAssistantResponse({
       messages,
       ...modelParams,
@@ -235,10 +228,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       requestedModel,
       effectiveModel,
       systemProviderOptions,
-      abortSignal: abortController.signal,
+      abortSignal: signal,
       timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
       onSpanCreated: (spanId) => {
-        res.setHeader('x-braintrust-span-id', spanId)
+        braintrustSpanId = spanId
       },
     })
 
@@ -271,29 +264,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         part.type === 'abort' ? { timedOut: true } : undefined,
     })
 
-    // Keep this asynchronous so the TanStack adapter can return the streaming
-    // Response immediately. Handle piping failures after headers have been sent.
-    // Abort here rather than in toUIMessageStream's onEnd: that callback rebuilds the response
-    // message, which fails on approval continuations without the client's original messages.
-    void pipeUIMessageStreamToResponse({
-      response: res,
-      stream,
-      headers: { 'Content-Encoding': 'none' },
+    // Abort when the stream finishes, errors, or is cancelled so the remote MCP connection opened
+    // in getTools is always released. Abort here rather than in toUIMessageStream's onEnd: that
+    // callback rebuilds the response message, which fails on approval continuations without the
+    // client's original messages.
+    // Bound outside the literal: TS's Transformer type doesn't declare `cancel` yet.
+    const releaseOnEnd = { flush: release, cancel: release }
+
+    return createUIMessageStreamResponse({
+      stream: stream.pipeThrough(new TransformStream<UIMessageChunk, UIMessageChunk>(releaseOnEnd)),
+      headers: {
+        'Content-Encoding': 'none',
+        ...(braintrustSpanId && { 'x-braintrust-span-id': braintrustSpanId }),
+      },
     })
-      .catch((error) => console.error('Error piping Assistant stream:', error))
-      // Runs when the stream finishes, aborts, or is cancelled.
-      .finally(() => abortController.abort())
   } catch (error) {
+    release()
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message })
+      return Response.json({ message: error.message }, { status: 500 })
     }
-    return res.status(500).json({ message: 'An unexpected error occurred.' })
+    return Response.json({ message: 'An unexpected error occurred.' }, { status: 500 })
   }
 }
 
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/generate-v4')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
+  },
 })

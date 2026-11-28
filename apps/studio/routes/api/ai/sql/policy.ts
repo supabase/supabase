@@ -1,12 +1,9 @@
-import type { JwtPayload } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText, isStepCount, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
@@ -15,7 +12,8 @@ import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { withoutApprovalTools } from '@/lib/ai/tool-filter'
 import { getTools } from '@/lib/ai/tools'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { trustedUserEmail } from '@/lib/server/configcat'
 
 const policySchema = z.object({
@@ -46,31 +44,22 @@ const requestBodySchema = z.object({
   message: z.string().optional(),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res, claims)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
-  const authorization = req.headers.authorization
+async function handlePost({ request, claims }: ApiHandlerContext) {
+  const authorization = request.headers.get('authorization') ?? undefined
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
-    return res.status(401).json({ error: 'Authorization token is required' })
+    return Response.json({ error: 'Authorization token is required' }, { status: 401 })
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const body = await parseJsonBody(request)
   const { data, error: parseError } = requestBodySchema.safeParse(body)
 
   if (parseError) {
-    return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
+    return Response.json(
+      { error: 'Invalid request body', issues: parseError.issues },
+      { status: 400 }
+    )
   }
 
   const { tableName, schema, columns = [], projectRef, connectionString, orgSlug, message } = data
@@ -86,10 +75,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
-    } catch (error) {
-      return res.status(400).json({
-        error: 'There was an error fetching your organization details',
-      })
+    } catch {
+      return Response.json(
+        { error: 'There was an error fetching your organization details' },
+        { status: 400 }
+      )
     }
   }
 
@@ -102,18 +92,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     })
 
     if (modelError) {
-      return res.status(500).json({ error: modelError.message })
+      return Response.json({ error: modelError.message }, { status: 500 })
     }
 
     // Closes the remote MCP connection opened in getTools when generation is done,
     // if anything below throws, or if the client disconnects mid-generation so the
     // connection isn't held until generateText resolves on its own (mirrors the
     // request-scoped cleanup in generate-v4.ts).
-    const toolsAbortController = new AbortController()
-    req.on('close', () => toolsAbortController.abort())
-    req.on('aborted', () => toolsAbortController.abort())
-    // Fires when the response finishes or the connection drops.
-    res.on('close', () => toolsAbortController.abort())
+    const done = new AbortController()
     try {
       const allTools = await getTools({
         projectRef,
@@ -122,7 +108,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         aiOptInLevel,
         accessToken,
         isExplorerEnabled: explorerEnabled,
-        signal: toolsAbortController.signal,
+        signal: AbortSignal.any([request.signal, done.signal]),
       })
       // One-shot generateText can't answer an approval request
       const tools = withoutApprovalTools(allTools)
@@ -165,28 +151,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         schema,
       }))
 
-      return res.json(policies)
+      return Response.json(policies)
     } finally {
-      toolsAbortController.abort()
+      done.abort()
     }
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI policy generation failed: ${error.message}`)
-      return res.status(500).json({
-        error: 'Failed to generate policy. Please try again.',
-      })
+      return Response.json(
+        { error: 'Failed to generate policy. Please try again.' },
+        { status: 500 }
+      )
     }
-    return res.status(500).json({
-      error: 'An unknown error occurred.',
-    })
+    return Response.json({ error: 'An unknown error occurred.' }, { status: 500 })
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
-
 export const Route = createFileRoute('/api/ai/sql/policy')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
+  },
 })

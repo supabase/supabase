@@ -1,12 +1,12 @@
 import { safeSql } from '@supabase/pg-meta'
-import { pipeUIMessageStreamToResponse, streamText, UIMessage } from 'ai'
-import { expect, test, vi } from 'vitest'
+import { streamText, UIMessage } from 'ai'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { Route } from '@/routes/api/ai/sql/generate-v4'
-import { getRouteHandler } from '@/tests/lib/server-route'
+import { callRoute } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
@@ -50,18 +50,31 @@ vi.mock('ai', async () => {
         },
       }),
     })),
-    // Consume the response, as the real Node response writer does.
-    pipeUIMessageStreamToResponse: vi.fn(async ({ stream }) => {
-      const chunks: unknown[] = []
-      const reader = stream.getReader()
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) return chunks
-        chunks.push(value)
-      }
-    }),
   }
 })
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+/** Makes the next streamText call return a stream that never ends on its own. */
+function mockOpenStream() {
+  vi.mocked(streamText).mockImplementationOnce(
+    () => ({ stream: new ReadableStream() }) as unknown as ReturnType<typeof streamText>
+  )
+}
+
+async function readSseChunks(response: Response): Promise<unknown[]> {
+  const text = await response.text()
+  const chunks: unknown[] = []
+  for (const line of text.split('\n')) {
+    if (!line.startsWith('data: ')) continue
+    const payload = line.slice('data: '.length)
+    if (payload === '[DONE]') continue
+    chunks.push(JSON.parse(payload))
+  }
+  return chunks
+}
 
 function createRequest() {
   const clientConnection = new AbortController()
@@ -97,18 +110,18 @@ function createRequest() {
 
   return {
     disconnectClient: () => clientConnection.abort(),
-    callGenerateV4: () => getRouteHandler(Route, 'POST')({ request }),
+    callGenerateV4: () => callRoute(Route, request),
   }
 }
 
-test('generateV4 calls the tool sanitizer', async () => {
+test('generateV4 calls the tool sanitizer and aborts MCP tools on client disconnect', async () => {
   // Keep the stream open so only the client disconnect can release the request.
-  vi.mocked(pipeUIMessageStreamToResponse).mockImplementationOnce(() => new Promise(() => {}))
+  mockOpenStream()
   const { disconnectClient, callGenerateV4 } = createRequest()
 
   const response = await callGenerateV4()
-  expect(pipeUIMessageStreamToResponse).toHaveBeenCalledOnce()
   expect(response.status).toBe(200)
+  expect(response.headers.get('content-encoding')).toBe('none')
 
   expect(sanitizeMessagePart).toHaveBeenCalled()
   expect(getTools).toHaveBeenCalledWith(
@@ -121,11 +134,24 @@ test('generateV4 calls the tool sanitizer', async () => {
   expect(signal?.aborted).toBe(false)
   disconnectClient()
   expect(signal?.aborted).toBe(true)
+  await response.body?.cancel()
+})
+
+test('generateV4 aborts MCP tools when the response stream is canceled', async () => {
+  // Keep the stream open so only canceling the response body can release the request.
+  mockOpenStream()
+  const { callGenerateV4 } = createRequest()
+
+  const response = await callGenerateV4()
+  expect(response.status).toBe(200)
+
+  const { signal } = vi.mocked(getTools).mock.calls[0][0]
+  expect(signal?.aborted).toBe(false)
+  await response.body?.cancel()
+  await vi.waitFor(() => expect(signal?.aborted).toBe(true))
 })
 
 test('generateV4 streams a tool result that continues the previous assistant message', async () => {
-  vi.mocked(streamText).mockClear()
-  vi.mocked(pipeUIMessageStreamToResponse).mockClear()
   // After an approval, streamText runs the approved tool first and streams its result into the
   // assistant message the client already has, so the tool call never appears in this stream.
   vi.mocked(streamText).mockImplementationOnce(
@@ -148,8 +174,8 @@ test('generateV4 streams a tool result that continues the previous assistant mes
   )
   const { callGenerateV4 } = createRequest()
 
-  await callGenerateV4()
-  const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
+  const response = await callGenerateV4()
+  const chunks = await readSseChunks(response)
 
   expect(chunks).toContainEqual(
     expect.objectContaining({ type: 'tool-output-available', toolCallId: 'test-tool-call-id' })
@@ -157,8 +183,6 @@ test('generateV4 streams a tool result that continues the previous assistant mes
 })
 
 test('generateV4 flags a response the deadline stopped and releases the request', async () => {
-  vi.mocked(streamText).mockClear()
-  vi.mocked(pipeUIMessageStreamToResponse).mockClear()
   vi.mocked(streamText).mockImplementationOnce(
     () =>
       ({
@@ -173,8 +197,8 @@ test('generateV4 flags a response the deadline stopped and releases the request'
   )
   const { callGenerateV4 } = createRequest()
 
-  await callGenerateV4()
-  const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
+  const response = await callGenerateV4()
+  const chunks = await readSseChunks(response)
 
   expect(chunks).toContainEqual({ type: 'message-metadata', messageMetadata: { timedOut: true } })
   const params = vi.mocked(streamText).mock.calls[0][0]
