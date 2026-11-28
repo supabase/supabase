@@ -24,7 +24,8 @@
     "next-themes": "catalog:",
     "posthog-js": "^1.416.1",
     "react-use": "^17.4.0",
-    "valtio": "catalog:"
+    "valtio": "catalog:",
+    "web-vitals": "^6.2.1"
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",
