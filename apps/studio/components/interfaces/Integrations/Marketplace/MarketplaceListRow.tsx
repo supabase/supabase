@@ -7,6 +7,7 @@ import {
   getMarketplaceSource,
   getMarketplaceType,
   getMarketplaceTypeLabel,
+  MarketplaceBuiltBy,
   MarketplaceSourceBadge,
 } from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
@@ -60,7 +61,11 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
       </TableCell>
 
       <TableCell className={`w-40 text-foreground-lighter ${HIDE_BELOW_4XL}`}>
-        {integration.author?.name || '—'}
+        {integration.author?.name ? (
+          <MarketplaceBuiltBy authorName={integration.author.name} source={source} />
+        ) : (
+          '—'
+        )}
       </TableCell>
 
       <TableCell className="w-24">

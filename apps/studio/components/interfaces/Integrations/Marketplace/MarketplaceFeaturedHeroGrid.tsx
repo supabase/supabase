@@ -139,7 +139,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                 <div className="flex-1" />
                 <div className="flex items-center justify-between gap-2 pt-2.5">
                   <div className="flex flex-wrap items-center gap-1">
-                    <MarketplaceSourceBadge source={primarySource} />
+                    <MarketplaceSourceBadge source={primarySource} officialTooltip="Official" />
                     {primaryIntegration.status && (
                       <Badge variant="warning">{primaryIntegration.status}</Badge>
                     )}
@@ -201,7 +201,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                     <div className="flex-1" />
                     <div className="flex items-center justify-between gap-2 pt-2.5">
                       <div className="flex flex-wrap items-center gap-1">
-                        <MarketplaceSourceBadge source={source} />
+                        <MarketplaceSourceBadge source={source} officialTooltip="Official" />
                         {integration.status && (
                           <Badge variant="warning">{integration.status}</Badge>
                         )}
