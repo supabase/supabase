@@ -2,7 +2,7 @@
 
 Generate Open Graph images with Deno and Supabase Edge Functions and cache the generated image with Supabase Storage CDN.
 
-- Docs: https://deno.land/x/og_edge@0.0.2
+- Docs: 
 - Examples: https://vercel.com/docs/og-image-generation#examples
 - Demo: https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-og?username=<username>
 
