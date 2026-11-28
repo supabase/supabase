@@ -11,6 +11,7 @@ const NEXT_PLUGIN_FILES = ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}']
 // Custom Supabase rules
 const noAwaitBeforeCopyToClipboard = require('./rules/no-await-before-copy-to-clipboard')
 const requireExplicitTabIndex = require('./rules/require-explicit-tabindex')
+const wrapJsxText = require('./rules/wrap-jsx-text')
 
 // Transitional config that turns off all the React Compiler hook rules that come bundled
 // with core-web-vitals@16. We want to upgrade to get exhaustive-deps updates without
@@ -33,6 +34,7 @@ const supabasePlugin = {
   rules: {
     'no-await-before-copy-to-clipboard': noAwaitBeforeCopyToClipboard,
     'require-explicit-tabindex': requireExplicitTabIndex,
+    'wrap-jsx-text': wrapJsxText,
   },
 }
 
