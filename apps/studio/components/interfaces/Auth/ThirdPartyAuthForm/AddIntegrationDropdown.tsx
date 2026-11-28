@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { ChevronDownIcon } from 'lucide-react'
 import {
   Button,
@@ -15,6 +16,8 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+
+export const SCALEKIT_TPA_FLAG = 'isScalekitTPAEnabled'
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
@@ -54,6 +57,8 @@ export const AddIntegrationDropdown = ({
   onOpenChange,
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
+  const isScalekitEnabled = useFlag<boolean>(SCALEKIT_TPA_FLAG)
+
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
@@ -67,6 +72,9 @@ export const AddIntegrationDropdown = ({
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
+        {isScalekitEnabled && (
+          <ProviderDropdownItem type="scalekit" onSelectIntegrationType={onSelectIntegrationType} />
+        )}
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="custom" onSelectIntegrationType={onSelectIntegrationType} />
