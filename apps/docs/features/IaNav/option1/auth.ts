@@ -46,8 +46,8 @@ export const auth: NavMenuConstant = {
           url: '/guides/auth/choosing-a-server-package',
           enabled: authFlowsEnabled,
         },
-        { name: 'Server SDK', url: '/reference/server' },
-        { name: 'Middleware SDK', url: '/reference/middleware' },
+        { name: 'Server SDK reference', url: '/reference/server' },
+        { name: 'Middleware SDK reference', url: '/reference/middleware' },
         {
           name: 'Server-side rendering',
           enabled: authFlowsEnabled,
@@ -95,18 +95,17 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
-      name: 'Social sign-in (OAuth)',
+      name: 'Sign-in options',
       enabled: allAuthProvidersEnabled && authFlowsEnabled,
       items: [
-        { name: 'Overview', url: '/guides/auth/social-sign-in' },
-        ...[...SocialSignInItems].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
-        { name: 'Custom OAuth/OIDC providers', url: '/guides/auth/custom-oauth-providers' },
-      ],
-    },
-    {
-      name: 'Other sign-in methods',
-      enabled: allAuthProvidersEnabled && authFlowsEnabled,
-      items: [
+        {
+          name: 'Social sign-in (OAuth)',
+          items: [
+            { name: 'Overview', url: '/guides/auth/social-sign-in' },
+            ...[...SocialSignInItems].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
+            { name: 'Custom OAuth/OIDC providers', url: '/guides/auth/custom-oauth-providers' },
+          ],
+        },
         { name: 'Password-based', url: '/guides/auth/passwords' },
         { name: 'Email (magic link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         { name: 'Phone sign-in', url: '/guides/auth/phone-login' },

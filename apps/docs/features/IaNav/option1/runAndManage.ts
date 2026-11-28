@@ -53,16 +53,16 @@ export const runAndManage: NavMenuConstant = {
                   url: '/guides/platform/project-transfer/vercel-marketplace',
                 },
                 {
-                  name: 'Pause a paid-plan project',
-                  url: '/guides/platform/project-transfer/pause-project',
-                },
-                {
                   name: 'Troubleshooting',
                   url: '/guides/platform/project-transfer/troubleshooting',
                 },
               ],
             },
             { name: 'Free project pausing', url: '/guides/platform/free-project-pausing' },
+            {
+              name: 'Pause a paid-plan project',
+              url: '/guides/platform/project-transfer/pause-project',
+            },
             { name: 'Delete a project', url: '/guides/platform/delete-project' },
           ],
         },
@@ -171,6 +171,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Secure product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        { name: 'Rotate a leaked API key', url: '/guides/security/rotate-leaked-api-keys' },
         {
           name: 'Security checklist',
           url: '/guides/security/production-checklist',
@@ -336,22 +337,16 @@ export const runAndManage: NavMenuConstant = {
     {
       name: 'Logs and monitoring',
       items: [
+        { name: 'Overview', url: '/guides/observability' },
         {
-          name: 'Logs',
+          name: 'Read project data',
           items: [
-            { name: 'Logs in Studio', url: '/guides/observability/logs' },
             { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
+            { name: 'Logs in Studio', url: '/guides/observability/logs' },
+            { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
             { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
-            { name: 'Configure logging', url: '/guides/observability/configure-logging' },
-            { name: 'Log drains', url: '/guides/observability/log-drains' },
-            {
-              name: 'Postgres connection logging',
-              url: '/guides/platform/postgres-connection-logging',
-            },
-            {
-              name: 'Log slow and failing queries',
-              url: '/guides/observability/log-slow-queries',
-            },
+            { name: 'Advisors', url: '/guides/observability/advisors' },
+            { name: 'Reports', url: '/guides/observability/reports' },
           ],
         },
         {
@@ -368,13 +363,9 @@ export const runAndManage: NavMenuConstant = {
             { name: 'Vendor-agnostic setup', url: '/guides/observability/metrics/vendor-agnostic' },
           ],
         },
-        { name: 'Reports', url: '/guides/observability/reports' },
         {
-          name: 'Advisors and health checks',
-          items: [
-            { name: 'Advisors', url: '/guides/observability/advisors' },
-            { name: 'Detection checks', url: '/guides/observability/detecting' },
-          ],
+          name: 'Detect and diagnose',
+          items: [{ name: 'Detection checks', url: '/guides/observability/detecting' }],
         },
         {
           name: 'Agent prompts',
@@ -390,8 +381,18 @@ export const runAndManage: NavMenuConstant = {
           ],
         },
         {
-          name: 'Tracing and error monitoring',
+          name: 'Configure and export',
           items: [
+            { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+            {
+              name: 'Log slow and failing queries',
+              url: '/guides/observability/log-slow-queries',
+            },
+            { name: 'Log drains', url: '/guides/observability/log-drains' },
+            {
+              name: 'Postgres connection logging',
+              url: '/guides/platform/postgres-connection-logging',
+            },
             { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
             { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
           ],
