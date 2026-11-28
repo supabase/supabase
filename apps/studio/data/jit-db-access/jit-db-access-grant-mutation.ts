@@ -54,7 +54,12 @@ export const useJitDbAccessGrantMutation = ({
 
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.members(projectRef) })
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.members(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.status(projectRef) }),
+      ])
+
       await onSuccess?.(data, variables, context, mutationContext)
     },
     async onError(data, variables, context, mutationContext) {

@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { EllipsisVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
@@ -5,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
   DropdownMenu,
@@ -20,11 +22,12 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import type { JitUserRule } from './JitDbAccess.types'
 import { getJitStatusDisplay } from './JitDbAccess.utils'
+import { JitDbAccessInfo } from './JitDbAccessInfo'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useJitDbAccessStatusQuery } from '@/data/jit-db-access/jit-db-access-status-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface JitDbAccessRulesTableProps {
@@ -48,6 +51,8 @@ export function JitDbAccessRulesTable({
   onEditRule,
   onDeleteRule,
 }: JitDbAccessRulesTableProps) {
+  const { ref: projectRef } = useParams()
+
   const addDisabled = disableActions || !canUpdate || allProjectMembersHaveRules
   const addRuleTooltip = !canUpdate
     ? 'Additional permissions required'
@@ -59,7 +64,11 @@ export function JitDbAccessRulesTable({
     FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
   )
 
-  if (isLoading) {
+  const { data: jitDbAccess, isPending: isLoadingUserJitDbAccess } = useJitDbAccessStatusQuery({
+    projectRef,
+  })
+
+  if (isLoading || isLoadingUserJitDbAccess) {
     return (
       <Card>
         <CardContent className="space-y-4 p-4">
@@ -73,15 +82,6 @@ export function JitDbAccessRulesTable({
           <Skeleton className="h-32 w-full" />
         </CardContent>
       </Card>
-    )
-  }
-
-  if (!canManageJitDbAccess) {
-    return (
-      <Admonition
-        title="You need additional permissions to view temporary database access"
-        description="Contact a project owner or administrator to request access"
-      />
     )
   }
 
@@ -107,122 +107,136 @@ export function JitDbAccessRulesTable({
           )}
         </CardHeader>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Member</TableHead>
-              <TableHead>Roles</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-1">
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.length === 0 ? (
-              <TableRow className="[&>td]:hover:bg-inherit">
-                <TableCell colSpan={4}>
-                  <p className="text-sm text-foreground">No rules yet</p>
-                  <p className="text-sm text-foreground-lighter">
-                    Add your first temporary access rule above
-                  </p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => {
-                const statusDisplay = getJitStatusDisplay(user.status)
-                const enabledGrants = user.grants.filter((grant) => grant.enabled)
-                const rowIsInteractive = canUpdate && !disableActions
+        <JitDbAccessInfo />
 
-                return (
-                  <TableRow
-                    key={user.id}
-                    className={rowIsInteractive ? 'relative focus-inset cursor-pointer' : undefined}
-                    onClick={
-                      rowIsInteractive
-                        ? (event) => {
-                            if ((event.target as HTMLElement).closest('button')) return
-                            onEditRule(user)
-                          }
-                        : undefined
-                    }
-                    onKeyDown={
-                      rowIsInteractive
-                        ? (event) => {
-                            if ((event.target as HTMLElement).closest('button')) return
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault()
+        {canManageJitDbAccess && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead>Roles</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-1">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.length === 0 ? (
+                <TableRow className="[&>td]:hover:bg-inherit">
+                  <TableCell colSpan={4}>
+                    <p className="text-sm text-foreground">No rules yet</p>
+                    <p className="text-sm text-foreground-lighter">
+                      Add your first temporary access rule above
+                    </p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                users.map((user) => {
+                  const statusDisplay = getJitStatusDisplay(user.status)
+                  const enabledGrants = user.grants.filter((grant) => grant.enabled)
+                  const rowIsInteractive = canUpdate && !disableActions
+
+                  return (
+                    <TableRow
+                      key={user.id}
+                      className={
+                        rowIsInteractive ? 'relative focus-inset cursor-pointer' : undefined
+                      }
+                      onClick={
+                        rowIsInteractive
+                          ? (event) => {
+                              if ((event.target as HTMLElement).closest('button')) return
                               onEditRule(user)
                             }
-                          }
-                        : undefined
-                    }
-                    tabIndex={rowIsInteractive ? 0 : undefined}
-                  >
-                    <TableCell className="text-sm">
-                      {user.name && <p>{user.name}</p>}
-                      <p className="text-foreground-lighter">{user.email}</p>
-                    </TableCell>
-                    <TableCell className="text-sm text-foreground-light">
-                      {enabledGrants.length} role
-                      {enabledGrants.length === 1 ? '' : <span>s</span>}
-                    </TableCell>
-                    <TableCell className="text-sm text-foreground-light">
-                      {statusDisplay.badges.length > 0 ? (
-                        <span className="flex flex-wrap gap-1.5">
-                          {statusDisplay.badges.map((badge) => (
-                            <Badge key={badge.label} variant={badge.variant}>
-                              {badge.label}
-                            </Badge>
-                          ))}
-                        </span>
-                      ) : null}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            icon={<EllipsisVerticalIcon />}
-                            aria-label="More actions"
-                            size="tiny"
-                            className="w-7 hit-area-2"
-                            disabled={!canUpdate || disableActions}
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" side="bottom" className="w-40">
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onEditRule(user)
-                            }}
-                            disabled={!canUpdate || disableActions}
-                          >
-                            <PencilIcon size={14} className="text-foreground-lighter" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onDeleteRule(user)
-                            }}
-                            disabled={!canUpdate || disableActions}
-                          >
-                            <Trash2Icon size={14} className="text-foreground-lighter" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
+                          : undefined
+                      }
+                      onKeyDown={
+                        rowIsInteractive
+                          ? (event) => {
+                              if ((event.target as HTMLElement).closest('button')) return
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                onEditRule(user)
+                              }
+                            }
+                          : undefined
+                      }
+                      tabIndex={rowIsInteractive ? 0 : undefined}
+                    >
+                      <TableCell className="text-sm">
+                        {user.name && <p>{user.name}</p>}
+                        <p className="text-foreground-lighter">{user.email}</p>
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground-light">
+                        {enabledGrants.length} role
+                        {enabledGrants.length === 1 ? '' : <span>s</span>}
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground-light">
+                        {statusDisplay.badges.length > 0 ? (
+                          <span className="flex flex-wrap gap-1.5">
+                            {statusDisplay.badges.map((badge) => (
+                              <Badge key={badge.label} variant={badge.variant}>
+                                {badge.label}
+                              </Badge>
+                            ))}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              icon={<EllipsisVerticalIcon />}
+                              aria-label="More actions"
+                              size="tiny"
+                              className="w-7 hit-area-2"
+                              disabled={!canUpdate || disableActions}
+                            />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" side="bottom" className="w-40">
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                onEditRule(user)
+                              }}
+                              disabled={!canUpdate || disableActions}
+                            >
+                              <PencilIcon size={14} className="text-foreground-lighter" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                onDeleteRule(user)
+                              }}
+                              disabled={!canUpdate || disableActions}
+                            >
+                              <Trash2Icon size={14} className="text-foreground-lighter" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
+
+      {!canManageJitDbAccess && jitDbAccess?.user_id !== undefined && (
+        <CardFooter>
+          <p className="text-foreground-lighter text-sm">
+            You need additional permissions to manage temporary database access
+          </p>
+        </CardFooter>
+      )}
     </Card>
   )
 }
