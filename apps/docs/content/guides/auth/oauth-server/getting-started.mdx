@@ -538,10 +538,9 @@ const supabase = createClient(
 
 // Create an OAuth client
 const { data, error } = await supabase.auth.admin.oauth.createClient({
-  name: 'My Third-Party App',
+  client_name: 'My Third-Party App',
   redirect_uris: ['https://my-app.com/auth/callback', 'https://my-app.com/auth/silent-callback'],
-  client_type: 'confidential',
-  // Optional: defaults to 'client_secret_basic' for confidential, 'none' for public
+  // Optional: 'client_secret_basic' (default) makes a confidential client, 'none' a public one
   token_endpoint_auth_method: 'client_secret_basic',
 })
 
@@ -568,7 +567,7 @@ supabase = create_client(
 
 # Create an OAuth client
 response = supabase.auth.admin.oauth.create_client({
-    'name': 'My Third-Party App',
+    'client_name': 'My Third-Party App',
     'redirect_uris': [
         'https://my-app.com/auth/callback',
         'https://my-app.com/auth/silent-callback'
@@ -594,7 +593,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
   -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "My Third-Party App",
+    "client_name": "My Third-Party App",
     "redirect_uris": [
       "https://my-app.com/auth/callback",
       "https://my-app.com/auth/silent-callback"
@@ -611,7 +610,7 @@ curl -X POST 'http://localhost:54321/auth/v1/admin/oauth/clients' \
   -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Local Dev App",
+    "client_name": "Local Dev App",
     "redirect_uris": ["http://localhost:3000/auth/callback"],
     "client_type": "confidential",
     "token_endpoint_auth_method": "client_secret_post"
@@ -624,7 +623,7 @@ Response:
 {
   "client_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
   "client_secret": "verysecret-1234567890abcdef...",
-  "name": "My Third-Party App",
+  "client_name": "My Third-Party App",
   "redirect_uris": ["https://my-app.com/auth/callback", "https://my-app.com/auth/silent-callback"],
   "client_type": "confidential",
   "token_endpoint_auth_method": "client_secret_basic",
