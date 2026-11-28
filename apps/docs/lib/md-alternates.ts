@@ -5,6 +5,11 @@ const SLUGS = new Set<string>(MARKDOWN_SLUGS)
 
 export const MARKDOWN_CONTENT_TYPE = 'text/markdown; charset=utf-8'
 
+/** `alternates.types` entry pointing at a page's Markdown twin. */
+export function mdAlternateAt(url: string): { 'text/markdown': string } {
+  return { 'text/markdown': url }
+}
+
 export function mdUrl(slug: string): string | undefined {
   if (!SLUGS.has(slug)) return undefined
   return `${PROD_URL}/guides/${slug}.md`
@@ -12,5 +17,5 @@ export function mdUrl(slug: string): string | undefined {
 
 export function mdAlternate(slug: string): { 'text/markdown': string } | undefined {
   const url = mdUrl(slug)
-  return url ? { 'text/markdown': url } : undefined
+  return url ? mdAlternateAt(url) : undefined
 }

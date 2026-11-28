@@ -16,9 +16,12 @@ import {
 const RevVersionDropdown = ({
   library,
   currentVersion,
+  hrefs,
 }: {
   library: string
   currentVersion: string
+  /** Per-version targets, to keep the reader on the same page when it exists there */
+  hrefs?: Record<string, string>
 }) => {
   const { push } = useRouter()
 
@@ -36,7 +39,9 @@ const RevVersionDropdown = ({
   const stableVersions = versions.filter((version) => !getPrereleaseStage(library, version))
 
   const onSelectVersion = (version: string) => {
-    if (version === versions[0]) {
+    if (hrefs?.[version]) {
+      push(hrefs[version])
+    } else if (version === versions[0]) {
       push(`/reference/${library}`)
     } else {
       push(`/reference/${library}/${version}`)
