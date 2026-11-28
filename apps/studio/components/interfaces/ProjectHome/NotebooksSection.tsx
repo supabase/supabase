@@ -13,12 +13,19 @@ import {
   useNotebooksInfiniteQuery,
   type NotebookRow,
 } from '@/data/content/notebooks/notebooks-infinite-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 const MAX_HOMEPAGE_NOTEBOOKS = 4
 
 export const NotebooksSection = () => {
   const { ref: projectRef } = useParams()
   const { createNotebook } = useCreateNotebook()
+  const track = useTrack()
+
+  const onCreateNotebook = () => {
+    track('home_notebook_action_clicked', { action: 'create' })
+    createNotebook()
+  }
 
   const { data, error, isPending, isError, isSuccess, refetch } = useNotebooksInfiniteQuery({
     projectRef,
@@ -44,7 +51,7 @@ export const NotebooksSection = () => {
       {!isPending && (
         <div className="flex justify-between items-center mb-6">
           <h2>Notebooks</h2>
-          <Button icon={<PlusIcon />} onClick={() => createNotebook()}>
+          <Button icon={<PlusIcon />} onClick={onCreateNotebook}>
             New notebook
           </Button>
         </div>
@@ -63,9 +70,7 @@ export const NotebooksSection = () => {
         />
       )}
 
-      {isSuccess && notebooks.length === 0 && (
-        <EmptyState onCreateNotebook={() => createNotebook()} />
-      )}
+      {isSuccess && notebooks.length === 0 && <EmptyState onCreateNotebook={onCreateNotebook} />}
 
       {isSuccess && notebooks.length > 0 && (
         <Row maxColumns={4} minWidth={280}>
@@ -86,6 +91,7 @@ function NotebookCard({
   projectRef: string | undefined
 }) {
   const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
+  const track = useTrack()
 
   const cellCount = notebook.content?.cells?.length
   // Treat an unknown cell count as empty so Analyze is never offered on a notebook with no cells
@@ -111,7 +117,10 @@ function NotebookCard({
             className="w-7 h-7 px-1.5"
             icon={<AiIconAnimation size={16} loading={isCreating} />}
             disabled={isEmpty}
-            onClick={() => analyzeNotebook({ id: notebook.id, name: notebook.name })}
+            onClick={() => {
+              track('home_notebook_action_clicked', { action: 'analyze' })
+              analyzeNotebook({ id: notebook.id, name: notebook.name })
+            }}
             aria-label="Analyze"
             tooltip={{
               content: {

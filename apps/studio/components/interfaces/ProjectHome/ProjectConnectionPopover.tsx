@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { HomeProjectCredentialCopiedEvent } from 'common/telemetry-constants'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -31,6 +32,10 @@ import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
 import { pluckObjectFields } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+
+type CredentialType = HomeProjectCredentialCopiedEvent['properties']['credentialType']
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
 const EMPTY_CONNECTION_INFO = {
@@ -63,6 +68,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const { setConnectSheetSource } = useAppStateSnapshot()
+  const track = useTrack()
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
   const isLoadingPermissions = apiKeysGrant.status === 'loading'
@@ -118,10 +125,20 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   // behavior is unchanged.
   const showPublishableKey = IS_PLATFORM || !!publishableKey?.api_key
 
-  const menuItems = useMemo(
+  const menuItems = useMemo<
+    {
+      label: string
+      credentialType: CredentialType
+      value: string
+      displayValue: string
+      disabled: boolean
+      icon: typeof Link2Icon
+    }[]
+  >(
     () => [
       {
         label: 'Project URL',
+        credentialType: 'project_url',
         value: projectUrl ?? '',
         displayValue: isLoadingApiUrl
           ? 'Loading project URL...'
@@ -133,6 +150,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         ? [
             {
               label: 'Publishable key',
+              credentialType: 'publishable_key' as const,
               value: publishableKey?.api_key ?? '',
               displayValue: getPublishableKeyDisplay({
                 grantStatus: apiKeysGrant.status,
@@ -152,6 +170,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         ? [
             {
               label: 'Direct connection string',
+              credentialType: 'direct_connection_string' as const,
               value: directConnectionString,
               displayValue: isLoadingDatabases
                 ? 'Loading connection string...'
@@ -161,6 +180,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             },
             {
               label: 'CLI setup commands',
+              credentialType: 'cli_setup' as const,
               value: cliCommands,
               displayValue: cliCommands.replace(/\n/g, ' - '),
               disabled: !projectRef,
@@ -231,6 +251,9 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
 
                     copyToClipboard(item.value)
                     setCopiedItem(item.label)
+                    track('home_project_credential_copied', {
+                      credentialType: item.credentialType,
+                    })
                   }}
                 >
                   <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
@@ -264,6 +287,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 className="w-full"
                 onClick={() => {
                   setOpen(false)
+                  setConnectSheetSource('home_popover')
                   setShowConnect(true)
                 }}
               >

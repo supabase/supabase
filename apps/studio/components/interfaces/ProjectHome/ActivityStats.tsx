@@ -166,6 +166,7 @@ export const ActivityStats = () => {
           href={getInfrastructurePath(ref)}
           icon={<CpuIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Compute size</span>}
+          trackingProperties={{ stat_type: 'compute' }}
           value={
             <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               {project?.infra_compute_size ? (
@@ -187,6 +188,7 @@ export const ActivityStats = () => {
           href={integrationsPath}
           icon={<GithubIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>GitHub</span>}
+          trackingProperties={{ stat_type: 'github', stat_value: githubConnection ? 1 : 0 }}
           value={
             isLoadingGithubConnections ? (
               <Skeleton className="h-6 w-24" />
