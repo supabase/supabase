@@ -165,19 +165,27 @@ const EdgeFunctionDetailsLayout = ({
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
 
-    zipEntries.forEach(({ path, content }) => {
-      zipWriter.add(path, new BlobReader(new Blob([content])))
-    })
+    try {
+      await Promise.all(
+        zipEntries.map(({ path, content }) =>
+          zipWriter.add(path, new BlobReader(new Blob([content])))
+        )
+      )
 
-    const blobURL = URL.createObjectURL(await zipWriter.close())
-    const link = document.createElement('a')
-    link.href = blobURL
-    link.setAttribute('download', `${functionSlug}.zip`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode?.removeChild(link)
-    // Deferred so the browser has started the download before the URL is released
-    setTimeout(() => URL.revokeObjectURL(blobURL), 0)
+      const blobURL = URL.createObjectURL(await zipWriter.close())
+      const link = document.createElement('a')
+      link.href = blobURL
+      link.setAttribute('download', `${functionSlug}.zip`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode?.removeChild(link)
+      // Deferred so the browser has started the download before the URL is released
+      setTimeout(() => URL.revokeObjectURL(blobURL), 0)
+    } catch (error) {
+      return toast.error(
+        `Failed to download edge function: ${getErrorMessage(error, 'Unknown error')}`
+      )
+    }
   }
 
   const handleDownloadZip = async () => {

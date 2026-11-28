@@ -73,6 +73,74 @@ describe('formatFunctionBodyToFiles', () => {
       { id: 2, name: 'b.ts', content: 'bar', state: 'unchanged' },
     ])
   })
+
+  it('does not mutate functionBody.files so cached multipart paths stay intact for ZIP downloads', () => {
+    const functionBody = {
+      files: [
+        { name: 'source/auth/index.ts', content: 'entry' },
+        { name: 'source/auth/auth/handler.ts', content: 'nested' },
+        { name: 'source/auth/handler.ts', content: 'root' },
+      ],
+      metadata: { deno2_entrypoint_path: 'source/auth/index.ts' },
+    }
+
+    const formatted = formatFunctionBodyToFiles({ functionBody })
+    expect(formatted.map((f) => f.name)).toEqual(['auth/handler.ts', 'handler.ts', 'index.ts'])
+    expect(functionBody.files.map((f) => f.name)).toEqual([
+      'source/auth/index.ts',
+      'source/auth/auth/handler.ts',
+      'source/auth/handler.ts',
+    ])
+
+    const zipEntries = getFunctionZipEntries({
+      files: functionBody.files,
+      slug: 'auth',
+      source: 'multipart',
+    })
+    expect(zipEntries.map((e) => e.path)).toEqual(['index.ts', 'auth/handler.ts', 'handler.ts'])
+
+    const frozenBody = {
+      files: [Object.freeze({ name: 'source/auth/index.ts', content: 'entry' })],
+      metadata: { deno2_entrypoint_path: 'source/auth/index.ts' },
+    }
+    expect(formatFunctionBodyToFiles({ functionBody: frozenBody }).map((f) => f.name)).toEqual([
+      'index.ts',
+    ])
+  })
+
+  it('preserves shared-module and nested-entrypoint multipart paths for ZIP downloads after formatting', () => {
+    const sharedBody = {
+      files: [
+        { name: 'source/auth/index.ts', content: 'entry' },
+        { name: 'source/auth/../_shared/auth/jwt.ts', content: 'jwt' },
+      ],
+      metadata: { deno2_entrypoint_path: 'source/auth/index.ts' },
+    }
+    formatFunctionBodyToFiles({ functionBody: sharedBody })
+    expect(
+      getFunctionZipEntries({
+        files: sharedBody.files,
+        slug: 'auth',
+        source: 'multipart',
+      }).map((e) => e.path)
+    ).toEqual(['src/index.ts', '_shared/auth/jwt.ts'])
+
+    const nestedBody = {
+      files: [
+        { name: 'source/hello/app/index.ts', content: 'entry' },
+        { name: 'source/hello/deno.json', content: '{}' },
+      ],
+      metadata: { deno2_entrypoint_path: 'source/hello/app/index.ts' },
+    }
+    formatFunctionBodyToFiles({ functionBody: nestedBody })
+    expect(
+      getFunctionZipEntries({
+        files: nestedBody.files,
+        slug: 'hello',
+        source: 'multipart',
+      }).map((e) => e.path)
+    ).toEqual(['app/index.ts', 'deno.json'])
+  })
 })
 
 describe('formatFunctionBodyToFiles sorting', () => {
