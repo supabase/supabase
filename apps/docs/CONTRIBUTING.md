@@ -2,9 +2,69 @@
 
 Our docs help developers to get started and keep succeeding with Supabase. We welcome contributions from everyone.
 
-If you'd like to contribute, pick a [recommended issue](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22) or [open an issue](https://github.com/supabase/supabase/issues/new/choose) with your question or idea first. Link the issue in your pull request. GitHub automatically requests a review from the Docs team (`@supabase/docs`).
+If you'd like to contribute, pick a [recommended issue](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22) or [open an issue](https://github.com/supabase/supabase/issues/new/choose) with your question or idea first. Link the issue in your pull request. GitHub automatically requests a review from the Docs team (`@supabase/docs`). To learn how your PR gets reviewed and merged, see [Pull request review](#pull-request-review).
 
 How to write a docs page is covered by the [style guide](./style-guide/README.md). If you write with an agent, use our [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring), including the skills that help you frame a page and place it in the information architecture. Be sure to give your changes human review.
+
+## Pull request review
+
+The Docs team (`@supabase/docs`) reviews every docs pull request (PR). How a PR gets reviewed and merged depends on where it comes from:
+
+- **Branch PRs** come from a branch in the `supabase/supabase` repository. Most Supabase team members open these.
+- **Fork PRs** come from a fork of the repository. Most community contributors open these.
+
+### Pick a review category
+
+Branch PRs need a review category. In the **Review category** section of the PR template, select the category that fits your change. The category sets the review deadline, counted in business days from when the PR is marked ready for review.
+
+| Category | Use it when                                                  | Review deadline  |
+| -------- | ------------------------------------------------------------ | ---------------- |
+| Critical | The change needs a review as soon as possible                | 1 business day   |
+| Urgent   | The feature ships soon, or the change is blocking other work | 3 business days  |
+| Moderate | The change is good to have soon, but not urgent              | 5 business days  |
+| Low      | The change can wait until a reviewer has time                | 10 business days |
+
+A check fails until a branch PR has a category, and the PR can't merge while the check fails.
+
+Fork PRs don't need a category. They're always reviewed as Low.
+
+### Keep blocked PRs as drafts
+
+If your PR depends on another PR or on a feature that hasn't shipped, keep it as a draft until the blocker is resolved. Start the PR description with a callout that names the blocker:
+
+```markdown
+> [!WARNING]
+> This PR relies on #000 being merged first.
+```
+
+If a blocked PR is marked ready for review, a Docs team reviewer converts it back to a draft.
+
+### Claim a PR to review it
+
+Every docs PR requests a review from `@supabase/docs`. To claim a PR, a Docs team member adds themselves as a reviewer. A PR counts as claimed when a Docs team member is requested as a reviewer by name, or has submitted a review. More than one person can claim the same PR.
+
+### Merge an approved PR
+
+Who merges depends on the type of PR:
+
+- **Branch PRs:** the author merges their own PR after a Docs team member approves it.
+- **Fork PRs:** the Docs team member who approves the PR merges it, because fork authors can't merge.
+
+Approvals from community reviewers outside the Docs team don't replace a Docs review. A Docs team member still claims, approves, and merges those PRs.
+
+If an approved PR has passing checks and no activity for 3 days, a bot comment reminds the person who needs to merge it.
+
+### Inactive PRs
+
+A PR that's ready for review gets reminders when it has no activity, and then closes:
+
+| Days without activity | What happens                                               |
+| --------------------- | ---------------------------------------------------------- |
+| 15                    | A comment reminds the author that the PR closes at 60 days |
+| 30                    | A comment warns that the PR closes on a specific date      |
+| 60                    | The PR closes                                              |
+
+Any activity, such as a commit, comment, or review, resets the count. Drafts are exempt, so blocked PRs can wait as long as they need to.
 
 ## Style guide
 
