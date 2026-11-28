@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ChevronRightIcon, MinusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { cn, TableCell, TableRow } from 'ui'
@@ -37,7 +37,7 @@ interface DestinationRowProps {
 }
 
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -103,7 +103,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const hasUpdate = Boolean(versionData?.new_version)
 
   const handleNavigation = pipeline
-    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
+    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, navigate)
     : undefined
 
   const onDeleteClick = async () => {

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -34,6 +34,7 @@ import { Snippet } from '@/data/content/sql-folders-query'
 import type { SqlSnippet } from '@/data/content/sql-snippets-query'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_PLATFORM } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -57,7 +58,7 @@ interface RenameQueryFormProps {
 
 const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
@@ -140,7 +141,7 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
         const tabId = createTabId('sql', { id })
         if (tabsSnap.hasTab(tabId)) {
           tabsSnap.removeTab(tabId)
-          await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+          await navigateToUrl(navigate, `/project/${ref}/sql/${changedSnippet.id}`)
         }
       }
 

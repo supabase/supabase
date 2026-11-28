@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Badge,
@@ -31,6 +31,7 @@ import { filterComputeInstances, formatResources, getPage } from './Compute.util
 import { ComputeInstanceStatePill } from './ComputeInstanceStatePill'
 import { RuntimeBadge } from './RuntimeBadge'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface ComputeListProps {
   projectRef: string
@@ -68,7 +69,7 @@ export const ComputeList = ({
   onRefresh,
   isRefreshing,
 }: ComputeListProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<ComputeInstanceBuildState | 'all'>('all')
   const [accessFilter, setAccessFilter] = useState<ComputeInstanceAccess | 'all'>('all')
@@ -169,7 +170,7 @@ export const ComputeList = ({
               <TableRow
                 key={instance.name}
                 className="cursor-pointer"
-                onClick={() => router.push(computeInstancePagePath(instance.name))}
+                onClick={() => void navigateToUrl(navigate, computeInstancePagePath(instance.name))}
               >
                 <TableCell className="max-w-0 font-medium text-foreground">
                   <Link

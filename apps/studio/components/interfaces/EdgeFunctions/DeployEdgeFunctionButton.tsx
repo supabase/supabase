@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ChevronDownIcon, CodeIcon, TerminalIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
   AiIconAnimation,
@@ -18,7 +18,7 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const DeployEdgeFunctionButton = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -49,7 +49,7 @@ export const DeployEdgeFunctionButton = () => {
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuItem
           onSelect={() => {
-            router.push(`/project/${ref}/functions/new`)
+            if (ref) void navigate({ to: '/project/$ref/functions/new', params: { ref } })
             track('edge_function_via_editor_button_clicked', { origin: 'secondary_action' })
           }}
           className="gap-4"

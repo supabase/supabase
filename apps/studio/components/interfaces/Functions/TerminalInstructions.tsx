@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -25,7 +25,7 @@ export const TerminalInstructions = forwardRef<
   ElementRef<typeof Collapsible>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)
 
@@ -136,7 +136,7 @@ export const TerminalInstructions = forwardRef<
                 You can create a secure access token in your account section
               </p>
             </div>
-            <Button onClick={() => router.push('/account/tokens')}>Access tokens</Button>
+            <Button onClick={() => void navigate({ to: '/account/tokens' })}>Access tokens</Button>
           </div>
         ) : (
           <div className="py-4 space-y-3 border-t">

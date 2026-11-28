@@ -3,7 +3,6 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
-import router from 'next-router-mock'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -12,7 +11,7 @@ import type { ReplicationCostEstimateData } from '@/data/replication/cost-estima
 import { replicationKeys } from '@/data/replication/keys'
 import { DOCS_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
@@ -193,14 +192,16 @@ const renderWizard = (
 
 describe('PipelineCreationFlow', () => {
   it('keeps header navigation pending until dirty changes are discarded', async () => {
-    const push = vi.spyOn(router, 'push')
+    const testRouter = createTestRouter('/project/default/database/pipelines/new')
+    const navigateSpy = vi.spyOn(testRouter, 'navigate')
     customRender(
-      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
+      { router: testRouter }
     )
     selectDestination(/Snowflake/)
     fireEvent.click(screen.getByRole('link', { name: 'Supabase home', hidden: true }))
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
-    expect(push).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
 
     fireEvent.click(
       within(screen.getByRole('alertdialog')).getByRole('button', {
@@ -208,15 +209,14 @@ describe('PipelineCreationFlow', () => {
         hidden: true,
       })
     )
-    expect(push).not.toHaveBeenCalled()
+    expect(navigateSpy).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('link', { name: 'Supabase home', hidden: true }))
     const discard = await screen.findByRole('button', { name: 'Discard changes' })
     fireEvent.click(discard)
 
     await waitFor(() =>
-      expect(push).toHaveBeenCalledWith(`${window.location.origin}/organizations`)
+      expect(navigateSpy).toHaveBeenCalledWith(expect.objectContaining({ to: '/organizations' }))
     )
-    push.mockRestore()
   })
 
   it.each([

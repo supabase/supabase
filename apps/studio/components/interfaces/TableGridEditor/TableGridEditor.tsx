@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
@@ -26,7 +25,7 @@ import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
-import { useTabsStateSnapshot } from '@/state/tabs'
+import { useTabRouter, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -37,7 +36,7 @@ export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
-  const router = useRouter()
+  const router = useTabRouter()
   const { ref: projectRef, id } = useParams()
   const { setLastVisitedTable } = useDashboardHistory()
   const { selectedSchema } = useQuerySchemaState()

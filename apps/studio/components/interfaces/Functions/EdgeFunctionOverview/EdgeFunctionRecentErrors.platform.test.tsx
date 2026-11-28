@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
+import routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
@@ -19,9 +20,6 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 type AnalyticsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
 vi.unmock('common')
-
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
 
 const removeRouteParser = routerMock.useParser(
   createDynamicRouteParser(['/project/[ref]/functions/[functionSlug]'])
@@ -141,7 +139,10 @@ const renderErrors = () => {
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>
   )
-  const rendered = customRender(content('fn-1'), { queryClient })
+  const rendered = customRender(content('fn-1'), {
+    queryClient,
+    initialUrl: '/project/default/functions/hello-world',
+  })
   return {
     ...rendered,
     renderFunction: (functionId: string) => rendered.rerender(content(functionId)),
@@ -197,12 +198,12 @@ describe('EdgeFunctionRecentErrors', () => {
   it('opens the clicked error in the Logs tab with the same filters', async () => {
     mockLogs({ rows: [0, 1].map((index) => errorRow(index)), totalErrors: 2, invocationCount: 20 })
 
-    renderErrors()
+    const { router } = renderErrors()
 
     await userEvent.click(await screen.findByText('TypeError: failure 1'))
 
-    await waitFor(() => expect(routerMock.query.id).toBe('log-1'))
-    const url = new URL(routerMock.asPath, 'http://localhost')
+    await waitFor(() => expect(router.state.location.search).toMatchObject({ id: 'log-1' }))
+    const url = new URL(router.state.location.href, 'http://localhost')
     expect(url.pathname).toBe('/project/default/functions/hello-world/logs')
     expect(url.searchParams.get('filter')).toBe('level:eq:error')
     expect(url.searchParams.get('id')).toBe('log-1')
@@ -218,18 +219,24 @@ describe('EdgeFunctionRecentErrors', () => {
       invocationCount: 20,
     })
 
-    renderErrors()
+    const { router } = renderErrors()
 
     await userEvent.click(await screen.findByText('TypeError: failure 0'))
-    const runtimeUrl = new URL(routerMock.asPath, 'http://localhost')
-    expect(runtimeUrl.pathname).toBe('/project/default/functions/hello-world/logs')
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/project/default/functions/hello-world/logs')
+    )
+    const runtimeUrl = new URL(router.state.location.href, 'http://localhost')
     expect(runtimeUrl.searchParams.get('log')).toBe('log-0')
     expect(runtimeUrl.searchParams.get('its')).toBeTruthy()
     expect(runtimeUrl.searchParams.get('ite')).toBeTruthy()
 
     await userEvent.click(screen.getByText('TypeError: failure 1'))
-    const invocationUrl = new URL(routerMock.asPath, 'http://localhost')
-    expect(invocationUrl.pathname).toBe('/project/default/functions/hello-world/invocations')
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        '/project/default/functions/hello-world/invocations'
+      )
+    )
+    const invocationUrl = new URL(router.state.location.href, 'http://localhost')
     expect(invocationUrl.searchParams.get('log')).toBe('log-1')
   })
 

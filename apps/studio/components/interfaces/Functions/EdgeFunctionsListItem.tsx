@@ -1,8 +1,8 @@
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, useFlag } from 'common'
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { CheckIcon, CopyIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo, useState, type MouseEvent } from 'react'
 import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -23,7 +23,7 @@ interface EdgeFunctionsListItemProps {
 }
 
 export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
@@ -35,7 +35,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
 
   const handleNavigation = createNavigationHandler(
     `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
-    router
+    navigate
   )
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })

@@ -16,7 +16,6 @@ vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
   return { ...actual, useIsLoggedIn: () => true, useParams: () => ({ ref: 'default' }) }
 })
-vi.mock('next/router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 const withoutKeysRead = (): PermissionsV2Response => ({
   organizations: [

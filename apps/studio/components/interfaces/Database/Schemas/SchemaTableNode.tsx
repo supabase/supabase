@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Handle, Node, NodeProps } from '@xyflow/react'
 import { TableEditor } from 'icons'
 import {
@@ -11,7 +12,6 @@ import {
   MoreVerticalIcon,
   Table2Icon,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { memo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -36,6 +36,7 @@ import { getTableDefinition } from '@/data/database/table-definition-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 // ReactFlow is scaling everything by the factor of 2
@@ -59,7 +60,7 @@ const TableNodeComponent = ({
   const { can: canUpdateColumns } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
-  const router = useRouter()
+  const navigate = useNavigate()
   const track = useTrack()
   const itemHeight = 'h-[22px]'
 
@@ -147,7 +148,8 @@ const TableNodeComponent = ({
                           data-attr="schema-visualizer-node-open-editor"
                           className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={() =>
-                            router.push(
+                            void navigateToUrl(
+                              navigate,
                               buildTableEditorUrl({
                                 projectRef: project?.ref,
                                 tableId: data.id,

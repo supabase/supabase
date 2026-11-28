@@ -359,27 +359,29 @@ describe('DestinationRow', () => {
 
   test('navigates to the pipeline when the row is clicked', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/pipelines')
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+    const { router } = customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      initialUrl: '/project/default/database/pipelines',
+    })
 
     const row = (await screen.findByText('supabase_realtime')).closest('tr')
     expect(row).not.toBeNull()
     await userEvent.click(row!)
 
-    expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
+    await waitFor(() =>
+      expect(router.state.location.href).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
+    )
   })
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/pipelines')
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+    const { router } = customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      initialUrl: '/project/default/database/pipelines',
+    })
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
-    expect(routerMock.asPath).toBe('/project/default/database/pipelines')
+    expect(router.state.location.href).toBe('/project/default/database/pipelines')
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {

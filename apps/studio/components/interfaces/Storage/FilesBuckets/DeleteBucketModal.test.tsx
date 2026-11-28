@@ -116,7 +116,9 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />)
+    const { router } = customRender(<Page onClose={onClose} />, {
+      initialUrl: `/project/default/storage/files`,
+    })
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
@@ -129,13 +131,14 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
+    expect(router.state.location.href).toStrictEqual(`/project/default/storage/files`)
   })
 
   it(`navigates from the deleted bucket's page to the buckets list`, async () => {
-    routerMock.setCurrentUrl(`/project/default/storage/files/buckets/${bucket.id}?action=delete`)
+    const bucketUrl = `/project/default/storage/files/buckets/${bucket.id}?action=delete`
+    routerMock.setCurrentUrl(bucketUrl)
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />)
+    const { router } = customRender(<Page onClose={onClose} />, { initialUrl: bucketUrl })
 
     await userEvent.click(screen.getByRole(`button`, { name: `Open` }))
     await screen.findByRole(`dialog`)
@@ -143,7 +146,9 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.type(screen.getByPlaceholderText(`Type bucket name`), bucket.id)
     fireEvent.click(screen.getByRole(`button`, { name: `Delete bucket` }))
 
-    await waitFor(() => expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`))
+    await waitFor(() =>
+      expect(router.state.location.href).toStrictEqual(`/project/default/storage/files`)
+    )
     expect(onClose).not.toHaveBeenCalled()
   })
 })

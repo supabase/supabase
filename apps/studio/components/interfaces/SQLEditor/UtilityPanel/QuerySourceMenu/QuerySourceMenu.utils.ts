@@ -2,10 +2,10 @@ import { type SqlSnippetSource } from '../../querySource'
 
 export type SourceSwitchNavigation = {
   /**
-   * `push` opens a new tab (leaving the current snippet intact); `replace`
+   * `false` opens a new tab (leaving the current snippet intact); `true`
    * re-flavors the current blank tab in place without a history entry.
    */
-  method: 'push' | 'replace'
+  replace: boolean
   url: string
 }
 
@@ -36,7 +36,7 @@ export function resolveSourceSwitch({
   if (!ref || target === currentSource) return null
   const suffix = target === 'logs' ? '&source=logs' : ''
   return {
-    method: isBlankNewTab ? 'replace' : 'push',
+    replace: isBlankNewTab,
     // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
     url: `/project/${ref}/sql/new?skip=true${suffix}`,
   }

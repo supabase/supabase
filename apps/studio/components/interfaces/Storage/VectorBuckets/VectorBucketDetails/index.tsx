@@ -1,8 +1,8 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { SqlEditor, TableEditor } from 'icons'
 import { MoreVerticalIcon, SearchIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -49,9 +49,10 @@ import { AlertError } from '@/components/ui/AlertError'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketQuery } from '@/data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
+import { navigateToUrl } from '@/lib/navigation'
 
 export const VectorBucketDetails = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, bucketId } = useParams()
   const { data: _bucket, isSuccess } = useSelectedVectorBucket()
 
@@ -326,7 +327,7 @@ export const VectorBucketDetails = () => {
         onCancel={() => setShowDeleteModal(false)}
         onSuccess={() => {
           setShowDeleteModal(false)
-          router.push(`/project/${projectRef}/storage/vectors`)
+          void navigateToUrl(navigate, `/project/${projectRef}/storage/vectors`)
         }}
       />
     </>

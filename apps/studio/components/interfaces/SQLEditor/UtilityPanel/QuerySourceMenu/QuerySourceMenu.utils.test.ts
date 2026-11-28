@@ -11,7 +11,7 @@ describe('resolveSourceSwitch', () => {
         currentSource: 'database',
         isBlankNewTab: false,
       })
-    ).toEqual({ method: 'push', url: '/project/abc/sql/new?skip=true&source=logs' })
+    ).toEqual({ replace: false, url: '/project/abc/sql/new?skip=true&source=logs' })
   })
 
   it('re-flavors in place (replace) on a brand-new blank tab', () => {
@@ -22,7 +22,7 @@ describe('resolveSourceSwitch', () => {
         currentSource: 'database',
         isBlankNewTab: true,
       })
-    ).toEqual({ method: 'replace', url: '/project/abc/sql/new?skip=true&source=logs' })
+    ).toEqual({ replace: true, url: '/project/abc/sql/new?skip=true&source=logs' })
   })
 
   it('omits the source param when switching to database (the default source)', () => {
@@ -33,7 +33,7 @@ describe('resolveSourceSwitch', () => {
         currentSource: 'logs',
         isBlankNewTab: false,
       })
-    ).toEqual({ method: 'push', url: '/project/abc/sql/new?skip=true' })
+    ).toEqual({ replace: false, url: '/project/abc/sql/new?skip=true' })
   })
 
   it('is a no-op when the snippet is already on the target source', () => {

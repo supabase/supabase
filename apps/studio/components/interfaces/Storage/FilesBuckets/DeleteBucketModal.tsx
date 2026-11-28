@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { getPolicyBucketNames } from '@/components/interfaces/Storage/Storage.utils'
@@ -10,6 +10,7 @@ import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/databa
 import { useBucketDeleteMutation } from '@/data/storage/bucket-delete-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 
 export interface DeleteBucketModalProps {
   visible: boolean
@@ -18,7 +19,7 @@ export interface DeleteBucketModalProps {
 }
 
 export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -37,7 +38,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
       if (bucketId) {
-        await router.push(`/project/${projectRef}/storage/files`)
+        await navigateToUrl(navigate, `/project/${projectRef}/storage/files`)
       } else {
         onClose()
       }

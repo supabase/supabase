@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ClockIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -21,7 +21,7 @@ import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/use
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const BackupsList = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
   const { hasAccess: hasAccessToBackups } = useCheckEntitlements('backup.retention_days')
@@ -46,7 +46,7 @@ export const BackupsList = () => {
               'DD MMM YYYY HH:mm:ss'
             )}`
           )
-          router.push(`/project/${projectRef}`)
+          void navigate({ to: '/project/$ref', params: { ref: projectRef } })
         }, 3000)
       }
     },

@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { SaveIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
@@ -39,7 +39,7 @@ export const SaveQueryDropdown = ({
   query,
   source,
 }: PropsWithChildren<SaveQueryDropdownProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { createNotebook } = useCreateNotebook()
   const notebooksSnap = useNotebooksStateSnapshot()
@@ -82,7 +82,10 @@ export const SaveQueryDropdown = ({
       })
       notebooksSnap.requestScrollToBottom(notebookId)
 
-      router.push(`/project/${ref}/explorer/notebook/${notebookId}`)
+      void navigate({
+        to: '/project/$ref/explorer/notebook/$id',
+        params: { ref, id: notebookId },
+      })
     } catch (error) {
       toast.error('Failed to add query to notebook')
     }

@@ -1,5 +1,6 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -33,31 +34,30 @@ export function useFunctionsDetailShortcuts({
   onOpenDownload,
   onCopyUrl,
 }: UseFunctionsDetailShortcutsParams) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const ready = Boolean(projectRef && functionSlug)
   const shortcutsEnabled = ready && canReadFunctions
   const base = `/project/${projectRef}/functions/${functionSlug}`
+  const goTo = (path: string) => () => void navigateToUrl(navigate, `${base}${path}`)
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, () => router.push(base), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, goTo(''), {
     enabled: shortcutsEnabled && isPlatform,
   })
 
-  useShortcut(
-    SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS,
-    () => router.push(`${base}/invocations`),
-    { enabled: shortcutsEnabled && isPlatform && hasInvocationsTab }
-  )
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS, goTo('/invocations'), {
+    enabled: shortcutsEnabled && isPlatform && hasInvocationsTab,
+  })
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, () => router.push(`${base}/logs`), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, goTo('/logs'), {
     enabled: shortcutsEnabled && isPlatform,
   })
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE, () => router.push(`${base}/code`), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE, goTo('/code'), {
     enabled: shortcutsEnabled,
   })
 
-  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS, () => router.push(`${base}/details`), {
+  useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS, goTo('/details'), {
     enabled: shortcutsEnabled,
   })
 

@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Alert,
@@ -35,7 +35,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 import { getTimezoneLabel, type Timezone } from '@/lib/constants/timezones'
 
 export const PITRSelection = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
 
   const { data: backups } = useBackupsQuery({ projectRef: ref })
@@ -59,7 +59,7 @@ export const PITRSelection = () => {
       setTimeout(() => {
         setShowConfirmation(false)
         setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
-        router.push(`/project/${variables.ref}`)
+        void navigate({ to: '/project/$ref', params: { ref: variables.ref } })
       }, 3000)
     },
   })

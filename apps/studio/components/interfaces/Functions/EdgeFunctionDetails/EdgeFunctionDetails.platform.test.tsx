@@ -23,7 +23,6 @@ vi.mock('common', async () => {
     useParams: () => ({ ref: 'default', functionSlug: 'hello' }),
   }
 })
-vi.mock('next/router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 type FunctionResponse = components['schemas']['FunctionSlugResponse_Output']
