@@ -44,7 +44,13 @@ For every Postgres connection mode, the string comes from the same place:
 1. Open your project in the [Supabase Dashboard](/dashboard/project/_).
 2. Click **Connect** at the top of the page.
 3. Choose the connection method you picked above.
-4. Copy the string and replace `[YOUR-DATABASE-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
+4. Copy the string and replace `[YOUR-DATABASE-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `@`, `:`, `/`, `%`, `&`, `#`, `?`, or a space.
+
+<Admonition type="caution">
+
+Unencoded special characters in your password are a common cause of `password authentication failed` errors, including `P1000` errors from ORMs such as Prisma. An unencoded `@` can move the host boundary, so clients parse the wrong host and send credentials you did not type. An unencoded `:` is allowed within the user information by RFC 3986, but some clients split credentials on it and fail anyway. If you have reset your password and still cannot connect, percent-encode every reserved character before putting it in the connection string.
+
+</Admonition>
 
    The Supabase Dashboard doesn't show your database password after you create the project. If you don't have it, reset it with **Reset database password** in the Connect dialog or in your [Database Settings](/dashboard/project/_/database/settings#database-password). A reset breaks existing connections that use the old password.
 
