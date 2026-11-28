@@ -38,7 +38,7 @@ By default it will use the asset name to save the file on disk. You can optional
 
 #### Programmatic downloads with query parameters
 
-When using the SDK's `download()` method, you can pass additional query parameters to customize the download behavior:
+In JavaScript, pass the `download` option to `getPublicUrl()` or `createSignedUrl()` to get a URL that saves the file under a custom name. The JavaScript `download()` method returns the file contents and doesn't take a filename. In Dart and Swift, pass the query parameters to `download()`:
 
 <Tabs
   scrollable
@@ -55,10 +55,18 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
-// Download with custom filename
-const { data, error } = await supabase.storage.from('avatars').download('avatar1.png', {
+// `download()` returns the file contents as a Blob and has no filename option.
+// To have the browser save the file under a custom name, create a URL with `download`.
+
+// Public bucket
+const { data } = supabase.storage.from('avatars').getPublicUrl('avatar1.png', {
   download: 'my-custom-name.png',
 })
+
+// Private bucket
+const { data: signedUrlData, error } = await supabase.storage
+  .from('avatars')
+  .createSignedUrl('avatar1.png', 60, { download: 'my-custom-name.png' })
 ```
 
 </TabPanel>
