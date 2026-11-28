@@ -98,6 +98,14 @@ postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[POOLER-HOST]:6543/
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction) and choosing **Transaction pooler**.
 
+<Admonition type="caution">
+
+In both session and transaction mode, the shared pooler ignores Postgres settings that you pass as startup options, such as `PGOPTIONS='-c default_transaction_read_only=on'` or `-c statement_timeout=5000`. The only one it passes on to Postgres is `search_path`. The connection still succeeds, but the session uses the defaults for your role and database, so don't rely on startup options for safeguards like read-only sessions or timeouts.
+
+To apply a setting through the shared pooler, set it on the role or database with `alter role ... set` or `alter database ... set`. See [Timeouts](/docs/guides/database/postgres/timeouts#role-level) for examples. In session mode, you can also run `set` after you connect. A [direct connection](#direct-connection) passes startup options to Postgres.
+
+</Admonition>
+
 ### Dedicated pooler [#dedicated-pooler]
 
 On the Pro Plan and above, Supabase provisions a dedicated pooler (PgBouncer) that runs alongside your Postgres database. Use it for high-load applications. The dedicated pooler runs in transaction mode only. For session mode, use the [shared pooler](#pooler-session-mode). Unlike the shared pooler, it supports prepared statements on PgBouncer 1.21 and later. It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
