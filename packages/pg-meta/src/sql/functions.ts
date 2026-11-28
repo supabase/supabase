@@ -54,6 +54,7 @@ select
   pg_get_function_result(f.oid) as return_type,
   nullif(rt.typrelid, 0) as return_type_relation_id,
   f.proretset as is_set_returning_function,
+  f.proisstrict as is_strict,
   case
     when f.provolatile = 'i' then 'IMMUTABLE'
     when f.provolatile = 's' then 'STABLE'
