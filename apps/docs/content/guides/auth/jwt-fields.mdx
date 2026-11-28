@@ -22,7 +22,6 @@ These claims are always present in Supabase JWTs and cannot be removed:
 
 | Field          | Type                 | Description                                                 | Example                                       |
 | -------------- | -------------------- | ----------------------------------------------------------- | --------------------------------------------- |
-| `iss`          | `string`             | **Issuer** - The entity that issued the JWT                 | `"https://project-ref.supabase.co/auth/v1"`   |
 | `aud`          | `string \| string[]` | **Audience** - The intended recipient of the JWT            | `"authenticated"` or `"anon"`                 |
 | `exp`          | `number`             | **Expiration Time** - Unix timestamp when the token expires | `1640995200`                                  |
 | `iat`          | `number`             | **Issued At** - Unix timestamp when the token was issued    | `1640991600`                                  |
@@ -38,13 +37,14 @@ These claims are always present in Supabase JWTs and cannot be removed:
 
 These claims may be present depending on the authentication context:
 
-| Field           | Type     | Description                                                                | Example                                             |
-| --------------- | -------- | -------------------------------------------------------------------------- | --------------------------------------------------- |
-| `jti`           | `string` | **JWT ID** - Unique identifier for the JWT                                 | `"jwt-uuid"`                                        |
-| `nbf`           | `number` | **Not Before** - Unix timestamp before which the token is invalid          | `1640991600`                                        |
-| `app_metadata`  | `object` | **App Metadata** - Application-specific user data                          | `{"provider": "email"}`                             |
-| `user_metadata` | `object` | **User Metadata** - User-specific data                                     | `{"name": "John Doe"}`                              |
-| `amr`           | `array`  | **Authentication Methods Reference** - List of authentication methods used | `[{"method": "password", "timestamp": 1640991600}]` |
+| Field           | Type     | Description                                                                         | Example                                             |
+| --------------- | -------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `iss`           | `string` | **Issuer** - The entity that issued the JWT. A custom access token hook can omit it | `"https://project-ref.supabase.co/auth/v1"`         |
+| `jti`           | `string` | **JWT ID** - Unique identifier for the JWT                                          | `"jwt-uuid"`                                        |
+| `nbf`           | `number` | **Not Before** - Unix timestamp before which the token is invalid                   | `1640991600`                                        |
+| `app_metadata`  | `object` | **App Metadata** - Application-specific user data                                   | `{"provider": "email"}`                             |
+| `user_metadata` | `object` | **User Metadata** - User-specific data                                              | `{"name": "John Doe"}`                              |
+| `amr`           | `array`  | **Authentication Methods Reference** - List of authentication methods used          | `[{"method": "password", "timestamp": 1640991600}]` |
 
 ## Special claims
 
