@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 const commitSchema = z.object({
   committer: z.object({ date: z.string().datetime({ offset: true }) }),
@@ -33,27 +32,25 @@ async function getCommitTime(commitSha: string) {
   }
 }
 
-async function handler(
-  _req: NextApiRequest,
-  res: NextApiResponse<{ commitSha: string; commitTime: string }>
-) {
+async function handleGet() {
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || 'development'
   const commitTime = commitSha !== 'development' ? await getCommitTime(commitSha) : 'unknown'
 
   // Valid metadata is identical for all visitors; failed lookups must remain retryable.
-  res.setHeader(
-    'Cache-Control',
+  const cacheControl =
     commitTime === 'unknown' ? 'private, no-store' : 'public, max-age=0, s-maxage=600'
-  )
 
-  res.status(200).json({
-    commitSha,
-    commitTime,
-  })
+  return Response.json(
+    {
+      commitSha,
+      commitTime,
+    },
+    { headers: { 'Cache-Control': cacheControl } }
+  )
 }
 
-const webHandler = toWebHandler(handler)
-
 export const Route = createFileRoute('/api/get-deployment-commit')({
-  server: { handlers: { GET: webHandler } },
+  server: {
+    handlers: createApiHandlers({ GET: handleGet }),
+  },
 })

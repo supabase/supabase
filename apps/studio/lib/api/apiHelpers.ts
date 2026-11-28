@@ -150,6 +150,27 @@ export class InternalServerError extends Error {
   }
 }
 
+export class InvalidJsonError extends Error {
+  constructor(message = 'Invalid JSON') {
+    super(message)
+    this.name = 'InvalidJsonError'
+  }
+}
+
+/**
+ * Parse a JSON request body. Empty bodies resolve to `{}` (matching prior API behavior);
+ * malformed JSON throws `InvalidJsonError` so route wrappers can return a 400 response.
+ */
+export async function parseJsonBody<T = unknown>(request: Request): Promise<T> {
+  const text = await request.text()
+  if (!text) return {} as T
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    throw new InvalidJsonError()
+  }
+}
+
 /**
  * Construct the pgMeta redirection url passing along the filtering query params
  * @param req

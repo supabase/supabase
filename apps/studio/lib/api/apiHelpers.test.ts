@@ -6,6 +6,8 @@ import {
   constructHeaders,
   fromNodeHeaders,
   getBearerToken,
+  InvalidJsonError,
+  parseJsonBody,
   toSnakeCase,
   zBooleanString,
 } from './apiHelpers'
@@ -287,6 +289,54 @@ describe('apiHelpers', () => {
 
       expect(token).toBeNull()
       expect(elapsed).toBeLessThan(100)
+    })
+  })
+
+  describe('parseJsonBody', () => {
+    it.each<[string | undefined, unknown]>([
+      ['{"query":"select 1"}', { query: 'select 1' }],
+      ['[1,"two",null]', [1, 'two', null]],
+      ['"hello"', 'hello'],
+      ['42', 42],
+      ['null', null],
+      ['', {}],
+      [undefined, {}],
+    ])('parses valid JSON body %s', async (body, expected) => {
+      const request = new Request('http://localhost/api/test', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body,
+      })
+      expect(await parseJsonBody(request)).toEqual(expected)
+    })
+
+    it('parses JSON sent with a text/plain content type', async () => {
+      const request = new Request('http://localhost/api/test', {
+        method: 'POST',
+        headers: { 'content-type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify({ filenames: ['a/b.png'] }),
+      })
+      expect(await parseJsonBody(request)).toEqual({ filenames: ['a/b.png'] })
+    })
+
+    it.each(['{', '[1,', 'undefined', '   ', '{"trailing":1,}'])(
+      'throws InvalidJsonError for malformed JSON: %s',
+      async (body) => {
+        const request = new Request('http://localhost/api/test', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body,
+        })
+        await expect(parseJsonBody(request)).rejects.toBeInstanceOf(InvalidJsonError)
+      }
+    )
+
+    it('rethrows body-read failures instead of masking them as InvalidJsonError', async () => {
+      const request = new Request('http://localhost/api/test', { method: 'POST', body: '{}' })
+      const readError = new Error('Stream aborted')
+      vi.spyOn(request, 'text').mockRejectedValue(readError)
+
+      await expect(parseJsonBody(request)).rejects.toBe(readError)
     })
   })
 })

@@ -6,14 +6,28 @@ type ServerRouteHandler = (ctx: {
 type ServerRoute = { options: { server?: { handlers?: unknown } } }
 
 /**
- * Returns the server handler a TanStack file route registers for `method`. The request passed to
- * it can use any method, which is how tests reach a handler's own "method not allowed" branch.
+ * Returns the server handler a TanStack file route dispatches for `method`, mirroring
+ * TanStack Start's lookup order (`HEAD` falls back to `GET`, and any unmatched method falls
+ * back to `ANY`).
  */
 export function getRouteHandler(route: ServerRoute, method: string): ServerRouteHandler {
   const handlers = route.options.server?.handlers as
     | Partial<Record<string, ServerRouteHandler>>
     | undefined
-  const handler = handlers?.[method]
+  const upper = method.toUpperCase()
+  const handler =
+    upper === 'HEAD'
+      ? (handlers?.HEAD ?? handlers?.GET ?? handlers?.ANY)
+      : (handlers?.[upper] ?? handlers?.ANY)
   if (!handler) throw new Error(`Route has no ${method} handler`)
   return handler
+}
+
+/** Dispatches `request` to the handler `route` registers for `request.method`. */
+export function callRoute(
+  route: ServerRoute,
+  request: Request,
+  params: Record<string, string> = {}
+): Promise<Response> {
+  return getRouteHandler(route, request.method)({ request, params })
 }

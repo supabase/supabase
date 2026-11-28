@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
 import { DASHBOARD_LOG_BUCKET } from '@/components/interfaces/Support/dashboard-logs'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers, type ApiHandlerContext } from '@/lib/api/apiWrapper'
 import { getUserClaims } from '@/lib/gotrue'
 
 const GenerateAttachmentUrlSchema = z.object({
@@ -15,25 +14,28 @@ const GenerateAttachmentUrlSchema = z.object({
     .default('support-attachments'),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { claims, error: userClaimsError } = await getUserClaims(req.headers.authorization!)
+async function handlePost({ request }: ApiHandlerContext) {
+  const { claims, error: userClaimsError } = await getUserClaims(
+    request.headers.get('authorization')!
+  )
   if (userClaimsError || !claims) {
-    return res.status(401).json({ error: { message: 'Unauthorized' } })
+    return Response.json({ error: { message: 'Unauthorized' } }, { status: 401 })
   }
   const userId = claims.sub
 
-  const json = JSON.parse(req.body)
+  const json = await parseJsonBody(request)
   const parseResult = GenerateAttachmentUrlSchema.safeParse(json)
   if (!parseResult.success) {
-    return res.status(400).json({ error: { message: 'Invalid request body' } })
+    return Response.json({ error: { message: 'Invalid request body' } }, { status: 400 })
   }
   const filenames = parseResult.data.filenames
 
   const requestedPrefixes = [...new Set(filenames.map((filename) => filename.split('/')[0]))]
   if (requestedPrefixes.some((prefix) => prefix !== userId)) {
-    return res
-      .status(403)
-      .json({ error: { message: 'Forbidden: Users can only access their own resources' } })
+    return Response.json(
+      { error: { message: 'Forbidden: Users can only access their own resources' } },
+      { status: 403 }
+    )
   }
 
   const adminSupabase = createClient(
@@ -62,31 +64,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     .createSignedUrls(filenames, 10 * 365 * 24 * 60 * 60)
   if (signedUrlError) {
     console.error('Failed to sign URLs for attachments', signedUrlError)
-    return res.status(500).json({ error: { message: 'Failed to sign URLs for attachments' } })
+    return Response.json(
+      { error: { message: 'Failed to sign URLs for attachments' } },
+      { status: 500 }
+    )
   }
-  return res.status(200).json(data ? data.map((file) => file.signedUrl) : [])
+  return Response.json(data ? data.map((file) => file.signedUrl) : [])
 }
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({
-        data: null,
-        error: { message: `Method ${method} Not Allowed` },
-      })
-  }
-}
-
-const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
-  apiWrapper(req, res, handler, { withAuth: true })
-
-const webHandler = toWebHandler(wrapper)
 
 export const Route = createFileRoute('/api/generate-attachment-url')({
-  server: { handlers: { POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({ POST: handlePost }, { withAuth: true }),
+  },
 })

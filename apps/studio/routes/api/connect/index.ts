@@ -1,9 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 
 function getFilePaths(folderPath: string, baseFolder = ''): string[] {
   const filepaths: string[] = []
@@ -30,15 +29,14 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
   return filepaths
 }
 
-async function getFileNames(_req: NextApiRequest, res: NextApiResponse) {
-  const folderPath = path.join(process.cwd(), 'components/interfaces/ConnectSheet/content')
-  const filepaths = getFilePaths(folderPath)
-  res.statusCode = 200
-  res.json(filepaths)
-}
-
-const webHandler = toWebHandler(getFileNames)
-
 export const Route = createFileRoute('/api/connect/')({
-  server: { handlers: { GET: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async () => {
+        const folderPath = path.join(process.cwd(), 'components/interfaces/ConnectSheet/content')
+        const filepaths = getFilePaths(folderPath)
+        return Response.json(filepaths)
+      },
+    }),
+  },
 })
