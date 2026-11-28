@@ -166,7 +166,7 @@ export const NewScopedTokenForm = forwardRef<
 
   return (
     <>
-      <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
+      <ScrollArea className="flex-1 *:*:data-[slot=scroll-area-content]:min-w-0!">
         {step === 'form' ? (
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(handleReviewAccess)}>

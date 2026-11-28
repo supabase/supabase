@@ -180,7 +180,7 @@ export const ConnectSheet = () => {
         </SheetHeader>
 
         <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <ScrollViewport className="[&>div]:block!">
+          <ScrollViewport className="*:data-[slot=scroll-area-content]:min-w-0!">
             <div className="flex min-w-0 flex-col divide-y">
               <div className="p-8">
                 <ModeSelector
