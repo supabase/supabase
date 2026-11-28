@@ -102,7 +102,7 @@ export function failureReason(cardError: StripeError): string | undefined {
     case 'transaction_not_allowed':
     case 'generic_decline':
     case 'stolen_card':
-    case 'lost-card':
+    case 'lost_card':
       return `Your card has been declined by your card issuer. Please contact your card issuer or try a different card. ${internationalChargeInUsdHint}`
     case 'expired_card':
       return 'Your card has expired. Please use a different card.'
