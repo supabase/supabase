@@ -36,7 +36,7 @@ export const usePipelineCreationSubmission = ({
     control: form.control,
     name: DestinationPanelFormSchema.keyof().options,
   })
-  const configurationSnapshot = JSON.stringify([type, values])
+  const configurationSnapshot = JSON.stringify([type, clusterId, values])
   const failures = [...destinationValidationFailures, ...pipelineValidationFailures]
 
   const createPipeline = async (data: DestinationPanelSchemaType) => {

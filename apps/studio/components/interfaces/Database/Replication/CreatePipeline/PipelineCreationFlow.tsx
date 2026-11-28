@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Form, Separator } from 'ui'
+import { Button, Form, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationLogo } from '../DestinationLogo'
@@ -13,9 +13,11 @@ import type { DestinationPanelSchemaType } from '../DestinationPanel/Destination
 import { generateDefaultValues } from '../DestinationPanel/DestinationForm/DestinationForm.utils'
 import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fields'
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
+import { PipelineRegionField } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { usePreferredPipelineClusterId } from '../usePreferredPipelineClusterId'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
 import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
@@ -28,12 +30,15 @@ import {
   PipelineValidationAdmonition,
   SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
+import { useEnsurePipelineRegionSource } from './useEnsurePipelineRegionSource'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { usePipelineReviewCosts } from './usePipelineReviewCosts'
+import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -50,14 +55,54 @@ const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
   .withDefault('destination')
   .withOptions({ history: 'push', shallow: true, clearOnDefault: true })
 
-export const PipelineCreationFlow = ({
-  availableDestinations,
-  clusterId,
-  onClose,
-}: {
+type PipelineCreationFlowProps = {
   availableDestinations: DestinationType[]
-  clusterId?: string
   onClose: () => void
+}
+
+export const PipelineCreationFlow = (props: PipelineCreationFlowProps) => {
+  const [urlClusterId, setClusterId] = useQueryState(
+    'cluster_id',
+    parseAsString.withOptions({ history: 'replace' })
+  )
+  const preferred = usePreferredPipelineClusterId()
+  const defaultClusterId = preferred.clusters?.default_cluster_id
+  const requestedCluster = preferred.clusters?.regions.find(
+    ({ cluster_id }) => cluster_id === urlClusterId
+  )
+  const clusterId = requestedCluster
+    ? toRequestClusterId(requestedCluster.cluster_id, defaultClusterId)
+    : preferred.clusterId
+
+  useEffect(() => {
+    if (!requestedCluster && preferred.isReady && defaultClusterId !== undefined) {
+      void setClusterId(preferred.clusterId ?? defaultClusterId)
+    }
+  }, [requestedCluster, preferred.isReady, preferred.clusterId, defaultClusterId, setClusterId])
+
+  return (
+    <PipelineCreationSteps
+      {...props}
+      clusterId={clusterId}
+      preferredClusterId={preferred.clusterId}
+      isRegionReady={preferred.isReady}
+      onRegionChange={(id) => void setClusterId(id ?? defaultClusterId ?? null)}
+    />
+  )
+}
+
+const PipelineCreationSteps = ({
+  clusterId,
+  availableDestinations,
+  onClose,
+  isRegionReady,
+  preferredClusterId,
+  onRegionChange,
+}: PipelineCreationFlowProps & {
+  clusterId: string | undefined
+  isRegionReady: boolean
+  preferredClusterId?: string
+  onRegionChange: (clusterId: string | undefined) => void
 }) => {
   const router = useRouter()
   const [step, setStep] = useQueryState('step', stepParser)
@@ -82,6 +127,12 @@ export const PipelineCreationFlow = ({
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, clusterId, type, form })
   const sourceId = useReplicationSourceId({ projectRef, clusterId })
+  const {
+    ensureRegionSource,
+    isCreatingSource,
+    error: regionError,
+    reset: resetRegionError,
+  } = useEnsurePipelineRegionSource(projectRef)
   const {
     validateData,
     isValidatingData,
@@ -114,7 +165,7 @@ export const PipelineCreationFlow = ({
       ? 'Fix the above issues and review warnings before starting the pipeline.'
       : 'Fix the above issues before starting the pipeline.'
   }
-  const isBusy = isValidating || isValidatingData || isSubmitting
+  const isBusy = isValidating || isValidatingData || isSubmitting || isCreatingSource
   const accessibleStep = (() => {
     if (isSubmitting) return step
     if ((step === 'data' || step === 'review') && !isConnectionVerified) return 'connection'
@@ -128,6 +179,11 @@ export const PipelineCreationFlow = ({
     enabled: accessibleStep === 'review',
   })
   const handleNext = async () => {
+    if (
+      accessibleStep === 'connection' &&
+      (!isRegionReady || !(await ensureRegionSource(clusterId)))
+    )
+      return
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
     if (accessibleStep === 'data' && !(await validateData())) return
@@ -166,7 +222,10 @@ export const PipelineCreationFlow = ({
               nextLoading={isBusy}
               navigationDisabled={isBusy}
               nextLabel="Continue"
-              nextDisabled={accessibleStep === 'destination' && !canSelectDestination}
+              nextDisabled={
+                (accessibleStep === 'destination' && !canSelectDestination) ||
+                (accessibleStep === 'connection' && !isRegionReady)
+              }
               onCancel={handleClose}
               finalAction={{
                 label: submitLabel,
@@ -181,7 +240,7 @@ export const PipelineCreationFlow = ({
                 actions={docsUrl && <DocsButton href={docsUrl} />}
               />
               {accessibleStep === 'destination' && (
-                <div className="p-5">
+                <div className="flex flex-col gap-5 p-5">
                   <PipelineDestinationSelection
                     availableDestinations={availableDestinations}
                     value={type}
@@ -199,10 +258,37 @@ export const PipelineCreationFlow = ({
               {accessibleStep === 'connection' && (
                 <>
                   <PipelineConnectionSection
-                    revealInvalidSettings
+                    clusterId={clusterId}
                     type={type}
                     form={form}
-                    clusterId={clusterId}
+                    revealInvalidSettings
+                    regionField={
+                      <>
+                        <PipelineRegionField
+                          clusterId={clusterId}
+                          destinationType={type}
+                          preferredClusterId={preferredClusterId}
+                          onRegionChange={(clusterId) => {
+                            onRegionChange(clusterId)
+                            resetValidation()
+                            resetRegionError()
+                          }}
+                          disabled={isBusy || !isRegionReady}
+                        />
+                        {regionError && (
+                          <AlertError
+                            error={regionError}
+                            subject="Failed to prepare pipeline region"
+                            projectRef={projectRef}
+                            additionalActions={
+                              <Button disabled={isBusy} onClick={() => void handleNext()}>
+                                Retry
+                              </Button>
+                            }
+                          />
+                        )}
+                      </>
+                    }
                   >
                     {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
                     {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}

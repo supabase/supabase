@@ -49,7 +49,6 @@ function PipelineCreationPage() {
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
   const {
     hasSource,
-    clusterId: sourceClusterId,
     isPending: isSourceAvailabilityPending,
     error: sourceAvailabilityError,
     retry: retrySourceAvailability,
@@ -130,7 +129,6 @@ function PipelineCreationPage() {
       {status}
       <title>New Pipeline | Supabase</title>
       <PipelineCreationFlow
-        clusterId={sourceClusterId}
         availableDestinations={[
           ...(bigQuery ? ['BigQuery' as const] : []),
           ...(duckLake ? ['DuckLake' as const] : []),

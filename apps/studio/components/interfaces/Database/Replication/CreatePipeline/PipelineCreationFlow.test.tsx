@@ -1,19 +1,23 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
 import router from 'next-router-mock'
+import { parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
+import { projectKeys } from '@/data/projects/keys'
+import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { DOCS_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
   HomeIcon: () => (
@@ -178,13 +182,14 @@ const back = async (queryString: string) => {
 }
 const renderWizard = (
   ui: Parameters<typeof customRender>[0],
-  options?: { queryClient?: QueryClient; rateLimitFactor?: number }
+  options?: { queryClient?: QueryClient; rateLimitFactor?: number; searchParams?: string }
 ) =>
   customRender(ui, {
     queryClient: options?.queryClient,
     nuqs: {
       hasMemory: true,
       onUrlUpdate,
+      searchParams: options?.searchParams,
       ...(options?.rateLimitFactor === undefined
         ? {}
         : { rateLimitFactor: options.rateLimitFactor }),
@@ -192,6 +197,160 @@ const renderWizard = (
   })
 
 describe('PipelineCreationFlow', () => {
+  it.each([
+    ['preferred region', undefined, 'Frankfurt (eu-central-1)', false],
+    ['deep-linked region', '?cluster_id=1', 'Singapore (ap-southeast-1)', false],
+    ['unknown deep link', '?cluster_id=unknown', 'Frankfurt (eu-central-1)', false],
+    ['default after lookup failure', undefined, 'Singapore (ap-southeast-1)', true],
+  ] as const)(
+    'locks the chosen region while source lookup is pending (%s)',
+    async (_case, searchParams, label, shouldFailLookup) => {
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+        default_cluster_id: '1',
+        regions: [
+          { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+          { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+        ],
+      })
+      let isProjectLookupUnavailable: boolean = shouldFailLookup
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref',
+        response: () => {
+          if (isProjectLookupUnavailable) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Project details unavailable' },
+              { status: 503 }
+            )
+          }
+          return HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+            id: 1,
+            ref: 'default',
+            name: 'Project',
+            organization_id: 1,
+            status: 'ACTIVE_HEALTHY',
+            cloud_provider: 'AWS',
+            region: 'eu-central-1',
+            db_host: 'db.default.supabase.co',
+            restUrl: 'https://default.supabase.co',
+            connectionString: null,
+            inserted_at: '2026-01-01T00:00:00Z',
+            updated_at: '2026-01-01T00:00:00Z',
+            subscription_id: 'subscription',
+            is_branch_enabled: false,
+            is_physical_backups_enabled: false,
+            high_availability: false,
+            integration_source: null,
+          })
+        },
+      })
+      const sourceClusters: (string | null)[] = []
+      let finishLookup = () => {}
+      const pendingLookup = new Promise<void>((resolve) => {
+        finishLookup = resolve
+      })
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/sources',
+        response: async ({ request }) => {
+          sourceClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+          await pendingLookup
+          return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+            sources: [
+              {
+                id: 1,
+                name: 'default',
+                tenant_id: 'default',
+                config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
+              },
+            ],
+          })
+        },
+      })
+      renderWizard(
+        <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />,
+        {
+          queryClient,
+          searchParams,
+        }
+      )
+      expect(screen.queryByRole('combobox', { name: 'Pipeline region' })).not.toBeInTheDocument()
+      clickContinue()
+      const selector = await screen.findByRole('combobox', { name: 'Pipeline region' })
+      await waitFor(() => {
+        expect(selector).toHaveTextContent(label)
+        expect(selector).toBeEnabled()
+      })
+      fillConnection()
+      clickContinue()
+      await waitFor(() => expect(selector).toBeDisabled())
+      if (shouldFailLookup) {
+        isProjectLookupUnavailable = false
+        await act(async () => {
+          await queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') })
+        })
+      }
+      expect(screen.getByLabelText('Pipeline name')).toBeInTheDocument()
+      expect(screen.queryByText('Select publication')).not.toBeInTheDocument()
+      finishLookup()
+      expect(sourceClusters).not.toContain('unknown')
+      expect(await screen.findByText('Select publication')).toBeInTheDocument()
+      if (shouldFailLookup) {
+        expect(sourceClusters).toEqual([null])
+      }
+    }
+  )
+
+  it('keeps the chosen region through review and uses it for connection validation', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+      default_cluster_id: '1',
+      regions: [
+        { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+        { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+      ],
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    const requestedClusters: (string | null)[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: ({ request }) => {
+        requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      queryClient,
+      rateLimitFactor: 1,
+    })
+    clickContinue()
+    const selector = await screen.findByRole('combobox', { name: 'Pipeline region' })
+    await waitFor(() => expect(selector).toBeEnabled())
+    await userEvent.click(selector)
+    await userEvent.click(
+      within(await screen.findByRole('listbox')).getByRole('option', {
+        name: /Frankfurt/,
+      })
+    )
+    await waitFor(() => expect(selector).toHaveTextContent('Frankfurt (eu-central-1)'))
+    fillConnection()
+    clickContinue()
+    await screen.findByText('Select publication')
+    await selectPublication()
+    clickContinue()
+    await screen.findByText('Start pipeline')
+    expect(screen.getByText('Frankfurt', { exact: true })).toBeVisible()
+    expect(requestedClusters).toEqual(['2'])
+  })
+
   it('keeps header navigation pending until dirty changes are discarded', async () => {
     const push = vi.spyOn(router, 'push')
     customRender(
@@ -446,7 +605,7 @@ describe('PipelineCreationFlow', () => {
       const onClose = vi.fn()
       await reachReview(onClose)
       fireEvent.click(footerButton('Start pipeline'))
-      expect(footerButton('Back')).toBeDisabled()
+      await waitFor(() => expect(footerButton('Back')).toBeDisabled())
       expect(screen.getByDisplayValue('Warehouse')).toBeDisabled()
       fireEvent.click(footerButton('Start pipeline'))
       await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
@@ -656,7 +815,7 @@ describe('PipelineCreationFlow', () => {
       connection.queryByRole('spinbutton', { name: 'Connection pool size' })
     ).not.toBeInTheDocument()
     fireEvent.click(footerButton('Continue'))
-    expect(connection.getByLabelText('Connection pool size')).toBeVisible()
+    await waitFor(() => expect(connection.getByLabelText('Connection pool size')).toBeVisible())
     fireEvent.change(connection.getByLabelText('Connection pool size'), {
       target: { value: '5' },
     })
@@ -692,7 +851,7 @@ describe('PipelineCreationFlow', () => {
     await next('?step=connection')
     fillConnection()
     clickContinue()
-    expect(footerButton('Back')).toBeDisabled()
+    await waitFor(() => expect(footerButton('Back')).toBeDisabled())
     await waitFor(() => expect(screen.queryByText('Try again')).toBeInTheDocument())
     fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'retry-project' },
@@ -768,18 +927,48 @@ describe('PipelineCreationFlow', () => {
         })
       },
     })
-    const onClose = vi.fn()
-    const view = renderWizard(
-      <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+      default_cluster_id: '1',
+      regions: [
+        { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+        { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+      ],
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    const ChangeRegionInUrl = () => {
+      const [, setClusterId] = useQueryState('cluster_id', parseAsString)
+      return (
+        <button tabIndex={0} onClick={() => void setClusterId('2')}>
+          Change URL region
+        </button>
+      )
+    }
+    renderWizard(
+      <>
+        <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
+        <ChangeRegionInUrl />
+      </>,
+      { queryClient, rateLimitFactor: 1 }
     )
-    await next('?step=connection')
+    clickContinue()
+    await screen.findByText(/Step 2 of 4/)
     fillConnection()
-    await next('?step=data')
-    view.rerender(
-      <PipelineCreationFlow clusterId="2" availableDestinations={['BigQuery']} onClose={onClose} />
-    )
+    clickContinue()
+    await screen.findByText(/Step 3 of 4/)
+    fireEvent.click(screen.getByRole('button', { name: 'Change URL region' }))
     await waitFor(() => expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument())
-    await next('?step=data')
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: expect.stringContaining('step=connection') })
+      )
+    )
+    clickContinue()
+    await screen.findByText(/Step 3 of 4/)
     expect(validationClusters).toEqual([null, '2'])
   })
 

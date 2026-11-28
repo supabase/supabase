@@ -494,8 +494,8 @@ export const DestinationForm = ({
 
   const regionField = (
     <PipelineRegionField
-      destinationType={selectedType}
       clusterId={clusterId}
+      destinationType={selectedType}
       preferredClusterId={preferredClusterId}
       onRegionChange={
         canSelectRegion
@@ -519,9 +519,9 @@ export const DestinationForm = ({
               {shouldShowConnectionSection && (
                 <>
                   <PipelineConnectionSection
+                    clusterId={clusterId}
                     type={selectedType}
                     form={form}
-                    clusterId={clusterId}
                     regionField={regionField}
                   >
                     {destinationFields}
