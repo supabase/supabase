@@ -65,20 +65,11 @@ const FETCH_TYPE_BYPASS_EXCEPTIONS = [
   'data/log-drains/delete-log-drain-mutation.ts',
   // untyped `fetchGet` / `fetchPost`
   'lib/api/self-hosted/generate-types.ts',
+  'lib/api/self-hosted/pg-meta.ts',
   'routes/api/platform/auth/$ref/invite.ts',
   'routes/api/platform/auth/$ref/magiclink.ts',
   'routes/api/platform/auth/$ref/otp.ts',
   'routes/api/platform/auth/$ref/recover.ts',
-  'routes/api/platform/pg-meta/$ref/column-privileges.ts',
-  'routes/api/platform/pg-meta/$ref/extensions.ts',
-  'routes/api/platform/pg-meta/$ref/foreign-tables.ts',
-  'routes/api/platform/pg-meta/$ref/materialized-views.ts',
-  'routes/api/platform/pg-meta/$ref/policies.ts',
-  'routes/api/platform/pg-meta/$ref/publications.ts',
-  'routes/api/platform/pg-meta/$ref/tables.ts',
-  'routes/api/platform/pg-meta/$ref/triggers.ts',
-  'routes/api/platform/pg-meta/$ref/types.ts',
-  'routes/api/platform/pg-meta/$ref/views.ts',
 ]
 
 const APPROVAL_GATE_MESSAGE =
