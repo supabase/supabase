@@ -54,15 +54,22 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
   <RefSubLayout.Details>
     
     You can install @supabase/supabase-js via CDN links.
+    The CDN build exposes a `supabase` global on `window`.
+    If you want to use an `import { createClient } from '@supabase/supabase-js'` statement, install the package with a package manager instead.
 
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
 
-    ```js
+    ```html
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    //or
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Or: <script src="https://unpkg.com/@supabase/supabase-js@2"></script> -->
+
+    <script>
+      const supabaseUrl = 'https://your-project-id.supabase.co'
+      const supabaseKey = 'sb_publishable_...'
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+    </script>
     ```
 
   </RefSubLayout.Examples>
