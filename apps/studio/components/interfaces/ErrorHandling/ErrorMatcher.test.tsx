@@ -2,7 +2,11 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
-import { ConnectionTimeoutError, UnexpectedError } from '@/lib/errors/studio-errors'
+import {
+  ConnectionTimeoutError,
+  SupavisorSessionPoolError,
+  UnexpectedError,
+} from '@/lib/errors/studio-errors'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 vi.mock('@/state/ai-assistant-state', () => ({
@@ -55,6 +59,25 @@ describe('ErrorMatcher', () => {
     )
     expect(screen.getByText('Failed to load tables')).toBeInTheDocument()
     expect(screen.queryByText('Try restarting your project')).not.toBeInTheDocument()
+  })
+
+  it('renders the Supavisor session pool size guidance for the session limit error', () => {
+    const error = new SupavisorSessionPoolError({
+      message:
+        'MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size',
+    })
+    render(<ErrorMatcher title="Failed to connect" error={error} supportFormParams={{}} />)
+
+    expect(screen.getByText('Increase the Supavisor pool size')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'In session mode, each client holds a database connection, so the maximum number of clients is limited by pool_size. Increase the pool size in Database Settings.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View troubleshooting guide' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size'
+    )
   })
 
   it('renders fallback with provided title for unmatched errors', () => {

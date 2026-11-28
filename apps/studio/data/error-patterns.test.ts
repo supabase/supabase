@@ -20,6 +20,13 @@ const PATTERN_SAMPLES: Record<string, { matches: string[]; nonMatches: string[] 
       '',
     ],
   },
+  SupavisorSessionPoolError: {
+    matches: [
+      'MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size',
+      'ERROR: MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size: 15',
+    ],
+    nonMatches: ['Max client connections reached', 'max clients reached in transaction mode', ''],
+  },
 }
 
 describe('ERROR_PATTERNS registry', () => {

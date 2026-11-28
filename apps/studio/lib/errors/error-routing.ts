@@ -57,6 +57,7 @@ export const ERROR_ROUTING = {
     studio: { sentrySampleRate: SAMPLE_OWNED },
   },
   DbConnectionTimeout: { platform: { sentrySampleRate: SAMPLE_OTHER } },
+  SupavisorSessionPool: { user: { sentrySampleRate: SAMPLE_USER_FAULT } },
   UserSqlError: { user: { sentrySampleRate: SAMPLE_NEVER } },
   StudioSqlError: {
     user: { sentrySampleRate: SAMPLE_USER_FAULT }, // reason `user_input`

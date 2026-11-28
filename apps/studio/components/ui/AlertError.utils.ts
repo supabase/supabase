@@ -53,6 +53,7 @@ const TAG_SPECIFIC_LINES: Record<StudioErrorTag, (error: StudioError) => DetailL
   PlatformError: (error) => [['Message', error.message]],
   UnclassifiedApiError: (error) => [['Message', error.message]],
   DbConnectionTimeout: (error) => [['Message', error.message]],
+  SupavisorSessionPool: (error) => [['Message', error.message]],
   UnexpectedError: (error) => [['Message', error.message]],
   UserSqlError: (error) => [
     ['SQL state', error.sqlState],

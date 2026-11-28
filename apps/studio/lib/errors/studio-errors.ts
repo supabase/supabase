@@ -139,6 +139,13 @@ export class ConnectionTimeoutError extends studioError('DbConnectionTimeout', {
   retryable: () => true,
 }) {}
 
+export class SupavisorSessionPoolError extends studioError('SupavisorSessionPool', {
+  fault: 'user',
+  classifiedBy: 'rule',
+  reasons: ['session_pool_limit'],
+  retryable: () => false,
+}) {}
+
 // Postgres rejected SQL the user (or an AI agent acting for them) wrote. The message can echo
 // the user's SQL and data, so this error is never sent to Sentry (see `ERROR_ROUTING` and
 // `isNeverReportedError`).
@@ -177,6 +184,7 @@ export type StudioError =
   | PlatformError
   | UnclassifiedApiError
   | ConnectionTimeoutError
+  | SupavisorSessionPoolError
   | UserSqlError
   | StudioSqlError
   | UnexpectedError
@@ -184,7 +192,7 @@ export type StudioError =
 export type StudioErrorTag = StudioError['_tag']
 export type StudioErrorReason = StudioError['reason']
 
-export type ClassifiedError = ConnectionTimeoutError
+export type ClassifiedError = ConnectionTimeoutError | SupavisorSessionPoolError
 
 // A Record (not a Set) so a new tag fails typecheck until it is listed here.
 const STUDIO_ERROR_TAGS: Record<StudioErrorTag, true> = {
@@ -194,6 +202,7 @@ const STUDIO_ERROR_TAGS: Record<StudioErrorTag, true> = {
   PlatformError: true,
   UnclassifiedApiError: true,
   DbConnectionTimeout: true,
+  SupavisorSessionPool: true,
   UserSqlError: true,
   StudioSqlError: true,
   UnexpectedError: true,
