@@ -99,7 +99,7 @@ function handleRemoveFile(filename: string) {
 
         <Button
           v-if="!loading && !successes.includes(file.name)"
-          aria-label="Remove file Button"
+          :aria-label="`Remove file ${file.name}`"
           size="icon"
           variant="link"
           class="shrink-0 text-muted-foreground hover:text-foreground"

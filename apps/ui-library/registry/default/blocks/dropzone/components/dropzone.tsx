@@ -146,9 +146,10 @@ const DropzoneContent = ({ className }: { className?: string }) => {
                 size="icon"
                 variant="link"
                 className="shrink-0 justify-self-end text-muted-foreground hover:text-foreground"
+                aria-label={`Remove file ${file.name}`}
                 onClick={() => handleRemoveFile(file.name)}
               >
-                <X />
+                <X aria-hidden="true" />
               </Button>
             )}
           </div>
