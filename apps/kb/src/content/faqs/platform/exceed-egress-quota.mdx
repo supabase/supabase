@@ -1,0 +1,13 @@
+---
+title: What happens when I go over my egress quota on Supabase?
+topics: ['Platform', 'Database']
+lastEdited: 2026-11-27
+---
+
+Supabase doesn't pause your project right away even if you go over the limit. On the Free plan, or on the Pro plan with the spend cap on, you get an email and a generous grace period before anything is restricted. On Pro with the spend cap off, or on the Team plan and above, nothing is restricted.
+
+If you are still over your quota when the grace period ends, the [Fair Use Policy](/docs/guides/platform/billing-faq#fair-use-policy) applies. That can mean paused projects, read-only databases, or API requests that return a [402 status code](/kb/troubleshooting/http-status-codes#402-service-restriction), generally across every project in the organization. You are notified before this happens, and you can still access your data through the dashboard.
+
+A restriction lifts when your quota refills at the start of the next billing cycle. To lift it immediately, [upgrade to Pro](/docs/guides/platform/manage-your-subscription#upgrade) if you are on the Free plan, or turn off the [spend cap](/docs/guides/platform/cost-control#spend-cap) if you are on Pro.
+
+The grace period doesn't renew right away. If you go over your quota again in the next few billing cycles, you are restricted without a new one, so it's worth finding out where the egress came from. The [egress usage guide](/docs/guides/platform/manage-your-usage/egress) shows how to track it down and reduce it.
