@@ -97,4 +97,6 @@ export const logsKeys = {
       logId,
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  traceSpans: (projectRef: string | undefined, traceId: string | undefined) =>
+    ['projects', projectRef, 'unified-logs', 'trace-spans', traceId] as const,
 }

@@ -28,6 +28,8 @@ interface LogFieldRowProps<TData> {
   /** `menu` keeps the dropdown on every device, for surfaces without hover actions. */
   actionsMode?: 'hover' | 'menu'
   className?: string
+  /** Extra `DropdownMenuItem`s rendered above the default filter/copy actions. */
+  extraItems?: ReactNode
 }
 
 /** Key/value row for a log field, offering copy and filter actions. */
@@ -44,6 +46,7 @@ export function LogFieldRow<TData>({
   filterOperators,
   actionsMode = 'hover',
   className,
+  extraItems,
 }: LogFieldRowProps<TData>) {
   const isHoverDevice = useMedia(HOVER_ACTIONS_QUERY, false)
   const canUseHoverActions = actionsMode === 'hover' && isHoverDevice && !disabled
@@ -91,6 +94,7 @@ export function LogFieldRow<TData>({
             label={label}
             onAddFilter={onAddFilter}
             filterOperators={filterOperators}
+            extraItems={extraItems}
           >
             <button
               type="button"
@@ -122,6 +126,7 @@ export function LogFieldRow<TData>({
       className="rounded-none"
       onAddFilter={onAddFilter}
       filterOperators={filterOperators}
+      extraItems={extraItems}
     >
       {row}
     </DataTableSheetRowAction>

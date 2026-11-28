@@ -62,7 +62,7 @@ export function CollapseAll() {
       <Button
         variant="text"
         size="tiny"
-        className="size-6 p-0"
+        className="size-5 p-0 [&_svg]:!size-3"
         disabled={index.childrenOf.size === 0}
         focusableWhenDisabled
         icon={allCollapsed ? <ChevronsUpDown /> : <ChevronsDownUp />}
@@ -82,7 +82,7 @@ export function ResetZoom() {
       <Button
         variant="text"
         size="tiny"
-        className="size-6 p-0"
+        className="size-5 p-0 [&_svg]:!size-3"
         disabled={!isZoomed}
         focusableWhenDisabled
         icon={<Maximize2 />}

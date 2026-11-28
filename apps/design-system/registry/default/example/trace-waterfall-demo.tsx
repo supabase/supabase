@@ -24,7 +24,14 @@ function span(
 
 const finished: TraceData = {
   spans: [
-    span('root', null, 'GET /rest/v1/orders', 0, 480),
+    span('root', null, 'GET /rest/v1/orders', 0, 480, {
+      attributes: {
+        'http.method': 'GET',
+        'http.route': '/rest/v1/orders',
+        'http.status_code': 200,
+        'client.address': '203.0.113.42',
+      },
+    }),
     span('auth', 'root', 'auth.verify_jwt', 8, 140, {
       attributes: { 'enduser.id': 'usr_42', 'auth.method': 'jwt' },
       events: [
@@ -32,10 +39,19 @@ const finished: TraceData = {
         { timeMs: 95, name: 'jwks.cache_miss' },
       ],
     }),
-    span('db', 'root', 'postgrest.query', 70, 410),
-    span('plan', 'db', 'db.plan', 72, 90),
-    span('exec', 'db', 'db.execute', 95, 400),
-    span('rls', 'root', 'rls.policy_check', 420, 470, { status: 'error' }),
+    span('db', 'root', 'postgrest.query', 70, 410, {
+      attributes: { 'db.system': 'postgresql', 'db.schema': 'public', 'db.table': 'orders' },
+    }),
+    span('plan', 'db', 'db.plan', 72, 90, {
+      attributes: { 'db.plan.rows_estimate': 1200, 'db.plan.cost': 48.2 },
+    }),
+    span('exec', 'db', 'db.execute', 95, 400, {
+      attributes: { 'db.rows_affected': 24, 'db.cache_hit': true },
+    }),
+    span('rls', 'root', 'rls.policy_check', 420, 470, {
+      status: 'error',
+      attributes: { 'rls.policy': 'orders_select_own', 'error.message': 'permission denied' },
+    }),
   ],
 }
 

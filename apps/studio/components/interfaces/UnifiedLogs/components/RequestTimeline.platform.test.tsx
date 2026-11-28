@@ -4,7 +4,7 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useQueryStates } from 'nuqs'
 import { ResizablePanelGroup } from 'ui'
@@ -22,9 +22,10 @@ import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTable
 import type { User } from '@/data/auth/users-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { miscKeys } from '@/data/misc/keys'
+import { API_URL } from '@/lib/constants'
 import { TimezoneProvider } from '@/lib/datetime'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
@@ -129,6 +130,7 @@ function renderPanel(
   {
     scope,
     flag = true,
+    enableTracesWaterfall = true,
     timezone,
     selectedLog,
     onSelectRow,
@@ -136,6 +138,7 @@ function renderPanel(
   }: {
     scope?: UnifiedLogsScope
     flag?: boolean | null
+    enableTracesWaterfall?: boolean
     timezone?: string
     selectedLog?: ColumnSchema
     onSelectRow?: (id: string) => void
@@ -194,7 +197,7 @@ function renderPanel(
   customRender(
     <FeatureFlagContext.Provider
       value={{
-        configcat: flag === null ? {} : { otelUnifiedLogs: flag },
+        configcat: flag === null ? {} : { otelUnifiedLogs: flag, enableTracesWaterfall },
         posthog: {},
         hasLoaded: true,
       }}
@@ -290,6 +293,128 @@ describe('request timeline tab', () => {
     expect(screen.queryByText('method')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  const TRACE_ID = 'a'.repeat(32)
+  const tracedRows = timelineRows.map((row) => ({
+    ...row,
+    metadata: { ...row.metadata, trace_id: TRACE_ID },
+  }))
+  const spanResponse = {
+    data: [
+      {
+        type: 'span',
+        id: 'span-1',
+        attributes: {
+          parent_span_id: null,
+          service_name: 'postgrest',
+          span_name: 'GET /rest/v1/orders',
+          span_kind: 'server',
+          status_code: 'ok',
+          start_time: '2026-01-01T10:00:00.000Z',
+          duration_ns: 1_500_000,
+        },
+      },
+      {
+        type: 'span',
+        id: 'span-2',
+        attributes: {
+          parent_span_id: null,
+          service_name: 'postgres',
+          span_name: 'SELECT orders',
+          span_kind: 'client',
+          status_code: 'ok',
+          start_time: '2026-01-01T10:00:00.002Z',
+          duration_ns: 900_000,
+        },
+      },
+    ],
+    meta: { partial: true },
+  }
+  const mockTrace = (response: typeof spanResponse = spanResponse) =>
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json(response)
+      )
+    )
+
+  const openTrace = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('tab', { name: 'Trace' }))
+  }
+
+  it('always offers the Trace tab, with an empty state when the request has no trace id', async () => {
+    const user = userEvent.setup()
+    const { queryClient } = renderPanel(timelineRows)
+
+    await openTrace(user)
+
+    expect(await screen.findByText('No trace for this request')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('renders the trace header and waterfall once the spans come back', async () => {
+    const user = userEvent.setup()
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows)
+
+    await openTrace(user)
+
+    // Trace.Title is the root span's name; the rest of the header is ours
+    expect(await screen.findByRole('heading', { name: 'GET /rest/v1/orders' })).toBeVisible()
+    expect(screen.getByText(TRACE_ID)).toBeVisible()
+    expect(screen.getByText('postgres, postgrest')).toBeVisible()
+    expect(screen.getByText('Partial')).toBeVisible()
+    // The waterfall virtualises its rows against a measured viewport, which jsdom never lays
+    // out, so individual span rows can't be asserted here — only that the tree mounted.
+    expect(screen.getByRole('tree')).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('shows an error in the Trace tab when the trace fetch fails', async () => {
+    const user = userEvent.setup()
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json({ message: 'Not found' }, { status: 404 })
+      )
+    )
+    renderPanel(tracedRows)
+
+    await openTrace(user)
+
+    expect(await screen.findByText('Failed to retrieve trace')).toBeVisible()
+  })
+
+  it('shows a plain empty state when the trace has no spans', async () => {
+    const user = userEvent.setup()
+    mockTrace({ data: [], meta: { partial: false } })
+    const { queryClient } = renderPanel(tracedRows)
+
+    await openTrace(user)
+
+    expect(await screen.findByText('No spans recorded')).toBeVisible()
+    expect(screen.queryByText('Partial')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('keeps the Timeline free of trace UI even when a trace resolves', async () => {
+    const user = userEvent.setup()
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows)
+
+    const list = await openTimeline(user)
+
+    expect(within(list).queryByText('GET /rest/v1/orders')).not.toBeInTheDocument()
+    expect(screen.queryByText('Partial')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('hides the Trace tab when enableTracesWaterfall is off', async () => {
+    mockTrace()
+    const { queryClient } = renderPanel(tracedRows, { enableTracesWaterfall: false })
+
+    await screen.findByRole('tab', { name: 'Timeline' })
+    expect(screen.queryByRole('tab', { name: 'Trace' })).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 

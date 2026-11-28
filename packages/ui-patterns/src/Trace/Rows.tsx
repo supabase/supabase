@@ -8,7 +8,7 @@ import { Button, cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import type { SpanContextValue } from './types'
-import { effectiveEndMs, flattenTree, formatDuration } from './utils'
+import { effectiveEndMs, flattenTree, formatDuration, STATUS_TEXT } from './utils'
 
 const ROW_HEIGHT = 24
 const OVERSCAN = 8
@@ -136,7 +136,7 @@ export function Rows({
                   tabIndex={id === tabbableId ? 0 : -1}
                   data-trace-row
                   data-trace-row-id={id}
-                  className="focus-inset absolute left-0 top-0 flex w-full cursor-pointer items-stretch divide-x divide-border hover:bg-control aria-selected:bg-selection"
+                  className="focus-inset absolute left-0 top-0 flex w-full cursor-pointer items-stretch hover:bg-control aria-selected:bg-selection"
                   style={{ height: item.size, transform: `translateY(${item.start}px)` }}
                   onClick={() => {
                     select(id)
@@ -151,6 +151,10 @@ export function Rows({
           })}
         </div>
       </ScrollViewport>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-(--trace-tree-width) w-px bg-border"
+      />
       <ScrollBar orientation="vertical" />
     </ScrollRoot>
   )
@@ -164,12 +168,20 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
     <div
       data-trace-cell
       className={cn(
-        'flex w-(--trace-tree-width) shrink-0 items-center gap-1.5 overflow-hidden pr-2',
+        'relative flex w-(--trace-tree-width) shrink-0 items-center gap-1.5 overflow-hidden pr-2',
         className
       )}
       style={{ paddingLeft: row.depth * INDENT + 4, ...style }}
       {...props}
     >
+      {Array.from({ length: row.depth }, (_, depth) => (
+        <span
+          key={depth}
+          aria-hidden
+          className="absolute inset-y-0 w-px bg-border"
+          style={{ left: depth * INDENT + 13 }}
+        />
+      ))}
       <span className="flex size-4.5 shrink-0 items-center justify-center">
         {row.hasChildren && (
           <Button
@@ -193,7 +205,17 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
           />
         )}
       </span>
-      <span data-trace-name className="min-w-0 flex-1 truncate font-mono text-xs">
+      <span
+        aria-hidden
+        className={cn('size-1.5 shrink-0 rounded-full bg-current', STATUS_TEXT[row.span.status])}
+      />
+      <span
+        data-trace-name
+        className={cn(
+          'min-w-0 flex-1 truncate font-mono text-xs',
+          row.span.endMs === null && 'text-foreground-light'
+        )}
+      >
         {row.span.name}
       </span>
       {row.span.endMs === null && (

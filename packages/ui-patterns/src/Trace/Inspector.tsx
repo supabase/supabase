@@ -1,16 +1,23 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Badge, Popover, PopoverAnchor, PopoverContent, type BadgeProps } from 'ui'
+import { Badge, Button, cn, Popover, PopoverAnchor, PopoverContent, type BadgeProps } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import type { SpanStatus } from './types'
-import { effectiveEndMs, formatAttributeValue, formatDuration } from './utils'
+import { effectiveEndMs, formatAttributeValue, formatDuration, STATUS_TEXT } from './utils'
 
 const STATUS_BADGE: Record<SpanStatus, BadgeProps['variant']> = {
   ok: 'success',
   error: 'destructive',
   unset: 'default',
+}
+
+const STATUS_LABEL: Record<SpanStatus, string> = {
+  ok: 'Done',
+  error: 'Failed',
+  unset: 'Unknown',
 }
 
 function anchorRect(tree: HTMLElement | null, viewport: HTMLElement | null, id: string): DOMRect {
@@ -51,7 +58,8 @@ export function Inspector() {
   if (!span) return null
 
   const attributes = Object.entries(span.attributes)
-  const label = 'text-foreground-lighter'
+  const label = 'text-foreground-lighter text-sm'
+  const sectionLabel = 'text-[10px] font-medium uppercase tracking-wider text-foreground-muted'
 
   return (
     <Popover
@@ -69,7 +77,7 @@ export function Inspector() {
         updatePositionStrategy="always"
         aria-label={`${span.name} details`}
         data-trace-inspector
-        className="flex max-h-96 w-80 flex-col gap-3 overflow-y-auto p-3 text-xs"
+        className="flex max-h-96 w-[282px] flex-col gap-5 overflow-y-auto p-3 text-xs"
         onOpenAutoFocus={(event) => event.preventDefault()}
         onCloseAutoFocus={(event) => event.preventDefault()}
         onFocusOutside={(event) => event.preventDefault()}
@@ -79,53 +87,89 @@ export function Inspector() {
         }}
       >
         <div className="flex items-start justify-between gap-2">
-          <span className="min-w-0 break-all font-mono text-sm text-foreground">{span.name}</span>
-          <Badge variant={STATUS_BADGE[span.status]}>{span.status}</Badge>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span
+              aria-hidden
+              className={cn('size-1.5 shrink-0 rounded-full bg-current', STATUS_TEXT[span.status])}
+            />
+            <span className="min-w-0 truncate font-mono text-xs font-medium text-foreground">
+              {span.name}
+            </span>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <Badge variant={STATUS_BADGE[span.status]}>{STATUS_LABEL[span.status]}</Badge>
+            <Button
+              variant="text"
+              size="tiny"
+              className="size-5 p-0 [&_svg]:!size-3"
+              icon={<X />}
+              aria-label="Close"
+              onClick={() => select(null)}
+            />
+          </div>
         </div>
 
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono tabular-nums">
-          <dt className={label}>Start</dt>
-          <dd>{formatDuration(span.startMs - bounds[0])}</dd>
-          <dt className={label}>Duration</dt>
-          <dd>
-            {formatDuration(effectiveEndMs(span, nowMs) - span.startMs)}
-            {span.endMs === null && <span className={label}> (running)</span>}
-          </dd>
+        <dl className="-mt-2 grid grid-cols-2 gap-3 rounded-md border p-3 font-mono">
+          <div className="flex flex-col gap-0.5">
+            <dt className={sectionLabel}>Start</dt>
+            <dd className="tabular-nums text-foreground">
+              {formatDuration(span.startMs - bounds[0])}
+            </dd>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <dt className={sectionLabel}>Duration</dt>
+            <dd className="tabular-nums text-foreground">
+              {formatDuration(effectiveEndMs(span, nowMs) - span.startMs)}
+              {span.endMs === null && <span className={label}> (running)</span>}
+            </dd>
+          </div>
         </dl>
 
-        <section className="flex flex-col gap-1">
-          <h3 className={label}>Attributes</h3>
-          {attributes.length === 0 ? (
-            <p className={label}>No attributes</p>
-          ) : (
-            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono">
+        {attributes.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h3 className="text-xs font-medium text-foreground-light">Attributes</h3>
+            <dl className="flex flex-col divide-y divide-border">
               {attributes.map(([key, value]) => (
-                <div key={key} className="contents">
-                  <dt className={label}>{key}</dt>
-                  <dd className="break-all">{formatAttributeValue(value)}</dd>
+                <div
+                  key={key}
+                  className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
+                >
+                  <dt className="text-[11px] text-foreground-muted">{key}</dt>
+                  <dd className="break-all text-right font-mono text-[11px] text-foreground">
+                    {formatAttributeValue(value)}
+                  </dd>
                 </div>
               ))}
             </dl>
-          )}
-        </section>
+          </section>
+        )}
 
-        <section className="flex flex-col gap-1">
-          <h3 className={label}>Events</h3>
-          {span.events.length === 0 ? (
-            <p className={label}>No events</p>
-          ) : (
-            <ul className="flex flex-col gap-1 font-mono">
+        {span.events.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h3 className="text-xs font-medium text-foreground-light">Events</h3>
+            <ul className="flex flex-col divide-y divide-border">
               {span.events.map((event, i) => (
-                <li key={i} className="flex justify-between gap-3">
-                  <span className="break-all">{event.name}</span>
-                  <span className={`${label} tabular-nums`}>
+                <li
+                  key={i}
+                  className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
+                >
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span
+                      aria-hidden
+                      className="size-[7px] shrink-0 rotate-45 border border-foreground bg-background"
+                    />
+                    <span className="break-all text-[11px] text-foreground-muted">
+                      {event.name}
+                    </span>
+                  </span>
+                  <span className="font-mono text-[11px] tabular-nums text-foreground">
                     +{formatDuration(event.timeMs - span.startMs)}
                   </span>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
+          </section>
+        )}
       </PopoverContent>
     </Popover>
   )

@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { useRef, useState } from 'react'
 import {
   ResizableHandle,
@@ -13,6 +14,7 @@ import { LogDetail } from './components/LogDetail'
 import { LogStepSummary } from './components/LogTimeline'
 import { LogUser } from './components/LogUser'
 import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import { RequestTrace } from './components/RequestTrace'
 import { useLogEnrichment } from './components/useLogEnrichment'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
@@ -49,17 +51,23 @@ export function ServiceFlowPanel({
 
   const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
   const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
+  const enableTracesWaterfall = useFlag('enableTracesWaterfall')
   const hasMultiple = selectedRows.length > 1
   const selectedRow = selectedRows[0]
   const activeLog =
     (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
   const isProcessLog = selectedRow?.log_type === 'compute' || selectedRow?.log_type === 'pipelines'
   const showTimeline = isRequestTimelineEnabled && !isProcessLog
+  // Always present when the Timeline is: a request with no trace shows an empty state rather
+  // than a tab that appears and disappears as the trace resolves.
+  const showTrace = showTimeline && enableTracesWaterfall
   const showUser = !isProcessLog
+
   const tabs = [
     'overview',
     'raw-json',
     ...(showTimeline ? ['timeline'] : []),
+    ...(showTrace ? ['trace'] : []),
     ...(showUser ? ['user'] : []),
   ]
   const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
@@ -135,6 +143,11 @@ export function ServiceFlowPanel({
                     Timeline
                   </TabsTrigger>
                 )}
+                {showTrace && (
+                  <TabsTrigger value="trace" className={TAB_TRIGGER_CLASS_NAME}>
+                    Trace
+                  </TabsTrigger>
+                )}
                 {showUser && (
                   <TabsTrigger value="user" className={TAB_TRIGGER_CLASS_NAME}>
                     User
@@ -155,6 +168,7 @@ export function ServiceFlowPanel({
                       onSelectLog={handleSelectTimelineLog}
                     />
                   )}
+                  {tab === 'trace' && selectedRow && <RequestTrace row={selectedRow} />}
                   {tab === 'user' && activeLog && (
                     <LogUser row={activeLog} searchParameters={searchParameters} />
                   )}
