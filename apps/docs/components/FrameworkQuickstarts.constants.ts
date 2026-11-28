@@ -1,10 +1,11 @@
 import { isFeatureEnabled } from 'common/enabled-features'
 
 const {
+  sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
   sdkKotlin: sdkKotlinEnabled,
   sdkSwift: sdkSwiftEnabled,
-} = isFeatureEnabled(['sdk:dart', 'sdk:kotlin', 'sdk:swift'])
+} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:swift'])
 
 export const frameworks = [
   {
@@ -88,6 +89,12 @@ export const frameworks = [
     icon: '/docs/img/icons/flutter-icon',
     href: '/guides/getting-started/quickstarts/flutter',
     enabled: sdkDartEnabled,
+  },
+  {
+    name: 'Unity',
+    icon: '/docs/img/icons/c-sharp-icon',
+    href: '/guides/getting-started/quickstarts/unity',
+    enabled: sdkCsharpEnabled,
   },
   {
     name: 'Python',

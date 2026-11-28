@@ -179,6 +179,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       description: 'Ship iOS and Android from one Dart codebase, backed by Supabase Postgres.',
     },
     {
+      title: 'Unity',
+      href: '/guides/getting-started/quickstarts/unity',
+      icon: '/docs/img/icons/c-sharp-icon',
+      hasLightIcon: false,
+      feature: 'sdk:csharp',
+      description: 'Games and apps in Unity, reading Postgres through the Supabase C# SDK.',
+    },
+    {
       title: 'Python',
       href: '/guides/getting-started/quickstarts/flask',
       icon: '/docs/img/icons/python-icon',

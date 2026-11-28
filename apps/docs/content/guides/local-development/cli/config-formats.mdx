@@ -81,7 +81,7 @@ supabase config validate
 
 The command reports every problem in one pass, each with its key path and `file:line:column`. It exits with `0` when the file is valid and `1` when it has errors. It doesn't contact the Supabase API or modify any file.
 
-Values written as `env()` references aren't checked unless you pass `--resolve-env`, which reads your shell and `.env` files.
+Values written as [`env()` references](/docs/guides/local-development/managing-config#using-secrets-inside-configtoml) aren't checked unless you pass `--resolve-env`, which reads your shell and `.env` files.
 
 To catch problems before they merge, add the command to a CI workflow:
 
