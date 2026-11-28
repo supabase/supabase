@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { FAQSection } from './_components/FAQSection'
 import { FrameworksSection } from './_components/FrameworksSection'
 import { HomeContent } from './_components/HomeContent'
 import { DEFAULT_META_DESCRIPTION } from '@/lib/constants'
@@ -70,7 +71,7 @@ export default function HomePage() {
           ),
         }}
       />
-      <HomeContent frameworksSlot={<FrameworksSection />} />
+      <HomeContent frameworksSlot={<FrameworksSection />} faqSlot={<FAQSection />} />
     </>
   )
 }

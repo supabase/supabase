@@ -84,3 +84,5 @@ npx supabase login
 - GitHub: https://github.com/supabase/supabase
 - Pricing: https://supabase.com/pricing
 - Pricing (markdown): https://supabase.com/pricing.md
+
+<!-- HOME_FAQ -->

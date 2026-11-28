@@ -22,7 +22,13 @@ const OpenSourceSection = dynamic(() =>
   import('./OpenSourceSection').then((mod) => mod.OpenSourceSection)
 )
 
-export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNode }) {
+export function HomeContent({
+  frameworksSlot,
+  faqSlot,
+}: {
+  frameworksSlot: React.ReactNode
+  faqSlot: React.ReactNode
+}) {
   const content = getContent()
 
   return (
@@ -51,6 +57,9 @@ export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNod
       </section>
       <section id="open-source" className="border-b border-border overflow-hidden">
         <OpenSourceSection />
+      </section>
+      <section id="faq" className="border-b border-border">
+        {faqSlot}
       </section>
       <section id="cta">
         <CTASection />
