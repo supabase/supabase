@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest'
 
-import { ident, keyword, literal, safeSql } from '../src/pg-format'
+import { ident, keyword, literal, safeSql, string } from '../src/pg-format'
 
 describe('pg-format', () => {
   describe('ident', () => {
@@ -129,6 +129,19 @@ describe('pg-format', () => {
       expect(literal(['a', 'b', 'c'])).toBe("'a','b','c'")
     })
 
+    test('should convert nested arrays to grouped lists', () => {
+      // a leading nested array must not be prefixed with a space
+      expect(literal([['a', 'b']])).toBe("('a', 'b')")
+      expect(
+        literal([
+          ['a', 'b'],
+          ['c', 'd'],
+        ])
+      ).toBe("('a', 'b'), ('c', 'd')")
+      // only groups that follow another element are separated by one
+      expect(literal(['a', ['b', 'c']])).toBe("'a', ('b', 'c')")
+    })
+
     test('should handle objects as JSON', () => {
       expect(literal({ name: 'test' })).toBe('\'{"name":"test"}\'::jsonb')
       expect(literal({ id: 1, name: 'test' })).toBe('\'{"id":1,"name":"test"}\'::jsonb')
@@ -137,6 +150,21 @@ describe('pg-format', () => {
     test('should handle strings with backslashes', () => {
       expect(literal('path\\to\\file')).toBe("E'path\\\\to\\\\file'")
       expect(literal('C:\\Users\\test')).toBe("E'C:\\\\Users\\\\test'")
+    })
+  })
+
+  describe('string', () => {
+    test('should convert nested arrays to grouped lists', () => {
+      // a leading nested array must not be prefixed with a space
+      expect(string([[1, 2]])).toBe('(1, 2)')
+      expect(
+        string([
+          [1, 2],
+          [3, 4],
+        ])
+      ).toBe('(1, 2), (3, 4)')
+      // only groups that follow another element are separated by one
+      expect(string([1, [2, 3]])).toBe('1, (2, 3)')
     })
   })
 
