@@ -5,6 +5,7 @@ import LegalDocVersions, { type LegalDocVersion } from '~/components/Legal/Legal
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
 import V1 from '~/data/legal/customer-resources/sfp-addendum/v1.mdx'
+import V2 from '~/data/legal/customer-resources/sfp-addendum/v2.mdx'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { NextSeo } from 'next-seo'
 
@@ -20,6 +21,7 @@ const meta = {
 }
 
 const versions: LegalDocVersion[] = [
+  { id: 'v2', label: 'Version 2', effectiveDate: 'November 24, 2026', Component: V2 },
   { id: 'v1', label: 'Version 1', effectiveDate: 'October 22, 2026', Component: V1 },
 ]
 
