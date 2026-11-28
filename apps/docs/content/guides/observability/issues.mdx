@@ -1,0 +1,96 @@
+---
+id: 'issues'
+title: 'Issue Inbox'
+description: 'Health, security, and performance issues you or an agent can check for in a project.'
+---
+
+Issue Inbox flags health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. You can use Issue Inbox alongside [Advisors](/docs/guides/observability/advisors).
+
+You or an agent can check for issues from:
+
+- Studio: [Health issues](/dashboard/project/_/issues?category=health), [Security issues](/dashboard/project/_/issues?category=security), and [Performance issues](/dashboard/project/_/issues?category=performance)
+- MCP: `get_issues`
+- CLI: [`supabase issues`](/docs/reference/cli/supabase-issues)
+- Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
+
+The **Issues** table lists findings from the latest checks. Use [Reports](/docs/guides/observability/reports) to monitor metrics over time.
+
+Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
+
+## Check issues with the CLI
+
+`supabase issues` requires CLI `v3.5.0-beta.1` or later on the beta channel, or `v4.0.0-next.51` or later on the next channel. Stable `v3.4.0` does not include the command.
+
+If you use the stable CLI, try the beta without changing your installed version:
+
+```sh
+npx --yes supabase@beta issues --remote
+```
+
+Replace `supabase` with `npx --yes supabase@beta` in the examples below to keep using the beta.
+
+Run checks against your local database, or use `--remote` for your linked project:
+
+```sh
+supabase issues
+supabase issues --remote
+supabase issues --remote --type security --severity warning --fail-on warning
+supabase issues --remote --output-format json
+```
+
+`--type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `--severity` sets the minimum severity: `info`, `warning`, or `critical`. It defaults to `info`.
+
+Health checks cover elevated log error rates for the Data API, Auth, Storage, and Edge Functions and require a hosted project. They do not assess CPU, memory, disk, or connection saturation. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. Use `--remote=<project-ref>` or `--remote=<branch>` to select another hosted project, or `--remote=<postgresql-url>` for direct database checks. Supply the target with `=`, as in `--remote=your-project-ref`.
+
+Hosted CLI checks require **Advisors** read access (`advisors_read`). Selecting a project can also require `projects_read`; resolving a branch can require `branching_development_read` or `branching_production_read`. Use `supabase issues --help` to inspect conditional token permissions.
+
+The CLI defaults to JSON when it detects an agent. Use `--agent no --output-format text` to request human-readable output explicitly.
+
+Text output summarizes each issue and its affected-resource count, followed by check coverage. Use `--output-format json` or `--output-format stream-json` for structured results. The legacy `-o` / `--output` flag is unsupported.
+
+`--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`. API, network, or decoding failures preserve successful categories and mark the failed category unavailable. Authentication and permission failures stop the command.
+
+The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command remains available with its existing flags, defaults, output, and exit behavior.
+
+## Check issues with MCP
+
+<Admonition type="note">
+
+`get_issues` is included in `@supabase/mcp-server-supabase` `v0.20.0` and later. Hosted MCP availability depends on its deployment. If your MCP client lists `get_issues`, use it. If it only lists `get_advisors`, use that tool until your server updates.
+
+</Admonition>
+
+On a project-scoped connection, these `get_issues` arguments request security issues at warning severity or above:
+
+```json
+{
+  "type": "security",
+  "severity": "warning"
+}
+```
+
+`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. On a project-scoped connection, the server supplies `project_id` and omits it from the tool’s input schema. On an account-wide connection, add `"project_id": "your-project-ref"` to the arguments. Send `type` and `severity` explicitly when following the discovery schema. Platforms without health support omit `health` from the advertised type values; `all` still reports health as unavailable.
+
+`get_issues` belongs to the `debugging` feature group and supports read-only connections. Hosted checks require **Advisors** read access (`advisors_read`). A tool listed in discovery can still reject calls when your token lacks this permission.
+
+ChatGPT connections using published plugin metadata need an updated plugin submission to expose the new tool.
+
+The `get_advisors` tool remains available for existing callers.
+
+## Interpret results
+
+CLI structured output and `get_issues` return `issues` and `checks`:
+
+- `issues` groups findings by check. Each issue includes its `id`, `title`, `description`, `severity`, `category`, `source`, and `docs_url`. The issue-level `docs_url` provides a portable link to the relevant documentation for the check.
+- Each `affected` entry identifies a finding with its resource, detail, severity, and finding ID. CLI structured output also includes documentation links for individual findings. Severity filtering selects issues by their highest finding severity, and the CLI retains all findings within a matching issue. MCP returns up to 20 `affected` entries per issue, with the full total in `affected_count`. Issue severity reflects all findings, including entries beyond that limit.
+- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable. MCP retains available findings when another category’s check fails. Authentication, permission, and protocol errors still fail the tool call.
+
+Check IDs identify checks within a project, rather than persistent incidents. These interfaces inspect current findings; they do not dismiss issues or track their resolution.
+
+An empty `issues` list means no issues match your filter. Review `checks` before treating that result as clear: an unavailable check means the assessment is incomplete.
+
+`supabase issues` and `get_issues` normalize underlying lint levels: `INFO` becomes `info`, `WARN` becomes `warning`, and `ERROR` becomes `critical`. Existing Advisors API responses retain their lint-level names.
+
+## Available checks
+
+<DatabaseAdvisorsIndex />

@@ -38,6 +38,12 @@ export const telemetryAccessWhat: ContentListingGroup = {
       description: 'Inspect live Postgres stats from the CLI, Explorer, or MCP.',
     },
     {
+      title: 'Issue Inbox',
+      href: '/guides/observability/issues',
+      description:
+        'Check health, security, and performance issues from Studio, MCP, the CLI, or the API.',
+    },
+    {
       title: 'Advisors',
       href: '/guides/observability/advisors',
       description: 'Pull security and performance findings from Studio, MCP, the CLI, or the API.',

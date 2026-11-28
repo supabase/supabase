@@ -24,9 +24,15 @@ export async function DatabaseAdvisorsIndex() {
     )
   }
 
+  const advisors = [...healthAdvisors, ...lints]
+
   return (
-    <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:m-0!" queryGroup="lint">
-      {[...healthAdvisors, ...lints].map((lint) => (
+    <Tabs
+      listClassNames="flex flex-wrap gap-2 [&>button]:m-0!"
+      queryGroup="lint"
+      activePanelAnchorsOnly
+    >
+      {advisors.map((lint) => (
         <TabPanel key={lint.path} id={lint.path} label={capitalize(lint.path.replace(/_/g, ' '))}>
           <section id={lint.path}>
             <MDXRemoteBase source={lint.content} />

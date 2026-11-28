@@ -13,6 +13,7 @@ import {
   type KeyboardEvent,
 } from 'react'
 import { cn, TabsContent, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
+import { HeadingAnchorsContext } from 'ui/src/components/CustomHTMLElements/Heading'
 
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
 import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
@@ -23,6 +24,7 @@ export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
+  activePanelAnchorsOnly?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   block?: boolean
   onChange?: (id: string) => void
@@ -132,6 +134,7 @@ const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 
 export const Tabs = ({
   defaultActiveId,
   activeId,
+  activePanelAnchorsOnly = false,
   type = 'pills',
   size = 'tiny',
   block,
@@ -265,7 +268,13 @@ export const Tabs = ({
         {addOnAfter}
         {type === 'underlined' ? <TabsIndicator /> : null}
       </TabsList>
-      {childrenArr}
+      {activePanelAnchorsOnly
+        ? childrenArr.map((tab) => (
+            <HeadingAnchorsContext.Provider key={tab.props.id} value={activeTab === tab.props.id}>
+              {tab}
+            </HeadingAnchorsContext.Provider>
+          ))
+        : childrenArr}
     </TabsRoot>
   )
 }

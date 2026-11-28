@@ -24,6 +24,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-issues",
+        "title": "Check project issues",
+        "slug": "supabase-issues",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-init",
         "title": "Initialize a local project",
         "slug": "supabase-init",

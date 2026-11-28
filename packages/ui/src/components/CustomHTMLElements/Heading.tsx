@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useCallback, type HTMLAttributes } from 'react'
+import { createContext, forwardRef, useCallback, useContext, type HTMLAttributes } from 'react'
 import { useInView } from 'react-intersection-observer'
 
 import {
@@ -10,6 +10,8 @@ import {
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
 import { CopyHeadingLinkButton } from './CopyHeadingLinkButton'
+
+export const HeadingAnchorsContext = createContext(true)
 
 interface Props extends HTMLAttributes<HTMLHeadingElement> {
   tag?: string
@@ -29,9 +31,11 @@ interface Props extends HTMLAttributes<HTMLHeadingElement> {
 const Heading = forwardRef(
   ({ tag, customAnchor, children, ...props }: React.PropsWithChildren<Props>, forwardedRef) => {
     const HeadingTag = `${tag}` as any
-    const anchor = customAnchor ? customAnchor : getAnchor(children, props)
+    const anchorsEnabled = useContext(HeadingAnchorsContext)
+    const anchor = anchorsEnabled ? customAnchor || getAnchor(children, props) : undefined
 
     const { ref: viewRef } = useInView({
+      skip: !anchorsEnabled,
       threshold: 1,
       rootMargin: '-20% 0% -35% 0px',
       onChange: (inView, entry) => {
@@ -53,7 +57,12 @@ const Heading = forwardRef(
     )
 
     return (
-      <HeadingTag id={anchor} ref={combinedRef} className="group scroll-mt-24" {...props}>
+      <HeadingTag
+        ref={combinedRef}
+        className="group scroll-mt-24"
+        {...props}
+        id={anchorsEnabled ? (props.id ?? anchor) : undefined}
+      >
         {removeAnchor(children)}
         {anchor && <CopyHeadingLinkButton id={anchor} className="ml-2 align-middle" />}
       </HeadingTag>

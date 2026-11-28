@@ -25,13 +25,32 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
   })
 
-  test('advisors page renders (full content or graceful fallback, never a crash)', async ({
-    page,
-  }) => {
-    const response = await page.goto('/docs/guides/observability/advisors')
+  test('advisors page preserves its legacy route and query parameters', async ({ page }) => {
+    const response = await page.goto(
+      '/docs/guides/observability/advisors?lint=0001_unindexed_foreign_keys&queryGroups=lint'
+    )
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
-    await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Advisors', exact: true })).toBeVisible()
+    await expect(
+      page.locator('article').getByRole('link', { name: 'Issue Inbox', exact: true })
+    ).toHaveAttribute('href', '/docs/guides/observability/issues')
+    await expect(
+      page.locator('article').getByRole('link', { name: 'Security Advisor', exact: true })
+    ).toHaveAttribute('href', /\/dashboard\/project\/_\/advisors\/security$/)
+    await expect(page.getByRole('heading', { name: 'Available checks' })).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/docs/guides/observability/advisors')
+    expect(new URL(page.url()).searchParams.get('lint')).toBe('0001_unindexed_foreign_keys')
+    expect(new URL(page.url()).searchParams.getAll('queryGroups')).toContain('lint')
+  })
+
+  test('issues page renders (full content or graceful fallback, never a crash)', async ({
+    page,
+  }) => {
+    const response = await page.goto('/docs/guides/observability/issues')
+    expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
+
+    await expect(page.getByRole('heading', { name: 'Issue Inbox', exact: true })).toBeVisible()
   })
 
   test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {
