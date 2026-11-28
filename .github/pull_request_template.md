@@ -1,3 +1,10 @@
+<!--
+Blocked by another PR or an unshipped feature? Keep this PR as a draft, and replace this comment with:
+
+> [!WARNING]
+> This PR relies on #000 being merged first.
+-->
+
 ## Problem
 
 Describe what went wrong or what need emerged to justify this bug fix, feature, or change.
@@ -30,6 +37,18 @@ Copy the preview base URL from the Vercel bot comment on this PR. Use the follow
 Optionally add any other context or screenshots.
 
 -->
+
+## Review category (docs PRs only)
+
+<!--
+If this PR changes docs and you're on the Supabase team, select one category. It sets the review deadline, counted in business days from when the PR is marked ready for review.
+PRs from forks are always reviewed as Low, so you can skip this section.
+-->
+
+- [ ] Critical: needs a review as soon as possible (1 business day)
+- [ ] Urgent: the feature ships soon, or it's blocking something else (3 business days)
+- [ ] Moderate: good to have soon, not urgent (5 business days)
+- [ ] Low: get to it when you can (10 business days)
 
 ## Review instructions
 
