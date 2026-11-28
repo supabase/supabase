@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatFunctionBodyToFiles,
   getDefaultSelectedFileId,
+  getFallbackImportMapPath,
   getFunctionZipEntries,
 } from './EdgeFunctions.utils'
 
@@ -287,5 +288,27 @@ describe('getFunctionZipEntries', () => {
       expect(path.split('/')).not.toContain('..')
       expect(path.split('/')).not.toContain('')
     }
+  })
+})
+
+describe('getFallbackImportMapPath', () => {
+  it.each(['deno.json', 'deno.jsonc', 'import_map.json', 'functions/hello/deno.jsonc'])(
+    'finds %s',
+    (name) => {
+      const files = [{ name: 'index.ts' }, { name }]
+      expect(getFallbackImportMapPath(files)).toBe(name)
+    }
+  )
+
+  it.each([
+    'deno.jso',
+    'deno-json',
+    'import_map.jsonn',
+    'deno.json.bak',
+    'notdeno.json',
+    'dir/myimport_map.json',
+  ])('ignores %s', (name) => {
+    const files = [{ name: 'index.ts' }, { name }]
+    expect(getFallbackImportMapPath(files)).toBeUndefined()
   })
 })
