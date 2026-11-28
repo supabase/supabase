@@ -42,24 +42,24 @@ The sign-in flow works as follows:
 
 ## Step 1: Generate an RSA private key
 
-SAML requests must be signed. The value expected by `GOTRUE_SAML_PRIVATE_KEY` is a Base64-encoded PKCS#1 DER RSA private key (with a 2048-bit key as the minimum requirement). Generate it with the commands for your platform.
+SAML requests must be signed. The value expected by `GOTRUE_SAML_PRIVATE_KEY` is a Base64-encoded PKCS#1 DER RSA private key (with a 2048-bit key as the minimum requirement). Generate it with the command for your platform.
 
-On Linux with OpenSSL 3:
+On Linux and other systems with OpenSSL 1.1.1 or 3.x:
 
 ```sh
 (umask 077 && \
-openssl genpkey -algorithm RSA -out pk_pkcs8.pem -quiet && \
-openssl pkey -in pk_pkcs8.pem -out pk_rsa1.der -outform DER -traditional && \
-base64 -w 0 -i pk_rsa1.der)
+openssl genpkey -algorithm RSA -out pk_pkcs8.pem && \
+openssl pkey -in pk_pkcs8.pem -outform DER -traditional -out pk_rsa1.der && \
+base64 < pk_rsa1.der | tr -d '\n')
 ```
 
-On macOS, use the system LibreSSL (`/usr/bin/openssl`). It does not support `-quiet` or `-traditional`, and a Homebrew OpenSSL earlier in `PATH` would write PKCS#8 DER:
+On macOS, use the system LibreSSL (`/usr/bin/openssl`), which does not support `-traditional`:
 
 ```sh
 (umask 077 && \
 /usr/bin/openssl genpkey -algorithm RSA -out pk_pkcs8.pem && \
-/usr/bin/openssl rsa -in pk_pkcs8.pem -out pk_rsa1.der -outform DER && \
-base64 -i pk_rsa1.der | tr -d '\n')
+/usr/bin/openssl pkey -in pk_pkcs8.pem -outform DER -out pk_rsa1.der && \
+base64 < pk_rsa1.der | tr -d '\n')
 ```
 
 The commands above:
