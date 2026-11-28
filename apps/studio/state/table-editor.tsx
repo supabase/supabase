@@ -2,16 +2,18 @@ import * as Sentry from '@sentry/react'
 import type { PGColumn } from '@supabase/pg-meta'
 import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import {
   NewQueuedOperation,
   QueuedOperationType,
   type OperationQueueState,
-  type QueueStatus,
+  type QueuedOperation,
 } from './table-editor-operation-queue.types'
 import type { SupaRow } from '@/components/grid/types'
 import {
+  areEditValuesEqual,
+  operationMatchesRow,
   resolveDeleteRowConflicts,
   resolveEditCellConflicts,
   upsertOperation,
@@ -20,6 +22,7 @@ import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUt
 import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { Dictionary } from '@/types'
 
@@ -80,6 +83,8 @@ export type UIState =
  * See ./table-editor-table.tsx for table specific state.
  */
 export const createTableEditorState = () => {
+  const savingOperations = new Map<string, QueuedOperation>()
+
   const state = proxy({
     rowsPerPage: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
     setRowsPerPage: (rowsPerPage: number) => {
@@ -274,6 +279,40 @@ export const createTableEditorState = () => {
      * - DELETE_ROW on a newly added row: cancel both operations
      */
     queueOperation: (operation: NewQueuedOperation) => {
+      if (operation.type !== QueuedOperationType.ADD_ROW) {
+        const { rowIdentifiers, table } = operation.payload
+        const tempId = rowIdentifiers.__tempId
+        if (typeof tempId === 'string') {
+          const pendingInsert = state.operationQueue.operations.find(
+            (op) =>
+              op.type === QueuedOperationType.ADD_ROW &&
+              op.tableId === operation.tableId &&
+              op.payload.tempId === tempId
+          )
+          if (pendingInsert && savingOperations.has(pendingInsert.id)) return false
+
+          const hasTempIdPrimaryKey =
+            isTableLike(table) && table.primary_keys.some((key) => key.name === '__tempId')
+          if (!pendingInsert && !hasTempIdPrimaryKey) return false
+        }
+
+        // A delete or primary key update invalidates the identifiers for the next batch.
+        for (const savingOperation of savingOperations.values()) {
+          const changesRowIdentity =
+            savingOperation.type === QueuedOperationType.DELETE_ROW ||
+            (savingOperation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+              Object.hasOwn(
+                savingOperation.payload.rowIdentifiers,
+                savingOperation.payload.columnName
+              ))
+          if (
+            changesRowIdentity &&
+            operationMatchesRow(savingOperation, operation.tableId, rowIdentifiers)
+          ) {
+            return false
+          }
+        }
+      }
       const updateQueueStatus = () => {
         if (state.operationQueue.operations.length === 0) {
           state.operationQueue.status = 'idle'
@@ -307,7 +346,13 @@ export const createTableEditorState = () => {
       }
 
       // Normal upsert
-      const { operations } = upsertOperation(state.operationQueue.operations, operation)
+      const { operations } = upsertOperation(
+        state.operationQueue.operations,
+        operation,
+        operation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+          savingOperations.size > 0 &&
+          savingOperations.has(generateTableChangeKey(operation))
+      )
       state.operationQueue.operations = operations
       updateQueueStatus()
     },
@@ -316,14 +361,17 @@ export const createTableEditorState = () => {
      * Clear all operations from the queue
      */
     clearQueue: () => {
+      if (state.operationQueue.status === 'saving') return false
       state.operationQueue.operations = []
       state.operationQueue.status = 'idle'
+      return true
     },
 
     /**
      * Remove a specific operation from the queue
      */
     removeOperation: (operationId: string) => {
+      if (state.operationQueue.status === 'saving') return
       state.operationQueue.operations = state.operationQueue.operations.filter(
         (op) => op.id !== operationId
       )
@@ -336,17 +384,49 @@ export const createTableEditorState = () => {
      * Undo the latest operation from the queue
      */
     undoLatestOperation: () => {
+      if (state.operationQueue.status === 'saving') return
       state.operationQueue.operations = state.operationQueue.operations.slice(0, -1)
       if (state.operationQueue.operations.length === 0) {
         state.operationQueue.status = 'idle'
       }
     },
 
-    /**
-     * Update the queue status
-     */
-    setQueueStatus: (status: QueueStatus) => {
-      state.operationQueue.status = status
+    startQueueSave: () => {
+      const { operations, status } = state.operationQueue
+      if (status === 'saving' || operations.length === 0) return
+
+      // Keep the immutable operations sent to the mutation, even if the live queue changes.
+      const batch = snapshot(operations) as readonly QueuedOperation[]
+      for (const operation of batch) {
+        savingOperations.set(operation.id, operation)
+      }
+      state.operationQueue.status = 'saving'
+      return batch
+    },
+
+    finishQueueSave: (isSuccess: boolean) => {
+      state.operationQueue.operations = state.operationQueue.operations.flatMap((operation) => {
+        const sent = savingOperations.get(operation.id)
+        if (!sent) return [operation]
+        // An edit can reuse the same ID and timestamp within one millisecond.
+        if (snapshot(operation) === sent) return isSuccess ? [] : [operation]
+
+        if (
+          operation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+          sent.type === QueuedOperationType.EDIT_CELL_CONTENT
+        ) {
+          const oldValue = isSuccess ? sent.payload.newValue : sent.payload.oldValue
+          if (areEditValuesEqual(oldValue, operation.payload.newValue)) return []
+          return [{ ...operation, payload: { ...operation.payload, oldValue } }]
+        }
+
+        return [operation]
+      })
+      savingOperations.clear()
+      const hasPendingOperations = state.operationQueue.operations.length > 0
+      state.operationQueue.status = hasPendingOperations ? 'pending' : 'idle'
+      if (isSuccess) state.closeSidePanel()
+      return hasPendingOperations
     },
 
     /**

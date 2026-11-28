@@ -143,9 +143,25 @@ export function resolveEditCellConflicts(
   return { action: 'add' }
 }
 
+export function areEditValuesEqual(oldValue: unknown, newValue: unknown): boolean {
+  // The grid can render numbers and JSON in a different representation.
+  return (
+    (typeof oldValue === 'number' &&
+      typeof newValue === 'string' &&
+      newValue.trim() !== '' &&
+      Number(oldValue) === Number(newValue)) ||
+    (typeof oldValue === 'string' &&
+      newValue !== null &&
+      typeof newValue === 'object' &&
+      isEqual(tryParseJson(oldValue), newValue)) ||
+    oldValue === newValue
+  )
+}
+
 export function upsertOperation(
   operations: readonly QueuedOperation[],
-  newOperation: NewQueuedOperation
+  newOperation: NewQueuedOperation,
+  preserveRevert = false
 ): UpsertResult {
   const operationKey = generateTableChangeKey(newOperation)
   const existingOpIndex = operations.findIndex((op) => op.id === operationKey)
@@ -167,15 +183,13 @@ export function upsertOperation(
       queuedOperation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
       existingOp.type === QueuedOperationType.EDIT_CELL_CONTENT
     ) {
-      queuedOperation.payload.oldValue = existingOp.payload.oldValue
+      queuedOperation.payload = {
+        ...queuedOperation.payload,
+        oldValue: existingOp.payload.oldValue,
+      }
 
       const { oldValue, newValue } = queuedOperation.payload
-      // [Joshen] These comparisons by data type are because of how the table editor renders the values
-      if (
-        (typeof oldValue === 'number' && Number(oldValue) === Number(newValue)) ||
-        (typeof newValue === 'object' && isEqual(tryParseJson(oldValue), newValue)) ||
-        oldValue === newValue
-      ) {
+      if (!preserveRevert && areEditValuesEqual(oldValue, newValue)) {
         updatedOperations.splice(existingOpIndex, 1)
         return { operations: updatedOperations }
       }

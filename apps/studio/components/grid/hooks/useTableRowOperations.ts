@@ -20,6 +20,8 @@ import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import type { Dictionary } from '@/types'
 
+const ROW_SAVE_IN_PROGRESS = 'Wait for the current save to finish, then try again.'
+
 export interface EditCellParams {
   table: Entity
   tableId: number
@@ -121,7 +123,7 @@ export function useTableRowOperations() {
   const editCell = useCallback(
     async (params: EditCellParams) => {
       if (isQueueEnabled) {
-        queueCellEditWithOptimisticUpdate({
+        const queued = queueCellEditWithOptimisticUpdate({
           queueOperation: tableEditorSnap.queueOperation,
           tableId: params.tableId,
           table: params.table,
@@ -132,6 +134,7 @@ export function useTableRowOperations() {
           newValue: params.newValue,
           enumArrayColumns: params.enumArrayColumns,
         })
+        if (queued === false) toast.error(ROW_SAVE_IN_PROGRESS)
         return
       }
 
@@ -157,7 +160,7 @@ export function useTableRowOperations() {
       if (isQueueEnabled) {
         // Queue individual cell edits per changed column
         for (const columnName of Object.keys(params.payload)) {
-          queueCellEditWithOptimisticUpdate({
+          const queued = queueCellEditWithOptimisticUpdate({
             queueOperation: tableEditorSnap.queueOperation,
             tableId: params.tableId,
             table: params.table,
@@ -168,6 +171,10 @@ export function useTableRowOperations() {
             newValue: params.payload[columnName],
             enumArrayColumns: params.enumArrayColumns,
           })
+          if (queued === false) {
+            toast.error(ROW_SAVE_IN_PROGRESS)
+            throw new Error(ROW_SAVE_IN_PROGRESS)
+          }
         }
         return
       }
@@ -222,12 +229,16 @@ export function useTableRowOperations() {
     (params: DeleteRowsParams) => {
       // When queue is enabled and not all rows are selected, queue the deletes
       if (isQueueEnabled && !params.allRowsSelected) {
-        queueRowDeletesWithOptimisticUpdate({
+        const queued = queueRowDeletesWithOptimisticUpdate({
           rows: params.rows,
           table: params.table,
           queueOperation: tableEditorSnap.queueOperation,
           projectRef: project?.ref,
         })
+        if (queued === false) {
+          toast.error(ROW_SAVE_IN_PROGRESS)
+          return
+        }
         params.callback?.()
         return
       }

@@ -91,7 +91,7 @@ export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>):
 }
 
 interface QueueCellEditParams {
-  queueOperation: (operation: NewQueuedOperation) => void
+  queueOperation: (operation: NewQueuedOperation) => false | void
   tableId: number
   table: Entity
   row: SupaRow
@@ -119,8 +119,7 @@ export function queueCellEditWithOptimisticUpdate({
     rowIdentifiers.__tempId = row.__tempId
   }
 
-  // Queue the operation
-  queueOperation({
+  return queueOperation({
     type: QueuedOperationType.EDIT_CELL_CONTENT,
     tableId,
     payload: {
@@ -142,6 +141,8 @@ interface QueueRowAddParams {
   enumArrayColumns?: string[]
 }
 
+let lastPendingRowIndex = 0
+
 export function queueRowAddWithOptimisticUpdate({
   queueOperation,
   tableId,
@@ -150,7 +151,8 @@ export function queueRowAddWithOptimisticUpdate({
   enumArrayColumns,
 }: QueueRowAddParams) {
   // Generate unique idx and tempId for this pending row
-  const idx = -Date.now()
+  const idx = Math.min(-Date.now(), lastPendingRowIndex - 1)
+  lastPendingRowIndex = idx
   const tempId = String(idx)
 
   // Queue the operation
@@ -226,7 +228,7 @@ export const formatGridDataWithOperationValues = ({
 interface QueueRowDeletesParams {
   rows: SupaRow[]
   table: Entity
-  queueOperation: (operation: NewQueuedOperation) => void
+  queueOperation: (operation: NewQueuedOperation) => false | void
   projectRef: string | undefined
 }
 
@@ -239,7 +241,7 @@ export function queueRowDeletesWithOptimisticUpdate({
   table,
   queueOperation,
   projectRef,
-}: QueueRowDeletesParams): void {
+}: QueueRowDeletesParams) {
   // [Ali] We can handle these better in the future
   // right now this is a pretty abnormal case of this occurring
   if (!projectRef) {
@@ -257,6 +259,7 @@ export function queueRowDeletesWithOptimisticUpdate({
     return
   }
 
+  let hasBlockedDeletes = false
   for (const row of rows) {
     const rowIdentifiers: Record<string, unknown> = {}
     table.primary_keys.forEach((pk) => {
@@ -267,7 +270,7 @@ export function queueRowDeletesWithOptimisticUpdate({
       stableRowIdentifiers.__tempId = row.__tempId
     }
 
-    queueOperation({
+    const queued = queueOperation({
       type: QueuedOperationType.DELETE_ROW,
       tableId: table.id,
       payload: {
@@ -276,5 +279,7 @@ export function queueRowDeletesWithOptimisticUpdate({
         table,
       },
     })
+    if (queued === false) hasBlockedDeletes = true
   }
+  return !hasBlockedDeletes
 }

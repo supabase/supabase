@@ -59,6 +59,6 @@ export function useOperationQueueShortcuts() {
         })
       }
     },
-    { enabled: isEnabled }
+    { enabled: isEnabled && !isSaving }
   )
 }
