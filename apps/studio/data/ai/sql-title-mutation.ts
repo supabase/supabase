@@ -43,7 +43,6 @@ async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
 type SqlTitleGenerateData = Awaited<ReturnType<typeof generateSqlTitle>>
 
 export const useSqlTitleGenerateMutation = ({
-  onSuccess,
   onError,
   ...options
 }: Omit<
