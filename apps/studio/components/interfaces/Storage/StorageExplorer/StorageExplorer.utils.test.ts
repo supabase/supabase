@@ -251,6 +251,16 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       )
     })
 
+    it('chooses an unused name when a numbered duplicate has been deleted', () => {
+      const existingNames = ['file.txt', 'file (2).txt']
+      const state = makeState([existingNames.map((name) => ({ name }))])
+
+      const result = sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })
+
+      expect(result).toMatch(/^file \(\d+\)\.txt$/)
+      expect(existingNames).not.toContain(result)
+    })
+
     it('counts a reserved duplicate, so the suffix skips a name an archived file holds', () => {
       // Without this the upload lands on `file (1).txt` and restores the archived file,
       // which is exactly what picking "keep both" declined.
@@ -262,6 +272,28 @@ describe('sanitizeNameForDuplicateInColumn', () => {
           reservedNames: ['file (1).txt'],
         })
       ).toBe('file (2).txt')
+    })
+
+    it('treats regex metacharacters in the name literally', () => {
+      const state = makeState([[{ name: 'a+b.txt' }, { name: 'a+b (1).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'a+b.txt', autofix: true })).toBe(
+        'a+b (2).txt'
+      )
+    })
+
+    it('ignores unrelated names that only match when the name is read as a regex', () => {
+      // `a+b` as a pattern would match `aab (7).txt` and push the suffix to 8.
+      const state = makeState([[{ name: 'a+b.txt' }, { name: 'aab (7).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'a+b.txt', autofix: true })).toBe(
+        'a+b (1).txt'
+      )
+    })
+
+    it('matches the extension dot literally', () => {
+      const state = makeState([[{ name: 'file.txt' }, { name: 'file (5)xtxt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (1).txt'
+      )
     })
 
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
