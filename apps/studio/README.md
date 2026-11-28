@@ -59,28 +59,34 @@ pnpm run test -- --watch # run tests in watch mode
 
 Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker) to get started.
 
-```
-cd ..
-cd docker
-docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
-```
-
-Once you've got that set up, update `.env` in the studio folder with the corresponding values.
+From `apps/studio`, start the Docker services:
 
 ```
+cd ../../docker
+docker compose -f docker-compose.yml up
+```
+
+In another terminal in `apps/studio`, create `.env.local` and set these variables to the matching values from `../../docker/.env`:
+
+```
+PG_META_CRYPTO_KEY=
 POSTGRES_PASSWORD=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_KEY=
 ```
 
-Then run the following commands to install dependencies and start the dashboard.
+Use `ANON_KEY` for `SUPABASE_ANON_KEY` and `SERVICE_ROLE_KEY` for `SUPABASE_SERVICE_KEY`. The crypto key must match so postgres-meta can decrypt Studio's connection string.
 
-```
-npm install
-npm run dev
+From `apps/studio`, install dependencies and start the source dashboard on port 8083. Keep the Docker services running for the API gateway.
+
+```bash
+pnpm install
+STUDIO_PORT=8083 pnpm run dev
 ```
 
-If you would like to configure different defaults for "Default Organization" and "Default Project", you will need to update the `.env` in the studio folder with the corresponding values.
+Open http://localhost:8083.
+
+If you would like to configure different defaults for "Default Organization" and "Default Project", set the corresponding values in `.env.local`.
 
 ```
 DEFAULT_ORGANIZATION_NAME=
