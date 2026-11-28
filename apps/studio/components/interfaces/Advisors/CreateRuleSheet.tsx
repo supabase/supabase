@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -37,6 +37,7 @@ import { generateRuleDescription } from './AdvisorRules.utils'
 import { useLintRuleCreateMutation } from '@/data/lint/create-lint-rule-mutation'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { navigateToUrl } from '@/lib/navigation'
 
 interface CreateRuleSheetProps {
   lint?: LintInfo
@@ -65,10 +66,11 @@ const defaultValues = {
  * (Spoken with Hieu) We'll eventually support granularity of Entity/Items as well, just not atm
  */
 export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref: projectRef } = useParams()
 
-  const routeCategory = router.pathname.split('/').pop()
+  const routeCategory = pathname.split('/').pop()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
@@ -80,7 +82,8 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
 
       if (ruleLintMeta) {
         if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
-          router.push(
+          navigateToUrl(
+            navigate,
             `/project/${projectRef}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
           )
         } else {

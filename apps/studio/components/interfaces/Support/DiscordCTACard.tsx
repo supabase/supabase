@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
-import router from 'next/router'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button } from 'ui'
 
 import { NO_ORG_MARKER } from './SupportForm.utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { BASE_PATH } from '@/lib/constants'
 
 interface DiscordCTACardProps {
   organizationSlug?: string | null
@@ -42,7 +42,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
             <div
               className="absolute inset-0 opacity-20 md:opacity-30"
               style={{
-                backgroundImage: `url(${router.basePath}/img/support/discord-bg-small.jpg)`,
+                backgroundImage: `url(${BASE_PATH}/img/support/discord-bg-small.jpg)`,
                 backgroundSize: '75%',
                 backgroundPosition: '112% 50%',
                 backgroundRepeat: 'no-repeat',
@@ -64,9 +64,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
                   <Button
                     size="tiny"
                     variant="secondary"
-                    icon={
-                      <SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />
-                    }
+                    icon={<SVG src={`${BASE_PATH}/img/discord-icon.svg`} className="h-4 w-4" />}
                     className="bg-white hover:bg-white/90" // Force white button on all color schemes
                   >
                     <span style={{ color: '#404EED' }}>Ask on Discord</span>

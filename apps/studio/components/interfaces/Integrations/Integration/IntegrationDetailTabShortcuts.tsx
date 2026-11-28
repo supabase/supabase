@@ -1,6 +1,7 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 
 import type { IntegrationTab } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_REFERENCE_GROUPS } from '@/state/shortcuts/referenceGroups'
 import { DynamicShortcut } from '@/state/shortcuts/useDynamicShortcut'
 
@@ -24,7 +25,7 @@ export const IntegrationDetailTabShortcuts = ({
   tabs,
   enabled = true,
 }: IntegrationDetailTabShortcutsProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -37,7 +38,7 @@ export const IntegrationDetailTabShortcuts = ({
           referenceGroup={SHORTCUT_REFERENCE_GROUPS.NAVIGATION_INTEGRATIONS_DETAIL}
           enabled={enabled && !tab.active}
           registerInCommandMenu
-          callback={() => router.push(tab.href)}
+          callback={() => navigateToUrl(navigate, tab.href)}
         />
       ))}
     </>

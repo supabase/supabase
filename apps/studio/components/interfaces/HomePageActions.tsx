@@ -1,9 +1,9 @@
 import { keepPreviousData } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { GridIcon, ListIcon, Loader2Icon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { Button, ToggleGroup, ToggleGroupItem, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -31,7 +31,7 @@ interface HomePageActionsProps {
 
 export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
   const { slug: urlSlug } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const slug = _slug ?? urlSlug
@@ -170,7 +170,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           <Shortcut
             id={SHORTCUT_IDS.ORG_PROJECTS_NEW}
             onTrigger={() => {
-              if (slug) router.push(`/new/${slug}`)
+              if (slug) navigate({ to: '/new/$slug', params: { slug } })
             }}
             side="bottom"
           >

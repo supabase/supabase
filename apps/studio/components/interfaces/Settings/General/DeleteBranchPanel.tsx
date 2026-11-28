@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
 import {
@@ -18,10 +18,11 @@ import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const DeleteBranchPanel = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
@@ -120,7 +121,7 @@ export const DeleteBranchPanel = () => {
             },
             { project: projectRef }
           )
-          router.push(`/project/${projectRef}/branches`)
+          navigateToUrl(navigate, `/project/${projectRef}/branches`)
         }}
       />
 

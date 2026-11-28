@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CirclePauseIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -27,7 +27,7 @@ import {
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const PauseProjectButton = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
@@ -53,7 +53,7 @@ export const PauseProjectButton = () => {
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
-      router.push(`/project/${projectRef}`)
+      navigate({ to: '/project/$ref', params: { ref: projectRef } })
     },
   })
 

@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { type AnyRouter, useLocation, useNavigate } from '@tanstack/react-router'
 import { useAuthError, useFeatureFlags, useFlag } from 'common'
 import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
@@ -33,6 +33,7 @@ import { useRecoveryCodesVerifyMutation } from '@/data/recovery-codes/recovery-c
 import { useSignOut } from '@/lib/auth'
 import { BASE_PATH } from '@/lib/constants'
 import { getReturnToPath } from '@/lib/gotrue'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
@@ -42,9 +43,11 @@ const schema = z.object({
 const formId = 'sign-in-recovery-code-form'
 
 export const SignInRecoveryCodeForm = () => {
-  const router = useRouter()
-  const { context, ...query } = router.query
-  const isPasswordRecovery = context === 'forgot-password'
+  const navigate = useNavigate()
+  const isPasswordRecovery = useLocation({
+    select: (location) =>
+      (location.search as Record<string, unknown>).context === 'forgot-password',
+  })
   const signOut = useSignOut()
   const isVerification = getReturnToPath().startsWith('/account/security?removeAuthenticator=')
   const [verificationError, setVerificationError] = useState<{ message: string } | null>(null)
@@ -92,9 +95,15 @@ export const SignInRecoveryCodeForm = () => {
       await queryClient.resetQueries()
 
       if (isPasswordRecovery) {
-        router.push({ pathname: '/reset-password', query })
+        navigate<AnyRouter, string>({
+          to: '/reset-password',
+          search: (prev: Record<string, unknown>) => {
+            const { context: _context, ...rest } = prev
+            return rest
+          },
+        })
       } else {
-        router.push(getReturnToPath())
+        navigateToUrl(navigate, getReturnToPath())
       }
     },
   })
@@ -102,11 +111,11 @@ export const SignInRecoveryCodeForm = () => {
   const onClickLogout = async () => {
     if (isVerifying) return
     if (isVerification) {
-      await router.replace('/account/security')
+      await navigate({ to: '/account/security', replace: true })
       return
     }
     await signOut()
-    await router.replace('/sign-in')
+    await navigate({ to: '/sign-in', replace: true })
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code }) => {
@@ -118,9 +127,9 @@ export const SignInRecoveryCodeForm = () => {
   useEffect(() => {
     // if users wander into this page and he has no recovery code setup or is on platform where it's not enabled
     if (hasLoaded && (!enableAuthRecoveryCodes || recoveryCodesStatus?.status === 'unenrolled')) {
-      queryClient.resetQueries().then(() => router.push(getReturnToPath()))
+      queryClient.resetQueries().then(() => navigateToUrl(navigate, getReturnToPath()))
     }
-  }, [hasLoaded, enableAuthRecoveryCodes, recoveryCodesStatus, router, queryClient])
+  }, [hasLoaded, enableAuthRecoveryCodes, recoveryCodesStatus, navigate, queryClient])
 
   const error = useAuthError()
 

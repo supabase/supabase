@@ -1,7 +1,7 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ExternalLinkIcon, EyeIcon, EyeOffIcon, FlaskConicalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -43,6 +43,7 @@ import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useVisibleFeaturePreviewsByCategory } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
@@ -61,7 +62,8 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 }
 
 export const FeaturePreviewModal = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const currentPath = useLocation({ select: (location) => location.pathname.replace(/\/$/, '') })
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
   const previewsByCategory = useVisibleFeaturePreviewsByCategory()
@@ -86,7 +88,6 @@ export const FeaturePreviewModal = () => {
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
 
-  const currentPath = router.asPath.split(/[?#]/)[0].replace(/\/$/, '')
   const isAlreadyOnFeatureRoute =
     hasRoute &&
     (currentPath === selectedFeatureRoute ||
@@ -114,7 +115,7 @@ export const FeaturePreviewModal = () => {
       // what closes the modal. Don't also close it via
       // toggleFeaturePreviewModal — its queued nuqs URL update races the push
       // and can navigate back to the current page, swallowing the redirect.
-      router.push(selectedFeatureRoute)
+      navigateToUrl(navigate, selectedFeatureRoute)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })

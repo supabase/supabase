@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
@@ -16,7 +16,9 @@ import { databaseKeys } from '@/data/database/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useIndexInvalidation() {
-  const router = useRouter()
+  const rawRoles = useLocation({
+    select: (location) => (location.search as Record<string, string | string[] | undefined>).roles,
+  })
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
@@ -36,7 +38,7 @@ export function useIndexInvalidation() {
     QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES] ??
     QUERY_PERFORMANCE_PRESET_MAP[QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
-  const roles = router?.query?.roles ?? []
+  const roles = rawRoles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,

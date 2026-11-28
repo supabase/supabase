@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
+import routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { ResizablePanelGroup } from 'ui'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -28,8 +29,6 @@ const mockUser: User = {
 }
 
 vi.unmock('common')
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
 const removeRouteParser = routerMock.useParser(
   createDynamicRouteParser(['/project/[ref]/auth/users'])
 )

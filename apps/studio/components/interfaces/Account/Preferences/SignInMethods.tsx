@@ -1,5 +1,5 @@
 import type { Provider } from '@supabase/auth-js'
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import {
@@ -10,7 +10,6 @@ import {
   MailIcon,
   UnlinkIcon,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -72,7 +71,7 @@ export const SignInMethods = ({
 }: {
   primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
 } = {}) => {
-  const router = useRouter()
+  const href = useLocation({ select: (location) => location.href })
 
   const { data, isPending: isLoading, isSuccess, isError, error } = useProfileIdentitiesQuery()
 
@@ -96,7 +95,7 @@ export const SignInMethods = ({
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
   const [linkingProviderId, setLinkingProviderId] = useState<string>()
 
-  const message = parseRedirectMessage(router.asPath)
+  const message = parseRedirectMessage(href)
   const unlinkedExternalProviders = connectableExternalProviders.filter((provider) => {
     return !identities.some(
       (identity) => identity.provider === provider.authProvider || identity.provider === provider.id

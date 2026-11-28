@@ -29,7 +29,6 @@ const getStatus = (overrides: StatusOverrides = {}) =>
     isLoadingInvitation: false,
     isLoadingProfile: false,
     isLoggedIn: true,
-    isRouterReady: true,
     isSuccessInvitation: true,
     profileExists: true,
     ...overrides,

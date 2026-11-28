@@ -1,8 +1,8 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
@@ -32,6 +32,7 @@ import { isUserFaultForStatsStatement } from '@/data/database/pg-stat-statements
 import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -59,7 +60,11 @@ export const QueryInsightsTable = ({
     order: parseAsString,
     source: parseAsArrayOf(parseAsString).withDefault([]),
   })
-  const [searchQuery, setSearchQuery] = useState(urlSearch || '')
+  const searchQuery = urlSearch
+  const setSearchQuery = useCallback(
+    (value: string) => setQueryStates({ search: value || null }),
+    [setQueryStates]
+  )
   const appNameFilter = urlSource
   const setAppNameFilter = (names: string[]) =>
     setQueryStates({ source: names.length ? names : null })
@@ -105,7 +110,8 @@ export const QueryInsightsTable = ({
   const [explainLoadingQuery, setExplainLoadingQuery] = useState<string | null>(null)
 
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -207,8 +213,8 @@ export const QueryInsightsTable = ({
   )
 
   const handleGoToLogs = useCallback(() => {
-    router.push(`/project/${ref}/logs/postgres-logs`)
-  }, [router, ref])
+    navigateToUrl(navigate, `/project/${ref}/logs/postgres-logs`)
+  }, [navigate, ref])
 
   const handleAiSuggestedFix = useCallback(
     (item: ClassifiedQuery) => {
@@ -229,18 +235,13 @@ export const QueryInsightsTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetView, activeSheetRow?.query])
 
+  const prevPathnameRef = useRef(pathname)
   useEffect(() => {
-    const currentPath = router.asPath.split('?')[0]
-    const handleRouteChange = (url: string) => {
-      if (url.split('?')[0] !== currentPath) {
-        setQueryStates({ search: null })
-        onCurrentSelectQuery?.(null)
-      }
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname
+      onCurrentSelectQuery?.(null)
     }
-    router.events.on('routeChangeStart', handleRouteChange)
-    return () => router.events.off('routeChangeStart', handleRouteChange)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [pathname, onCurrentSelectQuery])
 
   const timeConsumedWidth = useMemo(() => {
     if (!explorerItems.length) return 150
@@ -326,13 +327,6 @@ export const QueryInsightsTable = ({
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
-
-  useEffect(() => {
-    if (urlSearch !== searchQuery) {
-      setQueryStates({ search: searchQuery || null })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery])
 
   const errorCount = errors.length
   const indexCount = indexIssues.length

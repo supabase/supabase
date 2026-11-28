@@ -8,7 +8,6 @@ type OrganizationInviteStatusVariables = {
   isLoadingInvitation: boolean
   isLoadingProfile: boolean
   isLoggedIn: boolean
-  isRouterReady: boolean
   isSuccessInvitation: boolean
   profileExists: boolean
 }
@@ -30,14 +29,13 @@ export function getOrganizationInviteStatus({
   isLoadingInvitation,
   isLoadingProfile,
   isLoggedIn,
-  isRouterReady,
   isSuccessInvitation,
   profileExists,
 }: OrganizationInviteStatusVariables): OrganizationInviteStatus {
   const isSignedOut = !isLoggedIn || (!profileExists && !isLoadingProfile)
 
   if (isSignedOut) return 'signed-out'
-  if (isLoadingProfile || isLoadingInvitation || !isRouterReady) return 'loading'
+  if (isLoadingProfile || isLoadingInvitation) return 'loading'
 
   if (error?.code === 401 && error?.message.includes('Failed to retrieve organization')) {
     return 'no-longer-valid'

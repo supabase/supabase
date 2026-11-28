@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -16,7 +16,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useProfile } from '@/lib/profile'
 
 export const LeaveTeamButton = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -52,7 +52,7 @@ export const LeaveTeamButton = () => {
       toast.success(`Successfully left ${selectedOrganization?.name}`)
 
       setLastVisitedOrganization('')
-      router.push('/organizations')
+      navigate({ to: '/organizations' })
     },
     onError: (error) => {
       setIsLeaving(false)

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link, useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useAuthError, useFlag, useParams } from 'common'
 import { LockIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -23,7 +23,7 @@ import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useSignOut } from '@/lib/auth'
 import { getReturnToPath } from '@/lib/gotrue'
-import { splitInternalUrl } from '@/lib/internal-url'
+import { navigateToUrl } from '@/lib/navigation'
 import { searchParamsToRecord } from '@/lib/router-search-params'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -90,8 +90,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
           search: true,
         })
       } else {
-        const { to, search, hash } = splitInternalUrl(getReturnToPath())
-        void navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
+        void navigateToUrl(navigate, getReturnToPath())
       }
     },
   })
@@ -111,10 +110,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
       if (factors.totp.length === 0) {
-        queryClient.resetQueries().then(() => {
-          const { to, search, hash } = splitInternalUrl(getReturnToPath())
-          void navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
-        })
+        queryClient.resetQueries().then(() => navigateToUrl(navigate, getReturnToPath()))
       }
       if (factors.totp.length > 0) {
         setSelectedFactor(factors.totp[0])

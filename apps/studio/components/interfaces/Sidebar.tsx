@@ -1,3 +1,4 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useMountEffect, useParams } from 'common'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
@@ -12,7 +13,6 @@ import {
 } from 'lucide-react'
 import { AnimatePresence, motion, MotionProps } from 'motion/react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
   Badge,
@@ -52,6 +52,7 @@ import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorage, useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -186,7 +187,7 @@ export function SideBarNavLink({
   active?: boolean
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { state: sidebarState } = useSidebar()
 
   const isActiveLink = !!(route.link && !route.disabled)
@@ -241,7 +242,7 @@ export function SideBarNavLink({
               : undefined
           }
           id={route.shortcutId!}
-          onTrigger={() => router.push(route.link!)}
+          onTrigger={() => navigateToUrl(navigate, route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
         >
@@ -266,13 +267,13 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 }
 
 const ProjectLinks = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = pathname.replace(/\/$/, '').split('/')[3]
 
   const {
     projectAuthAll: authEnabled,
@@ -307,7 +308,7 @@ const ProjectLinks = () => {
         <SidebarMenu>
           <SideBarNavLink
             key="home"
-            active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+            active={isUndefined(activeRoute) && !isUndefined(ref)}
             route={{
               key: 'HOME',
               label: 'Project Overview',
@@ -402,10 +403,10 @@ const ProjectLinks = () => {
 }
 
 const OrganizationLinks = () => {
-  const router = useRouter()
-  const { slug } = useParams()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const { slug, orgSlug } = useParams()
 
-  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+  const organizationSlug: string = slug ?? orgSlug ?? ''
 
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
@@ -413,7 +414,7 @@ const OrganizationLinks = () => {
 
   const showBilling = useIsFeatureEnabled('billing:all')
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = pathname.replace(/\/$/, '').split('/')[3]
   const navMenuItems = [
     {
       label: 'Projects',

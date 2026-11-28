@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, CardContent, cn, TextArea } from 'ui'
@@ -30,6 +30,7 @@ export const DeleteProjectModal = ({
   project?: OrgProject
   organization?: Organization
 }) => {
+  const navigate = useNavigate()
   const router = useRouter()
   const { data: projectFromQuery } = useSelectedProjectQuery()
   const { data: organizationFromQuery } = useSelectedOrganizationQuery()
@@ -70,12 +71,13 @@ export const DeleteProjectModal = ({
     onSuccess: async () => {
       toast.success(`Successfully deleted ${project?.name}`)
 
-      // Only redirect if still viewing the deleted project
-      if (router.asPath.startsWith(`/project/${projectRef}`)) {
+      // Only redirect if still viewing the deleted project. The modal may have unmounted since
+      // the deletion started, so read the live location rather than one from the last render.
+      if (router.state.location.pathname.startsWith(`/project/${projectRef}`)) {
         if (lastVisitedOrganization) {
-          router.push(`/org/${lastVisitedOrganization}`)
+          navigate({ to: '/org/$slug', params: { slug: lastVisitedOrganization } })
         } else {
-          router.push('/organizations')
+          navigate({ to: '/organizations' })
         }
       }
     },

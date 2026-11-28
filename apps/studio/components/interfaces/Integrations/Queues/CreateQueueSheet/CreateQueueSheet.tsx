@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,6 +26,7 @@ import { useDatabaseQueueCreateMutation } from '@/data/database-queues/database-
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { navigateToUrl } from '@/lib/navigation'
 
 export interface CreateQueueSheetProps {
   visible: boolean
@@ -35,7 +36,7 @@ export interface CreateQueueSheetProps {
 const FORM_ID = 'create-queue-sidepanel'
 
 export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
@@ -100,7 +101,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
       {
         onSuccess: () => {
           toast.success(`Successfully created queue ${name}`)
-          router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
+          navigateToUrl(navigate, `/project/${project?.ref}/integrations/queues/queues/${name}`)
           onClose()
         },
       }

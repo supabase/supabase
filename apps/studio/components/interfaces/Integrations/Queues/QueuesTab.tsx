@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
@@ -18,11 +18,12 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { navigateToUrl } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const QueuesTab = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -172,7 +173,7 @@ export const QueuesTab = () => {
                     onClick={() => {
                       const { queue_name } = props.row
                       const url = `/project/${ref}/integrations/queues/queues/${queue_name}`
-                      router.push(url)
+                      navigateToUrl(navigate, url)
                     }}
                   />
                 )

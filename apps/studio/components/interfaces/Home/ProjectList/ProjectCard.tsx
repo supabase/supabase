@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
@@ -44,7 +44,7 @@ export const ProjectCard = ({
   vercelIntegration,
   resourceWarnings,
 }: ProjectCardProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { name, ref: projectRef } = project
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
@@ -104,7 +104,10 @@ export const ProjectCard = ({
                           className="gap-x-2"
                           onClick={(e) => {
                             e.stopPropagation()
-                            router.push(`/project/${projectRef}/settings/general`)
+                            navigate({
+                              to: '/project/$ref/settings/general',
+                              params: { ref: projectRef },
+                            })
                           }}
                         >
                           <SettingsIcon size={14} />

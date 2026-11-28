@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
+import routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
@@ -18,8 +19,6 @@ import { addAPIMock } from '@/tests/lib/msw'
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
 vi.unmock('common')
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
 const removeRouteParser = routerMock.useParser(createDynamicRouteParser(['/project/[ref]/logs']))
 afterAll(removeRouteParser)
 const requestSchema = z.object({ sql: z.string() })
@@ -68,7 +67,10 @@ function renderRecentLogs(
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>
   )
-  const rendered = customRender(content(USER_ID), { queryClient })
+  const rendered = customRender(content(USER_ID), {
+    queryClient,
+    initialUrl: '/project/default/logs',
+  })
   return {
     ...rendered,
     queries,
@@ -80,13 +82,13 @@ function renderRecentLogs(
 describe('UserRecentLogs', () => {
   beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
   it("lists the user's recent logs and opens one on the logs page", async () => {
-    const { queries } = renderRecentLogs([
+    const { queries, router } = renderRecentLogs([
       listRow('log-2', '2026-01-02T09:30:00.000000', '/rest/v1/todos'),
       listRow('log-1', '2026-01-02T09:00:00.000000', '/rest/v1/notes'),
     ])
 
     await userEvent.click(await screen.findByText('/rest/v1/todos'))
-    const logUrl = new URL(routerMock.asPath, 'http://localhost')
+    const logUrl = new URL(router.state.location.href, 'http://localhost')
     expect(logUrl.pathname).toBe('/project/default/logs')
     expect(logUrl.searchParams.get('user')).toBe(USER_ID)
     expect(logUrl.searchParams.get('id')).toBe('log-2')
@@ -96,10 +98,12 @@ describe('UserRecentLogs', () => {
   })
 
   it('opens all logs filtered to the selected user', async () => {
-    renderRecentLogs([listRow('log-1', '2026-01-02T09:00:00.000000', '/rest/v1/todos')])
+    const { router } = renderRecentLogs([
+      listRow('log-1', '2026-01-02T09:00:00.000000', '/rest/v1/todos'),
+    ])
 
     await userEvent.click(await screen.findByRole('button', { name: 'View more in Logs' }))
-    const logsUrl = new URL(routerMock.asPath, 'http://localhost')
+    const logsUrl = new URL(router.state.location.href, 'http://localhost')
     expect(logsUrl.searchParams.get('user')).toBe(USER_ID)
     expect(logsUrl.searchParams.has('id')).toBe(false)
   })

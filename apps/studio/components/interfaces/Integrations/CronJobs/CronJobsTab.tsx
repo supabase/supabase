@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
@@ -30,7 +30,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
 export const CronjobsTab = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
@@ -121,7 +121,7 @@ export const CronjobsTab = () => {
 
     track('cron_job_history_clicked')
 
-    createNavigationHandler(url, router)(event)
+    createNavigationHandler(url, navigate)(event)
   }
 
   const onClose = () => {

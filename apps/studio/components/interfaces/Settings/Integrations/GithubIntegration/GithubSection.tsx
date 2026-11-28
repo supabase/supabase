@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
@@ -59,7 +59,7 @@ const toIntegrationProjectConnection = (
 })
 
 export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: boolean }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -94,8 +94,8 @@ export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: b
   )
 
   const onAddGitHubConnection = useCallback(() => {
-    router.push('/project/_/settings/integrations')
-  }, [router])
+    navigate({ to: '/project/$ref/settings/integrations', params: { ref: '_' } })
+  }, [navigate])
 
   useShortcut(SHORTCUT_IDS.ORG_INTEGRATIONS_ADD_CONNECTION, onAddGitHubConnection, {
     enabled: !isProjectScoped && canCreateGitHubConnection,

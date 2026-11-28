@@ -1,7 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Loading, WarningIcon } from 'ui'
 import { ChartEmptyState } from 'ui-patterns/Chart'
@@ -23,6 +23,7 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 
 type LogsBarChartDatum = {
@@ -51,7 +52,7 @@ type ServiceComputed = ServiceEntry & {
 }
 
 export const ProjectUsageSection = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const track = useTrack()
@@ -196,7 +197,8 @@ export const ProjectUsageSection = () => {
     const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
 
     if (isUnifiedLogsEnabled) {
-      router.push(
+      navigateToUrl(
+        navigate,
         buildUnifiedLogsUrl({ projectRef: projectRef!, logType: service.logType, start, end })
       )
     } else {
@@ -204,7 +206,7 @@ export const ProjectUsageSection = () => {
         iso_timestamp_start: start,
         iso_timestamp_end: end,
       })
-      router.push(`/project/${projectRef}${service.route}?${queryParams.toString()}`)
+      navigateToUrl(navigate, `/project/${projectRef}${service.route}?${queryParams.toString()}`)
     }
 
     track('home_project_usage_chart_clicked', {

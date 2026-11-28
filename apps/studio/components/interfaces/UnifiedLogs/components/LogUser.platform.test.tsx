@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
+import routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
@@ -30,8 +31,6 @@ vi.mock('@/lib/constants', async (importOriginal) => ({
 }))
 
 vi.unmock('common')
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
 const removeRouteParser = routerMock.useParser(createDynamicRouteParser(['/project/[ref]/logs']))
 afterAll(removeRouteParser)
 const requestSchema = z.object({ sql: z.string() })

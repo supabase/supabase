@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { AlertCircleIcon, AlertTriangleIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -53,7 +53,7 @@ const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTarget
 }
 
 export const ProjectUpgradeAlert = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
@@ -79,7 +79,11 @@ export const ProjectUpgradeAlert = () => {
     onSuccess: (res, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
       toast.success('Upgrading project')
-      router.push(`/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
+      navigate({
+        to: '/project/$ref',
+        params: { ref: variables.ref },
+        search: { upgradeInitiated: 'true', trackingId: res.tracking_id },
+      })
     },
   })
 

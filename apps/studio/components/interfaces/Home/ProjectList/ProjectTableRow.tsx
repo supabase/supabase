@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CheckIcon, CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
@@ -49,7 +49,7 @@ export const ProjectTableRow = ({
   vercelIntegration,
   resourceWarnings,
 }: ProjectTableRowProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project.status)
   const [isCopied, setIsCopied] = useState(false)
@@ -63,7 +63,7 @@ export const ProjectTableRow = ({
     project.integration_source
   )
   const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
-  const handleNavigation = createNavigationHandler(url, router)
+  const handleNavigation = createNavigationHandler(url, navigate)
 
   const handleCopyProjectRef = (e: React.SyntheticEvent) => {
     e.stopPropagation()
@@ -190,7 +190,10 @@ export const ProjectTableRow = ({
                   className="gap-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    router.push(`/project/${projectRef}/settings/general`)
+                    navigate({
+                      to: '/project/$ref/settings/general',
+                      params: { ref: projectRef },
+                    })
                   }}
                 >
                   <SettingsIcon size={14} />

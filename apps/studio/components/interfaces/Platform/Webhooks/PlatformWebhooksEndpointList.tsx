@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import {
   ChevronRightIcon,
   EyeIcon,
@@ -7,7 +8,6 @@ import {
   Trash2Icon,
   WebhookIcon,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo, useRef, useState } from 'react'
 import {
   Badge,
@@ -55,7 +55,7 @@ export const PlatformWebhooksEndpointList = ({
   onSearchChange,
   onViewEndpoint,
 }: PlatformWebhooksEndpointListProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => searchInputRef.current?.focus(), {
@@ -175,15 +175,15 @@ export const PlatformWebhooksEndpointList = ({
                     className="relative cursor-pointer focus-inset"
                     onClick={createNavigationHandler(
                       `${webhooksHref}/${encodeURIComponent(endpoint.id)}`,
-                      router
+                      navigate
                     )}
                     onAuxClick={createNavigationHandler(
                       `${webhooksHref}/${encodeURIComponent(endpoint.id)}`,
-                      router
+                      navigate
                     )}
                     onKeyDown={createNavigationHandler(
                       `${webhooksHref}/${encodeURIComponent(endpoint.id)}`,
-                      router
+                      navigate
                     )}
                     tabIndex={0}
                   >

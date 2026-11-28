@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
-import { NextRouter, useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { Button, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -29,12 +29,11 @@ export interface ReportWidgetProps<T = any> {
 }
 
 export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
-  router: NextRouter
   projectRef: string
 }
 
 const ReportWidget = (props: ReportWidgetProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const projectRef = ref as string
 
@@ -63,19 +62,23 @@ const ReportWidget = (props: ReportWidgetProps) => {
                   icon={<ExternalLinkIcon />}
                   className="px-1"
                   onClick={() => {
-                    const isDbQueryType = props.queryType === 'db'
-                    const pathname = isDbQueryType
-                      ? `/project/${projectRef}/sql/new`
-                      : `/project/${projectRef}/logs/explorer`
-                    const query: Record<string, string | undefined> = {}
-                    if (isDbQueryType) {
-                      query.content = props.resolvedSql
+                    if (props.queryType === 'db') {
+                      navigate({
+                        to: '/project/$ref/sql/$id',
+                        params: { ref: projectRef, id: 'new' },
+                        search: { content: props.resolvedSql },
+                      })
                     } else {
-                      query.q = props.params?.sql
-                      query.its = props.params?.iso_timestamp_start || ''
-                      query.ite = props.params?.iso_timestamp_end || ''
+                      navigate({
+                        to: '/project/$ref/logs/explorer',
+                        params: { ref: projectRef },
+                        search: {
+                          q: props.params?.sql,
+                          its: props.params?.iso_timestamp_start || '',
+                          ite: props.params?.iso_timestamp_end || '',
+                        },
+                      })
                     }
-                    router.push({ pathname, query })
                   }}
                 />
               </TooltipTrigger>
@@ -89,7 +92,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
         <Loading active={props.isLoading}>
           {props.data === undefined
             ? null
-            : props.renderer({ ...props, router, projectRef: projectRef as string })}
+            : props.renderer({ ...props, projectRef: projectRef as string })}
         </Loading>
       </Panel.Content>
 
@@ -98,7 +101,6 @@ const ReportWidget = (props: ReportWidgetProps) => {
           {props.append({
             ...props,
             ...(props.appendProps || {}),
-            router,
             projectRef: projectRef as string,
           })}
         </>

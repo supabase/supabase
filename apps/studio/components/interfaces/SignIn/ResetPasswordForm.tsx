@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,6 +13,7 @@ import { z } from 'zod'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, getReturnToPath } from '@/lib/gotrue'
+import { navigateToUrl } from '@/lib/navigation'
 import { passwordValidation } from '@/lib/password-validation'
 
 const passwordSchema = z.object({
@@ -28,7 +29,7 @@ const recoveryPasswordSchema = z.object({
 type FormData = z.infer<typeof passwordSchema>
 
 export const ResetPasswordForm = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { type } = useParams()
   const requireCurrentPassword = type === 'change'
 
@@ -56,7 +57,7 @@ export const ResetPasswordForm = () => {
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-      await router.push(getReturnToPath('/organizations'))
+      await navigateToUrl(navigate, getReturnToPath('/organizations'))
     } else {
       toast.error(`Failed to save password: ${error.message}`, { id: toastId })
       captureCriticalError(error, 'reset password')

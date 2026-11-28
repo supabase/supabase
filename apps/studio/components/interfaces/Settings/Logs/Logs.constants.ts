@@ -953,8 +953,8 @@ export const TIER_QUERY_LIMITS: {
 }
 
 export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [
-  '/project/[ref]/logs/edge-logs',
-  '/project/[ref]/logs/pooler-logs',
-  '/project/[ref]/logs/postgres-logs',
-  '/project/[ref]/logs/postgrest-logs',
+  '/project/$ref/logs/edge-logs',
+  '/project/$ref/logs/pooler-logs',
+  '/project/$ref/logs/postgres-logs',
+  '/project/$ref/logs/postgrest-logs',
 ]

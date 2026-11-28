@@ -1,6 +1,7 @@
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
@@ -13,7 +14,6 @@ import {
   XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -77,6 +77,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { navigateToUrl } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
@@ -116,7 +117,7 @@ const INDEX_WORKER_LOGS_QUERY_OTEL = safeSql`
 `
 
 export const UsersV2 = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const {
@@ -402,16 +403,16 @@ export const UsersV2 = () => {
     })
 
     if (destination === 'sql') {
-      router.push(`/project/${projectRef}/sql`)
+      navigateToUrl(navigate, `/project/${projectRef}/sql`)
     } else {
-      router.push(`/project/${projectRef}/editor`)
+      navigateToUrl(navigate, `/project/${projectRef}/editor`)
     }
   }
 
   const onSelectViewLogs = (user: User) => {
     const identifier = user.id || user.email
     if (!projectRef || !identifier) return
-    router.push(buildUnifiedLogsUrl({ projectRef, user: identifier }))
+    navigateToUrl(navigate, buildUnifiedLogsUrl({ projectRef, user: identifier }))
   }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {

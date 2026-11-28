@@ -37,10 +37,6 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   return { ...actual, IS_PLATFORM: true }
 })
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}))
-
 vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }))
