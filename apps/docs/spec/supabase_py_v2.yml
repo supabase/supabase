@@ -2875,16 +2875,26 @@ functions:
       - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
+      - The `CreateOAuthClientParams` type does not include `client_type` as a typed field. To create a public client, pass `client_type: "public"` in the request dictionary.
+      - If both `client_type` and `token_endpoint_auth_method` are omitted, the client defaults to a confidential client.
     params:
       - name: params
         isOptional: false
         type: CreateOAuthClientParams
         description: Parameters for creating a new OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: false
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: false
             type: list[string]
@@ -2897,14 +2907,10 @@ functions:
             isOptional: true
             type: list[string]
             description: List of allowed response types.
-          - name: client_type
+          - name: scope
             isOptional: true
             type: string
-            description: The client type.
-          - name: registration_type
-            isOptional: true
-            type: string
-            description: The registration type.
+            description: Space-separated list of scope values.
     examples:
       - id: create-oauth-client
         name: Create OAuth client
@@ -2912,8 +2918,20 @@ functions:
           ```python
           response = supabase.auth.admin.oauth.create_client(
               {
-                  "name": "My OAuth Client",
+                  "client_name": "My OAuth Client",
                   "redirect_uris": ["https://example.com/callback"]
+              }
+          )
+          ```
+      - id: create-oauth-client-public
+        name: Create public OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.create_client(
+              {
+                  "client_name": "My Public Client",
+                  "redirect_uris": ["https://example.com/callback"],
+                  "client_type": "public"
               }
           )
           ```
@@ -2936,10 +2954,18 @@ functions:
         type: UpdateOAuthClientParams
         description: Parameters for updating the OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: true
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: true
             type: list[string]
@@ -2958,9 +2984,9 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.oauth.update_client(
-              "client-id",
+              "00000000-0000-0000-0000-000000000000",
               {
-                  "name": "Updated OAuth Client",
+                  "client_name": "Updated OAuth Client",
                   "redirect_uris": ["https://example.com/callback", "https://example.com/callback2"]
               }
           )
@@ -9009,7 +9035,7 @@ functions:
           ```python
           supabase.storage.vectors().from_("vectors-bucket").create_index(
               index_name="my-index",
-              dimension=128,
+              dimension=3,
               distance_metric="cosine",
               data_type="float32"
           )
@@ -9116,12 +9142,14 @@ functions:
         name: Put vectors
         code: |
           ```python
+          from storage3.types import VectorObject, VectorData
+
           supabase.storage.vectors().from_("vectors-bucket").index("my-index").put([
-              {
-                  "key": "vector-1",
-                  "data": {"float32": [0.1, 0.2, 0.3]},
-                  "metadata": {"category": "example"}
-              }
+              VectorObject(
+                  key="vector-1",
+                  data=VectorData(float32=[0.1, 0.2, 0.3]),
+                  metadata={"category": "example"}
+              )
           ])
           ```
 
