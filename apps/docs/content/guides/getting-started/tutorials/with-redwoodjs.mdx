@@ -338,12 +338,14 @@ const Account = () => {
 
   useEffect(() => {
     getProfile()
-  }, [supabase.auth.session])
+  }, [currentUser])
 
   async function getProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -370,7 +372,9 @@ const Account = () => {
   async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
       const updates = {
         id: user.id,
@@ -380,9 +384,7 @@ const Account = () => {
         updated_at: new Date(),
       }
 
-      const { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
