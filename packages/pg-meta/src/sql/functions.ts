@@ -74,8 +74,8 @@ from
       (
         select
           oid,
-          (string_to_array(unnest(proconfig), '='))[1] as param,
-          (string_to_array(unnest(proconfig), '='))[2] as value
+          split_part(unnest(proconfig), '=', 1) as param,
+          substring(unnest(proconfig) from '^[^=]+=(.*)$') as value
         from
           functions
       ) as t
