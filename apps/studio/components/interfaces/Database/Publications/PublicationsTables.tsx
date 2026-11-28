@@ -61,7 +61,9 @@ export const PublicationsTables = () => {
 
   const tables = useMemo(() => {
     return tablesData.filter((table) =>
-      filterString.length === 0 ? table : table.name.includes(filterString)
+      filterString.length === 0
+        ? table
+        : table.name.toLowerCase().includes(filterString.toLowerCase())
     )
   }, [tablesData, filterString])
 

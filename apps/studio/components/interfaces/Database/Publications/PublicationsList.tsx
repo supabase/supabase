@@ -86,7 +86,9 @@ export const PublicationsList = () => {
   const publications = (
     filterString.length === 0
       ? data
-      : data.filter((publication) => publication.name.includes(filterString))
+      : data.filter((publication) =>
+          publication.name.toLowerCase().includes(filterString.toLowerCase())
+        )
   ).sort((a, b) => a.id - b.id)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
