@@ -1,0 +1,321 @@
+{
+  "title": "Reference definition frontmatter",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Stable, shared across languages. Must match the file name.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "method",
+        "command",
+        "endpoint",
+        "class",
+        "type",
+        "constant"
+      ]
+    },
+    "category": {
+      "description": "Groups definitions in the navigation.",
+      "default": "general",
+      "type": "string"
+    },
+    "subcategory": {
+      "description": "Groups definitions within their category, as a sub-group in the navigation.",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "symbol": {
+      "description": "Fully qualified name, e.g. `supabase.auth.signUp`.",
+      "type": "string"
+    },
+    "summary": {
+      "description": "One line, used in lists.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Markdown.",
+      "type": "string"
+    },
+    "signature": {
+      "description": "Methods, classes, types and constants.",
+      "type": "string"
+    },
+    "usage": {
+      "description": "Commands only.",
+      "type": "string"
+    },
+    "http": {
+      "description": "Endpoints only.",
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "type_params": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stability": {
+      "default": "stable",
+      "type": "string",
+      "enum": [
+        "stable",
+        "beta",
+        "experimental"
+      ]
+    },
+    "deprecated": {
+      "default": false,
+      "type": "boolean"
+    },
+    "since": {
+      "type": "string"
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "inherits_flags": {
+      "description": "Commands that also accept a shared flag group.",
+      "type": "string"
+    },
+    "auth": {
+      "description": "Endpoints only.",
+      "type": "object",
+      "properties": {
+        "scopes": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "permissions": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameters": {
+      "description": "Arguments of methods, commands and endpoints; constructor arguments of classes.",
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "properties": {
+      "description": "Members of classes and types. Same shape as parameters, `location: property`.",
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "returns": {
+      "description": "Methods.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "responses": {
+      "description": "Endpoints only.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "description": {
+            "type": "string"
+          },
+          "schema": {}
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "throws": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Error type. Omitted when only a description is given.",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "examples": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Stable within the definition.",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "description": "Markdown.",
+            "type": "string"
+          },
+          "lang": {
+            "description": "Code fence language, e.g. `js`, `sh`.",
+            "default": "plaintext",
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "response": {
+            "description": "Sample output.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "summary"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "location": {
+          "description": "Where the parameter is passed.",
+          "type": "string",
+          "enum": [
+            "argument",
+            "positional",
+            "flag",
+            "path",
+            "query",
+            "header",
+            "body",
+            "property"
+          ]
+        },
+        "type": {
+          "type": "string"
+        },
+        "required": {
+          "default": false,
+          "type": "boolean"
+        },
+        "description": {
+          "description": "Markdown.",
+          "type": "string"
+        },
+        "default": {},
+        "allowed_values": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "short": {
+          "description": "Short flag, e.g. `-i`. Commands only.",
+          "type": "string"
+        },
+        "env": {
+          "description": "Environment variable that sets this parameter.",
+          "type": "string"
+        },
+        "variadic": {
+          "type": "boolean"
+        },
+        "deprecated": {
+          "type": "boolean"
+        },
+        "replaced_by": {
+          "type": "string"
+        },
+        "children": {
+          "description": "Nested fields, same shape.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
