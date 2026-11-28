@@ -1,0 +1,51 @@
+---
+title: 'Manage OAuth app access'
+subtitle: 'Control which OAuth apps can reach the projects in your organization'
+description: 'See which OAuth apps members have authorized, which projects each grant covers, and revoke access for one member or the whole organization.'
+---
+
+Review the OAuth apps authorized in your organization and revoke access you no longer want. Some apps let any member authorize them with that member's own permissions, so one app can have several grants in your organization.
+
+## Authorization emails
+
+When a member authorizes an app that uses member permissions, organization Owners and Administrators receive an email. The email names the app and the member. The app can access only what that member's role allows. If the app allows selecting projects and the member chose specific projects, the app can access only those projects. Otherwise, it can access all current and future projects in the organization.
+
+To review or revoke the grant, follow the steps in [Review authorized apps](#review-authorized-apps).
+
+## Review authorized apps
+
+1. In your organization's settings, go to the **OAuth Apps** tab.
+2. Under **Authorized apps**, find the app.
+3. Open the app's **Manage app** menu and select **View grants**.
+
+Each grant shows the projects it covers, either all current and future projects or a list of specific projects. A grant tied to a member also shows that member. A grant that applies to the whole organization is labeled **Organization-wide** and doesn't show a member.
+
+## Revoke an app for the organization
+
+Revoking an app ends every grant for it in your organization, including grants created by individual members. Members lose access on the app's next request and must authorize the app again to reconnect. Only members with permission to revoke apps see the revoke option.
+
+1. In your organization's settings, go to the **OAuth Apps** tab.
+2. Under **Authorized apps**, find the app.
+3. Open the app's **Manage app** menu and select **Revoke grants**.
+4. In the dialog, click **Revoke**.
+
+## Revoke your own grant
+
+Any member can review and revoke the grants tied to them. This doesn't apply to organization-wide grants. To revoke one, an Owner or Administrator follows the steps in [Revoke an app for the organization](#revoke-an-app-for-the-organization).
+
+1. Go to your account settings.
+2. Open the **OAuth Apps** tab.
+3. Under **Authorized apps**, find the app.
+4. Open the app's **Manage app** menu and select **Revoke access**.
+5. In the dialog, click **Revoke**.
+
+The app can no longer access your projects in that organization. To reconnect, authorize the app again and reselect your projects. Other members' grants aren't affected.
+
+## When a grant ends on its own
+
+A grant tied to a member stays in place when the access it depends on goes away, and its access token remains valid. The grant loses access to the affected resources:
+
+- If the member leaves the organization, the grant loses all access to the organization's resources.
+- If an administrator lowers the member's role, the grant loses any access the new role doesn't cover.
+- If an administrator removes a project from the member's project-scoped roles, the grant loses access to that project.
+- If a project is transferred to another organization, the grant loses access to that project.
