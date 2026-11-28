@@ -70,7 +70,7 @@ const PaymentMethods = () => {
             <PageSectionTitle>Payment Methods</PageSectionTitle>
             <PageSectionDescription>
               {isStripeManagedOrganization
-                ? 'Billing for this organisation is handled through Stripe Projects.'
+                ? 'Billing for this organization is handled through Stripe Projects.'
                 : 'Payments for your subscription are made using the default card.'}
             </PageSectionDescription>
           </PageSectionSummary>
