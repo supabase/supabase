@@ -1390,11 +1390,6 @@
     "permanent": true
   },
   {
-    "source": "/docs/guides/integrations/build-a-supabase-integration",
-    "destination": "/docs/guides/integrations/build-a-supabase-oauth-integration",
-    "permanent": true
-  },
-  {
     "source": "/docs/guides/integrations/build-a-supabase-integration/oauth-scopes",
     "destination": "/docs/guides/integrations/build-a-supabase-oauth-integration",
     "permanent": true

@@ -3374,6 +3374,10 @@ export const integrations: NavMenuConstant = {
       name: 'Build Your Own',
       items: [
         {
+          name: 'Build a Supabase Integration',
+          url: '/guides/integrations/build-a-supabase-integration',
+        },
+        {
           name: 'Supabase OAuth Integration',
           url: '/guides/integrations/build-a-supabase-oauth-integration',
           items: [
