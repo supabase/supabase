@@ -16,6 +16,43 @@ This is not a comprehensive resource, but rather a helpful starting point for yo
 
 If you're new to query optimization, you may be interested in [`index_advisor`](/docs/guides/database/extensions/index_advisor), our tool for automatically detecting indexes that improve performance on a given query.
 
+## Find slow queries with pg_stat_statements
+
+Before creating indexes, use [`pg_stat_statements`](/docs/guides/database/extensions/pg_stat_statements) to identify which queries are worth optimizing. The extension tracks execution statistics for every query that runs against your database.
+
+Enable the extension, then query it to find candidates by filtering on execution time and call frequency:
+
+```sql
+select
+  calls,
+  round(mean_exec_time::numeric, 2) as mean_exec_ms,
+  round(total_exec_time::numeric, 2) as total_exec_ms,
+  query
+from pg_stat_statements
+where mean_exec_time > 100
+  and calls > 50
+order by total_exec_time desc
+limit 10;
+```
+
+Pass a slow query from the results to `index_advisor` to get index recommendations:
+
+```sql
+select index_statements, errors
+from
+  index_advisor(
+    'select a.name, b.date_of_purchase
+   from customers a
+   join orders b on a.id = b.customer_id
+   where a.sign_up_date > $1
+     and b.status = $2
+   order by b.date_of_purchase
+   limit 10'
+  );
+```
+
+Apply each `CREATE INDEX` statement returned in `index_statements`. After the index is active and the query has accumulated more executions, rerun the `pg_stat_statements` query to confirm that `mean_exec_ms` has fallen.
+
 ## Example query
 
 Consider the following example query that retrieves customer names and purchase dates from two tables:
