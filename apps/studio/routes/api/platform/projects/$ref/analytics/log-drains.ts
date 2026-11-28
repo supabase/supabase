@@ -1,145 +1,87 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
-import { PROJECT_ANALYTICS_URL } from '@/lib/constants/api'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
+import { getLogflareConfig } from '@/lib/api/self-hosted/logflare'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  const missingEnvVars = envVarsSet()
-
-  if (missingEnvVars !== true) {
-    return res
-      .status(500)
-      .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
-  }
-
-  const baseUrl = PROJECT_ANALYTICS_URL
-  if (!baseUrl) {
-    return res.status(500).json({ error: { message: `LOGFLARE_URL env variable is not set` } })
-  }
-
-  switch (method) {
-    case 'GET':
-      // list log drains
-      const url = new URL(baseUrl)
-      url.pathname = '/api/backends'
-      url.search = new URLSearchParams({
-        'metadata[type]': 'log-drain',
-      }).toString()
-      const upstream = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      })
-
-      if (!upstream.ok) {
-        return res
-          .status(500)
-          .json({ error: { message: 'Failed to fetch log drains from upstream' } })
-      }
-
-      const resp = await upstream.json()
-
-      if (!Array.isArray(resp)) {
-        return res
-          .status(500)
-          .json({ error: { message: 'Unexpected response format from upstream' } })
-      }
-
-      return res.status(200).json(resp)
-    case 'POST':
-      // create the log drain
-      const postUrl = new URL(baseUrl)
-      postUrl.pathname = '/api/backends'
-      const postResult = await fetch(postUrl, {
-        body: JSON.stringify({
-          ...req.body,
-          config: req.body.config,
-          metadata: {
-            type: 'log-drain',
-          },
-        }),
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }).then(async (r) => await r.json())
-
-      const sourcesGetUrl = new URL(baseUrl)
-      sourcesGetUrl.pathname = '/api/sources'
-      const sources = await fetch(sourcesGetUrl, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }).then((r) => r.json())
-
-      const params = sources
-        .filter((source: { name: string; metadata: { type: string } }) =>
-          [
-            'cloudflare.logs.prod',
-            'deno-relay-logs',
-            'deno-subhosting-events',
-            'gotrue.logs.prod',
-            'pgbouncer.logs.prod',
-            'postgrest.logs.prod',
-            'postgres.logs',
-            'realtime.logs.prod',
-            'storage.logs.prod.2',
-          ].includes(source.name.toLocaleLowerCase())
-        )
-        .map((source: { name: string; id: number }) => {
-          return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
-        })
-      const rulesPostUrl = new URL(baseUrl)
-      rulesPostUrl.pathname = '/api/rules'
-      await Promise.all(
-        params.map((param: any) =>
-          fetch(rulesPostUrl, {
-            method: 'POST',
-            body: JSON.stringify(param),
-            headers: {
-              Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-          })
-        )
-      )
-      return res.status(201).json(postResult)
-
-    default:
-      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const envVarsSet = () => {
-  const missingEnvVars = [
-    process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN ? null : 'LOGFLARE_PRIVATE_ACCESS_TOKEN',
-    process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
-  ].filter((v) => v)
-  if (missingEnvVars.length == 0) {
-    return true
-  } else {
-    return missingEnvVars
-  }
-}
-
-const webHandler = toWebHandler(nextHandler)
+const LOG_DRAIN_SOURCES = [
+  'cloudflare.logs.prod',
+  'deno-relay-logs',
+  'deno-subhosting-events',
+  'gotrue.logs.prod',
+  'pgbouncer.logs.prod',
+  'postgrest.logs.prod',
+  'postgres.logs',
+  'realtime.logs.prod',
+  'storage.logs.prod.2',
+]
 
 export const Route = createFileRoute('/api/platform/projects/$ref/analytics/log-drains')({
-  server: { handlers: { GET: webHandler, POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async () => {
+        const logflare = getLogflareConfig()
+        if (logflare instanceof Response) return logflare
+
+        // list log drains
+        const url = logflare.url('/api/backends')
+        url.search = new URLSearchParams({ 'metadata[type]': 'log-drain' }).toString()
+        const upstream = await fetch(url, { headers: logflare.headers })
+
+        if (!upstream.ok) {
+          return Response.json(
+            { error: { message: 'Failed to fetch log drains from upstream' } },
+            { status: 500 }
+          )
+        }
+
+        const resp = await upstream.json()
+
+        if (!Array.isArray(resp)) {
+          return Response.json(
+            { error: { message: 'Unexpected response format from upstream' } },
+            { status: 500 }
+          )
+        }
+
+        return Response.json(resp)
+      },
+      POST: async ({ request }) => {
+        const logflare = getLogflareConfig()
+        if (logflare instanceof Response) return logflare
+
+        const body = await parseJsonBody<Record<string, unknown>>(request)
+
+        // create the log drain
+        const postResult = await fetch(logflare.url('/api/backends'), {
+          body: JSON.stringify({ ...body, metadata: { type: 'log-drain' } }),
+          method: 'POST',
+          headers: logflare.headers,
+        }).then((r) => r.json())
+
+        const sources: { name: string; id: number }[] = await fetch(logflare.url('/api/sources'), {
+          headers: logflare.headers,
+        }).then((r) => r.json())
+
+        // route every matching source to the new drain
+        const rulesUrl = logflare.url('/api/rules')
+        await Promise.all(
+          sources
+            .filter((source) => LOG_DRAIN_SOURCES.includes(source.name.toLocaleLowerCase()))
+            .map((source) =>
+              fetch(rulesUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                  backend_id: postResult.id,
+                  lql_string: `~".*?"`,
+                  source_id: source.id,
+                }),
+                headers: logflare.headers,
+              })
+            )
+        )
+        return Response.json(postResult, { status: 201 })
+      },
+    }),
+  },
 })
