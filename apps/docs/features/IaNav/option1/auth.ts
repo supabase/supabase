@@ -78,6 +78,7 @@ export const auth: NavMenuConstant = {
           enabled: authConfigurationEnabled,
         },
         { name: 'Identities', url: '/guides/auth/identities' },
+        { name: 'OAuth Provider Metadata', url: '/guides/auth/oauth-provider-metadata' },
         {
           name: 'Identity Linking',
           url: '/guides/auth/auth-identity-linking',
