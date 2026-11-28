@@ -231,7 +231,7 @@ function update(
     default_value,
     default_value_format = 'literal',
     is_identity,
-    identity_generation = 'BY DEFAULT',
+    identity_generation,
     is_nullable,
     is_unique,
     comment,
@@ -297,7 +297,7 @@ function update(
   } else if (is_identity === undefined) {
     identitySql = safeSql``
   } else {
-    identitySql = safeSql`${alterColumnPrefix} ADD GENERATED ${keyword(identity_generation)} AS IDENTITY;`
+    identitySql = safeSql`${alterColumnPrefix} ADD GENERATED ${keyword(identity_generation ?? 'BY DEFAULT')} AS IDENTITY;`
   }
   let isNullableSql: SafeSqlFragment
   if (is_nullable === undefined) {
