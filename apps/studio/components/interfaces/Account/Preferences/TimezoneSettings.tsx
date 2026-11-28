@@ -68,7 +68,8 @@ export const TimezoneSettings = () => {
         <PageSectionSummary>
           <PageSectionTitle>Timezone</PageSectionTitle>
           <PageSectionDescription>
-            Choose how dates and times in logs and other dashboard surfaces are displayed.
+            Choose how dates and times in logs, the Table Editor, and other dashboard surfaces are
+            displayed.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
