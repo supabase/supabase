@@ -1,5 +1,4 @@
 import { safeLocalStorage, useParams } from 'common'
-import { partition } from 'lodash'
 import {
   createContext,
   PropsWithChildren,
@@ -252,11 +251,16 @@ export function createTabsState(projectRef: string) {
       // Add the new recent item to the beginning of the list
       store.recentItems.unshift(recentItem)
 
-      // Ensure that there's only up to max of MAX_RECENT_ITEMS items per tab type
-      const [itemsOfSameType, itemsOfDifferentType] = partition(store.recentItems, (item) => {
-        if (editorEntityTypes.table.includes(item.type)) return item
+      // Cap recent items at MAX_RECENT_ITEMS per editor type group while preserving recency order
+      const sameEditorTypes = Object.values(editorEntityTypes).find((types) =>
+        types.includes(tab.type)
+      ) ?? [tab.type]
+      let sameGroupCount = 0
+      store.recentItems = store.recentItems.filter((item) => {
+        if (!sameEditorTypes.includes(item.type)) return true
+        sameGroupCount += 1
+        return sameGroupCount <= MAX_RECENT_ITEMS
       })
-      store.recentItems = [...itemsOfSameType.slice(0, MAX_RECENT_ITEMS), ...itemsOfDifferentType]
     },
     clearRecentItems: () => {
       store.recentItems = []
