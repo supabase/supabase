@@ -982,6 +982,56 @@ describe('SupportFormPage', () => {
     })
   }, 10_000)
 
+  test('submits permission issue ticket with the Permission_issue category', async () => {
+    const submitSpy = vi.fn()
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
+
+    await selectCategoryOption(screen, 'Permission issue')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Permission issue')
+    })
+
+    const summaryField = getSummaryField(screen)
+    await userEvent.clear(summaryField)
+    await userEvent.paste('Cannot access my organization')
+
+    const messageField = getMessageField(screen)
+    await userEvent.clear(messageField)
+    await userEvent.paste('Dashboard says I do not have the necessary privileges')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    expect(submitSpy.mock.calls[0]?.[0]).toMatchObject({
+      subject: 'Cannot access my organization',
+      category: 'Permission_issue',
+    })
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
+    })
+  }, 10_000)
+
   test('submits database unresponsive ticket with initial error and Sentry issue ID, without dashboard logs', async () => {
     const submitSpy = vi.fn()
 
