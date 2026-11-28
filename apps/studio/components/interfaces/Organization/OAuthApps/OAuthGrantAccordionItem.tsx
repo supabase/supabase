@@ -1,8 +1,14 @@
 import { ReactNode } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
-export const OAuthGrantAccordion = ({ children }: { children: ReactNode }) => (
-  <Accordion type="multiple" className="divide-y! divide-border!">
+export const OAuthGrantAccordion = ({
+  children,
+  defaultValue,
+}: {
+  children: ReactNode
+  defaultValue?: string[]
+}) => (
+  <Accordion defaultValue={defaultValue} type="multiple" className="divide-y! divide-border!">
     {children}
   </Accordion>
 )
@@ -12,7 +18,8 @@ interface OAuthGrantAccordionItemProps {
   icon: ReactNode
   title: string
   description: string
-  sections: { label: string; values: string[] }[]
+  children?: ReactNode
+  sections?: { label: string; values: string[] }[]
 }
 
 export const OAuthGrantAccordionItem = ({
@@ -20,11 +27,12 @@ export const OAuthGrantAccordionItem = ({
   icon,
   title,
   description,
-  sections,
+  sections = [],
+  children,
 }: OAuthGrantAccordionItemProps) => {
   return (
     <AccordionItem value={value} className="border-b-0">
-      <AccordionTrigger className="hover:no-underline gap-x-4 py-3.5">
+      <AccordionTrigger className="cursor-pointer hover:no-underline gap-x-4 py-3.5">
         <span className="shrink-0 text-foreground-lighter">{icon}</span>
         <div className="min-w-0 flex-1 flex flex-col gap-y-1">
           <p className="truncate text-sm text-foreground">{title}</p>
@@ -33,6 +41,7 @@ export const OAuthGrantAccordionItem = ({
       </AccordionTrigger>
       <AccordionContent>
         <div className="flex flex-col gap-y-2 pl-8">
+          {children}
           {sections
             .filter((section) => section.values.length > 0)
             .map((section) => (

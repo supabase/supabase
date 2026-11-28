@@ -13,13 +13,14 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { authorizedAppsPreview } from './OAuthAppsAuthorizedPreview'
 import { OAuthAppsAuthorizedRow } from './OAuthAppsAuthorizedRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOAuthApprovalsQuery } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
-export const OAuthAppsAuthorizedList = () => {
+export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boolean }) => {
   const { slug } = useParams()
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -41,7 +42,7 @@ export const OAuthAppsAuthorizedList = () => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useOAuthApprovalsQuery({ slug })
+  } = useOAuthApprovalsQuery({ slug }, { enabled: !isPreview })
 
   const [sentinelRef, entry] = useIntersectionObserver({
     root: null,
@@ -56,12 +57,13 @@ export const OAuthAppsAuthorizedList = () => {
   }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage, isError])
 
   const statusText = useMemo(() => {
+    if (isPreview) return 'Authorized apps preview loaded'
     if (isFetchingNextPage) return 'Loading more authorized apps...'
     if (isPending || isLoadingPermissions) return 'Loading...'
     return 'Authorized apps loaded'
-  }, [isPending, isLoadingPermissions, isFetchingNextPage])
+  }, [isPreview, isPending, isLoadingPermissions, isFetchingNextPage])
 
-  const hasAuthorizedApps = isSuccess && data.pages.length > 0 && data.pages[0].data.length > 0
+  const hasAuthorizedApps = isPreview || (isSuccess && Boolean(data.pages[0]?.data.length))
 
   return (
     <PageSection id="authorized-apps">
@@ -78,20 +80,22 @@ export const OAuthAppsAuthorizedList = () => {
         <p aria-live="polite" className="sr-only">
           {statusText}
         </p>
-        {(isPending || isLoadingPermissions) && !isFetchingNextPage && (
+        {!isPreview && (isPending || isLoadingPermissions) && !isFetchingNextPage && (
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
           </div>
         )}
 
-        {!isLoadingPermissions && !canReadOAuthApps && (
+        {!isPreview && !isLoadingPermissions && !canReadOAuthApps && (
           <NoPermission resourceText="view authorized apps" />
         )}
 
-        {isError && <AlertError subject="Failed to retrieve authorized apps" error={error} />}
+        {!isPreview && isError && (
+          <AlertError subject="Failed to retrieve authorized apps" error={error} />
+        )}
 
-        {isSuccess && canReadOAuthApps && (
+        {(isPreview || (isSuccess && canReadOAuthApps)) && (
           <Card>
             <Table>
               <TableHeader>
@@ -115,15 +119,30 @@ export const OAuthAppsAuthorizedList = () => {
                     App
                   </TableHead>
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
-                    Access
+                    {isPreview ? 'Scope' : 'Access'}
                   </TableHead>
+                  {isPreview && <TableHead>Permissions</TableHead>}
                   <TableHead className="text-right">
                     <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
+                {isPreview ? (
+                  authorizedAppsPreview.map(
+                    ({ approval, projects, scopes, databaseAccess, grants }) => (
+                      <OAuthAppsAuthorizedRow
+                        key={approval.id}
+                        approval={approval}
+                        databaseAccess={databaseAccess}
+                        previewScopes={scopes}
+                        previewGrants={grants}
+                        previewProjects={projects}
+                        canRevoke
+                      />
+                    )
+                  )
+                ) : !data?.pages[0]?.data.length ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>
                       <p className="text-sm text-foreground">No results found</p>
