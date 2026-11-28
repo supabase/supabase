@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
@@ -8,6 +8,7 @@ import { EdgeFunctionIntervalSelector } from './EdgeFunctionIntervalSelector'
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
+  getEdgeFunctionLogsUrl,
   getExecutionMetrics,
   getInvocationChartData,
   getInvocationChartNavigationUrl,
@@ -34,7 +35,7 @@ import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSort
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const EdgeFunctionOverview = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, functionSlug } = useParams()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -138,17 +139,29 @@ export const EdgeFunctionOverview = () => {
     [invocationChartData, selectedFunction?.updated_at, endDate, startDate]
   )
 
+  const openLogsUrl = useMemo(() => {
+    if (!projectRef || !functionSlug) return undefined
+    if (!isUnifiedLogsEnabled) return `/project/${projectRef}/functions/${functionSlug}/invocations`
+
+    return getEdgeFunctionLogsUrl({
+      projectRef,
+      functionSlug,
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+    })
+  }, [endDate, functionSlug, isUnifiedLogsEnabled, projectRef, startDate])
   const invocationActions = useMemo(
-    () => [
-      {
-        label: isUnifiedLogsEnabled ? 'Open logs' : 'Open invocations',
-        href: `/project/${projectRef}/functions/${functionSlug}/${
-          isUnifiedLogsEnabled ? 'logs' : 'invocations'
-        }`,
-        icon: <ExternalLinkIcon size={12} />,
-      },
-    ],
-    [functionSlug, isUnifiedLogsEnabled, projectRef]
+    () =>
+      openLogsUrl
+        ? [
+            {
+              label: isUnifiedLogsEnabled ? 'Open logs' : 'Open invocations',
+              href: openLogsUrl,
+              icon: <ExternalLinkIcon size={12} />,
+            },
+          ]
+        : [],
+    [isUnifiedLogsEnabled, openLogsUrl]
   )
 
   useEdgeFunctionOverviewShortcuts({
@@ -157,11 +170,7 @@ export const EdgeFunctionOverview = () => {
       combinedStatsResults.refetch()
     },
     onOpenLogs: () => {
-      router.push(
-        `/project/${projectRef}/functions/${functionSlug}/${
-          isUnifiedLogsEnabled ? 'logs' : 'invocations'
-        }`
-      )
+      if (openLogsUrl) void navigate({ href: openLogsUrl })
     },
   })
 
@@ -171,9 +180,12 @@ export const EdgeFunctionOverview = () => {
 
   useEffect(() => {
     if (!IS_PLATFORM && projectRef && functionSlug) {
-      router.replace(`/project/${projectRef}/functions/${functionSlug}/details`)
+      void navigate({
+        href: `/project/${projectRef}/functions/${functionSlug}/details`,
+        replace: true,
+      })
     }
-  }, [functionSlug, projectRef, router])
+  }, [functionSlug, navigate, projectRef])
 
   if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
@@ -207,16 +219,16 @@ export const EdgeFunctionOverview = () => {
           onChartClick={(timestamp) => {
             if (!projectRef || !functionSlug) return
 
-            router.push(
-              getInvocationChartNavigationUrl({
+            void navigate({
+              href: getInvocationChartNavigationUrl({
                 projectRef,
                 functionSlug,
                 isUnifiedLogsEnabled,
                 rangeStart: startDate.toISOString(),
                 rangeEnd: endDate.toISOString(),
                 clickedTimestamp: timestamp,
-              })
-            )
+              }),
+            })
           }}
           updateAnnotation={invocationUpdateAnnotation}
         />

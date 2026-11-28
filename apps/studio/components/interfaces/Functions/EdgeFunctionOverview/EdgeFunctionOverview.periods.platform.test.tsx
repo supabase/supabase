@@ -1,10 +1,11 @@
 import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FeatureFlagContext } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, expect, it, vi } from 'vitest'
 
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { configKeys } from '@/data/config/keys'
 import { customDomainKeys } from '@/data/custom-domains/keys'
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
@@ -17,9 +18,13 @@ import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { renderRoute } from '@/tests/lib/route-render'
 
-afterEach(() => vi.useRealTimers())
+afterEach(() => {
+  vi.useRealTimers()
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
+})
 
 it('loads the overview before feature flags and updates metrics with the selected period', async () => {
+  localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, 'true')
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-03-20T10:37:21Z'))
   const user = userEvent.setup()
@@ -64,14 +69,14 @@ it('loads the overview before feature flags and updates metrics with the selecte
     response: () => HttpResponse.json<{ result: never[] }>({ result: [] }),
   })
 
-  await renderRoute(Route, {
+  const { router } = await renderRoute(Route, {
     routeId: '/project/$ref/functions/$functionSlug/',
     url: '/project/default/functions/send-email',
     renderOptions: {
       wrapper: ({ children }) => (
         <CustomWrapper queryClient={queryClient}>
           <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
-            {children}
+            <FeaturePreviewContextProvider>{children}</FeaturePreviewContextProvider>
           </FeatureFlagContext.Provider>
         </CustomWrapper>
       ),
@@ -86,4 +91,18 @@ it('loads the overview before feature flags and updates metrics with the selecte
     expect(screen.getByRole('button', { name: '1 day', pressed: true })).toBeVisible()
   )
   expect(await screen.findByText('90ms')).toBeVisible()
+
+  await user.click(screen.getByRole('button', { name: '3 hours' }))
+  const expectedRange = `${Date.parse('2026-03-20T07:37:21.000Z')}-${Date.parse('2026-03-20T10:37:21.000Z')}`
+  const openLogsLink = await screen.findByRole('link', { name: 'Open logs' })
+  expect
+    .soft(openLogsLink)
+    .toHaveAttribute('href', `/project/default/functions/send-email/logs?date=${expectedRange}`)
+
+  await user.keyboard('o')
+  await user.keyboard('l')
+  await waitFor(() =>
+    expect(router.state.location.pathname).toBe('/project/default/functions/send-email/logs')
+  )
+  expect(router.state.location.searchStr).toBe(`?date=${expectedRange}`)
 })
