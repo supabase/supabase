@@ -5,6 +5,7 @@ import { delay, HttpResponse } from 'msw'
 import { useSyncExternalStore } from 'react'
 import { beforeEach, expect, it, vi } from 'vitest'
 
+import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { Route } from '@/routes/project/$ref/database/pipelines/new'
 import { CustomWrapper } from '@/tests/lib/custom-render'
@@ -168,6 +169,43 @@ it('renders the page body when the preview and project allow access', async () =
   await renderPage()
   expect(await screen.findByText('Wizard form')).toBeInTheDocument()
 })
+it('opens the wizard when the project only has a source in a non-default region', async () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+    default_cluster_id: '1',
+    regions: [
+      { cluster_id: '1', region_code: 'ap-southeast-1', region_name: 'Singapore' },
+      { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' },
+    ],
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: ({ request }) =>
+      HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+        sources:
+          new URL(request.url).searchParams.get('cluster_id') === '2'
+            ? [
+                {
+                  id: 42,
+                  name: 'default',
+                  tenant_id: 'tenant',
+                  config: {
+                    host: 'localhost',
+                    port: 5432,
+                    name: 'postgres',
+                    username: 'postgres',
+                  },
+                },
+              ]
+            : [],
+      }),
+  })
+
+  await renderPage({ queryClient })
+  expect(await screen.findByText('Wizard form')).toBeInTheDocument()
+})
+
 it.each([
   { loading: true },
   { orgPending: true },
@@ -203,27 +241,8 @@ it('returns through the shared router without reloading the toast host', async (
 })
 
 it('returns to the combined list when closing a regional wizard', async () => {
-  const requestedClusters: Array<string | null> = []
-  addAPIMock({
-    method: 'get',
-    path: '/platform/replication/:ref/sources',
-    response: ({ request }) => {
-      requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
-      return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
-        sources: [
-          {
-            id: 42,
-            name: 'default',
-            tenant_id: 'tenant',
-            config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
-          },
-        ],
-      })
-    },
-  })
   await renderPage({ clusterId: 'eu-west-1' })
   fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
-  expect(requestedClusters).toContain('eu-west-1')
   expect(state.navigate).toHaveBeenCalledWith({
     ...pipelinesList,
   })

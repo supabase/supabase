@@ -22,7 +22,7 @@ export const usePipelineConnectionValidation = ({
 }) => {
   const names = getConnectionFieldNames(type)
   const values = useWatch({ control: form.control, name: names })
-  const snapshot = JSON.stringify([type, ...values])
+  const snapshot = JSON.stringify([clusterId, type, ...values])
   const currentSnapshotRef = useRef(snapshot)
   const [result, setResult] = useState<{
     snapshot: string
