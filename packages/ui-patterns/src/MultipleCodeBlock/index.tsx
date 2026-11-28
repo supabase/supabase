@@ -136,7 +136,14 @@ export const MultipleCodeBlock = ({
       onValueChange={handleValueChange}
       className={cn('border rounded-lg gap-0 space-y-0 overflow-hidden', className)}
     >
-      <TabsList className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b">
+      <TabsList
+        className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b"
+        onWheel={(event) => {
+          if (event.shiftKey) {
+            event.stopPropagation()
+          }
+        }}
+      >
         {files.map((file) => (
           <TabsTrigger
             key={file.name}

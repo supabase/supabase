@@ -201,6 +201,11 @@ export const CodeBlock = memo(function CodeBlock({
             'group relative max-w-[90vw] md:max-w-none overflow-auto',
             wrapperClassName
           )}
+          onWheel={(event) => {
+            if (event.shiftKey) {
+              event.stopPropagation()
+            }
+          }}
         >
           {/* @ts-ignore */}
           <SyntaxHighlighter
