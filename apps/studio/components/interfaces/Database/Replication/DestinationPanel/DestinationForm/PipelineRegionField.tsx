@@ -1,14 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { AWS_REGIONS } from 'shared-data'
-import { cn } from 'ui'
+import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationType } from '../DestinationPanel.types'
+import { toRequestClusterId } from '@/components/interfaces/Database/Replication/PipelineClusterScope.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
+import {
+  replicationClustersQueryOptions,
+  type ReplicationRegion,
+} from '@/data/replication/clusters-query'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
-// Keep the existing environment region as a fallback when discovery has no region code.
 export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
   ? AWS_REGIONS.SOUTHEAST_ASIA
   : AWS_REGIONS.CENTRAL_EU
@@ -20,23 +23,38 @@ const DESTINATION_REGION_HINT: Record<DestinationType, string> = {
   ClickHouse: 'Choose a nearby ClickHouse cluster where possible.',
 }
 
-export const getPipelineRegionDescription = (destinationType?: DestinationType) => {
-  const destinationHint = destinationType
+export const getPipelineRegionDescription = (destinationType?: DestinationType) =>
+  destinationType
     ? DESTINATION_REGION_HINT[destinationType]
     : 'Choose a nearby destination region where possible.'
 
-  return `All pipelines run from this region. ${destinationHint}`
-}
-
 export const PipelineRegionField = ({
   destinationType,
-  clusterId: selectedClusterId,
+  clusterId,
   className,
+  onRegionChange,
+  preferredClusterId,
+  disabled,
 }: {
   destinationType?: DestinationType
   clusterId?: string
   className?: string
+  /** Makes the region selectable when there is more than one region. */
+  onRegionChange?: (clusterId: string | undefined) => void
+  preferredClusterId?: string
+  disabled?: boolean
 }) => {
+  const { data } = useQuery(replicationClustersQueryOptions())
+  const hasMultipleRegions = (data?.regions.length ?? 0) > 1
+  const canSelectRegion = hasMultipleRegions && onRegionChange !== undefined && data !== undefined
+  const regions = data?.regions ?? []
+  const firstRegion = regions.find(
+    (region) => region.cluster_id === (preferredClusterId ?? data?.default_cluster_id)
+  )
+  const orderedRegions = firstRegion
+    ? [firstRegion, ...regions.filter((region) => region.cluster_id !== firstRegion.cluster_id)]
+    : regions
+
   return (
     <FormItemLayout
       isReactForm={false}
@@ -44,10 +62,64 @@ export const PipelineRegionField = ({
       label="Pipeline region"
       description={getPipelineRegionDescription(destinationType)}
     >
-      <PipelineRegionReadonly clusterId={selectedClusterId} className={className} />
+      {canSelectRegion ? (
+        <PipelineRegionSelect
+          regions={orderedRegions}
+          className={className}
+          disabled={disabled}
+          value={clusterId ?? data.default_cluster_id}
+          onValueChange={(value) =>
+            onRegionChange(toRequestClusterId(value, data.default_cluster_id))
+          }
+        />
+      ) : (
+        <PipelineRegionReadonly clusterId={clusterId} className={className} />
+      )}
     </FormItemLayout>
   )
 }
+
+const PipelineRegionSelect = ({
+  regions,
+  value,
+  onValueChange,
+  className,
+  disabled,
+}: {
+  regions: ReplicationRegion[]
+  value: string
+  onValueChange: (clusterId: string) => void
+  className?: string
+  disabled?: boolean
+}) => (
+  <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+    <SelectTrigger aria-label="Pipeline region" className={className}>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      {regions.map((region) => {
+        const label = region.region_code
+          ? `${region.region_name} (${region.region_code})`
+          : region.region_name
+        return (
+          <SelectItem key={region.cluster_id} value={region.cluster_id} textValue={label}>
+            <span className="flex items-center gap-x-2">
+              {region.region_code && (
+                <RegionFlag className="w-5 shrink-0" region={region.region_code} />
+              )}
+              <span>
+                {region.region_name}
+                {region.region_code && (
+                  <span className="text-foreground-lighter"> ({region.region_code})</span>
+                )}
+              </span>
+            </span>
+          </SelectItem>
+        )
+      })}
+    </SelectContent>
+  </Select>
+)
 
 export const PipelineRegionReadonly = ({
   clusterId: selectedClusterId,
@@ -58,9 +130,8 @@ export const PipelineRegionReadonly = ({
 }) => {
   const { data } = useQuery(replicationClustersQueryOptions())
   const clusterId = selectedClusterId ?? data?.default_cluster_id
-  const cluster = data?.regions.find((region) => region.cluster_id === clusterId)
-  const region = cluster?.region_code ? cluster : undefined
-  const regionCode = region?.region_code ?? PIPELINE_REGION.code
+  const cluster = data?.regions.find((item) => item.cluster_id === clusterId)
+  const regionCode = cluster ? cluster.region_code : PIPELINE_REGION.code
 
   return (
     <div
@@ -71,11 +142,13 @@ export const PipelineRegionReadonly = ({
         className
       )}
     >
-      <RegionFlag className="w-5 shrink-0" region={regionCode} />
+      {regionCode && <RegionFlag className="w-5 shrink-0" region={regionCode} />}
       <span className="min-w-0 truncate text-foreground">
-        {region?.region_name ?? PIPELINE_REGION.displayName}
+        {cluster?.region_name ?? PIPELINE_REGION.displayName}
       </span>
-      <span className="shrink-0 font-mono text-xs text-foreground-lighter">{regionCode}</span>
+      {regionCode && (
+        <span className="shrink-0 font-mono text-xs text-foreground-lighter">{regionCode}</span>
+      )}
     </div>
   )
 }

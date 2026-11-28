@@ -17,6 +17,8 @@ export type ReplicationClustersData = Awaited<ReturnType<typeof getReplicationCl
 
 export type ReplicationClustersError = StudioError
 
+export type ReplicationRegion = ReplicationClustersData['regions'][number]
+
 export const replicationClustersQueryOptions = () =>
   queryOptions<ReplicationClustersData, ReplicationClustersError>({
     queryKey: replicationKeys.clusters(),
