@@ -1,4 +1,4 @@
-import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { Fragment, useId, useState, useSyncExternalStore } from 'react'
 import {
   cn,
@@ -9,7 +9,8 @@ import {
   DropdownMenuTrigger,
   Tabs,
   TabsContent,
-  TabsIndicator,
+  TabsFolderCorner,
+  TabsFolderIndicator,
   TabsList,
   TabsTrigger,
 } from 'ui'
@@ -124,7 +125,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
       <Tabs
         value={toTabValue(activeTopic)}
         onValueChange={handleTabChange}
-        className="group/topic-tabs tab-flares flex flex-col"
+        className="flex flex-col"
       >
         <div className="relative flex items-end">
           <TopicTabs
@@ -134,21 +135,12 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
             className="flex-1"
           />
         </div>
-        <span aria-hidden className="relative z-1 block h-0">
-          <span
-            className={cn(
-              'absolute left-0 top-0 size-2 border-l border-default bg-200 opacity-0',
-              'transition-opacity duration-150 ease-move motion-reduce:transition-none',
-              'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:opacity-100',
-              'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:duration-400'
-            )}
-          />
-        </span>
+        <TabsFolderCorner active={activeTopic === null} />
         <TabsContent
           value={toTabValue(activeTopic)}
           className={cn(
-            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 px-6 py-2',
-            'transition-[height] duration-300 ease-move motion-reduce:transition-none'
+            'mt-0 box-content overflow-hidden rounded-lg border border-default bg-200 pl-3.75 pr-4 py-1',
+            'transition-[height] duration-250 ease-out motion-reduce:transition-none'
           )}
         >
           <div ref={bindPanelHeight}>
@@ -161,7 +153,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
               onTopicClear={handleTopicClear}
             />
             {hasMore ? (
-              <div className="flex justify-center py-6">
+              <div className="flex justify-center pt-7 pb-5">
                 <button
                   type="button"
                   onClick={handleLoadMore}
@@ -220,7 +212,7 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
               'text-foreground-lighter hover:text-foreground'
             )}
           >
-            <span className="flex items-center gap-1 px-3">
+            <span className="flex items-center gap-1 px-4">
               More
               <ChevronDown aria-hidden className="size-3.5" strokeWidth={2.25} />
             </span>
@@ -236,17 +228,7 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
           </DropdownMenuContent>
         </DropdownMenu>
       ) : null}
-      <TabsIndicator
-        className={cn(
-          'top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
-          'before:absolute before:bottom-0 before:-left-2 before:size-2',
-          'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
-          'group-has-[[role=tab]:first-child[data-state=active]]/topic-tabs:before:opacity-0',
-          'before:bg-(image:--tab-flare-left)',
-          'after:absolute after:bottom-0 after:-right-2 after:size-2',
-          'after:bg-(image:--tab-flare-right)'
-        )}
-      />
+      <TabsFolderIndicator />
     </TabsList>
   )
 }
@@ -255,7 +237,7 @@ const TopicTab = ({ topic }: TopicTabProps) => (
   <TabsTrigger
     value={toTabValue(topic)}
     className={cn(
-      'shrink-0 whitespace-nowrap rounded-md py-2 text-sm tracking-body transition-colors focus-inset',
+      'shrink-0 whitespace-nowrap rounded-md py-2 text-sm tracking-body transition-[color] focus-inset',
       'relative z-1 data-[state=active]:shadow-none',
       // indicator set before hydration
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:rounded-b-none',
@@ -266,10 +248,16 @@ const TopicTab = ({ topic }: TopicTabProps) => (
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:rounded-t-lg',
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border',
       'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-b-0',
-      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-default'
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-default',
+      'tab-flares',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:absolute',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:bottom-0',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:-right-1.75',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:size-2',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:after:bg-(image:--tab-flare-right)'
     )}
   >
-    <span className="block px-3">{topic ?? 'All'}</span>
+    <span className="block px-4">{topic ?? 'All'}</span>
   </TabsTrigger>
 )
 
@@ -299,7 +287,7 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
             // guide and troubleshooting slugs can be the same. hrefs are unique
             key={guide.href}
             className={cn(
-              'border-b border-dashed border-muted last:border-b-0 transition-colors',
+              'border-b border-dashed border-muted last:border-b-0',
               'hover:border-transparent has-[+li:hover]:border-transparent',
               'has-[:focus-visible]:border-transparent has-[+li_:focus-visible]:border-transparent'
             )}
@@ -309,14 +297,16 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               // community guides link off-site
               {...(externalHost && { target: '_blank', rel: 'noopener noreferrer' })}
               className={cn(
-                'group -mx-4 flex min-h-14 flex-col gap-1 rounded-md px-4 py-3 transition-colors',
+                'group -ml-2.75 -mr-3 flex min-h-14 flex-col gap-1 rounded-md pl-2.75 pr-3 py-3',
                 'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-hidden',
                 'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
               )}
             >
               <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
+                {guide.title}
                 {externalHost ? (
-                  <span className="mr-3">
+                  <span className="ml-1 text-foreground-light">
+                    {' by '}
                     <img
                       // google serves a favicon for any host, so contributors do not upload a logo
                       src={`https://www.google.com/s2/favicons?domain=${externalHost}&sz=32`}
@@ -325,20 +315,10 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
                       height={16}
                       loading="lazy"
                       referrerPolicy="no-referrer"
-                      className="mr-2 inline size-4 rounded-sm align-text-bottom"
+                      className="mx-1 inline size-4 rounded-sm align-text-bottom"
                     />
                     {guide.author ?? externalHost}
-                  </span>
-                ) : null}
-                <span className={cn(externalHost && 'text-foreground-light')}>{guide.title}</span>
-                {externalHost ? (
-                  <span className="ml-1 text-foreground-lighter transition-colors group-hover:text-foreground-light">
-                    <ArrowUpRight
-                      aria-hidden
-                      strokeWidth={2.5}
-                      className="ml-1 inline size-4 align-text-bottom"
-                    />
-                    <span className="sr-only">(opens in a new tab)</span>
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </span>
                 ) : null}
               </span>

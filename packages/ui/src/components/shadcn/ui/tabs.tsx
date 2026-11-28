@@ -6,6 +6,10 @@ import { useRef, type ComponentPropsWithRef } from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { useTabIndicator } from './useTabIndicator'
 
+interface TabsFolderCornerProps extends ComponentPropsWithRef<'span'> {
+  active: boolean
+}
+
 const Tabs = TabsPrimitive.Root
 
 const trackClasses = cn(
@@ -54,10 +58,39 @@ const TabsIndicator = ({ className, ...props }: ComponentPropsWithRef<'span'>) =
       'group-data-[tab-indicator-ready]/list:duration-[250ms]',
       'group-data-[tab-indicator-ready]/list:ease-move',
       'motion-reduce:transition-none',
+      'motion-reduce:group-data-[tab-indicator-ready]/list:transition-none',
       className
     )}
     {...props}
   />
+)
+
+const TabsFolderIndicator = ({ className, ...props }: ComponentPropsWithRef<'span'>) => (
+  <TabsIndicator
+    className={cn(
+      'tab-flares top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
+      'before:absolute before:bottom-0 before:-left-2 before:size-2',
+      'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
+      'group-has-[[role=tab]:first-child[data-state=active]]/list:before:opacity-0',
+      'before:bg-(image:--tab-flare-left)',
+      'after:absolute after:bottom-0 after:-right-2 after:size-2',
+      'after:bg-(image:--tab-flare-right)',
+      className
+    )}
+    {...props}
+  />
+)
+
+const TabsFolderCorner = ({ active, className, ...props }: TabsFolderCornerProps) => (
+  <span aria-hidden className={cn('relative z-1 block h-0', className)} {...props}>
+    <span
+      className={cn(
+        'absolute left-0 top-0 size-2 border-l border-default bg-200',
+        'transition-opacity ease-move motion-reduce:transition-none',
+        active ? 'opacity-100 duration-400' : 'opacity-0 duration-150'
+      )}
+    />
+  </span>
 )
 
 const TabsTrigger = ({
@@ -84,4 +117,12 @@ const TabsContent = ({
   <TabsPrimitive.Content className={cn('mt-4 focus-ring', className)} {...props} />
 )
 
-export { Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger }
+export {
+  Tabs,
+  TabsContent,
+  TabsFolderCorner,
+  TabsFolderIndicator,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+}

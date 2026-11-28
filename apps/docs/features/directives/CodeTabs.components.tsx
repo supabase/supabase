@@ -2,7 +2,14 @@
 
 import { useTabsWithQueryParams } from '~/features/ui/useTabsWithQueryParams'
 import { Children, isValidElement, useState, type PropsWithChildren, type ReactNode } from 'react'
-import { cn, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
+import {
+  cn,
+  TabsFolderCorner,
+  TabsFolderIndicator,
+  TabsList,
+  Tabs as TabsRoot,
+  TabsTrigger,
+} from 'ui'
 
 interface CodeTabPanelProps {
   id: string
@@ -27,7 +34,7 @@ export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: str
     >
       <span
         className={cn(
-          'relative z-1 -mb-px flex w-fit items-center px-3 py-2',
+          'tab-flares relative z-1 -mb-px flex w-fit items-center px-3 py-2',
           'rounded-t-lg border border-b-0 border-default bg-200',
           'text-xs text-foreground',
           'after:absolute after:bottom-0 after:-right-2 after:size-2',
@@ -53,6 +60,7 @@ export function CodeTabs({
     queryGroup,
   })
   const [selected, setSelected] = useState(tabs[0]?.props.id)
+  const activeTab = value ?? queryTab ?? selected
 
   const handleValueChange = (next: string) => {
     setSelected(next)
@@ -62,9 +70,9 @@ export function CodeTabs({
 
   return (
     <TabsRoot
-      value={value ?? queryTab ?? selected}
+      value={activeTab}
       onValueChange={handleValueChange}
-      className="group/code-tabs shiki-wrapper w-full isolate [&_.shiki]:my-0!"
+      className="shiki-wrapper w-full isolate [&_.shiki]:my-0!"
     >
       <TabsList
         className={cn(
@@ -84,28 +92,9 @@ export function CodeTabs({
             </span>
           </TabsTrigger>
         ))}
-        <TabsIndicator
-          className={cn(
-            'top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
-            'before:absolute before:bottom-0 before:-left-2 before:size-2',
-            'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
-            'group-has-[[role=tab]:first-child[data-state=active]]/code-tabs:before:opacity-0',
-            'before:bg-(image:--tab-flare-left)',
-            'after:absolute after:bottom-0 after:-right-2 after:size-2',
-            'after:bg-(image:--tab-flare-right)'
-          )}
-        />
+        <TabsFolderIndicator />
       </TabsList>
-      <span aria-hidden className="relative z-1 block h-0">
-        <span
-          className={cn(
-            'absolute left-0 top-0 size-2 border-l border-default bg-200 opacity-0',
-            'transition-opacity duration-150 ease-move motion-reduce:transition-none',
-            'group-has-[[role=tab]:first-child[data-state=active]]/code-tabs:opacity-100',
-            'group-has-[[role=tab]:first-child[data-state=active]]/code-tabs:duration-400'
-          )}
-        />
-      </span>
+      <TabsFolderCorner active={activeTab === tabs[0]?.props.id} />
       {children}
     </TabsRoot>
   )
