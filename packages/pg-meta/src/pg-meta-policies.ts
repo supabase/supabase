@@ -148,10 +148,16 @@ function update(
   const alter = safeSql`ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
   const nameSql: SafeSqlFragment =
     name === undefined ? safeSql`` : safeSql`${alter} RENAME TO ${ident(name)};`
+  // An empty expression is a syntax error rather than a way to drop the clause,
+  // so a blank fragment is treated the same as an omitted one — matching create()
   const definitionSql: SafeSqlFragment =
-    definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
+    definition === undefined || definition.trim().length === 0
+      ? safeSql``
+      : safeSql`${alter} USING (${definition});`
   const checkSql: SafeSqlFragment =
-    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
+    check === undefined || check.trim().length === 0
+      ? safeSql``
+      : safeSql`${alter} WITH CHECK (${check});`
   const rolesSql: SafeSqlFragment =
     roles === undefined
       ? safeSql``
