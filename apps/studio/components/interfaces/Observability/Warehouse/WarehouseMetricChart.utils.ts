@@ -1,4 +1,5 @@
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
+import { formatBytes } from '@/lib/helpers'
 
 export type WarehouseChartSeries = { metric?: WarehouseMetric; label: string }
 
@@ -8,23 +9,146 @@ const getLabelKey = (labels: Record<string, string>) =>
     .map((key) => `${key}=${labels[key]}`)
     .join('|')
 
-export const expandWarehouseChartSeries = (series: WarehouseChartSeries[]) =>
-  series.flatMap(({ metric, label }) => {
+export type WarehouseSeriesLabelPart = { key: string; text: string }
+export type WarehouseSeriesLabelFormatter = (
+  labels: Record<string, string>
+) => WarehouseSeriesLabelPart[]
+export type WarehouseSeriesLabelOptions = {
+  /** Defaults to the raw label values sorted by key. */
+  formatLabels?: WarehouseSeriesLabelFormatter
+  /** Drops label parts that every labelled series shares. */
+  hideSharedLabels?: boolean
+}
+
+const formatRawLabels: WarehouseSeriesLabelFormatter = (labels) =>
+  Object.keys(labels)
+    .sort()
+    .map((key) => ({ key, text: labels[key] }))
+
+const humanize = (value: string) => {
+  const text = value.replaceAll('_', ' ')
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
+const WORKER_PATH_LABELS: Record<string, string> = {
+  'apply:cdc': 'Live changes',
+  'table_sync:copy': 'Initial copy',
+  'table_sync:cdc': 'Initial copy catch-up',
+}
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  copy: 'Initial copy',
+  insert: 'Inserts',
+  update: 'Updates',
+  delete: 'Deletes',
+}
+
+const OPERATION_LABELS: Record<string, string> = {
+  cleanup_old_files: 'Clean up old files',
+}
+
+const REASON_LABELS: Record<string, string> = {
+  pending_inlined_data_bytes_threshold: 'Inlined data threshold',
+  active_data_files_threshold: 'Data file threshold',
+  deleted_row_ratio_threshold: 'Deleted row threshold',
+  snapshot_retention_threshold: 'Snapshot retention',
+}
+
+const RESULT_LABELS: Record<string, string> = {
+  noop: 'Nothing to flush',
+}
+
+const ETL_PART_ORDER = [
+  'worker_path',
+  'event_type',
+  'trigger',
+  'operation',
+  'reason',
+  'outcome',
+  'result',
+  'table',
+]
+
+const getEtlPart = (key: string, value: string): WarehouseSeriesLabelPart => {
+  switch (key) {
+    case 'event_type':
+      return { key, text: EVENT_TYPE_LABELS[value] ?? humanize(value) }
+    case 'operation':
+      return { key, text: OPERATION_LABELS[value] ?? humanize(value) }
+    case 'reason':
+      return { key, text: REASON_LABELS[value] ?? humanize(value) }
+    case 'result':
+      return { key, text: RESULT_LABELS[value] ?? humanize(value) }
+    case 'table':
+      return { key, text: value }
+    case 'pipeline_id':
+      return { key, text: `Pipeline ${value}` }
+    default:
+      return { key, text: humanize(value) }
+  }
+}
+
+export const formatWarehouseEtlLabels: WarehouseSeriesLabelFormatter = (labels) => {
+  const { worker_type: workerType, replication_path: replicationPath, ...rest } = labels
+  const parts: WarehouseSeriesLabelPart[] = Object.keys(rest).map((key) =>
+    getEtlPart(key, rest[key])
+  )
+  if (workerType !== undefined || replicationPath !== undefined) {
+    const known =
+      workerType !== undefined && replicationPath !== undefined
+        ? WORKER_PATH_LABELS[`${workerType}:${replicationPath}`]
+        : undefined
+    const text =
+      known ??
+      [workerType, replicationPath]
+        .filter((value): value is string => value !== undefined)
+        .map(humanize)
+        .join(' ')
+    parts.push({ key: 'worker_path', text })
+  }
+
+  const rank = (key: string) => {
+    if (key === 'pipeline_id') return ETL_PART_ORDER.length + 1
+    const index = ETL_PART_ORDER.indexOf(key)
+    return index === -1 ? ETL_PART_ORDER.length : index
+  }
+  return parts.sort((a, b) => rank(a.key) - rank(b.key) || a.key.localeCompare(b.key))
+}
+
+export const WAREHOUSE_ETL_LABEL_PROPS = {
+  formatLabels: formatWarehouseEtlLabels,
+  hideSharedLabels: true,
+} as const
+
+type ExpandedSeries = WarehouseChartSeries & { parts?: WarehouseSeriesLabelPart[] }
+
+export const expandWarehouseChartSeries = (
+  series: WarehouseChartSeries[],
+  { formatLabels = formatRawLabels, hideSharedLabels = false }: WarehouseSeriesLabelOptions = {}
+) => {
+  const expanded = series.flatMap(({ metric, label }): ExpandedSeries[] => {
     if (!metric || metric.series.length === 0) return [{ metric, label }]
     return [...metric.series]
       .sort((a, b) => getLabelKey(a.labels).localeCompare(getLabelKey(b.labels)))
       .map((item) => ({
         metric: { ...metric, series: [item] },
-        label: [
-          label,
-          ...Object.keys(item.labels)
-            .sort()
-            .map((key) => item.labels[key]),
-        ]
-          .filter(Boolean)
-          .join(' · '),
+        label,
+        parts: formatLabels(item.labels),
       }))
   })
+
+  const labelled = expanded.flatMap(({ parts }) => (parts && parts.length > 0 ? [parts] : []))
+  const isShared = (part: WarehouseSeriesLabelPart) =>
+    hideSharedLabels &&
+    labelled.every((parts) => parts.some((p) => p.key === part.key && p.text === part.text))
+
+  return expanded.map(({ metric, label, parts }) => ({
+    metric,
+    label: [label, ...(parts ?? []).filter((part) => !isShared(part)).map((part) => part.text)]
+      .filter(Boolean)
+      .join(' · '),
+  }))
+}
 
 export const getWarehouseSeriesRank = ({ metric }: WarehouseChartSeries) => {
   const points = metric?.series.flatMap((series) => series.points) ?? []
@@ -46,4 +170,126 @@ export const getWarehouseChartPoints = (series: WarehouseChartSeries[], scale: n
     })
   })
   return [...rows.entries()].sort(([a], [b]) => a - b).map(([, row]) => row)
+}
+
+export const getWarehouseSeriesPeak = ({ metric }: WarehouseChartSeries) =>
+  Math.max(
+    0,
+    ...(metric?.series.flatMap((series) =>
+      series.points.flatMap((point) =>
+        point.value !== null && Number.isFinite(point.value) ? [Math.abs(point.value)] : []
+      )
+    ) ?? [])
+  )
+
+// Fixed locale: sizes from formatBytes always use a period, so this keeps every chart consistent.
+const formatNumber = (value: number, maximumFractionDigits: number) =>
+  value.toLocaleString('en-US', { maximumFractionDigits })
+
+export const formatWarehouseCount = (value: number) => formatNumber(value, 1)
+
+// For charts without their own formatter; 3 digits matches ChartLine's default toLocaleString()
+export const formatWarehouseNumber = (value: number) => formatNumber(value, 3)
+
+export type WarehouseChartUnit = 'ms' | '/s'
+
+// "12.3 ms" but "1.2/s", like formatWarehouseDuration and formatWarehousePerSecond
+export const formatWarehouseUnitValue = (value: number, unit: WarehouseChartUnit) =>
+  unit === 'ms' ? `${formatWarehouseNumber(value)} ms` : `${formatWarehouseNumber(value)}/s`
+
+export const formatWarehousePerSecond = (perSecond: number) => `${formatNumber(perSecond, 2)}/s`
+
+export const formatWarehousePerMinute = (perSecond: number) =>
+  `${formatNumber(perSecond * 60, 2)}/min`
+
+export const formatWarehouseBytes = (bytes: number) =>
+  Math.abs(bytes) < 1 ? `${formatNumber(bytes, 2)} bytes` : formatBytes(bytes, 1)
+
+export const formatWarehouseBytesPerSecond = (bytesPerSecond: number) =>
+  `${formatWarehouseBytes(bytesPerSecond)}/s`
+
+export const formatWarehouseRatio = (ratio: number) => `${formatNumber(ratio * 100, 1)}%`
+
+export const formatWarehouseDuration = (seconds: number): string => {
+  if (seconds < 0) return `-${formatWarehouseDuration(-seconds)}`
+  if (seconds < 1) return `${Math.round(seconds * 1000)} ms`
+  if (seconds < 60) return `${formatNumber(seconds, 1)} s`
+  const whole = Math.floor(seconds)
+  const units: [string, number][] = [
+    ['d', Math.floor(whole / 86400)],
+    ['h', Math.floor((whole % 86400) / 3600)],
+    ['m', Math.floor((whole % 3600) / 60)],
+    ['s', whole % 60],
+  ]
+  return units
+    .filter(([, amount]) => amount > 0)
+    .slice(0, 2)
+    .map(([unit, amount]) => `${amount}${unit}`)
+    .join(' ')
+}
+
+export const formatWarehousePaused = (value: number) => (value > 0 ? 'Paused' : 'Not paused')
+
+const HEX_PART = /^(?:[0-9a-f]{2})+$/i
+
+const decodeHexPart = (hex: string) => {
+  if (!HEX_PART.test(hex)) return undefined
+  try {
+    return decodeURIComponent(hex.replace(/../g, '%$&'))
+  } catch {
+    return undefined
+  }
+}
+
+// Keys come from ETL's `DuckLakeTableName::id()`: `v2:<namespace>:<schema>:<table>`, hex-encoded.
+export const decodeWarehouseTableKey = (key: string): { namespace?: string; name: string } => {
+  const parts = key.split(':')
+  if (parts.length === 4 && parts[0] === 'v2') {
+    const [namespace, schema, table] = parts.slice(1).map(decodeHexPart)
+    if (namespace !== undefined && schema !== undefined && table !== undefined) {
+      return { namespace, name: `${schema}.${table}` }
+    }
+  }
+  return { name: key }
+}
+
+export type WarehouseInlinedTableRow = {
+  key: string
+  name: string
+  latest: number
+  peak: number
+}
+
+export const getWarehouseInlinedTableRows = (
+  metric?: WarehouseMetric
+): WarehouseInlinedTableRow[] => {
+  const measured = (metric?.series ?? []).flatMap((series, index) => {
+    const points = series.points.filter(
+      (point): point is { timestamp: number; value: number } =>
+        point.value !== null && Number.isFinite(point.value)
+    )
+    if (points.length === 0) return []
+    const latest = points.reduce((a, b) => (b.timestamp > a.timestamp ? b : a)).value
+    const peak = Math.max(...points.map((point) => point.value))
+    const tableKey = series.labels.table
+    const decoded =
+      tableKey === undefined ? { name: 'Unknown table' } : decodeWarehouseTableKey(tableKey)
+    return [{ key: String(index), decoded, pipelineId: series.labels.pipeline_id, latest, peak }]
+  })
+
+  const hasManyNamespaces = new Set(measured.map((row) => row.decoded.namespace)).size > 1
+  const hasManyPipelines = new Set(measured.map((row) => row.pipelineId)).size > 1
+
+  return measured
+    .map(({ key, decoded, pipelineId, latest, peak }) => ({
+      key,
+      name: [
+        hasManyNamespaces && decoded.namespace !== undefined ? `${decoded.namespace} · ` : '',
+        decoded.name,
+        hasManyPipelines && pipelineId !== undefined ? ` · Pipeline ${pipelineId}` : '',
+      ].join(''),
+      latest,
+      peak,
+    }))
+    .sort((a, b) => b.latest - a.latest || b.peak - a.peak || a.name.localeCompare(b.name))
 }

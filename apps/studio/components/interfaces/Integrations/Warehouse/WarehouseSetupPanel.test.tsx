@@ -15,6 +15,7 @@ import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addWarehouseMetricsMock } from '@/tests/lib/warehouse-metrics-mock'
 
 type SetupStatus = components['schemas']['WarehouseSetupStatusResponse_Output']
 type Destinations = components['schemas']['DestinationsResponse_Output']
@@ -100,11 +101,7 @@ function mockWarehouse(
     path: '/platform/replication/:ref/destinations',
     response: () => HttpResponse.json<Destinations>({ destinations }),
   })
-  addAPIMock({
-    method: 'get',
-    path: '/platform/warehouse/:ref/metrics',
-    response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
-  })
+  addWarehouseMetricsMock(() => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }))
 }
 
 const DuckLakeForm = () => {

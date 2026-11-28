@@ -34,7 +34,8 @@ async function getWarehouseMetrics(
   const { data, error } = await get('/platform/warehouse/{ref}/metrics', {
     params: {
       path: { ref: projectRef },
-      query: { attributes: [...attributes], startDate, endDate, interval },
+      // A comma-separated list also covers measurements the generated enum doesn't list yet.
+      query: { attributes: attributes.join(','), startDate, endDate, interval },
     },
     signal,
   })

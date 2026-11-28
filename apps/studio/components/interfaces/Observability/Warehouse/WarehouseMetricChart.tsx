@@ -3,9 +3,14 @@ import { ChartLine } from 'ui-patterns/Chart'
 
 import {
   expandWarehouseChartSeries,
+  formatWarehouseNumber,
+  formatWarehouseUnitValue,
   getWarehouseChartPoints,
+  getWarehouseSeriesPeak,
   getWarehouseSeriesRank,
+  type WarehouseSeriesLabelOptions,
   type WarehouseChartSeries,
+  type WarehouseChartUnit,
 } from './WarehouseMetricChart.utils'
 import { getEmptyMessage } from './WarehouseMetricsReport.utils'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
@@ -19,18 +24,29 @@ export const WarehouseMetricChart = ({
   scale = 1,
   emptyMessage,
   series: inputSeries = [{ metric, label: title }],
+  formatValue,
+  formatLabels,
+  hideSharedLabels,
 }: {
   metric?: WarehouseMetric
   title: string
   description: string
-  unit?: 'ms' | '/s'
+  unit?: WarehouseChartUnit
   scale?: number
   emptyMessage?: string
   series?: WarehouseChartSeries[]
-}) => {
-  const allSeries = expandWarehouseChartSeries(inputSeries)
+  formatValue?: (value: number) => string
+} & WarehouseSeriesLabelOptions) => {
+  const valueFormatter =
+    formatValue ??
+    (unit ? (value: number) => formatWarehouseUnitValue(value, unit) : formatWarehouseNumber)
+  const allSeries = expandWarehouseChartSeries(inputSeries, { formatLabels, hideSharedLabels })
   const selectedSeries = [...allSeries]
-    .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
+    .sort(
+      (a, b) =>
+        getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a) ||
+        getWarehouseSeriesPeak(b) - getWarehouseSeriesPeak(a)
+    )
     .slice(0, 12)
   const series = allSeries.filter((item) => selectedSeries.includes(item))
 
@@ -52,7 +68,7 @@ export const WarehouseMetricChart = ({
       )
   )
   return (
-    <section aria-label={title}>
+    <section aria-label={title} className="min-w-0">
       <Card>
         <CardContent className="flex flex-col gap-y-4 p-4">
           {hasValues ? (
@@ -87,7 +103,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
+                YAxisProps={{ tickFormatter: valueFormatter }}
               />
             </>
           ) : (
