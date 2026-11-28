@@ -48,7 +48,7 @@ On Linux and other systems with OpenSSL 1.1.1 or 3.x:
 
 ```sh
 (umask 077 && \
-openssl genpkey -algorithm RSA -out pk_pkcs8.pem && \
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out pk_pkcs8.pem && \
 openssl pkey -in pk_pkcs8.pem -outform DER -traditional -out pk_rsa1.der && \
 base64 < pk_rsa1.der | tr -d '\n')
 ```
@@ -57,7 +57,7 @@ On macOS, use the system LibreSSL (`/usr/bin/openssl`), which does not support `
 
 ```sh
 (umask 077 && \
-/usr/bin/openssl genpkey -algorithm RSA -out pk_pkcs8.pem && \
+/usr/bin/openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out pk_pkcs8.pem && \
 /usr/bin/openssl pkey -in pk_pkcs8.pem -outform DER -out pk_rsa1.der && \
 base64 < pk_rsa1.der | tr -d '\n')
 ```
@@ -68,7 +68,7 @@ The commands above:
 2. Convert the key to PKCS#1 DER format
 3. Base64-encode the key for use as the value of `GOTRUE_SAML_PRIVATE_KEY`
 
-Before running these commands, remove any existing `pk_pkcs8.pem` and `pk_rsa1.der` files or restrict their permissions. The subshell sets `umask 077`, so newly created temporary key files are readable only by your user.
+Before running these commands, remove any existing `pk_pkcs8.pem` and `pk_rsa1.der` files or restrict their permissions. The subshell sets `umask 077`, so newly created files are not group- or world-readable. On macOS, run the commands in a directory whose ACLs do not grant other users access, because new files inherit those ACLs.
 
 Save the Base64 output - make sure to copy it as single line, ignoring the trailing newline. Remove the temporary files.
 
@@ -80,7 +80,7 @@ Keep this key secret. Anyone with the private key can forge SAML requests on beh
 
 <Admonition type="note">
 
-For a production deployment, consider using a 4096-bit key by adding `-pkeyopt rsa_keygen_bits:4096` to the `openssl genpkey` command in the example for your platform.
+For a production deployment, change `-pkeyopt rsa_keygen_bits:2048` to `-pkeyopt rsa_keygen_bits:4096` in the `openssl genpkey` command.
 
 </Admonition>
 
