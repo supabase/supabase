@@ -14,7 +14,13 @@ export function stripHeadingCustomIds(tree: MarkdownTree) {
     if (last?.type !== 'text') return
     const text = last.value.trimEnd()
     const anchorStart = text.lastIndexOf('[#')
-    if (anchorStart === -1 || !text.endsWith(']')) return
+    // Only strip if the bracketed segment at the end is the custom anchor,
+    // i.e. the last '[' in the text starts the '[#...' anchor. Headings like
+    // 'Step [#1]: Accessing items[0]' or 'Issue [#123] [Beta]' must keep
+    // their trailing bracketed labels.
+    if (anchorStart === -1) return
+    if (text.lastIndexOf('[') !== anchorStart) return
+    if (!text.endsWith(']')) return
     last.value = text.slice(0, anchorStart).trimEnd()
   })
 }
