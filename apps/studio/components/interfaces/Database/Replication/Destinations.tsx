@@ -1,9 +1,7 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
-import { useRouter as useNextRouter } from 'next/compat/router'
-import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -100,8 +98,7 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
-  const router = useTanStackRouter({ warn: false })
-  const nextRouter = useNextRouter()
+  const navigate = useNavigate()
   const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
   const bigQuery = useIsPipelinesBigQueryEnabled()
   const duckLake = useIsPipelinesDuckLakeEnabled()
@@ -245,16 +242,15 @@ export const Destinations = () => {
 
   const canLinkToWizard =
     isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
-  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+  const wizardLink = linkOptions({
+    to: '/project/$ref/database/pipelines/new',
+    params: { ref: projectRef ?? '_' },
+    search: { cluster_id: clusterId },
+  })
 
   const openCreation = (type: DestinationType) => {
     if (isWizardEnabled && hasWizardDestination && projectRef) {
-      if (router)
-        void router.navigate({
-          to: '/project/$ref/database/pipelines/new',
-          params: { ref: projectRef },
-        })
-      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+      void navigate(wizardLink)
     } else {
       setDestinationType(type)
     }
@@ -280,7 +276,8 @@ export const Destinations = () => {
     pendingCreationTypeRef.current = null
     if (
       type &&
-      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+      queryClient.getQueryState(replicationKeys.sources(projectRef, clusterId))?.status ===
+        'success'
     ) {
       openCreation(type)
     }
@@ -356,7 +353,11 @@ export const Destinations = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
-                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                <Link
+                  to="/org/$slug/usage"
+                  params={{ slug: organization?.slug ?? '_' }}
+                  hash="pipeline-initial-sync-data"
+                >
                   View Pipelines usage
                 </Link>
               </DropdownMenuItem>
@@ -409,7 +410,7 @@ export const Destinations = () => {
               asChild={canLinkToWizard}
               onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+              {canLinkToWizard ? <Link {...wizardLink}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </Shortcut>
         </div>
@@ -508,7 +509,7 @@ export const Destinations = () => {
               asChild={canLinkToWizard}
               onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+              {canLinkToWizard ? <Link {...wizardLink}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </EmptyStatePresentational>
         )}

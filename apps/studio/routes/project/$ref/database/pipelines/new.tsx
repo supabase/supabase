@@ -60,14 +60,18 @@ function PipelineCreationPage() {
       void navigate({
         to: '/project/$ref/database/pipelines',
         params: { ref },
-        search: isEnabled ? undefined : { destinationType: 'BigQuery' },
+        search: { cluster_id: clusterId, destinationType: isEnabled ? undefined : 'BigQuery' },
         replace: true,
       })
     }
-  }, [isAccessLoading, canOpenFlow, isEnabled, ref, navigate])
+  }, [isAccessLoading, canOpenFlow, isEnabled, ref, navigate, clusterId])
   const handleClose = () => {
     if (!ref) return
-    void navigate({ to: '/project/$ref/database/pipelines', params: { ref } })
+    void navigate({
+      to: '/project/$ref/database/pipelines',
+      params: { ref },
+      search: { cluster_id: clusterId },
+    })
   }
   // header links resolve to absolute URLs: keep same-app ones as client-side navigations
   const handleNavigate = (href: string) => {

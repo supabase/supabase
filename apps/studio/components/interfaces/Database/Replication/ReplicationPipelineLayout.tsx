@@ -1,3 +1,4 @@
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import {
   ArrowRightIcon,
@@ -9,8 +10,6 @@ import {
   RotateCcwIcon,
   TrashIcon,
 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -71,6 +70,7 @@ import { useStartPipelineMutation } from '@/data/replication/start-pipeline-muta
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { splitInternalUrl } from '@/lib/internal-url'
 import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
@@ -89,9 +89,9 @@ const LIFECYCLE_BY_STATUS: Partial<
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
-  const clusterId = useReplicationClusterId()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-  const router = useRouter()
+  const navigate = useNavigate()
+  const clusterId = useReplicationClusterId()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -225,7 +225,11 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(`/project/${projectRef}/database/pipelines`)
+      void navigate({
+        to: '/project/$ref/database/pipelines',
+        params: { ref: projectRef },
+        search: { cluster_id: clusterId },
+      })
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {
@@ -246,7 +250,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             <PageBreadcrumbsActions>
               <DocsButton href={`${DOCS_URL}/guides/database/replication/pipelines`} />
               <Button asChild variant="default">
-                <Link href={logsUrl}>View logs</Link>
+                <Link {...splitInternalUrl(logsUrl)}>View logs</Link>
               </Button>
             </PageBreadcrumbsActions>
           }
@@ -254,7 +258,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/database/pipelines`}>Pipelines</Link>
+                <Link
+                  to="/project/$ref/database/pipelines"
+                  params={{ ref: projectRef ?? '_' }}
+                  search={{ cluster_id: clusterId }}
+                >
+                  Pipelines
+                </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
