@@ -39,7 +39,7 @@ export interface SearchPanelProps {
   /** Fires when a result is activated by click or Enter. `query` is the one its results belong to. */
   onResultActivate?: (result: SearchResult, context: { query: string }) => void
   /** Fires when a result is activated from the keyboard, so the consumer has to navigate. */
-  onResultNavigate: (path: string) => void
+  onResultNavigate: (href: string) => void
   /** Fires when a result link is about to navigate in this tab (not a new-tab click). */
   onResultLinkNavigate?: () => void
   renderNoResults?: (context: { query: string }) => ReactNode
@@ -183,7 +183,7 @@ export function SearchPanel({
                     onActivate={(activated) =>
                       onResultActivate?.(activated, { query: highlightQuery })
                     }
-                    onNavigate={(path) => onResultNavigate(path)}
+                    onNavigate={(href) => onResultNavigate(href)}
                     onLinkNavigate={() => onResultLinkNavigate?.()}
                   />
                 ))}

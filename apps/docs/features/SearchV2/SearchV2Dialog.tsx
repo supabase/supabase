@@ -16,6 +16,7 @@ import { useEffect } from 'react'
 
 import { AskAiIcon } from './AskAiIcon'
 import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
+import { reshapeDocsResult } from './reshapeDocsResult'
 import type { SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
@@ -57,6 +58,7 @@ export function SearchV2Panel({
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2({
     endpoint: SEARCH_V2_ENDPOINT,
+    reshape: reshapeDocsResult,
   })
 
   useEffect(() => {

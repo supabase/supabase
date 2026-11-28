@@ -7,6 +7,8 @@ import { useMountEffect } from './useMountEffect'
 
 interface DocsSearchV2Result {
   path: string
+  anchor?: string
+  headingLevel?: number
   title: string
   heading: string
   excerpt: string
@@ -34,6 +36,7 @@ function reshapeResult(row: unknown): DocsSearchV2Result | null {
       'slug' in row &&
       'page_title' in row &&
       'heading' in row &&
+      'heading_level' in row &&
       'excerpt' in row &&
       'heading_path' in row &&
       'score' in row
@@ -47,6 +50,7 @@ function reshapeResult(row: unknown): DocsSearchV2Result | null {
     path: slug ? `/${slug}` : '/',
     title: row.page_title as string,
     heading: row.heading as string,
+    headingLevel: row.heading_level as number,
     excerpt: row.excerpt as string,
     headingPath: row.heading_path as string[],
     score: row.score as number,
@@ -149,5 +153,5 @@ const useDocsSearchV2 = ({ endpoint, reshape = reshapeResult }: UseDocsSearchV2O
   }
 }
 
-export { useDocsSearchV2 }
+export { reshapeResult as reshapeDocsSearchV2Row, useDocsSearchV2 }
 export type { DocsSearchV2Result, UseDocsSearchV2Options, SearchState as DocsSearchV2State }

@@ -14,6 +14,7 @@ const row = {
   page_title: 'Migrate from Heroku',
   slug: 'kb/guides/Migrate-From-Heroku',
   heading: 'Overview',
+  heading_level: 2,
   excerpt: 'Move your database',
   score: 1,
 }
@@ -45,6 +46,7 @@ describe('GET /api/search', () => {
         title: 'Migrate from Heroku',
         href: 'https://supabase.com/kb/guides/Migrate-From-Heroku',
         heading: 'Overview',
+        headingLevel: 2,
         excerpt: 'Move your database',
         score: 1,
       },

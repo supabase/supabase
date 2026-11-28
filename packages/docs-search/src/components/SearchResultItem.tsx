@@ -15,7 +15,7 @@ export interface SearchResultItemProps {
   /** Fires whenever the result is activated, by click or Enter, before anything navigates. */
   onActivate?: (result: SearchResult) => void
   /** Fires when the result was activated from the keyboard, so the consumer has to navigate. */
-  onNavigate: (path: string) => void
+  onNavigate: (href: string) => void
   /** Fires when the link itself is about to navigate in this tab (not a new-tab click). */
   onLinkNavigate?: () => void
 }
@@ -30,6 +30,7 @@ export function SearchResultItem({
 }: SearchResultItemProps) {
   // clicks navigate via the link and also fire onSelect, so onSelect only navigates for Enter
   const isPointerSelectRef = useRef(false)
+  const href = result.anchor ? `${result.path}#${result.anchor}` : result.path
 
   function handleLinkClick(event: MouseEvent<HTMLAnchorElement>) {
     isPointerSelectRef.current = true
@@ -43,7 +44,7 @@ export function SearchResultItem({
       isPointerSelectRef.current = false
       return
     }
-    onNavigate(result.path)
+    onNavigate(href)
   }
 
   return (
@@ -54,7 +55,7 @@ export function SearchResultItem({
       className="cursor-pointer rounded-md px-2 py-2"
     >
       {renderLink({
-        href: result.path,
+        href,
         tabIndex: -1,
         onClick: handleLinkClick,
         children: (
