@@ -46,6 +46,7 @@ describe('parseCronJobCommand', () => {
       functionName: 'function_1',
     },
     { command: 'select lowercase.issue ()', schema: 'lowercase', functionName: 'issue' },
+    { command: 'SELECT public.cleanup() ;', schema: 'public', functionName: 'cleanup' },
   ])('parses "$command" as a sql function', ({ command, schema, functionName }) => {
     expect(parseCronJobCommand(command, REF)).toStrictEqual({
       type: 'sql_function',
@@ -61,6 +62,22 @@ describe('parseCronJobCommand', () => {
     { case: 'a function from the search path', command: 'SELECT test_cron_function()' },
     { case: 'a missing schema and function name', command: 'SELECT .()' },
     { case: 'a missing function name', command: 'SELECT schema.()' },
+    {
+      case: 'a function call followed by another statement',
+      command: 'select public.cleanup(); select public.notify_admins();',
+    },
+    {
+      case: 'a statement followed by a function call',
+      command: "insert into public.audit (note) values ('ran'); select public.refresh_stats();",
+    },
+    {
+      case: 'a function call inside another statement',
+      command: 'delete from public.sessions where user_id in (select auth.uid())',
+    },
+    {
+      case: 'a function call followed by a comment',
+      command: 'SELECT public.vacuum_logs() -- nightly cleanup',
+    },
     {
       case: 'an HTTP request in positional notation',
       command: `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`,
