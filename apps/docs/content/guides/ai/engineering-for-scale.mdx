@@ -33,9 +33,9 @@ create view public.docs as
 select
   id,
   embedding,
-  metadata, # Expose the metadata as JSON
-  (metadata->>'url')::text as url # Extract the URL as a string
-from vector
+  metadata, -- Expose the metadata as JSON
+  (metadata->>'url')::text as url -- Extract the URL as a string
+from vector;
 ```
 
 You can then use any of the client libraries to access your collections within your applications:
