@@ -14,6 +14,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import { toTelemetryPageTitle } from '@/lib/page-title'
 import { IS_SESSION_REPLAY_ENABLED, SESSION_REPLAY_CONFIG } from '@/lib/session-replay'
+import { useRouteRequestTelemetry } from '@/lib/telemetry/request-timing/use-route-request-telemetry'
 
 setTelemetryPageTitleResolver(toTelemetryPageTitle)
 
@@ -28,6 +29,8 @@ export function Telemetry() {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const user = useUser()
+
+  useRouteRequestTelemetry()
 
   // Project ref from the URL params, mirroring the backend's `request.params.ref`
   const { ref: projectRef } = useParams()

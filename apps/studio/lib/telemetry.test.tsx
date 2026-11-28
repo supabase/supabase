@@ -1,4 +1,11 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { render, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Telemetry } from './telemetry'
@@ -40,6 +47,15 @@ vi.mock('@sentry/react', () => ({
   setTag: (...args: unknown[]) => mocks.setTag(...args),
 }))
 
+// `Telemetry` reads the router for route request timing, which has its own tests
+const router = createRouter({
+  routeTree: createRootRoute(),
+  history: createMemoryHistory({ initialEntries: ['/'] }),
+})
+const RouterWrapper = ({ children }: { children: ReactNode }) => (
+  <RouterContextProvider router={router}>{children}</RouterContextProvider>
+)
+
 const USER_ID = 'user-abc-123'
 const CREATED_AT = '2026-05-14T22:30:00.000Z'
 
@@ -59,7 +75,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    render(<Telemetry />)
+    render(<Telemetry />, { wrapper: RouterWrapper })
 
     await waitFor(() => {
       expect(mocks.identify).toHaveBeenCalledWith(USER_ID, {
@@ -73,7 +89,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: undefined })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    render(<Telemetry />)
+    render(<Telemetry />, { wrapper: RouterWrapper })
 
     await waitFor(() => {
       expect(mocks.identify).toHaveBeenCalledWith(USER_ID, { org_count: 1 })
@@ -84,7 +100,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    const { rerender } = render(<Telemetry />)
+    const { rerender } = render(<Telemetry />, { wrapper: RouterWrapper })
     await waitFor(() => expect(mocks.identify).toHaveBeenCalledTimes(1))
 
     rerender(<Telemetry />)
@@ -99,7 +115,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: undefined })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    const { rerender } = render(<Telemetry />)
+    const { rerender } = render(<Telemetry />, { wrapper: RouterWrapper })
     await waitFor(() => expect(mocks.identify).toHaveBeenCalledTimes(1))
     expect(mocks.identify).toHaveBeenLastCalledWith(USER_ID, { org_count: 1 })
 
@@ -121,7 +137,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    const { rerender } = render(<Telemetry />)
+    const { rerender } = render(<Telemetry />, { wrapper: RouterWrapper })
     await waitFor(() => expect(mocks.identify).toHaveBeenCalledTimes(1))
 
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(2) })
@@ -138,7 +154,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     // user missing
     mocks.useUser.mockReturnValue(null)
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
-    const first = render(<Telemetry />)
+    const first = render(<Telemetry />, { wrapper: RouterWrapper })
     await new Promise((r) => setTimeout(r, 10))
     expect(mocks.identify).not.toHaveBeenCalled()
     first.unmount()
@@ -146,7 +162,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     // user present but orgs not loaded
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
     mocks.useOrganizationsQuery.mockReturnValue({ data: undefined })
-    render(<Telemetry />)
+    render(<Telemetry />, { wrapper: RouterWrapper })
     await new Promise((r) => setTimeout(r, 10))
     expect(mocks.identify).not.toHaveBeenCalled()
   })
@@ -164,7 +180,7 @@ describe('Telemetry — Sentry user identification', () => {
     mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    render(<Telemetry />)
+    render(<Telemetry />, { wrapper: RouterWrapper })
 
     await waitFor(() => {
       expect(mocks.setUser).toHaveBeenCalledWith({ id: USER_ID })
@@ -175,7 +191,7 @@ describe('Telemetry — Sentry user identification', () => {
     mocks.useUser.mockReturnValue(null)
     mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
 
-    render(<Telemetry />)
+    render(<Telemetry />, { wrapper: RouterWrapper })
     await new Promise((r) => setTimeout(r, 10))
     expect(mocks.setUser).not.toHaveBeenCalled()
   })

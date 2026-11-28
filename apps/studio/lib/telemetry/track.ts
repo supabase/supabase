@@ -1,5 +1,9 @@
 import { sendTelemetryEvent, useFramework } from 'common'
-import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
+import {
+  RouteRequestsEvaluatedEvent,
+  TelemetryEvent,
+  TelemetryGroups,
+} from 'common/telemetry-constants'
 import { useCallback } from 'react'
 
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -66,4 +70,29 @@ export const useTrack = () => {
   )
 
   return track
+}
+
+/**
+ * Sends the `route_requests_evaluated` summary of a finished route visit. This is the one event
+ * that does not go through `useTrack`, because it differs in three ways:
+ *
+ * - It is sent as the previous page is left (navigation, tab hidden, unload), when the current
+ *   project, org and pathname already belong to the next page. So it carries no project or org
+ *   group, and the pathname is the visit's own route template, never the live one.
+ * - It may be sent as the page unloads, so it does not wait to read the access token first (the
+ *   endpoint identifies the user from cookies).
+ * - It is sent from outside React (router and document listeners), so it cannot use a hook.
+ *
+ * Consent is still checked by `sendTelemetryEvent`.
+ */
+export function trackRouteVisit(
+  properties: RouteRequestsEvaluatedEvent['properties'],
+  { isLeavingPage = false }: { isLeavingPage?: boolean } = {}
+) {
+  sendTelemetryEvent(
+    API_URL,
+    { action: 'route_requests_evaluated', properties },
+    properties.routeTemplate,
+    { skipAccessToken: isLeavingPage }
+  )
 }

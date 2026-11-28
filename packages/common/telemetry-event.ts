@@ -18,6 +18,8 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_closed',
   'agent_setup_clicked',
   'view_as_markdown_clicked',
+  // Sent as the tab is hidden, when the page may be unloading
+  'route_requests_evaluated',
 ])
 
 let featureFlagProperties: Record<string, unknown> = {}

@@ -21,6 +21,7 @@ import {
 } from '@/lib/errors/report-studio-error'
 import { MalformedResponseError, type StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
+import { requestTimingCollector } from '@/lib/telemetry/request-timing/request-timing-collector'
 
 // generated from openapi-typescript
 
@@ -30,16 +31,44 @@ const DEFAULT_HEADERS = { Accept: 'application/json' }
 // `schemaPath`) and read by `fetchHandler`, which only sees the `Request`.
 const requestEndpoints = new WeakMap<Request, string>()
 
+// Requests made without going through the openapi client have no path template, and their raw
+// URL can carry identifiers, so they are counted under this instead
+const UNLABELED_ENDPOINT = 'unlabeled'
+
+function isAbortError(err: unknown) {
+  return typeof err === 'object' && err !== null && 'name' in err && err.name === 'AbortError'
+}
+
 export const fetchHandler: typeof fetch = async (input, init) => {
+  const request = typeof Request !== 'undefined' && input instanceof Request ? input : undefined
+  const startMs = requestTimingCollector.now()
+
+  // Time to response headers; the body is read later. Recorded outside the try so a failure
+  // here can never be mistaken for a failed request.
+  const recordTiming = (isError: boolean) => {
+    const method = (request?.method ?? init?.method ?? 'GET').toUpperCase()
+    requestTimingCollector.recordRequest({
+      endpoint: `${method} ${(request && requestEndpoints.get(request)) ?? UNLABELED_ENDPOINT}`,
+      startMs,
+      endMs: requestTimingCollector.now(),
+      isError,
+    })
+  }
+
+  let response: Response
   try {
-    return await fetch(input, init)
+    response = await fetch(input, init)
   } catch (err) {
-    const request = typeof Request !== 'undefined' && input instanceof Request ? input : undefined
+    // A request cancelled on purpose (e.g. a query that was cancelled) is not a failure
+    recordTiming(!isAbortError(err))
     throw classifyError(err, {
       endpoint: request ? requestEndpoints.get(request) : undefined,
       method: request?.method ?? init?.method,
     })
   }
+
+  recordTiming(response.status >= 400)
+  return response
 }
 
 export const client = createClient<paths>({
