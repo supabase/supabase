@@ -67,24 +67,72 @@ SUPABASE_KEY = os.getenv("SUPABASE_API_KEY")
 MIXPEEK_API_KEY = os.getenv("MIXPEEK_API_KEY")
 ```
 
+## Create the table and search function
+
+The Supabase Python client can't create tables or indexes, so set up the database with a migration. Create a new migration file:
+
+```shell
+supabase migration new video_chunks
+```
+
+Add the following SQL to the new file in `supabase/migrations`. It creates a table for the video chunk embeddings, an index for fast similarity search, and a `match_video_chunks` function that you'll call from Python later:
+
+```sql
+create extension if not exists vector with schema extensions;
+
+create table video_chunks (
+  id text primary key,
+  start_time float8,
+  end_time float8,
+  embedding extensions.vector(768),
+  metadata jsonb
+);
+
+create index on video_chunks using hnsw (embedding extensions.vector_cosine_ops);
+
+create or replace function match_video_chunks (
+  query_embedding extensions.vector(768),
+  match_threshold float,
+  match_count int
+)
+returns table (
+  id text,
+  start_time float8,
+  end_time float8,
+  metadata jsonb,
+  similarity float
+)
+language sql stable
+set search_path = ''
+as $$
+  select
+    video_chunks.id,
+    video_chunks.start_time,
+    video_chunks.end_time,
+    video_chunks.metadata,
+    1 - (video_chunks.embedding operator(extensions.<=>) query_embedding) as similarity
+  from public.video_chunks
+  where 1 - (video_chunks.embedding operator(extensions.<=>) query_embedding) > match_threshold
+  order by video_chunks.embedding operator(extensions.<=>) query_embedding
+  limit match_count;
+$$;
+```
+
+Apply the migration to your local database:
+
+```shell
+supabase db reset
+```
+
 ## Create embeddings for your videos
 
-Next, create a `seed` method, which will create a new Supabase table, generate embeddings for your video chunks, and insert the embeddings into your database:
+Next, create a `seed` method, which will generate embeddings for your video chunks and insert them into the `video_chunks` table:
 
 ```python
 def seed():
     # Initialize Supabase and Mixpeek clients
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
     mixpeek = Mixpeek(MIXPEEK_API_KEY)
-
-    # Create a table for storing video chunk embeddings
-    supabase.table("video_chunks").create({
-        "id": "text",
-        "start_time": "float8",
-        "end_time": "float8",
-        "embedding": "extensions.vector(768)",
-        "metadata": "jsonb"
-    })
 
     # Process and embed video
     video_url = "https://example.com/your_video.mp4"
@@ -114,10 +162,6 @@ def seed():
         }).execute()
 
     print("Video processed and embeddings inserted")
-
-    # Create index for fast search performance
-    supabase.query("CREATE INDEX ON video_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100)").execute()
-    print("Created index")
 ```
 
 Add this method as a script in your `pyproject.toml` file:
