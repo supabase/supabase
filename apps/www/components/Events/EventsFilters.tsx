@@ -103,7 +103,10 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
     setSearchTerm(text)
     searchParams?.has('q') &&
       router?.replace('/events', undefined, { shallow: true, scroll: false })
-    router?.replace(`/events?q=${text}`, undefined, { shallow: true, scroll: false })
+    router?.replace(`/events?q=${text}`, undefined, {
+      shallow: true,
+      scroll: false,
+    })
     if (text.length < 1) router?.replace('/events', undefined, { shallow: true, scroll: false })
 
     const matches = allEvents.filter((event: any) => {
@@ -237,7 +240,12 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
         >
-          <Button className="px-2 w-9 h-9" size="large" onClick={() => setShowSearchInput(true)}>
+          <Button
+            className="px-2 w-9 h-9"
+            size="large"
+            aria-label="Search events"
+            onClick={() => setShowSearchInput(true)}
+          >
             <Search size="14" />
           </Button>
         </motion.div>
@@ -264,6 +272,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
             {isMobile && (
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
+                  aria-label="Clear search"
                   onClick={() => {
                     handleSearchByText('')
                     setShowSearchInput(false)
