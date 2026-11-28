@@ -12,6 +12,11 @@ import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
+
+// The session ended (401), the user has no access to the project (403), or the project was
+// deleted (404). These come from the user's session or access, not from a Studio bug.
+const EXPECTED_PROJECT_DETAIL_STATUSES = [401, 403, 404] as const
+
 export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
@@ -80,7 +85,7 @@ export async function getProjectDetail(
     }
   }
 
-  if (error) handleError(error)
+  if (error) handleError(error, { expectedStatuses: EXPECTED_PROJECT_DETAIL_STATUSES })
 
   const project = { ...data, connectionString: connectionString } as Project
 
