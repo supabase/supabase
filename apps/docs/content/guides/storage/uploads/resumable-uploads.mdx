@@ -52,6 +52,12 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                 // Supabase TUS endpoint (with direct storage hostname)
                 endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
                 retryDelays: [0, 3000, 5000, 10000, 20000],
+                onShouldRetry: function (error, retryAttempt, options) {
+                    if (error.originalResponse?.getStatus() === 429) {
+                        return true
+                    }
+                    return tus.defaultOptions.onShouldRetry(error, retryAttempt, options)
+                },
                 headers: {
                     authorization: `Bearer ${session.access_token}`,
                     'x-upsert': 'true', // optionally set upsert to true to overwrite existing files
@@ -296,6 +302,14 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
   </TabPanel>
   </$Show>
 </Tabs>
+
+## Retrying failed uploads
+
+Resumable uploads can return `429 Too Many Requests` when database connections are exhausted. Configure your client to retry these requests using delays.
+
+`tus-js-client` does not retry `429` responses by default. Setting `retryDelays` alone does not enable retries for this status. The JavaScript example uses `onShouldRetry` to retry `429` responses and preserve the default behavior for other errors. The `retryDelays` array controls the delays and limits consecutive retries.
+
+[`@uppy/tus`](https://uppy.io/docs/tus/#onshouldretry-err-retryattempt-options-next) retries `429` responses by default. If you customize its `onShouldRetry` callback, call `next(error)` to preserve Uppy’s default retry behavior.
 
 ## Upload URL
 
