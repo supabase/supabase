@@ -1,7 +1,51 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { describe, expect, it, test } from 'vitest'
 
-import { applyAutoLimit, getSqlErrorLines, trimTrailingSemicolons } from '../utils'
+import {
+  applyAutoLimit,
+  getSqlErrorCode,
+  getSqlErrorDocUrl,
+  getSqlErrorLines,
+  trimTrailingSemicolons,
+} from '../utils'
+
+describe('getSqlErrorCode', () => {
+  it('reads the SQLSTATE from formattedError', () => {
+    expect(
+      getSqlErrorCode({
+        formattedError: 'ERROR:  42501: permission denied for table users\nHINT:  grant access',
+      })
+    ).toBe('42501')
+  })
+
+  it('falls back to the message', () => {
+    expect(getSqlErrorCode({ message: 'ERROR:  42P01: relation "x" does not exist' })).toBe('42P01')
+  })
+
+  it('returns undefined when there is no SQLSTATE', () => {
+    expect(getSqlErrorCode({ message: 'upstream request timeout' })).toBeUndefined()
+    expect(getSqlErrorCode({ formattedError: 'ERROR: boom' })).toBeUndefined()
+    expect(getSqlErrorCode({})).toBeUndefined()
+  })
+})
+
+describe('getSqlErrorDocUrl', () => {
+  it('links a mapped SQLSTATE to its troubleshooting article', () => {
+    expect(getSqlErrorDocUrl('42501')).toBe(
+      'https://supabase.com/kb/troubleshooting/database-api-42501-errors'
+    )
+  })
+
+  it('matches lowercase SQLSTATEs after uppercasing', () => {
+    expect(getSqlErrorDocUrl('42p01')).toBe(getSqlErrorDocUrl('42P01'))
+    expect(getSqlErrorDocUrl('42P01')).toBeDefined()
+  })
+
+  it('returns undefined for a SQLSTATE without an article', () => {
+    expect(getSqlErrorDocUrl('99999')).toBeUndefined()
+    expect(getSqlErrorDocUrl('toString')).toBeUndefined()
+  })
+})
 
 describe('getSqlErrorLines', () => {
   it('returns formattedError lines when present', () => {
