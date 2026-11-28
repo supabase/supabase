@@ -13,6 +13,7 @@ import { useQueryState } from 'nuqs'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
+import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
@@ -372,7 +373,8 @@ test('keeps request-access creation in the sheet when no wizard destination is a
 describe('regions', () => {
   const clusterOf = (request: Request) =>
     new URL(request.url).searchParams.get('cluster_id') ?? 'omitted'
-  const regionName = (cluster: string) => (cluster === '2' ? 'Frankfurt' : 'Singapore')
+  const regionNames: Record<string, string> = { '2': 'Frankfurt', '3': 'Sydney', '4': 'Virginia' }
+  const regionName = (cluster: string) => regionNames[cluster] ?? 'Singapore'
 
   const regionDestination = (cluster: string) => ({
     id: 1,
@@ -381,17 +383,33 @@ describe('regions', () => {
     config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
   })
 
-  const mockRegionResources = (frankfurtResponse?: Promise<Response>) => {
+  const mockRegionResources = ({
+    failingClusters = new Set<string>(),
+    pendingFrankfurt,
+    frankfurtResponse,
+    hasDestinations = true,
+  }: {
+    failingClusters?: Set<string>
+    pendingFrankfurt?: Promise<void>
+    frankfurtResponse?: Promise<Response>
+    hasDestinations?: boolean
+  } = {}) => {
     const statusRequests: string[] = []
     isEnabled = true
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/destinations',
-      response: ({ request }) => {
+      response: async ({ request }) => {
         const cluster = clusterOf(request)
+        if (cluster === '2') await pendingFrankfurt
+        if (failingClusters.has(cluster))
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Cluster unavailable' },
+            { status: 503 }
+          )
         if (cluster === '2' && frankfurtResponse) return frankfurtResponse
         return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
-          destinations: [regionDestination(cluster)],
+          destinations: hasDestinations ? [regionDestination(cluster)] : [],
         })
       },
     })
@@ -531,10 +549,178 @@ describe('regions', () => {
     expect(screen.queryByRole('row', { name: /Singapore sync/ })).not.toBeInTheDocument()
   })
 
+  test('shows loaded pipelines while another region is loading', async () => {
+    mockRegions()
+    let finishFrankfurt = () => {}
+    const pendingFrankfurt = new Promise<void>((resolve) => {
+      finishFrankfurt = resolve
+    })
+    mockRegionResources({ pendingFrankfurt })
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(screen.getByText('Loading pipelines from remaining regions')).toBeInTheDocument()
+    finishFrankfurt()
+    expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
+    expect(screen.queryByText('Loading pipelines from remaining regions')).not.toBeInTheDocument()
+  })
+
+  test('keeps loading when an empty region finishes before another region', async () => {
+    mockRegions()
+    let finishRegion = () => {}
+    const pendingRegion = new Promise<void>((resolve) => {
+      finishRegion = resolve
+    })
+    mockRegionResources({ pendingFrankfurt: pendingRegion, hasDestinations: false })
+    renderRegions()
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add pipeline' })).toBeEnabled())
+    expect(screen.getByRole('status')).toHaveTextContent('Loading pipelines')
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+    finishRegion()
+    expect(await screen.findByRole('heading', { name: 'Add a pipeline' })).toBeInTheDocument()
+  })
+
+  test('keeps other regions visible and retries a failed region', async () => {
+    mockRegions()
+    const failingClusters = new Set(['2'])
+    mockRegionResources({ failingClusters })
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(await screen.findByText('Could not load results from Frankfurt')).toBeInTheDocument()
+    expect(
+      screen.getByText('Any pipelines in this region are missing from this view.')
+    ).toBeInTheDocument()
+
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+    failingClusters.clear()
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await screen.findByText('Frankfurt sync')).toBeInTheDocument()
+    expect(screen.getByText('Singapore sync')).toBeInTheDocument()
+    expect(screen.queryByText('Could not load results from Frankfurt')).not.toBeInTheDocument()
+  })
+
+  test('uses one loading row and one warning for several unavailable regions', async () => {
+    mockRegions([
+      SINGAPORE,
+      FRANKFURT,
+      { cluster_id: '3', region_code: 'ap-southeast-2', region_name: 'Sydney' },
+      { cluster_id: '4', region_code: 'us-east-1', region_name: 'Virginia' },
+    ])
+    mockRegionResources()
+    const pending = Promise.withResolvers<void>()
+    let unavailable = true
+    const requests: string[] = []
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: async ({ request }) => {
+        const cluster = clusterOf(request)
+        requests.push(cluster)
+        if (cluster !== 'omitted') {
+          await pending.promise
+          if (unavailable)
+            return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
+        }
+        return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+          destinations: [regionDestination(cluster)],
+        })
+      },
+    })
+    renderRegions()
+    try {
+      await screen.findByText('Singapore sync')
+      expect(screen.getAllByText('Loading pipelines from remaining regions')).toHaveLength(1)
+    } finally {
+      pending.resolve()
+    }
+    await screen.findByText('Could not load results from some regions')
+    expect(screen.queryByText('Loading pipelines from remaining regions')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
+    const defaultRequests = requests.filter((cluster) => cluster === 'omitted').length
+    unavailable = false
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    for (const region of ['Frankfurt', 'Sydney', 'Virginia']) {
+      expect(await screen.findByText(`${region} sync`)).toBeInTheDocument()
+    }
+    expect(screen.getByText('Singapore sync')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByText('Could not load results from some regions')).not.toBeInTheDocument()
+    )
+    expect(requests.filter((cluster) => cluster === 'omitted')).toHaveLength(defaultRequests)
+  })
+
+  test('combines discovery, source and regional failures behind one retry action', async () => {
+    let unavailable = true
+    mockRegionResources({ hasDestinations: false })
+    for (const path of [
+      '/platform/replication/regions',
+      '/platform/replication/:ref/sources',
+      '/platform/replication/:ref/destinations',
+    ] as const) {
+      addAPIMock({
+        method: 'get',
+        path,
+        response: () => {
+          if (unavailable)
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Service unavailable' },
+              { status: 503 }
+            )
+          if (path.endsWith('/regions'))
+            return HttpResponse.json<ReplicationClustersData>({
+              default_cluster_id: '1',
+              regions: [],
+            })
+          if (path.endsWith('/sources'))
+            return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+              sources: [],
+            })
+          return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+            destinations: [],
+          })
+        },
+      })
+    }
+    renderRegions()
+    await screen.findByText('Could not load pipeline information')
+    await screen.findByText(
+      'The region list, setup details, and results from the default region are unavailable.'
+    )
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
+    unavailable = false
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+    )
+  })
+
+  test('shows regional errors instead of the empty state when all regions fail', async () => {
+    mockRegions()
+    mockRegionResources({ failingClusters: new Set(['omitted', '2']) })
+    renderRegions()
+
+    expect(await screen.findByText('Could not load results from some regions')).toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1)
+    expect(
+      screen.getByText('Any pipelines in the following regions are missing from this view:')
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem').some((item) => item.textContent === 'Singapore')).toBe(
+      true
+    )
+    expect(screen.getAllByRole('listitem').some((item) => item.textContent === 'Frankfurt')).toBe(
+      true
+    )
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+  })
+
   test('keeps loaded rows visible while another region loads or fails', async () => {
     mockRegions()
     const frankfurt = Promise.withResolvers<Response>()
-    mockRegionResources(frankfurt.promise)
+    mockRegionResources({ frankfurtResponse: frankfurt.promise })
     renderRegions()
     try {
       expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
@@ -543,7 +729,7 @@ describe('regions', () => {
         HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
       )
     }
-    await screen.findByText('Failed to retrieve pipelines')
+    await screen.findByText('Could not load results from Frankfurt')
     expect(screen.getByText('Singapore sync')).toBeInTheDocument()
   })
 
@@ -561,6 +747,7 @@ describe('regions', () => {
       'true'
     )
   })
+
   test('blocks an open disable dialog when a pipeline appears', async () => {
     mockRegions([SINGAPORE])
     isEnabled = true
