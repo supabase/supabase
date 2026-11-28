@@ -164,6 +164,79 @@ const smsProviderBaseSchema = z.object({
   SMS_AUTOCONFIRM: z.boolean().optional(),
 })
 
+/**
+ * Normalizes SMS template strings by converting literal escaped newlines (`\n`, `\r\n`)
+ * into actual line breaks while preserving escape sequences inside Go template actions.
+ */
+export const normalizeSmsTemplate = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  // Convert literal \r\n and \n escape sequences only outside Go template {{ ... }} actions.
+  // Scans actions while respecting quoted strings, escaped characters, raw strings, and comments,
+  // so delimiters like }} inside printf format strings do not prematurely terminate the action.
+  let result = ''
+  let i = 0
+  const len = value.length
+
+  while (i < len) {
+    if (value.startsWith('{{', i)) {
+      const actionStart = i
+      i += 2
+      while (i < len && !value.startsWith('}}', i)) {
+        const ch = value[i]
+        if (ch === '"') {
+          i++
+          while (i < len && value[i] !== '"') {
+            if (value[i] === '\\') {
+              i++
+            }
+            i++
+          }
+          if (i < len) i++
+        } else if (ch === '`') {
+          i++
+          while (i < len && value[i] !== '`') {
+            i++
+          }
+          if (i < len) i++
+        } else if (ch === "'") {
+          i++
+          while (i < len && value[i] !== "'") {
+            if (value[i] === '\\') {
+              i++
+            }
+            i++
+          }
+          if (i < len) i++
+        } else if (value.startsWith('/*', i)) {
+          i += 2
+          while (i < len && !value.startsWith('*/', i)) {
+            i++
+          }
+          if (i < len) i += 2
+        } else {
+          i++
+        }
+      }
+
+      if (value.startsWith('}}', i)) {
+        i += 2
+      }
+      result += value.slice(actionStart, i)
+    } else {
+      const nextAction = value.indexOf('{{', i)
+      const plainEnd = nextAction === -1 ? len : nextAction
+      const plainSegment = value.slice(i, plainEnd)
+      result += plainSegment.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+      i = plainEnd
+    }
+  }
+
+  return result
+}
+
 const getSmsOtpPhoneProviderSchema = (optional = false) =>
   z.object({
     SMS_OTP_EXP: preprocessEmptyNumberInput(
@@ -176,7 +249,10 @@ const getSmsOtpPhoneProviderSchema = (optional = false) =>
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(6, 'Must be 6 or larger')
     ),
-    SMS_TEMPLATE: optional ? z.string() : z.string().min(1, 'SMS Template is required'),
+    SMS_TEMPLATE: z.preprocess(
+      normalizeSmsTemplate,
+      optional ? z.string() : z.string().min(1, 'SMS Template is required')
+    ),
   })
 
 const getTwilioPhoneProviderSchema = (optional = false) =>
@@ -558,7 +634,8 @@ export const PROVIDER_PHONE = {
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'multiline-string',
-      description: 'To format the OTP code use `{{ .Code }}`',
+      description:
+        'To format the OTP code use `{{ .Code }}`. Line breaks are supported (e.g. for WebOTP formatting).',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
