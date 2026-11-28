@@ -1,9 +1,9 @@
 'use client'
 
+import { useLocation } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { Home } from 'icons'
 import { ChevronLeftIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -23,7 +23,7 @@ import { ProductMenuBarHeader } from '@/components/layouts/Navigation/ProductMen
 import type { Route } from '@/components/ui/ui.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { getPathnameWithoutQuery, getPathSegment } from '@/lib/pathname.utils'
+import { getPathSegment } from '@/lib/pathname.utils'
 
 export interface MobileMenuContentProps {
   currentProductMenu: React.ReactNode
@@ -40,10 +40,9 @@ export function MobileMenuContent({
   currentSectionKey,
   onCloseSheet,
 }: MobileMenuContentProps) {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const isIssuesInboxEnabled = useFlag('issuesInbox')
   const sectionKey = getPathSegment(pathname, 3)
   const activeRoute = sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey

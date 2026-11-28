@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -29,7 +29,7 @@ export const LogicalBackupCliInstructions = ({
   showResetPassword = true,
   note,
 }: LogicalBackupCliInstructionsProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { can: canResetDbPassword } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE
@@ -119,7 +119,11 @@ export const LogicalBackupCliInstructions = ({
           disabled={resetDisabled}
           onClick={() => {
             if (!resetDisabled && ref) {
-              void router.push(`/project/${ref}/database/settings#database-password`)
+              void navigate({
+                to: '/project/$ref/database/settings',
+                params: { ref },
+                hash: 'database-password',
+              })
             }
           }}
           tooltip={{

@@ -1,5 +1,5 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useFlag } from 'common'
-import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { cn } from 'ui'
@@ -19,11 +19,11 @@ export interface AccountLayoutProps {
 }
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const appSnap = useAppStateSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
-  const currentPath = router.pathname
+  const currentPath = useLocation({ select: (location) => location.pathname })
 
   const showOAuthApps = useFlag('enableScopedOAuthManage')
   const { appTitle } = useCustomContent(['app:title'])
@@ -124,9 +124,9 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
 
   useEffect(() => {
     if (!IS_PLATFORM && currentPath !== '/account/me') {
-      router.push('/project/default')
+      void navigate({ to: '/project/$ref', params: { ref: 'default' } })
     }
-  }, [currentPath, router])
+  }, [currentPath, navigate])
 
   return (
     <>

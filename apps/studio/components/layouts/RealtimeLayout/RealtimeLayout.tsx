@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -14,9 +14,9 @@ import { withAuth } from '@/hooks/misc/withAuth'
  * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
  */
 export const RealtimeProductMenu = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { data: project } = useSelectedProjectQuery()
-  const page = router.pathname.split('/')[4]
+  const page = pathname.split('/')[4]
 
   return <ProductMenu page={page} menu={generateRealtimeMenu(project ?? undefined)} />
 }
@@ -27,8 +27,8 @@ export interface RealtimeLayoutProps {
 
 export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const { data: project } = useSelectedProjectQuery()
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const page = pathname.split('/')[4]
   const menu = generateRealtimeMenu(project)
 
   return (

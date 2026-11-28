@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
@@ -10,7 +10,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
-  const router = useRouter()
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const setIsOpen = useSetCommandMenuOpen()
   let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
@@ -167,14 +167,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         id: 'nav-project-settings-connection-string',
         name: 'Connection string',
         action: () => {
-          router.push(
-            {
-              pathname: router.pathname,
-              query: { ...router.query, showConnect: 'true' },
-            },
-            undefined,
-            { shallow: true }
-          )
+          setShowConnect(true)
           setIsOpen(false)
         },
         defaultHidden: true,

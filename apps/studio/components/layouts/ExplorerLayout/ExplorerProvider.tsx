@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { createContext, useContext, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -8,7 +7,7 @@ import { useContentDeleteMutation } from '@/data/content/content-delete-mutation
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { createTabId, useTabRouter, useTabsStateSnapshot } from '@/state/tabs'
 
 type ExplorerDeleteItem = { id: string; type: 'notebook' | 'chat'; name: string }
 
@@ -27,7 +26,7 @@ export const useExplorerDeleteItem = () => {
 }
 
 export const ExplorerProvider = ({ children }: PropsWithChildren) => {
-  const router = useRouter()
+  const router = useTabRouter()
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const notebooksSnap = useNotebooksStateSnapshot()

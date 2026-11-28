@@ -1,9 +1,8 @@
+import { useLocation } from '@tanstack/react-router'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { MemoryRouterProvider } from 'next-router-mock/MemoryRouterProvider/next-13.5'
-import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -17,10 +16,11 @@ import {
 import { StudioMobileSheetNav } from '@/components/layouts/Navigation/NavigationBar/StudioMobileSheetNav'
 import type { Lint } from '@/data/lint/lint-query'
 import { getPathSegment } from '@/lib/pathname.utils'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
-import { routerMock } from '@/tests/lib/route-mock'
+
+vi.mock('next/link', async () => await import('@/compat/next/link'))
 
 mockAnimationsApi()
 
@@ -38,9 +38,9 @@ const lint: Lint = {
 }
 
 const ProjectMenu = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { setContent } = useMobileSheet()
-  const isIssuesPage = getPathSegment(router.pathname, 3) === 'issues'
+  const isIssuesPage = getPathSegment(pathname, 3) === 'issues'
   return (
     <>
       {isIssuesPage && <IssuesOverview />}
@@ -63,7 +63,8 @@ const ProjectMenu = () => {
   )
 }
 
-const renderProject = (issuesInbox: boolean) =>
+const renderProject = (issuesInbox: boolean, initialUrl = '/project/default') => {
+  const router = createTestRouter(initialUrl)
   customRender(
     <FeatureFlagContext.Provider
       value={{
@@ -77,27 +78,27 @@ const renderProject = (issuesInbox: boolean) =>
         posthog: {},
       }}
     >
-      <MemoryRouterProvider>
-        <MobileSheetProvider>
-          <ProjectMenu />
-        </MobileSheetProvider>
-      </MemoryRouterProvider>
+      <MobileSheetProvider>
+        <ProjectMenu />
+      </MobileSheetProvider>
     </FeatureFlagContext.Provider>,
     {
+      router,
       nuqs: {
         hasMemory: true,
         resetUrlUpdateQueueOnMount: false,
         onUrlUpdate: ({ queryString }) => {
-          void routerMock.push(`${routerMock.asPath.split('?')[0]}${queryString}`)
+          void router.navigate({ href: `${router.state.location.pathname}${queryString}` })
         },
       },
     }
   )
+  return router
+}
 
 describe('Issues navigation from the mobile project menu', () => {
   beforeEach(() => {
     vi.stubGlobal('innerWidth', 390)
-    routerMock.setCurrentUrl('/project/default')
     mockProjectGrantContext({ ref: 'default' })
     addAPIMock({ method: 'get', path: '/platform/projects/:ref/run-lints', response: [lint] })
     addAPIMock({
@@ -110,11 +111,15 @@ describe('Issues navigation from the mobile project menu', () => {
 
   it('navigates to Issues before opening its filters and preserves query updates', async () => {
     const user = userEvent.setup()
-    renderProject(true)
+    const router = renderProject(true)
     await user.click(screen.getByRole('button', { name: 'Open project menu' }))
     const menu = within(await screen.findByRole('dialog', { name: 'Project menu' }))
+    expect(await menu.findByRole('link', { name: 'Project Overview' })).toHaveAttribute(
+      'data-active',
+      'true'
+    )
     await user.click(await menu.findByRole('link', { name: 'Issues' }))
-    await waitFor(() => expect(routerMock.asPath).toBe('/project/default/issues'))
+    await waitFor(() => expect(router.state.location.href).toBe('/project/default/issues'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(await screen.findByRole('heading', { name: 'Issues' })).toBeInTheDocument()
 
@@ -123,7 +128,9 @@ describe('Issues navigation from the mobile project menu', () => {
     const search = within(issuesMenu).getByRole('textbox', { name: 'Search issues' })
     await user.click(search)
     await user.paste('accounts')
-    await waitFor(() => expect(routerMock.asPath).toBe('/project/default/issues?q=accounts'))
+    await waitFor(() =>
+      expect(router.state.location.href).toBe('/project/default/issues?q=accounts')
+    )
     expect(issuesMenu).toBeInTheDocument()
 
     await user.click(within(issuesMenu).getByRole('button', { name: 'Filters' }))
@@ -132,13 +139,13 @@ describe('Issues navigation from the mobile project menu', () => {
     criticalFilter.focus()
     await user.keyboard('{Enter}')
     await waitFor(() =>
-      expect(routerMock.query).toMatchObject({ severity: 'critical', q: 'accounts' })
+      expect(router.state.location.search).toMatchObject({ severity: 'critical', q: 'accounts' })
     )
     await user.keyboard('{Escape}')
     expect(issuesMenu).toBeInTheDocument()
     await user.click(within(issuesMenu).getByRole('link', { name: /RLS disabled/i }))
     await waitFor(() =>
-      expect(routerMock.asPath).toBe(
+      expect(router.state.location.href).toBe(
         '/project/default/issues/rls_disabled_in_public?severity=critical&q=accounts'
       )
     )
@@ -147,7 +154,7 @@ describe('Issues navigation from the mobile project menu', () => {
 
   it('keeps Advisors as a submenu when Issues is off', async () => {
     const user = userEvent.setup()
-    renderProject(false)
+    const router = renderProject(false)
     await user.click(screen.getByRole('button', { name: 'Open project menu' }))
     const menu = within(await screen.findByRole('dialog', { name: 'Project menu' }))
     await user.click(await menu.findByRole('button', { name: 'Advisors' }))
@@ -155,7 +162,19 @@ describe('Issues navigation from the mobile project menu', () => {
       'href',
       '/project/default/advisors/security'
     )
-    expect(routerMock.asPath).toBe('/project/default')
+    expect(router.state.location.href).toBe('/project/default')
     expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
+  })
+
+  it('marks Issues as the active section on Advisors routes when Issues is on', async () => {
+    const user = userEvent.setup()
+    renderProject(true, '/project/default/advisors/security')
+    await user.click(screen.getByRole('button', { name: 'Open project menu' }))
+    const menu = within(await screen.findByRole('dialog', { name: 'Project menu' }))
+    expect(await menu.findByRole('link', { name: 'Issues' })).toHaveAttribute('data-active', 'true')
+    expect(menu.getByRole('link', { name: 'Project Overview' })).toHaveAttribute(
+      'data-active',
+      'false'
+    )
   })
 })

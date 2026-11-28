@@ -1,7 +1,7 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
@@ -53,40 +53,40 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { buildStudioPageTitle } from '@/lib/page-title'
-import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
-  '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/addons',
-  '/project/[ref]/settings/general',
-  '/project/[ref]/database/settings',
-  '/project/[ref]/storage/settings',
+  '/project/$ref/settings/infrastructure',
+  '/project/$ref/settings/addons',
+  '/project/$ref/settings/general',
+  '/project/$ref/database/settings',
+  '/project/$ref/storage/settings',
 ]
 
 const routesToIgnoreDBConnection = [
-  '/project/[ref]/branches',
-  '/project/[ref]/database/backups',
-  '/project/[ref]/settings',
-  '/project/[ref]/functions',
-  '/project/[ref]/logs',
+  '/project/$ref/branches',
+  '/project/$ref/database/backups',
+  '/project/$ref/settings',
+  '/project/$ref/functions',
+  '/project/$ref/logs',
 ]
 
 const routesToIgnorePostgrestConnection = [
-  '/project/[ref]/settings/general',
-  '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/addons',
-  '/project/[ref]/database/settings',
-  '/project/[ref]/reports',
+  '/project/$ref/settings/general',
+  '/project/$ref/settings/infrastructure',
+  '/project/$ref/settings/addons',
+  '/project/$ref/database/settings',
+  '/project/$ref/reports',
 ]
 
 const DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY =
@@ -142,7 +142,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     },
     ref
   ) => {
-    const router = useRouter()
+    const pathname = useLocation({ select: (location) => location.pathname })
+    const routePattern = useRoutePattern()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
@@ -183,7 +184,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       registerOpenMenu,
     } = useMobileSheet()
 
-    const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const isIssuesInboxEnabled = useFlag('issuesInbox')
     const sectionKey = getSectionKeyFromPathname(pathname)
     const currentSectionKey =
@@ -221,11 +221,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
     const ignorePausedState =
-      router.pathname === '/project/[ref]' ||
-      router.pathname.includes('/project/[ref]/branches') ||
-      router.pathname.includes('/project/[ref]/settings') ||
-      router.pathname.includes('/project/[ref]/functions') ||
-      router.pathname.includes('/project/[ref]/logs')
+      routePattern === '/project/$ref' ||
+      routePattern.includes('/project/$ref/branches') ||
+      routePattern.includes('/project/$ref/settings') ||
+      routePattern.includes('/project/$ref/functions') ||
+      routePattern.includes('/project/$ref/logs')
     const showPausedState = isPaused && !ignorePausedState
     const showStripeProjectBanner =
       selectedProject?.integration_source === 'stripe_projects' &&
@@ -233,7 +233,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useEffect(() => {
       if (!selectedProject?.ref) return
-      const isProjectHomepage = router.pathname === '/project/[ref]'
+      const isProjectHomepage = routePattern === '/project/$ref'
       if (isProjectHomepage && showUpgradeBanner && !isFreeMicroUpgradeBannerDismissed) {
         addBanner({
           id: BANNER_ID.FREE_MICRO_UPGRADE,
@@ -245,7 +245,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
       }
     }, [
-      router.pathname,
+      routePattern,
       selectedProject?.ref,
       showUpgradeBanner,
       isFreeMicroUpgradeBannerDismissed,
@@ -421,9 +421,9 @@ const MenuBarWrapper = ({
   productMenu,
   children,
 }: MenuBarWrapperProps) => {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(routePattern)
 
   if (!isBlocking) {
     return children
@@ -452,15 +452,16 @@ interface ContentWrapperProps {
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
 const ContentWrapper = ({ children }: ContentWrapperProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const routePattern = useRoutePattern()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
-  const isHomePage = router.pathname === '/project/[ref]'
+  const isBackupsPage = routePattern.includes('/project/$ref/database/backups')
+  const isHomePage = routePattern === '/project/$ref'
 
-  const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
-  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+  const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => routePattern.includes(x))
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(routePattern)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
@@ -477,8 +478,8 @@ const ContentWrapper = ({ children }: ContentWrapperProps) => {
 
   const ignoreUnhealthyState =
     isHomePage ||
-    router.pathname.includes('/project/[ref]/settings') ||
-    router.pathname.includes('/project/[ref]/logs')
+    routePattern.includes('/project/$ref/settings') ||
+    routePattern.includes('/project/$ref/logs')
 
   const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
@@ -487,9 +488,9 @@ const ContentWrapper = ({ children }: ContentWrapperProps) => {
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {
-      router.replace(`/project/${ref}`)
+      void navigate({ to: '/project/$ref', params: { ref }, replace: true })
     }
-  }, [shouldRedirectToHomeForBuilding, ref, router])
+  }, [shouldRedirectToHomeForBuilding, ref, navigate])
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)

@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { BoxIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
 import { Button, CommandGroup } from 'ui'
@@ -18,6 +17,7 @@ import { getManagedByFromOrganizationPartner } from '@/data/organizations/manage
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -119,7 +119,7 @@ export const ProjectDropdown = ({
   className,
   onClose,
 }: ProjectDropdownProps = {}) => {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const { ref } = useParams()
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -158,8 +158,8 @@ export const ProjectDropdown = ({
     setOpen: handleSetOpen,
     selectedRef: ref,
     getItemHref: (project: { ref: string }) => {
-      const sanitizedRoute = sanitizeRoute(router.route, router.query)
-      return sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+      const sanitizedRoute = sanitizeRoute(routePattern)
+      return sanitizedRoute?.replace('$ref', project.ref) ?? `/project/${project.ref}`
     },
     renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
       <ProjectRowLink project={project} selectedRef={ref} />

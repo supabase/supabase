@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -52,7 +52,7 @@ const NotebookListItem = ({
 }
 
 export const ExplorerNavNotebooks = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref, id } = useParams()
   const { onSelectDelete } = useExplorerDeleteItem()
 
@@ -76,7 +76,7 @@ export const ExplorerNavNotebooks = () => {
     return items
   }, [notebooksData?.pages])
 
-  const activeNotebookId = router.pathname.includes('/explorer/notebook/') ? id : undefined
+  const activeNotebookId = pathname.includes('/explorer/notebook/') ? id : undefined
 
   const itemProps = useMemo(
     () => ({ projectRef: ref, activeNotebookId, onSelectDelete }),

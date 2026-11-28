@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerLayout } from './ExplorerLayout'
 import { createTabsState, TabsStateContext } from '@/state/tabs'
-import { customRender } from '@/tests/lib/custom-render'
+import { createTestRouter, customRender } from '@/tests/lib/custom-render'
 
 vi.mock('../ProjectLayout', () => ({
   ProjectLayoutWithAuth: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -64,18 +64,18 @@ describe('Explorer Home tab navigation', () => {
         metadata: { queryId: 'query-1' },
         isPreview: false,
       })
+      const router = createTestRouter('/project/default/explorer/query/query-1')
       let historyAtNavigation: unknown
-      const push = vi.spyOn(mockRouter, 'push')
-      push.mockImplementationOnce(async () => {
+      const navigate = vi.spyOn(router, 'navigate')
+      navigate.mockImplementationOnce(async () => {
         historyAtNavigation = queryClient.getQueryData(historyKey)
-        return true
       })
 
       customRender(
         <TabsStateContext.Provider value={tabs}>
           <ExplorerLayout>Explorer content</ExplorerLayout>
         </TabsStateContext.Provider>,
-        { queryClient, initialUrl: '/project/default/explorer/query/query-1' }
+        { queryClient, router }
       )
 
       if (input === 'mouse') {
@@ -86,7 +86,9 @@ describe('Explorer Home tab navigation', () => {
         await user.keyboard('{ArrowLeft}')
       }
 
-      expect(push).toHaveBeenCalledWith('/project/default/explorer')
+      expect(navigate).toHaveBeenCalledWith(
+        expect.objectContaining({ to: '/project/default/explorer' })
+      )
       expect(historyAtNavigation).toEqual(otherHistory)
       expect(queryClient.getQueryData(historyKey)).toEqual(otherHistory)
       expect(screen.getByRole('tab', { name: 'Open Explorer home' })).toHaveAttribute(

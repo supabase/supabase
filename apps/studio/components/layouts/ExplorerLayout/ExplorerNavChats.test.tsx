@@ -10,10 +10,6 @@ vi.mock('common', async (importOriginal) => {
   return { ...actual, useParams: () => ({ id: 'recent-chat' }) }
 })
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({ pathname: '/project/[ref]/explorer/chat/[id]' }),
-}))
-
 vi.mock('./ExplorerLayout.constants', () => ({
   ExplorerNavResourceWrapper: ({
     children,
@@ -56,7 +52,9 @@ vi.mock('@/state/ai-assistant-state', () => ({
 
 describe('ExplorerNavChats', () => {
   it('filters support chats, safely sorts rehydrated chats, and marks the route active', () => {
-    customRender(<ExplorerNavChats />)
+    customRender(<ExplorerNavChats />, {
+      initialUrl: '/project/default/explorer/chat/recent-chat',
+    })
 
     const chatLinks = screen.getAllByRole('link')
     expect(chatLinks.map((link) => link.textContent)).toEqual([

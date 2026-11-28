@@ -1,3 +1,10 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router'
 import { screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -17,8 +24,6 @@ const { mockSelectedOrganization, mockSelectedProject, mockSelectorProject, mock
     mockSelectorProps: vi.fn(),
   }))
 
-const mockPush = vi.hoisted(() => vi.fn())
-
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
@@ -26,14 +31,6 @@ vi.mock('common', async (importOriginal) => {
     useParams: () => ({ ref: 'proj_1' }),
   }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    route: '/project/[ref]/settings',
-    query: { ref: 'proj_1' },
-    push: mockPush,
-  }),
-}))
 
 vi.mock('@/lib/constants', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('@/lib/constants')
@@ -182,8 +179,20 @@ describe('ProjectDropdown', () => {
     )
   })
 
-  it('provides project command items with links that preserve the current route', () => {
-    render(<ProjectDropdown />)
+  it('provides project command items with links that preserve the current route', async () => {
+    const rootRoute = createRootRoute()
+    const settingsRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/project/$ref/settings',
+      component: () => <ProjectDropdown />,
+    })
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([settingsRoute]),
+      history: createMemoryHistory({ initialEntries: ['/project/proj_1/settings'] }),
+    })
+    await router.load()
+
+    render(<RouterProvider router={router} />)
 
     const selectorProps = mockSelectorProps.mock.lastCall?.[0]
     expect(selectorProps.getItemHref({ ref: 'proj_2' })).toBe('/project/proj_2/settings')

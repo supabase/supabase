@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { BookTextIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import {
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
@@ -15,7 +15,7 @@ const OPTIONS = ['templates', 'examples'] as const
 
 export function ReferenceSnippetsSection() {
   const { ref } = useParams()
-  const router = useRouter()
+  const href = useLocation({ select: (location) => location.href })
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(ref ?? ''),
@@ -24,7 +24,7 @@ export function ReferenceSnippetsSection() {
   const { community: showCommunitySnippets } = sectionVisibility
 
   function isPageActive(key: string): boolean {
-    return router.asPath === `/project/${ref}/sql/${key}`
+    return href === `/project/${ref}/sql/${key}`
   }
 
   return (

@@ -10,7 +10,6 @@ import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { customRenderHook as renderHook } from '@/tests/lib/custom-render'
-import { routerMock } from '@/tests/lib/route-mock'
 
 const { REF, mockIsPlatform } = vi.hoisted(() => ({
   REF: 'project-ref',
@@ -64,7 +63,6 @@ describe('useGenerateObservabilityMenu', () => {
   beforeEach(() => {
     vi.mocked(useIsWarehouseEnabled).mockReturnValue(false)
     mockIsPlatform.value = true
-    routerMock.setCurrentUrl(`/project/${REF}/observability`)
     vi.mocked(useFlag).mockReturnValue(false)
     vi.mocked(useParams).mockReturnValue({ ref: REF })
     vi.mocked(useSupamonitorStatus).mockReturnValue({
@@ -161,11 +159,9 @@ describe('useGenerateObservabilityMenu', () => {
   })
 
   it('preserves date range and helper query params across menu item URLs', () => {
-    routerMock.setCurrentUrl(
-      `/project/${REF}/observability?its=2024-01-01&ite=2024-01-31&isHelper=true&helperText=hello`
-    )
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
+    const { result } = renderHook(() => useGenerateObservabilityMenu(), {
+      initialUrl: `/project/${REF}/observability?its=2024-01-01&ite=2024-01-31&isHelper=true&helperText=hello`,
+    })
     const product = result.current.find((section) => section.title === 'PRODUCT')
     const database = product?.items.find((item) => item.key === 'database')
 
@@ -175,9 +171,9 @@ describe('useGenerateObservabilityMenu', () => {
   })
 
   it('ignores query param values that are not plain strings (e.g. duplicated keys)', () => {
-    routerMock.setCurrentUrl(`/project/${REF}/observability?its=2024-01-01&its=2024-02-01`)
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
+    const { result } = renderHook(() => useGenerateObservabilityMenu(), {
+      initialUrl: `/project/${REF}/observability?its=2024-01-01&its=2024-02-01`,
+    })
     const product = result.current.find((section) => section.title === 'PRODUCT')
     const database = product?.items.find((item) => item.key === 'database')
 
@@ -193,10 +189,6 @@ describe('useGenerateCustomReportsMenu', () => {
     type: 'report',
     content: {},
     ...overrides,
-  })
-
-  beforeEach(() => {
-    routerMock.setCurrentUrl(`/project/${REF}/observability`)
   })
 
   it('returns an empty array and reports loading while content is pending', () => {
@@ -253,7 +245,6 @@ describe('useGenerateCustomReportsMenu', () => {
   })
 
   it('builds report URLs preserving query params and defaults a missing description to an empty string', () => {
-    routerMock.setCurrentUrl(`/project/${REF}/observability?its=2024-01-01`)
     vi.mocked(useContentQuery).mockReturnValue({
       data: {
         cursor: null,
@@ -262,7 +253,9 @@ describe('useGenerateCustomReportsMenu', () => {
       isPending: false,
     } as any)
 
-    const { result } = renderHook(() => useGenerateCustomReportsMenu())
+    const { result } = renderHook(() => useGenerateCustomReportsMenu(), {
+      initialUrl: `/project/${REF}/observability?its=2024-01-01`,
+    })
 
     expect(result.current.data[0].url).toBe(`/project/${REF}/observability/r1?its=2024-01-01`)
     expect(result.current.data[0].description).toBe('')

@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { HeartIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
@@ -45,6 +45,7 @@ import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -55,7 +56,7 @@ interface SQLEditorNavProps {
 }
 
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref: projectRef, id } = useParams()
 
   const { profile } = useProfile()
@@ -361,9 +362,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
 
     if (existingSnippetIds.length === 0) {
-      router.push(`/project/${projectRef}/sql/new`)
+      void navigateToUrl(navigate, `/project/${projectRef}/sql/new`)
     } else if (ids.includes(id as string)) {
-      router.push(`/project/${projectRef}/sql/${existingSnippetIds[0]}`)
+      void navigateToUrl(navigate, `/project/${projectRef}/sql/${existingSnippetIds[0]}`)
     }
 
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
@@ -734,7 +735,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           sql: '',
                         })
                         snapV2.addSnippet({ projectRef: project.ref, snippet })
-                        router.push(`/project/${projectRef}/sql/${snippet.id}`)
+                        void navigateToUrl(navigate, `/project/${projectRef}/sql/${snippet.id}`)
                       }
                     }}
                     onSelectDelete={() => {

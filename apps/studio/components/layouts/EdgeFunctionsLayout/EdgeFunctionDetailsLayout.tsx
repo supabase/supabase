@@ -1,8 +1,8 @@
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
 import { CopyIcon, DownloadIcon, FileArchiveIcon, SendIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
@@ -56,7 +56,8 @@ const EdgeFunctionDetailsLayout = ({
   title,
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const track = useTrack()
   const { functionSlug, ref } = useParams()
 
@@ -195,7 +196,7 @@ const EdgeFunctionDetailsLayout = ({
 
     if (!!functionSlug && isError && error.code === 404 && !cancel) {
       toast('Edge function cannot be found in your project')
-      router.push(`/project/${ref}/functions`)
+      if (ref) void navigate({ to: '/project/$ref/functions', params: { ref } })
     }
 
     return () => {
@@ -321,7 +322,7 @@ const EdgeFunctionDetailsLayout = ({
             <PageNav>
               <NavMenu>
                 {navigationItems.map((item) => {
-                  const isActive = router.asPath.split('?')[0] === item.href
+                  const isActive = pathname === item.href
                   return (
                     <NavMenuItem key={item.label} active={isActive}>
                       <Link href={item.href}>{item.label}</Link>

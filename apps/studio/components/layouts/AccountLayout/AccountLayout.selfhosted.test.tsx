@@ -1,14 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import type { PropsWithChildren } from 'react'
+import { screen, waitFor } from '@testing-library/react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import AccountLayout from './AccountLayout'
+import { customRender } from '@/tests/lib/custom-render'
 
-const { mockRouter, mockRegisterOpenMenu, mockSetMobileSheetContent } = vi.hoisted(() => ({
-  mockRouter: {
-    pathname: '/account/me',
-    push: vi.fn(),
-  },
+const { mockRegisterOpenMenu, mockSetMobileSheetContent } = vi.hoisted(() => ({
   mockRegisterOpenMenu: vi.fn(),
   mockSetMobileSheetContent: vi.fn(),
 }))
@@ -20,10 +17,6 @@ vi.mock('@/lib/constants', async () => {
     IS_PLATFORM: false,
   }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => mockRouter,
-}))
 
 vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
@@ -80,25 +73,18 @@ vi.mock('./WithSidebar', () => ({
   ),
 }))
 
-vi.mock('ui', () => ({
-  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-}))
+const renderAccountLayout = (initialUrl: string, children: ReactNode) =>
+  customRender(<AccountLayout title="Preferences">{children}</AccountLayout>, { initialUrl })
 
 describe('AccountLayout (self-hosted)', () => {
   beforeEach(() => {
-    mockRouter.pathname = '/account/me'
-    mockRouter.push.mockReset()
     mockRegisterOpenMenu.mockReset()
     mockSetMobileSheetContent.mockReset()
     document.title = ''
   })
 
   it('keeps /account/me available and shows only the Preferences link', async () => {
-    render(
-      <AccountLayout title="Preferences">
-        <div>Preferences page</div>
-      </AccountLayout>
-    )
+    const { router } = renderAccountLayout('/account/me', <div>Preferences page</div>)
 
     await waitFor(() => {
       expect(document.title).toBe('Preferences | Supabase')
@@ -107,20 +93,14 @@ describe('AccountLayout (self-hosted)', () => {
     expect(screen.getByText('Preferences')).toBeInTheDocument()
     expect(screen.queryByText('Access Tokens')).not.toBeInTheDocument()
     expect(screen.queryByText('Account Settings')).not.toBeInTheDocument()
-    expect(mockRouter.push).not.toHaveBeenCalled()
+    expect(router.state.location.pathname).toBe('/account/me')
   })
 
   it('redirects unsupported account routes back to the project dashboard', async () => {
-    mockRouter.pathname = '/account/tokens'
-
-    render(
-      <AccountLayout title="Preferences">
-        <div>Unsupported</div>
-      </AccountLayout>
-    )
+    const { router } = renderAccountLayout('/account/tokens', <div>Unsupported</div>)
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/project/default')
+      expect(router.state.location.pathname).toBe('/project/default')
     })
   })
 })

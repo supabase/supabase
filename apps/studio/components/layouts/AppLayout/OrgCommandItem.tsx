@@ -19,7 +19,7 @@ export function OrgCommandItem({
   hasRouteSlug,
   onClose,
 }: OrgCommandItemProps) {
-  const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
+  const href = hasRouteSlug ? routePathname.replace('$slug', org.slug) : `/org/${org.slug}`
 
   return (
     <CommandItemLink

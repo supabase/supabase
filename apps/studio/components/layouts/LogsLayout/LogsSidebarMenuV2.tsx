@@ -1,7 +1,7 @@
+import { useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { ChevronRightIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Separator } from 'ui'
 import {
@@ -50,7 +50,7 @@ export function SidebarCollapsible({
 }
 
 export function LogsSidebarMenuV2() {
-  const router = useRouter()
+  const href = useLocation({ select: (location) => location.href })
   const { ref } = useParams() as { ref: string }
 
   const [searchText, setSearchText] = useState('')
@@ -85,7 +85,7 @@ export function LogsSidebarMenuV2() {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   function isActive(path: string) {
-    return router.asPath.includes(path)
+    return href.includes(path)
   }
 
   const BASE_COLLECTIONS = [

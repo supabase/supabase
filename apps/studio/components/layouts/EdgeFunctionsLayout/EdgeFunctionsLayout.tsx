@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useMemo, type ComponentProps, type PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -20,7 +20,7 @@ const useGenerateEdgeFunctionsMenu = (): ProductMenuGroup[] => {
           {
             name: 'Functions',
             key: 'main',
-            pages: ['', '[functionSlug]', 'new'],
+            pages: ['', '$functionSlug', 'new'],
             url: `/project/${projectRef}/functions`,
             items: [],
             shortcutId: SHORTCUT_IDS.NAV_FUNCTIONS_OVERVIEW,
@@ -40,8 +40,8 @@ const useGenerateEdgeFunctionsMenu = (): ProductMenuGroup[] => {
 }
 
 export const EdgeFunctionsProductMenu = () => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const routePattern = useRoutePattern()
+  const page = routePattern.split('/')[4]
   const menu = useGenerateEdgeFunctionsMenu()
 
   return <ProductMenu page={page} menu={menu} />

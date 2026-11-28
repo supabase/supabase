@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { ExplorerNavResourceWrapper } from './ExplorerLayout.constants'
@@ -20,7 +20,7 @@ const getVisibleChats = (chats: ChatSession[], search: string): ChatSession[] =>
 
 export const ExplorerNavChats = () => {
   const [search, setSearch] = useState('')
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { id, ref } = useParams()
   const chatList = useAiAssistantChatList()
   const tabs = useTabsStateSnapshot()
@@ -37,7 +37,7 @@ export const ExplorerNavChats = () => {
           </p>
         ) : (
           chats.map((chat) => {
-            const isActive = router.pathname.includes('/explorer/chat/') && id === chat.id
+            const isActive = pathname.includes('/explorer/chat/') && id === chat.id
 
             return (
               <ExplorerNavItem

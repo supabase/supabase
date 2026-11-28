@@ -1,6 +1,16 @@
+import {
+  createRootRoute,
+  createRoute,
+  RouterContextProvider,
+  type AnyRouter,
+} from '@tanstack/react-router'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import type { ReactNode } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { buildSearchUpdateArgs } from './nuqs-tanstack-adapter'
+import { buildSearchUpdateArgs, NuqsAdapter } from './nuqs-tanstack-adapter'
+import { createTestRouter } from '@/tests/lib/custom-render'
 
 describe('buildSearchUpdateArgs (custom nuqs adapter)', () => {
   it('targets the current pathname with the search state as a record', () => {
@@ -43,5 +53,35 @@ describe('buildSearchUpdateArgs (custom nuqs adapter)', () => {
     expect(buildSearchUpdateArgs('/auth/providers/', empty).to).toBe('/auth/providers')
     expect(buildSearchUpdateArgs('/', empty).to).toBe('/')
     expect(buildSearchUpdateArgs('', empty).to).toBe('/')
+  })
+})
+
+describe('NuqsAdapter', () => {
+  it('writes to the current route when called through a setter from an earlier render', async () => {
+    const rootRoute = createRootRoute()
+    const routes = ['/project/$ref/settings/general', '/project/$ref/database/settings'].map(
+      (path) => createRoute({ getParentRoute: () => rootRoute, path })
+    )
+    const router: AnyRouter = createTestRouter(
+      '/project/abc/settings/general',
+      rootRoute.addChildren(routes)
+    )
+    await router.load()
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <RouterContextProvider router={router}>
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </RouterContextProvider>
+    )
+    const { result } = renderHook(() => useQueryState('showConnect', parseAsBoolean), { wrapper })
+    const [, retainedSetter] = result.current
+
+    await act(() => router.navigate<AnyRouter, string>({ to: '/project/abc/database/settings' }))
+    await act(() => retainedSetter(true))
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/project/abc/database/settings')
+      expect(router.state.location.search).toEqual({ showConnect: 'true' })
+    })
   })
 })

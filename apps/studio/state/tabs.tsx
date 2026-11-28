@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
 import {
@@ -5,6 +6,7 @@ import {
   PropsWithChildren,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ComponentType,
 } from 'react'
@@ -14,10 +16,24 @@ import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { navigateToUrl } from '@/lib/navigation'
 
 export type TabRouter = {
   push: (url: string) => unknown
   query: { ref?: string | string[]; schema?: string | string[] }
+}
+
+export const useTabRouter = (): TabRouter => {
+  const navigate = useNavigate()
+  const { ref, schema } = useParams()
+
+  return useMemo(
+    () => ({
+      push: (url: string) => navigateToUrl(navigate, url),
+      query: { ref, schema },
+    }),
+    [navigate, ref, schema]
+  )
 }
 
 export const editorEntityTypes = {

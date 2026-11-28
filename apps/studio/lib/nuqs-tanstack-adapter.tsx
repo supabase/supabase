@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
+import { useLocation, useNavigate, useRouter, type AnyRouter } from '@tanstack/react-router'
 import { unstable_createAdapterProvider } from 'nuqs/adapters/custom'
 import { startTransition, useCallback, useMemo } from 'react'
 
@@ -44,7 +44,7 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
     select: (state) =>
       Object.fromEntries(Object.entries(state.search).filter(([key]) => watchKeys.includes(key))),
   })
-  const pathname = useLocation({ select: (state) => state.pathname })
+  const router = useRouter()
   const navigate = useNavigate()
 
   const searchParams = useMemo(
@@ -62,7 +62,8 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
 
   const updateUrl = useCallback(
     (search: URLSearchParams, options: AdapterOptions) => {
-      const args = buildSearchUpdateArgs(pathname, search)
+      // Read the location at call time: nuqs setters can outlive the render that created them.
+      const args = buildSearchUpdateArgs(router.state.location.pathname, search)
       startTransition(() => {
         // The `<AnyRouter, string>` type arguments opt out of the registered
         // route tree's strict typing: the current pathname is a free-form
@@ -78,7 +79,7 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
         })
       })
     },
-    [navigate, pathname]
+    [navigate, router]
   )
 
   return {

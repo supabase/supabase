@@ -1,9 +1,9 @@
 import { CheckIcon, ShieldIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 
 import { sanitizeRoute } from './ProjectDropdown.utils'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface BranchLinkProps {
@@ -14,11 +14,11 @@ export interface BranchLinkProps {
 
 export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
   const track = useTrack()
-  const router = useRouter()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const href = router.route.startsWith('/project/[ref]/branches')
+  const routePattern = useRoutePattern()
+  const sanitizedRoute = sanitizeRoute(routePattern)
+  const href = routePattern.startsWith('/project/$ref/branches')
     ? `/project/${branch.project_ref}`
-    : (sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`)
+    : (sanitizedRoute?.replace('$ref', branch.project_ref) ?? `/project/${branch.project_ref}`)
 
   return (
     <CommandItemLink

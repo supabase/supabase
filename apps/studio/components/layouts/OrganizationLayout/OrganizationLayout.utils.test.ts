@@ -1,25 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getPathnameWithoutQuery, isOrgMenuScope } from './OrganizationLayout.utils'
-
-describe('getPathnameWithoutQuery', () => {
-  it('strips query string from path', () => {
-    expect(getPathnameWithoutQuery('/org/my-org?foo=bar', undefined)).toBe('/org/my-org')
-  })
-
-  it('returns asPath when no query', () => {
-    expect(getPathnameWithoutQuery('/org/my-org', undefined)).toBe('/org/my-org')
-  })
-
-  it('uses fallback when asPath is undefined', () => {
-    expect(getPathnameWithoutQuery(undefined, '/account/me')).toBe('/account/me')
-  })
-
-  it('returns empty string for invalid input', () => {
-    expect(getPathnameWithoutQuery(undefined, undefined)).toBe('')
-    expect(getPathnameWithoutQuery('', '')).toBe('')
-  })
-})
+import { isOrgMenuScope } from './OrganizationLayout.utils'
 
 describe('isOrgMenuScope', () => {
   it('returns true for /org/ routes', () => {

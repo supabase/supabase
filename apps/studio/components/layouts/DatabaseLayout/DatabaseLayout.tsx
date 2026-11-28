@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -12,16 +12,16 @@ export interface DatabaseLayoutProps {
 }
 
 export const DatabaseProductMenu = () => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const page = pathname.split('/')[4]
   const menu = useGenerateDatabaseMenu()
 
   return <ProductMenu page={page} menu={menu} />
 }
 
 const DatabaseLayoutContent = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const page = pathname.split('/')[4]
   const menu = useGenerateDatabaseMenu()
 
   return (

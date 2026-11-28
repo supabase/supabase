@@ -1,6 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon, LightbulbIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import {
   Button,
@@ -79,7 +79,7 @@ export const ProjectNeedsSecuringView = ({
   onDismiss: () => void
   onTrackAction: (type: ProjectSecurityActionType, details?: ProjectSecurityActionDetails) => void
 }) => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -185,7 +185,7 @@ export const ProjectNeedsSecuringView = ({
                         table.schema,
                         table.name
                       )
-                      const handleNavigation = createNavigationHandler(policiesHref, router)
+                      const handleNavigation = createNavigationHandler(policiesHref, navigate)
                       const trackViewPolicies = () =>
                         onTrackAction('view_policies', {
                           schema: table.schema,

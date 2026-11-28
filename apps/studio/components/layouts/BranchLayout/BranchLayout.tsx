@@ -1,5 +1,5 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -9,9 +9,9 @@ import { ProductMenu } from '@/components/ui/ProductMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
 
 const BranchProductMenu = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref: projectRef = 'default' } = useParams()
-  const page = router.pathname.split('/')[4] ?? 'branches'
+  const page = pathname.split('/')[4] ?? 'branches'
 
   return (
     <>

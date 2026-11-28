@@ -1,9 +1,9 @@
+import { useLocation } from '@tanstack/react-router'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChevronLeftIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
@@ -48,7 +48,7 @@ export const LayoutHeader = ({
   headerTitle,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -56,7 +56,7 @@ export const LayoutHeader = ({
 
   const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
-  const isAccountPage = router.pathname.startsWith('/account')
+  const isAccountPage = pathname.startsWith('/account')
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(

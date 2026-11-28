@@ -1,6 +1,5 @@
 import { useBreakpoint, useParams } from 'common'
 import { BoxesIcon, ChevronsUpDownIcon, PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Command,
@@ -25,10 +24,11 @@ import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export function OrgSelector() {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const { slug: routeSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
@@ -119,7 +119,7 @@ export function OrgSelector() {
                         key={org.slug}
                         org={org}
                         selectedSlug={slug}
-                        routePathname={router.pathname}
+                        routePathname={routePattern}
                         hasRouteSlug={!!routeSlug}
                         onClose={() => setOpen(false)}
                       />

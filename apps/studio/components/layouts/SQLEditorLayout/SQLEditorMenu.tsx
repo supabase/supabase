@@ -1,8 +1,8 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { FilePlusIcon, FolderPlusIcon, PlusIcon, ScrollTextIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,11 +32,12 @@ import {
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getErrorMessage } from '@/lib/get-error-message'
+import { navigateToUrl } from '@/lib/navigation'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const SQLEditorMenu = () => {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -79,7 +80,7 @@ export const SQLEditorMenu = () => {
     }
     try {
       const suffix = source === 'logs' ? '&source=logs' : ''
-      router.push(`/project/${ref}/sql/new?skip=true${suffix}`)
+      void navigateToUrl(navigate, `/project/${ref}/sql/new?skip=true${suffix}`)
       setSearch('')
       setShowSearch(false)
     } catch (error) {

@@ -1,6 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
@@ -38,7 +38,7 @@ const SUPAVISOR_UPDATE_REGIONS = {
  * Used to display urgent notices that apply for all users, such as maintenance windows.
  */
 export const NoticeBanner = () => {
-  const router = useRouter()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -53,7 +53,7 @@ export const NoticeBanner = () => {
 
   if (
     Date.now() >= BANNER_EXPIRES_AT.getTime() ||
-    router.pathname.includes('sign-in') ||
+    pathname.includes('sign-in') ||
     !isSuccess ||
     !project ||
     !maintenanceWindow ||
