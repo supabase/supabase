@@ -1,3 +1,6 @@
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
@@ -67,19 +70,43 @@ describe('MCP advisor operations pass exposedSchemas to getLints', () => {
     }
   )
 
-  it('getSecurityAdvisors should filter to SECURITY category', async () => {
+  it.each([
+    ['security', 'getSecurityAdvisors', 'rls_disabled_in_public'],
+    ['performance', 'getPerformanceAdvisors', 'unindexed_foreign_keys'],
+  ] as const)('preserves the %s advisor array over MCP', async (type, operation, name) => {
+    const lints = (await mockGetLints()).data
+    const expected = lints.filter((lint: { name: string }) => lint.name === name)
     const ops = getDebuggingOperations({ headers })
-    const result = await ops.getSecurityAdvisors('test-project')
+    const server = createSupabaseMcpServer({
+      platform: { debugging: ops },
+      projectId: 'test-project',
+      features: ['debugging'],
+    })
+    const client = new Client({ name: 'studio-advisor-test', version: '1.0.0' })
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
 
-    expect(result).toHaveLength(1)
-    expect((result as Array<{ name: string }>)[0].name).toBe('rls_disabled_in_public')
+    await server.connect(serverTransport)
+    await client.connect(clientTransport)
+
+    try {
+      expect(await ops[operation]('test-project')).toEqual(expected)
+      const result = await client.callTool({ name: 'get_advisors', arguments: { type } })
+      expect(result.isError).not.toBe(true)
+      expect(result.content).toEqual([{ type: 'text', text: JSON.stringify({ result: expected }) }])
+    } finally {
+      await client.close()
+      await server.close()
+    }
   })
 
-  it('getPerformanceAdvisors should filter to PERFORMANCE category', async () => {
-    const ops = getDebuggingOperations({ headers })
-    const result = await ops.getPerformanceAdvisors('test-project')
+  it.each(['getSecurityAdvisors', 'getPerformanceAdvisors'] as const)(
+    '%s propagates lint errors',
+    async (operation) => {
+      const error = new Error('Unable to retrieve database lints')
+      mockGetLints.mockResolvedValue({ data: undefined, error })
+      const ops = getDebuggingOperations({ headers })
 
-    expect(result).toHaveLength(1)
-    expect((result as Array<{ name: string }>)[0].name).toBe('unindexed_foreign_keys')
-  })
+      await expect(ops[operation]('test-project')).rejects.toBe(error)
+    }
+  )
 })
