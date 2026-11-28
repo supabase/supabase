@@ -2146,6 +2146,10 @@ export const storage: NavMenuConstant = {
               name: 'S3 Uploads',
               url: '/guides/storage/uploads/s3-uploads' as `/${string}`,
             },
+            {
+              name: 'Upload FAQ',
+              url: '/guides/storage/uploads/faq' as `/${string}`,
+            },
             { name: 'Limits', url: '/guides/storage/uploads/file-limits', enabled: billingEnabled },
           ],
         },
