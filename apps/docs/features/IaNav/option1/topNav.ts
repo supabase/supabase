@@ -185,18 +185,21 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-javascript',
             href: '/reference/server',
             level: 'reference_server',
+            new: true,
           },
           {
             label: 'Middleware',
             icon: 'reference-javascript',
             href: '/reference/middleware',
             level: 'reference_middleware',
+            new: true,
           },
           {
             label: 'TanStack DB',
             icon: 'reference-javascript',
             href: '/reference/tanstack_db',
             level: 'reference_tanstack_db',
+            experimental: true,
           },
           {
             label: 'Flutter',

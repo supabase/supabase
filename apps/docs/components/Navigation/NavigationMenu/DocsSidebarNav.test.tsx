@@ -210,11 +210,11 @@ describe('DocsSidebarNav', () => {
   })
 
   it.each([
-    ['/reference/server/introduction', MenuId.RefServerV1, 'Server'],
-    ['/reference/cli/supabase-login', MenuId.RefCli, 'CLI Commands'],
+    ['/reference/server/introduction', MenuId.RefServerV1, '/reference/server'],
+    ['/reference/cli/supabase-login', MenuId.RefCli, '/reference/cli/introduction'],
   ])(
     'marks the library of %s as current in the option-1 reference list',
-    (pathname, menuId, label) => {
+    (pathname, menuId, libraryHref) => {
       navigation.pathname = pathname
       vi.mocked(useNavItems).mockReturnValue(option1NavItems)
 
@@ -223,7 +223,7 @@ describe('DocsSidebarNav', () => {
       const currentLinks = screen
         .getAllByRole('link')
         .filter((link) => link.hasAttribute('aria-current'))
-      expect(currentLinks.map((link) => link.textContent)).toEqual([label])
+      expect(currentLinks.map((link) => link.getAttribute('href'))).toEqual([libraryHref])
     }
   )
 
