@@ -100,7 +100,6 @@ const PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
       v_parent_schema text;
       v_persist text;
       v_temp  text := '';
-      v_temp2 text;
       v_relopts text;
       v_tablespace text;
       v_pgversion int;
@@ -116,8 +115,7 @@ const PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
       v_cnt2   integer;
       search_path_old text := '';
       search_path_new text := '';
-      v_partial    boolean;
-      v_pos        integer;
+      v_index_where text;
 
       -- assume defaults for ENUMs at the getgo
       pkcnt            int := 0;
@@ -618,7 +616,16 @@ const PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
 
       -- create indexes
       FOR v_indexrec IN
-        SELECT indexdef, COALESCE(tablespace, 'pg_default') as tablespace, indexname FROM pg_indexes WHERE (schemaname, tablename) = (in_schema, in_table)
+        SELECT
+          pg_get_indexdef(i.indexrelid) AS indexdef,
+          COALESCE(s.spcname, 'pg_default') AS tablespace,
+          idx.relname AS indexname,
+          i.indpred,
+          i.indrelid
+        FROM pg_index i
+        JOIN pg_class idx ON idx.oid = i.indexrelid
+        LEFT JOIN pg_tablespace s ON s.oid = idx.reltablespace
+        WHERE i.indrelid = v_table_oid
       LOOP
         -- RAISE NOTICE 'DEBUG6: indexname=%  indexdef=%', v_indexrec.indexname, v_indexrec.indexdef;
         -- loop through constraints and skip ones already defined
@@ -634,37 +641,19 @@ const PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
         if bSkip THEN CONTINUE; END IF;
 
         -- Add IF NOT EXISTS clause so partition index additions will not be created if declarative partition in effect and index already created on parent
-        v_indexrec.indexdef := REPLACE(v_indexrec.indexdef, 'CREATE INDEX', 'CREATE INDEX IF NOT EXISTS');
-        -- Fix Issue#26: do it for unique/primary key indexes as well
-        v_indexrec.indexdef := REPLACE(v_indexrec.indexdef, 'CREATE UNIQUE INDEX', 'CREATE UNIQUE INDEX IF NOT EXISTS');
+        v_indexrec.indexdef := regexp_replace(
+          v_indexrec.indexdef, '^(CREATE (UNIQUE )?INDEX) ', E'\\\\1 IF NOT EXISTS '
+        );
         -- RAISE NOTICE 'DEBUG8: adding index, %', v_indexrec.indexname;
 
         -- NOTE:  cannot specify default tablespace for partitioned relations
-        IF v_partition_key IS NOT NULL AND v_partition_key <> '' THEN
-            v_table_ddl := v_table_ddl || v_indexrec.indexdef || ';' || E'\\n';
-        ELSE
-            -- Issue#25: see if partial index or not
-            -- Supabase perf fix: scope by the table OID resolved earlier instead of casting
-            -- relnamespace::regnamespace::text for every pg_class row (O(catalog) per index).
-            -- Indexes always live in the same schema as their table, so the schema quals were
-            -- redundant with v_table_oid.
-            -- select CASE WHEN i.indpred IS NOT NULL THEN True ELSE False END INTO v_partial
-            -- FROM pg_index i JOIN pg_class c1 ON (i.indexrelid = c1.oid) JOIN pg_class c2 ON (i.indrelid = c2.oid)
-            -- WHERE c1.relnamespace::regnamespace::text = in_schema AND c2.relnamespace::regnamespace::text = in_schema AND c2.relname = in_table AND c1.relname = v_indexrec.indexname;
-            select CASE WHEN i.indpred IS NOT NULL THEN True ELSE False END INTO v_partial
-            FROM pg_index i JOIN pg_class c1 ON (i.indexrelid = c1.oid)
-            WHERE i.indrelid = v_table_oid AND c1.relname = v_indexrec.indexname;
-            IF v_partial THEN
-                -- Put tablespace def before WHERE CLAUSE
-                v_temp = v_indexrec.indexdef;
-                v_pos = POSITION(' WHERE ' IN v_temp);
-                v_temp2 = SUBSTRING(v_temp, v_pos);
-                v_temp  = SUBSTRING(v_temp, 1, v_pos);
-                v_table_ddl := v_table_ddl || v_temp || ' TABLESPACE ' || quote_ident(v_indexrec.tablespace) || v_temp2 || ';' || E'\\n';
-            ELSE
-                v_table_ddl := v_table_ddl || v_indexrec.indexdef || ' TABLESPACE ' || quote_ident(v_indexrec.tablespace) || ';' || E'\\n';
-            END IF;
+        IF COALESCE(v_partition_key, '') = '' THEN
+          -- pg_get_indexdef appends the predicate using the same deparser as pg_get_expr.
+          v_index_where := COALESCE(' WHERE ' || pg_get_expr(v_indexrec.indpred, v_indexrec.indrelid), '');
+          v_indexrec.indexdef := left(v_indexrec.indexdef, length(v_indexrec.indexdef) - length(v_index_where))
+            || ' TABLESPACE ' || quote_ident(v_indexrec.tablespace) || v_index_where;
         END IF;
+        v_table_ddl := v_table_ddl || v_indexrec.indexdef || ';' || E'\\n';
 
       END LOOP;
       IF bVerbose THEN RAISE NOTICE '(7)tabledef so far: %', v_table_ddl; END IF;
