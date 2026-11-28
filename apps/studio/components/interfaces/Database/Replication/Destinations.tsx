@@ -1,9 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -42,8 +42,8 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { replicationKeys } from '@/data/replication/keys'
-import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -68,11 +68,14 @@ export const Destinations = () => {
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
   const clusterId = useReplicationClusterId()
+  const { data: clusters } = useQuery(replicationClustersQueryOptions())
+  const pipelineRegion = clusters?.regions.find(
+    (region) => region.cluster_id === (clusterId ?? clusters.default_cluster_id)
+  )?.region_name
   const { data: organization } = useSelectedOrganizationQuery()
 
   useRedirectLegacyReadReplicaDestination()
 
-  const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
@@ -121,7 +124,7 @@ export const Destinations = () => {
     isSuccess: isDestinationsSuccess,
   } = destinationsResult
   const hasDestinations = isDestinationsSuccess && destinations.length > 0
-  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = pipelinesResult
+  const { isSuccess: isPipelinesSuccess } = pipelinesResult
   const {
     data: sourcesData,
     isSuccess: isSourcesSuccess,
@@ -204,27 +207,6 @@ export const Destinations = () => {
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
-
-  useEffect(() => {
-    if (
-      projectRef &&
-      !prefetchedRef.current &&
-      pipelinesData?.pipelines &&
-      pipelinesData.pipelines.length > 0 &&
-      isPipelinesSuccess
-    ) {
-      prefetchedRef.current = true
-      pipelinesData.pipelines.forEach((p) => {
-        if (!p?.id) return
-        queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, clusterId),
-          queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id, clusterId }, signal),
-          staleTime: Infinity,
-        })
-      })
-    }
-  }, [projectRef, clusterId, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
     <div className="w-full space-y-4">
@@ -354,7 +336,7 @@ export const Destinations = () => {
         )}
 
         {isDestinationsLoading && (
-          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
         )}
 
         {!isDestinationsLoading && hasDestinations && (
@@ -382,16 +364,20 @@ export const Destinations = () => {
                         Status
                       </TableHeadSort>
                     </TableHead>
+                    <TableHead key="region">Region</TableHead>
                     <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
-                    <TableHead key="publication">Publication</TableHead>
                     <TableHead key="actions" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {sortedDestinations.map(({ destination }) => (
-                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                    <DestinationRow
+                      key={destination.id}
+                      destinationId={destination.id}
+                      pipelineRegion={pipelineRegion}
+                    />
                   ))}
 
                   {!isDestinationsLoading && sortedDestinations.length === 0 && hasDestinations && (
