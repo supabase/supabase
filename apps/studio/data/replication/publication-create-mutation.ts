@@ -12,10 +12,18 @@ export type CreatePublicationParams = {
   name: string
   tableIds: number[]
   publishViaPartitionRoot?: boolean
+  clusterId?: string
 }
 
 async function createPublication(
-  { projectRef, sourceId, name, tableIds, publishViaPartitionRoot = true }: CreatePublicationParams,
+  {
+    projectRef,
+    sourceId,
+    name,
+    tableIds,
+    publishViaPartitionRoot = true,
+    clusterId,
+  }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -23,7 +31,10 @@ async function createPublication(
   const { data, error } = await put(
     '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
-      params: { path: { ref: projectRef, source_id: sourceId, publication_name: name } },
+      params: {
+        path: { ref: projectRef, source_id: sourceId, publication_name: name },
+        query: { cluster_id: clusterId },
+      },
       body: {
         type: 'tables',
         tables: tableIds.map((id) => ({ id })),
@@ -55,10 +66,15 @@ export const useCreatePublicationMutation = ({
   return useMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
     mutationFn: (vars) => createPublication(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, sourceId } = variables
+      const { projectRef, sourceId, name, clusterId } = variables
       await queryClient.invalidateQueries({
-        queryKey: replicationKeys.publications(projectRef, sourceId),
+        queryKey: replicationKeys.publications(projectRef, sourceId, clusterId),
       })
+      if (clusterId !== undefined) {
+        await queryClient.invalidateQueries({
+          queryKey: replicationKeys.costEstimate(projectRef, sourceId, name),
+        })
+      }
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
