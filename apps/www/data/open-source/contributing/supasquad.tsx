@@ -184,10 +184,35 @@ export const data = {
   ctaSection: {
     id: 'cta',
     title: 'Ready to make an impact?',
-    primaryCta: {
-      label: 'Apply to Join SupaSquad',
-      url: process.env.NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL || '#',
-      type: 'primary' as any,
+    notice: {
+      title: 'Applications are currently paused',
+      body: (
+        <>
+          We're not accepting new SupaSquad members right now while we fine-tune the program for our
+          growing community. Want to make an impact in the meantime? Join the conversation on{' '}
+          <a
+            href="https://discord.supabase.com"
+            className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+          >
+            Discord
+          </a>
+          , come to an{' '}
+          <a
+            href="https://supabase.com/events"
+            className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+          >
+            upcoming event
+          </a>
+          , or{' '}
+          <a
+            href="https://github.com/supabase/supabase"
+            className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+          >
+            contribute on GitHub
+          </a>
+          .
+        </>
+      ),
     },
   },
 }

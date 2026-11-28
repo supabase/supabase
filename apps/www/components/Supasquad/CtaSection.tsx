@@ -8,7 +8,11 @@ interface Props {
   id: string
   title: string | React.ReactNode
   subtitle?: string
-  primaryCta: {
+  notice?: {
+    title: string
+    body: React.ReactNode
+  }
+  primaryCta?: {
     label: string
     url: string
     target?: string
@@ -25,7 +29,15 @@ interface Props {
   className?: string
 }
 
-const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }: Props) => {
+const CtaSection = ({
+  id,
+  title,
+  subtitle,
+  notice,
+  primaryCta,
+  secondaryCta,
+  className,
+}: Props) => {
   return (
     <SectionContainer
       id={id}
@@ -35,18 +47,28 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
         <div className="flex flex-col gap-6 text-center items-center max-w-5xl mx-auto">
           <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight">{title}</h2>
           {subtitle && <p className="text-foreground-light text-lg">{subtitle}</p>}
-          <div className="flex flex-wrap gap-3 pt-4">
-            <Button variant="primary" asChild size="medium" icon={primaryCta.icon}>
-              <Link href={primaryCta.url} target={primaryCta.target}>
-                {primaryCta.label}
-              </Link>
-            </Button>
-            {secondaryCta && (
-              <Button asChild size="medium">
-                <Link href={secondaryCta.url}>{secondaryCta.label}</Link>
-              </Button>
-            )}
-          </div>
+          {notice && (
+            <div className="border rounded-lg bg-surface-100 px-6 py-5 text-center max-w-2xl">
+              <p className="text-foreground font-medium">{notice.title}</p>
+              <p className="text-foreground-light text-base mt-2">{notice.body}</p>
+            </div>
+          )}
+          {(primaryCta || secondaryCta) && (
+            <div className="flex flex-wrap gap-3 pt-4">
+              {primaryCta && (
+                <Button variant="primary" asChild size="medium" icon={primaryCta.icon}>
+                  <Link href={primaryCta.url} target={primaryCta.target}>
+                    {primaryCta.label}
+                  </Link>
+                </Button>
+              )}
+              {secondaryCta && (
+                <Button asChild size="medium">
+                  <Link href={secondaryCta.url}>{secondaryCta.label}</Link>
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
