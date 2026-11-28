@@ -102,6 +102,7 @@ export const FeaturePreviewModal = () => {
     onUpdateFlag(selectedFeature.key, isEnabling)
     track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
       feature: selectedFeature.key,
+      origin: 'modal',
     })
 
     if (!isEnabling) {
