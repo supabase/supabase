@@ -231,7 +231,7 @@ export const FileExplorerColumn = ({
                       htmlFor="checkbox-select-all"
                       className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      Select all {columnFiles.length} files
+                      Select all {columnFiles.length} {columnFiles.length === 1 ? 'file' : 'files'}
                     </label>
                   </div>
                 </>
@@ -260,7 +260,7 @@ export const FileExplorerColumn = ({
                     htmlFor="checkbox-select-all"
                     className="sr-only text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Select all {columnFiles.length} files
+                    Select all {columnFiles.length} {columnFiles.length === 1 ? 'file' : 'files'}
                   </label>
                 </div>
                 <p className="text-sm">Name</p>
