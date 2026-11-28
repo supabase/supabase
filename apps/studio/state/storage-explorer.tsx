@@ -1641,19 +1641,18 @@ export function createStorageExplorerState({
     moveFiles: async (newPathToFile: string) => {
       const newPaths = compact(newPathToFile.split('/'))
       const formattedNewPathToFile = newPaths.join('/')
+      const itemsToMove = state.selectedItemsToMove
+      const totalFiles = itemsToMove.length
       let numberOfFilesMovedFail = 0
       state.clearSelectedItems()
 
-      const toastId = toast(
-        `Moving ${state.selectedItemsToMove.length} file${state.selectedItemsToMove.length > 1 ? 's' : ''}...`,
-        {
-          description: STORAGE_PROGRESS_INFO_TEXT,
-          duration: Infinity,
-        }
-      )
+      const toastId = toast(`Moving ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`, {
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        duration: Infinity,
+      })
 
       await Promise.all(
-        state.selectedItemsToMove.map(async (item) => {
+        itemsToMove.map(async (item) => {
           const pathToFile = state.openedFolders
             .slice(0, item.columnIndex)
             .map((folder) => folder.name)
@@ -1677,17 +1676,20 @@ export function createStorageExplorerState({
         })
       )
 
-      if (numberOfFilesMovedFail === state.selectedItemsToMove.length) {
-        toast.error('Failed to move files')
+      const filesMoved = totalFiles - numberOfFilesMovedFail
+      const destination = formattedNewPathToFile || 'the root of your bucket'
+      const toastOptions = { id: toastId, description: null, duration: SONNER_DEFAULT_DURATION }
+
+      if (filesMoved === 0) {
+        toast.error('Failed to move files', toastOptions)
+      } else if (numberOfFilesMovedFail > 0) {
+        toast.warning(`Moved ${filesMoved} of ${totalFiles} files to ${destination}`, toastOptions)
       } else {
-        toast(
-          `Successfully moved ${
-            state.selectedItemsToMove.length - numberOfFilesMovedFail
-          } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+        toast.success(
+          `Moved ${filesMoved} file${filesMoved === 1 ? '' : 's'} to ${destination}`,
+          toastOptions
         )
       }
-
-      toast.dismiss(toastId)
 
       // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
