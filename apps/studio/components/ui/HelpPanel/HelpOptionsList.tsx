@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
 import { ActivityIcon, BookOpenIcon, ChevronRightIcon, MailIcon, WrenchIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { AiIconAnimation } from 'ui'
@@ -11,7 +11,8 @@ import { createSupportFormUrl } from '@/components/interfaces/Support/SupportFor
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
-import { DOCS_URL } from '@/lib/constants'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { navigateToUrl } from '@/lib/navigation'
 
 const DISCORD_URL = 'https://discord.supabase.com'
 const STATUS_URL = 'https://status.supabase.com'
@@ -41,8 +42,7 @@ export const HelpOptionsList = ({
   onAssistantClick,
   onSupportClick,
 }: HelpOptionsListProps) => {
-  const router = useRouter()
-  const basePath = router.basePath ?? ''
+  const navigate = useNavigate()
 
   const ids = HELP_OPTION_IDS.filter((id) => !excludeIds.includes(id))
 
@@ -61,7 +61,7 @@ export const HelpOptionsList = ({
     }
 
     takeBreadcrumbSnapshot()
-    router.push(createSupportFormUrl(supportLinkQueryParams ?? {}))
+    void navigateToUrl(navigate, createSupportFormUrl(supportLinkQueryParams ?? {}))
   }
 
   const renderOption = (title: string, description: string) => (
@@ -91,7 +91,7 @@ export const HelpOptionsList = ({
       href: `${DOCS_URL}/guides/troubleshooting?products=platform`,
     },
     discord: {
-      media: <SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />,
+      media: <SVG src={`${BASE_PATH}/img/discord-icon.svg`} className="h-4 w-4" />,
       title: 'Ask on Discord',
       description: 'Get help from the community on code-related questions.',
       href: DISCORD_URL,

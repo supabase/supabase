@@ -1,9 +1,6 @@
 import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceWarningMessage {
-  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
-  restrictToRoutes?: string[]
-
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }

@@ -1,19 +1,13 @@
-import { render } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { ProductMenuGroup } from './ProductMenu.types'
 import { ProductMenuShortcuts } from './ProductMenuShortcuts'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { customRender } from '@/tests/lib/custom-render'
 
-const { mockPush, mockUseShortcut } = vi.hoisted(() => ({
-  mockPush: vi.fn(),
+const { mockUseShortcut } = vi.hoisted(() => ({
   mockUseShortcut: vi.fn(),
-}))
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
 }))
 
 vi.mock('@/state/shortcuts/useShortcut', () => ({
@@ -53,9 +47,12 @@ const menu: ProductMenuGroup[] = [
   },
 ]
 
+const renderShortcuts = (items: ProductMenuGroup[]) =>
+  customRender(<ProductMenuShortcuts menu={items} />)
+
 describe('ProductMenuShortcuts', () => {
   it('registers visible enabled internal shortcut items', () => {
-    render(<ProductMenuShortcuts menu={menu} />)
+    renderShortcuts(menu)
 
     expect(mockUseShortcut).toHaveBeenCalledTimes(1)
     expect(mockUseShortcut).toHaveBeenCalledWith(
@@ -65,40 +62,38 @@ describe('ProductMenuShortcuts', () => {
     )
   })
 
-  it('navigates to the item url when the shortcut fires', () => {
-    render(<ProductMenuShortcuts menu={menu} />)
+  it('navigates to the item url when the shortcut fires', async () => {
+    const { router } = renderShortcuts(menu)
 
     const callback = mockUseShortcut.mock.calls[0][1]
     callback()
 
-    expect(mockPush).toHaveBeenCalledWith('/project/ref/database/tables')
+    await waitFor(() => {
+      expect(router.state.location.href).toBe('/project/ref/database/tables')
+    })
   })
 
   it('registers shortcut items nested under childItems', () => {
-    render(
-      <ProductMenuShortcuts
-        menu={[
+    renderShortcuts([
+      {
+        title: 'Nested',
+        items: [
           {
-            title: 'Nested',
-            items: [
+            name: 'Parent',
+            key: 'parent',
+            url: '/project/ref/database',
+            childItems: [
               {
-                name: 'Parent',
-                key: 'parent',
-                url: '/project/ref/database',
-                childItems: [
-                  {
-                    name: 'Indexes',
-                    key: 'indexes',
-                    url: '/project/ref/database/indexes',
-                    shortcutId: SHORTCUT_IDS.NAV_DATABASE_INDEXES,
-                  },
-                ],
+                name: 'Indexes',
+                key: 'indexes',
+                url: '/project/ref/database/indexes',
+                shortcutId: SHORTCUT_IDS.NAV_DATABASE_INDEXES,
               },
             ],
           },
-        ]}
-      />
-    )
+        ],
+      },
+    ])
 
     expect(mockUseShortcut).toHaveBeenCalledWith(
       SHORTCUT_IDS.NAV_DATABASE_INDEXES,

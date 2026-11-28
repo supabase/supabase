@@ -1,6 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ListIcon, Loader2Icon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { Card, cn, WarningIcon } from 'ui'
 
@@ -134,8 +135,8 @@ const ComposedChartHandler = ({
   syncId,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const navigate = useNavigate()
+  const { ref } = useParams()
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
@@ -261,16 +262,18 @@ const ComposedChartHandler = ({
         label: 'Open in Postgres Logs',
         icon: <ListIcon size={12} />,
         onSelect: ({ start, end }) => {
-          const projectRef = ref as string
-          if (!projectRef) return
+          if (!ref) return
           const its = parseChartTimestamp(start).toISOString()
           const ite = parseChartTimestamp(end).toISOString()
-          const url = `/project/${projectRef}/logs/postgres-logs?its=${its}&ite=${ite}`
-          router.push(url)
+          void navigate({
+            to: '/project/$ref/logs/postgres-logs',
+            params: { ref },
+            search: { its, ite },
+          })
         },
       },
     ]
-  }, [ref])
+  }, [ref, navigate])
 
   if (loading) {
     return (

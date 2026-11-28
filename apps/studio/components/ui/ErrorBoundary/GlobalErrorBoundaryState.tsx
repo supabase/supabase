@@ -1,11 +1,12 @@
 import { isError } from 'lodash'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { ClientSideExceptionHandler } from './ClientSideExceptionHandler'
 import { InsertBeforeRemoveChildErrorHandler } from './InsertBeforeRemoveChildErrorHandler'
 import { useChunkLoadReload } from './useChunkLoadReload'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useRoutePattern } from '@/hooks/misc/useRoutePattern'
+import { BASE_PATH } from '@/lib/constants'
 
 export type FallbackProps = {
   error: unknown
@@ -13,7 +14,7 @@ export type FallbackProps = {
 }
 
 export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
-  const router = useRouter()
+  const routePattern = useRoutePattern()
   const checkIsError = isError(error)
 
   const largeLogo = useIsFeatureEnabled('branding:large_logo')
@@ -25,7 +26,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
   if (isReloading) return null
 
   const errorMessage = checkIsError ? error.message : ''
-  const urlMessage = checkIsError ? `Path name: ${router.pathname}\n\n${error?.stack}` : ''
+  const urlMessage = checkIsError ? `Path name: ${routePattern}\n\n${error?.stack}` : ''
 
   const isRemoveChildError = checkIsError
     ? errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
@@ -43,7 +44,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
         <Link href="/" className="items-center justify-center">
           <img
             alt="Supabase"
-            src={`${router.basePath}/img/supabase-logo.svg`}
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
             className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
           />
         </Link>

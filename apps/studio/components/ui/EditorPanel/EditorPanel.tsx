@@ -1,6 +1,7 @@
 import type { Monaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, safeSql, untrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import {
@@ -14,7 +15,6 @@ import {
   XIcon,
 } from 'lucide-react'
 import type { editor as MonacoEditor } from 'monaco-editor'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -123,7 +123,7 @@ export const EditorPanel = () => {
   const currentValue = value || safeSql``
 
   const { ref } = useParams()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -323,7 +323,7 @@ export const EditorPanel = () => {
     }
     requestSave(snippet.id)
 
-    router.push(`/project/${ref}/sql/${snippet.id}`)
+    void navigate({ to: '/project/$ref/sql/$id', params: { ref, id: snippet.id } })
     handleClosePanel()
   }
 

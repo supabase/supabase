@@ -11,7 +11,6 @@ import { ShortcutsReferenceSheet } from '@/components/ui/GlobalShortcuts/Shortcu
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { customRender } from '@/tests/lib/custom-render'
-import { routerMock } from '@/tests/lib/route-mock'
 
 const ShortcutHost = ({ menu }: { menu: ProductMenuGroup[] }) => {
   const [open, setOpen] = useState(false)
@@ -27,7 +26,7 @@ const ShortcutHost = ({ menu }: { menu: ProductMenuGroup[] }) => {
 it.each([false, true])(
   'shows and runs the active navigation shortcuts: %s',
   async (issuesInbox) => {
-    routerMock.setCurrentUrl(`/project/default/${issuesInbox ? 'issues' : 'advisors/security'}`)
+    const initialUrl = `/project/default/${issuesInbox ? 'issues' : 'advisors/security'}`
     const generateMenu = issuesInbox ? generateIssuesMenu : generateAdvisorsMenu
     const menu = generateMenu({
       ref: 'default',
@@ -36,10 +35,11 @@ it.each([false, true])(
       isPlatform: false,
     })
     const user = userEvent.setup()
-    customRender(
+    const { router } = customRender(
       <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>
         <ShortcutHost menu={menu} />
-      </FeatureFlagContext.Provider>
+      </FeatureFlagContext.Provider>,
+      { initialUrl }
     )
     await user.click(screen.getByRole('button', { name: 'Show shortcuts' }))
     expect(
@@ -59,7 +59,7 @@ it.each([false, true])(
     search.blur()
     await user.keyboard('vs')
     await waitFor(() =>
-      expect(routerMock.asPath).toBe(
+      expect(router.state.location.href).toBe(
         issuesInbox
           ? '/project/default/issues?category=security'
           : '/project/default/advisors/security'

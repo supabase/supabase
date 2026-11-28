@@ -1,6 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { BlocksIcon, ExternalLinkIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -21,7 +20,6 @@ export const InsertBeforeRemoveChildErrorHandler = ({
   isRemoveChildError,
   isInsertBeforeError,
 }: InsertBeforeRemoveChildErrorHandlerProps) => {
-  const router = useRouter()
   const browser = detectBrowser()
 
   return (
@@ -69,7 +67,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
             More information
           </a>
         </Button>
-        <Button variant="outline" onClick={() => router.reload()}>
+        <Button variant="outline" onClick={() => window.location.reload()}>
           Refresh page
         </Button>
       </div>
