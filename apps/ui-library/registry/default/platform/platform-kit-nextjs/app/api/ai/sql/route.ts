@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
     // 3. Call OpenAI to generate SQL using responses.create (plain text output)
     const response = await openai.responses.create({
-      model: 'gpt-4.1',
+      model: 'gpt-6-luna',
       instructions: systemPrompt, // Use systemPrompt as instructions
       input: prompt, // User's question
     })
