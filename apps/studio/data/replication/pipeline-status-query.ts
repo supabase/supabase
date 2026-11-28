@@ -7,7 +7,11 @@ import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: string }
+type ReplicationPipelinesStatusParams = {
+  projectRef?: string
+  pipelineId?: string
+  clusterId?: string
+}
 
 const PIPELINE_STOP_TIMEOUT_MS = 30_000
 export type ReplicationPipelineStatusResponse = Awaited<
@@ -16,14 +20,17 @@ export type ReplicationPipelineStatusResponse = Awaited<
 export type ReplicationPipelineStatus = ReplicationPipelineStatusResponse['status']['name']
 
 async function fetchReplicationPipelineStatus(
-  { projectRef, pipelineId }: ReplicationPipelinesStatusParams,
+  { projectRef, pipelineId, clusterId }: ReplicationPipelinesStatusParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/status', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    params: {
+      path: { ref: projectRef, pipeline_id: pipelineId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
   if (error) {
@@ -44,10 +51,12 @@ export type ReplicationPipelineStatusData = Awaited<
 export const replicationPipelineStatusQueryOptions = <TData = ReplicationPipelineStatusData>({
   projectRef,
   pipelineId,
+  clusterId,
 }: ReplicationPipelinesStatusParams) =>
   queryOptions<ReplicationPipelineStatusData, StudioError, TData>({
-    queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-    queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
+    queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId, clusterId),
+    queryFn: ({ signal }) =>
+      fetchReplicationPipelineStatus({ projectRef, pipelineId, clusterId }, signal),
     ...replicationPollingOptions,
     enabled: typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
   })
@@ -84,8 +93,8 @@ export function waitForPipelineStopped(
 export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineStatusData>(
   variables: ReplicationPipelinesStatusParams,
   options: UseCustomQueryOptions<ReplicationPipelineStatusData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationPipelineStatusData, StudioError, TData>({
+) => {
+  return useQuery<ReplicationPipelineStatusData, StudioError, TData>({
     ...replicationPipelineStatusQueryOptions<TData>(variables),
     ...options,
     enabled:
@@ -93,3 +102,4 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
       typeof variables.projectRef !== 'undefined' &&
       typeof variables.pipelineId !== 'undefined',
   })
+}

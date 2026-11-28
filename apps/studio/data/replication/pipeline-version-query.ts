@@ -6,20 +6,27 @@ import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelineVersionParams = { projectRef?: string; pipelineId?: string }
+type ReplicationPipelineVersionParams = {
+  projectRef?: string
+  pipelineId?: string
+  clusterId?: string
+}
 type ReplicationPipelineVersionResponse = Awaited<
   ReturnType<typeof fetchReplicationPipelineVersion>
 >
 
 export async function fetchReplicationPipelineVersion(
-  { projectRef, pipelineId }: ReplicationPipelineVersionParams,
+  { projectRef, pipelineId, clusterId }: ReplicationPipelineVersionParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/version', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    params: {
+      path: { ref: projectRef, pipeline_id: pipelineId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
 
@@ -30,7 +37,7 @@ export async function fetchReplicationPipelineVersion(
 type ReplicationPipelineVersionData = ReplicationPipelineVersionResponse
 
 export const useReplicationPipelineVersionQuery = <TData = ReplicationPipelineVersionData>(
-  { projectRef, pipelineId }: ReplicationPipelineVersionParams,
+  variables: ReplicationPipelineVersionParams,
   {
     enabled = true,
     staleTime = Infinity,
@@ -38,13 +45,16 @@ export const useReplicationPipelineVersionQuery = <TData = ReplicationPipelineVe
     refetchOnWindowFocus = false,
     ...options
   }: UseCustomQueryOptions<ReplicationPipelineVersionData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationPipelineVersionData, StudioError, TData>({
-    queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
-    queryFn: ({ signal }) => fetchReplicationPipelineVersion({ projectRef, pipelineId }, signal),
+) => {
+  const { projectRef, pipelineId, clusterId } = variables
+  return useQuery<ReplicationPipelineVersionData, StudioError, TData>({
+    queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId, clusterId),
+    queryFn: ({ signal }) =>
+      fetchReplicationPipelineVersion({ projectRef, pipelineId, clusterId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
     staleTime,
     refetchOnMount,
     refetchOnWindowFocus,
     ...options,
   })
+}

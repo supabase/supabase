@@ -26,6 +26,7 @@ import {
   useRefreshOnOpen,
 } from './useRefreshOnOpen'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface PublicationsComboBoxProps {
   sourceId?: number
@@ -39,6 +40,7 @@ export const PublicationsComboBox = ({
   onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -50,7 +52,7 @@ export const PublicationsComboBox = ({
     isFetching,
     isError,
     refetch: refetchPublications,
-  } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
+  } = useReplicationPublicationNamesQuery({ projectRef, clusterId, sourceId })
   const isLoadingStateVisible = isMetadataListLoading(isPending || isFetching, publications.length)
   const isErrorStateVisible = isMetadataListErrorVisible(isError, publications.length)
   const { handleOpenChange: handleRefreshPublicationsOnOpen } = useRefreshOnOpen({

@@ -6,12 +6,15 @@ import { useReplicationDestinationByIdQuery } from '@/data/replication/destinati
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const useDestinationInformation = ({ id }: { id?: number | null }) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,
+    clusterId,
   })
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
   const replicationNotEnabled = isSourcesSuccess && !sourceId
@@ -24,6 +27,7 @@ export const useDestinationInformation = ({ id }: { id?: number | null }) => {
     isSuccess: isDestinationSuccess,
   } = useReplicationDestinationByIdQuery({
     projectRef,
+    clusterId,
     destinationId: id,
   })
   const destinationType = getReplicationDestinationType(destination?.config)
@@ -34,11 +38,12 @@ export const useDestinationInformation = ({ id }: { id?: number | null }) => {
     isPending: isPipelinePending,
     isError: isPipelineError,
     isSuccess: isPipelineSuccess,
-  } = useReplicationPipelinesQuery({ projectRef })
+  } = useReplicationPipelinesQuery({ projectRef, clusterId })
   const pipeline = pipelinesData?.pipelines.find((p) => p.destination_id === id)
 
   const { data: pipelineStatus } = useReplicationPipelineStatusQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const statusName = getStatusName(pipelineStatus?.status)

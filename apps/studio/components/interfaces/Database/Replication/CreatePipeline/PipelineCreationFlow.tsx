@@ -38,6 +38,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const getDocsUrl = (step: string, destination: DestinationType) => {
   if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
@@ -77,9 +78,10 @@ export const PipelineCreationFlow = ({
     if (!isSubmitting) requestNavigation(onClose)
   }
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
-  const sourceId = useReplicationSourceId({ projectRef })
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const {
     validateData,
     isValidatingData,

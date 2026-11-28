@@ -27,6 +27,7 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { createNavigationHandler } from '@/lib/navigation'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -39,6 +40,7 @@ interface DestinationRowProps {
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -61,6 +63,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     isSuccess: isPipelineStatusSuccess,
   } = useReplicationPipelineStatusQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const { getRequestStatus } = usePipelineRequestStatus()
@@ -78,7 +81,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     data: replicationStatusData,
     isPending: isReplicationStatusLoading,
     isError: isReplicationStatusError,
-  } = useReplicationPipelineReplicationStatusQuery({ projectRef, pipelineId: pipeline?.id }, {})
+  } = useReplicationPipelineReplicationStatusQuery(
+    { projectRef, clusterId, pipelineId: pipeline?.id },
+    {}
+  )
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const applyLag = replicationStatusData?.apply_lag
@@ -98,6 +104,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   // Check if a newer pipeline version is available (one-time check cached for session)
   const { data: versionData } = useReplicationPipelineVersionQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const hasUpdate = Boolean(versionData?.new_version)

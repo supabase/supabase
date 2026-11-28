@@ -11,10 +11,11 @@ type ReplicationPublicationParams = {
   projectRef?: string
   sourceId?: number
   publicationName?: string
+  clusterId?: string
 }
 
 async function fetchReplicationPublication(
-  { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
+  { projectRef, sourceId, publicationName, clusterId }: ReplicationPublicationParams,
   signal?: AbortSignal
 ): Promise<components['schemas']['PublicationDetailsResponse_Output']> {
   if (!projectRef) throw new Error('projectRef is required')
@@ -26,6 +27,7 @@ async function fetchReplicationPublication(
     {
       params: {
         path: { ref: projectRef, source_id: sourceId, publication_name: publicationName },
+        query: { cluster_id: clusterId },
       },
       signal,
     }
@@ -43,13 +45,13 @@ type ReplicationPublicationQueryOptions<TData> = Omit<
 > & { enabled?: boolean }
 
 export const replicationPublicationQueryOptions = <TData = ReplicationPublicationData>(
-  { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
+  { projectRef, sourceId, publicationName, clusterId }: ReplicationPublicationParams,
   { enabled = true, ...options }: ReplicationPublicationQueryOptions<TData> = {}
 ) =>
   queryOptions<ReplicationPublicationData, StudioError, TData>({
-    queryKey: replicationKeys.publication(projectRef, sourceId, publicationName),
+    queryKey: replicationKeys.publication(projectRef, sourceId, publicationName, clusterId),
     queryFn: ({ signal }) =>
-      fetchReplicationPublication({ projectRef, sourceId, publicationName }, signal),
+      fetchReplicationPublication({ projectRef, sourceId, publicationName, clusterId }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
@@ -61,7 +63,8 @@ export const replicationPublicationQueryOptions = <TData = ReplicationPublicatio
   })
 
 export const useReplicationPublicationQuery = <TData = ReplicationPublicationData>(
-  { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
+  variables: ReplicationPublicationParams,
   options: ReplicationPublicationQueryOptions<TData> = {}
-) =>
-  useQuery(replicationPublicationQueryOptions({ projectRef, sourceId, publicationName }, options))
+) => {
+  return useQuery(replicationPublicationQueryOptions(variables, options))
+}

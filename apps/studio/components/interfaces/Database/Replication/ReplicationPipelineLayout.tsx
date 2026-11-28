@@ -71,6 +71,7 @@ import { useStartPipelineMutation } from '@/data/replication/start-pipeline-muta
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -88,6 +89,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -105,16 +107,23 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
+  } = useReplicationPipelineByIdQuery(
+    { projectRef, clusterId, pipelineId },
+    { enabled: !!pipelineId }
+  )
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
+  } = useReplicationPipelineStatusQuery(
+    { projectRef, clusterId, pipelineId },
+    { enabled: !!pipelineId }
+  )
   const { data: versionData } = useReplicationPipelineVersionQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const {
@@ -123,6 +132,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     isPending: isDestinationLoading,
   } = useReplicationDestinationByIdQuery({
     projectRef,
+    clusterId,
     destinationId: pipeline?.destination_id,
   })
 

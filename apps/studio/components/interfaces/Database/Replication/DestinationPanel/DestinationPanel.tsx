@@ -33,14 +33,16 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
   const isAccessLoading = IS_PLATFORM && (!flagsLoaded || isOrganizationPending)
-  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
+  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef, clusterId })
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
 
   const [urlDestinationType, setDestinationType] = useQueryState(

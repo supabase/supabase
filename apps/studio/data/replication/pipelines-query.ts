@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
@@ -7,16 +7,16 @@ import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelinesParams = { projectRef?: string }
+type ReplicationPipelinesParams = { projectRef?: string; clusterId?: string }
 
 async function fetchReplicationPipelines(
-  { projectRef }: ReplicationPipelinesParams,
+  { projectRef, clusterId }: ReplicationPipelinesParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     signal,
   })
 
@@ -33,18 +33,29 @@ async function fetchReplicationPipelines(
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
+const replicationPipelinesQueryOptions = <TData = ReplicationPipelinesData>({
+  projectRef,
+  clusterId,
+}: ReplicationPipelinesParams) =>
+  queryOptions<ReplicationPipelinesData, StudioError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef, clusterId),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef, clusterId }, signal),
+    enabled: typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+  })
+
 export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
-  { projectRef }: ReplicationPipelinesParams,
+  variables: ReplicationPipelinesParams,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ReplicationPipelinesData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationPipelinesData, StudioError, TData>({
-    queryKey: replicationKeys.pipelines(projectRef),
-    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
+) => {
+  const { projectRef, clusterId } = variables
+  return useQuery<ReplicationPipelinesData, StudioError, TData>({
+    ...replicationPipelinesQueryOptions<TData>({ projectRef, clusterId }),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnWindowFocus: false,
-    retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
+}

@@ -55,6 +55,7 @@ import {
 } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -119,6 +120,7 @@ const PipelineOverviewSkeleton = () => (
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
@@ -147,18 +149,22 @@ export const ReplicationPipelineStatus = () => {
     isError: isPipelineError,
   } = useReplicationPipelineByIdQuery({
     projectRef,
+    clusterId,
     pipelineId,
   })
 
   const { data: pipelineStatusData, isPending: isPipelineStatusLoading } =
-    useReplicationPipelineStatusQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
+    useReplicationPipelineStatusQuery(
+      { projectRef, clusterId, pipelineId },
+      { enabled: !!pipelineId }
+    )
 
   const {
     data: replicationStatusData,
     isPending: isStatusLoading,
     isError: isStatusError,
   } = useReplicationPipelineReplicationStatusQuery(
-    { projectRef, pipelineId },
+    { projectRef, clusterId, pipelineId },
     { enabled: !!pipelineId }
   )
 
