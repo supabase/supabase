@@ -229,8 +229,8 @@ describe('NewScopedTokenSheet', () => {
 
   const grantProjectSettingsRead = async () => {
     await expandPermissionCategory('Project')
-    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
-    fireEvent.click(await findOption('Read'))
+    fireEvent.click(await screen.findByLabelText('Project settings', { exact: false }))
+    fireEvent.click(await findOption('Read only'))
   }
 
   const fillProjectScopedForm = async () => {
@@ -477,8 +477,8 @@ describe('NewScopedTokenSheet', () => {
     expect((await screen.findByRole('status')).textContent).toBe('All permissions set to read')
 
     await expandPermissionCategory('Project')
-    const select = await screen.findByLabelText('Project Settings', { exact: false })
-    expect(select.textContent).toBe('Read')
+    const select = await screen.findByLabelText('Project settings', { exact: false })
+    expect(select.textContent).toBe('Read only')
   })
 
   test('warns about full access, and falls back to Custom when a row diverges from the preset', async () => {
@@ -495,8 +495,8 @@ describe('NewScopedTokenSheet', () => {
     expect((await getPresetTrigger()).textContent).toContain('Full access')
 
     await expandPermissionCategory('Project')
-    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
-    fireEvent.click(await findOption('None'))
+    fireEvent.click(await screen.findByLabelText('Project settings', { exact: false }))
+    fireEvent.click(await findOption('No access'))
 
     await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'))
     expect(screen.queryByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })).toBeNull()
@@ -567,21 +567,21 @@ describe('NewScopedTokenSheet', () => {
     'Organization Audit Logs': 'organization:audit_logs',
     'Organization Billing And Invoices': 'organization:billing',
     'Organization Configuration, Such As Integrations And OAuth Apps': 'organization:config',
-    'Organization Members': 'organization:members',
-    'Organization Projects': 'organization:projects',
-    'Platform Webhooks (organization)': 'organization:platform_webhooks',
+    'Organization members': 'organization:members',
+    'Organization projects': 'organization:projects',
+    'Platform webhooks (organization)': 'organization:platform_webhooks',
     'Project Authentication Hooks': 'project:auth_hooks',
     'Project Authentication Users': 'project:auth_users',
     'Perform Developer Level Operations Like Restarting The Project': 'project:operations',
-    'SQL Snippets': 'project:snippets',
+    'SQL snippets': 'project:snippets',
   }
 
   const STILL_VISIBLE_ROWS = [
     'Projects (account-wide)',
-    'SQL Snippets (account-wide)',
-    'Organization Settings',
-    'Project Settings',
-    'Platform Webhooks',
+    'SQL snippets (account-wide)',
+    'Organization settings',
+    'Project settings',
+    'Platform webhooks',
     'Notebooks',
   ]
 
@@ -619,11 +619,11 @@ describe('NewScopedTokenSheet', () => {
     }
   })
 
-  test('offers only None and Read-write for Organization Settings on Project scope', async () => {
+  test('offers only No access and Read and write for Organization Settings on Project scope', async () => {
     await openSheet()
     await expandPermissionCategory('Account and organization')
 
-    expect(await modeOptionsFor('Organization Settings')).toEqual(['None', 'Read-write'])
+    expect(await modeOptionsFor('Organization settings')).toEqual(['No access', 'Read and write'])
   })
 
   test('shows every row and every Organization Settings option on Organization scope', async () => {
@@ -637,7 +637,11 @@ describe('NewScopedTokenSheet', () => {
     for (const name of STILL_VISIBLE_ROWS) {
       expect(await screen.findByLabelText(rowLabel(name)), name).toBeInTheDocument()
     }
-    expect(await modeOptionsFor('Organization Settings')).toEqual(['None', 'Read', 'Read-write'])
+    expect(await modeOptionsFor('Organization settings')).toEqual([
+      'No access',
+      'Read only',
+      'Read and write',
+    ])
   })
 
   test('resets hidden selections and Organization Settings Read when switching to Project scope', async () => {
@@ -645,33 +649,33 @@ describe('NewScopedTokenSheet', () => {
     await selectOrganizationScope()
     await expandPermissionCategory('Account and organization')
 
-    fireEvent.click(await screen.findByLabelText(rowLabel('Organization Members')))
-    fireEvent.click(await findOption('Read-write'))
-    fireEvent.click(await screen.findByLabelText(rowLabel('Organization Settings')))
-    fireEvent.click(await findOption('Read'))
-    expect((await screen.findByLabelText(rowLabel('Organization Members'))).textContent).toBe(
-      'Read-write'
+    fireEvent.click(await screen.findByLabelText(rowLabel('Organization members')))
+    fireEvent.click(await findOption('Read and write'))
+    fireEvent.click(await screen.findByLabelText(rowLabel('Organization settings')))
+    fireEvent.click(await findOption('Read only'))
+    expect((await screen.findByLabelText(rowLabel('Organization members'))).textContent).toBe(
+      'Read and write'
     )
-    expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-      'Read'
+    expect((await screen.findByLabelText(rowLabel('Organization settings'))).textContent).toBe(
+      'Read only'
     )
 
     await user.click(await screen.findByRole('radio', { name: /Project/ }))
-    expect(screen.queryByLabelText(rowLabel('Organization Members'))).toBeNull()
+    expect(screen.queryByLabelText(rowLabel('Organization members'))).toBeNull()
     await waitFor(async () =>
-      expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-        'None'
+      expect((await screen.findByLabelText(rowLabel('Organization settings'))).textContent).toBe(
+        'No access'
       )
     )
 
     await selectOrganizationScope()
     await waitFor(async () =>
-      expect((await screen.findByLabelText(rowLabel('Organization Members'))).textContent).toBe(
-        'None'
+      expect((await screen.findByLabelText(rowLabel('Organization members'))).textContent).toBe(
+        'No access'
       )
     )
-    expect((await screen.findByLabelText(rowLabel('Organization Settings'))).textContent).toBe(
-      'None'
+    expect((await screen.findByLabelText(rowLabel('Organization settings'))).textContent).toBe(
+      'No access'
     )
   })
 

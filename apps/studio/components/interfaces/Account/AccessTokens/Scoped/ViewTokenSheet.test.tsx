@@ -169,8 +169,8 @@ describe('ViewTokenSheet', () => {
 
     expect(await screen.findByText('Advisors')).toBeInTheDocument()
     expect(screen.getByText('Database')).toBeInTheDocument()
-    expect(screen.getByText('Read-write')).toBeInTheDocument()
-    expect(screen.getByText('Read')).toBeInTheDocument()
+    expect(screen.getByText('Read and write')).toBeInTheDocument()
+    expect(screen.getByText('Read only')).toBeInTheDocument()
 
     // Enabled tools are token-wide summary rows, visible without expanding any capability card.
     expect(screen.getByText('get_advisors')).toBeInTheDocument()
@@ -226,12 +226,12 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByText('Storage')).toBeInTheDocument()
     expect(screen.getByText('Backups')).toBeInTheDocument()
 
-    // The All/Read/Read-write toggle sits next to the "Capabilities" title, not a text filter.
-    fireEvent.click(screen.getByRole('radio', { name: 'Read-write' }))
+    // The All/Read only/Read and write toggle sits next to the "Capabilities" title, not a text filter.
+    fireEvent.click(screen.getByRole('radio', { name: 'Read and write' }))
     expect(screen.getByText('Database')).toBeInTheDocument()
     expect(screen.queryByText('Backups')).toBeNull()
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Read only' }))
     expect(screen.queryByText('Database')).toBeNull()
     expect(screen.getByText('Backups')).toBeInTheDocument()
   })

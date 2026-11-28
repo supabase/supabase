@@ -31,7 +31,7 @@ const CapabilityCardHeader = ({
             <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
           )}
         </span>
-        <span className="text-xs text-foreground-lighter">
+        <span className="text-sm text-foreground-lighter">
           {`${endpoints.length} ${pluralize(endpoints.length, 'endpoint')}`}
         </span>
       </div>
@@ -50,7 +50,7 @@ export const CapabilityCard = ({
 }: CapabilityCardProps) => {
   const body = <CapabilityCardBody entry={capability.entry} endpoints={capability.endpoints} />
   const positionClassName = cn(
-    'border',
+    'overflow-hidden border border-default',
     !isLast && 'border-b-0',
     isFirst && 'rounded-t-md',
     isLast && 'rounded-b-md'
@@ -58,7 +58,7 @@ export const CapabilityCard = ({
 
   return (
     <AccordionItem value={capability.entry.key} className={positionClassName}>
-      <AccordionTrigger className="bg-surface-300 px-4 py-3 transition first:rounded-t last:rounded-b hover:no-underline">
+      <AccordionTrigger className="bg-surface-300 px-4 py-3 transition hover:no-underline">
         <CapabilityCardHeader capability={capability} accessEntries={accessEntries} />
       </AccordionTrigger>
       <AccordionContent className="*:pb-0">

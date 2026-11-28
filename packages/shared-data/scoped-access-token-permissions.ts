@@ -36,9 +36,9 @@ export type RiskLevel = 'low' | 'medium' | 'high'
  * Studio's form and the docs guide's tables must label modes identically.
  */
 export const PERMISSION_MODE_LABEL = {
-  none: 'None',
-  read: 'Read',
-  readwrite: 'Read-write',
+  none: 'No access',
+  read: 'Read only',
+  readwrite: 'Read and write',
 } as const
 
 /** Selection modes for a catalog entry. The label map's keys are the single source of truth. */
@@ -118,7 +118,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'user:snippets': {
     category: 'account',
-    name: 'SQL Snippets (account-wide)',
+    name: 'SQL snippets (account-wide)',
     description: 'Saved SQL snippets across your account.',
     risk: 'low',
     riskReason: 'Read-only access to your saved snippets.',
@@ -126,7 +126,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'organization:admin': {
     category: 'account',
-    name: 'Organization Settings',
+    name: 'Organization settings',
     description: 'Organization settings and project transfers.',
     risk: 'high',
     riskReason: 'Read-write grants elevated access to organization settings and project transfers.',
@@ -135,7 +135,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'organization:members': {
     category: 'account',
-    name: 'Organization Members',
+    name: 'Organization members',
     description: 'Members and roles within the organization.',
     risk: 'high',
     riskReason: 'Read-write can add or remove members and change roles across your organization.',
@@ -144,7 +144,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'organization:projects': {
     category: 'account',
-    name: 'Organization Projects',
+    name: 'Organization projects',
     description: 'Projects within the organization.',
     risk: 'medium',
     riskReason: 'Read-write can create new projects in the organization.',
@@ -153,7 +153,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'organization:platform_webhooks': {
     category: 'account',
-    name: 'Platform Webhooks (organization)',
+    name: 'Platform webhooks (organization)',
     description: 'Platform webhook endpoints and deliveries for the organization.',
     risk: 'medium',
     riskReason: 'Read-write can create webhook endpoints that receive organization events.',
@@ -164,7 +164,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   // --- Project ---
   'project:admin': {
     category: 'project',
-    name: 'Project Settings',
+    name: 'Project settings',
     description: 'Project metadata and settings.',
     risk: 'high',
     riskReason: 'Read-write grants elevated access to change project settings and configuration.',
@@ -173,7 +173,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:action_runs': {
     category: 'project',
-    name: 'Action Runs',
+    name: 'Action runs',
     description: 'Project action run status and logs.',
     risk: 'medium',
     riskReason: 'Read-write can trigger action runs that execute project workflows.',
@@ -198,7 +198,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:analytics_usage': {
     category: 'project',
-    name: 'Usage Analytics',
+    name: 'Usage analytics',
     description: 'Project usage and analytics data.',
     risk: 'low',
     riskReason: 'Read-only access to usage analytics.',
@@ -206,7 +206,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:analytics_config': {
     category: 'project',
-    name: 'Analytics Config',
+    name: 'Analytics config',
     description: 'Log drains and analytics configuration.',
     risk: 'medium',
     riskReason: 'Read-write can create log drains that export project logs.',
@@ -215,7 +215,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:platform_webhooks': {
     category: 'project',
-    name: 'Platform Webhooks',
+    name: 'Platform webhooks',
     description: 'Platform webhook endpoints and deliveries for the project.',
     risk: 'medium',
     riskReason: 'Read-write can create webhook endpoints that receive project events.',
@@ -224,7 +224,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:snippets': {
     category: 'project',
-    name: 'SQL Snippets',
+    name: 'SQL snippets',
     description: 'Saved SQL snippets for the project.',
     risk: 'low',
     riskReason: 'Read-write can create and edit saved SQL snippets.',
@@ -274,7 +274,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_config': {
     category: 'database',
-    name: 'Database Config',
+    name: 'Database config',
     description: 'Database configuration.',
     risk: 'medium',
     riskReason: 'Read-write can change database configuration.',
@@ -292,7 +292,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_pooling_config': {
     category: 'database',
-    name: 'Connection Pooling',
+    name: 'Connection pooling',
     description: 'Database connection pooling.',
     risk: 'medium',
     riskReason: 'Read-write can change connection pooling behavior.',
@@ -301,7 +301,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_readonly_config': {
     category: 'database',
-    name: 'Read-only Mode',
+    name: 'Read-only mode',
     description: 'Database read-only mode.',
     risk: 'medium',
     riskReason: 'Read-write can toggle the database into or out of read-only mode.',
@@ -310,7 +310,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_ssl_config': {
     category: 'database',
-    name: 'SSL Enforcement',
+    name: 'SSL enforcement',
     description: 'Database SSL configuration.',
     risk: 'medium',
     riskReason: 'Read-write can change SSL enforcement for database connections.',
@@ -319,7 +319,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_webhooks_config': {
     category: 'database',
-    name: 'Database Webhooks',
+    name: 'Database webhooks',
     description: 'Webhooks triggered from the database.',
     risk: 'medium',
     riskReason: 'Read-write can change database webhook configuration.',
@@ -328,7 +328,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_network_bans': {
     category: 'database',
-    name: 'Network Bans',
+    name: 'Network bans',
     description: 'Banned IPs for the database.',
     risk: 'medium',
     riskReason: 'Read-write can ban or unban IP addresses from reaching the database.',
@@ -337,7 +337,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:database_network_restrictions': {
     category: 'database',
-    name: 'Network Restrictions',
+    name: 'Network restrictions',
     description: 'Network restrictions for the database.',
     risk: 'high',
     riskReason: 'Read-write can change which networks are allowed to reach the database.',
@@ -348,7 +348,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   // --- Application services ---
   'project:auth_config': {
     category: 'appsvc',
-    name: 'Auth Config',
+    name: 'Auth config',
     description: 'Authentication provider and settings.',
     risk: 'high',
     riskReason:
@@ -358,7 +358,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:auth_signing_keys': {
     category: 'appsvc',
-    name: 'Auth Signing Keys',
+    name: 'Auth signing keys',
     description: 'Authentication signing keys.',
     risk: 'high',
     riskReason: 'Read-write can rotate signing keys, invalidating existing sessions and tokens.',
@@ -367,7 +367,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:api_gateway_keys': {
     category: 'appsvc',
-    name: 'API Keys',
+    name: 'API keys',
     description: 'Project API keys.',
     risk: 'high',
     riskReason: 'Read exposes API keys; read-write grants elevated access to create new keys.',
@@ -376,7 +376,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:api_gateway_keys_secret': {
     category: 'appsvc',
-    name: 'API Key Secrets',
+    name: 'API key secrets',
     description: 'Secret values of project API keys.',
     risk: 'high',
     riskReason: 'Read reveals the secret values of project API keys.',
@@ -394,7 +394,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:edge_functions_secrets': {
     category: 'appsvc',
-    name: 'Edge Function Secrets',
+    name: 'Edge function secrets',
     description: 'Secrets available to edge functions.',
     risk: 'high',
     riskReason: 'Read exposes function secrets; read-write can set new secret values.',
@@ -412,7 +412,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:realtime_config': {
     category: 'appsvc',
-    name: 'Realtime Config',
+    name: 'Realtime config',
     description: 'Realtime configuration.',
     risk: 'medium',
     riskReason: 'Read-write can change realtime settings and shut down active connections.',
@@ -430,7 +430,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:storage_config': {
     category: 'appsvc',
-    name: 'Storage Config',
+    name: 'Storage config',
     description: 'Storage bucket configuration.',
     risk: 'medium',
     riskReason: 'Read-write can change storage configuration.',
@@ -439,7 +439,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:data_api_config': {
     category: 'appsvc',
-    name: 'Data API Config',
+    name: 'Data API config',
     description: 'Data API behavior and settings.',
     risk: 'medium',
     riskReason: 'Read-write can change how the auto-generated Data API behaves.',
@@ -448,7 +448,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:data_api_config_secret': {
     category: 'appsvc',
-    name: 'Data API JWT Secret',
+    name: 'Data API JWT secret',
     description: 'JWT secret used by the Data API.',
     risk: 'high',
     riskReason: 'Read exposes the JWT secret, which can be used to mint tokens for any role.',
@@ -459,7 +459,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   // --- Infrastructure and delivery ---
   'project:branching_development': {
     category: 'infra',
-    name: 'Development Branches',
+    name: 'Development branches',
     description: 'Development branch automation.',
     risk: 'low',
     riskReason: 'Branch automation for development workflows with limited blast radius.',
@@ -468,7 +468,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:branching_production': {
     category: 'infra',
-    name: 'Production Branches',
+    name: 'Production branches',
     description: 'Production branch automation.',
     risk: 'high',
     riskReason:
@@ -478,7 +478,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:custom_domain': {
     category: 'infra',
-    name: 'Custom Domains',
+    name: 'Custom domains',
     description: 'Custom hostnames.',
     risk: 'medium',
     riskReason: 'Read-write can change custom hostnames, affecting how your project is reached.',
@@ -487,7 +487,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:vanity_subdomain': {
     category: 'infra',
-    name: 'Vanity Subdomain',
+    name: 'Vanity subdomain',
     description: 'Project vanity subdomain.',
     risk: 'medium',
     riskReason: 'Read-write can change the project vanity subdomain.',
@@ -505,7 +505,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:infra_disk_config': {
     category: 'infra',
-    name: 'Disk Config',
+    name: 'Disk config',
     description: 'Disk configuration.',
     risk: 'medium',
     riskReason: 'Read-write can change disk size and configuration, which may incur cost.',
@@ -514,7 +514,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
   },
   'project:read_replicas': {
     category: 'infra',
-    name: 'Read Replicas',
+    name: 'Read replicas',
     description: 'Read replica configuration.',
     risk: 'medium',
     riskReason: 'Read-write can provision or remove read replicas, which may incur cost.',

@@ -70,12 +70,15 @@ export const PermissionRow = ({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 py-4">
+    <div className="grid grid-cols-1 items-start gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
       <div className="min-w-0 flex flex-col gap-1">
-        <span className="flex items-start md:items-center gap-2 flex-col-reverse md:flex-row">
+        <span className="flex items-start md:items-center gap-1.5 flex-col-reverse md:flex-row">
           <Label htmlFor={`${entry.key}-permissions`}>
             <span
-              className={cn('text-sm text-foreground', isMissingDependencies && 'text-lighter')}
+              className={cn(
+                'text-sm font-medium text-foreground',
+                isMissingDependencies && 'text-lighter'
+              )}
             >
               {entry.name} <span className="sr-only">permissions</span>
             </span>
@@ -85,7 +88,7 @@ export const PermissionRow = ({
             <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
           )}
         </span>
-        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-lighter">
+        <p id={`${entry.key}-permissions-description`} className="text-sm text-foreground-lighter">
           {entry.description}
           {entry.dependencies.length > 0 ? (
             <b>
@@ -93,11 +96,9 @@ export const PermissionRow = ({
               Requires{' '}
               {entry.dependencies.map((dependency, index) => (
                 <Fragment key={dependency.key}>
-                  {dependency.label} set to{' '}
-                  {dependency.permissions === 'read' ? (
-                    <span>read</span>
-                  ) : (
-                    <span>read or read-write</span>
+                  {dependency.label} set to {PERMISSION_MODE_LABEL.read}
+                  {dependency.permissions !== 'read' && (
+                    <span>{` or ${PERMISSION_MODE_LABEL.readwrite}`}</span>
                   )}
                   {index < entry.dependencies.length - 1 ? <span>{', '}</span> : null}
                 </Fragment>
@@ -116,7 +117,7 @@ export const PermissionRow = ({
       <div className="flex shrink-0 items-center gap-2">
         <Select disabled={isMissingDependencies} value={mode} onValueChange={handleChange}>
           <SelectTrigger
-            className="w-36 shrink-0"
+            className="w-full"
             id={`${entry.key}-permissions`}
             aria-describedby={`${entry.key}-permissions-description`}
           >
