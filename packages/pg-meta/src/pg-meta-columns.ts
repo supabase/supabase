@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
+import { filterByList, getDoBlockDelimiter } from './helpers'
 import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 
@@ -309,8 +309,12 @@ function update(
   }
   let isUniqueSql: SafeSqlFragment = safeSql``
   if (old.is_unique === true && is_unique === false) {
+    // The schema and table names flow into the DO block body, so the delimiter
+    // must not appear in either of them (e.g. a table named `weird$$name`
+    // would otherwise terminate a `$$`-quoted block early).
+    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.table])
     isUniqueSql = safeSql`
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   r record;
 BEGIN
@@ -324,7 +328,7 @@ BEGIN
     EXECUTE ${literal(`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END LOOP;
 END
-$$;`
+${doBlockDelimiter};`
   } else if (old.is_unique === false && is_unique === true) {
     isUniqueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(old.name)});`
   }
@@ -346,8 +350,18 @@ $$;`
   ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
   ASSERT v_conkey[1] = ${literal(old.ordinal_position)}, 'error creating column constraint: check condition cannot refer to other columns';`
         : safeSql``
+    // The schema, table and column names — as well as the check expression —
+    // flow into the DO block body, so the delimiter must not appear in any of
+    // them (e.g. a table named `weird$$name` would otherwise terminate a
+    // `$$`-quoted block early).
+    const doBlockDelimiter = getDoBlockDelimiter([
+      old.schema,
+      old.table,
+      old.name,
+      ...(check ? [check as string] : []),
+    ])
     checkSql = safeSql`
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   v_conname name;
   v_conkey int2[];
@@ -365,7 +379,7 @@ BEGIN
   END IF;
   ${addCheckSql}
 END
-$$;`
+${doBlockDelimiter};`
   }
 
   // TODO: Can't set default if column is previously identity even if

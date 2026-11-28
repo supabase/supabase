@@ -37,6 +37,19 @@ export function exceptionIdentifierNotFound(entityName: string, whereClause: str
   return safeSql`raise exception 'Cannot find ${ident(entityName)} with: %', ${literal(whereClause)};`
 }
 
+// DO blocks are dollar-quoted, so any user-derived value interpolated into the
+// block body could contain the closing delimiter and terminate the block early.
+// Generate a delimiter that cannot appear in any of the values instead.
+export function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
 // Escape LIKE/ILIKE wildcards so user input is matched literally. ILIKE's
 // default escape character is `\`, so we escape `\`, `%`, and `_` and let the
 // pattern carry its own surrounding `%`s as wildcards.
