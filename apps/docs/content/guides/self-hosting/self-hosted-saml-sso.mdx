@@ -68,7 +68,7 @@ The commands above:
 2. Convert the key to PKCS#1 DER format
 3. Base64-encode the key for use as the value of `GOTRUE_SAML_PRIVATE_KEY`
 
-The subshell sets `umask 077` so newly created temporary key files are readable only by your user. Remove any existing key files before rerunning these commands, or restrict their permissions.
+Before running these commands, remove any existing `pk_pkcs8.pem` and `pk_rsa1.der` files or restrict their permissions. The subshell sets `umask 077`, so newly created temporary key files are readable only by your user.
 
 Save the Base64 output - make sure to copy it as single line, ignoring the trailing newline. Remove the temporary files.
 
