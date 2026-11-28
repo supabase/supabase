@@ -80,8 +80,11 @@ export function buildAssistantContextMessages({
   if (supportMode) {
     messages.push({
       role: 'assistant',
-      content:
-        'This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise.',
+      content: [
+        'This is an active support chat. The user has submitted a support request. Keep guidance practical and concise.',
+        'Do not promise or imply that a human will reply, or say when.',
+        'Do not offer, promise or suggest actions that only Supabase staff can take, such as exceptions, refunds, credits, limit increases, extensions or manually lifting a restriction. Only recommend steps the user can take themselves, as confirmed by the documentation or your tools.',
+      ].join('\n'),
     })
   }
 

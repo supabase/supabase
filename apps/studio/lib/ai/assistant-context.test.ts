@@ -48,6 +48,19 @@ describe('buildAssistantContextMessages', () => {
 
     expect(messages).toHaveLength(1)
     expect(messages[0].content).toContain('active support chat')
+    expect(messages[0].content).toContain('only Supabase staff can take')
+    expect(messages[0].content).not.toContain('wait for a human')
+  })
+
+  it('leaves the staff-only actions rule out of non-support chats', () => {
+    const messages = buildAssistantContextMessages({
+      projectRef: 'abcdefghijklmnopqrst',
+      schemasString: SCHEMAS,
+    })
+
+    expect(messages.map((message) => message.content).join('\n')).not.toContain(
+      'only Supabase staff can take'
+    )
   })
 
   it('adds ClickHouse instructions when the conversation attached a logs query', () => {
