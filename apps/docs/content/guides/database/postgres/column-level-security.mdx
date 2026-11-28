@@ -131,14 +131,22 @@ supabase migration new create_posts_table
       create table
       posts (
       id bigint primary key generated always as identity,
-      user_id text,
+      user_id uuid,
       title text,
       content text,
       created_at timestamptz default now(),
       updated_at timestamptz default now()
       );
 
+      -- Enable row-level security
+      alter table
+      posts enable row level security;
+
       -- Add row-level security
+      create policy "Allow read for owners" on posts for
+      select
+      using ((select auth.uid()) = user_id);
+
       create policy "Allow update for owners" on posts for
       update
       using ((select auth.uid()) = user_id);
@@ -146,9 +154,19 @@ supabase migration new create_posts_table
       -- Add column-level security
       revoke
       update
-      (title) on table public.posts
+        on table public.posts
       from
-      authenticated;
+        authenticated;
+
+      grant
+      update
+        (title, content) on table public.posts to authenticated;
+
+      revoke
+      update
+        (title) on table public.posts
+      from
+        authenticated;
       ```
 
     </StepHikeCompact.Code>
