@@ -49,6 +49,7 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
+import { useUrlReplicationClusterId } from './PipelineClusterScope'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import {
@@ -71,7 +72,6 @@ import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutati
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { splitInternalUrl } from '@/lib/internal-url'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -88,18 +88,22 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef, pipelineId } = useParams()
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const navigate = useNavigate()
-  const clusterId = useReplicationClusterId()
+  const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useUrlReplicationClusterId()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
   const [, setEdit] = useQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus({
+    clusterId,
+  })
   const requestStatus = getRequestStatus(pipelineId)
   const isPipelineRequestPending = isRequestPending(pipelineId)
 
@@ -228,7 +232,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       void navigate({
         to: '/project/$ref/database/pipelines',
         params: { ref: projectRef },
-        search: { cluster_id: clusterId },
       })
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
@@ -258,11 +261,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link
-                  to="/project/$ref/database/pipelines"
-                  params={{ ref: projectRef ?? '_' }}
-                  search={{ cluster_id: clusterId }}
-                >
+                <Link to="/project/$ref/database/pipelines" params={{ ref: projectRef ?? '_' }}>
                   Pipelines
                 </Link>
               </BreadcrumbLink>
@@ -463,7 +462,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       {!isUnknownDestination && (canModify || pipelineError) && children}
 
-      <DestinationPanel />
+      <DestinationPanel clusterId={clusterId} />
 
       <DeleteDestination
         visible={showDeleteDestination}
@@ -475,6 +474,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       <UpdateVersionModal
         visible={canModify && showUpdateVersionModal}
+        clusterId={clusterId}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />

@@ -11,11 +11,13 @@ import type { DestinationType } from '../DestinationPanel/DestinationPanel.types
 export const PipelineConnectionSection = ({
   type,
   form,
+  clusterId,
   children,
   revealInvalidSettings = false,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
+  clusterId?: string
   children: ReactNode
   revealInvalidSettings?: boolean
 }) => (
@@ -23,7 +25,7 @@ export const PipelineConnectionSection = ({
     <div className="flex flex-col gap-y-4 p-5">
       <h3 className="text-sm font-medium text-foreground">Destination connection</h3>
       <DestinationNameInput form={form} destinationType={type} />
-      <PipelineRegionField destinationType={type} />
+      <PipelineRegionField destinationType={type} clusterId={clusterId} />
     </div>
     <DialogSectionSeparator />
     {children}

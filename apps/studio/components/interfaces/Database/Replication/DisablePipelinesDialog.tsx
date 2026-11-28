@@ -15,16 +15,19 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 interface DisablePipelinesDialogProps {
+  canConfirm?: boolean
   open: boolean
   setOpen: (value: boolean) => void
 }
 
-export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialogProps) => {
+export const DisablePipelinesDialog = ({
+  open,
+  setOpen,
+  canConfirm = true,
+}: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const [error, setError] = useState<string | null>(null)
 
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
@@ -37,11 +40,12 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
     })
 
   const onConfirm = async () => {
+    if (!canConfirm) return
     setError(null)
 
     try {
       if (!projectRef) throw new Error('Project ref is required')
-      await deleteReplicationTenant({ projectRef, clusterId })
+      await deleteReplicationTenant({ projectRef })
     } catch (error) {
       setError(
         error instanceof Error
@@ -73,7 +77,12 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
         )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="danger" loading={isSubmitting} onClick={onConfirm}>
+          <AlertDialogAction
+            variant="danger"
+            disabled={!canConfirm}
+            loading={isSubmitting}
+            onClick={onConfirm}
+          >
             Disable Pipelines
           </AlertDialogAction>
         </AlertDialogFooter>

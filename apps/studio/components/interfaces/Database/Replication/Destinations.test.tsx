@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterContextProvider,
 } from '@tanstack/react-router'
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
@@ -15,7 +15,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -168,7 +167,7 @@ const createListRouter = () =>
     parseSearch,
     stringifySearch,
   })
-const mountList = (router: ReturnType<typeof createListRouter>, clusterId?: string) => {
+const mountList = (router: ReturnType<typeof createListRouter>) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, retryDelay: 0 } },
   })
@@ -176,25 +175,23 @@ const mountList = (router: ReturnType<typeof createListRouter>, clusterId?: stri
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient} nuqs={{ hasMemory: true }}>
         <RouterContextProvider router={router}>
-          <ReplicationClusterProvider clusterId={clusterId}>
-            <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
-          </ReplicationClusterProvider>
+          <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
         </RouterContextProvider>
       </CustomWrapper>
     ),
   })
   return { ...view, router, queryClient }
 }
-const renderList = async (waitForSources = true, clusterId?: string) => {
+const renderList = async (waitForSources = true) => {
   const router = createListRouter()
   await router.load()
-  const view = mountList(router, clusterId)
+  const view = mountList(router)
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(
-        view.queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status
-      ).toBe('success')
+      expect(view.queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe(
+        'success'
+      )
     )
   return view
 }
@@ -317,23 +314,19 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
 test('renders both wizard entry controls as links', async () => {
   options.wizard = true
   isEnabled = true
-  const { router } = await renderList(true, 'eu-west-1')
+  const { router } = await renderList(true)
   const links = screen.getAllByRole('link', { name: 'Add pipeline' })
   expect(links).toHaveLength(2)
-  links.forEach((link) =>
-    expect(link).toHaveAttribute('href', `${listPath}/new?cluster_id=eu-west-1`)
-  )
+  links.forEach((link) => expect(link).toHaveAttribute('href', `${listPath}/new`))
   fireEvent.click(links[0], { ctrlKey: true })
   expect(router.history.location.href).toBe(listPath)
 })
-test('opens the wizard in the active cluster with the shortcut', async () => {
+test('opens the wizard from the combined list with the shortcut', async () => {
   options.wizard = true
   isEnabled = true
-  const { router } = await renderList(true, 'eu-west-1')
+  const { router } = await renderList(true)
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-  await waitFor(() =>
-    expect(router.history.location.href).toBe(`${listPath}/new?cluster_id=eu-west-1`)
-  )
+  await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
 })
 test('enables Pipelines before opening the wizard', async () => {
   options.wizard = true
@@ -388,7 +381,7 @@ describe('regions', () => {
     config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
   })
 
-  const mockRegionResources = () => {
+  const mockRegionResources = (frankfurtResponse?: Promise<Response>) => {
     const statusRequests: string[] = []
     isEnabled = true
     addAPIMock({
@@ -396,6 +389,7 @@ describe('regions', () => {
       path: '/platform/replication/:ref/destinations',
       response: ({ request }) => {
         const cluster = clusterOf(request)
+        if (cluster === '2' && frankfurtResponse) return frankfurtResponse
         return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
           destinations: [regionDestination(cluster)],
         })
@@ -475,6 +469,117 @@ describe('regions', () => {
     expect(screen.queryByRole('columnheader', { name: 'Publication' })).not.toBeInTheDocument()
     await waitFor(() => expect(statusRequests).toContain('42:omitted'))
     expect(statusRequests.every((request) => request.endsWith(':omitted'))).toBe(true)
+  })
+
+  test('shows each pipeline region and routes each pipeline to its cluster', async () => {
+    mockRegions()
+    const { statusRequests } = mockRegionResources()
+    renderRegions()
+
+    const singapore = (await screen.findByText('Singapore sync')).closest('tr')
+    const frankfurt = (await screen.findByText('Frankfurt sync')).closest('tr')
+    expect(within(singapore!).getByRole('cell', { name: 'Singapore' })).toBeInTheDocument()
+    expect(within(frankfurt!).getByRole('cell', { name: 'Frankfurt' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Region' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Publication' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('row').slice(1)).toEqual([frankfurt, singapore])
+    await waitFor(() =>
+      expect(statusRequests).toEqual(expect.arrayContaining(['42:omitted', 'frankfurtpipeline:2']))
+    )
+    expect(statusRequests).not.toContain('frankfurtpipeline:omitted')
+    expect(statusRequests).not.toContain('42:1')
+
+    fireEvent.pointerDown(within(frankfurt!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    expect(await screen.findByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+      'href',
+      '/project/default/database/pipelines/frankfurtpipeline?cluster_id=2'
+    )
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    fireEvent.pointerDown(within(singapore!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    await waitFor(() =>
+      expect(screen.getByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+        'href',
+        '/project/default/database/pipelines/42'
+      )
+    )
+  })
+
+  test('sorts and filters pipelines across regions', async () => {
+    mockRegions()
+    mockRegionResources()
+    renderRegions()
+
+    await screen.findByText('Failed')
+    await screen.findByText('Running')
+    const singapore = screen.getByRole('row', { name: /Singapore sync/ })
+    const frankfurt = screen.getByRole('row', { name: /Frankfurt sync/ })
+    fireEvent.click(
+      within(screen.getByRole('columnheader', { name: 'Status' })).getByRole('button')
+    )
+    expect(screen.getAllByRole('row').slice(1)).toEqual([singapore, frankfurt])
+
+    fireEvent.change(screen.getByPlaceholderText('Search pipelines'), {
+      target: { value: 'FRANKFURT' },
+    })
+    expect(screen.getAllByRole('row').slice(1)).toEqual([frankfurt])
+    expect(screen.queryByRole('row', { name: /Singapore sync/ })).not.toBeInTheDocument()
+  })
+
+  test('keeps loaded rows visible while another region loads or fails', async () => {
+    mockRegions()
+    const frankfurt = Promise.withResolvers<Response>()
+    mockRegionResources(frankfurt.promise)
+    renderRegions()
+    try {
+      expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    } finally {
+      frankfurt.resolve(
+        HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
+      )
+    }
+    await screen.findByText('Failed to retrieve pipelines')
+    expect(screen.getByText('Singapore sync')).toBeInTheDocument()
+  })
+
+  test('keeps multi-region disablement unavailable', async () => {
+    mockRegions()
+    isEnabled = true
+    renderRegions()
+    await screen.findByRole('heading', { name: 'Add a pipeline' })
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    expect(await screen.findByRole('menuitem', { name: /Disable Pipelines/ })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+  })
+  test('blocks an open disable dialog when a pipeline appears', async () => {
+    mockRegions([SINGAPORE])
+    isEnabled = true
+    const { queryClient } = renderRegions()
+    await screen.findByRole('heading', { name: 'Add a pipeline' })
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Disable Pipelines' }))
+    const dialog = await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
+    expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeEnabled()
+    mockRegionResources()
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines('default') })
+    )
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Disable Pipelines' })).toBeDisabled()
+    )
   })
 })
 

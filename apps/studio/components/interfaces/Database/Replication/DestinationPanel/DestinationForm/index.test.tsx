@@ -379,7 +379,14 @@ describe('DestinationForm', () => {
         })
 
         try {
-          customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
+          customRender(
+            <DestinationForm
+              clusterId={undefined}
+              selectedType="DuckLake"
+              visible
+              onClose={vi.fn()}
+            />
+          )
           const submitButton = await fillDuckLakeForm()
           const compatibilityStatus = screen.getByRole('status')
           expect(compatibilityStatus).toBeEmptyDOMElement()
@@ -455,7 +462,14 @@ describe('DestinationForm', () => {
         })
 
         try {
-          customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
+          customRender(
+            <DestinationForm
+              clusterId={undefined}
+              selectedType="DuckLake"
+              visible
+              onClose={vi.fn()}
+            />
+          )
           if (queryState !== 'pending') {
             expect(
               await screen.findByText(
@@ -486,9 +500,12 @@ describe('DestinationForm', () => {
         path: '/platform/projects/:ref',
         response: () => HttpResponse.json<ProjectDetail>(project),
       })
-      customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />, {
-        queryClient,
-      })
+      customRender(
+        <DestinationForm clusterId={undefined} selectedType="DuckLake" visible onClose={vi.fn()} />,
+        {
+          queryClient,
+        }
+      )
       const submitButton = await fillDuckLakeForm()
       fireEvent.change(screen.getByLabelText('Configuration method'), {
         target: { value: 'supabase' },
@@ -531,6 +548,7 @@ describe('DestinationForm', () => {
       mocks.isPreviewEnabled = isPreviewEnabled
       customRender(
         <DestinationForm
+          clusterId={undefined}
           selectedType="BigQuery"
           visible
           existingDestination={isEditing ? existingDestination : undefined}
@@ -561,6 +579,7 @@ describe('DestinationForm', () => {
       mocks.isSaving = true
       customRender(
         <DestinationForm
+          clusterId={undefined}
           selectedType="BigQuery"
           visible
           existingDestination={{
@@ -594,6 +613,7 @@ describe('DestinationForm', () => {
 
       customRender(
         <DestinationForm
+          clusterId={undefined}
           selectedType="BigQuery"
           visible
           existingDestination={destination}
@@ -628,6 +648,7 @@ describe('DestinationForm', () => {
 
     customRender(
       <DestinationForm
+        clusterId={undefined}
         selectedType="BigQuery"
         visible
         existingDestination={existingDestination}
@@ -649,6 +670,7 @@ describe('DestinationForm', () => {
 
     customRender(
       <DestinationForm
+        clusterId={undefined}
         selectedType="BigQuery"
         visible
         existingDestination={existingDestination}

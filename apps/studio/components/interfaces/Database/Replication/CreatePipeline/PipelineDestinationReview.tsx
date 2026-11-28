@@ -48,12 +48,14 @@ const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
 export const PipelineDestinationReview = ({
   type,
   control,
+  clusterId,
   onEditDestination,
   onEditConnection,
   validationFailures = [],
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
+  clusterId?: string
   onEditDestination?: () => void
   onEditConnection?: () => void
   validationFailures?: ValidationFailure[]
@@ -199,7 +201,7 @@ export const PipelineDestinationReview = ({
             label="Pipeline region"
             description={`All pipelines run from this region. ${type} connections originate here.`}
           >
-            <PipelineRegionReadonly />
+            <PipelineRegionReadonly clusterId={clusterId} />
           </FormItemLayout>
         </div>
         <PipelineValidationAdmonition failures={validationFailures} />

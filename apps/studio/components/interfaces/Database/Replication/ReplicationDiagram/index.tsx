@@ -11,7 +11,6 @@ import { getDagreGraphLayout } from './ReplicationDiagram.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { timeout } from '@/lib/helpers'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const ReplicationDiagram = () => {
   return (
@@ -32,17 +31,14 @@ const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
-  const clusterId = useReplicationClusterId()
 
+  // The diagram only ever shows the default cluster (no clusterId).
   const {
     data,
     error: destinationsError,
     isSuccess: isSuccessDestinations,
     isError: isErrorDestinations,
-  } = useReplicationDestinationsQuery({
-    projectRef,
-    clusterId,
-  })
+  } = useReplicationDestinationsQuery({ projectRef })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
   const skipRenderingDestinations = isErrorDestinations && isLocalPipelinesNotSetUp
