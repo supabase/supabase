@@ -22,11 +22,10 @@ export default defineConfig({
     globals: true,
     // Retry flaky tests in CI only; failures locally should surface immediately.
     retry: IS_CI ? 2 : 0,
-    // The DOM setup files (`dom.ts`, `radix.js`) no-op when there's no jsdom environment.
+    // The DOM setup file (`dom.ts`) no-ops when there's no jsdom environment.
     setupFiles: [
       resolve(dirname, './tests/setup/dom.ts'),
       resolve(dirname, './tests/vitestSetup.ts'),
-      resolve(dirname, './tests/setup/radix.js'),
     ],
     // Don't look for tests in the nextjs output directory
     exclude: [...configDefaults.exclude, `.next/*`],
