@@ -1,20 +1,20 @@
 function App() {
-  const [claims, setClaims] = useState(null)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const loadClaims = async () => {
+    const loadUser = async () => {
       const {
-        data: { claims },
-      } = await supabase.auth.getClaims()
-      setClaims(claims)
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
     }
 
-    loadClaims()
+    loadUser()
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      loadClaims()
+      loadUser()
     })
 
     return () => subscription.unsubscribe()
@@ -22,7 +22,7 @@ function App() {
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!claims ? <Auth /> : <Account key={claims.sub} claims={claims} />}
+      {!user ? <Auth /> : <Account key={user.id} user={user} />}
     </div>
   )
 }
