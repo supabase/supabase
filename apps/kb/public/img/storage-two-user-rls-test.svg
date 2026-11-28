@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 500" role="img" aria-labelledby="title desc">
+  <title id="title">Test private Storage access with two users</title>
+  <desc id="desc">An owner client and a second signed-in client request the same object path. The owner is allowed; the second user is denied by the row policy.</desc>
+  <defs>
+    <linearGradient id="thread" x1="0" x2="1">
+      <stop offset="0" stop-color="#31c48d"/>
+      <stop offset=".55" stop-color="#75f0c0"/>
+      <stop offset="1" stop-color="#f6c453"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-100%" width="160%" height="300%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      text { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      .small { fill: #92a39c; font-size: 18px; }
+      .heading { fill: #f3f7f4; font-size: 28px; font-weight: 600; }
+    </style>
+  </defs>
+  <rect width="1440" height="500" rx="28" fill="#07110e"/>
+  <path d="M350 160 C445 160 470 205 560 215 M350 340 C445 340 470 295 560 285 M875 250 C965 250 985 175 1075 175 M875 250 C965 250 985 325 1075 325" fill="none" stroke="#17352b" stroke-width="14" opacity=".75"/>
+  <path d="M350 160 C445 160 470 205 560 215 M350 340 C445 340 470 295 560 285 M875 250 C965 250 985 175 1075 175 M875 250 C965 250 985 325 1075 325" fill="none" stroke="url(#thread)" stroke-width="3" filter="url(#glow)"/>
+  <g>
+    <circle cx="155" cy="160" r="45" fill="#10241d" stroke="#31c48d" stroke-width="2"/>
+    <circle cx="155" cy="146" r="11" fill="#a3e9cb"/>
+    <path d="M132 183c4-16 42-16 46 0" fill="none" stroke="#a3e9cb" stroke-width="4" stroke-linecap="round"/>
+    <text x="220" y="153" class="heading">Owner client</text>
+    <text x="220" y="183" class="small">User A's JWT</text>
+  </g>
+  <g>
+    <circle cx="155" cy="340" r="45" fill="#10241d" stroke="#74d8b1" stroke-width="2"/>
+    <circle cx="155" cy="326" r="11" fill="#a3e9cb"/>
+    <path d="M132 363c4-16 42-16 46 0" fill="none" stroke="#a3e9cb" stroke-width="4" stroke-linecap="round"/>
+    <text x="220" y="333" class="heading">Second client</text>
+    <text x="220" y="363" class="small">User B's JWT</text>
+  </g>
+  <g>
+    <rect x="560" y="174" width="315" height="152" rx="18" fill="#0d1a16" stroke="#355c4c" stroke-width="2"/>
+    <path d="M603 218h220M603 250h160M603 282h195" stroke="#4b7764" stroke-width="5" stroke-linecap="round"/>
+    <text x="718" y="145" text-anchor="middle" class="heading">Same private object</text>
+    <text x="718" y="361" text-anchor="middle" class="small">bucket + exact object path</text>
+  </g>
+  <g>
+    <circle cx="1100" cy="175" r="38" fill="#10241d" stroke="#31c48d" stroke-width="2"/>
+    <path d="M1085 175l11 11 21-24" fill="none" stroke="#85e5ba" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="1160" y="169" class="heading">Allowed</text>
+    <text x="1160" y="198" class="small">owner download succeeds</text>
+  </g>
+  <g>
+    <circle cx="1100" cy="325" r="38" fill="#271616" stroke="#c45454" stroke-width="2"/>
+    <path d="M1089 314l22 22m0-22-22 22" stroke="#ff8f8f" stroke-width="5" stroke-linecap="round"/>
+    <text x="1160" y="319" class="heading">Denied</text>
+    <text x="1160" y="348" class="small">second user's download fails</text>
+  </g>
+  <circle cx="155" cy="160" r="62" fill="none" stroke="#f6c453" stroke-width="1.5" opacity=".28"/>
+</svg>

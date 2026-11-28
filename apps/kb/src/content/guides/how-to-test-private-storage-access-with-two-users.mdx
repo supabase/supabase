@@ -1,0 +1,135 @@
+---
+title: 'How to test private Storage access with two users'
+description: 'Check a private Storage policy by running the same download as its owner and another signed-in user.'
+topics: ['Tutorials', 'Storage', 'Auth']
+---
+
+![Two signed-in clients request the same private object; the owner can download it and the other user is denied.](/kb/img/storage-two-user-rls-test.svg)
+
+A failed download by itself does not show whether the object path is wrong or the requesting user is not allowed to read it. Test the same private object with two separate signed-in clients: the user who owns the object and a second user. This checks the Storage download path under each user's JWT, rather than simulating the policy with a SQL query. That matters when a policy uses operation-aware helpers, because a SQL query does not make the same Storage request. [Private-bucket downloads are subject to RLS](https://supabase.com/docs/guides/storage/buckets/fundamentals#private-buckets), and policies on `storage.objects` control downloads. [Read the Storage access control guide](https://supabase.com/docs/guides/storage/security/access-control) and [operation-aware helper documentation](https://supabase.com/docs/guides/storage/schema/helper-functions).
+
+## Prepare an isolated test
+
+Use a non-production project and a disposable private bucket, such as `rls-isolation-test`. Create two throwaway email-and-password Auth users. The first user will upload a test object; the second will attempt to download that same object.
+
+If you are checking an existing policy, use a non-production copy of the policy and an object in the path your app uses. Do not add a second permissive policy to a live bucket as a test: permissive policies can combine to grant access. [PostgreSQL documents how policies combine](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
+
+For this example, the object path starts with the uploader's user ID. Add these policies to the disposable bucket in the SQL Editor. They allow each signed-in user to upload, download, and remove files only from their own first-level folder. Supabase's Storage policy examples use the JWT `sub` claim with `storage.foldername(name)` to scope a path to a user. [See the policy examples](https://supabase.com/docs/guides/storage/security/access-control#policy-examples).
+
+```sql
+drop policy if exists "RLS test: upload to own folder" on storage.objects;
+drop policy if exists "RLS test: download own folder" on storage.objects;
+drop policy if exists "RLS test: remove own test file" on storage.objects;
+
+create policy "RLS test: upload to own folder"
+on storage.objects
+for insert to authenticated
+with check (
+  bucket_id = 'rls-isolation-test'
+  and (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
+);
+
+create policy "RLS test: download own folder"
+on storage.objects
+for select to authenticated
+using (
+  bucket_id = 'rls-isolation-test'
+  and (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
+);
+
+create policy "RLS test: remove own test file"
+on storage.objects
+for delete to authenticated
+using (
+  bucket_id = 'rls-isolation-test'
+  and (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
+);
+```
+
+## Run the same download as each user
+
+Create a temporary Node.js folder, install the JavaScript client, and create a local `.env` file with the project URL, publishable key, and the two test users' credentials. Do not commit `.env`. A publishable key is intended for use with a user's session; never put a secret or service-role key in this client-side test. [Supabase API keys](https://supabase.com/docs/guides/api/api-keys) · [JavaScript client](https://supabase.com/docs/reference/javascript/introduction).
+
+```sh
+npm init -y
+npm install @supabase/supabase-js@2.117.3 dotenv@17.2.3
+```
+
+Put these values in `.env`:
+
+```dotenv
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
+OWNER_EMAIL=owner-test@example.com
+OWNER_PASSWORD=replace-with-test-password
+OTHER_EMAIL=other-test@example.com
+OTHER_PASSWORD=replace-with-test-password
+```
+
+Save this as `test-storage-rls.mjs`. It signs in two independent clients, uploads one object under the first user's ID, then calls the same `download` method with each session. The JavaScript SDK documents `signInWithPassword`, `upload`, and `download` as client operations. [Auth sign-in](https://supabase.com/docs/reference/javascript/auth-signinwithpassword) · [Upload](https://supabase.com/docs/reference/javascript/file-buckets-upload) · [Download](https://supabase.com/docs/reference/javascript/file-buckets-download).
+
+```js
+import 'dotenv/config'
+import { Blob } from 'node:buffer'
+import { randomUUID } from 'node:crypto'
+import { createClient } from '@supabase/supabase-js'
+
+const url = process.env.SUPABASE_URL
+const key = process.env.SUPABASE_PUBLISHABLE_KEY
+const bucket = 'rls-isolation-test'
+
+if (!url || !key) throw new Error('Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in .env')
+
+async function signedInClient(email, password) {
+  const client = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+  const { data, error } = await client.auth.signInWithPassword({ email, password })
+  if (error) throw error
+  return { client, userId: data.user.id }
+}
+
+const owner = await signedInClient(process.env.OWNER_EMAIL, process.env.OWNER_PASSWORD)
+const other = await signedInClient(process.env.OTHER_EMAIL, process.env.OTHER_PASSWORD)
+const objectPath = `${owner.userId}/probe-${randomUUID()}.txt`
+let uploaded = false
+
+try {
+  const { error: uploadError } = await owner.client.storage
+    .from(bucket)
+    .upload(objectPath, new Blob(['RLS test file'], { type: 'text/plain' }))
+  if (uploadError) throw uploadError
+  uploaded = true
+
+  const { error: ownerError } = await owner.client.storage.from(bucket).download(objectPath)
+  if (ownerError) throw new Error(`Owner could not download the test object: ${ownerError.message}`)
+
+  const { error: otherError } = await other.client.storage.from(bucket).download(objectPath)
+  if (!otherError) throw new Error('The second user unexpectedly downloaded the test object')
+
+  const deniedCodes = ['AccessDenied', 'NoSuchKey', 'unauthorized', 'not_found']
+  if (!deniedCodes.includes(otherError.code)) {
+    throw new Error(
+      `Unexpected error from the second-user request: ${otherError.code ?? otherError.message}`
+    )
+  }
+
+  console.log(`PASS: owner download succeeded; second-user download returned ${otherError.code}`)
+} finally {
+  if (uploaded) {
+    const { error: cleanupError } = await owner.client.storage.from(bucket).remove([objectPath])
+    if (cleanupError)
+      console.warn('Remove the test object from Storage manually:', cleanupError.message)
+  }
+}
+```
+
+Run it:
+
+```sh
+node test-storage-rls.mjs
+```
+
+The owner's download should succeed. The second user's download should return an access or object-not-found code. The script checks the Storage error code and reports unrelated errors separately. It also attempts to remove the test object. The result applies to the exact bucket, path, and `download` operation you tested. Listing objects, creating signed URLs, uploading, and deleting have their own policy checks. [Storage access control](https://supabase.com/docs/guides/storage/security/access-control).
+
+If the owner request also fails, first check the bucket name, exact object path, user session, and test setup. If the owner succeeds but the second user is denied, compare the second user's ID with the path and review the applicable `SELECT` policy. Do not infer the cause from an error code alone; Storage documents `NoSuchKey` as a missing key and notes that an existing key may still be inaccessible to the caller. [Storage error codes](https://supabase.com/docs/guides/storage/debugging/error-codes).
