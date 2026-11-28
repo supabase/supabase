@@ -14,10 +14,10 @@ export const runAndManage: NavMenuConstant = {
   url: '/guides/platform',
   items: [
     {
-      name: 'Projects, organizations and compute',
+      name: 'Projects and compute',
       items: [
         {
-          name: 'Compute and Disk',
+          name: 'Compute and disk',
           url: '/guides/platform/compute-and-disk',
           enabled: fullPlatformEnabled,
         },
@@ -26,13 +26,13 @@ export const runAndManage: NavMenuConstant = {
           url: '/guides/platform/database-size',
           enabled: fullPlatformEnabled,
         },
-        { name: 'Performance Tuning', url: '/guides/platform/performance' },
+        { name: 'Performance tuning', url: '/guides/platform/performance' },
         { name: 'Regions', url: '/guides/platform/regions' },
         {
-          name: 'Transfer, pause or delete a project',
+          name: 'Transfer, pause or delete',
           items: [
             {
-              name: 'Transfer to another organization',
+              name: 'Organization transfers',
               enabled: fullPlatformEnabled,
               items: [
                 { name: 'Transfer a project', url: '/guides/platform/project-transfer' },
@@ -49,11 +49,11 @@ export const runAndManage: NavMenuConstant = {
                   url: '/guides/platform/project-transfer/transfer-ownership',
                 },
                 {
-                  name: 'Transfer a Vercel-managed project',
+                  name: 'Vercel-managed projects',
                   url: '/guides/platform/project-transfer/vercel-marketplace',
                 },
                 {
-                  name: 'Pause a Pro or Team Plan project',
+                  name: 'Pause a paid-plan project',
                   url: '/guides/platform/project-transfer/pause-project',
                 },
                 {
@@ -62,8 +62,8 @@ export const runAndManage: NavMenuConstant = {
                 },
               ],
             },
-            { name: 'Project Pausing', url: '/guides/platform/free-project-pausing' },
-            { name: 'Delete Project', url: '/guides/platform/delete-project' },
+            { name: 'Free project pausing', url: '/guides/platform/free-project-pausing' },
+            { name: 'Delete a project', url: '/guides/platform/delete-project' },
           ],
         },
       ],
@@ -73,12 +73,12 @@ export const runAndManage: NavMenuConstant = {
       items: [
         { name: 'SSL enforcement', url: '/guides/platform/ssl-enforcement' },
         {
-          name: 'Network restrictions (IP allowlist)',
+          name: 'Network restrictions',
           url: '/guides/platform/network-restrictions',
         },
         { name: 'PrivateLink', url: '/guides/platform/privatelink' },
         { name: 'Dedicated IPv4 address', url: '/guides/platform/ipv4-address' },
-        { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
+        { name: 'Custom domains', url: '/guides/platform/custom-domains' },
       ],
     },
     {
@@ -93,9 +93,9 @@ export const runAndManage: NavMenuConstant = {
             {
               name: 'Sign-in flows',
               items: [
-                { name: 'Understanding Sign-in Flows', url: '/guides/platform/sso/login-flows' },
+                { name: 'Understanding sign-in flows', url: '/guides/platform/sso/login-flows' },
                 {
-                  name: 'Choosing a Sign-in Flow',
+                  name: 'Choosing a sign-in flow',
                   url: '/guides/platform/sso/choosing-login-flow',
                 },
               ],
@@ -103,19 +103,19 @@ export const runAndManage: NavMenuConstant = {
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             { name: 'SSO with Google Workspace', url: '/guides/platform/sso/gsuite' },
             { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
-            { name: 'Multiple SSO Providers', url: '/guides/platform/sso/multiple-providers' },
+            { name: 'Multiple SSO providers', url: '/guides/platform/sso/multiple-providers' },
             {
-              name: 'Testing and Best Practices',
+              name: 'Testing and best practices',
               url: '/guides/platform/sso/testing-best-practices',
             },
             {
-              name: 'Enterprise-Managed Authorization for MCP',
+              name: 'Enterprise MCP authorization',
               url: '/guides/platform/sso/enterprise-mcp-authorization',
             },
           ],
         },
         {
-          name: 'Multi-factor authentication (MFA)',
+          name: 'Multi-factor auth (MFA)',
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/multi-factor-authentication' },
@@ -126,13 +126,13 @@ export const runAndManage: NavMenuConstant = {
           ],
         },
         {
-          name: 'Personal Access Tokens',
+          name: 'Personal access tokens',
           url: '/guides/platform/personal-access-tokens',
           enabled: fullPlatformEnabled,
         },
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
         {
-          name: 'Map team members to Postgres roles',
+          name: 'Team access to Postgres',
           url: '/guides/platform/team-database-access',
         },
       ],
@@ -141,7 +141,7 @@ export const runAndManage: NavMenuConstant = {
       name: 'Security and compliance',
       items: [
         {
-          name: 'Compliance: SOC 2, HIPAA, GDPR',
+          name: 'SOC 2, HIPAA and GDPR',
           items: [
             {
               name: 'Shared responsibility model',
@@ -157,7 +157,7 @@ export const runAndManage: NavMenuConstant = {
               enabled: complianceEnabled,
               items: [
                 { name: 'Overview', url: '/guides/security/hipaa-compliance' },
-                { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
+                { name: 'HIPAA projects', url: '/guides/platform/hipaa-projects' },
               ],
             },
             {
@@ -167,20 +167,20 @@ export const runAndManage: NavMenuConstant = {
             },
           ],
         },
-        { name: 'Secure platform configuration', url: '/guides/security/platform-security' },
+        { name: 'Secure the platform', url: '/guides/security/platform-security' },
         { name: 'Secure product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
         {
-          name: 'Production security checklist',
+          name: 'Security checklist',
           url: '/guides/security/production-checklist',
         },
       ],
     },
     {
-      name: 'Backups, restore and upgrades',
+      name: 'Backups and upgrades',
       items: [
-        { name: 'Database Backups', url: '/guides/platform/backups' },
+        { name: 'Database backups', url: '/guides/platform/backups' },
         { name: 'Restore to a new project', url: '/guides/platform/clone-project' },
         {
           name: 'Upgrading Postgres',
@@ -245,7 +245,7 @@ export const runAndManage: NavMenuConstant = {
                   url: '/guides/platform/manage-your-usage/monthly-active-users',
                 },
                 {
-                  name: 'Monthly Active Third-Party Users',
+                  name: 'Third-party MAU',
                   url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
                 },
                 {
@@ -263,7 +263,7 @@ export const runAndManage: NavMenuConstant = {
               items: [
                 { name: 'Storage Size', url: '/guides/platform/manage-your-usage/storage-size' },
                 {
-                  name: 'Storage Image Transformations',
+                  name: 'Image transformations',
                   url: '/guides/platform/manage-your-usage/storage-image-transformations',
                 },
               ],
@@ -295,7 +295,7 @@ export const runAndManage: NavMenuConstant = {
               ],
             },
             {
-              name: 'Branching, PITR, and replication',
+              name: 'Branching, PITR, replicas',
               items: [
                 { name: 'Branching', url: '/guides/platform/manage-your-usage/branching' },
                 {
@@ -309,7 +309,7 @@ export const runAndManage: NavMenuConstant = {
           ],
         },
         {
-          name: 'Your monthly invoice and credits',
+          name: 'Invoices and credits',
           items: [
             { name: 'Overview', url: '/guides/platform/your-monthly-invoice' },
             { name: 'Credits', url: '/guides/platform/credits' },
@@ -320,8 +320,8 @@ export const runAndManage: NavMenuConstant = {
           name: 'AWS Marketplace',
           items: [
             { name: 'Overview', url: '/guides/platform/aws-marketplace' },
-            { name: 'Getting Started', url: '/guides/platform/aws-marketplace/getting-started' },
-            { name: 'Account Setup', url: '/guides/platform/aws-marketplace/account-setup' },
+            { name: 'Getting started', url: '/guides/platform/aws-marketplace/getting-started' },
+            { name: 'Account setup', url: '/guides/platform/aws-marketplace/account-setup' },
             {
               name: 'Manage your AWS subscription',
               url: '/guides/platform/aws-marketplace/manage-your-subscription',
@@ -345,7 +345,7 @@ export const runAndManage: NavMenuConstant = {
             { name: 'Configure logging', url: '/guides/observability/configure-logging' },
             { name: 'Log drains', url: '/guides/observability/log-drains' },
             {
-              name: 'Postgres Connection Logging',
+              name: 'Postgres connection logging',
               url: '/guides/platform/postgres-connection-logging',
             },
             {
@@ -397,7 +397,7 @@ export const runAndManage: NavMenuConstant = {
           ],
         },
         {
-          name: 'Platform Webhooks',
+          name: 'Platform webhooks',
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/webhooks' },

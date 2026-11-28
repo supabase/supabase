@@ -42,12 +42,12 @@ export const start: NavMenuConstant = {
       ],
     },
     {
-      name: 'Migrating from legacy API keys',
+      name: 'Migrate from legacy API keys',
       url: '/guides/getting-started/migrating-to-new-api-keys',
     },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
-      name: 'Framework Quickstarts',
+      name: 'Framework quickstarts',
       enabled: frameworkQuickstartsEnabled,
       items: [
         {
@@ -92,7 +92,7 @@ export const start: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app demos',
+      name: 'Web app tutorials',
       enabled: webAppsEnabled,
       items: [
         { name: 'Next.js', url: '/guides/getting-started/tutorials/with-nextjs' },

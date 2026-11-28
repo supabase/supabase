@@ -8,7 +8,7 @@ const { docsLocalDevelopment: localDevelopmentEnabled, docsPgtap: pgTapEnabled }
 
 export const localDevelopment: NavMenuConstant = {
   icon: 'dev-cli',
-  title: 'Local Development and CLI',
+  title: 'Local development and CLI',
   url: '/guides/local-development',
   items: [
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
@@ -36,7 +36,7 @@ export const localDevelopment: NavMenuConstant = {
       name: 'Local environment setup',
       items: [
         {
-          name: 'Running multiple local projects',
+          name: 'Multiple local projects',
           url: '/guides/local-development/running-multiple-local-projects',
         },
         {
@@ -44,7 +44,7 @@ export const localDevelopment: NavMenuConstant = {
           url: '/guides/local-development/docker-and-native-runtimes',
         },
         {
-          name: 'Managing configuration and secrets',
+          name: 'Configuration and secrets',
           url: '/guides/local-development/managing-config',
         },
         {

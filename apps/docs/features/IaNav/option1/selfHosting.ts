@@ -1,19 +1,19 @@
 import type { NavMenuConstant } from '@/components/Navigation/Navigation.types'
 
 export const selfHosting: NavMenuConstant = {
-  title: 'Self-Hosting',
+  title: 'Self-hosting',
   icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
     {
-      name: 'Keys, gateway, HTTPS, and Postgres',
+      name: 'Keys, HTTPS and Postgres',
       items: [
         { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
         { name: 'Configure API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
-        { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+        { name: 'API gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         {
-          name: 'Add Reverse Proxy with HTTPS',
+          name: 'Add reverse proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
         { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
@@ -29,18 +29,18 @@ export const selfHosting: NavMenuConstant = {
     {
       name: 'Configure Auth',
       items: [
-        { name: 'Configure Social Sign-in (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
+        { name: 'Social sign-in (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         {
-          name: 'Configure Custom OAuth/OIDC',
+          name: 'Configure custom OAuth/OIDC',
           url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
         },
         {
-          name: 'Configure Phone Sign-in and MFA',
+          name: 'Phone sign-in and MFA',
           url: '/guides/self-hosting/self-hosted-phone-mfa',
         },
-        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Add custom email templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
-        { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
+        { name: 'Configure passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         {
           name: 'Configure OAuth 2.1 Server',
@@ -49,13 +49,13 @@ export const selfHosting: NavMenuConstant = {
       ],
     },
     {
-      name: 'Functions, Storage, MCP, extensions',
+      name: 'Services and extensions',
       items: [
-        { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
+        { name: 'Run Edge Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         {
-          name: 'Build Custom Extensions',
+          name: 'Build custom extensions',
           url: '/guides/self-hosting/custom-postgres-extensions',
         },
       ],
@@ -64,14 +64,14 @@ export const selfHosting: NavMenuConstant = {
       name: 'Move from Supabase Cloud',
       items: [
         {
-          name: 'Restore Project from Platform',
+          name: 'Restore a Cloud project',
           url: '/guides/self-hosting/restore-from-platform',
         },
-        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Copy Storage from Cloud', url: '/guides/self-hosting/copy-from-platform-s3' },
       ],
     },
     {
-      name: 'Service reference and configuration',
+      name: 'Service reference',
       items: [
         {
           name: 'Auth Server',
@@ -97,7 +97,7 @@ export const selfHosting: NavMenuConstant = {
               name: 'Realtime Server reference',
               url: '/reference/self-hosting-realtime/introduction',
             },
-            { name: 'Realtime Server configuration', url: '/guides/self-hosting/realtime/config' },
+            { name: 'Realtime configuration', url: '/guides/self-hosting/realtime/config' },
           ],
         },
         {
@@ -108,7 +108,7 @@ export const selfHosting: NavMenuConstant = {
               url: '/reference/self-hosting-analytics/introduction',
             },
             {
-              name: 'Analytics Server configuration',
+              name: 'Analytics configuration',
               url: '/guides/self-hosting/analytics/config',
             },
           ],

@@ -9,7 +9,7 @@ export const cronAndQueues: NavMenuConstant = {
       name: 'Cron',
       items: [
         {
-          name: 'Getting Started',
+          name: 'Getting started',
           items: [
             { name: 'Install', url: '/guides/cron/install' },
             { name: 'Quickstart', url: '/guides/cron/quickstart' },
@@ -23,15 +23,15 @@ export const cronAndQueues: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/queues' },
         {
-          name: 'Getting Started',
+          name: 'Getting started',
           items: [
             { name: 'Quickstart', url: '/guides/queues/quickstart' },
             {
-              name: 'Read messages with Edge Functions',
+              name: 'Consume with Edge Functions',
               url: '/guides/queues/consuming-messages-with-edge-functions',
             },
             {
-              name: 'Expose Queues for self-hosting',
+              name: 'Self-hosted Queues',
               url: '/guides/queues/expose-self-hosted-queues',
             },
           ],
@@ -40,7 +40,7 @@ export const cronAndQueues: NavMenuConstant = {
           name: 'References',
           items: [
             { name: 'API', url: '/guides/queues/api' },
-            { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
+            { name: 'PGMQ extension', url: '/guides/queues/pgmq' },
           ],
         },
       ],

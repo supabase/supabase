@@ -15,7 +15,7 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/connecting-to-postgres' },
         {
-          name: 'Connection pooling and limits',
+          name: 'Connection pooling',
           items: [
             {
               name: 'Overview',
@@ -30,7 +30,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/connecting-to-postgres/serverless-drivers',
         },
         {
-          name: 'ORM Quickstarts',
+          name: 'ORM quickstarts',
           items: [
             { name: 'Connecting with Prisma', url: '/guides/database/prisma' },
             {
@@ -43,7 +43,7 @@ export const database: NavMenuConstant = {
         },
         navDataForMdx.guiQuickstarts,
         {
-          name: 'Temporary access with user tokens',
+          name: 'Temporary access tokens',
           url: '/guides/platform/temporary-access',
         },
       ],
@@ -57,14 +57,14 @@ export const database: NavMenuConstant = {
         {
           name: 'Querying and search',
           items: [
-            { name: 'Querying joins and nested tables', url: '/guides/database/joins-and-nesting' },
-            { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+            { name: 'Joins and nested tables', url: '/guides/database/joins-and-nesting' },
+            { name: 'Using full text search', url: '/guides/database/full-text-search' },
             {
-              name: 'PGroonga: multilingual search',
+              name: 'PGroonga: multilingual text',
               url: '/guides/database/extensions/pgroonga',
             },
             {
-              name: 'Select First Row per Group',
+              name: 'Select first row per group',
               url: '/guides/database/postgres/first-row-in-group',
             },
           ],
@@ -90,11 +90,11 @@ export const database: NavMenuConstant = {
               url: '/guides/database/postgres/cascade-deletes',
             },
             {
-              name: 'Delete data and drop objects safely',
+              name: 'Delete data safely',
               url: '/guides/database/postgres/data-deletion',
             },
             {
-              name: 'Drop All Tables in Schema',
+              name: 'Drop all tables in a schema',
               url: '/guides/database/postgres/dropping-all-tables-in-schema',
             },
           ],
@@ -112,12 +112,12 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Row Level Security, roles and Vault',
+      name: 'RLS, roles and Vault',
       items: [
         { name: 'Securing your data', url: '/guides/database/secure-data' },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
-          name: 'Row Level Security Performance',
+          name: 'RLS performance',
           url: '/guides/database/postgres/row-level-security-performance',
         },
         { name: 'Column Level Security', url: '/guides/database/postgres/column-level-security' },
@@ -126,7 +126,7 @@ export const database: NavMenuConstant = {
           items: [
             { name: 'Overview', url: '/guides/database/postgres/roles' },
             {
-              name: 'Superuser access and limitations',
+              name: 'Superuser access and limits',
               url: '/guides/database/postgres/roles-superuser',
             },
             { name: 'Default platform permissions', url: '/guides/platform/permissions' },
@@ -143,7 +143,7 @@ export const database: NavMenuConstant = {
           items: [
             { name: 'Database configuration', url: '/guides/database/postgres/configuration' },
             {
-              name: 'Customizing Postgres configuration',
+              name: 'Customize Postgres config',
               url: '/guides/database/custom-postgres-config',
             },
             {
@@ -162,11 +162,11 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Debugging and troubleshooting',
+          name: 'Debug and troubleshoot',
           items: [
             { name: 'Inspect the database', url: '/guides/observability/inspect' },
             {
-              name: 'Print Postgres Version',
+              name: 'Print Postgres version',
               url: '/guides/database/postgres/which-version-of-postgres',
             },
           ],
@@ -204,11 +204,11 @@ export const database: NavMenuConstant = {
           name: 'Manual replication',
           items: [
             {
-              name: 'Setting up manual replication',
+              name: 'Set up manual replication',
               url: '/guides/database/replication/manual-replication-setup',
             },
             {
-              name: 'Monitoring manual replication',
+              name: 'Monitor manual replication',
               url: '/guides/database/replication/manual-replication-monitoring',
             },
             {
@@ -218,11 +218,11 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Replicate to external Postgres',
+          name: 'Replicate to other Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
         {
-          name: 'Read Replicas',
+          name: 'Read replicas',
           items: [
             { name: 'Overview', url: '/guides/platform/read-replicas' },
             { name: 'Getting started', url: '/guides/platform/read-replicas/getting-started' },
@@ -237,39 +237,39 @@ export const database: NavMenuConstant = {
         {
           name: 'Performance and monitoring',
           items: [
-            { name: 'HypoPG: Hypothetical indexes', url: '/guides/database/extensions/hypopg' },
+            { name: 'HypoPG: hypothetical indexes', url: '/guides/database/extensions/hypopg' },
             {
-              name: 'index_advisor: Query optimization',
+              name: 'index_advisor: query tuning',
               url: '/guides/database/extensions/index_advisor',
             },
             {
-              name: 'pg_stat_statements: query stats',
+              name: 'pg_stat_statements',
               url: '/guides/database/extensions/pg_stat_statements',
             },
             {
-              name: 'pg_plan_filter: Restrict Total Cost',
+              name: 'pg_plan_filter: cost limits',
               url: '/guides/database/extensions/pg_plan_filter',
             },
             {
-              name: 'pg_repack: Storage Optimization',
+              name: 'pg_repack: reclaim storage',
               url: '/guides/database/extensions/pg_repack',
             },
           ],
         },
         {
-          name: 'Search, vectors and geospatial',
+          name: 'Search, vectors, geospatial',
           items: [
             {
-              name: 'RUM: inverted index for search',
+              name: 'RUM: inverted search index',
               url: '/guides/database/extensions/rum',
             },
             {
-              name: 'pgvector: Embeddings and similarity',
+              name: 'pgvector: embeddings',
               url: '/guides/database/extensions/pgvector',
             },
-            { name: 'PostGIS: Geo queries', url: '/guides/database/extensions/postgis' },
+            { name: 'PostGIS: geo queries', url: '/guides/database/extensions/postgis' },
             {
-              name: 'pgRouting: Geospatial Routing',
+              name: 'pgRouting: geo routing',
               url: '/guides/database/extensions/pgrouting',
             },
           ],
@@ -277,24 +277,24 @@ export const database: NavMenuConstant = {
         {
           name: 'HTTP and GraphQL',
           items: [
-            { name: 'http: RESTful Client', url: '/guides/database/extensions/http' },
-            { name: 'pg_net: Async Networking', url: '/guides/database/extensions/pg_net' },
+            { name: 'http: RESTful client', url: '/guides/database/extensions/http' },
+            { name: 'pg_net: async networking', url: '/guides/database/extensions/pg_net' },
             {
-              name: 'pg_graphql: GraphQL Support',
+              name: 'pg_graphql: GraphQL support',
               url: '/guides/database/extensions/pg_graphql',
             },
           ],
         },
         {
-          name: 'Scheduling, queues and partitioning',
+          name: 'Jobs, queues, partitions',
           items: [
             {
-              name: 'pg_cron: Schedule Recurring Jobs',
+              name: 'pg_cron: recurring jobs',
               url: '/guides/database/extensions/pg_cron',
             },
             { name: 'pgmq: Queues', url: '/guides/database/extensions/pgmq' },
             {
-              name: 'pg_partman: Partition management',
+              name: 'pg_partman: partitions',
               url: '/guides/database/extensions/pg_partman',
             },
             { name: 'timescaledb (deprecated)', url: '/guides/database/extensions/timescaledb' },
@@ -304,30 +304,30 @@ export const database: NavMenuConstant = {
           name: 'Data types and IDs',
           items: [
             {
-              name: 'pg_jsonschema: JSON validation',
+              name: 'pg_jsonschema: validate JSON',
               url: '/guides/database/extensions/pg_jsonschema',
             },
-            { name: 'pg_hashids: Short UIDs', url: '/guides/database/extensions/pg_hashids' },
-            { name: 'uuid-ossp: Unique Identifiers', url: '/guides/database/extensions/uuid-ossp' },
+            { name: 'pg_hashids: short UIDs', url: '/guides/database/extensions/pg_hashids' },
+            { name: 'uuid-ossp: UUIDs', url: '/guides/database/extensions/uuid-ossp' },
           ],
         },
         {
           name: 'Security and auditing',
           items: [
-            { name: 'PGAudit: Postgres Auditing', url: '/guides/database/extensions/pgaudit' },
+            { name: 'PGAudit: Postgres auditing', url: '/guides/database/extensions/pgaudit' },
             {
-              name: 'pgsodium: encryption (deprecating)',
+              name: 'pgsodium (deprecating)',
               url: '/guides/database/extensions/pgsodium',
             },
             { name: 'pgjwt (deprecated)', url: '/guides/database/extensions/pgjwt' },
           ],
         },
         {
-          name: 'Testing and procedural languages',
+          name: 'Testing and languages',
           items: [
-            { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap' },
+            { name: 'pgTAP: unit testing', url: '/guides/database/extensions/pgtap' },
             {
-              name: 'plpgsql_check: PL/pgSQL Linter',
+              name: 'plpgsql_check: linter',
               url: '/guides/database/extensions/plpgsql_check',
             },
             { name: 'plv8 (deprecated)', url: '/guides/database/extensions/plv8' },
@@ -336,12 +336,12 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Foreign Data Wrappers',
+      name: 'Foreign data wrappers',
       enabled: fdwEnabled,
       items: [
         { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
         {
-          name: 'postgres_fdw: query other Postgres',
+          name: 'postgres_fdw: other Postgres',
           url: '/guides/database/extensions/postgres_fdw',
         },
         {

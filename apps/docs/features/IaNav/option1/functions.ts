@@ -14,7 +14,7 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Quickstart (Dashboard)', url: '/guides/functions/quickstart-dashboard' },
         { name: 'Quickstart (CLI)', url: '/guides/functions/quickstart' },
-        { name: 'Development Environment', url: '/guides/functions/development-environment' },
+        { name: 'Development environment', url: '/guides/functions/development-environment' },
         { name: 'Architecture', url: '/guides/functions/architecture' },
       ],
     },
@@ -22,29 +22,29 @@ export const functions: NavMenuConstant = {
       name: 'Develop and configure',
       items: [
         { name: 'Environment variables', url: '/guides/functions/secrets' },
-        { name: 'Managing Dependencies', url: '/guides/functions/dependencies' },
-        { name: 'Function Configuration', url: '/guides/functions/function-configuration' },
+        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
+        { name: 'Function configuration', url: '/guides/functions/function-configuration' },
         { name: 'Routing', url: '/guides/functions/routing' },
-        { name: 'Error Handling', url: '/guides/functions/error-handling' },
-        { name: 'CORS support for browser calls', url: '/guides/functions/cors' },
-        { name: 'Deploy to Production', url: '/guides/functions/deploy' },
+        { name: 'Error handling', url: '/guides/functions/error-handling' },
+        { name: 'CORS for browser calls', url: '/guides/functions/cors' },
+        { name: 'Deploy to production', url: '/guides/functions/deploy' },
       ],
     },
     {
       name: 'Runtime features',
       items: [
-        { name: 'Background Tasks', url: '/guides/functions/background-tasks' },
+        { name: 'Background tasks', url: '/guides/functions/background-tasks' },
         { name: 'File storage (ephemeral)', url: '/guides/functions/ephemeral-storage' },
         { name: 'WebSockets', url: '/guides/functions/websockets' },
-        { name: 'Wasm Modules', url: '/guides/functions/wasm' },
-        { name: 'AI Models', url: '/guides/functions/ai-models' },
-        { name: 'Recursive/Nested function calls', url: '/guides/functions/recursive-functions' },
+        { name: 'Wasm modules', url: '/guides/functions/wasm' },
+        { name: 'AI models', url: '/guides/functions/ai-models' },
+        { name: 'Recursive function calls', url: '/guides/functions/recursive-functions' },
       ],
     },
     {
       name: 'Debugging',
       items: [
-        { name: 'Local Debugging with DevTools', url: '/guides/functions/debugging-tools' },
+        { name: 'Debug locally with DevTools', url: '/guides/functions/debugging-tools' },
         { name: 'Testing your Functions', url: '/guides/functions/unit-test' },
         { name: 'Logging', url: '/guides/functions/logging' },
         { name: 'Error codes', url: '/guides/functions/error-codes' },
@@ -60,7 +60,7 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
-      name: 'Use with Auth, Database and Storage',
+      name: 'Auth, Database and Storage',
       items: [
         {
           name: 'Supabase Auth',
@@ -75,7 +75,7 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
-      name: 'Examples and third-party tools',
+      name: 'Examples and tools',
       items: [
         {
           name: 'AI and MCP',
@@ -88,35 +88,35 @@ export const functions: NavMenuConstant = {
               name: 'Generating AI images',
               url: '/guides/functions/examples/amazon-bedrock-image-generator',
             },
-            { name: 'Semantic AI Search', url: '/guides/functions/examples/semantic-search' },
+            { name: 'Semantic AI search', url: '/guides/functions/examples/semantic-search' },
             {
-              name: 'Text To Speech with ElevenLabs',
+              name: 'ElevenLabs text to speech',
               url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
             },
             {
-              name: 'Speech to text with ElevenLabs',
+              name: 'ElevenLabs speech to text',
               url: '/guides/functions/examples/elevenlabs-transcribe-speech',
             },
           ],
         },
         {
-          name: 'Bots, email and notifications',
+          name: 'Bots, email, notifications',
           items: [
-            { name: 'Building a Discord Bot', url: '/guides/functions/examples/discord-bot' },
-            { name: 'Building a Telegram Bot', url: '/guides/functions/examples/telegram-bot' },
+            { name: 'Building a Discord bot', url: '/guides/functions/examples/discord-bot' },
+            { name: 'Building a Telegram bot', url: '/guides/functions/examples/telegram-bot' },
             {
-              name: 'Slack Bot responding to mentions',
+              name: 'Slack bot for mentions',
               url: '/guides/functions/examples/slack-bot-mention',
             },
             {
-              name: 'Sending Push Notifications',
+              name: 'Sending push notifications',
               url: '/guides/functions/examples/push-notifications',
             },
             {
-              name: 'Auth send email hook (React Email)',
+              name: 'React Email auth hook',
               url: '/guides/functions/examples/auth-send-email-hook-react-email-resend',
             },
-            { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
+            { name: 'Sending emails with Resend', url: '/guides/functions/examples/send-emails' },
           ],
         },
         {
@@ -124,24 +124,24 @@ export const functions: NavMenuConstant = {
           items: [
             { name: 'Generating OG images', url: '/guides/functions/examples/og-image' },
             {
-              name: 'Transform and Optimize Images',
+              name: 'Optimize images',
               url: '/guides/functions/examples/image-manipulation',
             },
             {
-              name: 'Taking Screenshots with Puppeteer',
+              name: 'Puppeteer screenshots',
               url: '/guides/functions/examples/screenshots',
             },
           ],
         },
         {
-          name: 'Payments, CAPTCHA and rate limiting',
+          name: 'Payments, CAPTCHA, limits',
           items: [
             {
-              name: 'Handling Stripe Webhooks',
+              name: 'Handling Stripe webhooks',
               url: '/guides/functions/examples/stripe-webhooks',
             },
             {
-              name: 'CAPTCHA with Cloudflare Turnstile',
+              name: 'Cloudflare Turnstile CAPTCHA',
               url: '/guides/functions/examples/cloudflare-turnstile',
             },
             { name: 'Rate-limiting with Redis', url: '/guides/functions/examples/rate-limiting' },
@@ -151,14 +151,14 @@ export const functions: NavMenuConstant = {
           name: 'Libraries and tools',
           items: [
             { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
-            { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
+            { name: 'Type-safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
             { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
             {
               name: 'Monitoring with Sentry',
               url: '/guides/functions/examples/sentry-monitoring',
             },
             {
-              name: 'Resumable WebSockets with replay',
+              name: 'Resumable WebSockets',
               url: '/guides/functions/examples/resumable-websockets',
             },
           ],

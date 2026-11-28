@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import * as option1NavItems from '~/features/IaNav/option1.constants'
+import { useNavItems } from '~/features/IaNav/useNavItems'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -12,8 +14,6 @@ import { useDocsSidebarNav } from './DocsSidebarNavContext'
 import { MenuId } from './NavigationMenu'
 import * as currentNavItems from './NavigationMenu.constants'
 import { getMenuId } from './NavigationMenu.utils'
-import * as option1NavItems from '~/features/IaNav/option1.constants'
-import { useNavItems } from '~/features/IaNav/useNavItems'
 
 const navigation = vi.hoisted(() => ({ pathname: '/guides/database/overview' }))
 
@@ -79,7 +79,7 @@ describe('DocsSidebarNav', () => {
     renderSidebar()
 
     expect(
-      screen.getByRole('button', { name: 'Local Development and CLI, back to Develop and deploy' })
+      screen.getByRole('button', { name: 'Local development and CLI, back to Develop and deploy' })
     ).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Getting Started' }).getAttribute('href')).toBe(
       '/guides/local-development'
@@ -93,12 +93,12 @@ describe('DocsSidebarNav', () => {
     renderSidebar()
 
     expect(
-      screen.getByRole('button', { name: 'Backups, restore and upgrades, back to Run and manage' })
+      screen.getByRole('button', { name: 'Backups and upgrades, back to Run and manage' })
     ).toBeTruthy()
   })
 
   it.each([
-    ['/guides/realtime/broadcast', 'REST, GraphQL and Realtime APIs, back to Build'],
+    ['/guides/realtime/broadcast', 'REST, GraphQL and Realtime, back to Products'],
     ['/guides/deployment/terraform/tutorial', 'Terraform, back to Develop and deploy'],
   ])('opens the option-1 product whose tree holds %s', (pathname, backButtonName) => {
     navigation.pathname = pathname
@@ -115,13 +115,13 @@ describe('DocsSidebarNav', () => {
 
     renderSidebar()
     fireEvent.click(
-      screen.getByRole('button', { name: 'Backups, restore and upgrades, back to Run and manage' })
+      screen.getByRole('button', { name: 'Backups and upgrades, back to Run and manage' })
     )
 
     const currentLinks = screen
       .getAllByRole('link')
       .filter((link) => link.getAttribute('aria-current') === 'page')
-    expect(currentLinks.map((link) => link.textContent)).toEqual(['Backups, restore and upgrades'])
+    expect(currentLinks.map((link) => link.textContent)).toEqual(['Backups and upgrades'])
   })
 
   it('keeps the level when a modified click opens a product in another tab', () => {
