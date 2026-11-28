@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { CustomerioTrackClient } from '~/lib/customerio'
 
 const corsHeaders = {
@@ -31,12 +30,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    const customerioSiteId = process.env.CUSTOMERIO_SITE_ID
-    const customerioApiKey = process.env.CUSTOMERIO_API_KEY
-
-    if (!customerioSiteId || !customerioApiKey) {
-      throw new Error('Customer.io credentials not configured')
-    }
+    const customerioSiteId = process.env.CUSTOMERIO_SITE_ID ?? ''
+    const customerioApiKey = process.env.CUSTOMERIO_API_KEY ?? ''
 
     const cio = new CustomerioTrackClient(customerioSiteId, customerioApiKey)
 

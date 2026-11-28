@@ -5,6 +5,7 @@ import {
   fetchChangelogEntryFilesFromTarball,
   getPublishedChangelogEntries,
 } from './changelog-entries-core.mjs'
+import { requireEnvironmentVariables } from './required-env'
 
 const CHANGELOG_REPO_OWNER = 'supabase'
 const CHANGELOG_REPO_NAME = 'changelog'
@@ -52,6 +53,12 @@ export type ChangelogEntry = {
 }
 
 function createChangelogRepoOctokit() {
+  requireEnvironmentVariables({
+    CHANGELOG_SYNC_APP_ID: process.env.CHANGELOG_SYNC_APP_ID,
+    CHANGELOG_SYNC_APP_INSTALLATION_ID: process.env.CHANGELOG_SYNC_APP_INSTALLATION_ID,
+    CHANGELOG_SYNC_APP_PRIVATE_KEY: process.env.CHANGELOG_SYNC_APP_PRIVATE_KEY,
+  })
+
   return new Octokit({
     authStrategy: createAppAuth,
     auth: {
@@ -63,7 +70,7 @@ function createChangelogRepoOctokit() {
 }
 
 /**
- * supabase/changelog is the source of truth — no fallback source. If this
+ * supabase/changelog is the source of truth. If this
  * throws (outage, misconfigured App access, etc.), it propagates so the
  * failure is loud and visible rather than silently degrading to a stale or
  * differently-shaped data source.
