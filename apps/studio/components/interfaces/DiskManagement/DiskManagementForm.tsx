@@ -425,13 +425,16 @@ export function DiskManagementForm({
     recommendedCompute,
   ])
 
-  // Deep links from billing / UpgradePlanButton (e.g. #compute).
+  // Deep links from billing / UpgradePlanButton / the add-ons page (#compute, #advanced).
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (window.location.hash !== '#compute') return
+    const { hash } = window.location
+    if (hash !== '#compute' && hash !== '#advanced') return
 
     const timeoutId = setTimeout(() => {
-      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const target =
+        hash === '#compute' ? computeSettingsRef.current : document.getElementById('advanced')
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
 
     return () => clearTimeout(timeoutId)

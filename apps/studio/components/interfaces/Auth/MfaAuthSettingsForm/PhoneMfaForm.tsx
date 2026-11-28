@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -144,9 +144,20 @@ export const PhoneMfaForm = ({
     }
   }
 
+  // Deep link from the add-ons page (#sms-mfa)
+  useEffect(() => {
+    if (window.location.hash !== '#sms-mfa') return
+
+    const timeoutId = setTimeout(() => {
+      document.getElementById('sms-mfa')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [])
+
   return (
     <>
-      <PageSection>
+      <PageSection id="sms-mfa" className="scroll-mt-24">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>SMS MFA</PageSectionTitle>

@@ -242,7 +242,7 @@ export function AdvancedSection({
   const isHighAvailability = useIsHighAvailability()
 
   return (
-    <PageSection>
+    <PageSection id="advanced" className="scroll-mt-24">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle className="heading-default text-base">Advanced</PageSectionTitle>

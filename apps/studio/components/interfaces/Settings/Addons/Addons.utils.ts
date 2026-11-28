@@ -1,3 +1,8 @@
+import {
+  DISK_LIMITS,
+  DiskType,
+} from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+
 export interface IPv4DisabledReasonOptions {
   isAws: boolean
   isProjectActive: boolean
@@ -136,4 +141,56 @@ export const getPitrAlertState = ({
   }
 
   return undefined
+}
+
+// The default instance size is not an add-on, so ci_micro counts as "not enabled"
+export const DEFAULT_COMPUTE_SIZE = 'ci_micro'
+
+export const isComputeAddonEnabled = (computeSize: string | null | undefined) =>
+  !!computeSize && computeSize !== DEFAULT_COMPUTE_SIZE
+
+export const getActiveCountLabel = (count: number) => `${count} active`
+
+// Prices that don't come from the billing add-ons API, see packages/shared-data/pricing.ts
+export const LOG_DRAIN_PRICE_LABEL = '$60 / drain / month'
+export const SMS_MFA_PRICE_LABEL = '$75 / month'
+
+/** Lowest paid variant price for an add-on type, ignoring free and excluded variants */
+export const getLowestPaidPrice = (
+  availableAddons: { type: string; variants: { identifier: string; price: number }[] }[],
+  type: string,
+  excludedIdentifiers: string[] = []
+) => {
+  const prices = (availableAddons.find((addon) => addon.type === type)?.variants ?? [])
+    .filter((variant) => !excludedIdentifiers.includes(variant.identifier) && variant.price > 0)
+    .map((variant) => variant.price)
+
+  return prices.length > 0 ? Math.min(...prices) : undefined
+}
+
+/** The databases list includes the primary, which is not a read replica */
+export const countReadReplicas = (databases: { identifier: string }[], projectRef?: string) =>
+  databases.filter((database) => database.identifier !== projectRef).length
+
+type DiskAttributes =
+  | { type: 'gp3'; iops: number; throughput_mibps: number }
+  | { type: 'io2'; iops: number }
+
+/** io2, or gp3 with IOPS/throughput provisioned beyond what's included */
+export const isAdvancedDiskEnabled = (attributes: DiskAttributes | undefined) => {
+  if (!attributes) return false
+  if (attributes.type === 'io2') return true
+
+  return (
+    attributes.iops > DISK_LIMITS[DiskType.GP3].includedIops ||
+    attributes.throughput_mibps > DISK_LIMITS[DiskType.GP3].includedThroughput
+  )
+}
+
+export const getAdvancedDiskDetail = (attributes: DiskAttributes | undefined) => {
+  if (!attributes || !isAdvancedDiskEnabled(attributes)) return 'Usage based'
+  if (attributes.type === 'io2')
+    return `High-performance · ${attributes.iops.toLocaleString()} IOPS`
+
+  return `${attributes.iops.toLocaleString()} IOPS · ${attributes.throughput_mibps.toLocaleString()} MiB/s`
 }

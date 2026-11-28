@@ -1,26 +1,38 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { Link } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
-import { LockIcon } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Badge,
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+  CpuIcon,
+  GlobeIcon,
+  HistoryIcon,
+  LinkIcon,
+  CopyIcon,
+  HardDriveIcon,
+  MessageSquareLockIcon,
+  ScrollTextIcon,
+  WorkflowIcon,
+} from 'lucide-react'
+import { ReactElement } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
+import { AddonGroup, AddonRow } from './AddonRow'
 import {
+  countReadReplicas,
+  DEFAULT_COMPUTE_SIZE,
+  getActiveCountLabel,
+  getAdvancedDiskDetail,
   getCustomDomainDisabledReason,
   getIPv4DisabledReason,
+  getLowestPaidPrice,
   getPitrAlertState,
   getPitrDisabledReason,
+  isAdvancedDiskEnabled,
+  isComputeAddonEnabled,
+  LOG_DRAIN_PRICE_LABEL,
+  SMS_MFA_PRICE_LABEL,
 } from './Addons.utils'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
@@ -31,12 +43,18 @@ import {
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -48,12 +66,66 @@ import {
   useIsProjectActive,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
-import { getDatabaseMajorVersion, getSemanticVersion } from '@/lib/helpers'
+import { getComputeCpuLabel, getComputeSizeLabel } from '@/lib/compute-labels'
+import { DOCS_URL } from '@/lib/constants'
+import { formatCurrency, getDatabaseMajorVersion, getSemanticVersion } from '@/lib/helpers'
 import { useAddonsPagePanel } from '@/state/addons-page'
 
+const docsLink = (path: string) => (
+  <InlineLink className="text-foreground-light" href={`${DOCS_URL}${path}`}>
+    Docs
+  </InlineLink>
+)
+
+const PanelActionButton = ({
+  label,
+  disabledReason,
+  onClick,
+}: {
+  label: string
+  disabledReason?: string
+  onClick: () => void
+}) => (
+  <ButtonTooltip
+    size="tiny"
+    disabled={!!disabledReason}
+    onClick={onClick}
+    tooltip={{ content: { side: 'bottom', text: disabledReason } }}
+  >
+    {label}
+  </ButtonTooltip>
+)
+
+const FREE_PLAN_REASON = 'Upgrade to Pro to configure add-ons'
+
+/** Link-style "Configure" button that renders as a disabled button when the add-on can't be configured */
+const ConfigureLinkButton = ({
+  isDisabled,
+  children,
+}: {
+  isDisabled: boolean
+  children: ReactElement
+}) => {
+  if (isDisabled) {
+    return (
+      <ButtonTooltip
+        size="tiny"
+        disabled
+        tooltip={{ content: { side: 'bottom', text: FREE_PLAN_REASON } }}
+      >
+        Configure
+      </ButtonTooltip>
+    )
+  }
+
+  return (
+    <Button asChild size="tiny">
+      {children}
+    </Button>
+  )
+}
+
 export const Addons = () => {
-  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
   const isAws = useIsAwsCloudProvider()
@@ -61,14 +133,24 @@ export const Addons = () => {
   const isOrioleDbInAws = useIsOrioleDbInAws() === true
   const isHighAvailability = useIsHighAvailability()
 
-  const { projectSettingsCustomDomains, projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+  const {
+    projectSettingsCustomDomains,
+    projectAddonsDedicatedIpv4Address,
+    projectSettingsLogDrains,
+    databaseReplication,
+    infrastructureReadReplicas,
+  } = useIsFeatureEnabled([
     'project_settings:custom_domains',
     'project_addons:dedicated_ipv4_address',
+    'project_settings:log_drains',
+    'database:replication',
+    'infrastructure:read_replicas',
   ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isBranch = selectedProject?.parent_project_ref
+  const isFreePlan = selectedOrg?.plan?.id === 'free'
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -92,7 +174,54 @@ export const Addons = () => {
   } = useProjectAddonsQuery({ projectRef })
 
   const selectedAddons = addons?.selected_addons ?? []
-  const { pitr, customDomain, ipv4 } = getAddons(selectedAddons)
+  const { pitr, customDomain, ipv4, computeInstance } = getAddons(selectedAddons)
+
+  // These add-ons are configured on their own pages, so we only read their state here
+  const { data: logDrains, isPending: isLoadingLogDrains } = useLogDrainsQuery(
+    { ref: projectRef },
+    { enabled: projectSettingsLogDrains }
+  )
+  const { data: pipelinesData, isPending: isLoadingPipelines } = useReplicationPipelinesQuery(
+    { projectRef },
+    // No retries: a project without Pipelines set up errors, which should read as "Disabled"
+    { enabled: databaseReplication, retry: false }
+  )
+  const { data: databases, isPending: isLoadingReplicas } = useReadReplicasQuery(
+    { projectRef },
+    { enabled: infrastructureReadReplicas }
+  )
+  const { data: diskData, isPending: isLoadingDisk } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled: isAws }
+  )
+  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
+
+  const advancedDiskEnabled = isAdvancedDiskEnabled(diskData?.attributes)
+  const replicaCount = countReadReplicas(databases ?? [], projectRef)
+  const logDrainCount = logDrains?.length ?? 0
+  const pipelineCount = pipelinesData?.pipelines.length ?? 0
+  const computeSize = computeInstance?.variant.identifier
+  const computeEnabled = isComputeAddonEnabled(computeSize)
+  const availableAddons = addons?.available_addons ?? []
+  const lowestIpv4Price = getLowestPaidPrice(availableAddons, 'ipv4')
+  const lowestCustomDomainPrice = getLowestPaidPrice(availableAddons, 'custom_domain')
+  const lowestPitrPrice = getLowestPaidPrice(availableAddons, 'pitr')
+  const lowestComputePrice = getLowestPaidPrice(availableAddons, 'compute_instance', [
+    DEFAULT_COMPUTE_SIZE,
+  ])
+  const computeMeta = availableAddons
+    .find((addon) => addon.type === 'compute_instance')
+    ?.variants.find((variant) => variant.identifier === computeSize)?.meta
+  const computeDetail = computeEnabled
+    ? [
+        computeSize ? getComputeCpuLabel(computeSize, computeMeta?.cpu_cores) : undefined,
+        computeMeta?.memory_gb ? `${computeMeta.memory_gb} GB` : undefined,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : `from ${formatCurrency(lowestComputePrice)} / month`
+  const smsMfaEnabled =
+    authConfig?.MFA_PHONE_ENROLL_ENABLED === true || authConfig?.MFA_PHONE_VERIFY_ENABLED === true
 
   const canUpdateIPv4 = settings?.db_ip_addr_config === 'ipv6'
 
@@ -148,9 +277,9 @@ export const Addons = () => {
     isOrioleDbInAws,
   })
 
+  const getDisabledReason = (reason?: string) => (isFreePlan ? FREE_PLAN_REASON : reason)
+
   const listTopSpacing = isBranch ? 'mt-6' : undefined
-  const resourceItemClassName =
-    'min-h-[128px] border-b! last:border-b-0! [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
 
   let pitrAlert = null
 
@@ -211,7 +340,21 @@ export const Addons = () => {
 
   return (
     <PageContainer size="default">
-      <PageSection className="last:pb-0 gap-0">
+      <PageSection className="gap-0 pb-16">
+        {isFreePlan && (
+          <UpgradeToPro
+            className="mb-6"
+            primaryText="Upgrade to Pro to use add-ons"
+            secondaryText="Add-ons aren't available on the Free plan. Upgrade to configure compute, backups, networking and more."
+            source="addons"
+          />
+        )}
+        {!isFreePlan && (
+          <Admonition type="default" className="mb-6" title="Billed by the hour">
+            Add-ons are charged with your plan at the end of each billing cycle. Remove one and you
+            stop paying for it.
+          </Admonition>
+        )}
         <HighAvailabilityDisabledSectionNotice
           className="mb-4"
           title="Add-ons unavailable on High Availability projects"
@@ -237,11 +380,9 @@ export const Addons = () => {
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="flex min-h-[128px] items-center gap-4 border-b px-6 py-4 last:border-b-none"
+                className="flex items-center gap-3 border-b px-4 py-3 last:border-b-0"
               >
-                <div className="hidden @lg:flex h-24 w-40 shrink-0 items-center justify-center rounded-lg border">
-                  <div className="shimmering-loader h-full w-full rounded-lg" />
-                </div>
+                <div className="shimmering-loader size-8 shrink-0 rounded-lg" />
                 <div className="flex-1">
                   <HorizontalShimmerWithIcon />
                 </div>
@@ -253,167 +394,244 @@ export const Addons = () => {
         {isError && <AlertError error={error} subject="Failed to retrieve project add-ons" />}
 
         {isSuccess && (
-          <ResourceList className={listTopSpacing}>
-            {projectAddonsDedicatedIpv4Address && (
-              <ResourceItem
-                className={resourceItemClassName}
-                onClick={canOpenIPv4 ? () => setPanel('ipv4') : undefined}
-                media={
-                  <img
-                    className="bg rounded-lg border"
-                    alt=""
-                    aria-hidden="true"
-                    width={160}
-                    height={96}
-                    src={
-                      ipv4Enabled
-                        ? `${BASE_PATH}/img/ipv4-on${resolvedTheme?.includes('dark') ? '' : '--light'}.svg?v=2`
-                        : `${BASE_PATH}/img/ipv4-off${resolvedTheme?.includes('dark') ? '' : '--light'}.svg?v=2`
-                    }
-                  />
-                }
-                meta={
-                  <div className="flex items-center gap-4">
-                    {ipv4Enabled ? (
-                      <Badge variant="success">Enabled</Badge>
-                    ) : (
-                      <Badge variant="default">Disabled</Badge>
-                    )}
-                    {!canOpenIPv4 && ipv4DisabledReason && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
-                        </TooltipTrigger>
-                        <TooltipContent>{ipv4DisabledReason}</TooltipContent>
-                      </Tooltip>
-                    )}
-                  </div>
-                }
-              >
-                <div className="space-y-1">
-                  <div>Dedicated IPv4 address</div>
-                  <p className="m-0 text-foreground-light text-sm">
-                    Reserve a dedicated IPv4 address for your project.
-                  </p>
-                  <InlineLink
-                    className="text-foreground-light"
-                    href={`${DOCS_URL}/guides/platform/ipv4-address`}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    About IPv4 deprecation
-                  </InlineLink>
-                </div>
-              </ResourceItem>
+          <div className={listTopSpacing}>
+            {(projectAddonsDedicatedIpv4Address || projectSettingsCustomDomains) && (
+              <AddonGroup label="Networking">
+                <ResourceList>
+                  {projectAddonsDedicatedIpv4Address && (
+                    <AddonRow
+                      icon={<GlobeIcon size={16} strokeWidth={1.5} />}
+                      title="Dedicated IPv4 address"
+                      description="Reserve a dedicated IPv4 address for your project."
+                      descriptionAction={docsLink('/guides/platform/ipv4-address')}
+                      isEnabled={ipv4Enabled}
+                      status={ipv4Enabled ? 'Enabled' : 'Disabled'}
+                      detail={`${ipv4Enabled ? '' : 'from '}${formatCurrency(
+                        ipv4Enabled ? ipv4.variant.price : lowestIpv4Price
+                      )} / month`}
+                      action={
+                        <PanelActionButton
+                          label="Configure"
+                          disabledReason={getDisabledReason(
+                            canOpenIPv4 ? undefined : ipv4DisabledReason
+                          )}
+                          onClick={() => setPanel('ipv4')}
+                        />
+                      }
+                    />
+                  )}
+                  {projectSettingsCustomDomains && (
+                    <AddonRow
+                      icon={<LinkIcon size={16} strokeWidth={1.5} />}
+                      title="Custom domain"
+                      description="Serve your project on your own domain name."
+                      descriptionAction={docsLink('/guides/platform/custom-domains')}
+                      isEnabled={customDomainEnabled}
+                      status={customDomainEnabled ? 'Enabled' : 'Disabled'}
+                      detail={`${formatCurrency(
+                        customDomainEnabled ? customDomain.variant.price : lowestCustomDomainPrice
+                      )} / month`}
+                      action={
+                        <PanelActionButton
+                          label="Configure"
+                          disabledReason={getDisabledReason(
+                            canOpenCustomDomain ? undefined : customDomainDisabledReason
+                          )}
+                          onClick={() => setPanel('customDomain')}
+                        />
+                      }
+                    />
+                  )}
+                </ResourceList>
+              </AddonGroup>
             )}
 
-            <ResourceItem
-              className={resourceItemClassName}
-              onClick={canOpenPITR ? () => setPanel('pitr') : undefined}
-              media={
-                <img
-                  className="bg rounded-lg border"
-                  alt=""
-                  aria-hidden="true"
-                  width={160}
-                  height={96}
-                  src={
-                    pitrEnabled
-                      ? `${BASE_PATH}/img/pitr-on${resolvedTheme?.includes('dark') ? '' : '--light'}.svg`
-                      : `${BASE_PATH}/img/pitr-off${resolvedTheme?.includes('dark') ? '' : '--light'}.svg`
+            <AddonGroup label="Database">
+              <ResourceList>
+                <AddonRow
+                  icon={<CpuIcon size={16} strokeWidth={1.5} />}
+                  title="Compute size"
+                  description="Choose the CPU and memory available to your database."
+                  descriptionAction={docsLink('/guides/platform/compute-and-disk')}
+                  isEnabled={computeEnabled}
+                  status={
+                    computeEnabled ? (getComputeSizeLabel(computeSize) ?? 'Enabled') : 'Disabled'
+                  }
+                  detail={computeDetail}
+                  action={
+                    <ConfigureLinkButton isDisabled={isFreePlan}>
+                      <Link
+                        to="/project/$ref/settings/infrastructure"
+                        params={{ ref: projectRef ?? '' }}
+                        hash="compute"
+                      >
+                        Configure
+                      </Link>
+                    </ConfigureLinkButton>
                   }
                 />
-              }
-              meta={
-                <div className="flex items-center gap-4">
-                  {pitrEnabled ? (
-                    <Badge variant="success">Enabled</Badge>
-                  ) : (
-                    <Badge variant="default">Disabled</Badge>
-                  )}
-                  {!canOpenPITR && pitrDisabledReason && (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
-                      </TooltipTrigger>
-                      <TooltipContent>{pitrDisabledReason}</TooltipContent>
-                    </Tooltip>
-                  )}
-                </div>
-              }
-            >
-              <div className="space-y-1">
-                <div>Point in time recovery</div>
-                <p className="m-0 text-foreground-light text-sm">
-                  Restore your database to a specific moment in the past.
-                </p>
-                <InlineLink
-                  href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-                  className="text-foreground-light"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  About PITR backups
-                </InlineLink>
-              </div>
-            </ResourceItem>
-
-            {pitrAlert}
-
-            {projectSettingsCustomDomains && (
-              <ResourceItem
-                className={resourceItemClassName}
-                onClick={canOpenCustomDomain ? () => setPanel('customDomain') : undefined}
-                media={
-                  <img
-                    className="bg rounded-lg border"
-                    alt=""
-                    aria-hidden="true"
-                    width={160}
-                    height={96}
-                    src={
-                      customDomainEnabled
-                        ? `${BASE_PATH}/img/custom-domain-on${
-                            resolvedTheme?.includes('dark') ? '' : '--light'
-                          }.svg`
-                        : `${BASE_PATH}/img/custom-domain-off${
-                            resolvedTheme?.includes('dark') ? '' : '--light'
-                          }.svg`
+                {infrastructureReadReplicas && (
+                  <AddonRow
+                    icon={<CopyIcon size={16} strokeWidth={1.5} />}
+                    title="Read replicas"
+                    description="Deploy read-only copies of your database across regions."
+                    descriptionAction={docsLink('/guides/platform/read-replicas')}
+                    isEnabled={replicaCount > 0}
+                    status={
+                      isLoadingReplicas
+                        ? undefined
+                        : replicaCount > 0
+                          ? getActiveCountLabel(replicaCount)
+                          : 'Disabled'
+                    }
+                    detail="Billed per replica"
+                    action={
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
+                        <Link
+                          to="/project/$ref/settings/infrastructure"
+                          params={{ ref: projectRef ?? '' }}
+                          hash="read-replicas"
+                        >
+                          Configure
+                        </Link>
+                      </ConfigureLinkButton>
                     }
                   />
-                }
-                meta={
-                  <div className="flex items-center gap-4">
-                    {customDomainEnabled ? (
-                      <Badge variant="success">Enabled</Badge>
-                    ) : (
-                      <Badge variant="default">Disabled</Badge>
-                    )}
-                    {!canOpenCustomDomain && customDomainDisabledReason && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
-                        </TooltipTrigger>
-                        <TooltipContent>{customDomainDisabledReason}</TooltipContent>
-                      </Tooltip>
-                    )}
-                  </div>
-                }
-              >
-                <div className="space-y-1">
-                  <div>Custom domain</div>
-                  <p className="m-0 text-foreground-light text-sm">
-                    Serve your project on your own domain name.
-                  </p>
-                  <InlineLink
-                    href={`${DOCS_URL}/guides/platform/custom-domains`}
-                    className="text-foreground-light"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    About custom domains
-                  </InlineLink>
-                </div>
-              </ResourceItem>
+                )}
+                <AddonRow
+                  icon={<HistoryIcon size={16} strokeWidth={1.5} />}
+                  title="Point in time recovery"
+                  description="Restore your database to a specific moment in the past."
+                  descriptionAction={docsLink('/guides/platform/backups#point-in-time-recovery')}
+                  isEnabled={pitrEnabled}
+                  status={pitrEnabled ? 'Enabled' : 'Disabled'}
+                  detail={
+                    pitrEnabled
+                      ? `${formatCurrency(pitr.variant.price)} / month`
+                      : `from ${formatCurrency(lowestPitrPrice)} / month`
+                  }
+                  action={
+                    <PanelActionButton
+                      label="Configure"
+                      disabledReason={getDisabledReason(
+                        canOpenPITR ? undefined : pitrDisabledReason
+                      )}
+                      onClick={() => setPanel('pitr')}
+                    />
+                  }
+                />
+                {pitrAlert}
+                {isAws && (
+                  <AddonRow
+                    icon={<HardDriveIcon size={16} strokeWidth={1.5} />}
+                    title="Advanced Disk"
+                    description="Provision IOPS and throughput, or configure a high-performance disk."
+                    descriptionAction={docsLink('/guides/platform/compute-and-disk#disk')}
+                    isEnabled={advancedDiskEnabled}
+                    status={
+                      isLoadingDisk ? undefined : advancedDiskEnabled ? 'Enabled' : 'Disabled'
+                    }
+                    detail={getAdvancedDiskDetail(diskData?.attributes)}
+                    action={
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
+                        <Link
+                          to="/project/$ref/settings/infrastructure"
+                          params={{ ref: projectRef ?? '' }}
+                          hash="advanced"
+                        >
+                          Configure
+                        </Link>
+                      </ConfigureLinkButton>
+                    }
+                  />
+                )}
+                {databaseReplication && (
+                  <AddonRow
+                    icon={<WorkflowIcon size={16} strokeWidth={1.5} />}
+                    title="Pipelines"
+                    description="Replicate database changes to external destinations."
+                    descriptionAction={docsLink('/guides/database/replication/pipelines')}
+                    isEnabled={pipelineCount > 0}
+                    status={
+                      isLoadingPipelines
+                        ? undefined
+                        : pipelineCount > 0
+                          ? getActiveCountLabel(pipelineCount)
+                          : 'Disabled'
+                    }
+                    detail="Usage based"
+                    action={
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
+                        <Link
+                          to="/project/$ref/database/pipelines"
+                          params={{ ref: projectRef ?? '' }}
+                        >
+                          Configure
+                        </Link>
+                      </ConfigureLinkButton>
+                    }
+                  />
+                )}
+              </ResourceList>
+            </AddonGroup>
+
+            {projectSettingsLogDrains && (
+              <AddonGroup label="Observability">
+                <ResourceList>
+                  <AddonRow
+                    icon={<ScrollTextIcon size={16} strokeWidth={1.5} />}
+                    title="Log drains"
+                    description="Send your project logs to external destinations."
+                    descriptionAction={docsLink('/guides/telemetry/log-drains')}
+                    isEnabled={logDrainCount > 0}
+                    status={
+                      isLoadingLogDrains
+                        ? undefined
+                        : logDrainCount > 0
+                          ? getActiveCountLabel(logDrainCount)
+                          : 'Disabled'
+                    }
+                    detail={LOG_DRAIN_PRICE_LABEL}
+                    action={
+                      <ConfigureLinkButton isDisabled={isFreePlan}>
+                        <Link
+                          to="/project/$ref/settings/log-drains"
+                          params={{ ref: projectRef ?? '' }}
+                        >
+                          Configure
+                        </Link>
+                      </ConfigureLinkButton>
+                    }
+                  />
+                </ResourceList>
+              </AddonGroup>
             )}
-          </ResourceList>
+
+            <AddonGroup label="Auth">
+              <ResourceList>
+                <AddonRow
+                  icon={<MessageSquareLockIcon size={16} strokeWidth={1.5} />}
+                  title="Advanced Multi-Factor Auth - SMS"
+                  description="Let users verify sign-ins with a code sent by SMS."
+                  descriptionAction={docsLink('/guides/auth/auth-mfa/phone')}
+                  isEnabled={smsMfaEnabled}
+                  status={isLoadingAuthConfig ? undefined : smsMfaEnabled ? 'Enabled' : 'Disabled'}
+                  detail={SMS_MFA_PRICE_LABEL}
+                  action={
+                    <ConfigureLinkButton isDisabled={isFreePlan}>
+                      <Link
+                        to="/project/$ref/auth/mfa"
+                        params={{ ref: projectRef ?? '' }}
+                        hash="sms-mfa"
+                      >
+                        Configure
+                      </Link>
+                    </ConfigureLinkButton>
+                  }
+                />
+              </ResourceList>
+            </AddonGroup>
+          </div>
         )}
 
         {!isHighAvailability && (
