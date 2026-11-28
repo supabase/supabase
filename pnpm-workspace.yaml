@@ -137,4 +137,5 @@ overrides:
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
+  '@tanstack/router-core@1.171.37': patches/@tanstack__router-core@1.171.37.patch
   react-data-grid: patches/react-data-grid.patch

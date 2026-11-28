@@ -1,0 +1,36 @@
+diff --git a/dist/cjs/router.cjs b/dist/cjs/router.cjs
+index 68b6ef850a1e1cd10d492dff39b8542adcc372db..8459ab6dbe13aa0ed0e9daab3c3f499aeef6ac04 100644
+--- a/dist/cjs/router.cjs
++++ b/dist/cjs/router.cjs
+@@ -398,9 +398,11 @@ var RouterCore = class {
+ 			const commitPromise = new Promise((done) => {
+ 				resolve = done;
+ 			});
++			const pendingResolves = previousCommitPromise?._pendingResolves ?? [];
++			pendingResolves.push(resolve);
++			commitPromise._pendingResolves = pendingResolves;
+ 			commitPromise.resolve = () => {
+-				resolve();
+-				previousCommitPromise?.resolve();
++				for (const pendingResolve of pendingResolves.splice(0)) pendingResolve();
+ 			};
+ 			this._commitPromise = commitPromise;
+ 			if (isSameLocation) this.load();
+diff --git a/dist/esm/router.js b/dist/esm/router.js
+index a31886020d1dfff3c10ee27fea6ae781e6211f9a..57af6131490a0f597185fbe3c647100f2032e9f3 100644
+--- a/dist/esm/router.js
++++ b/dist/esm/router.js
+@@ -398,9 +398,11 @@ var RouterCore = class {
+ 			const commitPromise = new Promise((done) => {
+ 				resolve = done;
+ 			});
++			const pendingResolves = previousCommitPromise?._pendingResolves ?? [];
++			pendingResolves.push(resolve);
++			commitPromise._pendingResolves = pendingResolves;
+ 			commitPromise.resolve = () => {
+-				resolve();
+-				previousCommitPromise?.resolve();
++				for (const pendingResolve of pendingResolves.splice(0)) pendingResolve();
+ 			};
+ 			this._commitPromise = commitPromise;
+ 			if (isSameLocation) this.load();
