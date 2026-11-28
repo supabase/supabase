@@ -16,6 +16,7 @@ import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -39,12 +40,18 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ ref: 'default' }),
   useFeatureFlags: () => ({ hasLoaded: options.flagsLoaded }),
 }))
-vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  usePipelineCreationPreview: () => ({
-    isEnabled: options.wizard,
-    isLoading: options.previewLoading,
-  }),
-}))
+vi.mock(
+  '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext',
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext')
+    >()),
+    usePipelineCreationPreview: () => ({
+      isEnabled: options.wizard,
+      isLoading: options.previewLoading,
+    }),
+  })
+)
 vi.mock('./useIsPipelinesEnabled', () => ({
   useIsPipelinesBigQueryEnabled: () => options.bigQueryEnabled,
   useIsPipelinesDuckLakeEnabled: () => false,
@@ -140,7 +147,7 @@ beforeEach(() => {
   })
 })
 const listPath = '/project/default/database/pipelines'
-const renderList = async (waitForSources = true, clusterId?: string) => {
+const mountList = async (clusterId?: string) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createRouter({
     routeTree: createRootRoute(),
@@ -153,19 +160,25 @@ const renderList = async (waitForSources = true, clusterId?: string) => {
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient} nuqs={{ hasMemory: true }}>
         <RouterContextProvider router={router}>
-          <ReplicationClusterProvider clusterId={clusterId}>{children}</ReplicationClusterProvider>
+          <ReplicationClusterProvider clusterId={clusterId}>
+            <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
+          </ReplicationClusterProvider>
         </RouterContextProvider>
       </CustomWrapper>
     ),
   })
+  return { ...view, router, queryClient }
+}
+const renderList = async (waitForSources = true, clusterId?: string) => {
+  const view = await mountList(clusterId)
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status).toBe(
-        'success'
-      )
+      expect(
+        view.queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status
+      ).toBe('success')
     )
-  return { ...view, router }
+  return view
 }
 const addPipeline = () =>
   fireEvent.click(screen.getAllByRole('button', { name: 'Add pipeline' })[0])
@@ -343,4 +356,91 @@ test('keeps request-access creation in the sheet when no wizard destination is a
     await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
   ).toBeInTheDocument()
   expect(router.history.location.href).toBe(listPath)
+})
+
+test('sorts populated pipeline rows by name and status and filters them by name', async () => {
+  isEnabled = true
+  const destinations = [
+    { id: 1, name: 'Zulu sync' },
+    { id: 2, name: 'Alpha export' },
+  ].map((destination) => ({
+    ...destination,
+    tenant_id: 'tenant',
+    config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
+  }))
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/destinations',
+    response: () =>
+      HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({ destinations }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/destinations/:destination_id',
+    response: ({ params }) => {
+      const destination = destinations.find(({ id }) => String(id) === params.destination_id)
+      if (!destination)
+        return HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 })
+      return HttpResponse.json<components['schemas']['DestinationResponse_Output']>(destination)
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines',
+    response: () =>
+      HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+        pipelines: destinations.map(({ id, name, tenant_id }) => ({
+          id: String(id),
+          cluster_id: '1',
+          tenant_id,
+          source_id: 42,
+          source_name: 'default',
+          destination_id: id,
+          destination_name: name,
+          replicator_id: id,
+          config: { publication_name: 'publication' },
+        })),
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+    response: ({ params }) =>
+      HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+        pipeline_id: String(params.pipeline_id),
+        status: { name: params.pipeline_id === '1' ? 'failed' : 'started' },
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+    response: ({ params }) =>
+      HttpResponse.json<components['schemas']['PipelineReplicationStatusResponse_Output']>({
+        pipeline_id: String(params.pipeline_id),
+        table_statuses: [],
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
+    response: ({ params }) =>
+      HttpResponse.json<components['schemas']['PipelineVersionResponse_Output']>({
+        pipeline_id: String(params.pipeline_id),
+        version: { id: 1, name: 'v1' },
+      }),
+  })
+
+  await mountList()
+  const alpha = await screen.findByRole('row', { name: /Alpha export.*Running/ })
+  const zulu = await screen.findByRole('row', { name: /Zulu sync.*Failed/ })
+  const pipelineRows = () => screen.getAllByRole('row').slice(1)
+  expect(pipelineRows()).toEqual([alpha, zulu])
+  fireEvent.click(screen.getByRole('button', { name: 'Name' }))
+  expect(pipelineRows()).toEqual([zulu, alpha])
+  fireEvent.click(screen.getByRole('button', { name: 'Status' }))
+  expect(pipelineRows()).toEqual([zulu, alpha])
+  fireEvent.click(screen.getByRole('button', { name: 'Status' }))
+  expect(pipelineRows()).toEqual([alpha, zulu])
+  fireEvent.change(screen.getByPlaceholderText('Search pipelines'), { target: { value: 'ZULU' } })
+  expect(pipelineRows()).toEqual([zulu])
 })

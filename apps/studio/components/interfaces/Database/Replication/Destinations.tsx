@@ -1,9 +1,9 @@
-import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -29,29 +29,21 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { getStatusName } from './Pipeline.utils'
-import { PipelineStatusName } from './Replication.constants'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from './useIsPipelinesEnabled'
+import { usePipelineList } from './usePipelineList'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
-import {
-  replicationPipelineStatusQueryOptions,
-  type ReplicationPipelineStatusData,
-} from '@/data/replication/pipeline-status-query'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -62,39 +54,6 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type DestinationSortColumn = 'name' | 'status'
 type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
-
-// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
-const STATUS_SORT_ORDER: PipelineStatusName[] = [
-  PipelineStatusName.FAILED,
-  PipelineStatusName.STOPPED,
-  PipelineStatusName.STOPPING,
-  PipelineStatusName.STARTING,
-  PipelineStatusName.STARTED,
-  PipelineStatusName.UNKNOWN,
-]
-
-// Keyed by pipeline id from the responses themselves, so this never closes over component state.
-const combinePipelineStatuses = (
-  results: { data?: ReplicationPipelineStatusData }[]
-): Map<string, PipelineStatusName | undefined> =>
-  new Map(
-    results
-      .map((result) => result.data)
-      .filter((data): data is ReplicationPipelineStatusData => data !== undefined)
-      .map((data) => [data.pipeline_id, getStatusName(data.status)])
-  )
-
-const compareStatusNames = (
-  a: PipelineStatusName | undefined,
-  b: PipelineStatusName | undefined,
-  direction: 'asc' | 'desc'
-) => {
-  if (a === undefined) return b === undefined ? 0 : 1
-  if (b === undefined) return -1
-
-  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
-  return direction === 'asc' ? comparison : -comparison
-}
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -133,51 +92,6 @@ export const Destinations = () => {
     })
   )
 
-  const {
-    data: destinationsData,
-    error: destinationsError,
-    isPending: isDestinationsLoading,
-    isError: isDestinationsError,
-    isSuccess: isDestinationsSuccess,
-  } = useReplicationDestinationsQuery({
-    projectRef,
-    clusterId,
-  })
-  const destinations = useMemo(
-    () => destinationsData?.destinations ?? [],
-    [destinationsData?.destinations]
-  )
-  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
-  const filteredDestinations = useMemo(
-    () =>
-      filterString.length === 0
-        ? destinations
-        : destinations.filter((destination) =>
-            destination.name.toLowerCase().includes(filterString.toLowerCase())
-          ),
-    [destinations, filterString]
-  )
-
-  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
-    projectRef,
-    clusterId,
-  })
-  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
-
-  // Sorting by status needs every pipeline's status up here, not just inside each row. These share
-  // the rows' query keys, so each status is still only fetched once.
-  const statusByPipelineId = useQueries({
-    queries: pipelines.map((pipeline) =>
-      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id, clusterId })
-    ),
-    combine: combinePipelineStatuses,
-  })
-
-  const getDestinationStatus = (destinationId: number) => {
-    const pipeline = pipelines.find((p) => p.destination_id === destinationId)
-    return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
-  }
-
   const [sort, setSort] = useState<DestinationSort>('name:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
 
@@ -191,35 +105,32 @@ export const Destinations = () => {
     setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
   }
 
-  // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
-  // here would never hit. Sorting a handful of destinations per render costs nothing.
-  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
-    if (sortColumn === 'status') {
-      const nameComparison = a.name.localeCompare(b.name)
-
-      return (
-        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
-        (sortDirection === 'asc' ? nameComparison : -nameComparison)
-      )
-    }
-
-    const comparison = a.name.localeCompare(b.name)
-    return sortDirection === 'asc' ? comparison : -comparison
+  const { clusterResults, sortedDestinations } = usePipelineList({
+    projectRef,
+    groups: [{ clusterId }],
+    filterString,
+    sortColumn,
+    sortDirection,
   })
-
+  const { destinationsResult, pipelinesResult, sourcesResult, destinations, pipelines } =
+    clusterResults[0]
+  const {
+    error: destinationsError,
+    isPending: isDestinationsLoading,
+    isError: isDestinationsError,
+    isSuccess: isDestinationsSuccess,
+  } = destinationsResult
+  const hasDestinations = isDestinationsSuccess && destinations.length > 0
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = pipelinesResult
   const {
     data: sourcesData,
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
     refetch: refetchSources,
-  } = useReplicationSourcesQuery({
-    projectRef,
-    clusterId,
-  })
-  const externalReplicationSource = useMemo(
-    () => sourcesData?.sources.find((source) => source.name === projectRef),
-    [projectRef, sourcesData?.sources]
+  } = sourcesResult
+  const externalReplicationSource = sourcesData?.sources.find(
+    (source) => source.name === projectRef
   )
   const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
 
@@ -479,13 +390,13 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedDestinations.map((destination) => (
+                  {sortedDestinations.map(({ destination }) => (
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isDestinationsLoading &&
-                    filteredDestinations.length === 0 &&
-                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
+                  {!isDestinationsLoading && sortedDestinations.length === 0 && hasDestinations && (
+                    <TableRowNoResults colSpan={6} search={filterString} />
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
