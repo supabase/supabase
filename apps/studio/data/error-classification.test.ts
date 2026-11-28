@@ -4,6 +4,7 @@ import {
   classifyError,
   classifyResponseError,
   classifySqlResponseError,
+  isAuthFailure,
   isRequestAborted,
   isUserFaultForSql,
   isUserFaultForValues,
@@ -97,6 +98,23 @@ describe('classifyResponseError', () => {
     })
     expect(err.endpoint).toBe('/platform/projects/{ref}')
     expect(err.service).toBe('management-api')
+  })
+})
+
+describe('isAuthFailure', () => {
+  it.each([
+    [401, true],
+    [403, true],
+    [400, false],
+    [404, false],
+    [429, false],
+    [500, false],
+  ])('is %s -> %s', (code, expected) => {
+    expect(isAuthFailure(classifyResponseError({ message: 'x', code }))).toBe(expected)
+  })
+
+  it('is false for errors that are not API responses', () => {
+    expect(isAuthFailure(classifyError(new TypeError('Failed to fetch')))).toBe(false)
   })
 })
 

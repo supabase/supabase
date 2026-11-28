@@ -2,6 +2,7 @@ import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
 
 import { permissionKeys } from './keys'
+import { isAuthFailure } from '@/data/error-classification'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -13,6 +14,8 @@ export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
   if (error) {
     handleError(error, {
+      // A session that is signed out, expired, or not through MFA yet gets a 401 or 403 here
+      shouldReport: (err) => !isAuthFailure(err),
       sentryContext: {
         tags: {
           permissionsQuery: true,
