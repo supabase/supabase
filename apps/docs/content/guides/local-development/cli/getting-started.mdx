@@ -445,7 +445,7 @@ If you have any Supabase containers running locally, stop them and delete their 
 
 ## Telemetry
 
-The Supabase CLI collects telemetry data about general usage. Participating in this program is optional, and you can opt out at any time.
+The Supabase CLI collects usage data, such as the commands you run, to help improve the CLI. The data is linked to a device ID and, when you authenticate the CLI, to your Supabase account. Telemetry is optional, and you can opt out at any time.
 
 ### How to opt out
 
@@ -463,7 +463,9 @@ The Supabase CLI collects telemetry data about general usage. Participating in t
 
 To enable telemetry again, run `supabase telemetry enable`.
 
-You can also opt out using the `SUPABASE_TELEMETRY_DISABLED=1` environment variable. The broader `DO_NOT_TRACK=1` convention is also respected.
+You can also opt out with an environment variable. Set `SUPABASE_TELEMETRY_DISABLED=1` or `DO_NOT_TRACK=1`. The value must be exactly `1`.
+
+The CLI also checks GitHub for a newer CLI release after a command succeeds. This check is separate from telemetry. To turn it off, set `SUPABASE_NO_UPDATE_NOTIFIER=1`.
 
 ## Learn more
 
