@@ -53,6 +53,8 @@ set statement_timeout TO '4s'; -- set custom timeout
 
 This is mostly for recurring functions that need a special exemption for runtimes.
 
+The Database REST API applies the setting before it runs the request, so it only takes effect when this function is the one being called, for example with `supabase.rpc('myfunc')`. It doesn't apply when the function is called from another function, from the SQL Editor, or over a direct or pooler connection. Postgres doesn't change the timeout of a statement that is already running, so in those cases the caller's timeout still applies.
+
 ### Role level
 
 This sets the timeout for a specific role.
