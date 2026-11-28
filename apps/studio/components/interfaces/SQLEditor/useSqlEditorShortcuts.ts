@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react'
 import { resolveDiffKeyAction } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { detectOS } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -34,6 +35,7 @@ export function useSqlEditorShortcuts({
   const router = useRouter()
   const { ref } = useParams()
   const { editor, refocusEditor } = useSQLEditorContext()
+  const track = useTrack()
 
   const openNewSnippet = useCallback(() => {
     if (!ref) return
@@ -51,7 +53,12 @@ export function useSqlEditorShortcuts({
     registerInCommandMenu: true,
   })
 
-  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
+  const prettifyFromShortcut = useCallback(() => {
+    prettifyQuery()
+    track('sql_editor_prettify_clicked', { trigger: 'shortcut' })
+  }, [prettifyQuery, track])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyFromShortcut, {
     registerInCommandMenu: true,
   })
 

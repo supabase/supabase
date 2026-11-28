@@ -1968,6 +1968,205 @@ export interface SqlEditorQueryRunButtonClickedEvent {
   properties: {
     /** Which backend the query ran against. */
     source: 'database' | 'logs'
+    /** Whether the user ran only the selected part of the snippet. */
+    hasSelection: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User prettified the SQL in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorPrettifyClickedEvent {
+  action: 'sql_editor_prettify_clicked'
+  properties: {
+    /**
+     * How the user prettified the SQL: the toolbar button or its More actions menu item,
+     * the editor's context menu, or the Alt+Shift+F shortcut (also run from the command menu).
+     */
+    trigger: 'toolbar' | 'context_menu' | 'shortcut'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User added or removed the current snippet from favorites in the SQL editor toolbar.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetFavoriteUpdatedEvent {
+  action: 'sql_editor_snippet_favorite_updated'
+  properties: {
+    /** Whether the snippet is a favorite after the change. */
+    isFavorite: boolean
+    /** Where the user changed the favorite: the toolbar button or its More actions menu item. */
+    trigger: 'toolbar'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User saved the current snippet by hand in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorSaveClickedEvent {
+  action: 'sql_editor_save_clicked'
+  properties: {
+    /** How the user saved: the Save button, Cmd/Ctrl+S, or the editor's context menu. */
+    trigger: 'button' | 'shortcut' | 'context_menu'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User picked the Postgres role to run queries or view data as.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id} or /dashboard/project/{ref}/editor/{id}
+ */
+export interface RoleImpersonationUpdatedEvent {
+  action: 'role_impersonation_updated'
+  properties: {
+    /** The role the user picked. `postgres` is the default superuser role. */
+    role: 'postgres' | 'anon' | 'authenticated'
+    /** The editor the role selector is in. */
+    surface: 'sql_editor' | 'table_editor'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User picked the database to run queries against in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorDatabaseUpdatedEvent {
+  action: 'sql_editor_database_updated'
+  properties: {
+    /** Whether the user picked the primary database or a read replica. */
+    databaseType: 'primary' | 'read_replica'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User changed the row limit of query results in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorRowLimitUpdatedEvent {
+  action: 'sql_editor_row_limit_updated'
+  properties: {
+    /** The row limit the user picked: 100, 500 or 1000, or -1 for no limit. */
+    rowLimit: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User switched the query source of the SQL editor between the database and logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorQuerySourceUpdatedEvent {
+  action: 'sql_editor_query_source_updated'
+  properties: {
+    /** The query source the user switched to. */
+    querySource: 'database' | 'logs'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a tab of the results panel in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorResultTabClickedEvent {
+  action: 'sql_editor_result_tab_clicked'
+  properties: {
+    /** The tab the user opened. */
+    tab: 'results' | 'chart'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User changed a chart option in the Chart tab of the SQL editor results panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorChartConfigUpdatedEvent {
+  action: 'sql_editor_chart_config_updated'
+  properties: {
+    /** The chart option the user changed. */
+    setting: 'x_axis' | 'y_axis' | 'cumulative' | 'show_labels' | 'show_grid' | 'flip'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a prompt in the SQL editor's inline AI widget (opened with Cmd/Ctrl+Shift+K).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorInlineAiSubmittedEvent {
+  action: 'sql_editor_inline_ai_submitted'
+  properties: {
+    /** Whether the user selected part of the SQL before opening the inline AI widget. */
+    hasSelection: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked "Explain Code" in the SQL editor's context menu.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorExplainCodeClickedEvent {
+  action: 'sql_editor_explain_code_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User toggled an editor setting in the SQL editor toolbar's More actions menu.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorSettingUpdatedEvent {
+  action: 'sql_editor_setting_updated'
+  properties: {
+    /** The setting the user toggled. */
+    setting: 'intellisense' | 'confirm_unsaved_changes'
+    /** Whether the setting is on after the toggle. */
+    enabled: boolean
   }
   groups: TelemetryGroups
 }
@@ -2058,6 +2257,10 @@ export interface StudioPricingPlanCtaClickedEvent {
      * The plan type the org is currently on.
      */
     currentPlan?: string
+    /**
+     * Whether the redesigned plan change screen is enabled for this user. Remove with the legacy dialog.
+     */
+    planUpdateRedesignEnabled: boolean
     /**
      * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
      */
@@ -2868,6 +3071,119 @@ export interface BranchDeleteButtonClickedEvent {
 }
 
 /**
+ * Triggered when a user saves a new project name in project settings.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectNameUpdatedEvent {
+  action: 'project_name_updated'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user copies the project ID or region from project settings.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectSettingsValueCopiedEvent {
+  action: 'project_settings_value_copied'
+  properties: {
+    /**
+     * The field that was copied
+     */
+    field: 'projectRef' | 'region'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user confirms a project lifecycle action: a full project restart, a fast
+ * database reboot, a pause, a resume, or a transfer to another organization.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general or /dashboard/project/{ref} (resume from the paused project state)
+ */
+export interface ProjectLifecycleActionSubmittedEvent {
+  action: 'project_lifecycle_action_submitted'
+  properties: {
+    /**
+     * The lifecycle action the user confirmed
+     */
+    action: 'restart_project' | 'restart_database' | 'pause' | 'resume' | 'transfer'
+    /**
+     * Where the action was confirmed from
+     */
+    source: 'settings_general' | 'project_home'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user toggles the high compliance (sensitive data) mode of a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectComplianceModeUpdatedEvent {
+  action: 'project_compliance_mode_updated'
+  properties: {
+    /**
+     * Whether the project is marked as storing sensitive data after the toggle
+     */
+    isSensitive: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user submits a step of the custom domain flow: adding the hostname,
+ * verifying its DNS records, activating it, or deleting the active custom domain.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface CustomDomainStepSubmittedEvent {
+  action: 'custom_domain_step_submitted'
+  properties: {
+    /**
+     * The step of the custom domain flow that was submitted
+     */
+    step: 'configure' | 'verify' | 'activate' | 'remove'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user copies the name or value of a DNS record shown in the custom domain
+ * verification step.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface CustomDomainDnsRecordCopiedEvent {
+  action: 'custom_domain_dns_record_copied'
+  properties: {
+    /**
+     * The type of DNS record that was copied
+     */
+    recordType: 'CNAME' | 'TXT'
+    /**
+     * Whether the record name or the record value was copied
+     */
+    field: 'name' | 'value'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Triggered when a create merge request is clicked for a branch.
  *
  * @group Events
@@ -3035,11 +3351,12 @@ export interface HomeActivityStatClickedEvent {
     /**
      * The type of activity stat clicked
      */
-    stat_type: 'migrations' | 'backups' | 'branches'
+    stat_type: 'compute' | 'github' | 'migrations' | 'backups' | 'branches'
     /**
-     * The current value of the stat
+     * The current value of the stat: the number of migrations, backups or branches,
+     * or 1 if a GitHub repository is connected and 0 if not. Not sent for compute.
      */
-    stat_value: number
+    stat_value?: number
   }
   groups: TelemetryGroups
 }
@@ -3133,6 +3450,55 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
+ * User copied a credential from the "Copy" popover next to the project URL on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectCredentialCopiedEvent {
+  action: 'home_project_credential_copied'
+  properties: {
+    /**
+     * The kind of credential copied. The copied value itself is never sent.
+     */
+    credentialType: 'project_url' | 'publishable_key' | 'direct_connection_string' | 'cli_setup'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Refresh" button of the custom report on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportRefreshClickedEvent {
+  action: 'home_custom_report_refresh_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a notebook action in the Notebooks section on the project homepage:
+ * "New notebook", "Create your first notebook" in the empty state, or "Analyze" on a notebook.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeNotebookActionClickedEvent {
+  action: 'home_notebook_action_clicked'
+  properties: {
+    /**
+     * The action clicked: creating a new notebook, or analyzing an existing one
+     */
+    action: 'create' | 'analyze'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Connect section was shown to the user on the project homepage.
  *
  * @group Events
@@ -3162,7 +3528,11 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
-export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+export type ConnectSheetSource =
+  | 'header_button'
+  | 'connect_section'
+  | 'keyboard_shortcut'
+  | 'home_popover'
 
 /**
  * User opened the ConnectSheet panel.
@@ -4506,8 +4876,7 @@ export interface AccessTokenDoneButtonClickedEvent {
 
 /**
  * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
- * `placement` identifying which one (the user dropdown, the org project-list usage card, or the
- * Free plan badge next to the organization name in the header).
+ * `placement` identifying which one (the user dropdown or the org project-list usage card).
  *
  * @group Events
  * @source studio
@@ -4515,7 +4884,7 @@ export interface AccessTokenDoneButtonClickedEvent {
 export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
-    placement: 'user_dropdown' | 'org_projects_list' | 'org_plan_badge'
+    placement: 'user_dropdown' | 'org_projects_list'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -5068,95 +5437,6 @@ export interface DatabaseSchemaVisualizerNodeMenuClickedEvent {
 }
 
 /**
- * User copied an API key with its Copy button on the API keys pages: a publishable or secret key,
- * or a legacy anon or service_role key. Keyboard copies from the key input are not counted. Not
- * fired when the copy is blocked by missing permissions or the clipboard write fails.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}/settings/api-keys
- * @page /project/{ref}/settings/api-keys/legacy
- */
-export interface ApiKeyCopiedEvent {
-  action: 'api_key_copied'
-  properties: {
-    /** Which key was copied */
-    keyType: 'publishable' | 'secret' | 'legacy_anon' | 'legacy_service_role'
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked to reveal a secret key (the new secret key or the legacy service_role key).
- * Publishable and legacy anon keys are always visible and don't fire this event.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}/settings/api-keys
- * @page /project/{ref}/settings/api-keys/legacy
- */
-export interface ApiKeyRevealClickedEvent {
-  action: 'api_key_reveal_clicked'
-  properties: {
-    /** Which key the user revealed */
-    keyType: 'secret' | 'legacy_service_role'
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * An API key was successfully created, either from the create dialog or the first-time setup.
- * The first-time setup creates a default publishable and secret key and fires once per key, so a
- * failed secret key doesn't lose the publishable key's event.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}/settings/api-keys
- */
-export interface ApiKeyCreatedEvent {
-  action: 'api_key_created'
-  properties: {
-    /** Which key was created */
-    keyType: 'publishable' | 'secret'
-    /** Where the user created the key */
-    source: 'create_dialog' | 'initial_setup'
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * An API key was successfully deleted after the user confirmed in the delete modal.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}/settings/api-keys
- */
-export interface ApiKeyRemovedEvent {
-  action: 'api_key_removed'
-  properties: {
-    /** Which key was deleted */
-    keyType: 'publishable' | 'secret'
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * Legacy JWT-based API keys (anon and service_role) were successfully disabled or re-enabled.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}/settings/api-keys/legacy
- */
-export interface LegacyApiKeysUpdatedEvent {
-  action: 'legacy_api_keys_updated'
-  properties: {
-    /** Whether the legacy keys are enabled after the update */
-    enabled: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -5287,6 +5567,18 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | SqlEditorPrettifyClickedEvent
+  | SqlEditorSnippetFavoriteUpdatedEvent
+  | SqlEditorSaveClickedEvent
+  | RoleImpersonationUpdatedEvent
+  | SqlEditorDatabaseUpdatedEvent
+  | SqlEditorRowLimitUpdatedEvent
+  | SqlEditorQuerySourceUpdatedEvent
+  | SqlEditorResultTabClickedEvent
+  | SqlEditorChartConfigUpdatedEvent
+  | SqlEditorInlineAiSubmittedEvent
+  | SqlEditorExplainCodeClickedEvent
+  | SqlEditorSettingUpdatedEvent
   | LogExplorerQueryRunButtonClickedEvent
   | StorageExplorerNavigateClickedEvent
   | StorageExplorerNavigateSubmittedEvent
@@ -5342,6 +5634,12 @@ export type TelemetryEvent =
   | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
+  | ProjectNameUpdatedEvent
+  | ProjectSettingsValueCopiedEvent
+  | ProjectLifecycleActionSubmittedEvent
+  | ProjectComplianceModeUpdatedEvent
+  | CustomDomainStepSubmittedEvent
+  | CustomDomainDnsRecordCopiedEvent
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
@@ -5361,6 +5659,9 @@ export type TelemetryEvent =
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent
   | HomeCustomReportBlockRemovedEvent
+  | HomeProjectCredentialCopiedEvent
+  | HomeCustomReportRefreshClickedEvent
+  | HomeNotebookActionClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
   | TableCreatedEvent
@@ -5439,10 +5740,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | ApiKeyCopiedEvent
-  | ApiKeyRevealClickedEvent
-  | ApiKeyCreatedEvent
-  | ApiKeyRemovedEvent
-  | LegacyApiKeysUpdatedEvent
   | WarehouseEnabledEvent
   | WarehouseDisabledEvent

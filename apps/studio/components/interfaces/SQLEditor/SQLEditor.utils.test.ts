@@ -18,6 +18,7 @@ import {
   createSqlSnippetSkeletonV2,
   deriveSnippetIdentity,
   extractDebugContext,
+  getEditorActionTrigger,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   getEditorSql,
@@ -991,5 +992,15 @@ describe('SQLEditor.utils:resolveConnectionString', () => {
   it('normalizes a null connectionString to undefined', () => {
     const databases = [buildDatabase({ identifier: 'primary', connectionString: null })]
     expect(resolveConnectionString(databases, 'primary')).toBeUndefined()
+  })
+})
+
+describe('getEditorActionTrigger', () => {
+  it('returns shortcut when Monaco runs the action with no arguments', () => {
+    expect(getEditorActionTrigger([])).toBe('shortcut')
+  })
+
+  it('returns context_menu when Monaco passes the model URI from the context menu', () => {
+    expect(getEditorActionTrigger([{ path: '/1' }])).toBe('context_menu')
   })
 })

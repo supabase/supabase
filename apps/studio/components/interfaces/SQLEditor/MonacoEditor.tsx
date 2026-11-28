@@ -5,11 +5,13 @@ import { RefObject, useRef } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
+import { getEditorActionTrigger } from './SQLEditor.utils'
 import { useSnippetEditor } from './useSnippetEditor'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
@@ -33,6 +35,7 @@ export type MonacoEditorProps = {
     afterSelection: string
     startLineNumber: number
     endLineNumber: number
+    hasSelection: boolean
   }) => void
   placeholder?: string
 }
@@ -53,6 +56,7 @@ export const MonacoEditor = ({
 }: MonacoEditorProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const track = useTrack()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -78,6 +82,11 @@ export const MonacoEditor = ({
   const { requestSave } = useSqlEditorSaveCoordinator()
   const requestSaveRef = useRef(requestSave)
   requestSaveRef.current = requestSave
+
+  // Monaco actions are registered once on mount, so read `track` through a ref to
+  // attach the latest project and organization groups.
+  const trackRef = useRef(track)
+  trackRef.current = track
 
   const handleEditorOnMount: OnMount = (editor, monaco) => {
     const model = editor.getModel()
@@ -114,9 +123,11 @@ export const MonacoEditor = ({
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
-      run: () => {
+      run: (_editor, ...args) => {
         const currentSnippet = snippetRef.current
-        if (currentSnippet) requestSaveRef.current(currentSnippet.snippet.id)
+        if (!currentSnippet) return
+        requestSaveRef.current(currentSnippet.snippet.id)
+        trackRef.current('sql_editor_save_clicked', { trigger: getEditorActionTrigger(args) })
       },
     })
 
@@ -126,8 +137,9 @@ export const MonacoEditor = ({
       keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
       contextMenuGroupId: 'operation',
       contextMenuOrder: 2,
-      run: () => {
+      run: (_editor, ...args) => {
         prettifyQueryRef.current()
+        trackRef.current('sql_editor_prettify_clicked', { trigger: getEditorActionTrigger(args) })
       },
     })
 
@@ -142,6 +154,7 @@ export const MonacoEditor = ({
 
         const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
 
+        trackRef.current('sql_editor_explain_code_clicked')
         openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         aiSnap.newChat({
           name: 'Explain code section',

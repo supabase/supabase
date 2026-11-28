@@ -116,6 +116,8 @@ interface PromptState {
   afterSelection: string
   startLineNumber: number
   endLineNumber: number
+  /** Whether the user selected SQL before opening the prompt. */
+  hasSelection: boolean
 }
 
 const initialPromptState: PromptState = {
@@ -125,6 +127,7 @@ const initialPromptState: PromptState = {
   afterSelection: '',
   startLineNumber: 0,
   endLineNumber: 0,
+  hasSelection: false,
 }
 
 export function useSqlEditorPrompt() {

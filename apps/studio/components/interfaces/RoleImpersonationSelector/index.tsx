@@ -2,7 +2,10 @@ import { CheckIcon, DatabaseIcon, UserCheckIcon, UserXIcon } from 'lucide-react'
 import { Separator, ToggleGroup, ToggleGroupItem } from 'ui'
 
 import { UserImpersonationSelector } from './UserImpersonationSelector'
-import { useRoleImpersonationSelection } from './useRoleImpersonationSelection'
+import {
+  useRoleImpersonationSelection,
+  type RoleImpersonationTelemetrySurface,
+} from './useRoleImpersonationSelection'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationController,
@@ -13,6 +16,8 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   disallowAuthenticatedOption?: boolean
   title?: string
+  /** The editor the selector is in. Role picks are tracked only when it is set. */
+  telemetrySurface?: RoleImpersonationTelemetrySurface
 }
 
 /**
@@ -36,7 +41,7 @@ export const RoleImpersonationSelectorInterface = (
   const serviceRoleLabel = props.serviceRoleLabel ?? 'Postgres'
   const disallowAuthenticatedOption = props.disallowAuthenticatedOption ?? false
   const { selectedOption, onSelectedChange, keepAuthenticatedSelected } =
-    useRoleImpersonationSelection(state)
+    useRoleImpersonationSelection(state, props.telemetrySurface)
 
   const roleSummary = {
     service_role: 'Bypasses RLS and can return all rows.',

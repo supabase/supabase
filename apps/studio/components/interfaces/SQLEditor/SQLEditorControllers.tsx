@@ -179,7 +179,10 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
     setAiTitle,
   })
 
-  const { executeLogsQuery, isExecuting: isExecutingLogs } = useLogsSqlExecution({ id })
+  const { executeLogsQuery, isExecuting: isExecutingLogs } = useLogsSqlExecution({
+    id,
+    hasSelection,
+  })
 
   const isExecuting = isExecutingDb || isExecutingLogs
 

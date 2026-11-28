@@ -115,18 +115,23 @@ export const UtilityPanel = ({
     })
   }
 
+  function handleActiveTabChange(tab: string) {
+    onActiveTabChange?.(tab)
+    if (tab === 'results' || tab === 'chart') track('sql_editor_result_tab_clicked', { tab })
+  }
+
   return (
     <Tabs
       value={activeTab}
-      onValueChange={onActiveTabChange}
+      onValueChange={handleActiveTabChange}
       className="w-full h-full flex flex-col"
     >
       <TabsList className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
-          <TabsTrigger className="py-3 text-xs" value="results">
+          <TabsTrigger className="py-3 text-xs" value="results" data-attr="sql-editor-result-tab">
             <span className="translate-y-px">Results</span>
           </TabsTrigger>
-          <TabsTrigger className="py-3 text-xs" value="chart">
+          <TabsTrigger className="py-3 text-xs" value="chart" data-attr="sql-editor-result-tab">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger>
         </div>

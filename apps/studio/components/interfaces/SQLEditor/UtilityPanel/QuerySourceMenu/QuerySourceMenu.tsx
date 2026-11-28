@@ -27,6 +27,7 @@ import {
 } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -58,6 +59,7 @@ type QuerySourceMenuProps = {
 export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySourceMenuProps) => {
   const { ref } = useParams()
   const router = useRouter()
+  const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const databaseSelector = useDatabaseSelectorStateSnapshot()
@@ -90,12 +92,22 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
     const next = resolveSourceSwitch({ ref, target, currentSource, isBlankNewTab })
     if (next === null) return
     router[next.method](next.url)
+    track('sql_editor_query_source_updated', { querySource: target })
   }
 
   const updateDatabaseIdentifier = (identifier: string) => {
     databaseSelector.setSelectedDatabaseId(identifier)
     setLastSelectedDatabase(identifier)
     sessionSnap.resetResult(id)
+    track('sql_editor_database_updated', {
+      databaseType: identifier === ref ? 'primary' : 'read_replica',
+    })
+  }
+
+  const updateRowLimit = (value: string) => {
+    const rowLimit = Number(value)
+    sessionSnap.setLimit(rowLimit)
+    track('sql_editor_row_limit_updated', { rowLimit })
   }
 
   return (
@@ -106,6 +118,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[currentSource]}`}
             icon={<QuerySourceIcon source={currentSource} className="text-foreground-light" />}
             iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}
+            data-attr="sql-editor-query-source"
           >
             {QUERY_SOURCE_LABELS[currentSource]}
           </Button>
@@ -145,11 +158,8 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
                   onIdentifierChange={updateDatabaseIdentifier}
                 />
               )}
-              <RunAsSubMenu />
-              <RowLimitSubMenu
-                value={sessionSnap.limit}
-                onValueChange={(val) => sessionSnap.setLimit(Number(val))}
-              />
+              <RunAsSubMenu telemetrySurface="sql_editor" />
+              <RowLimitSubMenu value={sessionSnap.limit} onValueChange={updateRowLimit} />
             </>
           )}
         </DropdownMenuContent>

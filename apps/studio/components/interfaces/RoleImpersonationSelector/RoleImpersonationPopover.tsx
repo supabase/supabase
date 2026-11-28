@@ -2,7 +2,7 @@ import { ChevronDownIcon, UserIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
-import { RoleImpersonationSelector } from '.'
+import { RoleImpersonationSelector, type RoleImpersonationSelectorProps } from '.'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import type { User } from '@/data/auth/users-infinite-query'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -13,6 +13,7 @@ export interface RoleImpersonationPopoverProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
   disallowAuthenticatedOption?: boolean
+  telemetrySurface?: RoleImpersonationSelectorProps['telemetrySurface']
 }
 
 export const RoleImpersonationPopover = ({
@@ -21,6 +22,7 @@ export const RoleImpersonationPopover = ({
   variant = 'regular',
   align = 'end',
   disallowAuthenticatedOption = false,
+  telemetrySurface,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -33,6 +35,7 @@ export const RoleImpersonationPopover = ({
       <PopoverTrigger asChild>
         <Button
           size="tiny"
+          data-attr="role-impersonation-selector"
           className={cn(
             'h-[26px] pr-3 gap-0',
             variant === 'connected-on-right' && 'rounded-r-none border-r-0',
@@ -64,6 +67,7 @@ export const RoleImpersonationPopover = ({
           header={header}
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
+          telemetrySurface={telemetrySurface}
         />
       </PopoverContent>
     </Popover>
