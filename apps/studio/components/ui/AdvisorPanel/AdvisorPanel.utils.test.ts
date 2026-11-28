@@ -104,6 +104,23 @@ describe('AdvisorPanel.utils', () => {
     })
   })
 
+  it('skips notifications without a data payload or title', () => {
+    const items = createAdvisorNotificationItems([
+      createNotification({ id: 'notification-no-data', data: undefined }),
+      createNotification({
+        id: 'notification-null-data',
+        data: null as unknown as Notification['data'],
+      }),
+      createNotification({
+        id: 'notification-no-title',
+        data: { message: 'Body', actions: [] } as unknown as Notification['data'],
+      }),
+      createNotification({ id: 'notification-valid' }),
+    ])
+
+    expect(items.map((item) => item.id)).toEqual(['notification-valid'])
+  })
+
   describe('notification secondary text', () => {
     const [notificationWithProject] = createAdvisorNotificationItems([
       createNotification({
