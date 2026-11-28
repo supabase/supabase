@@ -65,6 +65,11 @@
       "path": "registry/default/password-based-auth/nuxtjs/server/routes/auth/confirm.get.ts",
       "type": "registry:file",
       "target": "server/routes/auth/confirm.get.ts"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/server/utils/safe-next-path.ts",
+      "type": "registry:file",
+      "target": "server/utils/safe-next-path.ts"
     }
   ]
 }
