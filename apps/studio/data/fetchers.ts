@@ -269,6 +269,11 @@ export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
+  /**
+   * Never send this error to Sentry. For responses the caller handles as an expected state (for
+   * example a 404 that the UI recovers from). Overrides `alwaysCapture`.
+   */
+  skipReport?: boolean
   sentryContext?: StudioSentryContext
   /**
    * For callers outside React Query. Inside queries and mutations the query cache reports the
@@ -286,7 +291,9 @@ type HandleErrorOptions = {
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   const raw = parseResponseErrorBody(error)
   const classified = raw ? classifyResponseError(raw) : classifyError(error)
-  if (options.reportImmediately) {
+  if (options.skipReport) {
+    deferStudioErrorReport(classified, { skip: true })
+  } else if (options.reportImmediately) {
     reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
   } else {
     deferStudioErrorReport(classified, {
