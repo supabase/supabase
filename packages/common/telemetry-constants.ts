@@ -905,6 +905,143 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
+ * User chose an option in the "+" (create new) menu of the SQL editor sidebar.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorNewItemClickedEvent {
+  action: 'sql_editor_new_item_clicked'
+  properties: {
+    /** Which item the user chose to create */
+    itemType: 'snippet' | 'logs_query' | 'folder'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User started a search in the SQL editor sidebar snippet search. Fires once per search
+ * session, on the first keystroke into an empty search input. Clearing the input ends the
+ * session. The search text is not sent.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetSearchSubmittedEvent {
+  action: 'sql_editor_snippet_search_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * User changed the sort order of the SQL editor sidebar snippet list.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetSortUpdatedEvent {
+  action: 'sql_editor_snippet_sort_updated'
+  properties: {
+    /** The sort order the user chose: alphabetical (name) or created at (inserted_at) */
+    sortBy: 'name' | 'inserted_at'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User chose an action in the context menu of a snippet or a folder in the SQL editor sidebar.
+ * Actions that open a modal (rename, move, share, unshare, export, delete) fire when the menu
+ * item is chosen, not when the modal is confirmed.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetActionClickedEvent {
+  action: 'sql_editor_snippet_action_clicked'
+  properties: {
+    /** Which context menu action the user chose */
+    action:
+      | 'rename'
+      | 'move'
+      | 'share'
+      | 'unshare'
+      | 'duplicate'
+      | 'favorite'
+      | 'unfavorite'
+      | 'export'
+      | 'delete'
+      | 'open_new_tab'
+      | 'folder_create_snippet'
+      | 'folder_rename'
+      | 'folder_delete'
+    /** Whether the action applies to several selected snippets at once */
+    isBulk: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed sharing a snippet with the project team in the share snippet modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetShareSubmittedEvent {
+  action: 'sql_editor_snippet_share_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * One or more snippets were moved to a folder from the move snippet modal. Fires after the
+ * move succeeds.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/sql/{id}
+ */
+export interface SqlEditorSnippetMovedEvent {
+  action: 'sql_editor_snippet_moved'
+  properties: {
+    /** Number of snippets moved */
+    snippetCount: number
+    /** Whether the snippets were moved into a folder created in the same step */
+    toNewFolder: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User closed one or more editor tabs in the SQL, Table or Explorer editor tab bar. Fires when
+ * the tabs close, after any unsaved changes confirmation.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ * @page /project/{ref}/editor
+ * @page /project/{ref}/explorer
+ */
+export interface EditorTabClosedEvent {
+  action: 'editor_tab_closed'
+  properties: {
+    /** Which close option the user chose: the tab itself, other tabs, tabs to the right, or all tabs */
+    closeType: 'single' | 'others' | 'right' | 'all'
+    /** Which editor the tab bar belongs to */
+    editor: 'sql' | 'table' | 'explorer'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the "Disable" button next to the autosave status text in the
  * SQL Editor, to open the feature preview modal for manual snippet saving.
  *
@@ -5224,6 +5361,13 @@ export type TelemetryEvent =
   | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
+  | SqlEditorNewItemClickedEvent
+  | SqlEditorSnippetSearchSubmittedEvent
+  | SqlEditorSnippetSortUpdatedEvent
+  | SqlEditorSnippetActionClickedEvent
+  | SqlEditorSnippetShareSubmittedEvent
+  | SqlEditorSnippetMovedEvent
+  | EditorTabClosedEvent
   | SqlEditorAutosaveDisableClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent

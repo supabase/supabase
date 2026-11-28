@@ -6,6 +6,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import type { SqlSnippets } from '@/types'
 
@@ -20,6 +21,7 @@ export const ShareSnippetModal = ({
 }) => {
   const { ref: projectRef } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const track = useTrack()
 
   const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
     onError: (error) => {
@@ -30,6 +32,8 @@ export const ShareSnippetModal = ({
   const onShareSnippet = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!snippet) return console.error('Snippet ID is required')
+
+    track('sql_editor_snippet_share_submitted')
 
     const storeSnippet = snapV2.snippets[snippet.id]
     let snippetContent = storeSnippet?.snippet?.content

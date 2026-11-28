@@ -42,6 +42,7 @@ import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -64,6 +65,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const router = useRouter()
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
@@ -182,6 +184,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
             }
           }
         })
+      )
+
+      track(
+        'sql_editor_snippet_moved',
+        { snippetCount: snippets.length, toNewFolder: selectedId === 'new-folder' },
+        { project: ref }
       )
 
       toast.success(

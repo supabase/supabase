@@ -1,6 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
+import type { SqlEditorSnippetActionClickedEvent } from 'common/telemetry-constants'
 import {
   CopyIcon,
   DownloadIcon,
@@ -40,6 +41,7 @@ import {
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   isFolderEditing,
   isFolderSaving,
@@ -111,6 +113,14 @@ export const SQLEditorTreeViewItem = ({
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { saveFavorite } = useSqlEditorSaveCoordinator()
+  const track = useTrack()
+
+  const trackAction = (
+    action: SqlEditorSnippetActionClickedEvent['properties']['action'],
+    isBulk = false
+  ) => {
+    track('sql_editor_snippet_action_clicked', { action, isBulk })
+  }
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -295,7 +305,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectCreate !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectCreate()}
+                  onSelect={() => {
+                    trackAction('folder_create_snippet')
+                    onSelectCreate()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <PlusIcon size={14} />
@@ -305,7 +318,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectRename()}
+                  onSelect={() => {
+                    trackAction('folder_rename')
+                    onSelectRename()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <EditIcon size={14} />
@@ -317,7 +333,10 @@ export const SQLEditorTreeViewItem = ({
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     className="gap-x-2"
-                    onSelect={() => onSelectDelete()}
+                    onSelect={() => {
+                      trackAction('folder_delete')
+                      onSelectDelete()
+                    }}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
                     <TrashIcon size={14} />
@@ -331,7 +350,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectMove !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectMove()}
+                  onSelect={() => {
+                    trackAction('move', true)
+                    onSelectMove()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <MoveIcon size={14} />
@@ -342,7 +364,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectDelete !== undefined && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectDelete()}
+                  onSelect={() => {
+                    trackAction('delete', true)
+                    onSelectDelete()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <TrashIcon size={14} />
@@ -355,6 +380,7 @@ export const SQLEditorTreeViewItem = ({
               <ContextMenuItem
                 asChild
                 className="gap-x-2"
+                onSelect={() => trackAction('open_new_tab')}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Link
@@ -370,7 +396,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectRename()}
+                  onSelect={() => {
+                    trackAction('rename')
+                    onSelectRename()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <EditIcon size={14} />
@@ -380,7 +409,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectMove !== undefined && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectMove()}
+                  onSelect={() => {
+                    trackAction('move')
+                    onSelectMove()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <MoveIcon size={14} />
@@ -393,7 +425,10 @@ export const SQLEditorTreeViewItem = ({
                 IS_PLATFORM && (
                   <ContextMenuItem
                     className="gap-x-2"
-                    onSelect={() => onSelectShare()}
+                    onSelect={() => {
+                      trackAction('share')
+                      onSelectShare()
+                    }}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
                     <ShareIcon size={14} />
@@ -403,7 +438,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectUnshare()}
+                  onSelect={() => {
+                    trackAction('unshare')
+                    onSelectUnshare()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <LockIcon size={14} />
@@ -413,7 +451,10 @@ export const SQLEditorTreeViewItem = ({
               {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectDuplicate()}
+                  onSelect={() => {
+                    trackAction('duplicate')
+                    onSelectDuplicate()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <CopyIcon size={14} />
@@ -423,7 +464,10 @@ export const SQLEditorTreeViewItem = ({
               {IS_PLATFORM && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onToggleFavorite()}
+                  onSelect={() => {
+                    trackAction(isFavorite ? 'unfavorite' : 'favorite')
+                    onToggleFavorite()
+                  }}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <HeartIcon
@@ -434,8 +478,10 @@ export const SQLEditorTreeViewItem = ({
                         : 'fill-none stroke-foreground-light'
                     )}
                   />
-                  {isFavorite ? <span>Remove from</span> : <span>Add to</span>}{' '}
-                  <span>favorites</span>
+                  <span>
+                    {isFavorite ? <span>Remove from</span> : <span>Add to</span>}{' '}
+                    <span>favorites</span>
+                  </span>
                 </ContextMenuItem>
               )}
               {onSelectDownload !== undefined &&
@@ -443,7 +489,10 @@ export const SQLEditorTreeViewItem = ({
                 getSnippetSource(element.metadata) !== 'logs' && (
                   <ContextMenuItem
                     className="gap-x-2"
-                    onSelect={() => onSelectDownload()}
+                    onSelect={() => {
+                      trackAction('export')
+                      onSelectDownload()
+                    }}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
                     <DownloadIcon size={14} />
@@ -453,7 +502,13 @@ export const SQLEditorTreeViewItem = ({
               {onSelectDelete !== undefined && isOwner && (
                 <>
                   <ContextMenuSeparator />
-                  <ContextMenuItem className="gap-x-2" onSelect={() => onSelectDelete()}>
+                  <ContextMenuItem
+                    className="gap-x-2"
+                    onSelect={() => {
+                      trackAction('delete')
+                      onSelectDelete()
+                    }}
+                  >
                     <TrashIcon size={14} />
                     Delete query
                   </ContextMenuItem>
