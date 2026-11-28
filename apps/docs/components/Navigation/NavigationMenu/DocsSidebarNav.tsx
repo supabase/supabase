@@ -215,7 +215,7 @@ const useDocsSidebarNavState = (
       undefined
     ) ??
     treeItems[0] ??
-    // a reference page has a versioned menu id and no guide tree, so its row matches on the level
+    // reference pages have no guide tree and can have versioned menu ids, so the row matches on the level
     (menuId ? sectionItems.find((item) => isMenuLevel(menuId, item.level)) : undefined) ??
     // a tree that no section lists, like resources, is a level of its own on its pages
     (isMenu(pageTree) && isActiveHref(pageTree.url, pathname)
