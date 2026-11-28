@@ -101,7 +101,7 @@ Values below 5 minutes, and especially below 2 minutes, should not be used in mo
 
 As your users continue using your app, refresh tokens are being constantly exchanged for new access tokens.
 
-The general rule is that a refresh token can only be used once. However, strictly enforcing this can cause certain issues to arise. There are two exceptions to this design to prevent the early and unexpected termination of user's sessions:
+The general rule is that a refresh token can only be used once. However, strictly enforcing this can cause certain issues to arise. There are two exceptions to this design to prevent the early and unexpected termination of users' sessions:
 
 - A refresh token can be used more than once within a defined reuse interval. By default this is 10 seconds and we do not recommend changing this value. This exception is granted for legitimate situations such as:
   - Using [server-side rendering](/docs/guides/auth/server-side) where the same refresh token needs to be reused on the server and soon after on the client
@@ -122,7 +122,7 @@ This approach has some tradeoffs compared to using a JWT-based approach:
 
 - If the authentication server or its database crashes or is unavailable for even a few seconds, the whole application goes down. Scheduling maintenance or dealing with transient errors becomes very challenging.
 - A failing authentication server can cause a chain of failures across other systems and APIs, paralyzing the whole application system.
-- All requests that require authentication has to be routed through the authentication, which adds an additional latency overhead to all requests.
+- All requests that require authentication have to be routed through the authentication, which adds an additional latency overhead to all requests.
 
 Supabase Auth prefers a JWT-based approach using access and refresh tokens because session information is encoded within the short-lived access token, enabling transfer across APIs and systems without dependence on a central server's availability or performance. This approach enhances an application's tolerance to transient failures or performance issues. Furthermore, proactively refreshing the access token allows the application to function reliably even during significant outages.
 
