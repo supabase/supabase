@@ -9,7 +9,6 @@ import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/Proje
 import { Bucket } from '@/data/storage/buckets-query'
 import { render } from '@/tests/helpers'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -47,8 +46,6 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 
 describe(`EmptyBucketModal`, () => {
   beforeEach(() => {
-    // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
     // useSelectedProject -> Project
     addAPIMock({
       method: `get`,

@@ -24,14 +24,8 @@ dayjs.extend(relativeTime)
 //   },
 // })
 
-// These must stay at module scope: Vitest hoists `vi.mock` above imports.
-// Inside `renderRoute`, the router hooks defer to the app's `compat/next` shims so they reflect
-// the memory router's URL; elsewhere they use the static mocks.
-vi.mock('next/router', async () => (await import('./lib/route-aware-hooks')).mockNextRouter())
-vi.mock('next/compat/router', async () =>
-  (await import('./lib/route-aware-hooks')).mockNextRouter()
-)
-
+// This must stay at module scope: Vitest hoists `vi.mock` above imports.
+// Inside `renderRoute`, `useParams` reads from the memory router; elsewhere it uses the static mock.
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   const { routeAwareHook } = await import('./lib/route-aware-hooks')

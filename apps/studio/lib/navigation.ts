@@ -1,10 +1,7 @@
 import type { AnyRouter, UseNavigateResult } from '@tanstack/react-router'
-import type { NextRouter } from 'next/router'
 
 import { BASE_PATH } from './constants'
 import { isAbsoluteUrl, splitInternalUrl } from './internal-url'
-
-type Router = NextRouter | UseNavigateResult<string>
 
 const MIDDLE_MOUSE_BUTTON = 1
 
@@ -22,25 +19,17 @@ export const navigateToUrl = (
   return navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '', replace })
 }
 
-const navigateWithRouter = (url: string, router: Router) => {
-  if (typeof router === 'function') {
-    void navigateToUrl(router, url)
-  } else {
-    router.push(url)
-  }
-}
-
 /**
  * Creates a navigation handler that supports keyboard, modifier clicks, and middle mouse button.
  *
- * This is a curried function that takes a URL and router, and returns an event handler that:
+ * This is a curried function that takes a URL and navigate function, and returns an event handler that:
  * - Handles keyboard navigation (Enter/Space keys)
  * - Opens in new tab on Cmd/Ctrl + click
  * - Opens in new tab on middle mouse button click
  * - Performs normal navigation on regular click
  *
  * @param url - The relative URL to navigate to (e.g., "/project/123/functions/my-function")
- * @param router - Next.js Pages Router instance or TanStack Router navigate function
+ * @param navigate - TanStack Router navigate function
  * @returns Event handler function for onClick, onAuxClick, and onKeyDown
  *
  * @example
@@ -56,7 +45,7 @@ const navigateWithRouter = (url: string, router: Router) => {
  * />
  * ```
  */
-export const createNavigationHandler = (url: string, router: Router) => {
+export const createNavigationHandler = (url: string, navigate: UseNavigateResult<string>) => {
   return (event: React.MouseEvent | React.KeyboardEvent) => {
     // Handle keyboard events
     if ('key' in event) {
@@ -67,7 +56,7 @@ export const createNavigationHandler = (url: string, router: Router) => {
         if (isModifierKey) {
           window.open(`${BASE_PATH}${url}`, '_blank')
         } else {
-          navigateWithRouter(url, router)
+          void navigateToUrl(navigate, url)
         }
       }
       return
@@ -93,6 +82,6 @@ export const createNavigationHandler = (url: string, router: Router) => {
     // Regular left click only. Other aux buttons (e.g. right-click) must not navigate.
     if ('button' in event && event.button !== 0) return
 
-    navigateWithRouter(url, router)
+    void navigateToUrl(navigate, url)
   }
 }

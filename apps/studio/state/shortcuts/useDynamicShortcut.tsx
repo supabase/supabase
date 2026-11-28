@@ -117,7 +117,7 @@ export function useDynamicShortcut({
  *     sequence={[String(i + 1)]}
  *     label={`Go to ${tab.label}`}
  *     registerInCommandMenu
- *     callback={() => router.push(tab.href)}
+ *     callback={() => navigateToUrl(navigate, tab.href)}
  *   />
  * ))}
  * ```

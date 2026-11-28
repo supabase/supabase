@@ -16,8 +16,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
-vi.mock('next/router', () => import('next-router-mock'))
-
 vi.mock('react-data-grid', async () => {
   const { createContext, useContext, useRef } = await import('react')
 

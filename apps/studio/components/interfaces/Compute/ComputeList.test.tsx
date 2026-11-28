@@ -1,11 +1,10 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { ComputeInstance } from './Compute.types'
 import { ComputeList } from './ComputeList'
 import { customRender } from '@/tests/lib/custom-render'
-import { routerMock } from '@/tests/lib/route-mock'
 
 const instance = (name: string, overrides: Partial<ComputeInstance> = {}): ComputeInstance => ({
   name,
@@ -36,10 +35,6 @@ const rowNames = () =>
     .map((row) => within(row).getAllByRole('cell')[0].textContent)
 
 describe('ComputeList', () => {
-  beforeEach(() => {
-    routerMock.setCurrentUrl('/project/default/compute')
-  })
-
   it('renders a row per instance, linking to its detail page', () => {
     renderList([instance('embed'), instance('resize', { buildState: 'building' })])
 

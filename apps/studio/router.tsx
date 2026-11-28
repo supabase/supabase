@@ -27,8 +27,8 @@ export function getRouter() {
     defaultPreload: 'intent',
     // Next-style search params (plain strings, repeated keys → arrays)
     // instead of TanStack's JSON defaults, which coerce "2"→2/"true"→true
-    // and JSON-quote strings on write. The whole app — including the
-    // next/router compat shim and nuqs — expects the Next semantics.
+    // and JSON-quote strings on write. The whole app — including nuqs and
+    // search-param readers — expects the Next semantics.
     parseSearch,
     stringifySearch,
     // Inlined via Vite's `define` at build time; stays undefined (= app at `/`)

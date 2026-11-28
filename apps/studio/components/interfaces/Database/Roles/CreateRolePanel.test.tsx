@@ -9,7 +9,6 @@ import { CreateRolePanel } from './CreateRolePanel'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -22,7 +21,6 @@ describe('CreateRolePanel', () => {
 
   beforeEach(() => {
     queries = []
-    routerMock.setCurrentUrl('/project/default/database/roles')
     // useSelectedProjectQuery
     addAPIMock({
       method: 'get',

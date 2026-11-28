@@ -9,23 +9,18 @@ type Outcome = 'push' | 'new-tab' | 'none'
 
 describe('createNavigationHandler', () => {
   const URL = '/project/123/settings'
-  const router = { push: vi.fn() }
   const navigate = vi.fn()
   const windowOpen = vi.fn()
 
   beforeEach(() => {
-    router.push.mockReset()
     navigate.mockReset()
     windowOpen.mockReset()
     global.window.open = windowOpen
   })
 
-  const run = (event: Record<string, unknown>, url = URL, useTanStackNavigate = false) => {
+  const run = (event: Record<string, unknown>, url = URL) => {
     const preventDefault = vi.fn()
-    const targetRouter = useTanStackNavigate
-      ? (navigate as unknown as UseNavigateResult<string>)
-      : (router as unknown as Parameters<typeof createNavigationHandler>[1])
-    const handler = createNavigationHandler(url, targetRouter)
+    const handler = createNavigationHandler(url, navigate as unknown as UseNavigateResult<string>)
     handler({
       metaKey: false,
       ctrlKey: false,
@@ -35,15 +30,10 @@ describe('createNavigationHandler', () => {
     return { preventDefault }
   }
 
-  const expectOutcome = (outcome: Outcome, useTanStackNavigate = false) => {
+  const expectOutcome = (outcome: Outcome) => {
     if (outcome === 'push') {
-      if (useTanStackNavigate) {
-        expect(navigate).toHaveBeenCalledWith({ to: URL, search: {}, hash: '' })
-      } else {
-        expect(router.push).toHaveBeenCalledWith(URL)
-      }
+      expect(navigate).toHaveBeenCalledWith({ to: URL, search: {}, hash: '' })
     } else {
-      expect(router.push).not.toHaveBeenCalled()
       expect(navigate).not.toHaveBeenCalled()
     }
     if (outcome === 'new-tab') {
@@ -88,21 +78,14 @@ describe('createNavigationHandler', () => {
     if (outcome === 'new-tab') expect(preventDefault).toHaveBeenCalled()
   })
 
-  it('splits path, search params, and hash when navigating with TanStack useNavigate', () => {
-    run({ button: 0 }, '/project/123/settings?tab=general&filter=a&filter=b#limits', true)
+  it('splits path, search params, and hash when navigating', () => {
+    run({ button: 0 }, '/project/123/settings?tab=general&filter=a&filter=b#limits')
 
     expect(navigate).toHaveBeenCalledWith({
       to: '/project/123/settings',
       search: { tab: 'general', filter: ['a', 'b'] },
       hash: 'limits',
     })
-  })
-
-  it('clears search and hash for plain paths when navigating with TanStack useNavigate', () => {
-    const { preventDefault } = run({ key: 'Enter' }, URL, true)
-
-    expect(preventDefault).toHaveBeenCalled()
-    expectOutcome('push', true)
   })
 })
 

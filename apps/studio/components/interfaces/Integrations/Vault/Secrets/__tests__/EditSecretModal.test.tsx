@@ -8,7 +8,6 @@ import { EditSecretModal } from '../EditSecretModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 import type { VaultSecret } from '@/types'
 
 const secret: VaultSecret = {
@@ -25,8 +24,6 @@ mockAnimationsApi()
 
 describe(`EditSecretModal`, () => {
   beforeEach(() => {
-    // useSelectedProjectQuery -> useParams
-    routerMock.setCurrentUrl(`/project/default/integrations/vault/secrets`)
     // useSelectedProjectQuery
     addAPIMock({
       method: `get`,

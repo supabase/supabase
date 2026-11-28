@@ -14,7 +14,6 @@ import { API_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
 type ReplicationDestinationResponse = DestinationWireResponse<
@@ -235,7 +234,6 @@ describe('DestinationRow', () => {
 
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     let completeShutdown: () => void = () => {}
     const shutdown = new Promise<void>((resolve) => {
@@ -300,7 +298,6 @@ describe('DestinationRow', () => {
 
   test('keeps deletion retryable when shutdown status cannot be verified', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     const deleted = vi.fn()
     addAPIMock({

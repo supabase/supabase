@@ -4,9 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
-import routerMock from 'next-router-mock'
-import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
-import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
@@ -20,11 +18,6 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 type AnalyticsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
 vi.unmock('common')
-
-const removeRouteParser = routerMock.useParser(
-  createDynamicRouteParser(['/project/[ref]/functions/[functionSlug]'])
-)
-afterAll(removeRouteParser)
 
 const featureFlags = {
   configcat: {
@@ -151,7 +144,6 @@ const renderErrors = () => {
 
 describe('EdgeFunctionRecentErrors', () => {
   beforeEach(() => {
-    routerMock.setCurrentUrl('/project/default/functions/hello-world')
     localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, 'true')
   })
 

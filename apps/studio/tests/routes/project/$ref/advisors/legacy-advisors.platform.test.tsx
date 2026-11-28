@@ -9,7 +9,6 @@ import { Route as SecurityRoute } from '@/routes/project/$ref/advisors/security'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
-import { routerMock } from '@/tests/lib/route-mock'
 import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('@/components/layouts/AdvisorsLayout/LegacyAdvisorsLayout', () => ({
@@ -56,7 +55,6 @@ describe('Legacy Advisor pages', () => {
   ] as const)(
     'renders the existing %s Advisor when Issues is off',
     async (category, route, title) => {
-      routerMock.setCurrentUrl(`/project/default/advisors/${category}`)
       await renderAdvisorsRoute(route, category, { issuesInbox: false, healthAdvisor: true })
       expect(await screen.findByText(title)).toBeInTheDocument()
       expect(await screen.findByText('Errors')).toBeInTheDocument()
@@ -75,7 +73,6 @@ describe('Legacy Advisor pages', () => {
         href: `http://localhost:3000/project/default/advisors/${category}?preset=WARN&id=finding#detail`,
         replace,
       })
-      routerMock.setCurrentUrl(`/project/default/advisors/${category}`)
       await renderAdvisorsRoute(route, category, { issuesInbox: true })
       await waitFor(() =>
         expect(replace).toHaveBeenCalledWith(

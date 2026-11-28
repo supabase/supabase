@@ -6,7 +6,6 @@ import { CreateBucketModal } from './CreateBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: () => ({ can: true }),
@@ -30,8 +29,6 @@ vi.mock(
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
     versioningEnabled.current = false
-    // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets`)
     // useSelectedProject -> Project
     addAPIMock({
       method: `get`,
