@@ -41,6 +41,33 @@ describe('fixSqlBackslashEscapes', () => {
       fixSqlBackslashEscapes("INSERT INTO t (a, b) VALUES ('We\\'ll', $$Don\\'t escape$$)")
     ).toBe("INSERT INTO t (a, b) VALUES ('We''ll', $$Don\\'t escape$$)")
   })
+
+  it('fixes regular strings but leaves $tag1$ dollar-quoted strings unchanged', () => {
+    expect(
+      fixSqlBackslashEscapes("INSERT INTO t (a, b) VALUES ('We\\'ll', $b2$Don\\'t escape$b2$)")
+    ).toBe("INSERT INTO t (a, b) VALUES ('We''ll', $b2$Don\\'t escape$b2$)")
+  })
+
+  it('fixes backslash-apostrophes when the string also contains comment markers', () => {
+    expect(fixSqlBackslashEscapes("SELECT 'It\\'s -- not a comment'")).toBe(
+      "SELECT 'It''s -- not a comment'"
+    )
+  })
+
+  it.each([
+    ['a string that is a single backslash', "SELECT replace(path, '\\', '/') FROM files"],
+    ['strings that end in a backslash', "SELECT count(*) FROM t WHERE a = '\\' OR b = 'C:\\'"],
+    ['an escaped backslash', "SELECT regexp_replace(name, '\\\\', '/', 'g') FROM files"],
+    ['an escape string ending in a backslash', "SELECT E'C:\\\\'"],
+    ['an escape string with an escaped quote', "SELECT E'It\\'s -- not a comment'"],
+    ['a lowercase escape string with an escaped quote', "SELECT e'it\\'s more'"],
+    [
+      'a dollar-quoted body whose tag has a digit',
+      "SELECT $foo1$It\\'s fine$foo1$, replace(path, '\\', '/') FROM files",
+    ],
+  ])('leaves valid SQL with %s unchanged', (_, sql) => {
+    expect(fixSqlBackslashEscapes(sql)).toBe(sql)
+  })
 })
 
 describe('selectWeightedKey', () => {
