@@ -100,6 +100,22 @@ describe('api/self-hosted/util', () => {
       expect(result).toBe('postgresql://readonly_user:secret@db.example.com:5433/mydb')
     })
 
+    it('should URL encode username and password with special characters', async () => {
+      vi.stubEnv('POSTGRES_HOST', 'db.example.com')
+      vi.stubEnv('POSTGRES_PORT', '5432')
+      vi.stubEnv('POSTGRES_DB', 'mydb')
+      vi.stubEnv('POSTGRES_PASSWORD', 'p@ss/w?rd#123:test')
+      vi.stubEnv('POSTGRES_USER_READ_WRITE', 'admin@user')
+
+      const { getConnectionString } = await import('./util')
+
+      const result = getConnectionString({ readOnly: false })
+
+      expect(result).toBe(
+        'postgresql://admin%40user:p%40ss%2Fw%3Frd%23123%3Atest@db.example.com:5432/mydb'
+      )
+    })
+
     it('should use default values when env vars not set', async () => {
       vi.stubEnv('POSTGRES_HOST', '')
       vi.stubEnv('POSTGRES_PORT', '')
