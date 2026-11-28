@@ -2,7 +2,7 @@ import type { ShikiConfig } from '@astrojs/markdown-remark'
 import { fromHtml } from 'hast-util-from-html'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import { getCopyText, getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
 import {
   CodeBlockFrame,
   CodeBlockTokens,
@@ -15,6 +15,10 @@ type ShikiTransformer = NonNullable<ShikiConfig['transformers']>[number]
 // the .md and .mdx processors keep only the first child of the root, so the frame is the only child
 export const sharedCodeBlock: ShikiTransformer = {
   name: 'kb-shared-code-block',
+  preprocess(_code, options) {
+    // getCopyText finds comments by token type, and shiki adds the type only on request
+    options.includeExplanation = 'tokenType'
+  },
   root() {
     const lines = this.tokens.map((line) =>
       line.map(({ content, color, fontStyle }): CodeToken => [
@@ -40,7 +44,7 @@ export const sharedCodeBlock: ShikiTransformer = {
       delete node.position
     })
     // CodeBlockControlsIsland copies this text. it does not read the text from the rendered dom
-    frame.properties.dataCodeSource = this.source
+    frame.properties.dataCodeSource = getCopyText({ code: this.source, lang, tokens: this.tokens })
     return { type: 'root', children: [frame] }
   },
 }

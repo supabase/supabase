@@ -1,3 +1,5 @@
+import { type ThemedToken } from 'shiki'
+
 // As defined in @shikijs/core/dist/chunk-tokens.d.mts
 enum FontStyle {
   NotSet = -1,
@@ -63,4 +65,57 @@ export const getTokenClassName = (
     if (fontStyle & FontStyle.Underline) classes.push('s-l')
   }
   return classes.length ? classes.join(' ') : undefined
+}
+
+export const getCopyText = ({
+  code,
+  lang,
+  tokens,
+}: {
+  code: string
+  lang: string | null
+  tokens: Array<Array<Pick<ThemedToken, 'content' | 'type'>>>
+}): string => {
+  // markdown blocks, such as AI prompts, are text to read, so their comments stay
+  if (['markdown', 'md', 'mdx'].includes(lang ?? '')) return code
+  // with includeExplanation 'tokenType', type 1 is a comment. tokens nested in a comment, such as jsdoc tags, inherit it
+  if (!tokens.some((line) => line.some(({ type }) => type === 1))) return code
+
+  const stripped = tokens
+    .reduce<Array<string>>((kept, line, index) => {
+      const text = line.map(({ content }) => content).join('')
+      const codeTokens = line.filter(({ type }) => type !== 1)
+      // a line without comments stays. directives and the astro frontmatter fence also stay, because the code needs them
+      if (
+        codeTokens.length === line.length ||
+        /^(#!|\/\/\/\s*<reference|\/\/\s*@(ts-|deno-types|jsx)|\/\*\*?\s*@jsx|\/\/go:|#\s*syntax=|---\s*$)/.test(
+          text.trimStart()
+        )
+      ) {
+        kept.push(text)
+        return kept
+      }
+      const strippedLine = codeTokens
+        .map(({ content }) => content)
+        .join('')
+        .trimEnd()
+      if (strippedLine) {
+        kept.push(strippedLine)
+        return kept
+      }
+      // a dropped comment between two blank lines takes one of them, so blank lines do not stack
+      if (
+        kept.at(-1)?.trim() === '' &&
+        tokens[index + 1]?.every(({ content }) => !content.trim())
+      ) {
+        kept.pop()
+      }
+      return kept
+    }, [])
+    .join('\n')
+    // a dropped comment can leave blank lines at the ends, but the first line keeps its indent
+    .replace(/^(?:[ \t]*\n)+|(?:\n[ \t]*)+$/g, '')
+
+  // a block of only comments, such as config to uncomment, copies in full
+  return stripped.trim() ? stripped : code
 }
