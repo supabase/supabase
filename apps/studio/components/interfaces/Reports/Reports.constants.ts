@@ -205,6 +205,13 @@ const OTEL_ROUTE_GROUP_BY = safeLogSql`
   ${OTEL_STATUS_CODE}`
 const OTEL_ERROR_STATUS = safeLogSql`${OTEL_STATUS_CODE} >= 400`
 
+// Captures a storage route prefix (e.g. `/storage/v1/s3`, `/storage/v1/object/public`) so
+// all object keys under it group as one `<prefix>/*` row, matching the billing egress view.
+export const STORAGE_ROUTE_PATTERN =
+  '^(/storage/v1/(?:s3|object|render/image)(?:/(?:public|sign|authenticated|upload/sign|info))?)/'
+const STORAGE_ROUTE_RE = analyticsLiteral(STORAGE_ROUTE_PATTERN)
+const OTEL_PATH = safeLogSql`log_attributes['request.path']`
+
 function otelWhere(filters: ReportFilterItem[], extra?: SafeLogSqlFragment): SafeLogSqlFragment {
   const base = extra
     ? safeLogSql`where source = 'edge_logs' and ${extra}`
@@ -288,6 +295,47 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         group by ${OTEL_ROUTE_GROUP_BY}
         order by count desc
         limit 10`,
+      },
+      egressTopPaths: {
+        queryType: 'logs',
+        safeSql: () => safeLogSql`
+        -- reports-egress-top-paths
+        select
+          coalesce(
+            concat(regexp_extract(request.path, ${STORAGE_ROUTE_RE}), '/*'),
+            request.path
+          ) as path,
+          count(t.id) as count,
+          -- HEAD responses carry the object's content_length but send no body.
+          sum(
+            if(request.method = 'HEAD', 0, cast(coalesce(resp_headers.content_length, "0") as int64))
+          ) as egress_bytes
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(response.headers) as resp_headers
+        group by path
+        order by egress_bytes desc
+        limit 5`,
+        safeSqlOtel: () => safeLogSql`
+        -- reports-egress-top-paths
+        select
+          if(
+            match(${OTEL_PATH}, ${STORAGE_ROUTE_RE}),
+            concat(extract(${OTEL_PATH}, ${STORAGE_ROUTE_RE}), '/*'),
+            ${OTEL_PATH}
+          ) as path,
+          toFloat64(count()) as count,
+          sumIf(
+            toFloat64OrZero(log_attributes['response.headers.content_length']),
+            log_attributes['request.method'] != 'HEAD'
+          ) as egress_bytes
+        from logs
+        where source = 'edge_logs'
+        group by path
+        order by egress_bytes desc
+        limit 5`,
       },
       errorCounts: {
         queryType: 'logs',
