@@ -14,7 +14,12 @@ import {
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import {
+  getTablesForPublicationToggle,
+  isTableInPublication,
+} from '@/data/database-publications/database-publications.utils'
 import { Entity } from '@/data/table-editor/table-editor-types'
+import { useGetTables } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -38,8 +43,11 @@ export const RealtimeToggleDialog = ({
   const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
+  const isRealtimeEnabled = isTableInPublication(realtimePublication, table.id)
+  const getTables = useGetTables({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { mutate: updatePublications, isPending: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
@@ -60,15 +68,19 @@ export const RealtimeToggleDialog = ({
   const toggleRealtime = async () => {
     if (!project || !realtimePublication) return
 
-    const exists = realtimeEnabledTables.some((x) => x.id === table.id)
-    const tables = !exists
-      ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t) => `${t.schema}.${t.name}`)
-        )
-      : realtimeEnabledTables.filter((x) => x.id !== table.id).map((x) => `${x.schema}.${x.name}`)
+    const enabled = !isRealtimeEnabled
+    const allTables =
+      realtimePublication.tables === null && !enabled ? await getTables() : undefined
+    const tables = getTablesForPublicationToggle({
+      publication: realtimePublication,
+      table,
+      enabled,
+      allTables,
+    })
+    if (tables === undefined) return
 
     track('realtime_toggle_table_clicked', {
-      newState: exists ? 'disabled' : 'enabled',
+      newState: enabled ? 'enabled' : 'disabled',
       origin: 'tableGridHeader',
     })
 

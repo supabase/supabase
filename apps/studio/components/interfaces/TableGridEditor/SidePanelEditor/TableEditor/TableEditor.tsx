@@ -28,6 +28,7 @@ import {
 import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { isTableInPublication } from '@/data/database-publications/database-publications.utils'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
@@ -147,10 +148,9 @@ export const TableEditor = ({
   const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = isNewRecord
     ? false
-    : realtimeEnabledTables.some((t) => t.id === table?.id)
+    : isTableInPublication(realtimePublication, table?.id)
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
