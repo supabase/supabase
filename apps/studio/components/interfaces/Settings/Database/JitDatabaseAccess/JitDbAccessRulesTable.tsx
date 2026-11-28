@@ -4,6 +4,9 @@ import {
   Button,
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,13 +19,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import type { JitUserRule } from './JitDbAccess.types'
 import { getJitStatusDisplay } from './JitDbAccess.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface JitDbAccessRulesTableProps {
   users: JitUserRule[]
@@ -52,6 +55,10 @@ export function JitDbAccessRulesTable({
       ? 'All project members already have temporary access rules'
       : undefined
 
+  const { can: canManageJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
   if (isLoading) {
     return (
       <Card>
@@ -69,30 +76,38 @@ export function JitDbAccessRulesTable({
     )
   }
 
+  if (!canManageJitDbAccess) {
+    return (
+      <Admonition
+        title="You need additional permissions to view temporary database access"
+        description="Contact a project owner or administrator to request access"
+      />
+    )
+  }
+
   return (
     <Card>
-      <CardContent className="space-y-4 p-0">
-        <div className="flex items-center justify-between px-4 pb-2 pt-6">
-          <div>
-            <h3 className="text-sm text-foreground">Temporary access rules</h3>
-            <p className="text-sm text-foreground-light">
+      <CardContent className="p-0">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex flex-col gap-y-0.5 mb-0">
+            <CardTitle>Temporary access rules</CardTitle>
+            <CardDescription>
               Manage member access, allowed roles, and expiry settings.
-            </p>
+            </CardDescription>
           </div>
+          {canManageJitDbAccess && (
+            <ButtonTooltip
+              icon={<PlusIcon />}
+              onClick={onAddRule}
+              disabled={addDisabled}
+              tooltip={{ content: { side: 'bottom', text: addRuleTooltip } }}
+            >
+              Add rule
+            </ButtonTooltip>
+          )}
+        </CardHeader>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="inline-flex">
-                <Button icon={<PlusIcon />} onClick={onAddRule} disabled={addDisabled}>
-                  Add rule
-                </Button>
-              </span>
-            </TooltipTrigger>
-            {addRuleTooltip && <TooltipContent side="bottom">{addRuleTooltip}</TooltipContent>}
-          </Tooltip>
-        </div>
-
-        <Table className="border-t">
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Member</TableHead>
@@ -149,7 +164,8 @@ export function JitDbAccessRulesTable({
                       <p className="text-foreground-lighter">{user.email}</p>
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
-                      {enabledGrants.length} role{enabledGrants.length === 1 ? '' : <span>s</span>}
+                      {enabledGrants.length} role
+                      {enabledGrants.length === 1 ? '' : <span>s</span>}
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
                       {statusDisplay.badges.length > 0 ? (

@@ -46,6 +46,7 @@ import { SSLEnforcementConfirmDialog } from '@/components/interfaces/Settings/Da
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -77,20 +78,30 @@ export const JitDbAccessConfiguration = () => {
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
   const [deleteRuleError, setDeleteRuleError] = useState<string | null>(null)
 
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE
+  )
+
+  // [Joshen] API uses DATABASE_JIT_WRITE atm to check against read access as well
+  // Opting to stay consistent, unless API changes to use DATABASE_JIT_READ
+  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
   const {
     data: jitDbAccessConfiguration,
     error: jitDbAccessConfigurationError,
     isError: isErrorJitDbAccessConfiguration,
     isLoading: isLoadingConfiguration,
     isSuccess: isSuccessConfiguration,
-  } = useJitDbAccessQuery({ projectRef: ref })
+  } = useJitDbAccessQuery({ projectRef: ref }, { enabled: canUpdateJitDbAccess })
 
   const {
     data: jitMembers,
     error: jitMembersError,
     isError: isErrorJitMembers,
     isLoading: isLoadingJitMembers,
-  } = useJitDbAccessMembersQuery({ projectRef: ref })
+  } = useJitDbAccessMembersQuery({ projectRef: ref }, { enabled: canUpdateJitDbAccess })
 
   const { data: projectMembers, isLoading: isLoadingProjectMembers } = useProjectMembersQuery({
     projectRef: ref,
@@ -103,10 +114,6 @@ export const JitDbAccessConfiguration = () => {
     projectRef: ref,
     connectionString: project?.connectionString,
   })
-
-  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
-  )
 
   const { mutateAsync: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
     useJitDbAccessUpdateMutation({
@@ -399,7 +406,18 @@ export const JitDbAccessConfiguration = () => {
                     isSubmitting={isEnablingSSLEnforcement}
                     onConfirm={handleEnableSSLEnforcement}
                   >
-                    <Button loading={isEnablingSSLEnforcement}>Enable SSL enforcement</Button>
+                    <ButtonTooltip
+                      disabled={!canUpdateSSLEnforcement}
+                      loading={isEnablingSSLEnforcement}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'You need additional permissions to enable SSL enforcement',
+                        },
+                      }}
+                    >
+                      Enable SSL enforcement
+                    </ButtonTooltip>
                   </SSLEnforcementConfirmDialog>
                 ) : (
                   <Button asChild>
@@ -418,66 +436,70 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!parentProjectRef && !isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
-            <Card>
-              <CardContent className="space-y-4">
-                <FormLayout
-                  layout="flex-row-reverse"
-                  label="Allow temporary access"
-                  description="Let project members request temporary database access."
-                >
-                  <div className="flex w-fit shrink-0 items-center justify-end gap-2">
-                    {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
-                      <Loader2Icon
-                        className="animate-spin text-foreground-muted/50"
-                        strokeWidth={2}
-                        size={16}
-                      />
-                    )}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                        <div>
-                          <Switch
-                            size="large"
-                            checked={enabled}
-                            onCheckedChange={handleJitToggleChange}
-                            disabled={switchDisabled}
-                          />
-                        </div>
-                      </TooltipTrigger>
-                      {switchTooltipText && (
-                        <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
+          {!parentProjectRef &&
+            !isErrorJitDbAccessConfiguration &&
+            !isJitDbAccessUnavailable &&
+            canUpdateJitDbAccess && (
+              <Card>
+                <CardContent className="space-y-4">
+                  <FormLayout
+                    layout="flex-row-reverse"
+                    label="Allow temporary access"
+                    description="Let project members request temporary database access."
+                  >
+                    <div className="flex w-fit shrink-0 items-center justify-end gap-2">
+                      {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
+                        <Loader2Icon
+                          className="animate-spin text-foreground-muted/50"
+                          strokeWidth={2}
+                          size={16}
+                        />
                       )}
-                    </Tooltip>
-                  </div>
-                </FormLayout>
-              </CardContent>
-              {showToggleFailedWarning && (
-                <Admonition
-                  type="warning"
-                  layout="horizontal"
-                  title="Temporary access update didn’t apply"
-                  description={
-                    <>
-                      The change didn’t apply. Try enabling or disabling temporary access again, or{' '}
-                      <SupportLink
-                        queryParams={{
-                          category: SupportCategories.DASHBOARD_BUG,
-                          subject: 'Temporary access was not updated successfully',
-                        }}
-                        className={InlineLinkClassName}
-                      >
-                        contact support
-                      </SupportLink>{' '}
-                      if the issue persists.
-                    </>
-                  }
-                  className="mb-0 rounded-none border-0"
-                />
-              )}
-            </Card>
-          )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                          <div>
+                            <Switch
+                              size="large"
+                              checked={enabled}
+                              onCheckedChange={handleJitToggleChange}
+                              disabled={switchDisabled}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        {switchTooltipText && (
+                          <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
+                        )}
+                      </Tooltip>
+                    </div>
+                  </FormLayout>
+                </CardContent>
+                {showToggleFailedWarning && (
+                  <Admonition
+                    type="warning"
+                    layout="horizontal"
+                    title="Temporary access update didn’t apply"
+                    description={
+                      <>
+                        The change didn’t apply. Try enabling or disabling temporary access again,
+                        or{' '}
+                        <SupportLink
+                          queryParams={{
+                            category: SupportCategories.DASHBOARD_BUG,
+                            subject: 'Temporary access was not updated successfully',
+                          }}
+                          className={InlineLinkClassName}
+                        >
+                          contact support
+                        </SupportLink>{' '}
+                        if the issue persists.
+                      </>
+                    }
+                    className="mb-0 rounded-none border-0"
+                  />
+                )}
+              </Card>
+            )}
 
           {!parentProjectRef && enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>

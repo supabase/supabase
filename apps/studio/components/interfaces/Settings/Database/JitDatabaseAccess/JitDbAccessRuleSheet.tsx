@@ -47,6 +47,7 @@ import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-quer
 import { useJitDbAccessGrantMutation } from '@/data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
@@ -129,6 +130,12 @@ export function JitDbAccessRuleSheet({
   const [isNewRule, setIsNewRule] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
 
+  // [Joshen] API uses DATABASE_JIT_WRITE atm to check against read access as well
+  // Opting to stay consistent, unless API changes to use DATABASE_JIT_READ
+  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_WRITE
+  )
+
   const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
     projectRef,
     connectionString: project?.connectionString,
@@ -136,9 +143,10 @@ export function JitDbAccessRuleSheet({
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
   const roleIds = useMemo(() => roleOptions.map((role) => role.id), [roleOptions])
 
-  const { data: jitMembers, isSuccess: isSuccessJitMembers } = useJitDbAccessMembersQuery({
-    projectRef,
-  })
+  const { data: jitMembers, isSuccess: isSuccessJitMembers } = useJitDbAccessMembersQuery(
+    { projectRef },
+    { enabled: canUpdateJitDbAccess }
+  )
   const { data: projectMembers, isSuccess: isSuccessProjectMembers } = useProjectMembersQuery({
     projectRef,
   })
