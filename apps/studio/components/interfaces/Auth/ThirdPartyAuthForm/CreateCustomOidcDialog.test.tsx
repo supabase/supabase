@@ -93,4 +93,45 @@ describe('CreateCustomOidcIntegrationDialog', () => {
     await waitFor(() => expect(submit).not.toBeDisabled())
     expect(onClose).not.toHaveBeenCalled()
   })
+
+  test('shows a warning for a shared CI/CD issuer and still allows submit', async () => {
+    const requests: unknown[] = []
+    mockCreateIntegration(requests)
+    const { onClose } = renderDialog()
+
+    expect(
+      screen.queryByText(/issues workflow tokens, not end-user tokens/)
+    ).not.toBeInTheDocument()
+
+    await userEvent.type(
+      screen.getByPlaceholderText(ISSUER_PLACEHOLDER),
+      'https://token.actions.githubusercontent.com/'
+    )
+
+    expect(
+      await screen.findByText('GitHub Actions tokens identify workflows, not end users')
+    ).toBeVisible()
+    expect(screen.getByRole('link', { name: 'how to restrict access' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/guides/auth/third-party/custom-oidc#cicd-workflow-identity-issuers')
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Add provider' }))
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    expect(requests).toEqual([{ oidc_issuer_url: 'https://token.actions.githubusercontent.com/' }])
+  })
+
+  test('does not show the warning for a lookalike issuer', async () => {
+    renderDialog()
+
+    await userEvent.type(
+      screen.getByPlaceholderText(ISSUER_PLACEHOLDER),
+      'https://token.actions.githubusercontent.com.evil.example'
+    )
+
+    expect(
+      screen.queryByText(/issues workflow tokens, not end-user tokens/)
+    ).not.toBeInTheDocument()
+  })
 })

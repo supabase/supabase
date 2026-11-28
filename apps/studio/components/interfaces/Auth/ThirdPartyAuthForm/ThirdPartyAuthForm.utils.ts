@@ -85,3 +85,93 @@ export const isValidOidcIssuerUrl = (value: string) => {
     return false
   }
 }
+
+type CiOidcProvider = {
+  name: string
+  /** Patterns for the normalized issuer, host plus path, see `normalizeOidcUrl`. */
+  issuers: RegExp[]
+  /** Path of the provider's JWKS URL, relative to its issuer. Providers without one match on the issuer only. */
+  jwksPath?: string
+}
+
+/**
+ * CI/CD services whose OIDC issuers identify workflows and machines rather than end users.
+ * Some sign tokens for every customer of the service, others use one issuer URL per customer
+ * or workspace. Keep this list, and the matching rules below, in sync with the
+ * `auth_third_party_shared_ci_issuer` Security Advisor lint.
+ */
+const CI_OIDC_PROVIDERS: CiOidcProvider[] = [
+  {
+    name: 'GitHub Actions',
+    issuers: [
+      /^token\.actions\.githubusercontent\.com(\/[^/]+)?$/,
+      /^token\.actions\.[a-z0-9-]+\.ghe\.com(\/[^/]+)?$/,
+      /^[^/]+\/_services\/token$/,
+    ],
+  },
+  { name: 'GitLab CI/CD', issuers: [/^gitlab\.com$/], jwksPath: '/oauth/discovery/keys' },
+  { name: 'CircleCI', issuers: [/^oidc\.circleci\.com(\/org\/[^/]+)?$/] },
+  {
+    name: 'Bitbucket Pipelines',
+    issuers: [/^api\.bitbucket\.org\/2\.0\/workspaces\/[^/]+\/pipelines-config\/identity\/oidc$/],
+    jwksPath: '/keys.json',
+  },
+  { name: 'Buildkite', issuers: [/^agent\.buildkite\.com$/], jwksPath: '/.well-known/jwks' },
+  { name: 'HCP Terraform', issuers: [/^app\.terraform\.io$/], jwksPath: '/.well-known/jwks' },
+  { name: 'Semaphore', issuers: [/^[a-z0-9-]+\.semaphoreci\.com$/] },
+  // The next five are not verified against public vendor docs. They match on the issuer only.
+  { name: 'Azure DevOps', issuers: [/^vstoken\.dev\.azure\.com\/[^/]+$/] },
+  { name: 'Bitrise', issuers: [/^token\.builds\.bitrise\.io$/] },
+  { name: 'Codefresh', issuers: [/^oidc\.codefresh\.io$/] },
+  { name: 'Harness', issuers: [/^app\.harness\.io\/ng\/api\/oidc\/account\/[^/]+$/] },
+  { name: 'Spacelift', issuers: [/^[a-z0-9-]+\.app\.spacelift\.io$/] },
+]
+
+/**
+ * Reduces an HTTPS URL to its host and path, dropping whitespace and trailing slashes. The host
+ * is lowercased by the URL parser and the path keeps its case. A URL with another scheme, a port
+ * other than the default, credentials, a query, or a fragment doesn't normalize.
+ */
+const normalizeOidcUrl = (value?: string | null) => {
+  if (!value) return undefined
+  try {
+    const url = new URL(value.trim())
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
+      return undefined
+    }
+    return `${url.host}${url.pathname}`.replace(/\/+$/, '')
+  } catch {
+    return undefined
+  }
+}
+
+const matchesCiOidcProvider = (
+  provider: CiOidcProvider,
+  issuer: string | undefined,
+  jwks: string | undefined
+) => {
+  if (issuer && provider.issuers.some((pattern) => pattern.test(issuer))) return true
+  if (!jwks || !provider.jwksPath || !jwks.endsWith(provider.jwksPath)) return false
+
+  const jwksIssuer = jwks.slice(0, -provider.jwksPath.length)
+  return provider.issuers.some((pattern) => pattern.test(jwksIssuer))
+}
+
+/**
+ * Returns the names of CI/CD providers that match the given issuer URL or JWKS URL. Every
+ * pattern is anchored, so lookalike hosts and extra path segments never match.
+ */
+export const findCiOidcProviders = ({
+  issuerUrl,
+  jwksUrl,
+}: {
+  issuerUrl?: string | null
+  jwksUrl?: string | null
+}): string[] => {
+  const issuer = normalizeOidcUrl(issuerUrl)
+  const jwks = normalizeOidcUrl(jwksUrl)
+
+  return CI_OIDC_PROVIDERS.filter((provider) => matchesCiOidcProvider(provider, issuer, jwks)).map(
+    ({ name }) => name
+  )
+}
