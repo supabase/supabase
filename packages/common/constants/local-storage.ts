@@ -118,6 +118,8 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
     `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   EXPLORER_BANNER_DISMISSED: `explorer-banner-dismissed`,
+  STORAGE_VERSIONING_PREVIEW_BANNER_DISMISSED: (ref: string) =>
+    `storage-versioning-preview-banner-dismissed-${ref}`,
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,

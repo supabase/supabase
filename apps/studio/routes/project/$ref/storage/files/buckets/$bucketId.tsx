@@ -213,6 +213,7 @@ function BucketPage() {
       {bucket && (
         <>
           <EditBucketModal
+            key={bucket.id}
             visible={modalDisplayed === 'edit'}
             bucket={bucket}
             onClose={() => closeModal()}

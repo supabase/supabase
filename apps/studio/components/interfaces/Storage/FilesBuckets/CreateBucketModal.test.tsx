@@ -125,6 +125,7 @@ describe(`CreateBucketModal`, () => {
     // Submitted off the form itself: jsdom doesn't associate a button with a form by
     // attribute, so clicking the footer's Create submits nothing.
     fireEvent.submit(document.getElementById('create-storage-bucket-form')!)
+    await userEvent.click(await screen.findByRole('button', { name: 'Enable versioning' }))
 
     // The bucket exists, so the modal closes rather than inviting a retry that would
     // only collide on the name.

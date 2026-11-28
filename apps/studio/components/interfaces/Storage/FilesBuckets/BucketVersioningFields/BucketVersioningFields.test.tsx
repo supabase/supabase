@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { screen, waitForElementToBeRemoved, within } from '@testing-library/react'
+import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
@@ -60,6 +60,27 @@ const getVersionsInput = () =>
   screen.getByRole('spinbutton', { name: /newest noncurrent versions to keep/i })
 
 describe('BucketVersioningFields', () => {
+  test('opens on hover, keeps the Public Alpha details open while hovered, and retains form focus', async () => {
+    renderFields()
+
+    const versioningSwitch = getVersioningSwitch()
+    const trigger = screen.getByRole('button', { name: 'Public Alpha feature details' })
+    versioningSwitch.focus()
+    fireEvent.pointerEnter(trigger)
+
+    const popoverTitle = await screen.findByText('Storage object versioning is in public alpha')
+    expect(document.activeElement).toBe(versioningSwitch)
+
+    fireEvent.pointerEnter(popoverTitle)
+    fireEvent.pointerLeave(trigger)
+    expect(popoverTitle).toBeVisible()
+
+    fireEvent.pointerLeave(popoverTitle)
+    await waitForElementToBeRemoved(() =>
+      screen.queryByText('Storage object versioning is in public alpha')
+    )
+  })
+
   test('hides the lifecycle policy until versioning is turned on', async () => {
     renderFields()
 

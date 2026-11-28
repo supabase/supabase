@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { EditBucketModal } from './EditBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
-import { render } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 const { versioningEnabled } = vi.hoisted(() => ({ versioningEnabled: { current: false } }))
@@ -93,7 +93,7 @@ describe(`EditBucketModal`, () => {
 
   it(`renders a dialog with a form`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
@@ -153,7 +153,7 @@ describe(`EditBucketModal`, () => {
         response: () => new Promise(() => {}) as unknown as Response,
       })
 
-      render(
+      customRender(
         <ProjectContextProvider projectRef="default">
           <EditBucketModal visible bucket={versionedBucket} onClose={vi.fn()} />
         </ProjectContextProvider>
@@ -172,7 +172,7 @@ describe(`EditBucketModal`, () => {
         response: () => Response.json({ rules: [] }),
       })
 
-      render(
+      customRender(
         <ProjectContextProvider projectRef="default">
           <EditBucketModal visible bucket={versionedBucket} onClose={vi.fn()} />
         </ProjectContextProvider>
@@ -190,7 +190,7 @@ describe(`EditBucketModal`, () => {
           Response.json({ message: 'Bucket lifecycle is unavailable' }, { status: 500 }),
       })
 
-      render(
+      customRender(
         <ProjectContextProvider projectRef="default">
           <EditBucketModal visible bucket={versionedBucket} onClose={vi.fn()} />
         </ProjectContextProvider>
@@ -230,7 +230,7 @@ describe(`EditBucketModal`, () => {
         response: patchBucket,
       })
 
-      render(
+      customRender(
         <ProjectContextProvider projectRef="default">
           <EditBucketModal
             visible
@@ -249,6 +249,7 @@ describe(`EditBucketModal`, () => {
       // Saved off the form itself: jsdom doesn't associate a button with a form by attribute,
       // so clicking the footer's Save submits nothing.
       fireEvent.submit(document.getElementById('edit-storage-bucket-form')!)
+      await userEvent.click(await screen.findByRole('button', { name: 'Enable versioning' }))
 
       await waitFor(() => expect(patchBucket).toHaveBeenCalled())
       expect(putLifecycle).not.toHaveBeenCalled()

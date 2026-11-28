@@ -44,6 +44,7 @@ import {
   toVersioningStatusUpdate,
   type BucketVersioningSettings,
 } from './EditBucketModal.utils'
+import { EnableVersioningConfirmationModal } from './EnableVersioningConfirmationModal'
 import { EditBucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
@@ -105,6 +106,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   // Held while the suspend confirmation is open, so confirming completes the save.
   const [pendingSuspendValues, setPendingSuspendValues] = useState<BucketFormValues | null>(null)
+  const [pendingEnableValues, setPendingEnableValues] = useState<BucketFormValues | null>(null)
 
   const track = useTrack()
   // Stashed at submit time and only reported once the save actually succeeds.
@@ -276,6 +278,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     }
 
     // Future uploads stop producing recoverable versions, so confirm first.
+    if (
+      isStorageVersioningEnabled &&
+      versioningSettings.versioning !== 'enabled' &&
+      values.enable_versioning
+    ) {
+      return setPendingEnableValues(values)
+    }
+
     if (
       isStorageVersioningEnabled &&
       isSuspendingVersioning(versioningSettings.versioning, values.enable_versioning)
@@ -555,6 +565,17 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <EnableVersioningConfirmationModal
+        visible={pendingEnableValues !== null}
+        loading={isUpdating}
+        onCancel={() => setPendingEnableValues(null)}
+        onConfirm={() => {
+          const values = pendingEnableValues
+          setPendingEnableValues(null)
+          if (values !== null) void persistChanges(values)
+        }}
+      />
 
       <ConfirmationModal
         variant="warning"

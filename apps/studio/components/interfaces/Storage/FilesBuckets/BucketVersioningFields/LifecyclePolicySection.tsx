@@ -23,6 +23,7 @@ import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVers
 import { AlertError } from '@/components/ui/AlertError'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 const toFieldValue = (rawInput: string): '' | number => {
   const digits = rawInput.replace(/[^0-9]/g, '')
@@ -236,7 +237,16 @@ export const LifecyclePolicySection = ({
               type="warning"
               className="mt-2"
               title="No lifecycle policy"
-              description="Noncurrent versions accumulate and increase storage costs. Set an expiration to delete them automatically."
+              description={
+                <>
+                  Noncurrent versions use Storage space and may increase costs. Set an expiration to
+                  delete them automatically.{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/storage-size`}>
+                    Storage size and pricing
+                  </InlineLink>
+                  .
+                </>
+              }
             />
           </FormSectionCollapse>
         )}
