@@ -11,7 +11,6 @@ on:
       - 'packages/common/**/*.ts*'
       - 'packages/common/package.json'
       - 'apps/www/next.config.mjs'
-      - 'apps/www/next.config.js'
       - 'apps/www/lib/**/*.js'
       - 'apps/www/lib/**/*.mjs'
       - 'apps/www/content/md/**'
