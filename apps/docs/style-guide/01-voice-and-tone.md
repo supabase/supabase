@@ -26,6 +26,22 @@ deep, and they may be evaluating Supabase or already running it in production. T
 about the task they came to complete. Tell them what, and only what, they need to know
 to finish it.
 
+### Document what the reader can use
+
+Describe behavior the reader can observe, configure, or decide on. Leave out internal
+mechanism, such as an algorithm or a limit inside a service, unless the reader acts on
+it. A reader who doesn't need a detail still has to work out that they don't.
+
+- **Recommended**: `The functions service reuses workers, so top-level code runs once for each worker. Put heavy setup there.`
+- **Not recommended**: `Concurrent cold requests start up to one worker for each CPU, and later requests rotate across those workers.`
+
+### Answer the reader's next question
+
+After each step or fact, think of the first question the reader asks next, and answer
+it on the page or link to the answer. After `Enable RLS on the table`, the reader asks
+what happens to existing queries. Say that, until a policy allows them, your app's reads
+return no rows and its inserts fail.
+
 ### Write for a massive global audience
 
 Many readers have a native language that isn't English. Conversational, direct English
@@ -86,6 +102,12 @@ memorizing.
 If you can remove a sentence without losing information, remove it. Watch for a section
 that restates what an earlier section established, and for three phrasings of one idea:
 `It's free`, `You won't be billed`, `No charge`.
+
+When another section of the page, or another page, already states a fact, link to it
+and leave the fact there. Text that this guide asks for at each step, such as the
+[standard SQL snippet](./02-elements.md#for-every-run-the-following-sql-step), and
+shared partials aren't repeated points. Neither is a one-sentence explanation of a term,
+or a warning or prerequisite that the task needs.
 
 ### Use the positive form
 

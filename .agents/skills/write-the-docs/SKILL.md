@@ -31,7 +31,7 @@ Four inputs, read in this sequence (sequence, not priority; Linear remains the p
 3. **Code.** Read the actual implementation before writing a single behavior claim — the PRD describes intent, the code describes what shipped. Check the Linear issue/project first for a linked `supabase/supabase` PR — its diff and description are the most precise "what actually shipped" source, more precise than a general codebase read. If no PR is linked, locate the feature directly in `supabase/supabase` (or the product's own repo), and apply [`ask-the-docs`](../ask-the-docs/SKILL.md)'s reuse/minimalism lens: understand what exists before describing it. When behavior spans services (CLI, Auth, migrations, platform, …), follow [`pm-the-docs`](../pm-the-docs/SKILL.md) → [universe-lookup](../pm-the-docs/reference/universe-lookup.md) **capability gate** (universe when accessible, else OSS public search / linked repos — not `ask-the-docs`). If code and PRD disagree, the code wins for behavior claims — flag the mismatch rather than silently picking one.
 4. **Whatever else the author supplies.** Screenshots, example projects, related pages, Slack threads, a specific voice sample. Screenshots are for more than general context — use them to verify the _exact_ button/menu/field labels before writing instructional steps that reference them; a mismatched UI label is one of the easiest, most avoidable errors in a draft. Ask for these when the feature's user-facing shape is still unclear after 1–3, rather than guessing.
 
-When the draft adds to or rewrites an existing page, also read the whole page, each page it links to, and other pages under `apps/docs/content/` on the same topic. Note facts the draft must not repeat, and nearby text that the draft would make untrue, such as "the steps above".
+When the draft adds to or rewrites an existing page, also read the whole page, each page it links to, and other pages under `apps/docs/content/` and `apps/kb/src/content/` on the same topic. Search by the terms of the behavior as well as the page title. Note facts the draft must not repeat, and nearby text that the draft would make untrue, such as "the steps above".
 
 Summarize all four back to the requester before drafting: what's confirmed, what's product intent vs. shipped behavior, what's still a gap. Stop and ask if a real gap would change the draft's structure or scope.
 
@@ -103,10 +103,11 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 Run this after the compliance checklist, as a separate pass. A clean style review does not show that the page is true. Run it in a fresh subagent that gets only the draft and the pinned version, so it checks the code and not the drafting agent's summary.
 
 1. List every behavior claim in the draft: what the feature accepts, rejects, returns, or requires. Include what each command or script the page tells readers to run changes, beyond its stated purpose.
-2. For each claim, open the source lines again at a pinned version: the commit your branch is based on, or the release tag when the code lives in another repo. Do not check against your notes or an earlier summary of the code.
-3. Compare the claim with every branch in those lines, including early returns, special cases, and fallbacks. If the code has an exception that the sentence leaves out, add the exception or narrow the sentence.
-4. Treat _any_, _all_, _always_, _only_, and _never_ as claims about every case. Keep them only when the code or a test covers every case.
-5. Put the file, line range, and version for each claim in the handoff, so a reviewer can check it.
+2. For each claim, check that the reader needs it. Cut a claim about internal mechanism, instead of making it more exact. See [Document what the reader can use](../../../apps/docs/style-guide/01-voice-and-tone.md#document-what-the-reader-can-use).
+3. For each claim you keep, open the source lines again at a pinned version: the commit your branch is based on, or the release tag when the code lives in another repo. Do not check against your notes or an earlier summary of the code.
+4. Compare the claim with every branch in those lines, including early returns, special cases, and fallbacks. If the code has an exception that the sentence leaves out, and the exception changes what the reader sees or does, add the exception or narrow the sentence.
+5. Treat _any_, _all_, _always_, _only_, and _never_ as claims about every case. Keep them only when the code or a test covers every case.
+6. Put the file, line range, and version for each claim in the handoff, so a reviewer can check it.
 
 When brevity and accuracy conflict, keep the sentence short and complete. Do not drop an exception to make a sentence read better.
 
@@ -127,7 +128,7 @@ Only apply this phase when the draft renames, moves, or deletes an existing page
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
 
 - **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting verification. Gate prerequisites **per artifact class** (Docker Compose stack profile for DB/API artifacts; examples profile / Node in-runner for `example-app`). If declined, or a required prerequisite for that class is missing, record `deferred` for those artifacts only and continue. When accepted, attach the verification report to the PR body / self-review note.
-- Before opening the PR, run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (build, classify, and read the change as a reader), including `pnpm build:guides-markdown` where applicable and the anchor checks in [reference/drafting-mechanics.md](reference/drafting-mechanics.md).
+- Before opening the PR, run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (build, classify, and run the Content review), including `pnpm build:guides-markdown` where applicable and the anchor checks in [reference/drafting-mechanics.md](reference/drafting-mechanics.md).
 - When the PR is opened, carry the Phase 1/2 flagged-assumptions list into the PR description (for example, a "needs review" section) so a reviewer sees it, not just as an inline comment buried in the draft.
 - If the feature is UI-driven and the PR will need screenshots or GIFs, say so in the handoff rather than capturing evidence here.
 

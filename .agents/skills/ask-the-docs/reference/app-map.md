@@ -10,7 +10,7 @@ Verified at: 3089aa3f67 (2026-11-25).
 
 `apps/docs` is a **Next.js App Router** site served at **`/docs`**
 (`basePath` in `next.config.mjs`). It combines hand-written MDX guides,
-machine-generated reference docs, troubleshooting content, federated content
+machine-generated reference docs, federated content
 from external repos, and shared monorepo packages (`ui`, `common`,
 `ui-patterns`, etc.).
 
@@ -24,7 +24,6 @@ flowchart TB
 
   subgraph content ["Content sources"]
     mdx["content/guides/*.mdx"]
-    trouble["content/troubleshooting/*.mdx"]
     spec["spec/*.yml, *.json"]
     generated["features/docs/generated/**"]
     refmdx["docs/ref/*.mdx"]
@@ -38,7 +37,6 @@ flowchart TB
   end
 
   guides --> mdx
-  guides --> trouble
   guides --> fed
   reference --> spec
   reference --> generated
@@ -55,7 +53,7 @@ flowchart TB
 | -------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | `app/`                                 | Next.js App Router — thin route files that delegate to feature modules                 | Slug-based catch-alls per section, e.g. `guides/auth/[[...slug]]/page.tsx`                   |
 | `apps/docs/content/guides/`            | Source MDX for `/docs/guides/...` pages                                                | One file per page; `_partials/` for shared blocks                                            |
-| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                           | Recursion supported                                                                          |                            |
+| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                           | Recursion supported                                                                          |
 | `apps/docs/components/`                | React components used inside MDX                                                       | One folder per component or component family                                                 |
 | `apps/docs/data/`                      | Typed data modules consumed by components                                              | `.data.ts` suffix; lookup helpers live in `.utils.ts`, not here                              |
 | `apps/docs/lib/`                       | Pure library code shared across pipelines                                              | Schemas (zod), helpers (`.utils.ts`), tests                                                  |
@@ -81,12 +79,12 @@ Published guide sections: `ai`, `api`, `auth`, `cron`, `database`, `deployment`,
 
 ## Content types
 
-| Type                   | Location                                              | Notes                                                                                                                                                                                                                                                                    |
-| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Guides / tutorials** | `content/guides/`                                     | Hand-written MDX; goal-oriented                                                                                                                                                                                                                                          |
-| **Troubleshooting**    | `content/troubleshooting/`                            | Partly synced from GitHub issues                                                                                                                                                                                                                                         |
-| **Reference**          | Generated from `spec/` → `features/docs/generated/**` | Spec-driven (OpenAPI, SDKSpec, ConfigSpec, CLISpec). Reference pages do **not** use the standard MDX path — see [`docs-app-direction.md`](./docs-app-direction.md) for why. Management API OpenAPI path: [`management-api-reference.md`](./management-api-reference.md). |
-| **Federated**          | External repos at build time                          | Pulled via GitHub App. See [`federated-docs.md`](./federated-docs.md)                                                                                                                                                                                                    |
+| Type                   | Location                                                                       | Notes                                                                                                                                                                                                                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Guides / tutorials** | `content/guides/`                                                              | Hand-written MDX; goal-oriented                                                                                                                                                                                                                                          |
+| **Troubleshooting**    | Not in `apps/docs`: `/kb`, fetched into `apps/kb/src/content/troubleshooting/` | See `apps/kb/README.md`                                                                                                                                                                                                                                                  |
+| **Reference**          | Generated from `spec/` → `features/docs/generated/**`                          | Spec-driven (OpenAPI, SDKSpec, ConfigSpec, CLISpec). Reference pages do **not** use the standard MDX path — see [`docs-app-direction.md`](./docs-app-direction.md) for why. Management API OpenAPI path: [`management-api-reference.md`](./management-api-reference.md). |
+| **Federated**          | External repos at build time                                                   | Pulled via GitHub App. See [`federated-docs.md`](./federated-docs.md)                                                                                                                                                                                                    |
 
 ## Routing model
 
@@ -228,13 +226,6 @@ Wraps the app with:
 - `DevToolbar` from `dev-tools`
 - `DocsCommandProvider` / `DocsCommandMenu`
 - `SiteLayout` from `layouts/`
-
-
-- `features/docs/Troubleshooting.utils.common.mjs` — `.mjs`, shared between
-  the Next.js build and other scripts that read troubleshooting entries
-  (e.g. search embeddings generation).
-- Topics enum in `TroubleshootingSchema` (the `topics` field) is the source
-  of truth for product tag values.
 
 ## Known integrations
 
