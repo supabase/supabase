@@ -259,6 +259,38 @@ function getBasePath(entrypoint: string | undefined, fileNames: string[]): strin
   }
 }
 
+function getFunctionEditorPath(basePath: string, fileName: string): string {
+  const sharedPath = commonPath([basePath, fileName])
+  if (sharedPath === '' || sharedPath === '/tmp/') return fileName
+
+  return relative('/' + basePath, '/' + fileName)
+}
+
+export function getFunctionEditorImportMapPath({
+  functionBody,
+  entrypointPath,
+  importMapPath,
+}: {
+  functionBody: EdgeFunctionBodyData
+  entrypointPath?: string | null
+  importMapPath?: string | null
+}): string | undefined {
+  if (!importMapPath) return
+
+  const entrypoint = functionBody.metadata?.deno2_entrypoint_path ?? entrypointPath
+  const fileNames = functionBody.files.map(({ name }) => name)
+  // Metadata may include a deployment prefix that is absent from the multipart file names.
+  const configuredFile =
+    fileNames.find((name) => name === importMapPath) ??
+    fileNames
+      .filter((name) => importMapPath.endsWith('/' + name.replace(/^\/+/, '')))
+      .sort((a, b) => b.length - a.length)[0]
+
+  if (configuredFile) {
+    return getFunctionEditorPath(getBasePath(entrypoint ?? undefined, fileNames), configuredFile)
+  }
+}
+
 export const formatFunctionBodyToFiles = ({
   functionBody,
   entrypointPath,
@@ -278,16 +310,7 @@ export const formatFunctionBodyToFiles = ({
       // set file paths relative to entrypoint
       .map((file: { name: string; content: string }) => {
         try {
-          // if the current file and base path doesn't share a common path,
-          // return unmodified file
-          const common_path = commonPath([base_path, file.name])
-          if (common_path === '' || common_path === '/tmp/') {
-            return file
-          }
-
-          // prepend "/" to turn relative paths to absolute
-          file.name = relative('/' + base_path, '/' + file.name)
-          return file
+          return { ...file, name: getFunctionEditorPath(base_path, file.name) }
         } catch (e) {
           console.error(e)
           // return unmodified file

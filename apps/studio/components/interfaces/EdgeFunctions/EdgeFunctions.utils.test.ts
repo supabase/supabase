@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatFunctionBodyToFiles,
   getDefaultSelectedFileId,
+  getFunctionEditorImportMapPath,
   getFunctionZipEntries,
 } from './EdgeFunctions.utils'
 
@@ -120,6 +121,66 @@ describe('formatFunctionBodyToFiles sorting', () => {
       [3, 'c.ts'],
       [4, 'index.ts'],
     ])
+  })
+})
+
+describe('getFunctionEditorImportMapPath', () => {
+  it('keeps the configured nested import map when a root file shares its basename', () => {
+    const functionBody = {
+      files: [
+        { name: 'functions/hello/index.ts', content: '' },
+        { name: 'functions/hello/import_map.json', content: '{}' },
+        { name: 'functions/hello/config/import_map.json', content: '{}' },
+      ],
+      metadata: { deno2_entrypoint_path: 'functions/hello/index.ts' },
+    }
+
+    const editorFiles = formatFunctionBodyToFiles({ functionBody })
+    const path = getFunctionEditorImportMapPath({
+      functionBody,
+      importMapPath: 'file:///tmp/deploy/functions/hello/config/import_map.json',
+    })
+
+    expect(path).toBe('config/import_map.json')
+    expect(editorFiles.some(({ name }) => name === path)).toBe(true)
+  })
+
+  it('uses the same relative path as the editor for a shared import map', () => {
+    const functionBody = {
+      files: [
+        { name: 'functions/hello/index.ts', content: '' },
+        { name: 'functions/_shared/import_map.json', content: '{}' },
+      ],
+    }
+    const entrypointPath = 'functions/hello/index.ts'
+    const editorFiles = formatFunctionBodyToFiles({ functionBody, entrypointPath })
+
+    const path = getFunctionEditorImportMapPath({
+      functionBody,
+      entrypointPath,
+      importMapPath: 'functions/_shared/import_map.json',
+    })
+
+    expect(path).toBe('../_shared/import_map.json')
+    expect(editorFiles.some(({ name }) => name === path)).toBe(true)
+  })
+
+  it('keeps an exact configured filename when a nested file has the same name', () => {
+    const functionBody = {
+      files: [
+        { name: 'index.ts', content: '' },
+        { name: 'deno.json', content: '{}' },
+        { name: 'config/deno.json', content: '{}' },
+      ],
+      metadata: { deno2_entrypoint_path: 'index.ts' },
+    }
+
+    expect(getFunctionEditorImportMapPath({ functionBody, importMapPath: 'deno.json' })).toBe(
+      'deno.json'
+    )
+    expect(getFunctionEditorImportMapPath({ functionBody, importMapPath: 'missing.json' })).toBe(
+      undefined
+    )
   })
 })
 
