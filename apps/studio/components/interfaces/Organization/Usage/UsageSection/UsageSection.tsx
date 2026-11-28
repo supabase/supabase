@@ -23,6 +23,8 @@ export interface UsageSectionProps {
   currentBillingCycleSelected: boolean
   startDate?: string
   endDate?: string
+  /** Optional right-aligned actions rendered on the section header row */
+  headerActions?: React.ReactNode
 }
 
 const UsageSection = ({
@@ -34,6 +36,7 @@ const UsageSection = ({
   currentBillingCycleSelected,
   startDate,
   endDate,
+  headerActions,
 }: UsageSectionProps) => {
   const {
     data: usage,
@@ -60,6 +63,7 @@ const UsageSection = ({
           title={categoryMeta.name}
           description={categoryMeta.description}
           className="pb-0"
+          actions={headerActions}
         />
       </PageContainer>
 
