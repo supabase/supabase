@@ -58,14 +58,11 @@ const StudioLink = forwardRef(function StudioLink(
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
   const { href, prefetch, replace, scroll: _scroll, shallow: _shallow, children, ...rest } = props
-  const { currentPathname, currentSearch } = useRouterState({
-    select: (state) => {
-      const committed = state.resolvedLocation ?? state.location
-      return {
-        currentPathname: committed.pathname,
-        currentSearch: committed.searchStr,
-      }
-    },
+  const currentPathname = useRouterState({
+    select: (state) => (state.resolvedLocation ?? state.location).pathname,
+  })
+  const currentSearch = useRouterState({
+    select: (state) => (state.resolvedLocation ?? state.location).searchStr,
   })
   const resolvedHref = resolveSearchOrHashOnlyTarget(href, currentPathname, currentSearch)
   const { to, search, hash } = splitInternalUrl(resolvedHref)

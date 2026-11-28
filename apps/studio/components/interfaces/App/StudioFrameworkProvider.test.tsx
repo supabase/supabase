@@ -7,7 +7,8 @@ import {
 } from '@tanstack/react-router'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { FrameworkImage, FrameworkLink, useFramework, useParams } from 'common'
-import { describe, expect, it } from 'vitest'
+import { Profiler } from 'react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { StudioFrameworkProvider } from './StudioFrameworkProvider'
 import { renderRoute } from '@/tests/lib/route-render'
@@ -114,5 +115,64 @@ describe('StudioFrameworkProvider', () => {
 
     finishLoading()
     await waitFor(() => expect(screen.getByTestId('isReady')).toHaveTextContent('true'))
+  })
+
+  it('does not re-render StudioLink on router state ticks that leave pathname and search unchanged', async () => {
+    const onLinkRender = vi.fn()
+
+    function LinkProbe() {
+      return (
+        <Profiler id="studio-link" onRender={onLinkRender}>
+          <FrameworkLink href="/project/abc/editor">Editor</FrameworkLink>
+        </Profiler>
+      )
+    }
+
+    const rootRoute = createRootRoute({
+      shellComponent: ({ children }) => (
+        <StudioFrameworkProvider>{children}</StudioFrameworkProvider>
+      ),
+    })
+    const pageRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: 'project/$ref/editor',
+      component: LinkProbe,
+    })
+    let finishPending!: () => void
+    const pendingNav = new Promise<void>((resolve) => {
+      finishPending = resolve
+    })
+    const otherRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: 'project/$ref/sql',
+      beforeLoad: () => pendingNav,
+      component: () => null,
+    })
+
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([pageRoute, otherRoute]),
+      history: createMemoryHistory({ initialEntries: ['/project/my-proj/editor?tab=1'] }),
+    })
+
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByRole('link', { name: 'Editor' })).toBeInTheDocument()
+
+    const rendersAfterMount = onLinkRender.mock.calls.length
+
+    let navPromise!: Promise<void>
+    await act(async () => {
+      navPromise = router.navigate({
+        to: '/project/$ref/sql',
+        params: { ref: 'my-proj' },
+      })
+      await Promise.resolve()
+    })
+
+    expect(onLinkRender.mock.calls.length).toBe(rendersAfterMount)
+
+    await act(async () => {
+      finishPending()
+      await navPromise
+    })
   })
 })

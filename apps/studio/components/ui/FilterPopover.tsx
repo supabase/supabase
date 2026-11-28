@@ -52,13 +52,15 @@ interface FilterPopoverProps<T, ValueType extends keyof T = keyof T> {
   renderLabel?: (option: T, value: string) => React.ReactNode
 }
 
+const EMPTY_ARRAY: never[] = []
+
 // [Joshen] Known issue currently that FilterPopover trigger label will not show selected options properly
 // for async data with infinite loading. Thinking this requires quite a bit of change that I'd rather do in
 // a separate PR
 export const FilterPopover = <T extends Record<string, any>, ValueType extends keyof T = keyof T>({
   title,
-  options = [],
-  activeOptions = [],
+  options = EMPTY_ARRAY,
+  activeOptions = EMPTY_ARRAY,
   valueKey,
   labelKey,
   iconKey = 'icon',
@@ -153,8 +155,14 @@ export const FilterPopover = <T extends Record<string, any>, ValueType extends k
   })
 
   useEffect(() => {
-    if (!open) setSelectedOptions(activeOptions)
-    if (!open) setSearch('')
+    if (!open) {
+      setSelectedOptions((prev) =>
+        prev.length === activeOptions.length && prev.every((item, i) => item === activeOptions[i])
+          ? prev
+          : activeOptions
+      )
+      setSearch('')
+    }
   }, [open, activeOptions])
 
   useEffect(() => {

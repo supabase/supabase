@@ -68,6 +68,8 @@ export interface AnimatedCounterProps {
  * />
  * ```
  */
+const DEFAULT_EASE: [number, number, number, number] = [0.175, 0.885, 0.32, 1]
+
 export const AnimatedCounter: FC<AnimatedCounterProps> = ({
   value,
   duration = 2.5,
@@ -75,7 +77,7 @@ export const AnimatedCounter: FC<AnimatedCounterProps> = ({
   isPercentage = false,
   prefix = '',
   className = '',
-  ease = [0.175, 0.885, 0.32, 1],
+  ease = DEFAULT_EASE,
 }) => {
   const count = useMotionValue(0)
   const rounded = useTransform(count, (latest) =>

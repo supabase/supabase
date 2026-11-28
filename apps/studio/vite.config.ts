@@ -262,20 +262,7 @@ function ssrStubGraphiql(): Plugin {
 //
 // Cycles are matched by chunk basename prefix (directory and `-<hash>.js`
 // suffix stripped), so the allowlist stays stable across builds.
-const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
-  // `ui` ↔ `TreeView` chunk cycle. `cva` lives in the `ui` chunk
-  // (Rolldown pools it there because many ui files use it), TreeView
-  // imports `cva` back from `ui` while `ui`'s barrel re-exports
-  // TreeView — runtime crash is "cva is not a function" at SSR.
-  // Worked around via the `class-variance-authority` manualChunks
-  // pin below; the chunk graph still surfaces the SCC even though
-  // the top-level `cva(...)` call inside TreeView no longer crashes.
-  // The variants below are the same SCC in different shapes — they
-  // shuffle as Rolldown re-chunks across merges.
-  ['LoadingLine', 'TreeView', 'ui'],
-  ['FormLayout', 'LoadingLine', 'TreeView', 'ui', 'index'],
-  ['LoadingLine', 'TreeView', 'ui', 'index'],
-]
+const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = []
 
 function chunkPrefix(name: string): string {
   return name
@@ -554,25 +541,6 @@ export default defineConfig(({ command, mode }) => {
     getSecurityHeaders().map(({ key, value }) => [key, value])
   )
 
-  // Substitutions that have to apply to *both* our app source (via Vite's
-  // `define`) and any pre-bundled dependencies (via esbuild's optimizeDeps).
-  // The two pipelines don't share config — Vite's `define` only touches
-  // files going through Vite's transform, while optimizeDeps runs esbuild
-  // on `node_modules` deps with its own separate `define`.
-  //   - `global` → `globalThis`: makes Node-style libs (`randombytes` via
-  //     `generate-password-browser`, etc.) work in the browser. Surfaces
-  //     on /auth/hooks via `randombytes/browser.js:16`.
-  //
-  // NOTE: `define.amd` is deliberately NOT substituted here. The AMD
-  // short-circuit is handled exclusively by the `umdAmdShortCircuit()`
-  // transform above — a blanket `'define.amd': 'false'` define would also
-  // rewrite the *read* in vendored bundles that install their own local
-  // `define` shim (monaco-editor's `esm/vs/base/common/marked/marked.js`)
-  // and break them — see the plugin's comment for the failure mode.
-  const sharedDefines = {
-    global: 'globalThis',
-  }
-
   return {
     server: {
       port: 3000,
@@ -605,71 +573,22 @@ export default defineConfig(({ command, mode }) => {
         '@graphiql/react/setup-workers/vite',
       ],
     },
+    // NOTE: `define.amd` is deliberately NOT substituted here. The AMD
+    // short-circuit is handled exclusively by the `umdAmdShortCircuit()`
+    // transform above — a blanket `'define.amd': 'false'` define would also
+    // rewrite the *read* in vendored bundles that install their own local
+    // `define` shim (monaco-editor's `esm/vs/base/common/marked/marked.js`)
+    // and break them — see the plugin's comment for the failure mode.
     define: {
       ...publicEnvDefines,
-      ...sharedDefines,
     },
-    // Circular-dep workaround: pin shared library code into dedicated
-    // chunks so per-component chunks don't import from a chunk that
-    // (transitively) imports them back.
-    //
-    //   `class-variance-authority` — TreeView gets split into its own
-    //   chunk that imports `cva` from the `ui` chunk while `ui` imports
-    //   TreeView back. Leaves `cva` undefined at TreeView's top-level
-    //   `cva(...)` call during SSR prerender.
-    //
-    //   `lucide-react` — each icon (e.g. `FolderOpen`) gets a per-icon
-    //   chunk that imports `createLucideIcon` from the `ui` chunk; the
-    //   `ui` chunk in turn re-exports icons from `lucide-react`. The
-    //   circular leaves `createLucideIcon` undefined when the icon
-    //   chunk's top-level `createLucideIcon('FolderOpen', …)` runs —
-    //   surfaces in the browser as "TypeError: e is not a function" at
-    //   `folder-open-<hash>.js`.
-    //
-    //   `react` / `react-dom` — pinning lucide-react alone caused
-    //   Rolldown to suck React into the lucide-react chunk (lucide
-    //   depends on React, no explicit pin further up the graph). That
-    //   shifted live-bindings across the rest of the chunk graph and
-    //   broke unrelated chunks (e.g. `Alert-<hash>.js` started crashing
-    //   with `c is not a function` because its `styleHandler` import
-    //   came in through the now-too-large `lucide-react` chunk). Pin
-    //   React explicitly so it stays a leaf vendor chunk.
-    //
-    //   `packages/ui/src/components/shadcn/ui/field.tsx` — its only
-    //   non-barrel importer is Storage's `FileExplorerHeader`, so
-    //   Rolldown pools it into the storage bucket page chunk while the
-    //   `ui` package barrel (`packages/ui/index.tsx`) re-exports it —
-    //   `ui` ends up importing `FieldDescription` back from the page
-    //   chunk it's itself imported by.
-    //
-    //   `packages/ui/src/components/shadcn/ui/drawer.tsx` — same shape,
-    //   its only non-barrel importer sits inside the Logs Explorer page
-    //   tree (`DataTableFilterControlsDrawer`), so it gets pooled into
-    //   the `logs` page chunk while `ui`'s barrel re-exports it too.
-    //
-    //   `packages/ui/src/components/shadcn/ui/form.tsx` and
-    //   `packages/ui/src/components/shadcn/ui/sidebar.tsx` (+
-    //   `use-mobile.tsx`) — same shape again: each gets pooled into
-    //   whichever page/feature chunk happens to be its only non-barrel
-    //   importer (a form page, `components/interfaces/Sidebar.tsx`)
-    //   while `ui`'s barrel re-exports them too.
-    //
-    //   `packages/ui/src/components/shadcn/ui/slider.tsx` — same shape
-    //   again: its only non-barrel importer is the Appearance settings'
-    //   `ThemeColorSettings`, so Rolldown pools it into the `/account/me`
-    //   page chunk while `ui`'s barrel re-exports it too.
+    // Group React and Lucide into stable vendor chunks: keeps React as a single
+    // leaf chunk ahead of Lucide and prevents Lucide from fanning out into
+    // ~100 individual per-icon modulepreload requests in the initial shell.
     build: {
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            if (id.includes('node_modules/class-variance-authority/')) {
-              return 'class-variance-authority'
-            }
-            // Pin React / React-DOM (and their JSX runtimes + scheduler)
-            // before lucide-react, so downstream chunks consume React
-            // from one place. Rolldown can still inline React into
-            // adjacent chunks for CJS interop, but the explicit pin
-            // anchors the canonical copy here.
             if (
               /node_modules\/(react|react-dom|scheduler)(\/|$)/.test(id) ||
               /node_modules\/react\/jsx-(runtime|dev-runtime)/.test(id)
@@ -678,28 +597,6 @@ export default defineConfig(({ command, mode }) => {
             }
             if (id.includes('node_modules/lucide-react/')) {
               return 'lucide-react'
-            }
-            if (id.includes('packages/ui/src/components/shadcn/ui/field.tsx')) {
-              return 'ui-field'
-            }
-            if (id.includes('packages/ui/src/components/shadcn/ui/drawer.tsx')) {
-              return 'ui-drawer'
-            }
-            if (id.includes('packages/ui/src/components/shadcn/ui/form.tsx')) {
-              return 'ui-form'
-            }
-            if (
-              id.includes('packages/ui/src/components/shadcn/ui/sidebar.tsx') ||
-              id.includes('packages/ui/src/components/hooks/use-mobile.tsx')
-            ) {
-              return 'ui-sidebar'
-            }
-            if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
-              return 'ui-slider'
-            }
-            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
-            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
-              return 'ui-avatar'
             }
             return undefined
           },
