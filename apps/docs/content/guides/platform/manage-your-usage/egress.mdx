@@ -57,7 +57,7 @@ Data pushed to the connected log drain.
 
 ### Cached Egress
 
-Cached and uncached egress have independent quotas and independent pricing. Cached egress is egress that is served from our CDN via cache hits. Cached egress is typically incurred for storage through our [Smart CDN](/docs/guides/storage/cdn/smart-cdn).
+Cached egress is egress served from our CDN via cache hits, typically for Storage through our [Smart CDN](/docs/guides/storage/cdn/smart-cdn). A cache hit does not make this traffic free. Cached egress has its own quota and a lower per-GB price than uncached egress (see [Pricing](#pricing) below).
 
 ## How charges are calculated
 
@@ -197,7 +197,7 @@ height={510}
 
 ### Most requested API endpoints
 
-In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [query API Gateway events](/docs/guides/observability/advanced-log-filtering) to identify heavily queried paths. These logs currently do not include response byte data. That data will be available in the future too.
+In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [query API Gateway events](/docs/guides/observability/advanced-log-filtering) to identify heavily queried paths. These logs currently do not include response byte data, so rank paths by request count. That data will be available in the future too.
 
 <Image
   alt="Top paths"
@@ -209,6 +209,54 @@ In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [
 width={4492}
 height={1166}
 />
+
+Run this query in the [Logs Explorer](/dashboard/project/_/logs/explorer) to rank REST API paths by request count:
+
+```sql
+select
+  request.path as path,
+  count(*) as count
+from
+  edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+where request.path like '/rest/v1/%'
+group by path
+order by count desc
+limit 20;
+```
+
+### Heaviest Storage paths
+
+For Storage, group requests by path to find the objects that drive the most egress. A path with a high count and `cached = false` is a strong candidate for caching or image transformation:
+
+```sql
+select
+  request.path as path,
+  (responseHeaders.cf_cache_status = 'HIT') as cached,
+  count(*) as count
+from
+  edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+  cross join unnest(m.response) as response
+  cross join unnest(response.headers) as responseHeaders
+where request.path like '%storage/v1/object/%' and request.method = 'GET'
+group by path, cached
+order by count desc
+limit 20;
+```
+
+## Common causes
+
+High egress usually traces to one of these. Confirm the source in logs or Query Performance before changing anything — the fix may be in your application code or in your Supabase configuration.
+
+| Symptom                   | Where to confirm                                            | Possible fix (your code)                         | Possible fix (Supabase)                      |
+| ------------------------- | ----------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------- |
+| High REST / API egress    | Query Performance (rows returned × calls); API Gateway logs | Select fewer columns, paginate, make fewer calls | Cache cacheable responses                    |
+| High Storage egress       | Storage request logs (top paths)                            | Request smaller or transformed assets            | Smart CDN, `Cache-Control`, image transforms |
+| High Realtime egress      | Realtime logs                                               | Use subscriptions over polling; trim payloads    | —                                            |
+| High Shared Pooler egress | Limited today — review manual backups run through Supavisor | Reduce backup scope and frequency                | Contact support for a deeper breakdown       |
 
 ## Optimize usage
 
