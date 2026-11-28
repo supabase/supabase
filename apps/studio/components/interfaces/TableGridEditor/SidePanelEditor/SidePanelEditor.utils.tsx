@@ -208,6 +208,7 @@ export const createColumn = async ({
   foreignKeyRelations = [],
   skipSuccessMessage = false,
   toastId: _toastId,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -217,6 +218,7 @@ export const createColumn = async ({
   foreignKeyRelations?: ForeignKey[]
   skipSuccessMessage?: boolean
   toastId?: string | number
+  track?: Track
 }) => {
   const toastId = _toastId ?? toast.loading(`Creating column "${payload.name}"...`)
   try {
@@ -264,6 +266,15 @@ export const createColumn = async ({
       })
     }
 
+    track?.(
+      'table_column_created',
+      {
+        hasForeignKey: foreignKeyRelations.some((fk) => !fk.toRemove),
+        isArray: Boolean(payload.type.isArray),
+      },
+      { project: projectRef }
+    )
+
     if (!skipSuccessMessage) {
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
@@ -286,6 +297,7 @@ export const updateColumn = async ({
   existingForeignKeyRelations = [],
   skipPKCreation,
   skipSuccessMessage = false,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -297,6 +309,7 @@ export const updateColumn = async ({
   existingForeignKeyRelations?: ForeignKeyConstraint[]
   skipPKCreation?: boolean
   skipSuccessMessage?: boolean
+  track?: Track
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
@@ -347,6 +360,21 @@ export const updateColumn = async ({
         existingForeignKeyRelations,
       })
     }
+
+    track?.(
+      'table_column_updated',
+      {
+        hasForeignKey:
+          foreignKeyRelations.length > 0
+            ? foreignKeyRelations.some((fk) => !fk.toRemove)
+            : existingForeignKeyRelations.length > 0,
+        isArray:
+          payload.type !== undefined
+            ? Boolean(payload.type.isArray)
+            : originalColumn.data_type === 'ARRAY',
+      },
+      { project: projectRef }
+    )
 
     if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
@@ -893,6 +921,14 @@ export const updateTable = async ({
     includeRows: true,
     includeLint: true,
   })
+
+  if (!hasError) {
+    track(
+      'table_updated',
+      { columnCountChanged: columns.length !== originalColumns.length },
+      { project: projectRef }
+    )
+  }
 
   return {
     table: await prefetchTableEditor(queryClient, {

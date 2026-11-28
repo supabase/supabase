@@ -3357,6 +3357,210 @@ export interface RlsGeneratedPoliciesCreatedEvent {
 }
 
 /**
+ * User picked a different schema in the Table Editor sidebar schema selector. Re-selecting the
+ * current schema doesn't fire.
+ *
+ * @group Events
+ * @source Table Editor sidebar schema selector (SchemaSelector in TableEditorMenu), when the user picks a schema other than the current one
+ * @page /project/{ref}/editor, /project/{ref}/editor/{id}
+ */
+export interface TableEditorSchemaSelectorUpdatedEvent {
+  action: 'table_editor_schema_selector_updated'
+  properties: {
+    /** Kind of the selected schema */
+    schemaType: DatabaseSchemaType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to create a new schema or table in the Table Editor.
+ *
+ * @group Events
+ * @source "Create a new schema" in the sidebar schema selector, the sidebar "New table" button, or the "Create a table" card on the new-tab page
+ * @page /project/{ref}/editor, /project/{ref}/editor/{id}, /project/{ref}/editor/new
+ */
+export interface TableEditorNewItemClickedEvent {
+  action: 'table_editor_new_item_clicked'
+  properties:
+    | {
+        /** The type of database item being created */
+        itemType: 'schema'
+      }
+    | {
+        /** The type of database item being created */
+        itemType: 'table'
+        /** Where the user clicked to create the table */
+        trigger: 'sidebar' | 'new_tab_card'
+      }
+  groups: TelemetryGroups
+}
+
+/**
+ * User searched the Table Editor sidebar entity list. Fires 500ms after the user stops typing a
+ * non-empty search, so refining a search after a pause fires again. Clearing the search or
+ * switching schema before then cancels it. The search text is not sent.
+ *
+ * @group Events
+ * @source "Search tables..." input in the Table Editor sidebar
+ * @page /project/{ref}/editor, /project/{ref}/editor/{id}
+ */
+export interface TableEditorTableSearchSubmittedEvent {
+  action: 'table_editor_table_search_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * User changed which entity types the Table Editor sidebar list shows.
+ *
+ * @group Events
+ * @source Entity type checkboxes and "Select only" in the sidebar filter dropdown, or resetting filters from the empty state
+ * @page /project/{ref}/editor, /project/{ref}/editor/{id}
+ */
+export interface TableEditorEntityFilterUpdatedEvent {
+  action: 'table_editor_entity_filter_updated'
+  properties: {
+    /** Number of entity types shown after the change */
+    visibleTypeCount: number
+  }
+  groups: TelemetryGroups
+}
+
+export type TableEditorEntityAction =
+  | 'copy_name'
+  | 'copy_schema'
+  | 'copy_definition'
+  | 'edit'
+  | 'duplicate'
+  | 'export_csv'
+  | 'export_sql'
+  | 'export_cli'
+  | 'view_partitions'
+  | 'delete'
+
+export type TableEditorEntityType =
+  | 'table'
+  | 'view'
+  | 'materialized_view'
+  | 'foreign_table'
+  | 'partitioned_table'
+
+/**
+ * User selected an action for a table, view or other entity in the Table Editor sidebar. The
+ * dropdown and right-click menus share one handler, so each selection fires once. "View policies"
+ * is a link covered by pageviews and isn't tracked here.
+ *
+ * @group Events
+ * @source Entity dropdown (⋮) and context menus in the Table Editor sidebar list
+ * @page /project/{ref}/editor, /project/{ref}/editor/{id}
+ */
+export interface TableEditorEntityActionClickedEvent {
+  action: 'table_editor_entity_action_clicked'
+  properties: {
+    /** The menu action selected */
+    action: TableEditorEntityAction
+    /** The kind of entity the action targets */
+    entityType: TableEditorEntityType
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User created a column from the column side panel. Fires after the column and its foreign keys
+ * are saved. Columns added while editing a table in the table side panel count toward
+ * `table_updated` instead.
+ *
+ * @group Events
+ * @source Column side panel (ColumnEditor) save, once the save succeeds
+ * @page /project/{ref}/editor/{id}, /project/{ref}/database/tables, /project/{ref}/database/schemas
+ */
+export interface TableColumnCreatedEvent {
+  action: 'table_column_created'
+  properties: {
+    /** Whether the column has at least one foreign key */
+    hasForeignKey: boolean
+    /** Whether the column is an array type */
+    isArray: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing column from the column side panel. Fires after the column and its
+ * foreign keys are saved. Column changes made while editing a table in the table side panel
+ * count toward `table_updated` instead.
+ *
+ * @group Events
+ * @source Column side panel (ColumnEditor) save, once the save succeeds
+ * @page /project/{ref}/editor/{id}, /project/{ref}/database/tables, /project/{ref}/database/schemas
+ */
+export interface TableColumnUpdatedEvent {
+  action: 'table_column_updated'
+  properties: {
+    /** Whether the column has at least one foreign key after the update */
+    hasForeignKey: boolean
+    /** Whether the column is an array type after the update */
+    isArray: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User saved changes to an existing table from the table side panel. Not sent when any column
+ * change in the same save fails.
+ *
+ * @group Events
+ * @source Table side panel (TableEditor) save for an existing table, once the save succeeds
+ * @page /project/{ref}/editor/{id}, /project/{ref}/database/tables, /project/{ref}/database/schemas
+ */
+export interface TableUpdatedEvent {
+  action: 'table_updated'
+  properties: {
+    /**
+     * Whether the table has a different number of columns after the save. Adding one column and
+     * removing another in the same save reports `false`.
+     */
+    columnCountChanged: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User saved changes to an existing row from the Table Editor row side panel. Fires once the
+ * update is persisted: edits queued with queue operations enabled, saves from the expanded cell
+ * editors and foreign row selections are not counted. Row inserts are tracked by `table_data_added`.
+ *
+ * @group Events
+ * @source Row side panel (RowEditor) save for an existing row, once the update succeeds
+ * @page /project/{ref}/editor/{id}
+ */
+export interface TableEditorRowUpdatedEvent {
+  action: 'table_editor_row_updated'
+  properties: {
+    /** How the row edit was made */
+    editMethod: 'side_panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the expanded JSON or text editor for a cell, either from a grid cell's editor
+ * popover or from a field in the row side panel.
+ *
+ * @group Events
+ * @source "Expand editor" button in the grid cell editors (JsonEditor, TextEditor) and the row side panel fields
+ * @page /project/{ref}/editor/{id}
+ */
+export interface TableEditorCellEditorOpenedEvent {
+  action: 'table_editor_cell_editor_opened'
+  properties: {
+    /** Which expanded editor was opened */
+    editorType: 'json' | 'text'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened API docs panel.
  *
  * @group Events
@@ -5369,6 +5573,16 @@ export type TelemetryEvent =
   | RlsGeneratePoliciesClickedEvent
   | RlsGeneratedPolicyRemovedEvent
   | RlsGeneratedPoliciesCreatedEvent
+  | TableEditorSchemaSelectorUpdatedEvent
+  | TableEditorNewItemClickedEvent
+  | TableEditorTableSearchSubmittedEvent
+  | TableEditorEntityFilterUpdatedEvent
+  | TableEditorEntityActionClickedEvent
+  | TableColumnCreatedEvent
+  | TableColumnUpdatedEvent
+  | TableUpdatedEvent
+  | TableEditorRowUpdatedEvent
+  | TableEditorCellEditorOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent

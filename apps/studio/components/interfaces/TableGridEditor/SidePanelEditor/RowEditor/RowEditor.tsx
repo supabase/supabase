@@ -28,6 +28,7 @@ import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationU
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
@@ -54,6 +55,7 @@ export const RowEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: RowEditorProps) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save'
@@ -144,6 +146,16 @@ export const RowEditor = ({
     })
     setRowFields(updatedFields)
     updateEditorDirty()
+  }
+
+  const handleOpenJsonEditor = (value: EditValue) => {
+    track('table_editor_cell_editor_opened', { editorType: 'json' })
+    setSelectedValueForJsonEdit(value)
+  }
+
+  const handleOpenTextEditor = (value: EditValue) => {
+    track('table_editor_cell_editor_opened', { editorType: 'text' })
+    setSelectedValueForTextEdit(value)
   }
 
   const onOpenForeignRowSelector = async (row: RowField) => {
@@ -264,8 +276,8 @@ export const RowEditor = ({
                         field={field}
                         errors={errors}
                         onUpdateField={onUpdateField}
-                        onEditJson={setSelectedValueForJsonEdit}
-                        onEditText={setSelectedValueForTextEdit}
+                        onEditJson={handleOpenJsonEditor}
+                        onEditText={handleOpenTextEditor}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         status={copiedLargeValues.statuses[field.name]}
                         isEditable={
@@ -296,8 +308,8 @@ export const RowEditor = ({
                           field={field}
                           errors={errors}
                           onUpdateField={onUpdateField}
-                          onEditText={setSelectedValueForTextEdit}
-                          onEditJson={setSelectedValueForJsonEdit}
+                          onEditText={handleOpenTextEditor}
+                          onEditJson={handleOpenJsonEditor}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           status={copiedLargeValues.statuses[field.name]}
                           isEditable={

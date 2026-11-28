@@ -27,6 +27,7 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
@@ -41,6 +42,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isEditable?: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }) => {
+  const track = useTrack()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
@@ -103,6 +105,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   )
 
   const onSelectExpand = () => {
+    track('table_editor_cell_editor_opened', { editorType: 'text' })
     cancelChanges()
     onExpandEditor(column.key, {
       ...row,

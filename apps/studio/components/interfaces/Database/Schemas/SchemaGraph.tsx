@@ -74,7 +74,11 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import {
+  getDatabaseSchemaType,
+  useIsProtectedSchema,
+  useProtectedSchemas,
+} from '@/hooks/useProtectedSchemas'
 import { tablesToSQL } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
@@ -299,12 +303,7 @@ export const SchemaGraph = () => {
     setFindTableOpen(false)
     setSelectedSchema(name)
     track('database_schema_selector_updated', {
-      schemaType:
-        name === 'public'
-          ? 'public'
-          : protectedSchemas.some((s) => s.name === name)
-            ? 'protected'
-            : 'custom',
+      schemaType: getDatabaseSchemaType(name, protectedSchemas),
     })
   }
 
