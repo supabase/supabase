@@ -59,7 +59,7 @@ write(
 )
 write(
   'pnpm-lock.yaml',
-  "lockfileVersion: '9.0'\nimporters:\n  .: {}\n  apps/www: {}\n  apps/docs: {}\n  packages/common: {}\n"
+  "lockfileVersion: '9.0'\nimporters:\n  .: {}\n  apps/www: {}\n  packages/common: {}\n"
 )
 json('turbo.json', {
   tasks: { build: { dependsOn: ['^build'] } },
@@ -81,58 +81,23 @@ json('apps/www/turbo.json', {
   ...turboConfig,
   tasks: {
     ...turboConfig.tasks,
-    'content:build:core': passThrough(turboConfig.tasks['content:build:core'], 'FIXTURE_CONTENT'),
+    'content:build:core': passThrough(
+      turboConfig.tasks['content:build:core'],
+      'FIXTURE_CONTENT',
+      'FIXTURE_FAIL_PREPARE'
+    ),
     'content:build': passThrough(turboConfig.tasks['content:build'], 'FIXTURE_SKILLS'),
-  },
-})
-// Mirrors the parts of apps/docs/turbo.jsonc that www's build depends on.
-json('apps/docs/turbo.json', {
-  extends: ['//'],
-  tasks: {
-    'build:federated-content': {
-      cache: false,
-      passThroughEnv: ['FIXTURE_DOCS', 'FIXTURE_FAIL_PREPARE'],
-    },
-    'build:guides-markdown': {
-      dependsOn: ['build:federated-content'],
-      inputs: ['$TURBO_DEFAULT$', { mode: 'jit', globs: ['content/guides/**'] }],
-      outputs: ['public/markdown/guides/**'],
-    },
-  },
-})
-json('apps/docs/package.json', {
-  name: 'docs',
-  private: true,
-  scripts: {
-    'build:federated-content': 'node fetch.cjs',
-    'build:guides-markdown': 'node markdown.cjs',
   },
 })
 json('packages/common/package.json', { name: 'common', private: true })
 write('packages/common/index.js', 'export const version = 1\n')
 write('apps/studio/components/ui/TwoOptionToggle.tsx', 'export const version = 1\n')
 write('.checks/events', '')
-write(
-  'apps/docs/fetch.cjs',
-  helpers +
-    `
-event('docs:fetch');
-if (process.env.FIXTURE_FAIL_PREPARE) process.exit(1);
-write('content/guides/example.mdx', process.env.FIXTURE_DOCS || 'docs-v1');
-`
-)
-write(
-  'apps/docs/markdown.cjs',
-  helpers +
-    `
-event('docs:markdown');
-write('public/markdown/guides/example.md', fs.readFileSync('content/guides/example.mdx'));
-`
-)
 const generateContent =
   helpers +
   `
 event('www:content');
+if (process.env.FIXTURE_FAIL_PREPARE) process.exit(1);
 const content = process.env.FIXTURE_CONTENT || 'content-v1';
 for (const file of ['.generated/staticContent/_index.json', 'public/rss.xml', 'public/changelog-rss.xml', 'public/changelog.md', 'public/changelog/entry.md']) write(file, content);
 `
@@ -167,9 +132,8 @@ executable(
 event('compile');
 if (process.env.NEXT_PUBLIC_FIXTURE_FAIL_BUILD) process.exit(1);
 const content = fs.readFileSync('.generated/staticContent/_index.json', 'utf8');
-const docs = fs.readFileSync('../docs/public/markdown/guides/example.md', 'utf8');
-write('.next/server/page.html', content + docs);
-write('.next/static/chunk.js', content + docs);
+write('.next/server/page.html', content);
+write('.next/static/chunk.js', content);
 write('.next/cache/temporary', 'not a deploy artifact');
 write('public/customers-rss.xml', content);
 `
@@ -181,7 +145,6 @@ const deploymentArtifacts = [
   'apps/www/public/sitemap.xml',
   'apps/www/public/sitemap_www.xml',
   'apps/www/public/.well-known/agent-skills/index.json',
-  'apps/docs/public/markdown/guides/example.md',
 ]
 
 function missingArtifacts() {
@@ -247,10 +210,8 @@ describe('www deployment build lifecycle', () => {
     const result = build()
     expect(result.status, result.output).toBe(0)
     const log = events()
-    // Content preparation runs in parallel tasks, but all of it finishes before compilation.
-    expect([...log.slice(0, 3)].sort()).toEqual(['docs:fetch', 'docs:markdown', 'www:content'])
-    expect(log.indexOf('docs:fetch')).toBeLessThan(log.indexOf('docs:markdown'))
-    expect(log.slice(3)).toEqual(['compile', 'sitemap'])
+    // Content preparation finishes before compilation.
+    expect(log).toEqual(['www:content', 'compile', 'sitemap'])
     expect(missingArtifacts()).toEqual([])
   }, 90_000)
 
@@ -262,16 +223,13 @@ describe('www deployment build lifecycle', () => {
     expect(result.output).toContain('cache hit')
     expect(count('compile')).toBe(1)
     // Remote content is refreshed on every build, even when the compilation is cached.
-    expect(count('docs:fetch')).toBe(2)
     expect(count('www:content')).toBe(2)
-    expect(count('docs:markdown')).toBe(1)
     expect(missingArtifacts()).toEqual([])
     expect(fs.existsSync(path.join(app, '.next/cache/temporary'))).toBe(false)
   }, 90_000)
 
   it.each([
     { FIXTURE_CONTENT: 'content-v2' },
-    { FIXTURE_DOCS: 'docs-v2' },
     { FIXTURE_SKILLS: 'skills-v2' },
     { NEXT_PUBLIC_NEW_SETTING: 'new-value' },
     { VERCEL_GIT_COMMIT_SHA: '2222222222222222222222222222222222222222' },
@@ -312,12 +270,10 @@ describe('www deployment build lifecycle', () => {
 
   it('also refreshes content through the root Turbo build', () => {
     const compiled = count('compile')
-    const fetched = count('docs:fetch')
     const content = count('www:content')
     const result = build({}, true)
     expect(result.status, result.output).toBe(0)
     expect(count('compile')).toBe(compiled)
-    expect(count('docs:fetch')).toBe(fetched + 1)
     expect(count('www:content')).toBe(content + 1)
   }, 90_000)
 

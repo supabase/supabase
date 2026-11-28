@@ -232,6 +232,21 @@ describe('next.config.mjs', () => {
     expect(getPathMatch('/index')('/index.md')).toBe(false)
   })
 
+  it('permanently redirects /docs.md to the docs markdown sitemap', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const redirects = (await config.redirects?.()) || []
+
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/docs.md',
+          destination: '/docs/markdown/sitemap.md',
+          permanent: true,
+        }),
+      ])
+    )
+  })
+
   it('preserves the filename when redirecting legacy customer logos', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
     const redirects = (await config.redirects?.()) || []

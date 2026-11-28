@@ -1075,6 +1075,7 @@ module.exports = [
   { permanent: true, source: '/homepage.md', destination: '/index.md' },
   { permanent: true, source: '/.md', destination: '/index.md' },
   { permanent: true, source: '/kb.md', destination: '/kb/sitemap.md' },
+  { permanent: true, source: '/docs.md', destination: '/docs/markdown/sitemap.md' },
   { permanent: true, source: '/index', destination: '/' },
   {
     permanent: true,

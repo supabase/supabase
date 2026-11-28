@@ -11,6 +11,8 @@
     "build:federated-content": "tsx --conditions=react-server ./scripts/federated-content/fetch-federated-content.ts",
     "build:reference-markdown": "maybe-turbo tsx ./internals/generate-reference-markdown.ts",
     "build:markdown": "maybe-turbo",
+    "build:markdown-sitemap": "maybe-turbo tsx ./internals/generate-markdown-sitemap.ts",
+    "build:markdown-full": "maybe-turbo tsx ./internals/generate-markdown-full.ts",
     "check:removed-anchors": "tsx ./scripts/check-removed-anchors.ts",
     "build:gz-archive": "maybe-turbo tsx ./internals/generate-gz-archive.ts",
     "build:sitemap": "maybe-turbo tsx ./internals/generate-sitemap.ts",
