@@ -45,7 +45,9 @@ Now we can insert some embeddings into our "docs" collection using the `upsert()
 import vecs
 
 # create vector store client
-docs = vecs.get_or_create_collection(name="docs", dimension=3)
+vx = vecs.create_client("postgresql://postgres:postgres@localhost:54322/postgres")
+
+docs = vx.get_or_create_collection(name="docs", dimension=3)
 
 # a collection of vectors with 3 dimensions
 vectors=[
@@ -54,7 +56,7 @@ vectors=[
 ]
 
 # insert our vectors
-docs.upsert(vectors=vectors)
+docs.upsert(records=vectors)
 ```
 
 ### Query the collection
@@ -64,7 +66,9 @@ You can now query the collection to retrieve a relevant match:
 ```py
 import vecs
 
-docs = vecs.get_or_create_collection(name="docs", dimension=3)
+vx = vecs.create_client("postgresql://postgres:postgres@localhost:54322/postgres")
+
+docs = vx.get_or_create_collection(name="docs", dimension=3)
 
 # query the collection filtering metadata for "year" = 2012
 docs.query(

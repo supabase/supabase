@@ -32,10 +32,10 @@ For example, with 3 collections, called `docs`, `posts`, and `images`, we could 
 create view public.docs as
 select
   id,
-  embedding,
-  metadata, # Expose the metadata as JSON
-  (metadata->>'url')::text as url # Extract the URL as a string
-from vector
+  vec as embedding, -- Vecs stores the vector in the vec column
+  metadata, -- Expose the metadata as JSON
+  (metadata->>'url')::text as url -- Extract the URL as a string
+from vecs.docs
 ```
 
 You can then use any of the client libraries to access your collections within your applications:
@@ -77,11 +77,11 @@ Vecs provides methods for querying collections, either using a [cosine similarit
 
 ```python
 # cosine similarity
-docs.query(query_vector=[0.4,0.5,0.6], limit=5)
+docs.query(data=[0.4,0.5,0.6], limit=5)
 
 # metadata filtering
 docs.query(
-    query_vector=[0.4,0.5,0.6],
+    data=[0.4,0.5,0.6],
     limit=5,
     filters={"year": {"$eq": 2012}}, # metadata filters
 )

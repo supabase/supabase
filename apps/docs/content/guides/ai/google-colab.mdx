@@ -62,7 +62,7 @@ Create a new code block below the install block (`ctrl+m b`). Add the following 
 collection = vx.get_or_create_collection(name="colab_collection", dimension=3)
 
 collection.upsert(
-    vectors=[
+    records=[
         (
          "vec0",           # the vector's identifier
          [0.1, 0.2, 0.3],  # the vector. list or np.array
@@ -87,7 +87,7 @@ Now we can search for documents based on their similarity. Create a new code blo
 
 ```py
 collection.query(
-    query_vector=[0.4,0.5,0.6],  # required
+    data=[0.4,0.5,0.6],          # required
     limit=5,                     # number of records to return
     filters={},                  # metadata filters
     measure="cosine_distance",   # distance measure to use
