@@ -116,6 +116,62 @@ describe('tabs recent items', () => {
     expect(store.recentItems[0].label).toBe('routines')
     expect(store.recentItems[0].metadata?.name).toBe('routines')
   })
+
+  it('caps recent items per editor group for sql, explorer, and table tabs', () => {
+    const store = createTabsState('default')
+
+    for (let i = 1; i <= 10; i++) {
+      store.addRecentItem(sqlTab(`sql-${i}`))
+    }
+
+    expect(store.getRecentItemsByType('sql')).toHaveLength(8)
+    expect(store.getRecentItemsByType('sql').map((item) => item.id)).toEqual([
+      'sql-sql-10',
+      'sql-sql-9',
+      'sql-sql-8',
+      'sql-sql-7',
+      'sql-sql-6',
+      'sql-sql-5',
+      'sql-sql-4',
+      'sql-sql-3',
+    ])
+
+    for (let i = 1; i <= 10; i++) {
+      store.addRecentItem({
+        id: `query-${i}`,
+        type: i % 2 === 0 ? 'chat' : 'query',
+        label: `Explorer ${i}`,
+        metadata: i % 2 === 0 ? { chatId: `${i}` } : { queryId: `${i}` },
+      })
+    }
+
+    const explorerRecents = store.recentItems.filter((item) =>
+      ['notebook', 'query', 'chat'].includes(item.type)
+    )
+    expect(explorerRecents).toHaveLength(8)
+    expect(explorerRecents[0].id).toBe('query-10')
+    expect(explorerRecents[7].id).toBe('query-3')
+
+    // SQL recent items remain untouched when explorer items are added
+    expect(store.getRecentItemsByType('sql')).toHaveLength(8)
+
+    // Adding a table item keeps newest items first and caps table group independently
+    for (let i = 1; i <= 9; i++) {
+      store.addRecentItem({
+        id: `r-${i}`,
+        type: i === 9 ? ENTITY_TYPE.VIEW : ENTITY_TYPE.TABLE,
+        label: `table_${i}`,
+        metadata: { schema: 'public', name: `table_${i}`, tableId: i },
+      })
+    }
+
+    const tableRecents = store.recentItems.filter((item) =>
+      [ENTITY_TYPE.TABLE, ENTITY_TYPE.VIEW].includes(item.type as ENTITY_TYPE)
+    )
+    expect(tableRecents).toHaveLength(8)
+    expect(store.recentItems[0].id).toBe('r-9')
+    expect(store.getRecentItemsByType('sql')).toHaveLength(8)
+  })
 })
 
 describe('tabs sql source metadata', () => {
