@@ -285,6 +285,7 @@ Create a hook:
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
+security definer
 as $$
   declare
     claims jsonb;
