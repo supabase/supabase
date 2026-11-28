@@ -59,12 +59,25 @@ export function deferStudioErrorReport(err: StudioError, options: DeferredReport
 }
 
 /**
+ * `meta` a query or mutation can set to tell the query cache how to report its errors. Registered
+ * on React Query's `Register` in `data/query-client.ts`.
+ */
+export type StudioQueryMeta = {
+  /**
+   * True for errors the caller handles in its UI as an expected state (for example a 404 for a
+   * resource the user deleted). The query cache does not report those to Sentry.
+   */
+  isHandledError?: (error: StudioError) => boolean
+}
+
+/**
  * Reports an error that exhausted its React Query retries. Called from the `QueryCache` and
  * `MutationCache` `onError`. Errors thrown by `handleError` are already classified; anything else
  * (e.g. a query function that throws its own `Error`) is classified here.
  */
-export function reportQueryError(error: unknown) {
+export function reportQueryError(error: unknown, meta?: StudioQueryMeta) {
   const classified = classifyError(error)
+  if (meta?.isHandledError?.(classified)) return
   const options = deferredReportOptions.get(classified)
   reportStudioError(classified, options?.context, { force: options?.force })
 }

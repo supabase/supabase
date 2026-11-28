@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SAMPLE_USER_FAULT } from './error-routing'
-import { reportStudioError } from './report-studio-error'
-import { PlatformError, StudioSqlError, UserSqlError } from './studio-errors'
+import { getErrorRouting, SAMPLE_USER_FAULT } from './error-routing'
+import { reportQueryError, reportStudioError } from './report-studio-error'
+import { PlatformError, StudioSqlError, UnclassifiedApiError, UserSqlError } from './studio-errors'
 
 const { captureException } = vi.hoisted(() => ({ captureException: vi.fn(() => 'event-id') }))
 vi.mock('@sentry/react', () => ({ captureException }))
@@ -54,5 +54,24 @@ describe('reportStudioError', () => {
       expect.any(PlatformError),
       expect.objectContaining({ tags: expect.objectContaining({ reason: 'server_error' }) })
     )
+  })
+})
+
+describe('reportQueryError', () => {
+  const notFound = () => new UnclassifiedApiError({ code: 404, reason: 'not_found' })
+  const isHandledError = (error: { code?: number }) => error.code === 404
+
+  it('does not report an error the caller handles', () => {
+    reportQueryError(notFound(), { isHandledError })
+    expect(captureException).not.toHaveBeenCalled()
+  })
+
+  it('reports an error the caller does not handle', () => {
+    reportQueryError(new UnclassifiedApiError({ code: 403, reason: 'forbidden' }), {
+      isHandledError,
+    })
+    reportQueryError(notFound())
+    if (getErrorRouting(notFound()).sentrySampleRate === 0) return
+    expect(captureException).toHaveBeenCalledTimes(2)
   })
 })

@@ -12,9 +12,15 @@ import { useSqlSnippetByIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+
+const isSnippetMissingError = (error: StudioError) =>
+  error.code === 404 && error.message.includes('Content not found')
+const isInvalidIdError = (error: StudioError) =>
+  error.code === 400 && error.message.includes('Invalid uuid')
 
 export const Route = createFileRoute('/project/$ref/sql/$id')({
   component: SqlEditor,
@@ -46,12 +52,13 @@ function SqlEditor() {
     {
       retry: false,
       enabled: canFetchContentBasedOnId,
+      // Both are handled below (redirect to a new snippet, or SnippetNotFound), so not reported
+      meta: { isHandledError: (err) => isSnippetMissingError(err) || isInvalidIdError(err) },
     }
   )
 
-  const snippetMissing =
-    isError && error.code === 404 && error.message.includes('Content not found')
-  const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
+  const snippetMissing = isError && isSnippetMissingError(error)
+  const invalidId = isError && isInvalidIdError(error)
 
   // [Joshen] Atm we suspect that replication lag is causing this to happen whereby a newly created snippet
   // shows the "Unable to find snippet" error which blocks the whole UI
