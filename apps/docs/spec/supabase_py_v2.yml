@@ -6213,11 +6213,11 @@ functions:
   - id: not
     title: not_()
     description: |
-      Match only rows which doesn't satisfy the filter. `not_` expects you to use the raw PostgREST syntax for the filter values.
+      Match only rows which do not satisfy the filter. `not_` only negates the filter that follows, so pass the same Python values you would use without `not_` (for example, a list of values for `in_`).
     notes: |
       ```python
-      .not_.in_('id', '(5,6,7)')  # Use `()` for `in` filter
-      .not_.contains('arraycol', '{"a","b"}')  # Use `{}` for array values
+      .not_.in_('id', [5, 6, 7])
+      .not_.contains('arraycol', ['a', 'b'])
       ```
     examples:
       - id: with-select
