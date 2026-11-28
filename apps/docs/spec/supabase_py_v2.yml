@@ -2862,8 +2862,10 @@ functions:
         name: List OAuth clients with pagination
         code: |
           ```python
+          from supabase_auth.types import PageParams
+
           response = supabase.auth.admin.oauth.list_clients(
-              params={"page": 1, "per_page": 10}
+              params=PageParams(page=1, per_page=10)
           )
           ```
 
@@ -2881,10 +2883,18 @@ functions:
         type: CreateOAuthClientParams
         description: Parameters for creating a new OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: false
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: false
             type: list[string]
@@ -2901,10 +2911,6 @@ functions:
             isOptional: true
             type: string
             description: The client type.
-          - name: registration_type
-            isOptional: true
-            type: string
-            description: The registration type.
     examples:
       - id: create-oauth-client
         name: Create OAuth client
@@ -2912,7 +2918,7 @@ functions:
           ```python
           response = supabase.auth.admin.oauth.create_client(
               {
-                  "name": "My OAuth Client",
+                  "client_name": "My OAuth Client",
                   "redirect_uris": ["https://example.com/callback"]
               }
           )
@@ -2936,10 +2942,18 @@ functions:
         type: UpdateOAuthClientParams
         description: Parameters for updating the OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: true
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: true
             type: list[string]
@@ -2948,19 +2962,15 @@ functions:
             isOptional: true
             type: list[string]
             description: List of allowed grant types.
-          - name: response_types
-            isOptional: true
-            type: list[string]
-            description: List of allowed response types.
     examples:
       - id: update-oauth-client
         name: Update OAuth client
         code: |
           ```python
           response = supabase.auth.admin.oauth.update_client(
-              "client-id",
+              "ab5deca6-995b-41ed-b39a-9d86a9bbe20a",
               {
-                  "name": "Updated OAuth Client",
+                  "client_name": "Updated OAuth Client",
                   "redirect_uris": ["https://example.com/callback", "https://example.com/callback2"]
               }
           )
@@ -2984,7 +2994,7 @@ functions:
         name: Get OAuth client
         code: |
           ```python
-          response = supabase.auth.admin.oauth.get_client("client-id")
+          response = supabase.auth.admin.oauth.get_client("ab5deca6-995b-41ed-b39a-9d86a9bbe20a")
           ```
 
   - id: auth-js-gotrueadminoauthapi-deleteclient
@@ -3005,7 +3015,7 @@ functions:
         name: Delete OAuth client
         code: |
           ```python
-          supabase.auth.admin.oauth.delete_client("client-id")
+          supabase.auth.admin.oauth.delete_client("ab5deca6-995b-41ed-b39a-9d86a9bbe20a")
           ```
 
   - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
@@ -3026,7 +3036,7 @@ functions:
         name: Regenerate OAuth client secret
         code: |
           ```python
-          response = supabase.auth.admin.oauth.regenerate_client_secret("client-id")
+          response = supabase.auth.admin.oauth.regenerate_client_secret("ab5deca6-995b-41ed-b39a-9d86a9bbe20a")
           ```
 
   - id: mfa-delete-factor
@@ -9116,12 +9126,14 @@ functions:
         name: Put vectors
         code: |
           ```python
+          from storage3.types import VectorObject, VectorData
+
           supabase.storage.vectors().from_("vectors-bucket").index("my-index").put([
-              {
-                  "key": "vector-1",
-                  "data": {"float32": [0.1, 0.2, 0.3]},
-                  "metadata": {"category": "example"}
-              }
+              VectorObject(
+                  key="vector-1",
+                  data=VectorData(float32=[0.1, 0.2, 0.3]),
+                  metadata={"category": "example"},
+              )
           ])
           ```
 
