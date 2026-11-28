@@ -1,6 +1,6 @@
 import { useFeatureFlags, useParams } from 'common'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -15,6 +15,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useEnsurePipelineRegionSource } from '../CreatePipeline/useEnsurePipelineRegionSource'
 import { usePipelineCreationSourceAvailability } from '../CreatePipeline/usePipelineCreationSourceAvailability'
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
@@ -22,6 +23,7 @@ import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
 import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
+import { usePreferredPipelineClusterId } from '../usePreferredPipelineClusterId'
 import { DestinationForm } from './DestinationForm'
 import { NoDestinationsAvailable } from './DestinationForm/NoDestinationsAvailable'
 import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
@@ -92,16 +94,17 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
   const canCheckCreation = visible && !editMode && !isAccessLoading && hasPipelinesDestinationAccess
   const {
     hasSource,
-    clusterId: sourceClusterId,
     isPending: isSourceAvailabilityPending,
     error: sourceAvailabilityError,
     retry: retrySourceAvailability,
   } = usePipelineCreationSourceAvailability({ projectRef, enabled: canCheckCreation })
+  const preferredCluster = usePreferredPipelineClusterId({ enabled: canCheckCreation && hasSource })
+  const isCreationLoading = isSourceAvailabilityPending || !preferredCluster.isReady
   const replicationNotEnabled = editMode ? isEditSourceMissing : !hasSource
   const canRenderForm =
     visible &&
     !isAccessLoading &&
-    !isSourceAvailabilityPending &&
+    !isCreationLoading &&
     !sourceAvailabilityError &&
     hasPipelinesDestinationAccess
   const showEnablement = canRenderForm && replicationNotEnabled
@@ -123,10 +126,47 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
 
   const checkIsDirtyRef = useRef<() => boolean>(() => false)
 
+  // `null` until creation initializes a region. `undefined` is the API default.
+  const [chosenClusterId, setChosenClusterId] = useState<string | undefined | null>(null)
+  const creationClusterId = chosenClusterId === null ? preferredCluster.clusterId : chosenClusterId
+  const {
+    ensureRegionSource,
+    isCreatingSource,
+    error: regionSourceError,
+    reset: resetRegionSource,
+  } = useEnsurePipelineRegionSource(projectRef)
+
+  // A preselected region may need the project's source, just like an explicit pick.
+  const attemptedPreferredClusterRef = useRef<string | undefined | null>(null)
+  useEffect(() => {
+    const clusterId = preferredCluster.clusterId
+    if (!visible || editMode || !showDestinationForm || chosenClusterId !== null) return
+    if (!preferredCluster.isReady || attemptedPreferredClusterRef.current === clusterId) return
+    attemptedPreferredClusterRef.current = clusterId
+    setChosenClusterId(clusterId)
+    void ensureRegionSource(clusterId)
+  }, [
+    visible,
+    editMode,
+    showDestinationForm,
+    chosenClusterId,
+    preferredCluster.clusterId,
+    preferredCluster.isReady,
+    ensureRegionSource,
+  ])
+
+  let sourceStatus = ''
+  if (isSourceAvailabilityPending) sourceStatus = 'Checking pipeline sources'
+  else if (isCreatingSource) sourceStatus = 'Preparing pipeline region'
+  else if (chosenClusterId !== null && !regionSourceError) sourceStatus = 'Pipeline region is ready'
+
   const onClose = () => {
     checkIsDirtyRef.current = () => false
     setDestinationType(null)
     setEdit(null)
+    setChosenClusterId(null)
+    attemptedPreferredClusterRef.current = null
+    resetRegionSource()
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -189,9 +229,9 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
             </SheetHeader>
 
             <p role="status" aria-live="polite" className="sr-only">
-              {isSourceAvailabilityPending ? 'Checking pipeline sources' : ''}
+              {sourceStatus}
             </p>
-            {(isAccessLoading || isEditLoading || isSourceAvailabilityPending) && (
+            {(isAccessLoading || isEditLoading || isCreationLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
               </SheetSection>
@@ -236,16 +276,36 @@ export const DestinationPanel = ({ clusterId }: DestinationPanelProps) => {
               </div>
             )}
             {showDestinationForm && (
-              <DestinationForm
-                clusterId={editMode ? clusterId : sourceClusterId}
-                visible={visible}
-                selectedType={destinationType ?? 'BigQuery'}
-                existingDestination={existingDestination}
-                typeSelection={pipelinesTypeSelection}
-                checkIsDirtyRef={checkIsDirtyRef}
-                onClose={onClose}
-                onCancel={confirmOnClose}
-              />
+              <>
+                {regionSourceError && (
+                  <SheetSection>
+                    <AlertError
+                      error={regionSourceError}
+                      subject="Failed to prepare pipeline region"
+                      projectRef={projectRef}
+                      additionalActions={
+                        <Button
+                          loading={isCreatingSource}
+                          onClick={() => void ensureRegionSource(creationClusterId)}
+                        >
+                          Retry
+                        </Button>
+                      }
+                    />
+                  </SheetSection>
+                )}
+                <DestinationForm
+                  clusterId={editMode ? clusterId : creationClusterId}
+                  visible={visible}
+                  selectedType={destinationType ?? 'BigQuery'}
+                  existingDestination={existingDestination}
+                  typeSelection={pipelinesTypeSelection}
+                  checkIsDirtyRef={checkIsDirtyRef}
+                  onClose={onClose}
+                  onCancel={confirmOnClose}
+                  isPreparingRegion={isCreatingSource || regionSourceError !== null}
+                />
+              </>
             )}
           </div>
         </SheetContent>
