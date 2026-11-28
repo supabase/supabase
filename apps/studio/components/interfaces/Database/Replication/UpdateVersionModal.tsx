@@ -54,6 +54,7 @@ export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersion
       await runWithRequestStatus(pipeline.id, requestStatus, () =>
         updatePipelineVersion({
           projectRef,
+          clusterId,
           pipelineId: pipeline.id,
           versionId,
           skipStatusInvalidation: true,

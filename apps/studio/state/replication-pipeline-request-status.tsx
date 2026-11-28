@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
@@ -10,18 +11,25 @@ export enum PipelineStatusRequestStatus {
   StopRequested = 'StopRequested',
 }
 
+const requestKey = (pipelineId: string, clusterId?: string) =>
+  JSON.stringify([clusterId ?? null, pipelineId])
+
 type PipelineRequest = {
   id: symbol
   status: PipelineStatusRequestStatus
 }
 
 interface PipelineRequestStatusContextType {
-  getRequestStatus: (pipelineId: string | undefined) => PipelineStatusRequestStatus
-  isRequestPending: (pipelineId: string | undefined) => boolean
+  getRequestStatus: (
+    pipelineId: string | undefined,
+    clusterId?: string
+  ) => PipelineStatusRequestStatus
+  isRequestPending: (pipelineId: string | undefined, clusterId?: string) => boolean
   runWithRequestStatus: <T>(
     pipelineId: string,
     status: PipelineStatusRequestStatus,
-    action: () => Promise<T>
+    action: () => Promise<T>,
+    clusterId?: string
   ) => Promise<T>
 }
 
@@ -37,15 +45,17 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
     pipelineId,
     status,
-    action
+    action,
+    clusterId
   ) => {
     const id = Symbol('pipeline request')
-    setRequests((previous) => ({ ...previous, [pipelineId]: { id, status } }))
+    const key = requestKey(pipelineId, clusterId)
+    setRequests((previous) => ({ ...previous, [key]: { id, status } }))
     try {
       return await action()
     } finally {
       const options = {
-        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
+        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId, clusterId }),
         staleTime: 0,
       }
       // A status fetch that was already in flight started before this mutation resolved, so it
@@ -61,8 +71,8 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
       await queryClient.fetchQuery(options).catch(() => {})
 
       setRequests((previous) => {
-        if (previous[pipelineId]?.id !== id) return previous
-        const { [pipelineId]: _removed, ...rest } = previous
+        if (previous[key]?.id !== id) return previous
+        const { [key]: _removed, ...rest } = previous
         return rest
       })
     }
@@ -71,11 +81,13 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   return (
     <PipelineRequestStatusContext.Provider
       value={{
-        getRequestStatus: (pipelineId) =>
-          (pipelineId === undefined ? undefined : requests[pipelineId]?.status) ??
+        getRequestStatus: (pipelineId, clusterId) =>
+          (pipelineId === undefined
+            ? undefined
+            : requests[requestKey(pipelineId, clusterId)]?.status) ??
           PipelineStatusRequestStatus.None,
-        isRequestPending: (pipelineId) =>
-          pipelineId !== undefined && requests[pipelineId] !== undefined,
+        isRequestPending: (pipelineId, clusterId) =>
+          pipelineId !== undefined && requests[requestKey(pipelineId, clusterId)] !== undefined,
         runWithRequestStatus,
       }}
     >
@@ -84,9 +96,21 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   )
 }
 
+/** Request statuses are shared across clusters; refreshes target the caller's cluster. */
 export const usePipelineRequestStatus = () => {
+  const clusterId = useReplicationClusterId()
   const context = useContext(PipelineRequestStatusContext)
   if (context === undefined)
     throw new Error('usePipelineRequestStatus must be used within a PipelineRequestStatusProvider')
-  return context
+  return {
+    getRequestStatus: (pipelineId: string | undefined) =>
+      context.getRequestStatus(pipelineId, clusterId),
+    isRequestPending: (pipelineId: string | undefined) =>
+      context.isRequestPending(pipelineId, clusterId),
+    runWithRequestStatus: <T,>(
+      pipelineId: string,
+      status: PipelineStatusRequestStatus,
+      action: () => Promise<T>
+    ) => context.runWithRequestStatus(pipelineId, status, action, clusterId),
+  }
 }

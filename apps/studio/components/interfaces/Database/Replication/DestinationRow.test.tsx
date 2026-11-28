@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -11,6 +11,7 @@ import { DestinationRow as DestinationRowComponent } from './DestinationRow'
 import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import type { DestinationWireResponse } from '@/data/replication/api-types'
 import { API_URL } from '@/lib/constants'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -231,6 +232,73 @@ describe('DestinationRow', () => {
     expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
     expect(row).toHaveAttribute('tabindex', '0')
     expect(screen.getByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
+  })
+
+  test('starts only the selected cluster when two rows share a pipeline ID', async () => {
+    addAllMocks()
+    const clusterIds = ['2', '3']
+    const start = Promise.withResolvers<void>()
+    const startRequests: { clusterId: string | null; pipelineId: unknown }[] = []
+    const startedClusters = new Set<string | null>()
+    const getClusterId = (request: Request) => new URL(request.url).searchParams.get('cluster_id')
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: ({ request }) => {
+        const clusterId = getClusterId(request)
+        return HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: PIPELINE_ID,
+          status: { name: startedClusters.has(clusterId) ? 'started' : 'stopped' },
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/start',
+      response: async ({ request, params }) => {
+        const clusterId = getClusterId(request)
+        startRequests.push({ clusterId, pipelineId: params.pipeline_id })
+        await start.promise
+        startedClusters.add(clusterId)
+        return HttpResponse.json<Record<string, never>>({})
+      },
+    })
+
+    customRender(
+      <PipelineRequestStatusProvider>
+        <Table>
+          <TableBody>
+            {clusterIds.map((clusterId) => (
+              <ReplicationClusterProvider key={clusterId} clusterId={clusterId}>
+                <DestinationRowComponent destinationId={DESTINATION_ID} />
+              </ReplicationClusterProvider>
+            ))}
+          </TableBody>
+        </Table>
+      </PipelineRequestStatusProvider>
+    )
+
+    const [firstRow, secondRow] = (await screen.findAllByRole('row')).map((row) => within(row))
+    const user = userEvent.setup()
+    try {
+      expect(await firstRow.findByText('Stopped')).toBeVisible()
+      expect(await secondRow.findByText('Stopped')).toBeVisible()
+      await user.click(firstRow.getByRole('button', { name: 'Pipeline options' }))
+      await user.click(screen.getByRole('menuitem', { name: 'Start pipeline' }))
+
+      expect(await firstRow.findByText('Starting')).toBeVisible()
+      expect(secondRow.getByText('Stopped')).toBeVisible()
+      await waitFor(() =>
+        expect(startRequests).toEqual([{ clusterId: '2', pipelineId: PIPELINE_ID }])
+      )
+
+      start.resolve()
+      expect(await firstRow.findByText('Running')).toBeVisible()
+      expect(secondRow.getByText('Stopped')).toBeVisible()
+    } finally {
+      start.resolve()
+    }
   })
 
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
