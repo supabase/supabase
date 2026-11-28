@@ -5,11 +5,13 @@ import type { JitUserRuleDraft } from './JitDbAccess.types'
 import {
   computeStatusFromGrants,
   createEmptyGrant,
+  getAssignableJitRoleOptions,
   getInvalidIpRangeRows,
   getJitMemberOptions,
   getRelativeDatetimeByMode,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
+import type { PgRole } from '@/data/database-roles/database-roles-query'
 import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
 
 describe('jitDbAccess.utils', () => {
@@ -150,5 +152,57 @@ describe('getJitMemberOptions', () => {
         name: 'Active User',
       },
     ])
+  })
+})
+
+describe('getAssignableJitRoleOptions', () => {
+  const role = (name: string, overrides: Partial<PgRole> = {}): PgRole => ({
+    id: 1,
+    name,
+    isSuperuser: false,
+    canCreateDb: false,
+    canCreateRole: false,
+    inheritRole: true,
+    canLogin: true,
+    isReplicationRole: false,
+    canBypassRls: false,
+    activeConnections: 0,
+    connectionLimit: 100,
+    validUntil: null,
+    config: {},
+    comment: null,
+    ...overrides,
+  })
+
+  it('leaves out Supabase support and Trusted Partner roles', () => {
+    const options = getAssignableJitRoleOptions([
+      role('postgres'),
+      role('supabase_read_only_user'),
+      role('support_ro_1a2b3c'),
+      role('acme_user', { comment: '{"_supabase":{"oauth_app_id":"app"}}' }),
+      role('reporting', { comment: 'Role for reporting' }),
+    ])
+
+    expect(options.map((option) => option.id)).toEqual([
+      'postgres',
+      'reporting',
+      'supabase_read_only_user',
+    ])
+  })
+
+  it('leaves out Supabase system roles, superusers, pg_ roles and roles that cannot log in', () => {
+    const options = getAssignableJitRoleOptions([
+      role('supabase_auth_admin'),
+      role('supabase_admin'),
+      role('pgbouncer'),
+      role('authenticator'),
+      role('anon'),
+      role('pg_monitor'),
+      role('root', { isSuperuser: true }),
+      role('no_login', { canLogin: false }),
+      role('reporting'),
+    ])
+
+    expect(options.map((option) => option.id)).toEqual(['reporting'])
   })
 })

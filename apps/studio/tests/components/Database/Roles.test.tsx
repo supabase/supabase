@@ -13,7 +13,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
-const createRole = (id: number, name: string): PgRole => ({
+const createRole = (id: number, name: string, comment: string | null = null): PgRole => ({
   id,
   name,
   isSuperuser: false,
@@ -27,6 +27,7 @@ const createRole = (id: number, name: string): PgRole => ({
   connectionLimit: -1,
   validUntil: null,
   config: {},
+  comment,
 })
 
 const roles = [
@@ -34,6 +35,7 @@ const roles = [
   createRole(2, 'supabase_privileged_role'),
   createRole(3, 'supabase_auth_admin'),
   createRole(4, 'custom_role'),
+  createRole(5, 'acme_user', '{"_supabase":{"oauth_app_id":"app"}}'),
 ]
 
 beforeEach(() => {
@@ -144,6 +146,7 @@ describe('RolesList', () => {
     const projectRoles = within(screen.getByRole('region', { name: 'Project database roles' }))
     expect(await serviceRoles.findByText('supabase_privileged_role')).toBeInTheDocument()
     expect(serviceRoles.getByText('supabase_auth_admin')).toBeInTheDocument()
+    expect(serviceRoles.getByText('acme_user')).toBeInTheDocument()
     expect(serviceRoles.queryByText('postgres')).not.toBeInTheDocument()
     expect(projectRoles.getByRole('button', { name: /postgres \(ID: 1\)/ })).toBeInTheDocument()
     expect(projectRoles.getByRole('button', { name: /custom_role \(ID: 4\)/ })).toBeInTheDocument()
