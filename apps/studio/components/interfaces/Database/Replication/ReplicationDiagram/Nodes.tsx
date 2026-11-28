@@ -8,7 +8,7 @@ import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import type { ReplicationDestinationsData } from '@/data/replication/destinations-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -29,12 +29,9 @@ const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: 
   )
 }
 
-export const PrimaryDatabaseNode = () => {
-  const { ref: projectRef } = useParams()
+export const PrimaryDatabaseNode = ({ data }: { data: { hasDestinations: boolean } }) => {
   const { data: project } = useSelectedProjectQuery()
-
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
-  const hasDestinations = (destinationsData?.destinations ?? []).length > 0
+  const { hasDestinations } = data
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
@@ -55,21 +52,30 @@ export const PrimaryDatabaseNode = () => {
   )
 }
 
-export const ReplicationNode = ({ id }: { id: string }) => {
+export const ReplicationNode = ({
+  data,
+}: {
+  data: {
+    destination: ReplicationDestinationsData['destinations'][number]
+    clusterId: string | undefined
+  }
+}) => {
   const { ref: projectRef } = useParams()
+  const { destination, clusterId } = data
 
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
-  const destination = (destinationsData?.destinations ?? []).find((x) => x.id.toString() === id)
-
-  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
-  const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id.toString() === id)
+  const { data: pipelinesData } = useReplicationPipelinesQuery({
+    projectRef,
+    clusterId,
+  })
+  const pipeline = pipelinesData?.pipelines.find((x) => x.destination_id === destination.id)
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const statusName = getStatusName(pipelineStatusData?.status)
 
-  const type = getReplicationDestinationType(destination?.config)
+  const type = getReplicationDestinationType(destination.config)
 
   return (
     <NodeContainer>
@@ -94,8 +100,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
             </Tooltip>
           )}
         </div>
-        <p className="text-foreground-light">{destination?.name}</p>
-        <p className="text-foreground-light">ID: {destination?.id}</p>
+        <p className="text-foreground-light">{destination.name}</p>
       </div>
       {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />
