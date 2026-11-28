@@ -21,6 +21,12 @@ If a lock timeout error occurs, in your migration file, consider increasing your
 
 </Admonition>
 
+<Admonition type="tip">
+
+Schema changes on large tables can take heavy locks that block reads or writes while they run. Before you apply a migration, you can check which lock each statement takes with an open-source migration-safety linter, such as [pgfence](https://pgfence.com), [Squawk](https://squawkhq.com), or [Eugene](https://github.com/kaaveland/eugene). These tools read your SQL and report the lock mode and a safer rewrite.
+
+</Admonition>
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
