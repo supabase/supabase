@@ -1,14 +1,26 @@
 'use client'
 
 import { Feedback } from '~/components/Feedback'
+import { GuideToc } from '~/components/GuidesSidebar'
+import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useTocAnchors } from '~/features/docs/GuidesMdx.state'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
+import { RightRailPortal } from '~/layouts/RightRail'
 import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
-import { TocSection } from 'ui-patterns/Toc'
+import { TocPrimitive, TocSection } from 'ui-patterns/Toc'
 
 export type ReferenceLink = { title: string; href: string }
+
+interface ReferenceSidebarProps {
+  className?: string
+  links?: ReferenceLink[]
+}
+
+interface ReferenceRightRailProps {
+  links: ReferenceLink[]
+}
 
 export function ReferenceLinks({
   links,
@@ -33,18 +45,40 @@ export function ReferenceLinks({
   )
 }
 
-interface ReferenceSidebarProps {
-  className?: string
-  links?: ReferenceLink[]
+export const ReferenceSidebar = ({ className, links = [] }: ReferenceSidebarProps) =>
+  useDocsLayoutV2() ? (
+    <ReferenceRightRail links={links} />
+  ) : (
+    <LegacyReferenceSidebar className={className} links={links} />
+  )
+
+const ReferenceRightRail = ({ links }: ReferenceRightRailProps) => {
+  const pathname = usePathname()
+  const { toc } = useTocAnchors()
+  const activeIndex = Math.max(TocPrimitive.useTopActiveIndex(toc), 0)
+  const showFeedback = isFeatureEnabled('feedback:docs')
+
+  return (
+    <RightRailPortal>
+      <div className="flex min-h-0 flex-1 flex-col gap-8 px-6 pt-6">
+        {toc.length !== 0 ? <GuideToc toc={toc} activeUrl={toc[activeIndex]?.url} /> : null}
+        {links.length !== 0 ? <ReferenceLinks links={links} className="pb-6" /> : null}
+      </div>
+      {showFeedback ? (
+        <footer className="shrink-0 border-t py-2 pl-6 pr-4">
+          <div className="-ml-2.5 flex h-8 items-center">
+            <Feedback key={pathname} variant="rail" className="w-full" />
+          </div>
+        </footer>
+      ) : null}
+    </RightRailPortal>
+  )
 }
 
-/**
- * Right-hand sidebar for reference pages that render prose (e.g. the
- * Management API introduction). Mirrors `GuidesSidebar` minus the AI tools,
- * which need a per-page markdown file that reference pages don't have yet,
- * plus a list of additional links.
- */
-export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProps) {
+const LegacyReferenceSidebar = ({
+  className,
+  links,
+}: ReferenceRightRailProps & { className?: string }) => {
   const pathname = usePathname()
   const { toc } = useTocAnchors()
   const showFeedback = isFeatureEnabled('feedback:docs')
