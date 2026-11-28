@@ -5,11 +5,12 @@
  */
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import type { PaymentMethod } from '@stripe/stripe-js'
 import {
+  type PaymentMethod,
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
   type SetupIntent,
+  StripeError,
 } from '@stripe/stripe-js'
 import { CheckIcon, ChevronsUpDownIcon, HelpCircleIcon } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
@@ -86,6 +87,40 @@ export type PaymentMethodElementRef = {
       }
     | undefined
   >
+}
+
+export function failureReason(cardError: StripeError): string | undefined {
+  const code = cardError.decline_code
+  if (!code) {
+    return cardError?.message
+  }
+
+  const internationalChargeInUsdHint = `Make sure to allow international payments in USD out of Singapore.`
+
+  switch (code) {
+    case 'do_not_honor':
+    case 'transaction_not_allowed':
+    case 'generic_decline':
+    case 'stolen_card':
+    case 'lost_card':
+      return `Your card has been declined by your card issuer. Please contact your card issuer or try a different card. ${internationalChargeInUsdHint}`
+    case 'expired_card':
+      return 'Your card has expired. Please use a different card.'
+    case 'insufficient_funds':
+      return 'Your card has insufficient funds. Please make sure your account has sufficient funds or try a different card. Contact your card issuer if you believe this is an error.'
+    case 'processing_error':
+      return `There was an error processing the payment. Please try again later or use a different card. ${internationalChargeInUsdHint}`
+    case 'card_velocity_exceeded':
+      return `Your card has exceeded its transaction- or credit-limit. Please use a different card or contact your card issuer. ${internationalChargeInUsdHint}`
+    case 'incorrect_cvc':
+      return 'Your CVC was incorrect. Please try again or contact your card issuer if it persists.'
+    case 'incorrect_number':
+      return 'Your card number was incorrect. Please try again or contact your card issuer if it persists.'
+    case 'card_not_supported':
+      return 'Card not supported. Contact your card issuer to make sure your card can be used to make this type of purchase.'
+  }
+
+  return cardError?.message
 }
 
 export const NewPaymentMethodElement = forwardRef(
@@ -194,7 +229,11 @@ export const NewPaymentMethodElement = forwardRef(
         elements,
       })
       if (error || paymentMethod == null) {
-        toast.error(error?.message ?? ' Failed to process card details')
+        toast.error(failureReason(error) ?? ' Failed to process card details', {
+          dismissible: true,
+          position: 'bottom-center',
+          duration: 10_000,
+        })
         return
       }
 
@@ -233,7 +272,12 @@ export const NewPaymentMethodElement = forwardRef(
       })
 
       if (error || setupIntent == null) {
-        toast.error(error?.message ?? ' Failed to process card details')
+        toast.error(failureReason(error) ?? ' Failed to process card details', {
+          dismissible: true,
+          position: 'bottom-center',
+          duration: 10_000,
+        })
+
         return
       }
 
