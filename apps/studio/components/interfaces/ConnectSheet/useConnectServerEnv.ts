@@ -18,7 +18,7 @@ export const SERVER_ENV_VARS = {
   jwksUrl: 'SUPABASE_JWKS_URL',
 } as const
 
-const JWKS_DISCOVERY_PATH = '/auth/v1/.well-known/jwks.json'
+export const JWKS_DISCOVERY_PATH = '/auth/v1/.well-known/jwks.json'
 
 export interface ConnectServerEnvSecret {
   exists: boolean

@@ -3133,7 +3133,7 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * Connect section was shown to the user on the project homepage.
+ * Get started section (agent prompt) was shown to the user on the project homepage.
  *
  * @group Events
  * @source studio
@@ -3145,19 +3145,37 @@ export interface HomeConnectSectionExposedEvent {
 }
 
 /**
- * User clicked a connect action tile in the Connect section on the project homepage.
+ * User copied the agent setup prompt from the Get started section on the project homepage.
  *
  * @group Events
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeConnectActionClickedEvent {
-  action: 'home_connect_action_clicked'
+export interface HomeAgentPromptCopiedEvent {
+  action: 'home_agent_prompt_copied'
+  groups: TelemetryGroups
+}
+
+/**
+ * User copied a connection value from the row under the project title on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectionValueCopiedEvent {
+  action: 'home_connection_value_copied'
   properties: {
     /**
-     * The connect action/tile that was clicked
+     * Which value was copied
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
+    valueType:
+      | 'project_url'
+      | 'publishable_key'
+      | 'session_pooler'
+      | 'direct'
+      | 'transaction_pooler'
+      | 'dedicated_pooler'
   }
   groups: TelemetryGroups
 }
@@ -5353,7 +5371,8 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | HomeConnectSectionExposedEvent
-  | HomeConnectActionClickedEvent
+  | HomeAgentPromptCopiedEvent
+  | HomeConnectionValueCopiedEvent
   | ConnectSheetOpenedEvent
   | HomeSectionRowsUpdatedEvent
   | HomeActivityStatClickedEvent
