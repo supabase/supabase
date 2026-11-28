@@ -1,43 +1,34 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
-import { toWebHandler } from '@/compat/next/api'
-import { apiWrapper } from '@/lib/api/apiWrapper'
+import { parseJsonBody } from '@/lib/api/apiHelpers'
+import { createApiHandlers } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    case 'POST':
-      return handlePost(req, res)
-
-    default:
-      res.setHeader('Allow', ['GET', 'POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  const { data, error } = await supabase.storage.vectors.listBuckets()
-  if (error) return res.status(500).json({ error: { message: error.message } })
-
-  return res.status(200).json(data)
-}
-
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { bucketName } = req.body
-  const { data, error } = await supabase.storage.vectors.createBucket(bucketName)
-  if (error) return res.status(400).json({ error: { message: error.message } })
-  return res.status(200).json(data)
-}
-
-const webHandler = toWebHandler(nextHandler)
+const createVectorBucketBodySchema = z.object({
+  bucketName: z.string(),
+})
 
 export const Route = createFileRoute('/api/platform/storage/$ref/vector-buckets/')({
-  server: { handlers: { GET: webHandler, POST: webHandler } },
+  server: {
+    handlers: createApiHandlers({
+      GET: async () => {
+        const { data, error } = await supabase.storage.vectors.listBuckets()
+        if (error) return Response.json({ error: { message: error.message } }, { status: 500 })
+
+        return Response.json(data)
+      },
+      POST: async ({ request }) => {
+        const body = await parseJsonBody(request)
+        const parsed = createVectorBucketBodySchema.safeParse(body)
+        if (!parsed.success) {
+          return Response.json({ error: { message: 'Invalid request body' } }, { status: 400 })
+        }
+
+        const { data, error } = await supabase.storage.vectors.createBucket(parsed.data.bucketName)
+        if (error) return Response.json({ error: { message: error.message } }, { status: 400 })
+        return Response.json(data)
+      },
+    }),
+  },
 })
