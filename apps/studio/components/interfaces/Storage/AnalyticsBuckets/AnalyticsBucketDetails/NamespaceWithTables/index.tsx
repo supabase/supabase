@@ -170,7 +170,11 @@ export const NamespaceWithTables = ({
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-7" icon={<MoreVerticalIcon />} />
+                <Button
+                  className="w-7"
+                  icon={<MoreVerticalIcon />}
+                  aria-label={`Actions for namespace ${namespace}`}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
                 <DropdownMenuItem
