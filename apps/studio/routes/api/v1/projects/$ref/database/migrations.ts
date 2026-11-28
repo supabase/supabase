@@ -26,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  const { data, error } = await listMigrationVersions(headers)
+  const { data, error } = await listMigrationVersions({ headers })
 
   if (error) {
     if (error instanceof PgMetaDatabaseError) {
