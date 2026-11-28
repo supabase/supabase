@@ -18,10 +18,6 @@ vi.mock('@/hooks/misc/useOrgOptedIntoAi', () => ({
   getAiOptInLevel: vi.fn(),
 }))
 
-vi.mock('@/data/entitlements/entitlements-query', () => ({
-  checkEntitlement: vi.fn(),
-}))
-
 const AUTH = 'Bearer token'
 const HEADERS = { 'Content-Type': 'application/json', Authorization: AUTH }
 const ORG_SLUG = 'test-org'
@@ -32,20 +28,17 @@ describe('getAIDetails', () => {
   let mockGetProjectDetail: ReturnType<typeof vi.fn>
   let mockGetProjectSettings: ReturnType<typeof vi.fn>
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
-  let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const projectQuery = await import('@/data/projects/project-detail-query')
     const settingsQuery = await import('@/data/config/project-settings-v2-query')
     const aiHook = await import('@/hooks/misc/useOrgOptedIntoAi')
-    const entitlementsQuery = await import('@/data/entitlements/entitlements-query')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
     mockGetProjectSettings = vi.mocked(settingsQuery.getProjectSettings)
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
-    mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
 
     mockGetOrganizations.mockResolvedValue([
       { id: 1, slug: ORG_SLUG, plan: { id: 'pro' }, opt_in_tags: [] },
@@ -56,7 +49,6 @@ describe('getAIDetails', () => {
       organization_id: 1,
     })
     mockGetProjectSettings.mockResolvedValue({ is_sensitive: false })
-    mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
     mockGetAiOptInLevel.mockReturnValue('schema')
   })
 
@@ -69,7 +61,6 @@ describe('getAIDetails', () => {
 
     expect(result).toEqual({
       aiOptInLevel: 'schema',
-      hasAccessToAdvanceModel: false,
       orgId: 1,
       orgSlug: ORG_SLUG,
       planId: 'pro',
@@ -116,21 +107,13 @@ describe('getAIDetails', () => {
       { id: 1, slug: ORG_SLUG, plan: { id: 'pro' }, opt_in_tags },
     ])
 
-    await getAIDetails({ orgSlug: ORG_SLUG, projectRef: PROJECT_REF, authorization: AUTH })
-
-    expect(mockGetAiOptInLevel).toHaveBeenCalledWith(opt_in_tags)
-  })
-
-  it('returns hasAccessToAdvanceModel true when the entitlement grants access', async () => {
-    mockCheckEntitlement.mockResolvedValue({ hasAccess: true })
-
-    const result = await getAIDetails({
+    await getAIDetails({
       orgSlug: ORG_SLUG,
       projectRef: PROJECT_REF,
       authorization: AUTH,
     })
 
-    expect(result.hasAccessToAdvanceModel).toBe(true)
+    expect(mockGetAiOptInLevel).toHaveBeenCalledWith(opt_in_tags)
   })
 
   it('finds the correct org when multiple orgs are returned', async () => {
@@ -155,15 +138,13 @@ describe('getAIDetails', () => {
   })
 
   it('forwards authorization headers to all fetches', async () => {
-    await getAIDetails({ orgSlug: ORG_SLUG, projectRef: PROJECT_REF, authorization: AUTH })
+    await getAIDetails({
+      orgSlug: ORG_SLUG,
+      projectRef: PROJECT_REF,
+      authorization: AUTH,
+    })
 
     expect(mockGetOrganizations).toHaveBeenCalledWith({ headers: HEADERS })
-    expect(mockCheckEntitlement).toHaveBeenCalledWith(
-      ORG_SLUG,
-      'assistant.advance_model',
-      undefined,
-      HEADERS
-    )
     expect(mockGetProjectDetail).toHaveBeenCalledWith(
       { ref: PROJECT_REF, skipWake: true },
       undefined,
@@ -179,7 +160,12 @@ describe('getAIDetails', () => {
   describe('when the project does not belong to the org', () => {
     beforeEach(() => {
       mockGetOrganizations.mockResolvedValue([
-        { id: 1, slug: ORG_SLUG, plan: { id: 'pro' }, opt_in_tags: ['AI_SQL_GENERATOR_OPT_IN'] },
+        {
+          id: 1,
+          slug: ORG_SLUG,
+          plan: { id: 'pro' },
+          opt_in_tags: ['AI_SQL_GENERATOR_OPT_IN'],
+        },
         { id: 2, slug: 'other-org', plan: { id: 'free' }, opt_in_tags: [] },
       ])
       mockGetProjectDetail.mockResolvedValue({
@@ -188,7 +174,6 @@ describe('getAIDetails', () => {
         organization_id: 2,
       })
       mockGetAiOptInLevel.mockReturnValue('schema_and_log_and_data')
-      mockCheckEntitlement.mockResolvedValue({ hasAccess: true })
     })
 
     it('falls back to the most restrictive posture', async () => {
@@ -201,7 +186,6 @@ describe('getAIDetails', () => {
       expect(result.orgId).toBeUndefined()
       expect(result.projectRegion).toBeUndefined()
       expect(result.aiOptInLevel).toBe('disabled')
-      expect(result.hasAccessToAdvanceModel).toBe(false)
       expect(result.orgSlug).toBeUndefined()
       expect(result.planId).toBeUndefined()
     })

@@ -108,7 +108,6 @@
         "GITHUB_HEAD_REF",
         "GITHUB_REF_NAME",
         "GITHUB_PR_NUMBER",
-        "IS_THROTTLED",
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",

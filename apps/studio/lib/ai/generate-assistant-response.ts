@@ -45,7 +45,6 @@ export async function generateAssistantResponse({
   includesLogsSnippets,
   systemProviderOptions,
   providerOptions,
-  requestedModel,
   effectiveModel,
   abortSignal,
   timeout,
@@ -69,8 +68,6 @@ export async function generateAssistantResponse({
   isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
-  requestedModel?: string
-  /** The model actually used after entitlement/throttle fallback. */
   effectiveModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
@@ -86,7 +83,10 @@ export async function generateAssistantResponse({
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
         ? shouldTrace
-          ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+          ? await traced(async () => getSchemas(), {
+              name: 'getSchemas',
+              type: 'function',
+            })
           : await getSchemas()
         : NO_SCHEMA_ACCESS_MESSAGE
 
@@ -164,7 +164,10 @@ export async function generateAssistantResponse({
   if (shouldTrace) {
     // startSpan instead of traced() so we control when the span closes via onEnd.
     // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
-    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
+    const span = startSpan({
+      name: 'generateAssistantResponse',
+      type: 'function',
+    })
     onSpanCreated?.(span.id)
 
     const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
@@ -186,7 +189,6 @@ export async function generateAssistantResponse({
         orgSlug,
         planId,
         isHighComplianceProject,
-        requestedModel,
         effectiveModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,

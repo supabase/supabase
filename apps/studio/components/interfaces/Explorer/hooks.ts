@@ -6,7 +6,6 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
-import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
 import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { readNotebookDraft } from '@/state/notebooks/notebook-drafts'
@@ -145,11 +144,9 @@ export const useCreateChat = () => {
   const createChat = async ({
     name,
     initialMessage,
-    model,
   }: {
     name?: string
     initialMessage?: string
-    model?: AssistantModel
   } = {}) => {
     if (!project) {
       console.error('Project is required')
@@ -159,8 +156,7 @@ export const useCreateChat = () => {
     setIsCreating(true)
 
     try {
-      // Hydration replaces the chat map and the selected model wholesale, so wait it out before
-      // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
+      // Wait for hydration so the persisted chat map does not overwrite the new chat.
       await whenAiAssistantInitialized(aiAssistantState)
 
       aiAssistantState.setContext({
@@ -168,7 +164,6 @@ export const useCreateChat = () => {
         orgSlug: organization?.slug,
         connectionString: project.connectionString ?? '',
       })
-      if (model) aiAssistantState.setModel(model)
 
       const id = aiAssistantState.createChat({ name, initialMessage })
 

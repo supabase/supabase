@@ -128,6 +128,23 @@ describe('AI assistant chat surface isolation', () => {
   })
 })
 
+it('loads saved chats with a legacy model field', () => {
+  const state = createAiAssistantState()
+  const chatId = state.createChat({ name: 'Saved chat' })
+  const savedState = {
+    projectRef: 'default',
+    activeChatId: chatId,
+    chats: state.chats,
+    model: 'gpt-5.4-nano',
+  }
+  const restoredState = createAiAssistantState()
+
+  restoredState.loadPersistedState(savedState)
+
+  expect(restoredState.activeChat?.name).toBe('Saved chat')
+  expect(restoredState).not.toHaveProperty('model')
+})
+
 describe('whenAiAssistantInitialized', () => {
   it('resolves immediately once the state has hydrated', async () => {
     const state = createAiAssistantState()

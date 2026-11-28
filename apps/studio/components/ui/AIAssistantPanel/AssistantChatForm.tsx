@@ -6,9 +6,7 @@ import { Button, cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { formatAttachedSnippets } from './AIAssistant.utils'
-import { ModelSelector } from './ModelSelector'
 import { SnippetRow } from './SnippetRow'
-import type { AssistantModelId } from '@/lib/ai/model.utils'
 import { type SqlSnippet } from '@/state/ai-assistant-state'
 
 export interface FormProps {
@@ -46,10 +44,6 @@ export interface FormProps {
   className?: string
   /* If currently editing an existing message */
   isEditing?: boolean
-  /* The currently selected AI model */
-  selectedModel?: AssistantModelId
-  /* Callback when a model is chosen */
-  onSelectModel?: (model: AssistantModelId) => void
   /* Icon for the submit button when not loading, defaults to an up arrow */
   submitIcon?: ReactNode
   /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
@@ -81,8 +75,6 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       includeSnippetsInMessage = false,
       className,
       isEditing = false,
-      selectedModel,
-      onSelectModel,
       submitIcon = <ArrowUpIcon />,
       submitLabel = 'Send message',
       secondaryAction,
@@ -115,7 +107,6 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
     }
 
     const canSubmit = !disabled && !loading && !!value
-    const showModelSelector = selectedModel !== undefined && onSelectModel !== undefined
 
     return (
       <div className="w-full">
@@ -148,18 +139,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             onChange={(event) => onValueChange(event)}
             onKeyDown={handleKeyDown}
           />
-          <div
-            className={cn(
-              'absolute inset-x-2 bottom-2 flex items-center pointer-events-none',
-              showModelSelector ? 'justify-between' : 'justify-end'
-            )}
-          >
-            {showModelSelector && (
-              <div className="pointer-events-auto">
-                <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
-              </div>
-            )}
-
+          <div className="absolute inset-x-2 bottom-2 flex items-center justify-end pointer-events-none">
             <div className="flex gap-x-1.5 items-center pointer-events-auto">
               <AnimatePresence>
                 {!loading && secondaryAction && (

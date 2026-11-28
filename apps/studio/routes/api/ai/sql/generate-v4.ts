@@ -22,13 +22,7 @@ import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
-import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  getAssistantModelEntry,
-  isAssistantBaseModelId,
-  isKnownAssistantModelId,
-  type AssistantModelId,
-} from '@/lib/ai/model.utils'
+import { ASSISTANT_CHAT_MODEL } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
@@ -64,7 +58,6 @@ const requestBodySchema = z.object({
   chatName: z.string().optional(),
   supportMode: z.boolean().optional(),
   orgSlug: z.string().optional(),
-  model: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
@@ -92,12 +85,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     orgSlug: rawOrgSlug,
     chatId,
     chatName,
-    model: rawRequestedModel,
     supportMode,
   } = data
-
-  const requestedModel: AssistantModelId | undefined =
-    rawRequestedModel && isKnownAssistantModelId(rawRequestedModel) ? rawRequestedModel : undefined
 
   const messagesValidation = await safeValidateUIMessages({
     messages: rawMessages,
@@ -114,7 +103,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const includesLogsSnippets = messagesIncludeLogsSnippets(messages)
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let hasAccessToAdvanceModel = false
   let isHighComplianceProject: boolean | undefined
   let orgId: number | undefined
   let orgSlug: string | undefined
@@ -123,15 +111,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
-    hasAccessToAdvanceModel = true
   }
 
   if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
+      const aiDetails = await getAIDetails({
+        orgSlug: rawOrgSlug,
+        projectRef,
+        authorization,
+      })
 
       aiOptInLevel = aiDetails.aiOptInLevel
-      hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
       orgId = aiDetails.orgId
       orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
@@ -146,20 +136,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
-  const envThrottled = process.env.IS_THROTTLED !== 'false'
-
-  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-  if (!isAssistantBaseModelId(effectiveModel) && (!hasAccessToAdvanceModel || envThrottled)) {
-    effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
-  }
-
   const {
     modelParams,
     error: modelError,
     systemProviderOptions,
   } = await getModel({
     provider: 'openai',
-    modelEntry: getAssistantModelEntry(effectiveModel),
+    modelEntry: ASSISTANT_CHAT_MODEL,
   })
 
   if (modelError) {
@@ -232,11 +215,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       isHighComplianceProject,
       includesLogsSnippets,
-      requestedModel,
-      effectiveModel,
+      effectiveModel: ASSISTANT_CHAT_MODEL.id,
       systemProviderOptions,
       abortSignal: abortController.signal,
-      timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
+      timeout: {
+        totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)),
+      },
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
       },

@@ -20,8 +20,6 @@ import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
-import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
-import type { AssistantModelId } from '@/lib/ai/model.utils'
 import {
   applyNotebookCacheEffects,
   collectNotebookCacheEffects,
@@ -43,8 +41,6 @@ export type AssistantMessageType = MessageType
  * describes.
  */
 export type SqlSnippet = string | { label: string; content: string; source?: SqlSnippetSource }
-
-export type AssistantModel = AssistantModelId
 
 export type SupportChatMetadata = {
   subject: string
@@ -97,7 +93,6 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
-  model?: AssistantModel
   context: AiAssistantContext
 }
 
@@ -110,7 +105,6 @@ type StoredAiAssistantState = {
   projectRef: string
   activeChatId?: string
   chats: Record<string, ChatSession>
-  model?: AssistantModel
 }
 
 const createInitialAiAssistantData = (): AiAssistantData => ({
@@ -120,7 +114,6 @@ const createInitialAiAssistantData = (): AiAssistantData => ({
   tables: [],
   chats: {},
   activeChatId: undefined,
-  model: undefined,
   context: {},
 })
 
@@ -235,7 +228,6 @@ async function tryMigrateFromLocalStorage(
         projectRef: projectRef,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
-        model: parsedFromLocalStorage.model ?? createInitialAiAssistantData().model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
@@ -332,7 +324,6 @@ function createChatInstance(
             supportMode: chat?.supportMetadata?.isSupportChat ?? false,
             orgSlug: state.context.orgSlug,
             context: state.context,
-            model: state.model,
             ...opts.body,
           },
           ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
@@ -422,10 +413,6 @@ export const createAiAssistantState = (): AiAssistantState => {
     resetAiAssistantPanel: () => {
       Object.assign(state, createInitialAiAssistantData())
       state.isInitialized = false
-    },
-
-    setModel: (model: AssistantModel) => {
-      state.model = model
     },
 
     setInitialInput: (text: string) => {
@@ -665,11 +652,6 @@ export const createAiAssistantState = (): AiAssistantState => {
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-      const storedModel = persistedState.model
-      state.model =
-        storedModel && isKnownAssistantModelId(storedModel)
-          ? storedModel
-          : createInitialAiAssistantData().model
 
       // Reset sync guards on any support chats (can't be mid-sync after reload)
       Object.values(state.chats).forEach((chat) => {
@@ -721,7 +703,6 @@ export type AiAssistantState = AiAssistantData & {
   messageSpanIds: Record<string, string>
   isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
-  setModel: (model: AssistantModel) => void
   setInitialInput: (text: string) => void
   createChat: (options?: CreateChatOptions) => string
   newChat: (options?: NewChatOptions) => string
@@ -803,7 +784,6 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
           activeChatId: snap.activeChatId,
-          model: snap.model,
           chats: snap.chats
             ? (Object.entries(snap.chats) as Array<[string, ChatSession]>).reduce(
                 (acc, [chatId, chat]) => {
