@@ -1,12 +1,16 @@
+import { useState, useEffect } from 'react'
+import './App.css'
+import { supabase } from './supabaseClient'
+import Auth from './Auth'
+import Account from './Account'
+
 function App() {
   const [claims, setClaims] = useState(null)
 
   useEffect(() => {
     const loadClaims = async () => {
-      const {
-        data: { claims },
-      } = await supabase.auth.getClaims()
-      setClaims(claims)
+      const { data } = await supabase.auth.getClaims()
+      setClaims(data?.claims)
     }
 
     loadClaims()
@@ -26,3 +30,5 @@ function App() {
     </div>
   )
 }
+
+export default App
