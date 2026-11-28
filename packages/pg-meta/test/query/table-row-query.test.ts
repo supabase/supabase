@@ -62,6 +62,23 @@ describe('Table Row Query', () => {
       const result = getDefaultOrderByColumns(table, { excludedColumns: ['id'] })
       expect(result).toEqual(['name'])
     })
+
+    test('should apply exclusions to a composite primary key', () => {
+      const table = {
+        primary_keys: [{ name: 'tenant_id' }, { name: 'id' }],
+        columns: [
+          { name: 'tenant_id', data_type: 'integer' },
+          { name: 'id', data_type: 'integer' },
+          { name: 'metadata', data_type: 'jsonb' },
+          { name: 'name', data_type: 'text' },
+        ],
+      } as any
+
+      expect(getDefaultOrderByColumns(table)).toEqual(['tenant_id', 'id'])
+      expect(getDefaultOrderByColumns(table, { excludedColumns: ['tenant_id'] })).toEqual(['id'])
+      const allExcluded = getDefaultOrderByColumns(table, { excludedColumns: ['tenant_id', 'id'] })
+      expect(allExcluded).toEqual(['name'])
+    })
   })
 
   describe('getTableRowsSql', () => {
