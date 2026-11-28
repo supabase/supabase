@@ -22,9 +22,11 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const RestartServerButton = () => {
   const router = useRouter()
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
 
@@ -73,6 +75,10 @@ export const RestartServerButton = () => {
     if (!canRestartProject) {
       return toast.error('You do not have the required permissions to restart this project')
     }
+    track('project_lifecycle_action_submitted', {
+      action: 'restart_project',
+      source: 'settings_general',
+    })
     restartProject({ ref: projectRef })
   }
 
@@ -80,6 +86,10 @@ export const RestartServerButton = () => {
     if (!canRestartProject) {
       return toast.error('You do not have the required permissions to restart this project')
     }
+    track('project_lifecycle_action_submitted', {
+      action: 'restart_database',
+      source: 'settings_general',
+    })
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 

@@ -107,6 +107,7 @@ export const TransferProjectButton = () => {
   async function handleTransferProject() {
     if (project === undefined) return
     if (selectedOrg === undefined) return
+    track('project_lifecycle_action_submitted', { action: 'transfer', source: 'settings_general' })
     transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
   }
 

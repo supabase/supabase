@@ -10,6 +10,7 @@ import Panel from '@/components/ui/Panel'
 import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -17,6 +18,7 @@ export type CustomDomainDeleteProps = {
 }
 
 export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
+  const track = useTrack()
   const [removeCustomDomain, setRemoveCustomDomain] = useState(false)
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
 
@@ -32,6 +34,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
 
   const onDeleteCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
+    track('custom_domain_step_submitted', { step: 'remove' })
     deleteCustomDomain({ projectRef, removeAddon: removeCustomDomain })
   }
 

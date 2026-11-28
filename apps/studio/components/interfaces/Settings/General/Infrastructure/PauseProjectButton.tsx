@@ -25,9 +25,11 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const PauseProjectButton = () => {
   const router = useRouter()
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
@@ -61,6 +63,7 @@ export const PauseProjectButton = () => {
     if (!canPauseProject) {
       return toast.error(`You do not have the required permissions to pause this ${entityLabel}`)
     }
+    track('project_lifecycle_action_submitted', { action: 'pause', source: 'settings_general' })
     pauseProject({ ref: projectRef })
   }
 

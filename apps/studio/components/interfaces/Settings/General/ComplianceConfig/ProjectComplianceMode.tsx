@@ -19,9 +19,11 @@ import { useComplianceConfigUpdateMutation } from '@/data/config/project-complia
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()
+  const track = useTrack()
   const isIssuesInboxEnabled = useFlag('issuesInbox')
   const [isSensitive, setIsSensitive] = useState(false)
 
@@ -52,6 +54,7 @@ export const ComplianceConfig = () => {
   const toggleIsSensitive = async () => {
     if (!ref) return console.error('Project ref is required')
     setIsSensitive(!isSensitive)
+    track('project_compliance_mode_updated', { isSensitive: !isSensitive })
     updateComplianceConfig({ projectRef: ref, isSensitive: !isSensitive })
   }
 
