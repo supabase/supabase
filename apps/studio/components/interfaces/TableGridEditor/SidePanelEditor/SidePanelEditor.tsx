@@ -22,6 +22,7 @@ import {
   createColumn,
   createTable,
   duplicateTable,
+  filterForeignRowValue,
   getRowFromSidePanel,
   insertRowsViaSpreadsheet,
   insertTableRows,
@@ -360,7 +361,7 @@ export const SidePanelEditor = ({
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row } = selectedForeignKeyToEdit
+      const { row, column: editedColumn } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => {
         const col = selectedTable.columns?.find((x) => x.name === column.name)
@@ -374,7 +375,9 @@ export const SidePanelEditor = ({
         rowIdx: row.idx,
       }
 
-      await saveRow(value, isNewRecord, configuration, (error) => {
+      const payload = filterForeignRowValue(value, editedColumn?.name)
+
+      await saveRow(payload, isNewRecord, configuration, (error) => {
         if (error) {
           toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
         }
