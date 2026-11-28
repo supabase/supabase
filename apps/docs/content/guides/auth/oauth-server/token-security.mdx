@@ -337,16 +337,17 @@ USING (
 Track and review which clients have access:
 
 ```sql
--- View all active OAuth clients
+-- View OAuth clients and users with a session created or refreshed in the last 30 days
 SELECT
-  oc.client_id,
-  oc.name,
+  oc.id AS client_id,
+  oc.client_name,
   oc.created_at,
-  COUNT(DISTINCT s.user_id) as active_users
+  COUNT(DISTINCT s.user_id) as users_with_recent_sessions
 FROM auth.oauth_clients oc
-LEFT JOIN auth.sessions s ON s.client_id = oc.client_id
-WHERE s.created_at > NOW() - INTERVAL '30 days'
-GROUP BY oc.client_id, oc.name, oc.created_at;
+LEFT JOIN auth.sessions s
+  ON s.oauth_client_id = oc.id
+  AND coalesce(s.refreshed_at, s.created_at) > NOW() - INTERVAL '30 days'
+GROUP BY oc.id, oc.client_name, oc.created_at;
 ```
 
 ## Testing your policies
