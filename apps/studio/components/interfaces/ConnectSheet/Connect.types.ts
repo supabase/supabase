@@ -97,6 +97,9 @@ interface FieldDefinition {
   options?: FieldOption[] | { source: string } | ConditionalValue<FieldOption[]>
   // Only show this field when these state conditions are met
   dependsOn?: Record<string, string[]>
+  // Render this field inside an option of another field's radio list, instead of as its own row.
+  // Pair with dependsOn so it only exists while that option is selected.
+  inlineWithOption?: { fieldId: string; value: string }
   // Default value for this field
   defaultValue?: string | boolean | string[]
 }
