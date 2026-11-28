@@ -1,9 +1,10 @@
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { getCodexAuthenticateCommand } from 'ui-patterns/McpUrlBuilder/clients.data'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-function CodexAuthenticateContent(_props: StepContentProps) {
-  const command = 'codex mcp login supabase'
+function CodexAuthenticateContent({ state }: StepContentProps) {
+  const command = getCodexAuthenticateCommand(Boolean(state.mcpReadonly))
 
   return (
     <CodeBlock
