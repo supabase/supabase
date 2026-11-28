@@ -4,6 +4,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogSection,
   DialogTitle,
@@ -133,6 +134,9 @@ export const LocalVersionPopover = () => {
             <DialogContent>
               <DialogHeader className="border-b">
                 <DialogTitle>Stable release schedule</DialogTitle>
+                <DialogDescription className="sr-only">
+                  Details about the Supabase CLI stable release schedule
+                </DialogDescription>
               </DialogHeader>
               <DialogSection className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-2">
