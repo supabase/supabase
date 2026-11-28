@@ -116,6 +116,43 @@ withTestDatabase(
   }
 )
 
+withTestDatabase('list parses procedures, which have no return type', async ({ executeQuery }) => {
+  // `create()` accepts `type: 'procedure'` and the list query selects
+  // `prokind in ('f', 'p')`, but Postgres returns NULL from
+  // `pg_get_function_result()` for procedures. A single procedure in the schema
+  // used to fail the parse for the whole list.
+  const { sql: createSql } = pgMeta.functions.create({
+    name: 'test_proc',
+    schema: 'public',
+    args: [safeSql`a int2`],
+    definition: 'select a',
+    language: 'sql',
+    type: 'procedure',
+  })
+  await executeQuery(createSql)
+
+  const { sql, zod } = pgMeta.functions.list()
+  const res = zod.parse(await executeQuery(sql))
+
+  const proc = res.find(({ name }) => name === 'test_proc')
+  expect(proc?.type).toBe('procedure')
+  expect(proc?.return_type).toBeNull()
+
+  // Functions in the same list keep a return type.
+  expect(res.find(({ name }) => name === 'add')?.return_type).toBe('integer')
+
+  // `retrieve()` parses one row instead of an array, so it rejected the
+  // procedure outright rather than failing the whole result set.
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+    name: 'test_proc',
+    schema: 'public',
+    args: ['a int2'],
+  })
+  const retrieved = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  expect(retrieved?.type).toBe('procedure')
+  expect(retrieved?.return_type).toBeNull()
+})
+
 withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) => {
   // Create function
   const { sql: createSql } = pgMeta.functions.create({
