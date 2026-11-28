@@ -84,6 +84,7 @@ const OPTION_1_ALLOWLIST = [
   'Database > Foreign Data Wrappers > Databases and warehouses',
   'Start > Framework Quickstarts > JavaScript and TypeScript',
   'Start > Web app demos',
+  'Top nav > Reference > column 1',
 ]
 
 describe('navigation level size', () => {
