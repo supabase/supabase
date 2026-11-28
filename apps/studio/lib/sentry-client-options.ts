@@ -16,6 +16,7 @@ import {
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
 import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
+import { studioTracesSampler } from '@/lib/sentry-traces-sampler'
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0]
 
@@ -161,8 +162,9 @@ export function buildSentryClientOptions({
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
-    // Enable performance monitoring
-    tracesSampleRate: 0.02,
+    // Enable performance monitoring. Temporarily samples perf-relevant routes higher (FE-3828);
+    // see lib/sentry-traces-sampler.ts for the rates and how to revert to the flat 0.02.
+    tracesSampler: studioTracesSampler,
 
     // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
     // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.

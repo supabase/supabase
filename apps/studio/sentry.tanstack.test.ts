@@ -51,7 +51,7 @@ describe('initSentryTanStackClient', () => {
     expect(sentryMocks.init).toHaveBeenCalledWith(
       expect.objectContaining({
         dsn: 'https://public@sentry.example.com/1',
-        tracesSampleRate: 0.02,
+        tracesSampler: expect.any(Function),
       })
     )
   })
