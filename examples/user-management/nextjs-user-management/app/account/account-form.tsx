@@ -68,14 +68,18 @@ export default function AccountForm({ claims }: { claims: Claims | null }) {
 
       setLoading(true)
 
-      const { error } = await supabase.from('profiles').upsert({
-        id: claims.sub,
-        full_name: fullname,
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date().toISOString(),
-      })
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: fullname,
+          username,
+          website,
+          avatar_url,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', claims.sub)
+        .select('id')
+        .single()
       if (error) throw error
       alert('Profile updated!')
     } catch (error) {

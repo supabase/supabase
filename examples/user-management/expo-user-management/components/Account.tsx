@@ -55,14 +55,18 @@ export default function Account({ userId, email }: { userId: string; email?: str
       setLoading(true)
 
       const updates = {
-        id: userId,
         username,
         website,
         avatar_url,
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId)
+        .select('id')
+        .single()
 
       if (error) {
         throw error
