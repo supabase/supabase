@@ -171,9 +171,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    const { error } = await supabase.from('profiles').upsert(updates, {
-      returning: 'minimal', // Don't return the value after inserting
-    })
+    const { error } = await supabase.from('profiles').upsert(updates)
     if (error) throw error
   } catch (error) {
     alert(error.message)
