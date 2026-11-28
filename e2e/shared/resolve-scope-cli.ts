@@ -1,5 +1,6 @@
 import { parseChangedFilesList } from './paths.ts'
 import type { ScopeResult } from './run-suite.ts'
+import { formatAnnotation, formatJobSummary, formatLog } from './scan-limit.ts'
 
 export type ResolveScopeCliConfig = {
   label: string
@@ -30,7 +31,8 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
   }
 
   const result = await config.resolveScope({ changedFiles, repoRoot: config.repoRoot })
-  const output = `skip=${result.skip}\npaths=${result.pages.join(',')}\n`
+  const a11yLine = result.a11yPages ? `a11y_paths=${result.a11yPages.join(',')}\n` : ''
+  const output = `skip=${result.skip}\npaths=${result.pages.join(',')}\n${a11yLine}`
 
   if (process.env.GITHUB_OUTPUT) {
     const { appendFileSync } = await import('node:fs')
@@ -46,5 +48,17 @@ export async function runResolveScopeCli(config: ResolveScopeCliConfig): Promise
     }
   } else {
     console.error(`No in-scope ${config.label} pages — skipping Playwright suite.`)
+  }
+
+  if (result.unscanned?.pages.length) {
+    const warning = { label: config.label, ...result.unscanned }
+    console.error(formatLog(warning))
+    console.error(
+      `::warning title=Pages without the ${warning.check}::${formatAnnotation(warning)}`
+    )
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const { appendFileSync } = await import('node:fs')
+      appendFileSync(process.env.GITHUB_STEP_SUMMARY, formatJobSummary(warning))
+    }
   }
 }

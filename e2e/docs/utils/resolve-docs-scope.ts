@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { basename, join, relative } from 'node:path'
 
 import { normalizeRepoPath } from '../../shared/paths.ts'
+import type { ScopeResult } from '../../shared/run-suite.ts'
 
 export const FEDERATED_SECTIONS = [
   'graphql',
@@ -11,7 +12,8 @@ export const FEDERATED_SECTIONS = [
   'deployment/ci',
 ] as const
 
-export const MAX_SCOPED_PAGES = 20
+// Cap on pages that get the slow accessibility scan. The link check runs on every page.
+export const MAX_A11Y_PAGES = 20
 
 const GUIDES_PREFIX = 'apps/docs/content/guides/'
 const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
@@ -72,13 +74,10 @@ async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
 export type ResolveDocsScopeOptions = {
   changedFiles: string[]
   repoRoot: string
-  maxPages?: number
+  maxA11yPages?: number
 }
 
-export type ResolveDocsScopeResult = {
-  pages: string[]
-  skip: boolean
-}
+export type ResolveDocsScopeResult = Required<ScopeResult>
 
 function isFederatedGuideSlug(slug: string): boolean {
   return FEDERATED_SECTIONS.some((section) => slug === section || slug.startsWith(`${section}/`))
@@ -237,7 +236,8 @@ export async function resolveDocsScope(
 ): Promise<ResolveDocsScopeResult> {
   await assertFederatedSectionsInSync(options.repoRoot)
 
-  const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
+  // At least 1: an empty scan list means "scan every page" to the spec.
+  const maxA11yPages = Math.max(1, options.maxA11yPages ?? MAX_A11Y_PAGES)
   const pages = new Set<string>()
   const requiredPages = new Set<string>()
   const changedPartials: string[] = []
@@ -270,17 +270,23 @@ export async function resolveDocsScope(
     }
   }
 
-  const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
-  const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
-  const selectedPages = [...pages]
-    .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
-    .sort()
-    .slice(0, remainingSlots)
-  const sorted = [...selectedRequiredPages, ...selectedPages].sort()
+  // Required pages come first so the accessibility limit drops them last.
+  const orderedPages = [
+    ...[...requiredPages].sort(),
+    ...[...pages]
+      .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
+      .sort(),
+  ]
 
   return {
-    pages: sorted,
-    skip: sorted.length === 0,
+    pages: [...orderedPages].sort(),
+    a11yPages: orderedPages.slice(0, maxA11yPages).sort(),
+    skip: orderedPages.length === 0,
+    unscanned: {
+      check: 'accessibility scan',
+      limit: maxA11yPages,
+      pages: orderedPages.slice(maxA11yPages),
+    },
   }
 }
 

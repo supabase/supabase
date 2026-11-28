@@ -60,6 +60,9 @@ jobs:
               - '.github/workflows/docs-e2e.yml'
             docs_app:
               - 'apps/docs/**'
+            harness:
+              - 'e2e/docs/**'
+              - 'e2e/shared/**'
 
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true'
@@ -82,6 +85,22 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
+
+      # The harness unit tests need no installed packages, so they run before the
+      # scope step and also on harness-only changes, which skip Playwright.
+      - name: Run docs E2E harness unit tests
+        if: github.event_name == 'pull_request' && steps.changes.outputs.harness == 'true'
+        working-directory: e2e/docs
+        # `node --test` passes when its pattern matches no files, so fail here if a
+        # rename or move leaves nothing to run.
+        run: |
+          shopt -s nullglob
+          test_files=(utils/*.test.ts)
+          if [ "${#test_files[@]}" -eq 0 ]; then
+            echo "::error::No harness unit tests match e2e/docs/utils/*.test.ts."
+            exit 1
+          fi
+          node --test --experimental-strip-types "${test_files[@]}"
 
       # Map changed owned content (guides, partials) to page
       # URLs. Harness-only PRs resolve to skip=true and exit before Playwright.
@@ -225,6 +244,7 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
           DOCS_E2E_PAGE_PATHS: ${{ steps.scope.outputs.paths }}
+          DOCS_E2E_A11Y_PAGE_PATHS: ${{ steps.scope.outputs.a11y_paths }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
 
       - name: Upload Playwright report

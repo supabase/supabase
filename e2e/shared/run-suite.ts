@@ -1,14 +1,25 @@
 import { spawn } from 'node:child_process'
 
 import { collectChangedFiles, repoRootFrom } from './git.ts'
+import { parsePagePaths } from './paths.ts'
+import { formatLocalWarning, formatLog, type UnscannedPages } from './scan-limit.ts'
 
-export type ScopeResult = { pages: string[]; skip: boolean }
+export type ScopeResult = {
+  // Every in-scope page. The link check runs on all of them.
+  pages: string[]
+  // Pages that also get the accessibility scan. Defaults to `pages` when unset.
+  a11yPages?: string[]
+  skip: boolean
+  // In-scope pages over the accessibility scan limit, so they get no scan.
+  unscanned?: UnscannedPages
+}
 
 export type SuiteConfig = {
   root: string
   label: string
   devCommand: string
   pagePathsEnv: string
+  a11yPagePathsEnv?: string
   baseRefEnv: string
   defaultBaseUrl: string
   resolveScope: (options: { changedFiles: string[]; repoRoot: string }) => Promise<ScopeResult>
@@ -30,14 +41,26 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
   }
 }
 
-async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
-  const explicit = process.env[config.pagePathsEnv]?.trim()
-  if (explicit) {
-    return explicit
-      .split(/[\n,]/)
-      .map((path) => path.trim())
-      .filter(Boolean)
+type ResolvedPages = { pages: string[]; a11yPages?: string[] }
+
+// Reads page lists passed in the environment. CI passes both lists from the scope
+// step, so the scan list is kept when it is set.
+export function readExplicitPages(
+  config: Pick<SuiteConfig, 'pagePathsEnv' | 'a11yPagePathsEnv'>,
+  env: NodeJS.ProcessEnv
+): ResolvedPages | null {
+  const explicit = env[config.pagePathsEnv]?.trim()
+  if (!explicit) return null
+  const explicitA11y = config.a11yPagePathsEnv ? env[config.a11yPagePathsEnv]?.trim() : undefined
+  return {
+    pages: parsePagePaths(explicit),
+    ...(explicitA11y ? { a11yPages: parsePagePaths(explicitA11y) } : {}),
   }
+}
+
+async function resolvePagePaths(config: SuiteConfig): Promise<ResolvedPages | null> {
+  const explicit = readExplicitPages(config, process.env)
+  if (explicit) return explicit
 
   const baseRef = process.env[config.baseRefEnv]?.trim() || 'origin/master'
   const repoRoot = repoRootFrom(config.root)
@@ -57,7 +80,27 @@ async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
   for (const page of result.pages) {
     console.error(`  ${page}`)
   }
-  return result.pages
+  if (result.unscanned?.pages.length) {
+    const warning = { label: config.label, ...result.unscanned }
+    console.error(formatLog(warning))
+    console.error(formatLocalWarning(warning, config.pagePathsEnv))
+  }
+  return { pages: result.pages, a11yPages: result.a11yPages }
+}
+
+// Passes the resolved scan list, or clears one inherited from the shell when none was
+// resolved (as in --all runs) so the suite scans every page.
+export function buildChildEnv(
+  config: Pick<SuiteConfig, 'pagePathsEnv' | 'a11yPagePathsEnv'>,
+  resolved: ResolvedPages,
+  env: NodeJS.ProcessEnv
+): NodeJS.ProcessEnv {
+  const childEnv: NodeJS.ProcessEnv = { ...env, [config.pagePathsEnv]: resolved.pages.join(',') }
+  if (config.a11yPagePathsEnv) {
+    if (resolved.a11yPages) childEnv[config.a11yPagePathsEnv] = resolved.a11yPages.join(',')
+    else delete childEnv[config.a11yPagePathsEnv]
+  }
+  return childEnv
 }
 
 export async function runSuite(config: SuiteConfig): Promise<void> {
@@ -65,14 +108,15 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
   const runAll = rawArgs.includes('--all')
   const playwrightArgs = rawArgs.filter((arg) => arg !== '--all' && arg !== '--')
 
-  let pages: string[] | null
+  let resolved: ResolvedPages | null
   if (runAll && config.resolveAllPages) {
-    pages = await config.resolveAllPages(repoRootFrom(config.root))
+    const pages = await config.resolveAllPages(repoRootFrom(config.root))
     console.error(`Resolved all ${pages.length} in-scope ${config.label} page(s).`)
+    resolved = { pages }
   } else {
-    pages = await resolvePagePaths(config)
+    resolved = await resolvePagePaths(config)
   }
-  if (pages === null) process.exit(0)
+  if (resolved === null) process.exit(0)
 
   const hasMaxFailuresArg = playwrightArgs.some(
     (arg) => arg === '-x' || arg.startsWith('--max-failures')
@@ -91,9 +135,11 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
     process.exit(1)
   }
 
+  const childEnv = buildChildEnv(config, resolved, process.env)
+
   const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalArgs], {
     cwd: config.root,
-    env: { ...process.env, [config.pagePathsEnv]: pages.join(',') },
+    env: childEnv,
     stdio: 'inherit',
     shell: process.platform === 'win32',
   })
