@@ -1,0 +1,8 @@
+.output
+.vercel
+.nitro
+.tanstack
+dist
+node_modules
+tsconfig.tsbuildinfo
+.env*

@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/* `dark:` follows the data-theme attribute that index.html sets from the
+   saved choice or the system preference. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* Semantic colors with a light and a dark value, so components never
+   hardcode a palette. */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-hover: var(--hover);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-foreground: var(--foreground);
+  --color-subtle: var(--subtle);
+  --color-muted: var(--muted);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.985 0 0);
+  --surface: oklch(0.96 0 0);
+  --card: oklch(1 0 0);
+  --hover: oklch(0.93 0 0);
+  --line: oklch(0.9 0 0);
+  --line-strong: oklch(0.83 0 0);
+  --foreground: oklch(0.2 0 0);
+  --subtle: oklch(0.37 0 0);
+  --muted: oklch(0.55 0 0);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --background: oklch(0.145 0 0);
+  --surface: oklch(0.18 0 0);
+  --card: oklch(0.205 0 0);
+  --hover: oklch(0.27 0 0);
+  --line: oklch(0.27 0 0);
+  --line-strong: oklch(0.37 0 0);
+  --foreground: oklch(0.97 0 0);
+  --subtle: oklch(0.82 0 0);
+  --muted: oklch(0.6 0 0);
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}

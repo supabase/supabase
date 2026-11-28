@@ -1,0 +1,12 @@
+{
+  "$schema": "./../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      // Nitro picks its Vercel preset from VERCEL, which changes the output.
+      "env": ["VERCEL"],
+      "outputs": [".output/**", ".vercel/output/**"],
+    },
+  },
+}

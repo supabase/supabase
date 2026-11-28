@@ -1,0 +1,32 @@
+{
+  "name": "supabase-waitlist",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase-labs/tanstack-db": "^0.1.0",
+    "@supabase/supabase-js": "^2.117.3",
+    "@tanstack/react-db": "0.5.12",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "^4.2.4",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.16"
+  },
+  "overrides": {
+    "@tanstack/db": "0.15.2",
+    "@tanstack/query-db-collection": "1.4.8"
+  }
+}
