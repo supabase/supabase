@@ -3,6 +3,9 @@
 /packages/shared-data/plans.ts @supabase/billing
 /packages/shared-data/scoped-access-token-permissions.ts @supabase/Dashboard @supabase/docs
 /packages/common/telemetry-constants.ts @supabase/growth-eng
+/packages/common/posthog-client* @supabase/growth-eng
+/packages/common/telemetry-event* @supabase/growth-eng
+/.agents/skills/telemetry-standards/ @supabase/growth-eng
 /packages/dev-tools/ @supabase/growth-eng
 # /packages/pg-meta @supabase/postgres @avallete
 /packages/ui-patterns @supabase/design
