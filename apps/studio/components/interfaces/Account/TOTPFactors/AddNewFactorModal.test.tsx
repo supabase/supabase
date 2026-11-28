@@ -14,7 +14,12 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
-  return { ...actual, useFlag: vi.fn(() => false), useParams: () => ({ ref: 'default' }) }
+  return {
+    ...actual,
+    useFlag: vi.fn(() => false),
+    useParams: () => ({ ref: 'default' }),
+    useSession: () => ({ access_token: 'test-token' }),
+  }
 })
 
 async function enrollFactor() {

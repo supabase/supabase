@@ -1,6 +1,6 @@
 import type { UserIdentity } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
-import { useUser } from 'common'
+import { useSession, useUser } from 'common'
 
 import { profileKeys } from './keys'
 import { auth } from '@/lib/gotrue'
@@ -32,10 +32,12 @@ export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   ...options
 }: UseCustomQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
   const userId = useUser()?.id
+  // auth.getUser() errors with "Auth session missing" when signed out
+  const hasSession = useSession() !== null
   return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
     queryKey: profileKeys.identities(userId),
     queryFn: () => getProfileIdentities(),
-    enabled,
+    enabled: enabled && hasSession,
     ...options,
   })
 }
