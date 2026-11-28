@@ -354,7 +354,12 @@ export const updateColumn = async ({
   }
 }
 
-/** TODO: Refactor to do in a single transaction */
+/**
+ * Duplicates a table's structure and optionally its rows, foreign keys, RLS
+ * state, and comment.
+ *
+ * TODO: Refactor to do in a single transaction.
+ */
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -398,8 +403,23 @@ export const duplicateTable = async (
     })
   }
 
+  let failedIdentitySequenceUpdate: PromiseRejectedResult | undefined
+
   // Duplicate rows if needed
   if (isDuplicateRows) {
+    // Read the source columns at duplication time so columns added after the
+    // panel loaded are still copied instead of being filled with defaults.
+    const sourceTable = await getTableQuery({
+      projectRef,
+      connectionString,
+      name: sourceTableName,
+      schema: sourceTableSchema,
+    })
+    const columns = sourceTable.columns ?? []
+    const copyableColumns = columns
+      .filter((column) => !column.is_generated)
+      .map((column) => column.name)
+
     await executeSql({
       projectRef,
       connectionString,
@@ -409,14 +429,14 @@ export const duplicateTable = async (
         sourceTableName,
         sourceTableSchema,
         duplicatedTableName,
+        columns: copyableColumns,
       }),
       grant: unguarded.migrating,
     })
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
-    const columns = duplicateTable.columns ?? []
     const identityColumns = columns.filter((column) => column.identity_generation !== null)
-    identityColumns.map(async (column) => {
+    const identitySequenceUpdates = identityColumns.map(async (column) => {
       await executeSql({
         projectRef,
         connectionString,
@@ -431,6 +451,12 @@ export const duplicateTable = async (
         grant: unguarded.migrating,
       })
     })
+    // Settle every update before failing so the requested RLS setting below is
+    // still applied to the table that was already created.
+    const identitySequenceResults = await Promise.allSettled(identitySequenceUpdates)
+    failedIdentitySequenceUpdate = identitySequenceResults.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    )
   }
 
   const tables = await queryClient.fetchQuery({
@@ -452,7 +478,7 @@ export const duplicateTable = async (
     })
   }
 
-  return duplicatedTable
+  return { table: duplicatedTable, identitySequenceError: failedIdentitySequenceUpdate }
 }
 
 export const createTable = async ({
