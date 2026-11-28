@@ -239,7 +239,7 @@ const FormField = ({
                     <Textarea
                       {...field}
                       rows={4}
-                      placeholder="Enter multi-line text"
+                      placeholder={`Your verification code is {{ .Code }}\n\n@example.com #{{ .Code }}`}
                       className="resize-none"
                       readOnly={readOnly}
                     />
