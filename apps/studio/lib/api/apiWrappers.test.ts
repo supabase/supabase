@@ -1,11 +1,10 @@
 import * as Sentry from '@sentry/react'
 import type { JwtPayload } from '@supabase/supabase-js'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { describe, expect, it, vi } from 'vitest'
 
-import { apiAuthenticate, authenticateRequest } from './apiAuthenticate'
+import { authenticateRequest } from './apiAuthenticate'
 import { InvalidJsonError } from './apiHelpers'
-import { apiWrapper, createApiHandlers } from './apiWrapper'
+import { createApiHandlers } from './apiWrapper'
 import { classifyResponseError } from '@/data/error-classification'
 import { callRoute } from '@/tests/lib/server-route'
 
@@ -15,65 +14,12 @@ vi.mock('@/lib/constants', () => ({
 }))
 
 vi.mock('./apiAuthenticate', () => ({
-  apiAuthenticate: vi.fn(),
   authenticateRequest: vi.fn(),
 }))
 
 vi.mock('@sentry/react', () => ({
   captureException: vi.fn(),
 }))
-
-describe('apiWrapper', () => {
-  const mockReq = {} as NextApiRequest
-  const mockRes = {
-    status: vi.fn().mockReturnThis(),
-    json: vi.fn().mockReturnThis(),
-  } as unknown as NextApiResponse
-  const mockHandler = vi.fn()
-
-  it('should call handler directly when withAuth is false', async () => {
-    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })
-    expect(mockHandler).toHaveBeenCalledWith(mockReq, mockRes, undefined)
-    expect(apiAuthenticate).not.toHaveBeenCalled()
-  })
-
-  it('should pass JWT claims to handler when withAuth is true', async () => {
-    const mockClaims: JwtPayload = {
-      iss: 'supabase',
-      sub: 'user-123',
-      aud: 'authenticated',
-      exp: 9999999999,
-      iat: 1000000000,
-      role: 'authenticated',
-      aal: 'aal1',
-      session_id: 'session-123',
-    }
-    vi.mocked(apiAuthenticate).mockResolvedValue(mockClaims)
-
-    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
-    expect(apiAuthenticate).toHaveBeenCalledWith(mockReq, mockRes)
-    expect(mockHandler).toHaveBeenCalledWith(mockReq, mockRes, mockClaims)
-  })
-
-  it('should return 401 when authentication fails', async () => {
-    const mockError = { error: classifyResponseError({ message: 'Invalid token' }) }
-    vi.mocked(apiAuthenticate).mockResolvedValue(mockError)
-
-    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
-    expect(mockRes.status).toHaveBeenCalledWith(401)
-    expect(mockHandler).not.toHaveBeenCalled()
-  })
-
-  it('should report to Sentry and return 500 when the handler throws', async () => {
-    const mockError = new Error('boom')
-    mockHandler.mockRejectedValue(mockError)
-
-    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })
-    expect(Sentry.captureException).toHaveBeenCalledWith(mockError)
-    expect(mockRes.status).toHaveBeenCalledWith(500)
-    expect(mockRes.json).toHaveBeenCalledWith({ error: mockError })
-  })
-})
 
 describe('createApiHandlers', () => {
   const mockClaims: JwtPayload = {

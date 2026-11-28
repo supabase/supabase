@@ -1,9 +1,8 @@
 import * as Sentry from '@sentry/react'
 import type { JwtPayload } from '@supabase/supabase-js'
-import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { IS_PLATFORM } from '../constants'
-import { apiAuthenticate, authenticateRequest } from './apiAuthenticate'
+import { authenticateRequest } from './apiAuthenticate'
 import { InvalidJsonError } from './apiHelpers'
 import { isStudioError } from '@/lib/errors/studio-errors'
 import type { ResponseFailure } from '@/types'
@@ -92,40 +91,4 @@ export function createApiHandlers<M extends ApiMethod>(
   wrapped.ANY = async ({ request }) => methodNotAllowed(request)
 
   return wrapped
-}
-
-// Purpose of this apiWrapper is to function like a global catchall for ANY errors
-// It's a safety net as the API service should never drop, nor fail
-
-export async function apiWrapper(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  handler: (
-    req: NextApiRequest,
-    res: NextApiResponse,
-    claims?: JwtPayload
-  ) => Promise<NextApiResponse | Response | void>,
-  options?: { withAuth: boolean }
-): Promise<NextApiResponse | Response | void> {
-  try {
-    const { withAuth } = options || {}
-    let claims: JwtPayload | undefined
-
-    if (IS_PLATFORM && withAuth) {
-      const response = await apiAuthenticate(req, res)
-      if (!isResponseOk(response)) {
-        return res.status(401).json({
-          error: {
-            message: `Unauthorized: ${response.error.message}`,
-          },
-        })
-      }
-      claims = response
-    }
-
-    return await handler(req, res, claims)
-  } catch (error) {
-    Sentry.captureException(error)
-    return res.status(500).json({ error })
-  }
 }

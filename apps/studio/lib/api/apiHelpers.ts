@@ -1,4 +1,3 @@
-import type { IncomingHttpHeaders } from 'node:http'
 import { snakeCase } from 'lodash'
 import z from 'zod'
 
@@ -69,21 +68,6 @@ export const toSnakeCase = (object) => {
   } else {
     return object
   }
-}
-
-/**
- * Converts Node.js `IncomingHttpHeaders` to Fetch API `Headers`.
- */
-export function fromNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
-  const headers = new Headers()
-  for (const [key, value] of Object.entries(nodeHeaders)) {
-    if (Array.isArray(value)) {
-      value.forEach((v) => headers.append(key, v))
-    } else if (value !== undefined) {
-      headers.append(key, value)
-    }
-  }
-  return headers
 }
 
 /**
