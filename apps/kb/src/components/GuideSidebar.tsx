@@ -1,4 +1,4 @@
-import { cn } from 'ui'
+import { cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 import { AiTools, type AiAgent } from 'ui-patterns/AiTools'
 import { AnchorProvider, TocSection } from 'ui-patterns/Toc'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
@@ -24,18 +24,23 @@ const handleAskAiClick = (agent: AiAgent) =>
 
 export const GuideSidebar = ({ items, pageUrl, markdownUrl, className }: GuideSidebarProps) => (
   <AnchorProvider toc={items} single={false}>
-    <div className={cn('flex flex-col gap-8 border-l px-2', className)}>
-      <AiTools
-        pageUrl={pageUrl}
-        markdownUrl={markdownUrl}
-        markdownFallback={getArticleHtml}
-        agentSetupHref="https://supabase.com/docs/guides/ai-tools"
-        onAgentSetupClick={handleAgentSetupClick}
-        onMarkdownCopy={handleMarkdownCopy}
-        onAskAiClick={handleAskAiClick}
-        className="pl-5"
-      />
-      {items.length > 0 ? <TocSection items={items} /> : null}
-    </div>
+    <ScrollRoot className="flex min-h-0 flex-1 flex-col">
+      <ScrollViewport className="py-16">
+        <div className={cn('flex flex-col gap-8 border-l px-2', className)}>
+          <AiTools
+            pageUrl={pageUrl}
+            markdownUrl={markdownUrl}
+            markdownFallback={getArticleHtml}
+            agentSetupHref="https://supabase.com/docs/guides/ai-tools"
+            onAgentSetupClick={handleAgentSetupClick}
+            onMarkdownCopy={handleMarkdownCopy}
+            onAskAiClick={handleAskAiClick}
+            className="pl-5"
+          />
+          {items.length > 0 ? <TocSection items={items} /> : null}
+        </div>
+      </ScrollViewport>
+      <ScrollBar />
+    </ScrollRoot>
   </AnchorProvider>
 )
