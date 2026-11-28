@@ -108,12 +108,11 @@ Insert a record from the Python client:
 supabase.from_('arraytest').insert(
   [
     {
-      id: 2,
-      textarray: ["one", "two", "three", "four"]
+      "id": 2,
+      "textarray": ["one", "two", "three", "four"]
     }
   ]
-)
-.execute()
+).execute()
 ```
 
 </TabPanel>

@@ -587,7 +587,7 @@ def hybrid_search(query_vector, filters):
     # Merge results
     return [
         {
-            **vector.__dict__ if hasattr(vector, '__dict__') else {},
+            **(vector.__dict__ if hasattr(vector, '__dict__') else {}),
             **next((d for d in details if d['id'] == vector.metadata.get('doc_id')), {})
         }
         for vector in vector_results.vectors
