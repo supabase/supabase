@@ -113,6 +113,64 @@ describe('SidePanelEditor.utils.test.ts', () => {
     const formattedRows = formatRowsForInsert({ rows, headers, columns: columns as any })
     expect(formattedRows).toEqual([{ id: 1, value: ['item1', 'item2', 'item3'] }])
   })
+
+  test('formatRowsForInsert should handle unquoted, NULL, escaped, empty, and nested Postgres arrays', () => {
+    const rows = [
+      { id: 1, tags: '{alpha,beta,gamma}', matrix: '{{1,2},{3,4}}' },
+      { id: 2, tags: '{foo,NULL,"NULL","",bar}', matrix: '{}' },
+      { id: 3, tags: '{"hello, world","say \\"hi\\"","a\\\\b"}', matrix: '{{"a",NULL},{}}' },
+      { id: 4, tags: '[1:2]={one,two}', matrix: '' },
+      { id: 5, tags: ['already', 'parsed'], matrix: null },
+    ]
+    const headers = ['id', 'tags', 'matrix']
+    const columns = [
+      { id: '1', name: 'id', data_type: 'bigint', format: 'int8', is_nullable: false },
+      { id: '2', name: 'tags', data_type: 'ARRAY', format: '_text', is_nullable: true },
+      { id: '3', name: 'matrix', data_type: 'ARRAY', format: '_text', is_nullable: true },
+    ] as unknown as Parameters<typeof formatRowsForInsert>[0]['columns']
+
+    const formattedRows = formatRowsForInsert({ rows, headers, columns })
+    expect(formattedRows).toEqual([
+      {
+        id: 1,
+        tags: ['alpha', 'beta', 'gamma'],
+        matrix: [
+          ['1', '2'],
+          ['3', '4'],
+        ],
+      },
+      { id: 2, tags: ['foo', null, 'NULL', '', 'bar'], matrix: [] },
+      {
+        id: 3,
+        tags: ['hello, world', 'say "hi"', 'a\\b'],
+        matrix: [['a', null], []],
+      },
+      { id: 4, tags: ['one', 'two'], matrix: null },
+      { id: 5, tags: ['already', 'parsed'], matrix: null },
+    ])
+  })
+
+  test('formatRowsForInsert should return undefined for malformed Postgres array literals without throwing', () => {
+    const rows = [
+      { id: 1, tags: '{unclosed' },
+      { id: 2, tags: '{a,}' },
+      { id: 3, tags: '{"unclosed}' },
+      { id: 4, tags: '{"a" "b"}' },
+    ]
+    const headers = ['id', 'tags']
+    const columns = [
+      { id: '1', name: 'id', data_type: 'bigint', format: 'int8', is_nullable: false },
+      { id: '2', name: 'tags', data_type: 'ARRAY', format: '_text', is_nullable: true },
+    ] as unknown as Parameters<typeof formatRowsForInsert>[0]['columns']
+
+    const formattedRows = formatRowsForInsert({ rows, headers, columns })
+    expect(formattedRows).toEqual([
+      { id: 1, tags: undefined },
+      { id: 2, tags: undefined },
+      { id: 3, tags: undefined },
+      { id: 4, tags: undefined },
+    ])
+  })
 })
 
 describe('getRowFromSidePanel', () => {

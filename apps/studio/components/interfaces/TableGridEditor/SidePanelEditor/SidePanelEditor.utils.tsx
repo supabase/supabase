@@ -905,6 +905,132 @@ export const updateTable = async ({
 }
 
 /**
+ * Parses a PostgreSQL array literal (e.g. `{a,b}`, `{"a,b",NULL}`, `{{1,2},{3,4}}`)
+ * into a nested JS array matching `jsonb_populate_recordset` expectations.
+ * Returns `undefined` for malformed literals so callers fall back safely.
+ */
+function parsePostgresArrayLiteral(input: string): unknown[] | undefined {
+  const trimmed = input.trim()
+  // Support optional explicit dimension bounds prefix such as `[1:3]={a,b,c}`
+  const eqIndex = trimmed.indexOf('=')
+  const hasDimPrefix =
+    trimmed.startsWith('[') &&
+    eqIndex !== -1 &&
+    /^(\[-?\d+:-?\d+\])+$/.test(trimmed.slice(0, eqIndex))
+  const literal = hasDimPrefix ? trimmed.slice(eqIndex + 1).trim() : trimmed
+
+  if (!literal.startsWith('{') || !literal.endsWith('}')) {
+    return undefined
+  }
+
+  let pos = 0
+  const skipWhitespace = () => {
+    while (pos < literal.length && /\s/.test(literal[pos])) {
+      pos += 1
+    }
+  }
+
+  const readQuotedString = (): string | undefined => {
+    pos += 1 // skip opening quote
+    let value = ''
+    while (pos < literal.length) {
+      const ch = literal[pos]
+      if (ch === '\\') {
+        if (pos + 1 >= literal.length) return undefined
+        value += literal[pos + 1]
+        pos += 2
+      } else if (ch === '"') {
+        pos += 1 // skip closing quote
+        return value
+      } else {
+        value += ch
+        pos += 1
+      }
+    }
+    return undefined
+  }
+
+  const readUnquotedValue = (): string | null | undefined => {
+    let raw = ''
+    let lastNonSpaceLength = 0
+    let hasEscape = false
+
+    while (pos < literal.length) {
+      const ch = literal[pos]
+      if (ch === ',' || ch === '}') break
+      if (ch === '"' || ch === '{') return undefined
+
+      if (ch === '\\') {
+        if (pos + 1 >= literal.length) return undefined
+        hasEscape = true
+        raw += literal[pos + 1]
+        lastNonSpaceLength = raw.length
+        pos += 2
+      } else {
+        raw += ch
+        if (!/\s/.test(ch)) {
+          lastNonSpaceLength = raw.length
+        }
+        pos += 1
+      }
+    }
+
+    const trimmedValue = raw.slice(0, lastNonSpaceLength)
+    if (trimmedValue.length === 0) return undefined
+    if (!hasEscape && trimmedValue.toUpperCase() === 'NULL') return null
+    return trimmedValue
+  }
+
+  const readArray = (): unknown[] | undefined => {
+    if (literal[pos] !== '{') return undefined
+    pos += 1
+    skipWhitespace()
+
+    const items: unknown[] = []
+    if (literal[pos] === '}') {
+      pos += 1
+      return items
+    }
+
+    while (pos < literal.length) {
+      skipWhitespace()
+      if (pos >= literal.length || literal[pos] === ',' || literal[pos] === '}') {
+        return undefined
+      }
+
+      let element: unknown
+      if (literal[pos] === '{') {
+        element = readArray()
+      } else if (literal[pos] === '"') {
+        element = readQuotedString()
+      } else {
+        element = readUnquotedValue()
+      }
+
+      if (element === undefined) return undefined
+      items.push(element)
+
+      skipWhitespace()
+      if (literal[pos] === ',') {
+        pos += 1
+      } else if (literal[pos] === '}') {
+        pos += 1
+        return items
+      } else {
+        return undefined
+      }
+    }
+
+    return undefined
+  }
+
+  const parsed = readArray()
+  if (parsed === undefined) return undefined
+  skipWhitespace()
+  return pos === literal.length ? parsed : undefined
+}
+
+/**
  * Used in insertRowsViaSpreadsheet + insertTableRows
  */
 export const formatRowsForInsert = ({
@@ -928,23 +1054,33 @@ export const formatRowsForInsert = ({
       const column = columns?.find((c) => c.name === header)
 
       const originalValue = row[header]
+      const isNullableEmpty =
+        originalValue === '' &&
+        Boolean(column?.is_nullable) &&
+        emptyStringAsNullHeaders.includes(header)
 
       if ((column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(originalValue)
+        if (isNullableEmpty) {
+          formattedRow[header] = null
+        } else if (typeof originalValue === 'object') {
+          formattedRow[header] = originalValue
+        } else {
+          formattedRow[header] = tryParseJson(originalValue)
+        }
       } else if ((column?.data_type ?? '') === 'ARRAY') {
-        if (
-          typeof originalValue === 'string' &&
-          originalValue.startsWith('{') &&
-          originalValue.endsWith('}')
-        ) {
-          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
-          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
+        if (isNullableEmpty) {
+          formattedRow[header] = null
+        } else if (Array.isArray(originalValue) || originalValue === null) {
+          formattedRow[header] = originalValue
+        } else if (typeof originalValue === 'string') {
+          const parsedPgArray = parsePostgresArrayLiteral(originalValue)
+          formattedRow[header] =
+            parsedPgArray !== undefined ? parsedPgArray : tryParseJson(originalValue)
         } else {
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] =
-          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
+        formattedRow[header] = isNullableEmpty ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
