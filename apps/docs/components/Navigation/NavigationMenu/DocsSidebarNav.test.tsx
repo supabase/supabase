@@ -227,6 +227,17 @@ describe('DocsSidebarNav', () => {
     }
   )
 
+  it('opens a reference with its nav in the sidebar as a level under the reference list', () => {
+    navigation.pathname = '/reference/api/introduction'
+    vi.mocked(useNavItems).mockReturnValue(option1NavItems)
+
+    renderSidebar(MenuId.RefApi)
+
+    expect(screen.getByRole('button', { name: 'Management API, back to Reference' })).toBeTruthy()
+    expect(screen.getByText('page tree')).toBeTruthy()
+    expect(screen.queryByRole('link', { name: 'JavaScript' })).toBeNull()
+  })
+
   it('puts the knowledge base first in the footer and leaves out the changelog', () => {
     render(<DocsSidebarResources />)
 

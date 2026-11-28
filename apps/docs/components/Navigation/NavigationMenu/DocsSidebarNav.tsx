@@ -138,8 +138,12 @@ const getPageStack = ({
   activeGroup,
   referenceSection,
 }: PageStackOptions): SidebarLevel[] => {
-  // reference pages have a nav of their own, so the reference list is their deepest level
-  if (referenceSection) return [SECTIONS_LEVEL, { kind: 'section', section: referenceSection }]
+  if (referenceSection) {
+    const referenceLevel: SidebarLevel = { kind: 'section', section: referenceSection }
+    // most reference pages show their nav in the right rail, so the reference list is their deepest level
+    if (!activeItem?.hasPageNav) return [SECTIONS_LEVEL, referenceLevel]
+    return [SECTIONS_LEVEL, referenceLevel, { kind: 'product', item: activeItem }]
+  }
   if (!activeItem) return [SECTIONS_LEVEL]
   const productLevel: SidebarLevel = { kind: 'product', item: activeItem }
   // a single page section, like start, has no section list of its own
@@ -411,6 +415,8 @@ const LevelView = ({ level }: LevelViewProps) => {
   const { additionalNavItems } = useDocsSidebarNav()
   if (level.kind === 'sections') return <SectionsView />
   if (level.kind === 'section') return <GroupView group={level.section} />
+  // the page renders this nav, so the level stays empty until its route loads
+  if (level.item.hasPageNav) return null
   return (
     <NavigationMenuGuideList id={level.item.level ?? ''} additionalNavItems={additionalNavItems} />
   )
@@ -510,7 +516,7 @@ const GroupView = ({ group }: GroupViewProps) => {
           const hasGuideTree = isMenu(item.level ? navItems[item.level] : undefined)
           return (
             <li key={`${group.label}-${item.label}`} className="flex flex-col">
-              {hasGuideTree ? (
+              {hasGuideTree || item.hasPageNav ? (
                 <ProductLink item={item} isActive={isActive} onLevelOpen={onLevelOpen}>
                   <SectionLabel item={item} />
                 </ProductLink>

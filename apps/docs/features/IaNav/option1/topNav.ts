@@ -250,6 +250,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-api',
             href: '/reference/api/introduction',
             level: 'reference_api',
+            hasPageNav: true,
           },
           { label: 'UI Library', icon: 'ui', href: 'https://supabase.com/library', level: 'ui' },
         ],

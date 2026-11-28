@@ -165,5 +165,5 @@ const GuideTocLink = ({ item, isActive, hasActiveBar = false, className }: Guide
   </TocPrimitive.TOCItem>
 )
 
-export { GuidesSidebar }
+export { GuidesSidebar, GuideToc }
 export type { TOCHeader }

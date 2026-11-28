@@ -28,6 +28,7 @@ type MenuItem = {
   new?: boolean
   experimental?: boolean
   enabled?: boolean
+  hasPageNav?: boolean
 }
 
 export type DropdownMenuItem = MenuItem & {
