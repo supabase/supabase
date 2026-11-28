@@ -25,6 +25,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ColumnDefaultValue } from '../ColumnEditor/ColumnDefaultValue'
+import { isIntegerType } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -305,9 +306,7 @@ export const Column = ({
             enumTypes={enumTypes}
             showLabel={false}
             size="small"
-            className={`lg:gap-0 ${
-              column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
-            }`}
+            className={`lg:gap-0 ${isIntegerType(column) && column.isIdentity ? 'opacity-50' : ''}`}
             data-testid={`${column.name}-default-value`}
             aria-label="Column default value"
             onUpdateField={onUpdateColumn}
@@ -393,7 +392,7 @@ export const Column = ({
                   />
                 </FormItemLayout>
               )}
-              {column.format.includes('int') && (
+              {isIntegerType(column) && (
                 <FormItemLayout
                   isReactForm={false}
                   layout="flex"

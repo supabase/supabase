@@ -5,6 +5,7 @@ import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { nullSuggestion, typeExpressionSuggestions } from './ColumnEditor.constants'
 import type { Suggestion } from './ColumnEditor.types'
+import { isIntegerType } from './ColumnEditor.utils'
 import InputWithSuggestions from './InputWithSuggestions'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
@@ -39,7 +40,7 @@ export const ColumnDefaultValue = ({
   const { format, isNullable, isIdentity } = columnFields
   const suggestions: Suggestion[] = getDefaultValueSuggestions(format, isNullable)
   // Identity columns have their default value assigned by Postgres, so it isn't user-editable
-  const disabled = format.includes('int') && isIdentity
+  const disabled = isIntegerType(columnFields) && isIdentity
 
   // If selected column type is a user-defined enum, show a dropdown list of options
   const isEnum: boolean =

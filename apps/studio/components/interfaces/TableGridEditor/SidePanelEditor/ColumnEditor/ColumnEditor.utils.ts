@@ -3,6 +3,7 @@ import type { PGColumn } from '@supabase/pg-meta'
 import { isNull } from 'lodash'
 import { toast } from 'sonner'
 
+import { INTEGER_TYPES } from '../SidePanelEditor.constants'
 import {
   ColumnField,
   CreateColumnPayload,
@@ -40,6 +41,14 @@ export const displayColumnType = (
   const qualified = normalized ? `${normalized}.${bareFormat}` : bareFormat
   return isArray ? `${qualified}[]` : qualified
 }
+
+// Postgres only allows identity columns on smallint, integer and bigint. Match exact type names,
+// since names like `appointment_status` or `interval` merely contain "int". Built-in types carry
+// no formatSchema here.
+export const isIntegerType = ({
+  format,
+  formatSchema,
+}: Pick<ColumnField, 'format' | 'formatSchema'>) => !formatSchema && INTEGER_TYPES.includes(format)
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -136,7 +145,7 @@ export const generateCreateColumnPayload = (
   table: RetrieveTableResult,
   field: ColumnField
 ): CreateColumnPayload => {
-  const isIdentity = field.format.includes('int') ? field.isIdentity : false
+  const isIdentity = isIntegerType(field) ? field.isIdentity : false
   const defaultValue = field.defaultValue
   const payload: CreateColumnPayload = {
     schema: table.schema,
